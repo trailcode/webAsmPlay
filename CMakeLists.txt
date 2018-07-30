@@ -83,8 +83,22 @@ file(GLOB planargraphAlgorithmSrc "geos/src/planargraph/algorithm/*.cpp")
 file(GLOB precisionSrc "geos/src/precision/*.cpp")
 file(GLOB linearrefSrc "geos/src/linearref/*.cpp")
 
-file(GLOB SOURCES "test.cpp"
+include_directories(GLUTesselator/include)
+
+file(GLOB GLUTesselatorSrc "GLUTesselator/src/dict.cpp",
+        "GLUTesselator/src/mesh.cpp",
+        "GLUTesselator/src/render.cpp",
+        "GLUTesselator/src/tess.cpp",
+        "GLUTesselator/src/geom.cpp",
+        "GLUTesselator/src/memalloc.cpp",
+        "GLUTesselator/src/normal.cpp",
+        "GLUTesselator/src/priorityq.cpp",
+        "GLUTesselator/src/sweep.cpp",
+        "GLUTesselator/src/tessmono.cpp",
+        "GLUTesselator/src/tessellate.cpp"
         )
+
+file(GLOB SOURCES "test.cpp")
 
 add_executable(testStudent  ${SOURCES}
                             ${geomSrc}
@@ -123,6 +137,7 @@ add_executable(testStudent  ${SOURCES}
                             ${planargraphAlgorithmSrc}
                             ${precisionSrc}
                             ${linearrefSrc}
+                            ${GLUTesselatorSrc}
         )
 
 
