@@ -18,6 +18,7 @@ message(STATUS "Building with emcc")
     #SET(CMAKE_CXX_LINK_FLAGS "-s EXPORTED_FUNCTIONS=\"['_doIta', 'MyClass']\" --bind ")
 #SET(CMAKE_CXX_LINK_FLAGS "-s --bind -s WASM=1")
 #set(CMAKE_REQUIRED_FLAGS "${EMCC_LINKER_FLAGS}")
+SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
 
     # adjust the default behaviour of the FIND_XXX() commands:
     # search headers and libraries in the target environment, search
@@ -100,8 +101,7 @@ file(GLOB GLUTesselatorSrc "GLUTesselator/src/dict.cpp",
 
 file(GLOB SOURCES "test.cpp")
 
-add_executable(testStudent  ${SOURCES}
-                            ${geomSrc}
+add_library(geos  ${geomSrc}
                             ${geomPrepSrc}
                             ${geomUtilSrc}
                             ${iOSrc}
@@ -140,5 +140,30 @@ add_executable(testStudent  ${SOURCES}
                             ${GLUTesselatorSrc}
         )
 
+
+add_executable(testStudent ${SOURCES})
+target_link_libraries(testStudent geos)
+
+set(WEB_FILES
+        hi.html
+        index.html
+        triangle.js
+        jquery.mousewheel.js
+        styles/main.css
+        )
+
+message('fff', ${CMAKE_CURRENT_SOURCE_DIR})
+
+foreach(webfile ${WEB_FILES})
+    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${webfile}"
+            COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${webfile}"
+            "${CMAKE_CURRENT_BINARY_DIR}/${webfile}"
+            DEPENDS   "${CMAKE_CURRENT_SOURCE_DIR}/${webfile}"
+            )
+    list(APPEND webfile_dest "${CMAKE_CURRENT_BINARY_DIR}/${webfile}")
+
+endforeach(webfile)
+
+ADD_CUSTOM_TARGET(web ALL DEPENDS ${webfile_dest})
 
 
