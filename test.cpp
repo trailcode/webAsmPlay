@@ -73,7 +73,7 @@ void run_example(const double vertices_array[],
         free(tris_out);
 }
 
-
+/*
 
 extern "C" {
     int main() {
@@ -114,6 +114,7 @@ extern "C" {
         return 0;
     }
 }
+*/
 
 /*
 EMSCRIPTEN_BINDINGS(module) {

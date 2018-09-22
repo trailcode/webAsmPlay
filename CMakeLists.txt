@@ -140,9 +140,31 @@ add_library(geos  ${geomSrc}
                             ${GLUTesselatorSrc}
         )
 
+file(GLOB imguiSrc  "glfw-imgui/glfw-imgui.cpp"
+                    "glfw-imgui/imgui_impl_glfw_gl3.cpp"
+                    "glfw-imgui/imgui_impl_glfw_gl3.h"
+                    "glfw-imgui/GLFW/glfw3.h"
+                    "glfw-imgui/imgui/imconfig.h"
+                    "glfw-imgui/imgui/imgui.cpp"
+                    "glfw-imgui/imgui/imgui.h"
+                    "glfw-imgui/imgui/imgui_demo.cpp"
+                    "glfw-imgui/imgui/imgui_draw.cpp"
+                    "glfw-imgui/imgui/imgui_internal.h"
+                    "glfw-imgui/imgui/stb_rect_pack.h"
+                    "glfw-imgui/imgui/stb_textedit.h"
+                    "glfw-imgui/imgui/stb_truetype.h"
+                    )
+
+include_directories(glfw-imgui)
+include_directories(glfw-imgui/imgui)
+
+add_library(imgui ${imguiSrc})
 
 add_executable(testStudent ${SOURCES})
-target_link_libraries(testStudent geos)
+
+SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui/library_glfw.js --js-library ../glfw-imgui/library_gl.js ")
+
+target_link_libraries(testStudent geos imgui)
 
 set(WEB_FILES
         hi.html
