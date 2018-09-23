@@ -436,7 +436,7 @@ void Refresh(GLFWwindow* window)
 {
     glfwPollEvents();
     glfwMarkWindowForRefresh(window);
-    //cout << "Here " << endl;
+    //cout << "Here Comment back!" << endl;
 }
 
 static bool show_test_window = true;
@@ -452,16 +452,16 @@ extern "C" {
 extern void my_js();
 }
 
-extern "C" void invoke_callback(int callback_id, const char* text);
+//extern "C" void invoke_callback(int callback_id, const char* text);
 
 void my_c_function(int callback_id) {
-    invoke_callback( callback_id, "Hello World!" );
+    //invoke_callback( callback_id, "Hello World!" );
 }
 
 //====================
 
 TrackBallInteractor trackBallInteractor;
-Camera camera;
+Camera * camera = NULL;
 
 void mainLoop(GLFWwindow* window) {
     // Game loop
@@ -607,7 +607,7 @@ void mainLoop(GLFWwindow* window) {
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 
-    mat4 view = camera.getMatrix();
+    mat4 view = camera->getMatrix();
     mat4 model = mat4(1.0);
     mat4 projection = perspective(45.0, double(display_w) / double(display_h), 0.1, 100.0);
 
@@ -677,9 +677,27 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     Refresh(window);
 }
 
+void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+{
+    //cout << "x " << xpos << " y " << ypos << endl;
+
+    trackBallInteractor.setClickPoint(xpos, ypos);
+    trackBallInteractor.update();
+
+    if (render_when_mouse_up || mouse_buttons_down)
+    {
+        Refresh(window);
+    }
+}
+
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     dmess("ScrollCallback " << xoffset << " " << yoffset);
+
+    const double delta = yoffset;
+
+    trackBallInteractor.setScrollDirection(delta > 0);
+    trackBallInteractor.update();
 
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
     Refresh(window);
@@ -714,16 +732,6 @@ void WindowFocusCallback(GLFWwindow* window, int focused)
     }
 }
 
-void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
-{
-    //cout << "x " << xpos << " y " << ypos << endl;
-
-    if (render_when_mouse_up || mouse_buttons_down)
-    {
-        Refresh(window);
-    }
-}
-
 void CursorEnterCallback(GLFWwindow* window, int /* entered */)
 {
     Refresh(window);
@@ -740,8 +748,16 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // APPLE
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     glfwWindowHint(GLFW_ALPHA_BITS, 0);
+
+    /*
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+*/
 
     // Create a GLFWwindow object that we can use for GLFW's functions
     window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr);
@@ -773,6 +789,8 @@ int main()
     glfwGetFramebufferSize(window, &width, &height);  
     glViewport(0, 0, width, height);
     trackBallInteractor.setScreenSize(width, height);
+
+    camera = trackBallInteractor.getCamera();
 
     setupAnotherShader();
 

@@ -119,6 +119,20 @@ endif()
 
 #add_library(imgui ${imguiSrc})
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
+    SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
+    SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui/library_glfw.js --js-library ../glfw-imgui/library_gl.js ")
+else()
+
+    find_package(glfw3 REQUIRED)
+    find_package(glew REQUIRED)
+    include_directories(${GLEW_INCLUDE_DIRS})
+    link_libraries(${GLEW_LIBRARIES})
+    link_libraries(${OPENGL_gl_LIBRARY} glfw)
+    message("Glew" ${GLEW_LIBRARIES})
+
+endif()
+
 add_executable(testStudent  ${SOURCES}
                             ${imguiSrc}
                             ${geomSrc}
@@ -159,11 +173,6 @@ add_executable(testStudent  ${SOURCES}
                             ${linearrefSrc}
                             ${GLUTesselatorSrc}
 )
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
-    SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
-    SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui/library_glfw.js --js-library ../glfw-imgui/library_gl.js ")
-endif()
 
 #target_link_libraries(testStudent geos imgui)
 
