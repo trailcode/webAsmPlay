@@ -12,7 +12,7 @@
 
 #include <imgui.h>
 #include "imgui_impl_glfw_gl3.h"
-
+#include "imgui_internal.h"
 #include <iostream>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
@@ -718,30 +718,35 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     //dmess("ScrollCallback " << xoffset << " " << yoffset);
 
-    int state = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
-    
-    if (state == GLFW_PRESS)
+    ImGuiContext & g = *GImGui;
+
+    if(!g.IO.WantCaptureMouse)
     {
-        //dmess("GLFW_KEY_LEFT_SHIFT");
-        int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
-        lastShiftKeyDownMousePos += Vec2d(xoffset, 0);
-        trackBallInteractor.setClickPoint(lastShiftKeyDownMousePos.x % display_w, lastShiftKeyDownMousePos.y % display_h);
+        int state = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
+        
+        if (state == GLFW_PRESS)
+        {
+            //dmess("GLFW_KEY_LEFT_SHIFT");
+            int display_w, display_h;
+            glfwGetFramebufferSize(window, &display_w, &display_h);
+            lastShiftKeyDownMousePos += Vec2d(xoffset, 0);
+            trackBallInteractor.setClickPoint(lastShiftKeyDownMousePos.x % display_w, lastShiftKeyDownMousePos.y % display_h);
+            trackBallInteractor.update();
+            //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
+        }
+
+        state = glfwGetKey(window, GLFW_KEY_LEFT_ALT);
+
+        if (state == GLFW_PRESS)
+        {
+            dmess("GLFW_KEY_LEFT_ALT");
+        }
+
+        const double delta = yoffset;
+
+        trackBallInteractor.setScrollDirection(delta > 0);
         trackBallInteractor.update();
-        //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
     }
-
-    state = glfwGetKey(window, GLFW_KEY_LEFT_ALT);
-
-    if (state == GLFW_PRESS)
-    {
-        dmess("GLFW_KEY_LEFT_ALT");
-    }
-
-    const double delta = yoffset;
-
-    trackBallInteractor.setScrollDirection(delta > 0);
-    trackBallInteractor.update();
 
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
     Refresh(window);
@@ -750,24 +755,28 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     //dmess("key " << key << " scancode " << scancode << " action " << action << " mods " << mods);
-    
     switch(key)
     {
         case GLFW_KEY_LEFT_SHIFT:
-        {
+        case GLFW_KEY_LEFT_ALT:
+
             trackBallInteractor.setLeftClicked(action);
 
             if(action)
             {
-                //dmess("GLFW_KEY_LEFT_SHIFT");
                 double xPos;
                 double yPos;
                 glfwGetCursorPos(window, &xPos, &yPos);
                 lastShiftKeyDownMousePos = Vec2i(xPos, yPos);
-                //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
             }
+
             break;
-        }
+    }
+
+    switch(key)
+    {
+        case GLFW_KEY_LEFT_SHIFT: trackBallInteractor.setMotionLeftClick(ARC); break;
+        case GLFW_KEY_LEFT_ALT:   trackBallInteractor.setMotionLeftClick(PAN); break;
     }
     
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
@@ -825,7 +834,7 @@ glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 */
 
     // Create a GLFWwindow object that we can use for GLFW's functions
-    window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "WebAsmPlay", nullptr, nullptr);
     glfwMakeContextCurrent(window);
 
     // Set the required callback functions
