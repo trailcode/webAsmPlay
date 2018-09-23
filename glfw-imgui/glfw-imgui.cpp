@@ -28,12 +28,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <tceGeom/vec2.h>
 //#include <GLU/tessellate.h>
 
 using namespace std;
 using namespace geos::geom;
 using namespace rsmz;
 using namespace glm;
+using namespace tce::geom;
 
 #define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
@@ -460,6 +462,23 @@ void my_c_function(int callback_id) {
 
 //====================
 
+string mat4ToStr(const mat4 & m)
+    {
+       	char buf[1024];
+
+        sprintf(buf,
+                "[[%2.9f, %2.9f, %2.9f, %2.9f]\n"
+                " [%2.9f, %2.9f, %2.9f, %2.9f]\n"
+                " [%2.9f, %2.9f, %2.9f, %2.9f]\n"
+                " [%2.9f, %2.9f, %2.9f, %2.9f]]\n",
+                static_cast<double>(m[0][0]), static_cast<double>(m[0][1]), static_cast<double>(m[0][2]), static_cast<double>(m[0][3]),
+                static_cast<double>(m[1][0]), static_cast<double>(m[1][1]), static_cast<double>(m[1][2]), static_cast<double>(m[1][3]),
+                static_cast<double>(m[2][0]), static_cast<double>(m[2][1]), static_cast<double>(m[2][2]), static_cast<double>(m[2][3]),
+                static_cast<double>(m[3][0]), static_cast<double>(m[3][1]), static_cast<double>(m[3][2]), static_cast<double>(m[3][3]));
+
+        return buf;
+    }
+
 TrackBallInteractor trackBallInteractor;
 Camera * camera = NULL;
 
@@ -608,6 +627,7 @@ void mainLoop(GLFWwindow* window) {
     glDisable(GL_DEPTH_TEST);
 
     mat4 view = camera->getMatrix();
+    dmess("view " << mat4ToStr(view));
     mat4 model = mat4(1.0);
     mat4 projection = perspective(45.0, double(display_w) / double(display_h), 0.1, 100.0);
 
@@ -677,14 +697,16 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     Refresh(window);
 }
 
+Vec2i lastShiftKeyDownMousePos;
+
 void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    //cout << "x " << xpos << " y " << ypos << endl;
+    dmess("x " << xpos << " y " << ypos);
 
     trackBallInteractor.setClickPoint(xpos, ypos);
     trackBallInteractor.update();
 
-    if (render_when_mouse_up || mouse_buttons_down)
+    //if (render_when_mouse_up || mouse_buttons_down)
     {
         Refresh(window);
     }
@@ -693,6 +715,26 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     dmess("ScrollCallback " << xoffset << " " << yoffset);
+
+    int state = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
+    
+    if (state == GLFW_PRESS)
+    {
+        dmess("GLFW_KEY_LEFT_SHIFT");
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        lastShiftKeyDownMousePos += Vec2d(xoffset, 0);
+        trackBallInteractor.setClickPoint(lastShiftKeyDownMousePos.x % display_w, lastShiftKeyDownMousePos.y % display_h);
+        trackBallInteractor.update();
+        dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
+    }
+
+    state = glfwGetKey(window, GLFW_KEY_LEFT_ALT);
+
+    if (state == GLFW_PRESS)
+    {
+        dmess("GLFW_KEY_LEFT_ALT");
+    }
 
     const double delta = yoffset;
 
@@ -705,6 +747,28 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+    dmess("key " << key << " scancode " << scancode << " action " << action << " mods " << mods);
+
+    
+    switch(key)
+    {
+        case GLFW_KEY_LEFT_SHIFT:
+        {
+            trackBallInteractor.setLeftClicked(action);
+            
+            if(action)
+            {
+                dmess("GLFW_KEY_LEFT_SHIFT");
+                double xPos;
+                double yPos;
+                glfwGetCursorPos(window, &xPos, &yPos);
+                lastShiftKeyDownMousePos = Vec2i(xPos, yPos);
+                dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
+            }
+            break;
+        }
+    }
+    
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
     Refresh(window);
 }
@@ -790,7 +854,11 @@ glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glViewport(0, 0, width, height);
     trackBallInteractor.setScreenSize(width, height);
 
+    dmess("width " << width << " height " << height);
+
     camera = trackBallInteractor.getCamera();
+    trackBallInteractor.getCamera()->reset();
+    trackBallInteractor.setSpeed(3);
 
     setupAnotherShader();
 
