@@ -603,8 +603,6 @@ void mainLoop(GLFWwindow* window) {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
-
-
     static float time = 0.f;
     if (!paused)
     {
@@ -627,7 +625,11 @@ void mainLoop(GLFWwindow* window) {
     glDisable(GL_DEPTH_TEST);
 
     mat4 view = camera->getMatrix();
-    dmess("view " << mat4ToStr(view));
+
+    ImGui::Begin("View Matrix");
+    ImGui::Text(mat4ToStr(view).c_str());
+    ImGui::End();
+    //dmess("view " << mat4ToStr(view));
     mat4 model = mat4(1.0);
     mat4 projection = perspective(45.0, double(display_w) / double(display_h), 0.1, 100.0);
 
@@ -701,7 +703,7 @@ Vec2i lastShiftKeyDownMousePos;
 
 void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    dmess("x " << xpos << " y " << ypos);
+    //dmess("x " << xpos << " y " << ypos);
 
     trackBallInteractor.setClickPoint(xpos, ypos);
     trackBallInteractor.update();
@@ -714,19 +716,19 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    dmess("ScrollCallback " << xoffset << " " << yoffset);
+    //dmess("ScrollCallback " << xoffset << " " << yoffset);
 
     int state = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
     
     if (state == GLFW_PRESS)
     {
-        dmess("GLFW_KEY_LEFT_SHIFT");
+        //dmess("GLFW_KEY_LEFT_SHIFT");
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         lastShiftKeyDownMousePos += Vec2d(xoffset, 0);
         trackBallInteractor.setClickPoint(lastShiftKeyDownMousePos.x % display_w, lastShiftKeyDownMousePos.y % display_h);
         trackBallInteractor.update();
-        dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
+        //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
     }
 
     state = glfwGetKey(window, GLFW_KEY_LEFT_ALT);
@@ -747,23 +749,22 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    dmess("key " << key << " scancode " << scancode << " action " << action << " mods " << mods);
-
+    //dmess("key " << key << " scancode " << scancode << " action " << action << " mods " << mods);
     
     switch(key)
     {
         case GLFW_KEY_LEFT_SHIFT:
         {
             trackBallInteractor.setLeftClicked(action);
-            
+
             if(action)
             {
-                dmess("GLFW_KEY_LEFT_SHIFT");
+                //dmess("GLFW_KEY_LEFT_SHIFT");
                 double xPos;
                 double yPos;
                 glfwGetCursorPos(window, &xPos, &yPos);
                 lastShiftKeyDownMousePos = Vec2i(xPos, yPos);
-                dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
+                //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
             }
             break;
         }
