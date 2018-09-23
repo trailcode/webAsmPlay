@@ -4,48 +4,18 @@ set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_BUILD_TYPE Debug)
  
 set (CMAKE_CXX_STANDARD 11)
- 
-message(STATUS "Building with emcc")
-    # which C and C++ compiler to use
-    #SET(CMAKE_C_COMPILER   emcc)
-    #SET(CMAKE_CXX_COMPILER em++)
-    #SET(CMAKE_AR           emar)
-    #SET(CMAKE_RANLIB       emranlib)
-    #SET(CMAKE_C_FLAGS      -g)
-    #SET(CMAKE_CXX_FLAGS    "-g -O2")
-    #SET(CMAKE_CXX_FLAGS    "-O2")
-#SET(CMAKE_CXX_FLAGS    "-O0")
-    #SET(CMAKE_CXX_LINK_FLAGS "-s EXPORTED_FUNCTIONS=\"['_doIta', 'MyClass']\" --bind ")
-#SET(CMAKE_CXX_LINK_FLAGS "-s --bind -s WASM=1")
-#set(CMAKE_REQUIRED_FLAGS "${EMCC_LINKER_FLAGS}")
-SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
 
-    # adjust the default behaviour of the FIND_XXX() commands:
-    # search headers and libraries in the target environment, search
-    # programs in the host environment
-    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
-    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
-
-    #SET( GMP_RUN_RES "0" CACHE STRING "Result from TRY_RUN" FORCE)
-    #SET( GMP_RUN_RES__TRYRUN_OUTPUT "version=5.1.1" CACHE STRING "Output from TRY_RUN" FORCE)
-    #SET( MPFR_RUN_RES "0" CACHE STRING "Result from TRY_RUN" FORCE)
-    #SET( MPFR_RUN_RES__TRYRUN_OUTPUT "version=3.1.1" CACHE STRING "Output from TRY_RUN" FORCE)
-
-    #set(EMCC_LINKER_FLAGS "-s SAFE_HEAP=1 --bind -s WASM=1")
-
-    #add_definitions(-DEMCC_BUILD)
-	#add_definitions(-DEMSCRIPTEN=1)
-	#add_definitions(-DENVIRONMENT_IS_WEB=1)
-	#add_definitions(-DENVIRONMENT_IS_NODE=0)
-	#add_definitions("-s WASM=1")
-	#add_definitions(-s NODERAWFS=0)
- 
-include_directories(geos/include)
-
-#SET_SOURCE_FILES_PROPERTIES("test.cpp" PROPERTIES COMPILE_FLAGS -O0)
+if(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
+  message(" * C++ compiler: Emscripten")
+  set(CMAKE_CXX_COMPILER_ID "Emscripten")
+else()
+  message(" * C++ cimpiler: ${CMAKE_CXX_COMPILER_ID}")
+endif()
 
 file(GLOB utilSrc "geos/src/util/*.cpp")
 file(GLOB geomSrc "geos/src/geom/*.cpp")
@@ -99,9 +69,59 @@ file(GLOB GLUTesselatorSrc "GLUTesselator/src/dict.cpp",
         "GLUTesselator/src/tessellate.cpp"
         )
 
-file(GLOB SOURCES "test.cpp")
+file(GLOB tceGeom_SRC "./tceGeom/src/*.cpp" "./tceGeom/inc/tceGeom/*.h")
+file(GLOB tceOpenSteer_SRC "./tceOpenSteer/src/*.cpp" "./tceOpenSteer/inc/tceOpenSteer/*.h")
+file(GLOB tceCore_SRC "./tceCore/inc/tceCore/*.h")
+file(GLOB tceRender_SRC "./tceRender/src/*.cpp" "./tceRender/inc/tceRender/*.h")
 
-add_library(geos  ${geomSrc}
+file(GLOB SOURCES   "test.cpp"
+                    "Camera.cpp"
+                    "Camera.h"
+                    "debiug.cpp"
+                    "debug.h"
+                    "TrackBallInteractor.cpp"
+                    "TrackBallInteractor.h"
+                    ${tceGeom_SRC}
+                    ${tceCore_SRC}
+                    ${tceOpenSteer_SRC}
+                    ${tceRender_SRC})
+
+file(GLOB imguiSrc  "glfw-imgui/glfw-imgui.cpp"
+                    "glfw-imgui/imgui_impl_glfw_gl3.cpp"
+                    "glfw-imgui/imgui_impl_glfw_gl3.h"
+                    "glfw-imgui/GLFW/glfw3.h"
+                    "glfw-imgui/imgui/imconfig.h"
+                    "glfw-imgui/imgui/imgui.cpp"
+                    "glfw-imgui/imgui/imgui.h"
+                    "glfw-imgui/imgui/imgui_demo.cpp"
+                    "glfw-imgui/imgui/imgui_draw.cpp"
+                    "glfw-imgui/imgui/imgui_internal.h"
+                    "glfw-imgui/imgui/stb_rect_pack.h"
+                    "glfw-imgui/imgui/stb_textedit.h"
+                    "glfw-imgui/imgui/stb_truetype.h"
+                    )
+
+include_directories(geos/include)
+include_directories(glfw-imgui)
+include_directories(glfw-imgui/imgui)
+include_directories(glm)
+INCLUDE_DIRECTORIES(./tceGeom/inc)
+INCLUDE_DIRECTORIES(./tceCore/inc)
+INCLUDE_DIRECTORIES(./tceOpenSteer/inc)
+INCLUDE_DIRECTORIES(./tceRender/inc)
+INCLUDE_DIRECTORIES(./)
+
+add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
+    
+if(APPLE)
+    SET(CMAKE_CXX_LINK_FLAGS "-framework OpenGL")
+endif()
+
+#add_library(imgui ${imguiSrc})
+
+add_executable(testStudent  ${SOURCES}
+                            ${imguiSrc}
+                            ${geomSrc}
                             ${geomPrepSrc}
                             ${geomUtilSrc}
                             ${iOSrc}
@@ -138,33 +158,14 @@ add_library(geos  ${geomSrc}
                             ${precisionSrc}
                             ${linearrefSrc}
                             ${GLUTesselatorSrc}
-        )
+)
 
-file(GLOB imguiSrc  "glfw-imgui/glfw-imgui.cpp"
-                    "glfw-imgui/imgui_impl_glfw_gl3.cpp"
-                    "glfw-imgui/imgui_impl_glfw_gl3.h"
-                    "glfw-imgui/GLFW/glfw3.h"
-                    "glfw-imgui/imgui/imconfig.h"
-                    "glfw-imgui/imgui/imgui.cpp"
-                    "glfw-imgui/imgui/imgui.h"
-                    "glfw-imgui/imgui/imgui_demo.cpp"
-                    "glfw-imgui/imgui/imgui_draw.cpp"
-                    "glfw-imgui/imgui/imgui_internal.h"
-                    "glfw-imgui/imgui/stb_rect_pack.h"
-                    "glfw-imgui/imgui/stb_textedit.h"
-                    "glfw-imgui/imgui/stb_truetype.h"
-                    )
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
+    SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
+    SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui/library_glfw.js --js-library ../glfw-imgui/library_gl.js ")
+endif()
 
-include_directories(glfw-imgui)
-include_directories(glfw-imgui/imgui)
-
-add_library(imgui ${imguiSrc})
-
-add_executable(testStudent ${SOURCES})
-
-SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui/library_glfw.js --js-library ../glfw-imgui/library_gl.js ")
-
-target_link_libraries(testStudent geos imgui)
+#target_link_libraries(testStudent geos imgui)
 
 set(WEB_FILES
         hi.html

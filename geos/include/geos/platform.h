@@ -67,7 +67,7 @@ extern "C"
    typedef long int int64;
 #  ifndef HAVE_LONG_INT_64
 #   define INT64_IS_REALLY32 1
-#   warning "Could not find 64bit integer definition!"
+//#   warning "Could not find 64bit integer definition!"
 #  endif
 # endif
 #endif

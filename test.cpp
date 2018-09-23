@@ -15,9 +15,12 @@ using namespace std;
 //using namespace emscripten;
 using namespace geos::geom;
 
+namespace
+{
+    const GeometryFactory * geomFact;
+}
 
-const GeometryFactory * geomFact;
-
+/*
 extern "C" {
 geos::geom::Polygon *MakeBox(double xmin, double ymin, double xmax, double ymax) {
     cout << "boxa " << endl;
@@ -42,6 +45,7 @@ geos::geom::Polygon *MakeBox(double xmin, double ymin, double xmax, double ymax)
     return geomFact->createPolygon(shell, NULL);
 }
 }
+*/
 
 void run_example(const double vertices_array[],
                  const double *contours_array[],

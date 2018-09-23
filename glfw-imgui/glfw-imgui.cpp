@@ -1,7 +1,7 @@
 //OUT#include <iostream>
 #include <cmath>
 
-#include <emscripten.h>
+//#include <emscripten.h>
 
 // GLEW
 #define GLEW_STATIC
@@ -14,8 +14,26 @@
 #include "imgui_impl_glfw_gl3.h"
 
 #include <iostream>
+#include <geos/geom/Coordinate.h>
+#include <geos/geom/CoordinateSequenceFactory.h>
+#include <geos/geom/CoordinateSequence.h>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/Polygon.h>
+#include <GEOS/geom/LineString.h>
+#include <GEOS/geom/Point.h>
+#include "../GLUTesselator/include/GLU/tessellate.h"
+#include "../TrackBallInteractor.h"
+#include "../Camera.h"
+#include "../debug.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+//#include <GLU/tessellate.h>
 
 using namespace std;
+using namespace geos::geom;
+using namespace rsmz;
+using namespace glm;
 
 #define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
@@ -27,6 +45,35 @@ static void error_callback(int error, const char* description)
     fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
+namespace
+{
+const GeometryFactory * geomFact;
+
+extern "C" {
+geos::geom::Polygon *MakeBox(double xmin, double ymin, double xmax, double ymax) {
+    //cout << "boxa " << endl;
+
+    geomFact = GeometryFactory::getDefaultInstance();
+    //cout << "geomFact->getCoordinateSequenceFactory() " << geomFact->getCoordinateSequenceFactory() << endl;
+    geos::geom::CoordinateSequence *temp = geomFact->getCoordinateSequenceFactory()->create((std::size_t) 0, 0);
+    //cout << "temp " << temp << endl;
+
+    temp->add(geos::geom::Coordinate(xmin, ymin));
+    temp->add(geos::geom::Coordinate(xmin, ymax));
+    temp->add(geos::geom::Coordinate(xmax, ymax));
+    temp->add(geos::geom::Coordinate(xmax, ymin));
+    //Must close the linear ring or we will get an error:
+    //"Points of LinearRing do not form a closed linestring"
+    temp->add(geos::geom::Coordinate(xmin, ymin));
+
+    geos::geom::LinearRing *shell = geomFact->createLinearRing(temp);
+
+    //NULL in this case could instead be a collection of one or more holes
+    //in the interior of the polygon
+    return geomFact->createPolygon(shell, NULL);
+}
+}
+}
 
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -247,9 +294,126 @@ in vec4 v_color;
 out vec4 color;
 void main()
 {
-   color = v_color;
+   color = vec4(v_color.x, v_color.y, v_color.z, 0.2);
 }
 )";
+
+// Shader sources
+const GLchar* vertexSource = R"glsl(#version 330 core
+    in vec2 position;
+    uniform mat4 MVP;
+    void main()
+    {
+        gl_Position = MVP * vec4(position.xy, 0, 1);
+    }
+)glsl";
+const GLchar* fragmentSource = R"glsl(#version 330 core
+    out vec4 outColor;
+    
+    void main()
+    {
+        outColor = vec4(1,1,1,0.5);
+    }
+)glsl";
+
+GLuint vao;
+GLuint shaderProgram2;
+GLint posAttrib;
+GLint MVP_Attrib;
+
+void setupAnotherShader()
+{
+    // Create Vertex Array Object
+    dmess("setupAnotherShader");
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    dmess("vao " << vao);
+
+    // Create a Vertex Buffer Object and copy the vertex data to it
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+
+    dmess("vbo " << vbo);
+
+    GLfloat vertices[] = {
+        -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // Top-left
+         0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // Top-right
+         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // Bottom-right
+        -0.5f, -0.5f, 1.0f, 1.0f, 1.0f  // Bottom-left
+    };
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Create an element array
+    GLuint ebo;
+    glGenBuffers(1, &ebo);
+    dmess("ebo " << ebo);
+
+    GLuint elements[] = {
+        0, 1, 2,
+        2, 3, 0
+    };
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
+    GLchar infoLog[512];
+
+    // Create and compile the vertex shader
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexSource, NULL);
+    glCompileShader(vertexShader);
+    GLint success = 0;
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    dmess("success " << success);
+
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED: %s\n", infoLog);
+        return;
+    }
+
+    // Create and compile the fragment shader
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+    glCompileShader(fragmentShader);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    dmess("success " << success);
+
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED: %s\n", infoLog);
+        return;
+    }
+
+    // Link the vertex and fragment shader into a shader program
+    shaderProgram2 = glCreateProgram();
+    glAttachShader(shaderProgram2, vertexShader);
+    glAttachShader(shaderProgram2, fragmentShader);
+    //glBindFragDataLocation(shaderProgram2, 0, "outColor");
+    glLinkProgram(shaderProgram2);
+    glUseProgram(shaderProgram2);
+
+    // Specify the layout of the vertex data
+    posAttrib = glGetAttribLocation(shaderProgram2, "position");
+    glEnableVertexAttribArray(posAttrib);
+    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+
+    MVP_Attrib = glGetUniformLocation(shaderProgram2, "MVP");
+
+    dmess("MVP_Attrib " << MVP_Attrib);
+
+    /*
+    GLint colAttrib = glGetAttribLocation(shaderProgram2, "color");
+    glEnableVertexAttribArray(colAttrib);
+    glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+    */
+}
 
     static GLuint VBO, VAO, EBO;
     static GLuint shaderProgram;
@@ -294,6 +458,11 @@ void my_c_function(int callback_id) {
     invoke_callback( callback_id, "Hello World!" );
 }
 
+//====================
+
+TrackBallInteractor trackBallInteractor;
+Camera camera;
+
 void mainLoop(GLFWwindow* window) {
     // Game loop
     if (glfwWindowShouldClose(window)) {
@@ -302,6 +471,7 @@ void mainLoop(GLFWwindow* window) {
     }
 
     //cout << "main loop" << endl;
+    //glfwWaitEvents();
 
     // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
     glfwPollEvents();
@@ -311,7 +481,7 @@ void mainLoop(GLFWwindow* window) {
     // Render
     // 1. Show a simple window
     // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
-    /*
+    //*
     {
         static float f = 0.0f;
         static float frameTimes[100] = {0.f};
@@ -327,7 +497,7 @@ void mainLoop(GLFWwindow* window) {
         ImGui::Checkbox("Pause", &paused);
         ImGui::Checkbox("Render When Mouse Up", &render_when_mouse_up);
     }
-     */
+     //*/
 
     {
         ImGui::Begin("Style Editoraaa");
@@ -343,7 +513,7 @@ void mainLoop(GLFWwindow* window) {
 
                     cout << "Open" << endl;
 
-                    emscripten_run_script("fileInput.click();");
+                    //emscripten_run_script("fileInput.click();");
                     //emscripten_run_script("alert(fileSelector)");
                     //emscripten_run_script("Module.my_js();");
 
@@ -414,6 +584,8 @@ void mainLoop(GLFWwindow* window) {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
+
+
     static float time = 0.f;
     if (!paused)
     {
@@ -421,6 +593,8 @@ void mainLoop(GLFWwindow* window) {
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
     glUniform1f(timeLoc, time);
@@ -429,6 +603,53 @@ void mainLoop(GLFWwindow* window) {
     glUniform2f(resolutionLoc, display_w, display_h);
     glDrawArrays(GL_TRIANGLES, 0, numVerts);
     glBindVertexArray(0);
+
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+
+    mat4 view = camera.getMatrix();
+    mat4 model = mat4(1.0);
+    mat4 projection = perspective(45.0, double(display_w) / double(display_h), 0.1, 100.0);
+
+    mat4 MVP = projection * view * model;
+
+    //glLinkProgram(shaderProgram2);
+    glUseProgram(shaderProgram2);
+
+    glUniformMatrix4fv(MVP_Attrib, 1, false, glm::value_ptr(MVP));
+
+    glBindVertexArray(vao);
+    // Specify the layout of the vertex data
+    //glEnableVertexAttribArray(posAttrib);
+    //glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    // =========================
+
+    //*
+    Polygon * p = MakeBox(-1,-1,1,1);
+
+    const LineString * ring = p->getExteriorRing();
+
+    const size_t numPoints = ring->getNumPoints();
+
+    //cout << "ring  " << ring << " numPoints " << numPoints << " ring->isClosed(); " << ring->isClosed() << endl;
+
+    //cout << " p " << p->getArea() << " num Points " << ring->getNumPoints() << endl;
+
+    glDisable(GL_DEPTH_TEST);
+
+    for(size_t i = 0; i < numPoints; ++i)
+    {
+        Point * p = ring->getPointN(i);
+
+        //cout << " p.x " << p->getX() << " p.y " << p->getY() << endl;
+    }
+
+    geomFact->destroyGeometry(p);
+
+    //*/
 
     ImGui::Render();
 
@@ -458,6 +679,8 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
+    dmess("ScrollCallback " << xoffset << " " << yoffset);
+
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
     Refresh(window);
 }
@@ -474,8 +697,12 @@ void CharCallback(GLFWwindow* window, unsigned int c)
     Refresh(window);
 }
 
-void FramebufferSizeCallback(GLFWwindow* window, int /* width */, int /* height */)
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
+    //dmess("width " << width << " height " << height);
+
+    trackBallInteractor.setScreenSize(width, height);
+
     Refresh(window);
 }
 
@@ -487,8 +714,10 @@ void WindowFocusCallback(GLFWwindow* window, int focused)
     }
 }
 
-void CursorPosCallback(GLFWwindow* window, double /* xpos */, double /* ypos */)
+void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
+    //cout << "x " << xpos << " y " << ypos << endl;
+
     if (render_when_mouse_up || mouse_buttons_down)
     {
         Refresh(window);
@@ -543,7 +772,9 @@ int main()
     static int width, height;
     glfwGetFramebufferSize(window, &width, &height);  
     glViewport(0, 0, width, height);
+    trackBallInteractor.setScreenSize(width, height);
 
+    setupAnotherShader();
 
     // Build and compile our shader program
     // Vertex shader
@@ -591,43 +822,8 @@ int main()
     timeLoc = glGetUniformLocation(shaderProgram, "time");
     vertexCountLoc = glGetUniformLocation(shaderProgram, "vertexCount");
 
-//    // Set up vertex data (and buffer(s)) and attribute pointers
-//    //GLfloat vertices[] = {
-//    //  // First triangle
-//    //   0.5f,  0.5f,  // Top Right
-//    //   0.5f, -0.5f,  // Bottom Right
-//    //  -0.5f,  0.5f,  // Top Left
-//    //  // Second triangle
-//    //   0.5f, -0.5f,  // Bottom Right
-//    //  -0.5f, -0.5f,  // Bottom Left
-//    //  -0.5f,  0.5f   // Top Left
-//    //};
-//    static GLfloat vertices[] = {
-//         0.5f,  0.5f, 0.0f,  // Top Right
-//         0.5f, -0.5f, 0.0f,  // Bottom Right
-//        -0.5f, -0.5f, 0.0f,  // Bottom Left
-//        -0.5f,  0.5f, 0.0f   // Top Left
-//    };
-//    static GLuint indices[] = {  // Note that we start from 0!
-//        0, 1, 3,  // First Triangle
-//        1, 2, 3   // Second Triangle
-//    };
     glGenVertexArrays(1, &VAO);
-//    glGenBuffers(1, &VBO);
-//    glGenBuffers(1, &EBO);
-    // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
     glBindVertexArray(VAO);
-
-//    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-//
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-//
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-//    glEnableVertexAttribArray(0);
-//
-//    glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 
     glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
 
