@@ -13,6 +13,7 @@
 #include <imgui.h>
 #include "imgui_impl_glfw_gl3.h"
 #include "imgui_internal.h"
+#include <imguidock.h>
 #include <iostream>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
@@ -500,7 +501,7 @@ void mainLoop(GLFWwindow* window) {
     // Render
     // 1. Show a simple window
     // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
-    //*
+    /*
     {
         static float f = 0.0f;
         static float frameTimes[100] = {0.f};
@@ -519,6 +520,23 @@ void mainLoop(GLFWwindow* window) {
      //*/
 
     {
+        /*
+        if (ImGui::Begin("imguidock window (= lumix engine's dock system)",NULL,ImVec2(500, 500),0.95f,ImGuiWindowFlags_NoScrollbar))
+        {
+            ImGui::BeginDockspace();
+            static char tmp[128];
+            for (int i=0;i<10;i++)  {
+                sprintf(tmp,"Dock %d",i);
+                if (i==9) ImGui::SetNextDock(ImGuiDockSlot_Bottom);// optional
+                if(ImGui::BeginDock(tmp))  {
+                    ImGui::Text("Content of dock window %d goes here",i);
+                }
+                ImGui::EndDock();
+            }
+            ImGui::EndDockspace();
+        }
+        //*/
+
         ImGui::Begin("Style Editoraaa");
 
         if (ImGui::BeginMainMenuBar())
