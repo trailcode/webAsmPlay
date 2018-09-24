@@ -82,32 +82,34 @@ file(GLOB SOURCES   "test.cpp"
                     "TrackBallInteractor.cpp"
                     "TrackBallInteractor.h"
                     "mainWebAsm.cpp"
+                    #"main.cpp"
                     "GUI.cpp"
                     ${tceGeom_SRC}
                     ${tceCore_SRC}
                     ${tceOpenSteer_SRC}
                     ${tceRender_SRC})
 
-file(GLOB imguiSrc  "glfw-imgui/glfw-imgui.cpp"
-                    "glfw-imgui/imgui_impl_glfw_gl3.cpp"
-                    "glfw-imgui/imgui_impl_glfw_gl3.h"
-                    "glfw-imgui/GLFW/glfw3.h"
-                    "glfw-imgui/imgui/imconfig.h"
-                    "glfw-imgui/imgui/imgui.cpp"
-                    "glfw-imgui/imgui/imgui.h"
-                    "glfw-imgui/imgui/imgui_demo.cpp"
-                    "glfw-imgui/imgui/imgui_draw.cpp"
-                    "glfw-imgui/imgui/imgui_internal.h"
-                    "glfw-imgui/imgui/imguidock.cpp"
-                    "glfw-imgui/imgui/imguidock.h"
-                    "glfw-imgui/imgui/stb_rect_pack.h"
-                    "glfw-imgui/imgui/stb_textedit.h"
-                    "glfw-imgui/imgui/stb_truetype.h"
-                    )
+file(GLOB imguiEmscriptenSrc    "glfw-imgui-emscripten/glfw-imgui.cpp"
+                                "glfw-imgui-emscripten/imgui_impl_glfw_gl3.cpp"
+                                "glfw-imgui-emscripten/imgui_impl_glfw_gl3.h"
+                                "glfw-imgui-emscripten/GLFW/glfw3.h"
+                                "glfw-imgui-emscripten/imgui/imconfig.h"
+                                "glfw-imgui-emscripten/imgui/imgui.cpp"
+                                "glfw-imgui-emscripten/imgui/imgui.h"
+                                "glfw-imgui-emscripten/imgui/imgui_demo.cpp"
+                                "glfw-imgui-emscripten/imgui/imgui_draw.cpp"
+                                "glfw-imgui-emscripten/imgui/imgui_internal.h"
+                                "glfw-imgui-emscripten/imgui/imguidock.cpp"
+                                "glfw-imgui-emscripten/imgui/imguidock.h"
+                                "glfw-imgui-emscripten/imgui/stb_rect_pack.h"
+                                "glfw-imgui-emscripten/imgui/stb_textedit.h"
+                                "glfw-imgui-emscripten/imgui/stb_truetype.h"
+                                )
+
+include_directories(glfw-imgui-emscripten)
+include_directories(glfw-imgui-emscripten/imgui)
 
 include_directories(geos/include)
-include_directories(glfw-imgui)
-include_directories(glfw-imgui/imgui)
 include_directories(glm)
 INCLUDE_DIRECTORIES(./tceGeom/inc)
 INCLUDE_DIRECTORIES(./tceCore/inc)
@@ -125,7 +127,7 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
-    SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui/library_glfw.js --js-library ../glfw-imgui/library_gl.js ")
+    SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui-emscripten/library_glfw.js --js-library ../glfw-imgui-emscripten/library_gl.js ")
 else()
 
     find_package(glfw3 REQUIRED)
@@ -202,7 +204,8 @@ if(APPLE)
 endif()
 
 add_executable(testStudent  ${SOURCES}
-                            ${imguiSrc}
+                            #${imguiSrc}
+                            ${imguiEmscriptenSrc}
                             ${geomSrc}
                             ${geomPrepSrc}
                             ${geomUtilSrc}
