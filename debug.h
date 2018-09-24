@@ -6,6 +6,6 @@
 
 extern void (*debugLoggerFunc)(const std::string & file, const std::string & line, const std::string & message);
 
-#define dmess(a) { std::stringstream ss; ss << __FILE__ << ":" << __LINE__ << "[" << a << endl; std::cout << ss.str() ;}
+#define dmess(a) { std::stringstream ss; ss << __FILE__ << ":" << __LINE__ << "[" << a << std::endl; std::cout << ss.str() ;}
 
 #endif

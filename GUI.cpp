@@ -1,4 +1,3 @@
-#ifdef WORKING
 //OUT#include <iostream>
 #include <cmath>
 
@@ -44,7 +43,7 @@ using namespace tce::geom;
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-static void error_callback(int error, const char* description)
+void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error %d: %s\n", error, description);
 }
@@ -439,7 +438,7 @@ void cleanup() {
 void Refresh(GLFWwindow* window)
 {
     glfwPollEvents();
-    //glfwMarkWindowForRefresh(window);
+    glfwMarkWindowForRefresh(window);
     //cout << "Here Comment back!" << endl;
 }
 
@@ -837,4 +836,71 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-#endif // WORKING
+void initOpenGL(GLFWwindow* window)
+{
+    // Define the viewport dimensions
+    static int width, height;
+    glfwGetFramebufferSize(window, &width, &height);  
+    glViewport(0, 0, width, height);
+
+    trackBallInteractor.setScreenSize(width, height);
+
+    dmess("width " << width << " height " << height);
+
+    camera = trackBallInteractor.getCamera();
+    trackBallInteractor.getCamera()->reset();
+    trackBallInteractor.setSpeed(3);
+
+    setupAnotherShader();
+
+    // Build and compile our shader program
+    // Vertex shader
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    // Check for compile time errors
+    GLint success;
+    GLchar infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED: %s\n", infoLog);
+        return;
+    }
+    // Fragment shader
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+    // Check for compile time errors
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED: %s\n", infoLog);
+        return;
+    }
+    // Link shaders
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    // Check for linking errors
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        printf("ERROR::PROGRAM::LINK_FAILED: %s\n", infoLog);
+        return;
+    }
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    resolutionLoc = glGetUniformLocation(shaderProgram, "resolution");
+    timeLoc = glGetUniformLocation(shaderProgram, "time");
+    vertexCountLoc = glGetUniformLocation(shaderProgram, "vertexCount");
+
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
+}

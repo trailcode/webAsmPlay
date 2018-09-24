@@ -81,6 +81,8 @@ file(GLOB SOURCES   "test.cpp"
                     "debug.h"
                     "TrackBallInteractor.cpp"
                     "TrackBallInteractor.h"
+                    "mainWebAsm.cpp"
+                    "GUI.cpp"
                     ${tceGeom_SRC}
                     ${tceCore_SRC}
                     ${tceOpenSteer_SRC}
@@ -96,7 +98,7 @@ file(GLOB imguiSrc  "glfw-imgui/glfw-imgui.cpp"
                     "glfw-imgui/imgui/imgui_demo.cpp"
                     "glfw-imgui/imgui/imgui_draw.cpp"
                     "glfw-imgui/imgui/imgui_internal.h"
-                    #"glfw-imgui/imgui/imguidock.cpp"
+                    "glfw-imgui/imgui/imguidock.cpp"
                     "glfw-imgui/imgui/imguidock.h"
                     "glfw-imgui/imgui/stb_rect_pack.h"
                     "glfw-imgui/imgui/stb_textedit.h"
@@ -130,9 +132,73 @@ else()
     find_package(glew REQUIRED)
     include_directories(${GLEW_INCLUDE_DIRS})
     link_libraries(${GLEW_LIBRARIES})
-    link_libraries(${OPENGL_gl_LIBRARY} glfw)
+    #link_libraries(${OPENGL_gl_LIBRARY} glfw)
+    link_libraries(glfw)
     message("Glew" ${GLEW_LIBRARIES})
 
+endif()
+
+#--------------------------------------------------------------------
+# Detect and select backend APIs
+#--------------------------------------------------------------------
+if (GLFW_USE_WAYLAND)
+    set(_GLFW_WAYLAND 1)
+    message(STATUS "Using Wayland for window creation")
+elseif (GLFW_USE_MIR)
+    set(_GLFW_MIR 1)
+    message(STATUS "Using Mir for window creation")
+elseif (GLFW_USE_OSMESA)
+    set(_GLFW_OSMESA 1)
+    message(STATUS "Using OSMesa for headless context creation")
+elseif (WIN32)
+    set(_GLFW_WIN32 1)
+    message(STATUS "Using Win32 for window creation")
+elseif (APPLE)
+    set(_GLFW_COCOA 1)
+    message(STATUS "Using Cocoa for window creation")
+elseif (UNIX)
+    set(_GLFW_X11 1)
+    message(STATUS "Using X11 for window creation")
+else()
+    message(FATAL_ERROR "No supported platform was detected")
+endif()
+
+#--------------------------------------------------------------------
+# Add Vulkan static library if requested
+#--------------------------------------------------------------------
+if (GLFW_VULKAN_STATIC)
+    if (VULKAN_FOUND AND VULKAN_STATIC_LIBRARY)
+        list(APPEND glfw_LIBRARIES "${VULKAN_STATIC_LIBRARY}")
+        if (BUILD_SHARED_LIBS)
+            message(WARNING "Linking Vulkan loader static library into GLFW")
+        endif()
+    else()
+        if (BUILD_SHARED_LIBS OR GLFW_BUILD_EXAMPLES OR GLFW_BUILD_TESTS)
+            message(FATAL_ERROR "Vulkan loader static library not found")
+        else()
+            message(WARNING "Vulkan loader static library not found")
+        endif()
+    endif()
+endif()
+
+#--------------------------------------------------------------------
+# Use Cocoa for window creation and NSOpenGL for context creation
+#--------------------------------------------------------------------
+if (_GLFW_COCOA)
+    message("_GLFW_COCOA")
+    list(APPEND glfw_LIBRARIES
+        "-framework Cocoa"
+        "-framework IOKit"
+        "-framework CoreFoundation"
+        "-framework CoreVideo")
+
+    set(glfw_PKG_DEPS "")
+    set(glfw_PKG_LIBS "-framework Cocoa -framework IOKit -framework CoreFoundation -framework CoreVideo")
+endif()
+
+if(APPLE)
+    set_source_files_properties(glfw.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set(ICON glfw.icns)
 endif()
 
 add_executable(testStudent  ${SOURCES}
@@ -174,7 +240,20 @@ add_executable(testStudent  ${SOURCES}
                             ${precisionSrc}
                             ${linearrefSrc}
                             ${GLUTesselatorSrc}
+                            ${ICON}
+                            
 )
+
+if(APPLE)
+    set_target_properties(testStudent PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "testStudent")
+
+    set_target_properties(${WINDOWS_BINARIES} PROPERTIES
+                          RESOURCE glfw.icns
+                          MACOSX_BUNDLE_SHORT_VERSION_STRING ${GLFW_VERSION}
+                          MACOSX_BUNDLE_LONG_VERSION_STRING ${GLFW_VERSION_FULL}
+                          MACOSX_BUNDLE_ICON_FILE glfw.icns
+                          MACOSX_BUNDLE_INFO_PLIST "${GLFW_SOURCE_DIR}/CMake/MacOSXBundleInfo.plist.in")
+endif()
 
 #target_link_libraries(testStudent geos imgui)
 

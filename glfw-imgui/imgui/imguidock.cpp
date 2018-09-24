@@ -26,6 +26,7 @@ SOFTWARE.
 // modified from https://bitbucket.org/duangle/liminal/src/tip/src/liminal/imgui_dock.h
 
 //- Common Code For All Addons needed just to ease inclusion as separate files in user code ----------------------
+#include <debug.h>
 #include <imgui.h>
 #undef IMGUI_DEFINE_PLACEMENT_NEW
 #define IMGUI_DEFINE_PLACEMENT_NEW
@@ -592,7 +593,8 @@ struct DockContext
     {
         Dock* dest_dock = getDockAt(GetIO().MousePos);
 
-	SetNextWindowBgAlpha(0.0f);
+    dmess("fix here!");
+	//SetNextWindowBgAlpha(0.0f);
 	Begin("##Overlay",
               NULL,
               ImGuiWindowFlags_Tooltip | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
@@ -822,7 +824,9 @@ struct DockContext
                                              pos + ImVec2(size.x + 10, size.y),
                                              pos + ImVec2(size.x + 15, size.y),
                                              10);
-		draw_list->PathFillConvex(hovered ? color_hovered : (dock_tab->active ? color_active : color));
+        dmess("Fix here!");
+		//draw_list->PathFillConvex(hovered ? color_hovered : (dock_tab->active ? color_active : color));
+
 		draw_list->AddText(pos + ImVec2(0, 1), text_color, dock_tab->label, text_end);
 
 		if (dock_tab->active && close_button)	{
@@ -1217,7 +1221,8 @@ struct DockContext
     {
         // Draw this on top of everything else.
         ImGuiWindow* window = GetCurrentWindow();
-        window->BeginOrderWithinParent = 100000;
+        dmess("Fix here!");
+        //window->BeginOrderWithinParent = 100000;
     }
 
         return ret;
