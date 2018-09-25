@@ -438,8 +438,9 @@ void cleanup() {
 
 void Refresh(GLFWwindow* window)
 {
-    glfwPollEvents();
 #ifdef __EMSCRIPTEN__
+    glfwPollEvents();
+    
     glfwMarkWindowForRefresh(window);
 #endif
     //cout << "Here Comment back!" << endl;
