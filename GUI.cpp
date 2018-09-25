@@ -440,7 +440,7 @@ void Refresh(GLFWwindow* window)
 {
 #ifdef __EMSCRIPTEN__
     glfwPollEvents();
-    
+
     glfwMarkWindowForRefresh(window);
 #endif
     //cout << "Here Comment back!" << endl;
@@ -502,49 +502,12 @@ void mainLoop(GLFWwindow* window) {
     glfwPollEvents();
 
     ImGui_ImplGlfwGL3_NewFrame();
-    //ImGui_ImplGlfw_NewFrame();
 #endif
 
-    // Render
-    // 1. Show a simple window
-    // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
-    /*
     {
-        static float f = 0.0f;
-        static float frameTimes[100] = {0.f};
-        ImGui::Text("Hello, world!");
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-        ImGui::ColorEdit3("clear color", (float*)&clear_color);
-        if (ImGui::Button("Test Window")) show_test_window ^= 1;
-        if (ImGui::Button("Another Window")) show_another_window ^= 1;
-        memcpy(&frameTimes[0], &frameTimes[1], sizeof(frameTimes) - sizeof(frameTimes[0]));
-        frameTimes[ARRAYSIZE(frameTimes) - 1] = ImGui::GetIO().Framerate;
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::PlotLines("Frame History", frameTimes, ARRAYSIZE(frameTimes), 0, "", 0.0f, 100.0f, ImVec2(0, 50));
-        ImGui::Checkbox("Pause", &paused);
-        ImGui::Checkbox("Render When Mouse Up", &render_when_mouse_up);
-    }
-     //*/
+        
 
-    {
-        /*
-        if (ImGui::Begin("imguidock window (= lumix engine's dock system)",NULL,ImVec2(500, 500),0.95f,ImGuiWindowFlags_NoScrollbar))
-        {
-            ImGui::BeginDockspace();
-            static char tmp[128];
-            for (int i=0;i<10;i++)  {
-                sprintf(tmp,"Dock %d",i);
-                if (i==9) ImGui::SetNextDock(ImGuiDockSlot_Bottom);// optional
-                if(ImGui::BeginDock(tmp))  {
-                    ImGui::Text("Content of dock window %d goes here",i);
-                }
-                ImGui::EndDock();
-            }
-            ImGui::EndDockspace();
-        }
-        //*/
-
-        ImGui::Begin("Style Editoraaa");
+        
 
         if (ImGui::BeginMainMenuBar())
         {
@@ -581,45 +544,7 @@ void mainLoop(GLFWwindow* window) {
             }
             ImGui::EndMainMenuBar();
         }
-
-        ImGui::BulletText("Double-click on title bar to collapse window.");
-        ImGui::BulletText("Click and drag on lower right corner to resize window.");
-        ImGui::BulletText("Click and drag on any empty space to move window.");
-        ImGui::BulletText("Mouse Wheel to scroll.");
-        if (ImGui::GetIO().FontAllowUserScaling)
-            ImGui::BulletText("CTRL+Mouse Wheel to zoom window contents.");
-        ImGui::BulletText("TAB/SHIFT+TAB to cycle through keyboard editable fields.");
-        ImGui::BulletText("CTRL+Click on a slider or drag box to input text.");
-        ImGui::BulletText(
-                "While editing text:\n"
-                "- Hold SHIFT or use mouse to select text\n"
-                "- CTRL+Left/Right to word jump\n"
-                "- CTRL+A or double-click to select all\n"
-                "- CTRL+X,CTRL+C,CTRL+V clipboard\n"
-                "- CTRL+Z,CTRL+Y undo/redo\n"
-                "- ESCAPE to revert\n"
-                "- You can apply arithmetic operators +,*,/ on numerical values.\n"
-                "  Use +- to subtract.\n");
-        ImGui::End();
     }
-
-    /*
-    // 2. Show another simple window, this time using an explicit Begin/End pair
-    if (show_another_window)
-    {
-        ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
-        ImGui::Begin("Another Window", &show_another_window);
-        ImGui::Text("Hello");
-        ImGui::End();
-    }
-
-    // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-    if (show_test_window)
-    {
-        ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-        ImGui::ShowTestWindow(&show_test_window);
-    }
-    */
 
     // Rendering
     int display_w, display_h;
@@ -737,7 +662,7 @@ Vec2i lastShiftKeyDownMousePos;
 
 void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    //dmess("x " << xpos << " y " << ypos);
+    dmess("x " << xpos << " y " << ypos);
 
     trackBallInteractor.setClickPoint(xpos, ypos);
     trackBallInteractor.update();
@@ -818,13 +743,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
      
 #ifdef __EMSCRIPTEN__
-
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
-
 #else
-
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
-
 #endif
 
     Refresh(window);
@@ -842,7 +763,7 @@ void CharCallback(GLFWwindow* window, unsigned int c)
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-    //dmess("width " << width << " height " << height);
+    dmess("width " << width << " height " << height);
 
     trackBallInteractor.setScreenSize(width, height);
 
