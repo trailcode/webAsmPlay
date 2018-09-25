@@ -162,5 +162,7 @@ glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     }
     */
 
+   dmess("done");
+
     return 0;
 }

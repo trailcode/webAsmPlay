@@ -81,8 +81,8 @@ file(GLOB SOURCES   "test.cpp"
                     "debug.h"
                     "TrackBallInteractor.cpp"
                     "TrackBallInteractor.h"
-                    #"mainWebAsm.cpp"
-                    "main.cpp"
+                    "mainWebAsm.cpp"
+                    #"main.cpp"
                     "GUI.cpp"
                     ${tceGeom_SRC}
                     ${tceCore_SRC}
@@ -123,13 +123,14 @@ file(GLOB imguiSrc              "imgui/imgui.cpp"
                                 "imgui/gl3w/GL/gl3w.c"                          
                                 )
 
-
-#include_directories(glfw-imgui-emscripten)
-#include_directories(glfw-imgui-emscripten/imgui)
-
-include_directories(imgui)
-include_directories(imgui/glfw/include)
-include_directories(imgui/gl3w)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
+    include_directories(glfw-imgui-emscripten)
+    include_directories(glfw-imgui-emscripten/imgui)
+else()
+    include_directories(imgui)
+    include_directories(imgui/glfw/include)
+    include_directories(imgui/gl3w)
+endif()
 
 include_directories(geos/include)
 include_directories(glm)
@@ -148,21 +149,21 @@ endif()
 #add_library(imgui ${imguiSrc})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
+message("Emscripten=========================")
     SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
     SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui-emscripten/library_glfw.js --js-library ../glfw-imgui-emscripten/library_gl.js ")
+    add_definitions(-D__EMSCRIPTEN__)
 else()
 
-    
+    find_package(glfw3 REQUIRED)
+    #find_package(glew REQUIRED)
+    include_directories(${GLEW_INCLUDE_DIRS})
+    link_libraries(${GLEW_LIBRARIES})
+    #link_libraries(${OPENGL_gl_LIBRARY} glfw)
+    link_libraries(glfw)
+    message("Glew" ${GLEW_LIBRARIES})    
 
 endif()
-
-find_package(glfw3 REQUIRED)
-#find_package(glew REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
-link_libraries(${GLEW_LIBRARIES})
-#link_libraries(${OPENGL_gl_LIBRARY} glfw)
-link_libraries(glfw)
-message("Glew" ${GLEW_LIBRARIES})
 
 #--------------------------------------------------------------------
 # Detect and select backend APIs
@@ -228,8 +229,8 @@ if(APPLE)
 endif()
 
 add_executable(testStudent  ${SOURCES}
-                            ${imguiSrc}
-                            #${imguiEmscriptenSrc}
+                            #${imguiSrc}
+                            ${imguiEmscriptenSrc}
                             ${geomSrc}
                             ${geomPrepSrc}
                             ${geomUtilSrc}
