@@ -192,7 +192,6 @@ extern "C" {
  #define GLFWAPI __attribute__((visibility("default")))
 
 #else
-
  /* We are either building/calling a static lib or we are non-win32 */
  #define GLFWAPI
 

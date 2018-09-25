@@ -15,7 +15,6 @@ GLFWwindow * window;
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 
-// Is called whenever a key is pressed/released via GLFW
 void error_callback(int error, const char* description);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);

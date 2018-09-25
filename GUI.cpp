@@ -4,16 +4,22 @@
 //#include <emscripten.h>
 
 // GLEW
-#define GLEW_STATIC
-#include <GL/glew.h>
+//#define GLEW_STATIC
+//#include <GL/glew.h>
+
+#include <GL/gl3w.h>    // Initialize with gl3wInit()
 
 // GLFW
 #include <GLFW/glfw3.h>
 
 #include <imgui.h>
-#include "imgui_impl_glfw_gl3.h"
+//#include "imgui_impl_glfw_gl3.h"
+
+#include "imgui_impl_opengl3.h"
+
+#include "imgui_impl_glfw.h"
 #include "imgui_internal.h"
-#include <imguidock.h>
+//#include <imguidock.h>
 #include <iostream>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
@@ -438,7 +444,7 @@ void cleanup() {
 void Refresh(GLFWwindow* window)
 {
     glfwPollEvents();
-    glfwMarkWindowForRefresh(window);
+    //glfwMarkWindowForRefresh(window);
     //cout << "Here Comment back!" << endl;
 }
 
@@ -494,9 +500,12 @@ void mainLoop(GLFWwindow* window) {
     //glfwWaitEvents();
 
     // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
-    glfwPollEvents();
+    //glfwPollEvents();
 
-    ImGui_ImplGlfwGL3_NewFrame();
+
+    dmess("Put back");
+    //ImGui_ImplGlfwGL3_NewFrame();
+    //ImGui_ImplGlfw_NewFrame();
 
     // Render
     // 1. Show a simple window
@@ -693,6 +702,8 @@ void mainLoop(GLFWwindow* window) {
 
     ImGui::Render();
 
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    glfwMakeContextCurrent(window);
     glfwSwapBuffers(window);
 
     if (!paused)
@@ -713,7 +724,9 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
       mouse_buttons_down += action == GLFW_PRESS ? 1 : -1;
     }
 
-    ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
+    //ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+    dmess("Put bak");
     Refresh(window);
 }
 
@@ -766,7 +779,9 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
         trackBallInteractor.update();
     }
 
-    ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
+    //ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+    dmess("Put back");
     Refresh(window);
 }
 
@@ -797,13 +812,15 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         case GLFW_KEY_LEFT_ALT:   trackBallInteractor.setMotionLeftClick(PAN); break;
     }
     
-    ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
+    //ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
+    dmess("Put back");
     Refresh(window);
 }
 
 void CharCallback(GLFWwindow* window, unsigned int c)
 {
-    ImGui_ImplGlfwGL3_CharCallback(window, c);
+    //ImGui_ImplGlfwGL3_CharCallback(window, c);
+    dmess("Put back");
     Refresh(window);
 }
 

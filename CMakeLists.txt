@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
  
 set (CMAKE_CXX_STANDARD 11)
 
@@ -81,8 +81,8 @@ file(GLOB SOURCES   "test.cpp"
                     "debug.h"
                     "TrackBallInteractor.cpp"
                     "TrackBallInteractor.h"
-                    "mainWebAsm.cpp"
-                    #"main.cpp"
+                    #"mainWebAsm.cpp"
+                    "main.cpp"
                     "GUI.cpp"
                     ${tceGeom_SRC}
                     ${tceCore_SRC}
@@ -106,8 +106,30 @@ file(GLOB imguiEmscriptenSrc    "glfw-imgui-emscripten/glfw-imgui.cpp"
                                 "glfw-imgui-emscripten/imgui/stb_truetype.h"
                                 )
 
-include_directories(glfw-imgui-emscripten)
-include_directories(glfw-imgui-emscripten/imgui)
+file(GLOB imguiSrc              "imgui/imgui.cpp"
+                                "imgui/imgui.h"
+                                "imgui/imconfig.h"
+                                "imgui/imgui_demo.cpp"
+                                "imgui/imgui_draw.cpp"
+                                "imgui/imgui_impl_glfw.cpp"
+                                "imgui/imgui_impl_glfw.h"
+                                "imgui/imgui_internal.h"
+                                "imgui/imgui_widgets.cpp"
+                                "imgui/imstb_rectpack.h"
+                                "imgui/imstb_textedit.h"
+                                "imgui/imstb_truetype.h"
+                                "imgui/imgui_impl_opengl3.cpp"
+                                "imgui/imgui_impl_opengl3.h"
+                                "imgui/gl3w/GL/gl3w.c"                          
+                                )
+
+
+#include_directories(glfw-imgui-emscripten)
+#include_directories(glfw-imgui-emscripten/imgui)
+
+include_directories(imgui)
+include_directories(imgui/glfw/include)
+include_directories(imgui/gl3w)
 
 include_directories(geos/include)
 include_directories(glm)
@@ -130,15 +152,17 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui-emscripten/library_glfw.js --js-library ../glfw-imgui-emscripten/library_gl.js ")
 else()
 
-    find_package(glfw3 REQUIRED)
-    find_package(glew REQUIRED)
-    include_directories(${GLEW_INCLUDE_DIRS})
-    link_libraries(${GLEW_LIBRARIES})
-    #link_libraries(${OPENGL_gl_LIBRARY} glfw)
-    link_libraries(glfw)
-    message("Glew" ${GLEW_LIBRARIES})
+    
 
 endif()
+
+find_package(glfw3 REQUIRED)
+#find_package(glew REQUIRED)
+include_directories(${GLEW_INCLUDE_DIRS})
+link_libraries(${GLEW_LIBRARIES})
+#link_libraries(${OPENGL_gl_LIBRARY} glfw)
+link_libraries(glfw)
+message("Glew" ${GLEW_LIBRARIES})
 
 #--------------------------------------------------------------------
 # Detect and select backend APIs
@@ -204,8 +228,8 @@ if(APPLE)
 endif()
 
 add_executable(testStudent  ${SOURCES}
-                            #${imguiSrc}
-                            ${imguiEmscriptenSrc}
+                            ${imguiSrc}
+                            #${imguiEmscriptenSrc}
                             ${geomSrc}
                             ${geomPrepSrc}
                             ${geomUtilSrc}
