@@ -1,11 +1,4 @@
-//OUT#include <iostream>
 #include <cmath>
-
-//#include <emscripten.h>
-
-// GLFW
-
-
 #include <imgui.h>
 
 #ifdef __EMSCRIPTEN__
@@ -13,19 +6,16 @@
     #define GLEW_STATIC
     #include <GL/glew.h>
     #define IMGUI_API
-    #include "imgui_impl_glfw_gl3.h"
+    #include <imgui_impl_glfw_gl3.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
     #define IMGUI_IMPL_API // What about for windows?
-    #include "imgui_impl_opengl3.h"
-    #include "imgui_impl_glfw.h"
+    #include <imgui_impl_opengl3.h>
+    #include <imgui_impl_glfw.h>
 #endif // __EMSCRIPTEN__
 
 #include <GLFW/glfw3.h>
-
-//#include "imgui_impl_glfw.h"
-#include "imgui_internal.h"
-//#include <imguidock.h>
+#include <imgui_internal.h>
 #include <iostream>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
@@ -42,7 +32,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <tceGeom/vec2.h>
-//#include <GLU/tessellate.h>
 
 using namespace std;
 using namespace geos::geom;
