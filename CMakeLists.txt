@@ -74,20 +74,18 @@ file(GLOB tceOpenSteer_SRC "./tceOpenSteer/src/*.cpp" "./tceOpenSteer/inc/tceOpe
 file(GLOB tceCore_SRC "./tceCore/inc/tceCore/*.h")
 file(GLOB tceRender_SRC "./tceRender/src/*.cpp" "./tceRender/inc/tceRender/*.h")
 
-file(GLOB SOURCES   "test.cpp"
-                    "Camera.cpp"
-                    "Camera.h"
-                    "debiug.cpp"
-                    "debug.h"
-                    "TrackBallInteractor.cpp"
-                    "TrackBallInteractor.h"
-                    "mainWebAsm.cpp"
-                    #"main.cpp"
-                    "GUI.cpp"
-                    ${tceGeom_SRC}
-                    ${tceCore_SRC}
-                    ${tceOpenSteer_SRC}
-                    ${tceRender_SRC})
+file(GLOB webAsmPlay_SRC   "test.cpp"
+                            "Camera.cpp"
+                            "Camera.h"
+                            "debiug.cpp"
+                            "debug.h"
+                            "TrackBallInteractor.cpp"
+                            "TrackBallInteractor.h"
+                            "GUI.cpp"
+                            ${tceGeom_SRC}
+                            ${tceCore_SRC}
+                            ${tceOpenSteer_SRC}
+                            ${tceRender_SRC})
 
 file(GLOB imguiEmscriptenSrc    "glfw-imgui-emscripten/glfw-imgui.cpp"
                                 "glfw-imgui-emscripten/imgui_impl_glfw_gl3.cpp"
@@ -149,7 +147,7 @@ endif()
 #add_library(imgui ${imguiSrc})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
-message("Emscripten=========================")
+    message("Emscripten=========================")
     SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
     SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui-emscripten/library_glfw.js --js-library ../glfw-imgui-emscripten/library_gl.js ")
     add_definitions(-D__EMSCRIPTEN__)
@@ -228,49 +226,52 @@ if(APPLE)
     set(ICON glfw.icns)
 endif()
 
-add_executable(testStudent  ${SOURCES}
-                            #${imguiSrc}
-                            ${imguiEmscriptenSrc}
-                            ${geomSrc}
-                            ${geomPrepSrc}
-                            ${geomUtilSrc}
-                            ${iOSrc}
-                            ${algorithmSrc}
-                            ${algorithmDistanceSrc}
-                            ${algorithmLocateSrc}
-                            ${utilSrc}
-                            ${indexBinTreeSrc}
-                            ${indexChainSrc}
-                            ${indexIntervalrtreeSrc}
-                            ${indexQuadtreeSrc}
-                            ${indexStrtreeSrc}
-                            ${indexSweeplineSrc}
-                            ${geomgraphSrc}
-                            ${geomgraphIndexSrc}
-                            ${nodingSrc}
-                            ${nodingSnaproundSrc}
-                            ${operationSrc}
-                            ${operationBufferSrc}
-                            ${operationDistanceSrc}
-                            ${operationIntersectionSrc}
-                            ${operationLinemergeSrc}
-                            ${operationOverlaySrc}
-                            ${operationOverlayValidateSrc}
-                            ${operationOverlaySnapSrc}
-                            ${operationPolygonizeSrc}
-                            ${operationPredicateSrc}
-                            ${operationRelateSrc}
-                            ${operationSharedpathsSrc}
-                            ${operationUnionSrc}
-                            ${operationValidSrc}
-                            ${planargraphSrc}
-                            ${planargraphAlgorithmSrc}
-                            ${precisionSrc}
-                            ${linearrefSrc}
-                            ${GLUTesselatorSrc}
-                            ${ICON}
-                            
-)
+file(GLOB sources   ${webAsmPlay_SRC}
+                    ${geomSrc}
+                    ${geomPrepSrc}
+                    ${geomUtilSrc}
+                    ${iOSrc}
+                    ${algorithmSrc}
+                    ${algorithmDistanceSrc}
+                    ${algorithmLocateSrc}
+                    ${utilSrc}
+                    ${indexBinTreeSrc}
+                    ${indexChainSrc}
+                    ${indexIntervalrtreeSrc}
+                    ${indexQuadtreeSrc}
+                    ${indexStrtreeSrc}
+                    ${indexSweeplineSrc}
+                    ${geomgraphSrc}
+                    ${geomgraphIndexSrc}
+                    ${nodingSrc}
+                    ${nodingSnaproundSrc}
+                    ${operationSrc}
+                    ${operationBufferSrc}
+                    ${operationDistanceSrc}
+                    ${operationIntersectionSrc}
+                    ${operationLinemergeSrc}
+                    ${operationOverlaySrc}
+                    ${operationOverlayValidateSrc}
+                    ${operationOverlaySnapSrc}
+                    ${operationPolygonizeSrc}
+                    ${operationPredicateSrc}
+                    ${operationRelateSrc}
+                    ${operationSharedpathsSrc}
+                    ${operationUnionSrc}
+                    ${operationValidSrc}
+                    ${planargraphSrc}
+                    ${planargraphAlgorithmSrc}
+                    ${precisionSrc}
+                    ${linearrefSrc}
+                    ${GLUTesselatorSrc}
+                    ${ICON}
+                    )
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
+    add_executable(testStudent ${sources} ${imguiEmscriptenSrc} "mainWebAsm.cpp")
+else()
+    add_executable(testStudent ${sources} ${imguiSrc} "main.cpp")
+endif()
 
 if(APPLE)
     set_target_properties(testStudent PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "testStudent")

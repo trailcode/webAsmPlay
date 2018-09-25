@@ -3,21 +3,25 @@
 
 //#include <emscripten.h>
 
-#ifdef __EMSCRIPTEN__
-// GLEW
-#define GLEW_STATIC
-#include <GL/glew.h>
-#define IMGUI_API
-#include "imgui_impl_glfw_gl3.h"
-#else
-#include <GL/gl3w.h>    // Initialize with gl3wInit()
-#include "imgui_impl_opengl3.h"
-#endif // __EMSCRIPTEN__
-
 // GLFW
-#include <GLFW/glfw3.h>
+
 
 #include <imgui.h>
+
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+    #define IMGUI_API
+    #include "imgui_impl_glfw_gl3.h"
+#else
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+    #define IMGUI_IMPL_API // What about for windows?
+    #include "imgui_impl_opengl3.h"
+    #include "imgui_impl_glfw.h"
+#endif // __EMSCRIPTEN__
+
+#include <GLFW/glfw3.h>
 
 //#include "imgui_impl_glfw.h"
 #include "imgui_internal.h"
@@ -822,14 +826,27 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         case GLFW_KEY_LEFT_SHIFT: trackBallInteractor.setMotionLeftClick(ARC); break;
         case GLFW_KEY_LEFT_ALT:   trackBallInteractor.setMotionLeftClick(PAN); break;
     }
-    
+     
+#ifdef __EMSCRIPTEN__
+
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
+
+#else
+
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+
+#endif
+
     Refresh(window);
 }
 
 void CharCallback(GLFWwindow* window, unsigned int c)
 {
+#ifdef __EMSCRIPTEN__
     ImGui_ImplGlfwGL3_CharCallback(window, c);
+#else
+    ImGui_ImplGlfw_CharCallback(window, c);
+#endif
     Refresh(window);
 }
 
