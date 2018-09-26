@@ -17,57 +17,55 @@ else()
   message(" * C++ cimpiler: ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
-file(GLOB utilSrc "geos/src/util/*.cpp")
-file(GLOB geomSrc "geos/src/geom/*.cpp")
-file(GLOB indexBinTreeSrc "geos/src/index/bintree/*.cpp")
-file(GLOB indexChainSrc "geos/src/index/chain/*.cpp")
-file(GLOB indexIntervalrtreeSrc "geos/src/index/intervalrtree/*.cpp")
-file(GLOB indexQuadtreeSrc "geos/src/index/quadtree/*.cpp")
-file(GLOB indexStrtreeSrc "geos/src/index/strtree/*.cpp")
-file(GLOB indexSweeplineSrc "geos/src/index/sweepline/*.cpp")
-file(GLOB geomPrepSrc "geos/src/geom/prep/*.cpp")
-file(GLOB geomUtilSrc "geos/src/geom/util/*.cpp")
-file(GLOB iOSrc "geos/src/io/*.cpp")
-file(GLOB algorithmSrc "geos/src/algorithm/*.cpp")
-file(GLOB algorithmDistanceSrc "geos/src/algorithm/distance/*.cpp")
-file(GLOB algorithmLocateSrc "geos/src/algorithm/locate/*.cpp")
-file(GLOB geomgraphSrc "geos/src/geomgraph/*.cpp")
-file(GLOB geomgraphIndexSrc "geos/src/geomgraph/index/*.cpp")
-file(GLOB nodingSrc "geos/src/noding/*.cpp")
-file(GLOB nodingSnaproundSrc "geos/src/noding/snapround/*.cpp")
-file(GLOB operationSrc "geos/src/operation/*.cpp")
-file(GLOB operationBufferSrc "geos/src/operation/buffer/*.cpp")
-file(GLOB operationDistanceSrc "geos/src/operation/distance/*.cpp")
-file(GLOB operationIntersectionSrc "geos/src/operation/intersection/*.cpp")
-file(GLOB operationLinemergeSrc "geos/src/operation/linemerge/*.cpp")
-file(GLOB operationOverlaySrc "geos/src/operation/overlay/*.cpp")
-file(GLOB operationOverlayValidateSrc "geos/src/operation/overlay/validate/*.cpp")
-file(GLOB operationOverlaySnapSrc "geos/src/operation/overlay/snap/*.cpp")
-file(GLOB operationPolygonizeSrc "geos/src/operation/polygonize/*.cpp")
-file(GLOB operationPredicateSrc "geos/src/operation/predicate/*.cpp")
-file(GLOB operationRelateSrc "geos/src/operation/relate/*.cpp")
-file(GLOB operationSharedpathsSrc "geos/src/operation/sharedpaths/*.cpp")
-file(GLOB operationUnionSrc "geos/src/operation/union/*.cpp")
-file(GLOB operationValidSrc "geos/src/operation/valid/*.cpp")
-file(GLOB planargraphSrc "geos/src/planargraph/*.cpp")
-file(GLOB planargraphAlgorithmSrc "geos/src/planargraph/algorithm/*.cpp")
-file(GLOB precisionSrc "geos/src/precision/*.cpp")
-file(GLOB linearrefSrc "geos/src/linearref/*.cpp")
+file(GLOB geosSrc   "geos/src/util/*.cpp"
+                    "geos/src/geom/*.cpp"
+                    "geos/src/index/bintree/*.cpp"
+                    "geos/src/index/chain/*.cpp"
+                    "geos/src/index/intervalrtree/*.cpp"
+                    "geos/src/index/quadtree/*.cpp"
+                    "geos/src/index/strtree/*.cpp"
+                    "geos/src/index/sweepline/*.cpp"
+                    "geos/src/geom/prep/*.cpp"
+                    "geos/src/geom/util/*.cpp"
+                    "geos/src/io/*.cpp"
+                    "geos/src/algorithm/*.cpp"
+                    "geos/src/algorithm/distance/*.cpp"
+                    "geos/src/algorithm/locate/*.cpp"
+                    "geos/src/geomgraph/*.cpp"
+                    "geos/src/geomgraph/index/*.cpp"
+                    "geos/src/noding/*.cpp"
+                    "geos/src/noding/snapround/*.cpp"
+                    "geos/src/operation/*.cpp"
+                    "geos/src/operation/buffer/*.cpp"
+                    "geos/src/operation/distance/*.cpp"
+                    "geos/src/operation/intersection/*.cpp"
+                    "geos/src/operation/linemerge/*.cpp"
+                    "geos/src/operation/overlay/*.cpp"
+                    "geos/src/operation/overlay/validate/*.cpp"
+                    "geos/src/operation/overlay/snap/*.cpp"
+                    "geos/src/operation/polygonize/*.cpp"
+                    "geos/src/operation/predicate/*.cpp"
+                    "geos/src/operation/relate/*.cpp"
+                    "geos/src/operation/sharedpaths/*.cpp"
+                    "geos/src/operation/union/*.cpp"
+                    "geos/src/operation/valid/*.cpp"
+                    "geos/src/planargraph/*.cpp"
+                    "geos/src/planargraph/algorithm/*.cpp"
+                    "geos/src/precision/*.cpp"
+                    "geos/src/linearref/*.cpp")
 
-include_directories(GLUTesselator/include)
-
-file(GLOB GLUTesselatorSrc "GLUTesselator/src/dict.cpp",
-        "GLUTesselator/src/mesh.cpp",
-        "GLUTesselator/src/render.cpp",
-        "GLUTesselator/src/tess.cpp",
-        "GLUTesselator/src/geom.cpp",
-        "GLUTesselator/src/memalloc.cpp",
-        "GLUTesselator/src/normal.cpp",
-        "GLUTesselator/src/priorityq.cpp",
-        "GLUTesselator/src/sweep.cpp",
-        "GLUTesselator/src/tessmono.cpp",
-        "GLUTesselator/src/tessellate.cpp"
-        )
+file(GLOB GLUTesselatorSrc  "GLUTesselator/src/dict.cpp",
+                            "GLUTesselator/src/mesh.cpp",
+                            "GLUTesselator/src/render.cpp",
+                            "GLUTesselator/src/tess.cpp",
+                            "GLUTesselator/src/geom.cpp",
+                            "GLUTesselator/src/memalloc.cpp",
+                            "GLUTesselator/src/normal.cpp",
+                            "GLUTesselator/src/priorityq.cpp",
+                            "GLUTesselator/src/sweep.cpp",
+                            "GLUTesselator/src/tessmono.cpp",
+                            "GLUTesselator/src/tessellate.cpp"
+                            )
 
 file(GLOB tceGeom_SRC "./tceGeom/src/*.cpp" "./tceGeom/inc/tceGeom/*.h")
 file(GLOB tceOpenSteer_SRC "./tceOpenSteer/src/*.cpp" "./tceOpenSteer/inc/tceOpenSteer/*.h")
@@ -121,6 +119,8 @@ file(GLOB imguiSrc              "imgui/imgui.cpp"
                                 "imgui/gl3w/GL/gl3w.c"                          
                                 )
 
+file(GLOB globjectsSrc "globjects/source/*.cpp")
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     include_directories(glfw-imgui-emscripten)
     include_directories(glfw-imgui-emscripten/imgui)
@@ -130,13 +130,17 @@ else()
     include_directories(imgui/gl3w)
 endif()
 
+include_directories(GLUTesselator/include)
 include_directories(geos/include)
 include_directories(glm)
-INCLUDE_DIRECTORIES(./tceGeom/inc)
-INCLUDE_DIRECTORIES(./tceCore/inc)
-INCLUDE_DIRECTORIES(./tceOpenSteer/inc)
-INCLUDE_DIRECTORIES(./tceRender/inc)
-INCLUDE_DIRECTORIES(./)
+include_directories(glbinding/include)
+include_directories(glbinding-aux/include)
+include_directories(globjects/include)
+include_directories(./tceGeom/inc)
+include_directories(./tceCore/inc)
+include_directories(./tceOpenSteer/inc)
+include_directories(./tceRender/inc)
+include_directories(./)
 
 add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
     
@@ -154,12 +158,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 else()
 
     find_package(glfw3 REQUIRED)
-    #find_package(glew REQUIRED)
     include_directories(${GLEW_INCLUDE_DIRS})
     link_libraries(${GLEW_LIBRARIES})
-    #link_libraries(${OPENGL_gl_LIBRARY} glfw)
     link_libraries(glfw)
-    message("Glew" ${GLEW_LIBRARIES})    
 
 endif()
 
@@ -227,43 +228,9 @@ if(APPLE)
 endif()
 
 file(GLOB sources   ${webAsmPlay_SRC}
-                    ${geomSrc}
-                    ${geomPrepSrc}
-                    ${geomUtilSrc}
-                    ${iOSrc}
-                    ${algorithmSrc}
-                    ${algorithmDistanceSrc}
-                    ${algorithmLocateSrc}
-                    ${utilSrc}
-                    ${indexBinTreeSrc}
-                    ${indexChainSrc}
-                    ${indexIntervalrtreeSrc}
-                    ${indexQuadtreeSrc}
-                    ${indexStrtreeSrc}
-                    ${indexSweeplineSrc}
-                    ${geomgraphSrc}
-                    ${geomgraphIndexSrc}
-                    ${nodingSrc}
-                    ${nodingSnaproundSrc}
-                    ${operationSrc}
-                    ${operationBufferSrc}
-                    ${operationDistanceSrc}
-                    ${operationIntersectionSrc}
-                    ${operationLinemergeSrc}
-                    ${operationOverlaySrc}
-                    ${operationOverlayValidateSrc}
-                    ${operationOverlaySnapSrc}
-                    ${operationPolygonizeSrc}
-                    ${operationPredicateSrc}
-                    ${operationRelateSrc}
-                    ${operationSharedpathsSrc}
-                    ${operationUnionSrc}
-                    ${operationValidSrc}
-                    ${planargraphSrc}
-                    ${planargraphAlgorithmSrc}
-                    ${precisionSrc}
-                    ${linearrefSrc}
+                    ${geosSrc}
                     ${GLUTesselatorSrc}
+                    #${globjectsSrc}
                     ${ICON}
                     )
 
@@ -283,8 +250,6 @@ if(APPLE)
                           MACOSX_BUNDLE_ICON_FILE glfw.icns
                           MACOSX_BUNDLE_INFO_PLIST "${GLFW_SOURCE_DIR}/CMake/MacOSXBundleInfo.plist.in")
 endif()
-
-#target_link_libraries(testStudent geos imgui)
 
 set(WEB_FILES
         hi.html

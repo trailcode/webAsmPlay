@@ -32,11 +32,22 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <tceGeom/vec2.h>
+#include <globjects/Program.h>
+#include <globjects/Shader.h>
+#include <globjects/globjects.h>
+#include <globjects/NamedString.h>
+#include <globjects/base/AbstractStringSource.h>
+#include <globjects/NamedString.h>
+#include <globjects/Shader.h>
+#include <globjects/logging.h>
+#include <globjects/base/File.h>
 
+//using namespace gl;
 using namespace std;
 using namespace geos::geom;
 using namespace rsmz;
 using namespace glm;
+using namespace globjects;
 using namespace tce::geom;
 
 #define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
@@ -417,6 +428,19 @@ void setupAnotherShader()
     glEnableVertexAttribArray(colAttrib);
     glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
     */
+
+   /*
+    auto program = new Program();
+
+    program->attach(
+                    Shader::fromString(GL_VERTEX_SHADER, vertexShaderSource), 
+                    Shader::fromString(GL_FRAGMENT_SHADER, fragmentShaderSource)
+    );
+
+    program->setUniform("extent", glm::vec2(1.0f, 0.5f)));
+    */
+
+    //Shader::
 }
 
     static GLuint VBO, VAO, EBO;
