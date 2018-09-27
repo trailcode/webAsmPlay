@@ -59,6 +59,8 @@
 //
 // ----------------------------------------------------------------------------
 
+#ifdef WORKING
+
 
 #include <tceGeom/vec3.h>
 #include <tceOpenSteer/AbstractVehicle.h>
@@ -331,3 +333,4 @@ OpenSteer::SimpleVehicle::predictFuturePosition (const float predictionTime) con
 
 // ----------------------------------------------------------------------------
 
+#endif // WORKING

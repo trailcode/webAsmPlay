@@ -119,6 +119,37 @@ file(GLOB imguiSrc              "imgui/imgui.cpp"
                                 "imgui/gl3w/GL/gl3w.c"                          
                                 )
 
+file(GLOB opensteerSrc  "opensteer/src/Clock.cpp"
+                        "opensteer/src/Color.cpp"
+                        "opensteer/src/Obstacle.cpp"
+                        "opensteer/src/OldPathway.cpp"
+                        "opensteer/src/Path.cpp"
+                        "opensteer/src/Pathway.cpp"
+                        "opensteer/src/PlugIn.cpp"
+                        "opensteer/src/PolylineSegmentedPath.cpp"
+                        "opensteer/src/PolylineSegmentedPathwaySegmentRadii.cpp"
+                        "opensteer/src/PolylineSegmentedPathwaySingleRadius.cpp"
+                        "opensteer/src/SegmentedPath.cpp"
+                        "opensteer/src/SegmentedPathway.cpp"
+                        "opensteer/src/SimpleVehicle.cpp"
+                        "opensteer/src/TerrainRayTest.cpp"
+                        "opensteer/src/TerrainRayTest.h"
+                        "opensteer/src/Vec3.cpp"
+                        "opensteer/src/Vec3Utilities.cpp"
+                        "opensteer/src/lq.c"
+                        "opensteer/src/Draw.cpp"
+                        "opensteer/src/OpenSteerDemo.cpp"
+                        "opensteer/plugins/Boids.cpp"
+                        "opensteer/plugins/CaptureTheFlag.cpp"
+                        "opensteer/plugins/LowSpeedTurn.cpp"
+                        "opensteer/plugins/MapDrive.cpp"
+                        "opensteer/plugins/MultiplePursuit.cpp"
+                        "opensteer/plugins/OneTurning.cpp"
+                        "opensteer/plugins/Pedestrian.cpp"
+                        "opensteer/plugins/PedestriansWalkingAnEight.cpp"
+                        "opensteer/plugins/Soccer.cpp"
+                        )
+
 file(GLOB globjectsSrc "globjects/source/*.cpp")
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
@@ -136,6 +167,7 @@ include_directories(glm)
 include_directories(glbinding/include)
 include_directories(glbinding-aux/include)
 include_directories(globjects/include)
+include_directories(opensteer/include)
 include_directories(./tceGeom/inc)
 include_directories(./tceCore/inc)
 include_directories(./tceOpenSteer/inc)
@@ -231,6 +263,7 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     ${geosSrc}
                     ${GLUTesselatorSrc}
                     #${globjectsSrc}
+                    ${opensteerSrc}
                     ${ICON}
                     )
 

@@ -35,6 +35,7 @@
 //
 // ----------------------------------------------------------------------------
 
+#ifdef WORKING
 
 #include "OpenSteer/SimpleVehicle.h"
 #include "OpenSteerDemo.h"
@@ -263,3 +264,5 @@ namespace {
 
 
 } // anonymous namespace    
+
+#endif // WORKING

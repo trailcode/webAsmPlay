@@ -36,6 +36,7 @@
 //
 // ----------------------------------------------------------------------------
 
+#ifdef WORKING
 
 #include <iomanip>
 #include <sstream>
@@ -706,3 +707,5 @@ PedestrianPlugIn gPedestrianPlugIn;
 // ----------------------------------------------------------------------------
 
 } // anonymous namespace
+
+#endif // WORKING

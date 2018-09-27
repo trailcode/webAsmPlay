@@ -50,6 +50,7 @@
 //
 // ----------------------------------------------------------------------------
 
+#ifdef WORKING
 
 #include <iomanip>
 #include <string>
@@ -989,3 +990,5 @@ namespace {
 
 
 } // anonymous namespace
+
+#endif // WORKING

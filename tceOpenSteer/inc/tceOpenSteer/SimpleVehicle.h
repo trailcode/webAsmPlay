@@ -59,6 +59,7 @@
 //
 // ----------------------------------------------------------------------------
 
+#ifdef WORKING
 
 #ifndef OPENSTEER_SIMPLEVEHICLE_H
 #define OPENSTEER_SIMPLEVEHICLE_H
@@ -249,3 +250,5 @@ namespace OpenSteer {
     
 // ----------------------------------------------------------------------------
 #endif // OPENSTEER_SIMPLEVEHICLE_H
+
+#endif // WORKING

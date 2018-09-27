@@ -35,6 +35,7 @@
 //
 // ----------------------------------------------------------------------------
 
+#ifdef WORKING
 
 #include <sstream>
 #include "OpenSteer/SimpleVehicle.h"
@@ -794,3 +795,5 @@ namespace {
     // ----------------------------------------------------------------------------
 
 } // anonymous namespace
+
+#endif // WORKING
