@@ -1,4 +1,4 @@
-#include <debug.h>
+#include <webAsmPlay/debug.h>
 #define GLEW_STATIC
 #include <GL/glew.h>
 

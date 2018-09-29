@@ -26,7 +26,7 @@ SOFTWARE.
 // modified from https://bitbucket.org/duangle/liminal/src/tip/src/liminal/imgui_dock.h
 
 //- Common Code For All Addons needed just to ease inclusion as separate files in user code ----------------------
-#include <debug.h>
+#include <webAsmPlay/debug.h>
 #include <imgui.h>
 #undef IMGUI_DEFINE_PLACEMENT_NEW
 #define IMGUI_DEFINE_PLACEMENT_NEW

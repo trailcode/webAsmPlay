@@ -1,7 +1,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <iostream>
-#include "debug.h"
-#include "TrackBallInteractor.h"
+#include <webAsmPlay/debug.h>
+#include <webAsmPlay/TrackBallInteractor.h>
 #include <glm/gtx/norm.hpp> // length2
 #include <glm/vec3.hpp>
 #include <glm/gtc/type_ptr.hpp>

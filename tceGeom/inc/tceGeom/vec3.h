@@ -46,7 +46,6 @@ namespace geom
 template <typename valueType>
 struct Vec3
 {
-
 	// ----------------------------------------- generic 3d vector operations
 
 	// three-dimensional Cartesian coordinates

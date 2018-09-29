@@ -22,11 +22,12 @@
 #define _T_BOUNDING_BOX_H__
 
 #include <ostream>
+#include <limits>
 #include <tceGeom/vec3.h>
 #include <tceGeom/plane.h>
 
 #ifndef BOGUS_RANGE
-	#define BOGUS_RANGE 180000 // @@@ Move to myLimits?
+	#define BOGUS_RANGE 180000 // @@@ Move to myLimits? TODO remove this, make it better!
 #endif
 
 namespace tce

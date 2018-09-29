@@ -72,14 +72,12 @@ file(GLOB tceOpenSteer_SRC "./tceOpenSteer/src/*.cpp" "./tceOpenSteer/inc/tceOpe
 file(GLOB tceCore_SRC "./tceCore/inc/tceCore/*.h")
 file(GLOB tceRender_SRC "./tceRender/src/*.cpp" "./tceRender/inc/tceRender/*.h")
 
-file(GLOB webAsmPlay_SRC   "test.cpp"
-                            "Camera.cpp"
-                            "Camera.h"
-                            "debiug.cpp"
-                            "debug.h"
-                            "TrackBallInteractor.cpp"
-                            "TrackBallInteractor.h"
-                            "GUI.cpp"
+file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
+                            "src/debiug.cpp"
+                            "src/TrackBallInteractor.cpp"
+                            "src/GUI.cpp"
+                            "src/GeosRender.cpp"
+                            "src/GeosRenderiable.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
                             ${tceOpenSteer_SRC}
@@ -172,7 +170,7 @@ include_directories(./tceGeom/inc)
 include_directories(./tceCore/inc)
 include_directories(./tceOpenSteer/inc)
 include_directories(./tceRender/inc)
-include_directories(./)
+include_directories(./inc)
 
 add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
     
@@ -263,14 +261,14 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     ${geosSrc}
                     ${GLUTesselatorSrc}
                     #${globjectsSrc}
-                    ${opensteerSrc}
+                    #${opensteerSrc}
                     ${ICON}
                     )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
-    add_executable(testStudent ${sources} ${imguiEmscriptenSrc} "mainWebAsm.cpp")
+    add_executable(testStudent ${sources} ${imguiEmscriptenSrc} "src/mainWebAsm.cpp")
 else()
-    add_executable(testStudent ${sources} ${imguiSrc} "main.cpp")
+    add_executable(testStudent ${sources} ${imguiSrc} "src/main.cpp")
 endif()
 
 if(APPLE)

@@ -30,7 +30,9 @@
 #define POLYS_DIFF_NORMALS 1
 #define POLYS_SAME 2
 
+#ifndef BOGUS_RANGE
 #define BOGUS_RANGE 18000
+#endif
 
 namespace tce
 {

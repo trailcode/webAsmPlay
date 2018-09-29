@@ -1,6 +1,6 @@
 #include <iostream>
-#include "Camera.h"
-#include "debug.h"
+#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/debug.h>
 #include <tceGeom/vec3.h>
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp> // lookAt
