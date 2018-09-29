@@ -9,33 +9,43 @@
 using namespace std;
 using namespace glm;
 using namespace geos::geom;
+using namespace tce::geom;
 
 namespace
 {
-    GLuint shaderProgram2 = 0;
-    GLint   posAttrib = 0;
-    GLint   MVP_Attrib = 0;
+    GLuint  shaderProgram = 0;
+    GLint   posAttrib     = 0;
+    GLint   MVP_Attrib    = 0;
+    GLint   colorAttrib   = 0;
 
     void ensureShader()
     {
-        if(shaderProgram2) { return ;}
+        if(shaderProgram) { return ;}
 
         // Shader sources
         const GLchar* vertexSource = R"glsl(#version 330 core
             in vec2 position;
+            out vec4 vertexColor;
             uniform mat4 MVP;
+            uniform vec4 vertexColorIn;
+
             void main()
             {
                 gl_Position = MVP * vec4(position.xy, 0, 1);
+                //vertexColorOut = vertexColor;
+                //vertexColor = vec4(0.5, 0.0, 0.0, 1.0);
+                vertexColor = vertexColorIn;
             }
         )glsl";
 
         const GLchar* fragmentSource = R"glsl(#version 330 core
             out vec4 outColor;
-            
+            in vec4 vertexColor;
+
             void main()
             {
-                outColor = vec4(1,1,1,0.5);
+                //outColor = vec4(1,1,1,0.5);
+                outColor = vertexColor;
             }
         )glsl";
 
@@ -45,7 +55,6 @@ namespace
         glCompileShader(vertexShader);
         GLint success = 0;
         glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        dmess("success " << success);
 
         GLchar infoLog[512];
 
@@ -61,7 +70,6 @@ namespace
         glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
         glCompileShader(fragmentShader);
         glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        dmess("success " << success);
 
         if (!success)
         {
@@ -71,24 +79,23 @@ namespace
         }
 
         // Link the vertex and fragment shader into a shader program
-        shaderProgram2 = glCreateProgram();
-        dmess("shaderProgram2 " << shaderProgram2);
-        glAttachShader(shaderProgram2, vertexShader);
-        glAttachShader(shaderProgram2, fragmentShader);
-        //glBindFragDataLocation(shaderProgram2, 0, "outColor");
-        glLinkProgram(shaderProgram2);
-        //glUseProgram(shaderProgram2);
+        shaderProgram = glCreateProgram();
 
-        glUseProgram(shaderProgram2);
+        glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, fragmentShader);
+        glLinkProgram (shaderProgram);
+        glUseProgram  (shaderProgram);
 
         // Specify the layout of the vertex data
-        posAttrib = glGetAttribLocation(shaderProgram2, "position");
+        posAttrib = glGetAttribLocation(shaderProgram, "position");
         glEnableVertexAttribArray(posAttrib);
         glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
 
-        MVP_Attrib = glGetUniformLocation(shaderProgram2, "MVP");
+        MVP_Attrib = glGetUniformLocation(shaderProgram, "MVP");
 
-        dmess("MVP_Attrib " << MVP_Attrib);
+        colorAttrib = glGetUniformLocation(shaderProgram, "vertexColorIn");
+
+        dmess("colorAttrib " << colorAttrib);
     }
 }
 
@@ -115,10 +122,12 @@ GeosRenderiable * GeosRenderiable::create(const Geometry * geom)
 GeosRenderiable::GeosRenderiable(   const GLuint  vao,
                                     const GLuint  ebo,
                                     const GLuint  vbo,
-                                    const int     numTriangles) :   vao         (vao),
-                                                                    ebo         (ebo),
-                                                                    vbo         (vbo),
-                                                                    numTriangles(numTriangles)
+                                    const int     numTriangles,
+                                    const vector<size_t> & counterVertIndices) :    vao         (vao),
+                                                                                    ebo         (ebo),
+                                                                                    vbo         (vbo),
+                                                                                    numTriangles(numTriangles),
+                                                                                    counterVertIndices(counterVertIndices)
 {
 }
 
@@ -163,6 +172,8 @@ GeosRenderiable * GeosRenderiable::prepairPolygon(const Polygon * poly)
     counterVertIndices.push_back(0);
     counterVertIndices.push_back(verts.size());
     
+    //dmess("verts.size() " << verts.size());
+
     for(size_t i = 0; i < poly->getNumInteriorRing(); ++i)
     {
         const vector<Coordinate> & coords = *poly->getInteriorRingN(i)->getCoordinates()->toVector();
@@ -201,9 +212,10 @@ GeosRenderiable * GeosRenderiable::prepairPolygon(const Polygon * poly)
                 &counterVertPtrs[0],
                 &counterVertPtrs[0] + counterVertPtrs.size());
 
-    GLuint  vao;
-    GLuint  ebo;
-    GLuint  vbo;
+    GLuint vao          = 0;
+    GLuint ebo          = 0;
+    GLuint eboOutline   = 0;
+    GLuint vbo          = 0;
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -216,19 +228,21 @@ GeosRenderiable * GeosRenderiable::prepairPolygon(const Polygon * poly)
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2, &verts2[0], GL_STATIC_DRAW);
+    //dmess("numVerts * 2 " << numVerts * 2);
 
     glGenBuffers(1, &ebo);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, triangleIndices, GL_STATIC_DRAW);
-
+    
     free(vertsOut);
     if(triangleIndices) { free(triangleIndices) ;}
 
     return new GeosRenderiable( vao,
                                 ebo,
                                 vbo,
-                                numTriangles);
+                                numTriangles,
+                                counterVertIndices);
 }
 
 GeosRenderiable::~GeosRenderiable()
@@ -242,15 +256,68 @@ GeosRenderiable::~GeosRenderiable()
 
 void GeosRenderiable::render(const mat4 & MVP) const
 {
-    glUseProgram(shaderProgram2);
+    glUseProgram(shaderProgram);
 
     glUniformMatrix4fv(MVP_Attrib, 1, false, glm::value_ptr(MVP));
+
+    glUniform4f(colorAttrib, fillColor.x, fillColor.y, fillColor.z, fillColor.w);
 
     glBindVertexArray(vao);
     // Specify the layout of the vertex data
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+    glEnable(GL_BLEND);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboOutline);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, 0);
+    //glDrawElements(GL_LINE_STRIP, numTriangles * 3, GL_UNSIGNED_INT, 0);
+    //glDrawElements(GL_LINE_STRIP, numTriangles * 3, GL_UNSIGNED_INT, 0);
+
+    /*
+    dmess("counterVertIndices.size() " << counterVertIndices.size());
+    for(int i = 0; i < counterVertIndices.size() - 1; ++i)
+    {
+        const size_t a = counterVertIndices[i];
+        const size_t b = counterVertIndices[i + 1];
+        dmess("a " << a << " b - a " << (b - a) / 2);
+        glBindVertexArray(vao);
+        // Specify the layout of the vertex data
+        glEnableVertexAttribArray(posAttrib);
+        glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glDrawArrays(GL_LINE_STRIP, a, (b - a) / 2);
+        //glDrawArrays(GL_LINE_STRIP, a, 10);
+    }
+    */
+
+    //glDrawArrays(GL_LINE_STRIP, 0, 10);
+
+    //glDrawElements(GL_LINE_STRIP, 10, GL_UNSIGNED_INT, numTriangles * 3 * sizeof(GLuint));
+
+    glDisable(GL_BLEND);
+
+    
 }
 
+vec4 GeosRenderiable::setFillColor(const vec4 & fillColor)
+{
+    return this->fillColor = fillColor;
+}
+
+vec4 GeosRenderiable::getFillColor() const
+{
+    return fillColor;
+}
+
+vec4 GeosRenderiable::setOutlineColor(const vec4 & outlineColor)
+{
+    return this->outlineColor = outlineColor;
+}
+
+vec4 GeosRenderiable::getOutlineColor() const
+{
+    return outlineColor;
+}

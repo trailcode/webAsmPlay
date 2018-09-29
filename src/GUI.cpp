@@ -404,7 +404,12 @@ void mainLoop(GLFWwindow* window) {
 
     unique_ptr<GeosRenderiable> r(GeosRenderiable::create(p));
 
-    if(r) { r->render(MVP) ;}
+    if(r)
+    {
+        r->setFillColor(vec4(1,1,0,0.2));
+        
+        r->render(MVP);
+    }
 
     for(Geometry * g : toDelete)
     {
