@@ -183,7 +183,7 @@ endif()
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     message("Emscripten=========================")
     SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
-    SET(CMAKE_CXX_LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui-emscripten/library_glfw.js --js-library ../glfw-imgui-emscripten/library_gl.js ")
+    SET(CMAKE_CXX_LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1 -s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui-emscripten/library_glfw.js --js-library ../glfw-imgui-emscripten/library_gl.js ")
     add_definitions(-D__EMSCRIPTEN__)
 else()
 
