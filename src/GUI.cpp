@@ -402,9 +402,9 @@ void mainLoop(GLFWwindow* window) {
         //cout << " p.x " << p->getX() << " p.y " << p->getY() << endl;
     }
 
-    GeosRenderiable r(p);
+    unique_ptr<GeosRenderiable> r(GeosRenderiable::create(p));
 
-    r.render(MVP);
+    if(r) { r->render(MVP) ;}
 
     for(Geometry * g : toDelete)
     {

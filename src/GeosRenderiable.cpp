@@ -92,10 +92,37 @@ namespace
     }
 }
 
-GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao         (0),
-                                                    ebo         (0),
-                                                    vbo         (0),
-                                                    numTriangles(0)
+GeosRenderiable * GeosRenderiable::create(const Geometry * geom)
+{
+    switch(geom->getGeometryTypeId())
+    {
+        case GEOS_POINT:                dmess("Implement me!"); return NULL;
+        case GEOS_LINESTRING:           dmess("Implement me!"); return NULL;
+        case GEOS_LINEARRING:           dmess("Implement me!"); return NULL;
+        case GEOS_POLYGON:              return prepairPolygon(dynamic_cast<const Polygon *>(geom));
+        case GEOS_MULTIPOINT:           dmess("Implement me!"); return NULL;
+        case GEOS_MULTILINESTRING:      dmess("Implement me!"); return NULL;
+        case GEOS_MULTIPOLYGON:         dmess("Implement me!"); return NULL;
+        case GEOS_GEOMETRYCOLLECTION:   dmess("Implement me!"); return NULL;
+        default:
+            dmess("Error!");
+            abort();
+    }
+
+    return NULL;
+}
+
+GeosRenderiable::GeosRenderiable(   const GLuint  vao,
+                                    const GLuint  ebo,
+                                    const GLuint  vbo,
+                                    const int     numTriangles) :   vao         (vao),
+                                                                    ebo         (ebo),
+                                                                    vbo         (vbo),
+                                                                    numTriangles(numTriangles)
+{
+}
+
+GeosRenderiable * GeosRenderiable::prepairPolygon(const Polygon * poly)
 {
     ensureShader();
 
@@ -107,7 +134,7 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao         (0),
     {
         dmess("Bad geometry!");
 
-        return;
+        return NULL;
     }
 
     const LineString * ring = poly->getExteriorRing();
@@ -118,7 +145,7 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao         (0),
     {
         dmess("Bad gemetry!");
 
-        return;
+        return NULL;
     }
 
     vector<double> verts;
@@ -144,7 +171,7 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao         (0),
         {
             dmess("Bad gemetry!");
 
-            return;
+            return NULL;
         }
 
         for(size_t i = 0; i < coords.size() - 1; ++i)
@@ -165,6 +192,7 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao         (0),
     double  * vertsOut;
     int     * triangleIndices;
     int       numVerts;
+    int       numTriangles;
 
     tessellate( &vertsOut,
                 &numVerts,
@@ -172,6 +200,10 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao         (0),
                 &numTriangles,
                 &counterVertPtrs[0],
                 &counterVertPtrs[0] + counterVertPtrs.size());
+
+    GLuint  vao;
+    GLuint  ebo;
+    GLuint  vbo;
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -192,6 +224,11 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao         (0),
 
     free(vertsOut);
     if(triangleIndices) { free(triangleIndices) ;}
+
+    return new GeosRenderiable( vao,
+                                ebo,
+                                vbo,
+                                numTriangles);
 }
 
 GeosRenderiable::~GeosRenderiable()

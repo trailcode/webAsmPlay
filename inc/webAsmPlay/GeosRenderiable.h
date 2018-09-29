@@ -9,6 +9,7 @@ namespace geos
 {
     namespace geom
     {
+        class Geometry;
         class Polygon;
     }
 }
@@ -17,18 +18,25 @@ class GeosRenderiable
 {
 public:
 
-    GeosRenderiable(geos::geom::Polygon * poly);
-
     virtual ~GeosRenderiable();
 
     void render(const glm::mat4 & MVP) const;
 
+    static GeosRenderiable * create(const geos::geom::Geometry * geom);
+
 private:
 
-    GLuint  vao;
-    GLuint  ebo;
-    GLuint  vbo;
-    int     numTriangles;
+    GeosRenderiable(const GLuint  vao,
+                    const GLuint  ebo,
+                    const GLuint  vbo,
+                    const int     numTriangles);
+
+    static GeosRenderiable * prepairPolygon(const geos::geom::Polygon * poly);
+
+    const GLuint  vao;
+    const GLuint  ebo;
+    const GLuint  vbo;
+    const int     numTriangles;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__
