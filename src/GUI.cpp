@@ -373,7 +373,13 @@ void mainLoop(GLFWwindow* window) {
     // =========================
 
     //*
-    Polygon * p = MakeBox(-1,-1,1,1);
+    Polygon * pp = MakeBox(-0.1,-0.1,0.1,0.1);
+    Polygon * p = MakeBox(-0.5,-0.5,0.5,0.5);
+    Polygon * ppp = p;
+
+    //p = dynamic_cast<Polygon *>(p->buffer(0.1));
+    //Polygon * pppp = p;
+    p = dynamic_cast<Polygon *>(p->difference(pp));
 
     const LineString * ring = p->getExteriorRing();
 
@@ -397,6 +403,9 @@ void mainLoop(GLFWwindow* window) {
     r.render(MVP);
 
     geomFact->destroyGeometry(p);
+    //geomFact->destroyGeometry(pp);
+    //geomFact->destroyGeometry(ppp);
+    //geomFact->destroyGeometry(pppp);
 
     //*/
 
