@@ -92,46 +92,10 @@ namespace
     }
 }
 
-namespace 
-{
-    tuple<double *, int *, int, int> run_example(   const double vertices_array[],
-                        const double **contours_array,
-                        int contours_size)
-    {
-        double *coordinates_out;
-        int *tris_out;
-        int nverts, ntris, i;
-
-        const double *p = vertices_array;
-        /* const double **contours = contours_array; */
-
-        tessellate(&coordinates_out, &nverts,
-                &tris_out, &ntris,
-                contours_array, contours_array + contours_size);
-
-        /*
-        for (i=0; i<2 * nverts; ++i) {
-            fprintf(stdout, "%g ", coordinates_out[i]);
-        }
-        fprintf(stdout, "\n");
-        for (i=0; i<3 * ntris; ++i) {
-            fprintf(stdout, "%d ", tris_out[i]);
-        }
-        fprintf(stdout, "\n");
-        */
-        /*
-        free(coordinates_out);
-        if (tris_out)
-            free(tris_out);
-            */
-        return make_tuple(coordinates_out, tris_out, nverts, ntris);
-    }
-}
-
-GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao(0),
-                                                    ebo(0),
-                                                    vbo(0),
-                                                    ntris(0)
+GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao         (0),
+                                                    ebo         (0),
+                                                    vbo         (0),
+                                                    numTriangles(0)
 {
     ensureShader();
 
@@ -146,8 +110,6 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao(0),
         return;
     }
 
-    center.x; // TODO shift the geometry by this amount.
-
     const LineString * ring = poly->getExteriorRing();
 
     const vector<Coordinate> & coords = *ring->getCoordinates()->toVector();
@@ -159,8 +121,6 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao(0),
         return;
     }
 
-    //dmess("coords.size() " << coords.size());
-
     vector<double> verts;
 
     for(size_t i = 0; i < coords.size() - 1; ++i)
@@ -171,19 +131,11 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao(0),
         verts.push_back(C.y);
     }
 
-    //const double *c1[] = {&verts[0], &verts[0] + verts.size()};
-    //*
-    vector<size_t> c2;
-    vector<const double *> c1;
-    //c1.push_back(&verts[0]);
-    //c1.push_back(&verts[0] + verts.size());
-    c2.push_back(0);
-    c2.push_back(verts.size());
-    //*/
-
-    dmess("poly->getNumInteriorRing() " << poly->getNumInteriorRing());
-
-    //*
+    vector<size_t> counterVertIndices;
+    
+    counterVertIndices.push_back(0);
+    counterVertIndices.push_back(verts.size());
+    
     for(size_t i = 0; i < poly->getNumInteriorRing(); ++i)
     {
         const vector<Coordinate> & coords = *poly->getInteriorRingN(i)->getCoordinates()->toVector();
@@ -195,10 +147,6 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao(0),
             return;
         }
 
-        size_t startIndex = verts.size();
-
-        dmess("startIndex " << startIndex << " coords.size() " << coords.size());
-
         for(size_t i = 0; i < coords.size() - 1; ++i)
         {
             const Coordinate & C = coords[i];
@@ -207,95 +155,43 @@ GeosRenderiable::GeosRenderiable(Polygon * poly) :  vao(0),
             verts.push_back(C.y);
         }
 
-        //c1.push_back(&verts[startIndex]);
-
-        //c1.push_back(&verts[0] + verts.size());
-        c2.push_back(verts.size());
-    }
-    //*/
-    for(size_t i = 0; i < c2.size(); ++i)
-    {
-        c1.push_back(&verts[0] + c2[i]);
+        counterVertIndices.push_back(verts.size());
     }
 
-    double *coordinates_out;
-    int *tris_out;
-    int numVerts;
+    vector<const double *> counterVertPtrs;
 
-    //tie(coordinates_out, tris_out, numVerts, ntris) = run_example(&verts[0], &c1[0], 2);
-    tie(coordinates_out, tris_out, numVerts, ntris) = run_example(&verts[0], &c1[0], c1.size());
+    for(size_t i = 0; i < counterVertIndices.size(); ++i) { counterVertPtrs.push_back(&verts[0] + counterVertIndices[i]) ;}
 
-    dmess("coordinates_out " << coordinates_out << " tris_out " << tris_out << " numVerts " << numVerts);
+    double  * vertsOut;
+    int     * triangleIndices;
+    int       numVerts;
+
+    tessellate( &vertsOut,
+                &numVerts,
+                &triangleIndices,
+                &numTriangles,
+                &counterVertPtrs[0],
+                &counterVertPtrs[0] + counterVertPtrs.size());
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    //dmess("vao " << vao);
-
-    // Create a Vertex Buffer Object and copy the vertex data to it
-    //GLuint vbo;
     glGenBuffers(1, &vbo);
-
-    //dmess("vbo " << vbo);
-
-    /*
-    GLfloat vertices[] = {
-        -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // Top-left
-         0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // Top-right
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // Bottom-right
-        -0.5f, -0.5f, 1.0f, 1.0f, 1.0f  // Bottom-left
-    };
-    */
-
-    GLfloat vertices[] = {
-        -0.5f,  0.5f, // Top-left
-         0.5f,  0.5f, // Top-right
-         0.5f, -0.5f, // Bottom-right
-        -0.5f, -0.5f  // Bottom-left
-    };
 
     vector<GLfloat> verts2(numVerts * 2);
 
-    //dmess("numVerts " << numVerts);
-
-    for(size_t i = 0; i < numVerts * 2; ++i)
-    {
-        verts2[i] = coordinates_out[i];
-        //cout << verts2[i] << " ";
-    }
-    //cout << endl;
+    for(size_t i = 0; i < numVerts * 2; ++i) { verts2[i] = vertsOut[i] ;}
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2, &verts2[0], GL_STATIC_DRAW);
 
-    // Create an element array
-    //GLuint ebo;
     glGenBuffers(1, &ebo);
-    //dmess("ebo " << ebo);
-
-    GLuint elements[] = {
-        0, 1, 2,
-        2, 3, 0
-    };
-
-    vector<GLuint> elements2(ntris * 3);
-
-    //dmess("ntris * 3 " << ntris * 3);
-
-    for(size_t i = 0; i < ntris * 3; ++i)
-    {
-        elements2[i] = tris_out[i];
-        //cout << elements2[i] << " ";
-    }
-    //cout << endl;
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * ntris * 3, &elements2[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, triangleIndices, GL_STATIC_DRAW);
 
-    free(coordinates_out);
-    if (tris_out) free(tris_out);
+    free(vertsOut);
+    if(triangleIndices) { free(triangleIndices) ;}
 }
 
 GeosRenderiable::~GeosRenderiable()
@@ -311,18 +207,13 @@ void GeosRenderiable::render(const mat4 & MVP) const
 {
     glUseProgram(shaderProgram2);
 
-    //dmess("MVP_Attrib " << MVP_Attrib);
-
     glUniformMatrix4fv(MVP_Attrib, 1, false, glm::value_ptr(MVP));
 
     glBindVertexArray(vao);
     // Specify the layout of the vertex data
     glEnableVertexAttribArray(posAttrib);
-    //glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    //dmess("ntris " << ntris);
-    glDrawElements(GL_TRIANGLES, ntris * 3, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, 0);
 }
 

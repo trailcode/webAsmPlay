@@ -28,7 +28,7 @@ private:
     GLuint  vao;
     GLuint  ebo;
     GLuint  vbo;
-    int ntris;
+    int     numTriangles;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__
