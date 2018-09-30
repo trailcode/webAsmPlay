@@ -34,19 +34,32 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <tceGeom/vec2.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/GeosUtil.h>
 
-//using namespace gl;
 using namespace std;
 using namespace geos::geom;
 using namespace rsmz;
 using namespace glm;
 using namespace tce::geom;
 
-#define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
+//#define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
-// Function prototypes
-//void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+static ImVec4 clear_color = ImColor(114, 144, 154);
+static int mouse_buttons_down = 0;
+
+static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
+
+TrackBallInteractor trackBallInteractor;
+Camera * camera = NULL;
+
+bool showViewMatrixPanel = true;
+bool showMVP_MatrixPanel = true;
+
+bool isFirst = true;
+
+FrameBuffer * frameBuffer = NULL;
+ImVec2 sceneWindowSize;
 
 void errorCallback(int error, const char* description)
 {
@@ -67,23 +80,6 @@ void refresh(GLFWwindow* window)
     glfwMarkWindowForRefresh(window);
 #endif
 }
-
-static ImVec4 clear_color = ImColor(114, 144, 154);
-static int mouse_buttons_down = 0;
-
-static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
-
-TrackBallInteractor trackBallInteractor;
-Camera * camera = NULL;
-
-bool showViewMatrixPanel = true;
-bool showMVP_MatrixPanel = true;
-
-bool isFirst = true;
-
-unsigned int framebuffer;
-unsigned int textureColorbuffer;
-unsigned int rbo;
 
 void mainLoop(GLFWwindow* window)
 {
@@ -154,9 +150,9 @@ void mainLoop(GLFWwindow* window)
     }
 
     // Rendering
-    int display_w, display_h;
-    glfwGetFramebufferSize(window, &display_w, &display_h);
-    glViewport(0, 0, display_w, display_h);
+    int screenWidth, screenHeight;
+    glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
+    glViewport(0, 0, screenWidth, screenHeight);
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -171,7 +167,7 @@ void mainLoop(GLFWwindow* window)
 
     const mat4 view = camera->getMatrix();
     const mat4 model = mat4(1.0);
-    const mat4 projection = perspective(45.0, double(display_w) / double(display_h), 0.1, 100.0);
+    const mat4 projection = perspective(45.0, double(screenWidth) / double(screenHeight), 0.1, 100.0);
     const mat4 MVP = projection * view * model;
 
     if(showViewMatrixPanel)
@@ -206,14 +202,24 @@ void mainLoop(GLFWwindow* window)
     //glBindFramebuffer(GL_FRAMEBUFFER, framebufferName);
     //glViewport(0,0,1024,768); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
+    /*
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glViewport(0,0,640,480);
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
+    */
+
+    frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, Vec2i(sceneWindowSize.x, sceneWindowSize.y));
+
+    frameBuffer->bind();
+
+    glViewport(0,0,sceneWindowSize.x,sceneWindowSize.y);
+    glClearColor(0,0,0,1);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     if(r)
     {
-        r->setFillColor(vec4(1,1,0,0.2));
+        r->setFillColor(vec4(1,1,0,1));
         
         r->render(MVP);
     }
@@ -224,14 +230,12 @@ void mainLoop(GLFWwindow* window)
 
     ImVec2 pos = ImGui::GetCursorScreenPos();
 
-    //dmess("pos " << pos.x << " " << pos.y);
-
-    //*
     ImGui::GetWindowDrawList()->AddImage(
-        (void *)textureColorbuffer,
-        ImVec2(ImGui::GetCursorScreenPos()),
-        ImVec2(ImGui::GetCursorScreenPos().x + 800/2, ImGui::GetCursorScreenPos().y + 600/2), ImVec2(0, 1), ImVec2(1, 0));
-        //*/
+        (void *)frameBuffer->getTextureID(),
+        pos,
+        ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y), ImVec2(0, 1), ImVec2(1, 0));
+
+    sceneWindowSize = ImGui::GetWindowSize();
 
     ImGui::End();
 
@@ -243,7 +247,7 @@ void mainLoop(GLFWwindow* window)
     glfwMakeContextCurrent(window);
     glfwSwapBuffers(window);
 
-    refresh(window);
+    //refresh(window);
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -449,6 +453,7 @@ void initOpenGL(GLFWwindow* window)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     //*/
 
+    /*
     int SCR_WIDTH = 640;
     int SCR_HEIGHT = 480;
 
@@ -472,4 +477,5 @@ void initOpenGL(GLFWwindow* window)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    */
 }

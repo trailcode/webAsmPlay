@@ -80,6 +80,7 @@ file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
                             "src/GeosRenderiable.cpp"
                             "src/GeosUtil.cpp"
                             "src/Util.cpp"
+                            "src/FrameBuffer.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
                             ${tceOpenSteer_SRC}
