@@ -35,6 +35,7 @@
 #include <tceGeom/vec2.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeosUtil.h>
 
 using namespace std;
@@ -49,6 +50,8 @@ static ImVec4 clear_color = ImColor(114, 144, 154);
 static int mouse_buttons_down = 0;
 
 static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
+
+Canvas * canvas = NULL;
 
 TrackBallInteractor trackBallInteractor;
 Camera * camera = NULL;
@@ -188,6 +191,7 @@ void mainLoop(GLFWwindow* window)
 
     isFirst = false;
 
+    /*
     Polygon * pp = scopedGeosGeometry(GeosUtil::makeBox(-0.1,-0.1,0.1,0.1));
 
     Polygon * p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,0.5,0.5));
@@ -198,20 +202,10 @@ void mainLoop(GLFWwindow* window)
 
     unique_ptr<GeosRenderiable> r(GeosRenderiable::create(p));
 
-    // Render to our framebuffer
-    //glBindFramebuffer(GL_FRAMEBUFFER, framebufferName);
-    //glViewport(0,0,1024,768); // Render on the whole framebuffer, complete from the lower left corner to the upper right
-
-    /*
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    glViewport(0,0,640,480);
-    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
-    */
-
     frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, Vec2i(sceneWindowSize.x, sceneWindowSize.y));
 
     frameBuffer->bind();
+    
 
     glViewport(0,0,sceneWindowSize.x,sceneWindowSize.y);
     glClearColor(0,0,0,1);
@@ -223,22 +217,35 @@ void mainLoop(GLFWwindow* window)
         
         r->render(MVP);
     }
+    */
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     ImGui::Begin("Scene Window");
 
+    //dmess("ImGui::IsWindowFocused() " << ImGui::IsWindowFocused());
+
     ImVec2 pos = ImGui::GetCursorScreenPos();
 
+    canvas->setArea(__(pos), __(sceneWindowSize));
+
+    canvas->render();
+    
+    ImGuiContext & g = *GImGui;
+
+    canvas->setWantMouseCapture(g.IO.WantCaptureMouse);
+
     ImGui::GetWindowDrawList()->AddImage(
-        (void *)frameBuffer->getTextureID(),
+        //(void *)frameBuffer->getTextureID(),
+        (void *)canvas->getTextureID(),
         pos,
         ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y), ImVec2(0, 1), ImVec2(1, 0));
-
+        
     sceneWindowSize = ImGui::GetWindowSize();
 
     ImGui::End();
 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     ImGui::Render();
 
 #ifndef __EMSCRIPTEN__
@@ -256,6 +263,8 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
         return;
     }
+
+    canvas->onMouseButton(button, action, mods);
 
     if (mouse_buttons[button] != action) {
       mouse_buttons[button] = action;
@@ -277,6 +286,8 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
     //dmess("x " << xpos << " y " << ypos);
 
+    canvas->onMousePosition(Vec2d(xpos, ypos));
+
     trackBallInteractor.setClickPoint(xpos, ypos);
     trackBallInteractor.update();
 
@@ -289,6 +300,8 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     //dmess("ScrollCallback " << xoffset << " " << yoffset);
+
+    canvas->onMouseScroll(window, Vec2d(xoffset, yoffset));
 
     ImGuiContext & g = *GImGui;
 
@@ -330,6 +343,8 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+    canvas->onKey(window, key, scancode, action, mods);
+
     //dmess("key " << key << " scancode " << scancode << " action " << action << " mods " << mods);
     switch(key)
     {
@@ -366,6 +381,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 void charCallback(GLFWwindow* window, unsigned int c)
 {
+    canvas->onChar(c);
+
 #ifdef __EMSCRIPTEN__
     ImGui_ImplGlfwGL3_CharCallback(window, c);
 #else
@@ -415,67 +432,5 @@ void initOpenGL(GLFWwindow* window)
     trackBallInteractor.getCamera()->reset();
     trackBallInteractor.setSpeed(3);
 
-    //glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
-
-    /*
-    glGenFramebuffers(1, &framebufferName);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebufferName);
-
-    // The texture we're going to render to
-    glGenTextures(1, &renderedTexture);
-
-    // "Bind" the newly created texture : all future texture functions will modify this texture
-    glBindTexture(GL_TEXTURE_2D, renderedTexture);
-
-    // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1024, 768, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
-
-    // Poor filtering. Needed !
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-    // The depth buffer
-    glGenRenderbuffers(1, &depthrenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1024, 768);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
-
-    // Set "renderedTexture" as our colour attachement #0
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
-
-    // Set the list of draw buffers.
-    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
-
-    // Always check that our framebuffer is ok
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) { dmess("Error!") ;}
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //*/
-
-    /*
-    int SCR_WIDTH = 640;
-    int SCR_HEIGHT = 480;
-
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    // create a color attachment texture
-    
-    glGenTextures(1, &textureColorbuffer);
-    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
-    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    */
+    canvas = new Canvas();
 }

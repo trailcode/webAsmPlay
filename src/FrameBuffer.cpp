@@ -75,8 +75,6 @@ FrameBuffer::FrameBuffer(   const GLuint framebuffer,
 
 FrameBuffer::~FrameBuffer()
 {
-    dmess("FrameBuffer::~FrameBuffer");
-
     unbind();
 
     glDeleteTextures        (1, &textureColorbuffer);

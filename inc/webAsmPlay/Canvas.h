@@ -1,0 +1,60 @@
+#ifndef __WEB_ASM_PLAY_CANVAS_H__
+#define __WEB_ASM_PLAY_CANVAS_H__
+
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+#else
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+#endif
+#include <tceGeom/vec2.h>
+
+namespace rsmz
+{
+    class TrackBallInteractor;
+}
+
+class FrameBuffer;
+class GLFWwindow;
+
+class Canvas
+{
+public:
+
+    Canvas();
+    virtual ~Canvas();
+
+    void setArea(const tce::geom::Vec2i & upperLeft, const tce::geom::Vec2i & size);
+
+    virtual GLuint render();
+
+    GLuint getTextureID() const;
+
+    bool setWantMouseCapture(const bool wantMouseCapture);
+
+    void onMouseButton(const int button, const int action, const int mods);
+
+    void onMousePosition(const tce::geom::Vec2d & mousePos);
+
+    void onMouseScroll(GLFWwindow * window, const tce::geom::Vec2d & mouseScroll);
+
+    void onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods);
+
+    void onChar(const size_t c);
+
+private:
+
+    rsmz::TrackBallInteractor * trackBallInteractor;
+
+    FrameBuffer * frameBuffer;
+
+    tce::geom::Vec2i upperLeft;
+    tce::geom::Vec2i size;
+
+    bool wantMouseCapture;
+
+    tce::geom::Vec2i lastShiftKeyDownMousePos;
+};
+
+#endif // __WEB_ASM_PLAY_CANVAS_H__

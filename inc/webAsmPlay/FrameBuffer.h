@@ -1,6 +1,13 @@
 #ifndef __WEB_ASM_PLAY_FRAME_BUFFER_H__
 #define __WEB_ASM_PLAY_FRAME_BUFFER_H__
 
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+#else
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+#endif // __EMSCRIPTEN__
 #include <tceGeom/vec2.h>
 
 class FrameBuffer
