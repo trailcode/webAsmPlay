@@ -81,7 +81,12 @@ bool showMVP_MatrixPanel = true;
 
 bool isFirst = true;
 
-void mainLoop(GLFWwindow* window) {
+unsigned int framebuffer;
+unsigned int textureColorbuffer;
+unsigned int rbo;
+
+void mainLoop(GLFWwindow* window)
+{
     // Game loop
     if (glfwWindowShouldClose(window)) {
       cleanup();
@@ -197,6 +202,15 @@ void mainLoop(GLFWwindow* window) {
 
     unique_ptr<GeosRenderiable> r(GeosRenderiable::create(p));
 
+    // Render to our framebuffer
+    //glBindFramebuffer(GL_FRAMEBUFFER, framebufferName);
+    //glViewport(0,0,1024,768); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glViewport(0,0,640,480);
+    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     if(r)
     {
         r->setFillColor(vec4(1,1,0,0.2));
@@ -204,17 +218,20 @@ void mainLoop(GLFWwindow* window) {
         r->render(MVP);
     }
 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     ImGui::Begin("Scene Window");
 
     ImVec2 pos = ImGui::GetCursorScreenPos();
 
-    dmess("pos " << pos.x << " " << pos.y);
+    //dmess("pos " << pos.x << " " << pos.y);
 
-    /*
+    //*
     ImGui::GetWindowDrawList()->AddImage(
-        (void *)window.getRenderTexture(), ImVec2(ImGui::GetCursorScreenPos()),
-        ImVec2(ImGui::GetCursorScreenPos().x + window.getWidth()/2, ImGui::GetCursorScreenPos().y + window.getHeight()/2), ImVec2(0, 1), ImVec2(1, 0));
-        */
+        (void *)textureColorbuffer,
+        ImVec2(ImGui::GetCursorScreenPos()),
+        ImVec2(ImGui::GetCursorScreenPos().x + 800/2, ImGui::GetCursorScreenPos().y + 600/2), ImVec2(0, 1), ImVec2(1, 0));
+        //*/
 
     ImGui::End();
 
@@ -394,5 +411,65 @@ void initOpenGL(GLFWwindow* window)
     trackBallInteractor.getCamera()->reset();
     trackBallInteractor.setSpeed(3);
 
-    glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
+    //glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
+
+    /*
+    glGenFramebuffers(1, &framebufferName);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebufferName);
+
+    // The texture we're going to render to
+    glGenTextures(1, &renderedTexture);
+
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, renderedTexture);
+
+    // Give an empty image to OpenGL ( the last "0" )
+    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1024, 768, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+    // Poor filtering. Needed !
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    // The depth buffer
+    glGenRenderbuffers(1, &depthrenderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1024, 768);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+
+    // Set "renderedTexture" as our colour attachement #0
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+
+    // Set the list of draw buffers.
+    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+
+    // Always check that our framebuffer is ok
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) { dmess("Error!") ;}
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //*/
+
+    int SCR_WIDTH = 640;
+    int SCR_HEIGHT = 480;
+
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    // create a color attachment texture
+    
+    glGenTextures(1, &textureColorbuffer);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+    
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

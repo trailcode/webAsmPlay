@@ -4,6 +4,7 @@
 #ifdef __EMSCRIPTEN__
     // GLEW
     #define GLEW_STATIC
+    #include <GL/glew.h>
 #else
     #include <GL/gl3w.h>
 #endif // __EMSCRIPTEN__

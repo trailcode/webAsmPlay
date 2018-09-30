@@ -2,7 +2,7 @@
 #include <geos/geom/Envelope.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
-#include <webAsmPlay/debug.h>
+#include <webAsmPlay/Debug.h>
 #include "../GLUTesselator/include/GLU/tessellate.h"
 #include <webAsmPlay/GeosRenderiable.h>
 

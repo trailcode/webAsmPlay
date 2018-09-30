@@ -1,6 +1,6 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
-#include <webAsmPlay/debug.h>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GeosRender.h>
 
 using namespace geos::geom;
