@@ -22,7 +22,7 @@
 #include <tceGeom/Q3BSPMap.h>
 #include <tceRender/VertexBuffer.h>
 #include <tceRender/CGLState.h>
-#include <tceCore/debug.h>
+#include <tceCore/Debug.h>
 //#include "drawStuff.h"
 
 using namespace std;

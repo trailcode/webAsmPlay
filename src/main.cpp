@@ -6,7 +6,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
-#include <webAsmPlay/debug.h>
+#include <webAsmPlay/Debug.h>
 
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
 // Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
@@ -28,18 +28,19 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-void error_callback(int error, const char* description);
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void CharCallback(GLFWwindow* window, unsigned int c);
-void WindowFocusCallback(GLFWwindow* window, int focused);
-void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
-void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
-void CursorEnterCallback(GLFWwindow* window, int entered);
-void initOpenGL(GLFWwindow* window);
-void mainLoop(GLFWwindow* window);
+void errorCallback(int error, const char* description);
+
+void mouseButtonCallback    (GLFWwindow* window, int button, int action, int mods);
+void scrollCallback         (GLFWwindow* window, double xoffset, double yoffset);
+void keyCallback            (GLFWwindow* window, int key, int scancode, int action, int mods);
+void charCallback           (GLFWwindow* window, unsigned int c);
+void windowFocusCallback    (GLFWwindow* window, int focused);
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+void cursorPosCallback      (GLFWwindow* window, double xpos, double ypos);
+void cursorEnterCallback    (GLFWwindow* window, int entered);
+void initOpenGL             (GLFWwindow* window);
+void mainLoop               (GLFWwindow* window);
+void refresh                (GLFWwindow* window);
 
 int main(int, char**)
 {
@@ -120,14 +121,14 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    glfwSetMouseButtonCallback(window, MouseButtonCallback);
-    glfwSetScrollCallback(window, ScrollCallback);
-    glfwSetKeyCallback(window, KeyCallback);
-    glfwSetCharCallback(window, CharCallback);
-    glfwSetWindowFocusCallback(window, WindowFocusCallback);
-    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
-    glfwSetCursorPosCallback(window, CursorPosCallback);
-    glfwSetCursorEnterCallback(window, CursorEnterCallback);
+    glfwSetMouseButtonCallback      (window, mouseButtonCallback);
+    glfwSetScrollCallback           (window, scrollCallback);
+    glfwSetKeyCallback              (window, keyCallback);
+    glfwSetCharCallback             (window, charCallback);
+    glfwSetWindowFocusCallback      (window, windowFocusCallback);
+    glfwSetFramebufferSizeCallback  (window, framebufferSizeCallback);
+    glfwSetCursorPosCallback        (window, cursorPosCallback);
+    glfwSetCursorEnterCallback      (window, cursorEnterCallback);
 
     initOpenGL(window);
 

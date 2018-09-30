@@ -54,17 +54,17 @@ file(GLOB geosSrc   "geos/src/util/*.cpp"
                     "geos/src/precision/*.cpp"
                     "geos/src/linearref/*.cpp")
 
-file(GLOB GLUTesselatorSrc  "GLUTesselator/src/dict.cpp",
-                            "GLUTesselator/src/mesh.cpp",
-                            "GLUTesselator/src/render.cpp",
-                            "GLUTesselator/src/tess.cpp",
-                            "GLUTesselator/src/geom.cpp",
-                            "GLUTesselator/src/memalloc.cpp",
-                            "GLUTesselator/src/normal.cpp",
-                            "GLUTesselator/src/priorityq.cpp",
-                            "GLUTesselator/src/sweep.cpp",
-                            "GLUTesselator/src/tessmono.cpp",
-                            "GLUTesselator/src/tessellate.cpp"
+file(GLOB GLUTesselatorSrc  "GLUTesselator/src/dict.cpp"
+                            "GLUTesselator/src/mesh.cpp"
+                            "GLUTesselator/src/render.cpp"
+                            "GLUTesselator/src/tess.cpp"
+                            "GLUTesselator/src/geom.cpp"
+                            "GLUTesselator/src/memalloc.cpp"
+                            "GLUTesselator/src/normal.cpp"
+                            "GLUTesselator/src/priorityq.cpp"
+                            "GLUTesselator/src/sweep.cpp"
+                            "GLUTesselator/src/tessmono.cpp"
+                            "GLUTesselator/src/tessellate.cpp" 
                             )
 
 file(GLOB tceGeom_SRC "./tceGeom/src/*.cpp" "./tceGeom/inc/tceGeom/*.h")
@@ -73,11 +73,13 @@ file(GLOB tceCore_SRC "./tceCore/inc/tceCore/*.h")
 file(GLOB tceRender_SRC "./tceRender/src/*.cpp" "./tceRender/inc/tceRender/*.h")
 
 file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
-                            "src/debiug.cpp"
+                            "src/Debug.cpp"
                             "src/TrackBallInteractor.cpp"
                             "src/GUI.cpp"
                             "src/GeosRender.cpp"
                             "src/GeosRenderiable.cpp"
+                            "src/GeosUtil.cpp"
+                            "src/Util.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
                             ${tceOpenSteer_SRC}
@@ -181,7 +183,6 @@ endif()
 #add_library(imgui ${imguiSrc})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
-    message("Emscripten=========================")
     SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
     SET(CMAKE_CXX_LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1 -s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui-emscripten/library_glfw.js --js-library ../glfw-imgui-emscripten/library_gl.js ")
     add_definitions(-D__EMSCRIPTEN__)
@@ -192,31 +193,31 @@ else()
     link_libraries(${GLEW_LIBRARIES})
     link_libraries(glfw)
 
-endif()
-
-#--------------------------------------------------------------------
-# Detect and select backend APIs
-#--------------------------------------------------------------------
-if (GLFW_USE_WAYLAND)
+    #--------------------------------------------------------------------
+    # Detect and select backend APIs
+    #--------------------------------------------------------------------
+    if (GLFW_USE_WAYLAND)
     set(_GLFW_WAYLAND 1)
     message(STATUS "Using Wayland for window creation")
-elseif (GLFW_USE_MIR)
+    elseif (GLFW_USE_MIR)
     set(_GLFW_MIR 1)
     message(STATUS "Using Mir for window creation")
-elseif (GLFW_USE_OSMESA)
+    elseif (GLFW_USE_OSMESA)
     set(_GLFW_OSMESA 1)
     message(STATUS "Using OSMesa for headless context creation")
-elseif (WIN32)
+    elseif (WIN32)
     set(_GLFW_WIN32 1)
     message(STATUS "Using Win32 for window creation")
-elseif (APPLE)
+    elseif (APPLE)
     set(_GLFW_COCOA 1)
     message(STATUS "Using Cocoa for window creation")
-elseif (UNIX)
+    elseif (UNIX)
     set(_GLFW_X11 1)
     message(STATUS "Using X11 for window creation")
-else()
+    else()
     message(FATAL_ERROR "No supported platform was detected")
+    endif()
+
 endif()
 
 #--------------------------------------------------------------------
@@ -289,8 +290,6 @@ set(WEB_FILES
         jquery.mousewheel.js
         styles/main.css
         )
-
-message('fff', ${CMAKE_CURRENT_SOURCE_DIR})
 
 foreach(webfile ${WEB_FILES})
     ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${webfile}"

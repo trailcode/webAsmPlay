@@ -1,9 +1,14 @@
 #ifndef __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__
 #define __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__
 
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+#else
+    #include <GL/gl3w.h>
+#endif // __EMSCRIPTEN__
+
 #include <vector>
-#define GLEW_STATIC
-#include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <tceGeom/vec3.h>
 
