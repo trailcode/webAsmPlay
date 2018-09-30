@@ -186,6 +186,25 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
     SET(CMAKE_CXX_LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1 -s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui-emscripten/library_glfw.js --js-library ../glfw-imgui-emscripten/library_gl.js ")
     add_definitions(-D__EMSCRIPTEN__)
+
+    set(WEB_FILES
+        index.html
+        jquery.mousewheel.js
+        styles/main.css
+        )
+
+    foreach(webfile ${WEB_FILES})
+        ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${webfile}"
+                COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/html/${webfile}"
+                "${CMAKE_CURRENT_BINARY_DIR}/${webfile}"
+                DEPENDS   "${CMAKE_CURRENT_SOURCE_DIR}/html/${webfile}"
+                )
+        list(APPEND webfile_dest "${CMAKE_CURRENT_BINARY_DIR}/${webfile}")
+
+    endforeach(webfile)
+
+    ADD_CUSTOM_TARGET(web ALL DEPENDS ${webfile_dest})
+
 else()
 
     find_package(glfw3 REQUIRED)
@@ -267,13 +286,13 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
-    add_executable(testStudent ${sources} ${imguiEmscriptenSrc} "src/mainWebAsm.cpp")
+    add_executable(webAsmPlay ${sources} ${imguiEmscriptenSrc} "src/mainWebAsm.cpp")
 else()
-    add_executable(testStudent ${sources} ${imguiSrc} "src/main.cpp")
+    add_executable(webAsmPlay ${sources} ${imguiSrc} "src/main.cpp")
 endif()
 
 if(APPLE)
-    set_target_properties(testStudent PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "testStudent")
+    set_target_properties(webAsmPlay PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "webAsmPlay")
 
     set_target_properties(${WINDOWS_BINARIES} PROPERTIES
                           RESOURCE glfw.icns
@@ -283,24 +302,6 @@ if(APPLE)
                           MACOSX_BUNDLE_INFO_PLIST "${GLFW_SOURCE_DIR}/CMake/MacOSXBundleInfo.plist.in")
 endif()
 
-set(WEB_FILES
-        hi.html
-        index.html
-        triangle.js
-        jquery.mousewheel.js
-        styles/main.css
-        )
 
-foreach(webfile ${WEB_FILES})
-    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${webfile}"
-            COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${webfile}"
-            "${CMAKE_CURRENT_BINARY_DIR}/${webfile}"
-            DEPENDS   "${CMAKE_CURRENT_SOURCE_DIR}/${webfile}"
-            )
-    list(APPEND webfile_dest "${CMAKE_CURRENT_BINARY_DIR}/${webfile}")
-
-endforeach(webfile)
-
-ADD_CUSTOM_TARGET(web ALL DEPENDS ${webfile_dest})
 
 
