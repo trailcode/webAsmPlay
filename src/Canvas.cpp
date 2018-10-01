@@ -42,10 +42,10 @@ GLuint Canvas::render()
 {
     Camera * camera = trackBallInteractor->getCamera();
 
-    const mat4 view = camera->getMatrix();
-    const mat4 model = mat4(1.0);
-    const mat4 projection = perspective(45.0, double(size.x) / double(size.y), 0.1, 100.0);
-    const mat4 MVP = projection * view * model;
+    const mat4 view         = camera->getMatrix();
+    const mat4 model        = mat4(1.0);
+    const mat4 projection   = perspective(45.0, double(size.x) / double(size.y), 0.1, 100.0);
+    const mat4 MVP          = projection * view * model;
 
     frameBuffer->bind();
     
@@ -65,11 +65,14 @@ GLuint Canvas::render()
 
     if(r)
     {
-        r->setFillColor(vec4(1,1,0,1));
+        r->setFillColor(vec4(0.3,0.3,0,1));
         
+        r->setOutlineColor(vec4(1,0,0,1));
+
         r->render(MVP);
     }
 
+    /*
     unique_ptr<GeosRenderiable> rr(GeosRenderiable::create(p->getExteriorRing()));
 
     if(r)
@@ -78,6 +81,7 @@ GLuint Canvas::render()
         
         rr->render(MVP);
     }
+    */
 
     return frameBuffer->getTextureID();
 }
@@ -122,9 +126,12 @@ void Canvas::onMouseScroll(GLFWwindow * window, const Vec2d & mouseScroll)
 
     if (state == GLFW_PRESS)
     {
+        // TODO This is not working correctly
         lastShiftKeyDownMousePos += Vec2d(mouseScroll.x, 0);
         trackBallInteractor->setClickPoint(lastShiftKeyDownMousePos.x % size.x, lastShiftKeyDownMousePos.y % size.y);
         trackBallInteractor->update();
+
+        return;
     }
 
     trackBallInteractor->setScrollDirection(mouseScroll.y > 0);
@@ -148,6 +155,8 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
                 double yPos;
                 glfwGetCursorPos(window, &xPos, &yPos);
                 lastShiftKeyDownMousePos = Vec2i(xPos, yPos);
+
+                //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
             }
 
             break;

@@ -106,7 +106,7 @@ GeosRenderiable * GeosRenderiable::create(const Geometry * geom)
         case GEOS_POINT:                dmess("Implement me!"); return NULL;
         case GEOS_LINESTRING:           dmess("Implement me!"); return NULL;
         case GEOS_LINEARRING:           return prepairLineString(dynamic_cast<const LineString *>(geom));
-        case GEOS_POLYGON:              return prepairPolygon(dynamic_cast<const Polygon *>(geom));
+        case GEOS_POLYGON:              return prepairPolygon   (dynamic_cast<const Polygon *>(geom));
         case GEOS_MULTIPOINT:           dmess("Implement me!"); return NULL;
         case GEOS_MULTILINESTRING:      dmess("Implement me!"); return NULL;
         case GEOS_MULTIPOLYGON:         dmess("Implement me!"); return NULL;
@@ -123,10 +123,12 @@ GeosRenderiable::GeosRenderiable(   const GLuint  vao,
                                     const GLuint  ebo,
                                     const GLuint  vbo,
                                     const int     numTriangles,
+                                    const vector<size_t> & counterVertIndices,
                                     const char    geomType) :   vao         (vao),
                                                                 ebo         (ebo),
                                                                 vbo         (vbo),
                                                                 numTriangles(numTriangles),
+                                                                counterVertIndices(counterVertIndices),
                                                                 numVerts    (0),
                                                                 geomType    (geomType)
 {
@@ -257,10 +259,13 @@ GeosRenderiable * GeosRenderiable::prepairPolygon(const Polygon * poly)
     free(vertsOut);
     if(triangleIndices) { free(triangleIndices) ;}
 
+    for(size_t i = 0; i < counterVertIndices.size(); ++i) { counterVertIndices[i] /= 2 ;}
+
     return new GeosRenderiable( vao,
                                 ebo,
                                 vbo,
                                 numTriangles,
+                                counterVertIndices,
                                 GEOS_POLYGON);
 }
 
@@ -343,6 +348,19 @@ inline void GeosRenderiable::renderPolygon(const mat4 & MVP) const
     glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, 0);
     
     glDisable(GL_BLEND);
+
+    glUniform4f(colorAttrib, outlineColor.x, outlineColor.y, outlineColor.z, outlineColor.w);
+    //glUniform4f(colorAttrib, 1,0,0,1);
+
+    //glDisable(GL_DEPTH_TEST);
+
+    for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
+    {
+        const size_t a = counterVertIndices[i];
+        const size_t b = counterVertIndices[i + 1];
+
+        glDrawArrays(GL_LINE_LOOP, a, (b - a));
+    }
 }
 
 inline void GeosRenderiable::renderLineString(const mat4 & MVP) const
@@ -354,7 +372,7 @@ inline void GeosRenderiable::renderLineString(const mat4 & MVP) const
     glUniform4f(colorAttrib, fillColor.x, fillColor.y, fillColor.z, fillColor.w);
 
     glBindVertexArray(vao);
-    
+    //glBindBuffer(GL_ARRAY_BUFFER, vbo);
     // Specify the layout of the vertex data
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);

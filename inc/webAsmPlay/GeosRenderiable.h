@@ -45,6 +45,7 @@ private:
                     const GLuint  ebo,
                     const GLuint  vbo,
                     const int     numTriangles,
+                    const std::vector<size_t> & counterVertIndices,
                     const char    geomType);
 
     GeosRenderiable(const GLuint  vao,
@@ -56,13 +57,14 @@ private:
 
     static GeosRenderiable * prepairLineString(const geos::geom::LineString * lineString);
 
-    inline void renderPolygon(const glm::mat4 & MVP) const;
+    inline void renderPolygon   (const glm::mat4 & MVP) const;
     inline void renderLineString(const glm::mat4 & MVP) const;
 
     const GLuint  vao;
     const GLuint  ebo;
     const GLuint  vbo;
     const int     numTriangles;
+    const std::vector<size_t> counterVertIndices;
     const GLuint  numVerts;
 
     glm::vec4 fillColor;
