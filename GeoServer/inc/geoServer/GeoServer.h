@@ -1,0 +1,6 @@
+#ifndef __WEB_ASM_PLAY_GEO_SERVER_H__
+#define __WEB_ASM_PLAY_GEO_SERVER_H__
+
+
+
+#endif // __WEB_ASM_PLAY_GEO_SERVER_H__
