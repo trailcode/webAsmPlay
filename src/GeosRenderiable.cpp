@@ -105,7 +105,7 @@ GeosRenderiable * GeosRenderiable::create(const Geometry * geom)
     {
         case GEOS_POINT:                dmess("Implement me!"); return NULL;
         case GEOS_LINESTRING:           dmess("Implement me!"); return NULL;
-        case GEOS_LINEARRING:           dmess("Implement me!"); return NULL;
+        case GEOS_LINEARRING:           return prepairLineString(dynamic_cast<const LineString *>(geom));
         case GEOS_POLYGON:              return prepairPolygon(dynamic_cast<const Polygon *>(geom));
         case GEOS_MULTIPOINT:           dmess("Implement me!"); return NULL;
         case GEOS_MULTILINESTRING:      dmess("Implement me!"); return NULL;
@@ -123,12 +123,32 @@ GeosRenderiable::GeosRenderiable(   const GLuint  vao,
                                     const GLuint  ebo,
                                     const GLuint  vbo,
                                     const int     numTriangles,
-                                    const vector<size_t> & counterVertIndices) :    vao         (vao),
-                                                                                    ebo         (ebo),
-                                                                                    vbo         (vbo),
-                                                                                    numTriangles(numTriangles),
-                                                                                    counterVertIndices(counterVertIndices)
+                                    const char    geomType) :   vao         (vao),
+                                                                ebo         (ebo),
+                                                                vbo         (vbo),
+                                                                numTriangles(numTriangles),
+                                                                numVerts    (0),
+                                                                geomType    (geomType)
 {
+}
+
+GeosRenderiable::GeosRenderiable(   const GLuint  vao,
+                                    const GLuint  vbo,
+                                    const GLuint  numVerts,
+                                    const char    geomType) :   vao             (vao),
+                                                                ebo             (0),
+                                                                vbo             (vbo),
+                                                                numTriangles    (0),
+                                                                numVerts        (numVerts),
+                                                                geomType        (geomType)
+{
+}
+
+GeosRenderiable::~GeosRenderiable()
+{
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers     (1, &vbo);
+    glDeleteBuffers     (1, &ebo);
 }
 
 GeosRenderiable * GeosRenderiable::prepairPolygon(const Polygon * poly)
@@ -228,7 +248,6 @@ GeosRenderiable * GeosRenderiable::prepairPolygon(const Polygon * poly)
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2, &verts2[0], GL_STATIC_DRAW);
-    //dmess("numVerts * 2 " << numVerts * 2);
 
     glGenBuffers(1, &ebo);
 
@@ -242,19 +261,68 @@ GeosRenderiable * GeosRenderiable::prepairPolygon(const Polygon * poly)
                                 ebo,
                                 vbo,
                                 numTriangles,
-                                counterVertIndices);
+                                GEOS_POLYGON);
 }
 
-GeosRenderiable::~GeosRenderiable()
+GeosRenderiable * GeosRenderiable::prepairLineString(const LineString * lineString)
 {
-    //dmess("GeosRenderiable::~GeosRenderiable()");
-    
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ebo);
+    ensureShader();
+
+    const vector<Coordinate> & coords = *lineString->getCoordinates()->toVector();
+
+    if(coords.size() < 2)
+    {
+        dmess("Bad gemetry!");
+
+        return NULL;
+    }
+
+    GLuint vao = 0;
+    GLuint vbo = 0;
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glGenBuffers(1, &vbo);
+
+    vector<GLfloat> verts(coords.size() * 2);
+
+    GLfloat * vertsPtr = &verts[0];
+
+    for(size_t i = 0; i < coords.size(); ++i)
+    {
+        *vertsPtr = coords[i].x; ++vertsPtr;
+        *vertsPtr = coords[i].y; ++vertsPtr;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * coords.size() * 2, &verts[0], GL_STATIC_DRAW);
+
+    return new GeosRenderiable( vao,
+                                vbo,
+                                coords.size(),
+                                GEOS_LINESTRING);
 }
 
 void GeosRenderiable::render(const mat4 & MVP) const
+{
+    switch(geomType)
+    {
+        case GEOS_POINT:                dmess("Implement me!"); break;
+        case GEOS_LINESTRING:           renderLineString(MVP); break;
+        case GEOS_LINEARRING:           dmess("Implement me!"); break;
+        case GEOS_POLYGON:              renderPolygon(MVP); break;
+        case GEOS_MULTIPOINT:           dmess("Implement me!"); break;
+        case GEOS_MULTILINESTRING:      dmess("Implement me!"); break;
+        case GEOS_MULTIPOLYGON:         dmess("Implement me!"); break;
+        case GEOS_GEOMETRYCOLLECTION:   dmess("Implement me!"); break;
+        default:
+            dmess("Error!");
+            abort();
+    }
+}
+
+inline void GeosRenderiable::renderPolygon(const mat4 & MVP) const
 {
     glUseProgram(shaderProgram);
 
@@ -263,6 +331,7 @@ void GeosRenderiable::render(const mat4 & MVP) const
     glUniform4f(colorAttrib, fillColor.x, fillColor.y, fillColor.z, fillColor.w);
 
     glBindVertexArray(vao);
+    
     // Specify the layout of the vertex data
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -271,35 +340,26 @@ void GeosRenderiable::render(const mat4 & MVP) const
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboOutline);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, 0);
-    //glDrawElements(GL_LINE_STRIP, numTriangles * 3, GL_UNSIGNED_INT, 0);
-    //glDrawElements(GL_LINE_STRIP, numTriangles * 3, GL_UNSIGNED_INT, 0);
-
-    /*
-    dmess("counterVertIndices.size() " << counterVertIndices.size());
-    for(int i = 0; i < counterVertIndices.size() - 1; ++i)
-    {
-        const size_t a = counterVertIndices[i];
-        const size_t b = counterVertIndices[i + 1];
-        dmess("a " << a << " b - a " << (b - a) / 2);
-        glBindVertexArray(vao);
-        // Specify the layout of the vertex data
-        glEnableVertexAttribArray(posAttrib);
-        glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glDrawArrays(GL_LINE_STRIP, a, (b - a) / 2);
-        //glDrawArrays(GL_LINE_STRIP, a, 10);
-    }
-    */
-
-    //glDrawArrays(GL_LINE_STRIP, 0, 10);
-
-    //glDrawElements(GL_LINE_STRIP, 10, GL_UNSIGNED_INT, numTriangles * 3 * sizeof(GLuint));
-
-    glDisable(GL_BLEND);
-
     
+    glDisable(GL_BLEND);
+}
+
+inline void GeosRenderiable::renderLineString(const mat4 & MVP) const
+{
+    glUseProgram(shaderProgram);
+
+    glUniformMatrix4fv(MVP_Attrib, 1, false, glm::value_ptr(MVP));
+
+    glUniform4f(colorAttrib, fillColor.x, fillColor.y, fillColor.z, fillColor.w);
+
+    glBindVertexArray(vao);
+    
+    // Specify the layout of the vertex data
+    glEnableVertexAttribArray(posAttrib);
+    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glDrawArrays(GL_LINE_STRIP, 0, numVerts);
 }
 
 vec4 GeosRenderiable::setFillColor(const vec4 & fillColor)

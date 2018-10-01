@@ -19,6 +19,7 @@ namespace geos
     {
         class Geometry;
         class Polygon;
+        class LineString;
     }
 }
 
@@ -44,19 +45,30 @@ private:
                     const GLuint  ebo,
                     const GLuint  vbo,
                     const int     numTriangles,
-                    const std::vector<size_t> & counterVertIndices);
+                    const char    geomType);
+
+    GeosRenderiable(const GLuint  vao,
+                    const GLuint  vbo,
+                    const GLuint  numVerts,
+                    const char    geomType);
 
     static GeosRenderiable * prepairPolygon(const geos::geom::Polygon * poly);
+
+    static GeosRenderiable * prepairLineString(const geos::geom::LineString * lineString);
+
+    inline void renderPolygon(const glm::mat4 & MVP) const;
+    inline void renderLineString(const glm::mat4 & MVP) const;
 
     const GLuint  vao;
     const GLuint  ebo;
     const GLuint  vbo;
     const int     numTriangles;
-
-    const std::vector<size_t> counterVertIndices;
+    const GLuint  numVerts;
 
     glm::vec4 fillColor;
     glm::vec4 outlineColor;
+
+    const char geomType;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__

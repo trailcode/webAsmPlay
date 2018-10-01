@@ -12,6 +12,7 @@
 
 namespace rsmz
 {
+    class Camera;
     class TrackBallInteractor;
 }
 
@@ -33,15 +34,17 @@ public:
 
     bool setWantMouseCapture(const bool wantMouseCapture);
 
-    void onMouseButton(const int button, const int action, const int mods);
+    void onMouseButton(GLFWwindow * window, const int button, const int action, const int mods);
 
-    void onMousePosition(const tce::geom::Vec2d & mousePos);
+    void onMousePosition(GLFWwindow * window, const tce::geom::Vec2d & mousePos);
 
     void onMouseScroll(GLFWwindow * window, const tce::geom::Vec2d & mouseScroll);
 
     void onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods);
 
-    void onChar(const size_t c);
+    void onChar(GLFWwindow * window, const size_t c);
+
+    rsmz::Camera * getCamera() const;
 
 private:
 

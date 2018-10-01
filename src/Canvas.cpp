@@ -1,6 +1,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/geom/Polygon.h>
+#include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/FrameBuffer.h>
@@ -69,6 +70,15 @@ GLuint Canvas::render()
         r->render(MVP);
     }
 
+    unique_ptr<GeosRenderiable> rr(GeosRenderiable::create(p->getExteriorRing()));
+
+    if(r)
+    {
+        rr->setFillColor(vec4(1,0,1,1));
+        
+        rr->render(MVP);
+    }
+
     return frameBuffer->getTextureID();
 }
 
@@ -89,16 +99,18 @@ bool Canvas::setWantMouseCapture(const bool wantMouseCapture)
     return this->wantMouseCapture = wantMouseCapture;
 }
 
-void Canvas::onMouseButton(const int button, const int action, const int mods)
+void Canvas::onMouseButton(GLFWwindow * window, const int button, const int action, const int mods)
 {
 
 }
 
-void Canvas::onMousePosition(const Vec2d & mousePos)
+void Canvas::onMousePosition(GLFWwindow * window, const Vec2d & mousePos)
 {
-    //dmess("mousePos " << mousePos);
+    const Vec2d pos = mousePos - upperLeft;
 
-    trackBallInteractor->setClickPoint(mousePos.x, mousePos.y);
+    //dmess("mousePos " << pos);
+
+    trackBallInteractor->setClickPoint(pos.x, pos.y);
     trackBallInteractor->update();
 }
 
@@ -110,13 +122,9 @@ void Canvas::onMouseScroll(GLFWwindow * window, const Vec2d & mouseScroll)
 
     if (state == GLFW_PRESS)
     {
-        //dmess("GLFW_KEY_LEFT_SHIFT");
-        //int display_w, display_h;
-        //glfwGetFramebufferSize(window, &display_w, &display_h);
         lastShiftKeyDownMousePos += Vec2d(mouseScroll.x, 0);
         trackBallInteractor->setClickPoint(lastShiftKeyDownMousePos.x % size.x, lastShiftKeyDownMousePos.y % size.y);
         trackBallInteractor->update();
-        //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
     }
 
     trackBallInteractor->setScrollDirection(mouseScroll.y > 0);
@@ -126,7 +134,7 @@ void Canvas::onMouseScroll(GLFWwindow * window, const Vec2d & mouseScroll)
 void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods)
 {
     if(!wantMouseCapture) { return ;}
-    
+
     switch(key)
     {
         case GLFW_KEY_LEFT_SHIFT:
@@ -152,9 +160,9 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
     }
 }
 
-void Canvas::onChar(const size_t c)
+void Canvas::onChar(GLFWwindow * window, const size_t c)
 {
 
 }
 
-
+Camera * Canvas::getCamera() const { return trackBallInteractor->getCamera() ;}

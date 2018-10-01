@@ -58,6 +58,7 @@ Camera * camera = NULL;
 
 bool showViewMatrixPanel = true;
 bool showMVP_MatrixPanel = true;
+bool showSceneViewPanel  = true;
 
 bool isFirst = true;
 
@@ -191,35 +192,7 @@ void mainLoop(GLFWwindow* window)
 
     isFirst = false;
 
-    /*
-    Polygon * pp = scopedGeosGeometry(GeosUtil::makeBox(-0.1,-0.1,0.1,0.1));
-
-    Polygon * p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,0.5,0.5));
-
-    p = scopedGeosGeometry(dynamic_cast<Polygon *>(p->buffer(0.1)));
-
-    p = scopedGeosGeometry(dynamic_cast<Polygon *>(p->difference(pp)));
-
-    unique_ptr<GeosRenderiable> r(GeosRenderiable::create(p));
-
-    frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, Vec2i(sceneWindowSize.x, sceneWindowSize.y));
-
-    frameBuffer->bind();
     
-
-    glViewport(0,0,sceneWindowSize.x,sceneWindowSize.y);
-    glClearColor(0,0,0,1);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    if(r)
-    {
-        r->setFillColor(vec4(1,1,0,1));
-        
-        r->render(MVP);
-    }
-    */
-
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     ImGui::Begin("Scene Window");
 
@@ -229,17 +202,13 @@ void mainLoop(GLFWwindow* window)
 
     canvas->setArea(__(pos), __(sceneWindowSize));
 
-    canvas->render();
-    
-    ImGuiContext & g = *GImGui;
+    canvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
-    canvas->setWantMouseCapture(g.IO.WantCaptureMouse);
-
-    ImGui::GetWindowDrawList()->AddImage(
-        //(void *)frameBuffer->getTextureID(),
-        (void *)canvas->getTextureID(),
-        pos,
-        ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y), ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::GetWindowDrawList()->AddImage(   (void *)canvas->render(),
+                                            pos,
+                                            ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+                                            ImVec2(0, 1),
+                                            ImVec2(1, 0));
         
     sceneWindowSize = ImGui::GetWindowSize();
 
@@ -257,14 +226,14 @@ void mainLoop(GLFWwindow* window)
     //refresh(window);
 }
 
-void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
 {
     if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
     {
         return;
     }
 
-    canvas->onMouseButton(button, action, mods);
+    canvas->onMouseButton(window, button, action, mods);
 
     if (mouse_buttons[button] != action) {
       mouse_buttons[button] = action;
@@ -282,13 +251,14 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 
 Vec2i lastShiftKeyDownMousePos;
 
-void cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+void cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 {
     //dmess("x " << xpos << " y " << ypos);
 
-    canvas->onMousePosition(Vec2d(xpos, ypos));
+    canvas->onMousePosition(window, Vec2d(xpos, ypos));
 
     trackBallInteractor.setClickPoint(xpos, ypos);
+
     trackBallInteractor.update();
 
     //if (render_when_mouse_up || mouse_buttons_down)
@@ -297,7 +267,7 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     }
 }
 
-void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+void scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 {
     //dmess("ScrollCallback " << xoffset << " " << yoffset);
 
@@ -341,7 +311,7 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     refresh(window);
 }
 
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods)
 {
     canvas->onKey(window, key, scancode, action, mods);
 
@@ -379,9 +349,9 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     refresh(window);
 }
 
-void charCallback(GLFWwindow* window, unsigned int c)
+void charCallback(GLFWwindow * window, unsigned int c)
 {
-    canvas->onChar(c);
+    canvas->onChar(window, c);
 
 #ifdef __EMSCRIPTEN__
     ImGui_ImplGlfwGL3_CharCallback(window, c);
@@ -408,7 +378,7 @@ void windowFocusCallback(GLFWwindow* window, int focused)
     }
 }
 
-void cursorEnterCallback(GLFWwindow* window, int /* entered */)
+void cursorEnterCallback(GLFWwindow * window, int /* entered */)
 {
     refresh(window);
 }
