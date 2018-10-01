@@ -28,7 +28,7 @@
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/GeosRenderiable.h>
+#include <webAsmPlay/Renderiable.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
