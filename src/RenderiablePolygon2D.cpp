@@ -9,22 +9,23 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-RenderiablePolygon2D::RenderiablePolygon2D(const GLuint  vao,
-                    const GLuint  ebo,
-                    const GLuint  vbo,
-                    const int     numTriangles,
-                    const vector<size_t> & counterVertIndices) : vao(vao),
-                                    ebo(ebo),
-                                    vbo(vbo),
-                                    numTriangles(numTriangles)
+RenderiablePolygon2D::RenderiablePolygon2D( const GLuint            vao,
+                                            const GLuint            ebo,
+                                            const GLuint            vbo,
+                                            const int               numTriangles,
+                                            const vector<size_t> &  counterVertIndices) :   vao                 (vao),
+                                                                                            ebo                 (ebo),
+                                                                                            vbo                 (vbo),
+                                                                                            numTriangles        (numTriangles),
+                                                                                            counterVertIndices  (counterVertIndices)
 {
 }
 
 RenderiablePolygon2D::~RenderiablePolygon2D()
 {
-    //glDeleteVertexArrays(1, &vao);
-    //glDeleteBuffers     (1, &vbo);
-    //glDeleteBuffers     (1, &ebo);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers     (1, &vbo);
+    glDeleteBuffers     (1, &ebo);
 }
 
 Renderiable * RenderiablePolygon2D::create(const Polygon * poly)

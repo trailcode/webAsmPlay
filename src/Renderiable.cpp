@@ -1,8 +1,7 @@
-#include <geos/geom/Envelope.h>
+//#include <geos/geom/Envelope.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
-//#include "../GLUTesselator/include/GLU/tessellate.h"
 #include <webAsmPlay/RenderiableLineString2D.h>
 #include <webAsmPlay/RenderiablePolygon2D.h>
 #include <webAsmPlay/Renderiable.h>
@@ -103,8 +102,8 @@ Renderiable * Renderiable::create(const Geometry * geom)
     {
         case GEOS_POINT:                dmess("Implement me!"); return NULL;
         case GEOS_LINESTRING:           dmess("Implement me!"); return NULL;
-        case GEOS_LINEARRING:           return RenderiableLineString2D::create(dynamic_cast<const LineString *>(geom));
-        case GEOS_POLYGON:              return RenderiablePolygon2D::create(dynamic_cast<const Polygon *>(geom));
+        case GEOS_LINEARRING:           return RenderiableLineString2D  ::create(dynamic_cast<const LineString  *>(geom));
+        case GEOS_POLYGON:              return RenderiablePolygon2D     ::create(dynamic_cast<const Polygon     *>(geom));
         case GEOS_MULTIPOINT:           dmess("Implement me!"); return NULL;
         case GEOS_MULTILINESTRING:      dmess("Implement me!"); return NULL;
         case GEOS_MULTIPOLYGON:         dmess("Implement me!"); return NULL;

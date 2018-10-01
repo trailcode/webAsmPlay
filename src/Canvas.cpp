@@ -1,3 +1,16 @@
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+    #define IMGUI_API
+    #include <imgui_impl_glfw_gl3.h>
+#else
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+    #define IMGUI_IMPL_API // What about for windows?
+    #include <imgui.h>
+    #include <imgui_impl_opengl3.h>
+    #include <imgui_impl_glfw.h>
+#endif // __EMSCRIPTEN__
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/geom/Polygon.h>
@@ -40,6 +53,13 @@ void Canvas::setArea(const Vec2i & upperLeft, const Vec2i & size)
 
 GLuint Canvas::render()
 {
+    if(!size.x || !size.y)
+    {
+        dmess("Error canvas size is not valid!");
+
+        return 0;
+    }
+
     Camera * camera = trackBallInteractor->getCamera();
 
     const mat4 view         = camera->getMatrix();
