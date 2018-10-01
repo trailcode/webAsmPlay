@@ -73,14 +73,23 @@ GLuint Canvas::render()
     glClearColor(0,0,0,1);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    Polygon * pp = scopedGeosGeometry(GeosUtil::makeBox(-0.1,-0.1,0.1,0.1));
+    Geometry * pp = scopedGeosGeometry(GeosUtil::makeBox(-0.1,-0.1,0.1,0.1));
 
-    Polygon * p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,0.5,0.5));
+    Geometry * p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,0.5,0.5));
 
-    p = scopedGeosGeometry(dynamic_cast<Polygon *>(p->buffer(0.1)));
+    Geometry * ppp = scopedGeosGeometry(GeosUtil::makeBox(-0.05,-0.6,0.05,0.6));
 
-    p = scopedGeosGeometry(dynamic_cast<Polygon *>(p->difference(pp)));
+    Geometry * pppp = scopedGeosGeometry(GeosUtil::makeBox(-0.6,-0.05,0.6,0.05));
 
+    p = scopedGeosGeometry(p->buffer(0.1));
+
+    p = scopedGeosGeometry(p->difference(pp));
+
+    p = scopedGeosGeometry(p->difference(ppp));
+
+    p = scopedGeosGeometry(p->difference(pppp));
+
+    //*
     unique_ptr<Renderiable> r(Renderiable::create(p));
 
     if(r)
@@ -91,17 +100,18 @@ GLuint Canvas::render()
 
         r->render(MVP);
     }
+    //*/
 
     /*
-    unique_ptr<GeosRenderiable> rr(GeosRenderiable::create(p->getExteriorRing()));
+    unique_ptr<Renderiable> rr(Renderiable::create(p->getExteriorRing()));
 
-    if(r)
+    if(rr)
     {
         rr->setFillColor(vec4(1,0,1,1));
         
         rr->render(MVP);
     }
-    */
+    //*/
 
     return frameBuffer->getTextureID();
 }

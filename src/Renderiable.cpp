@@ -1,5 +1,6 @@
 //#include <geos/geom/Envelope.h>
 #include <geos/geom/Polygon.h>
+#include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/RenderiableLineString2D.h>
@@ -9,7 +10,6 @@
 using namespace std;
 using namespace glm;
 using namespace geos::geom;
-using namespace tce::geom;
 
 GLuint  Renderiable::shaderProgram = 0;
 GLint   Renderiable::posAttrib     = 0;
@@ -30,8 +30,6 @@ void Renderiable::ensureShader()
         void main()
         {
             gl_Position = MVP * vec4(position.xy, 0, 1);
-            //vertexColorOut = vertexColor;
-            //vertexColor = vec4(0.5, 0.0, 0.0, 1.0);
             vertexColor = vertexColorIn;
         }
     )glsl";
@@ -42,7 +40,6 @@ void Renderiable::ensureShader()
 
         void main()
         {
-            //outColor = vec4(1,1,1,0.5);
             outColor = vertexColor;
         }
     )glsl";
@@ -102,11 +99,11 @@ Renderiable * Renderiable::create(const Geometry * geom)
     {
         case GEOS_POINT:                dmess("Implement me!"); return NULL;
         case GEOS_LINESTRING:           dmess("Implement me!"); return NULL;
-        case GEOS_LINEARRING:           return RenderiableLineString2D  ::create(dynamic_cast<const LineString  *>(geom));
-        case GEOS_POLYGON:              return RenderiablePolygon2D     ::create(dynamic_cast<const Polygon     *>(geom));
+        case GEOS_LINEARRING:           return RenderiableLineString2D  ::create(dynamic_cast<const LineString *>(geom));
+        case GEOS_POLYGON:              return RenderiablePolygon2D     ::create(dynamic_cast<const Polygon *>(geom));
         case GEOS_MULTIPOINT:           dmess("Implement me!"); return NULL;
         case GEOS_MULTILINESTRING:      dmess("Implement me!"); return NULL;
-        case GEOS_MULTIPOLYGON:         dmess("Implement me!"); return NULL;
+        case GEOS_MULTIPOLYGON:         return RenderiablePolygon2D     ::create(dynamic_cast<const MultiPolygon *>(geom));
         case GEOS_GEOMETRYCOLLECTION:   dmess("Implement me!"); return NULL;
         default:
             dmess("Error!");

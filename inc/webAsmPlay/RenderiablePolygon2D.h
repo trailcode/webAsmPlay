@@ -3,6 +3,15 @@
 
 #include <webAsmPlay/Renderiable.h>
 
+namespace geos
+{
+    namespace geom
+    {
+        class Polygon;
+        class MultiPolygon;
+    }
+}
+
 class RenderiablePolygon2D : public Renderiable
 {
 public:
@@ -10,6 +19,8 @@ public:
     ~RenderiablePolygon2D();
 
     static Renderiable * create(const geos::geom::Polygon * poly);
+
+    static Renderiable * create(const geos::geom::MultiPolygon * multyPoly);
 
     void render(const glm::mat4 & MVP) const;
 

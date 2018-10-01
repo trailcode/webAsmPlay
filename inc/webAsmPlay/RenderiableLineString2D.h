@@ -3,6 +3,14 @@
 
 #include <webAsmPlay/Renderiable.h>
 
+namespace geos
+{
+    namespace geom
+    {
+        class LineString;
+    }
+}
+
 class RenderiableLineString2D : public Renderiable
 {
 public:

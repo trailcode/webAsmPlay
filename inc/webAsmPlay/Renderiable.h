@@ -7,19 +7,16 @@
     #include <GL/glew.h>
 #else
     #include <GL/gl3w.h>
-#endif // __EMSCRIPTEN__
+#endif
 
 #include <vector>
 #include <glm/glm.hpp>
-#include <tceGeom/vec3.h>
 
 namespace geos
 {
     namespace geom
     {
         class Geometry;
-        class Polygon;
-        class LineString;
     }
 }
 
