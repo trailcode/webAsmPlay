@@ -6,7 +6,7 @@
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/TrackBallInteractor.h>
-#include <webAsmPlay/GeosRenderiable.h>
+#include <webAsmPlay/Renderiable.h>
 #include <webAsmPlay/Canvas.h>
 
 using namespace std;
@@ -61,7 +61,7 @@ GLuint Canvas::render()
 
     p = scopedGeosGeometry(dynamic_cast<Polygon *>(p->difference(pp)));
 
-    unique_ptr<GeosRenderiable> r(GeosRenderiable::create(p));
+    unique_ptr<Renderiable> r(Renderiable::create(p));
 
     if(r)
     {
