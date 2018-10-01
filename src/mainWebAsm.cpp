@@ -22,6 +22,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void cursorPosCallback      (GLFWwindow* window, double xpos, double ypos);
 void cursorEnterCallback    (GLFWwindow* window, int entered);
 void initOpenGL             (GLFWwindow* window);
+void initGeometry           ();
 void mainLoop               (GLFWwindow* window);
 void refresh                (GLFWwindow* window);
 
@@ -72,6 +73,8 @@ int main()
     //ImGui::StyleColorsClassic();
 
     initOpenGL(window);
+
+    initGeometry();
 
     glfwSetWindowRefreshCallback(window, mainLoop);
 

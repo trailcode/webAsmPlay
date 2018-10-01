@@ -14,7 +14,7 @@ RenderiablePolygon2D::RenderiablePolygon2D( const GLuint            vao,
                                             const GLuint            ebo,
                                             const GLuint            vbo,
                                             const int               numTriangles,
-                                            const vector<size_t> &  counterVertIndices) :   vao                 (vao),
+                                            const vector<GLuint> &  counterVertIndices) :   vao                 (vao),
                                                                                             ebo                 (ebo),
                                                                                             vbo                 (vbo),
                                                                                             numTriangles        (numTriangles),
@@ -38,7 +38,7 @@ namespace
         int       numVerts          = 0;
         int       numTriangles      = 0;
 
-        vector<size_t> counterVertIndices;
+        vector<GLuint> counterVertIndices;
     };
 
     TesselationResult tessellatePolygon(const Polygon  * poly)

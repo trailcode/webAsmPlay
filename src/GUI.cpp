@@ -404,3 +404,30 @@ void initOpenGL(GLFWwindow* window)
 
     canvas = new Canvas();
 }
+
+void initGeometry()
+{
+    Geometry * pp = scopedGeosGeometry(GeosUtil::makeBox(-0.1,-0.1,0.1,0.1));
+
+    Geometry * p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,0.5,0.5));
+
+    Geometry * ppp = scopedGeosGeometry(GeosUtil::makeBox(-0.05,-0.6,0.05,0.6));
+
+    Geometry * pppp = scopedGeosGeometry(GeosUtil::makeBox(-0.6,-0.05,0.6,0.05));
+
+    p = scopedGeosGeometry(p->buffer(0.1));
+
+    p = scopedGeosGeometry(p->difference(pp));
+
+    p = scopedGeosGeometry(p->difference(ppp));
+
+    p = scopedGeosGeometry(p->difference(pppp));
+
+    Renderiable * r = Renderiable::create(p);
+
+    r->setFillColor(vec4(0.3,0.3,0,1));
+        
+    r->setOutlineColor(vec4(1,0,0,1));
+
+    canvas->addRenderiable(r);
+}

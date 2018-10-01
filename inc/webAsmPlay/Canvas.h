@@ -8,6 +8,8 @@
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
 #endif
+
+#include <list>
 #include <tceGeom/vec2.h>
 
 namespace rsmz
@@ -18,6 +20,7 @@ namespace rsmz
 
 class FrameBuffer;
 class GLFWwindow;
+class Renderiable;
 
 class Canvas
 {
@@ -46,6 +49,8 @@ public:
 
     rsmz::Camera * getCamera() const;
 
+    Renderiable * addRenderiable(Renderiable * renderiable);
+
 private:
 
     rsmz::TrackBallInteractor * trackBallInteractor;
@@ -58,6 +63,8 @@ private:
     bool wantMouseCapture;
 
     tce::geom::Vec2i lastShiftKeyDownMousePos;
+
+    std::list<Renderiable *> renderiables;
 };
 
 #endif // __WEB_ASM_PLAY_CANVAS_H__

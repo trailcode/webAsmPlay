@@ -30,13 +30,13 @@ private:
                             const GLuint                ebo,
                             const GLuint                vbo,
                             const int                   numTriangles,
-                            const std::vector<size_t> & counterVertIndices);
+                            const std::vector<GLuint> & counterVertIndices);
 
     const GLuint                vao;
     const GLuint                ebo;
     const GLuint                vbo;
     const int                   numTriangles;
-    const std::vector<size_t>   counterVertIndices;
+    const std::vector<GLuint>   counterVertIndices;
 }; 
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__
