@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
  
 set (CMAKE_CXX_STANDARD 11)
 
@@ -290,6 +290,11 @@ file(GLOB sources   ${webAsmPlay_SRC}
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     add_executable(webAsmPlay ${sources} ${imguiEmscriptenSrc} "src/mainWebAsm.cpp")
+
+    add_executable(worker "src/Worker.cpp")
+
+    set_target_properties(worker PROPERTIES LINK_FLAGS "-s EXPORTED_FUNCTIONS=\"['_one']\" -s BUILD_AS_WORKER=1")
+
 else()
     add_executable(webAsmPlay ${sources} ${imguiSrc} "src/main.cpp")
 endif()

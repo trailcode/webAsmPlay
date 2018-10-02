@@ -45,6 +45,7 @@ void refresh                (GLFWwindow* window);
 
 int main(int, char**)
 {
+    
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())

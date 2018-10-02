@@ -11,6 +11,7 @@
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 
+
 void errorCallback(int error, const char* description);
 
 void mouseButtonCallback    (GLFWwindow* window, int button, int action, int mods);
@@ -67,6 +68,7 @@ int main()
     glfwSetFramebufferSizeCallback  (window, framebufferSizeCallback);
     glfwSetCursorPosCallback        (window, cursorPosCallback);
     glfwSetCursorEnterCallback      (window, cursorEnterCallback);
+
 
     // Setup style
     //ImGui::StyleColorsDark();

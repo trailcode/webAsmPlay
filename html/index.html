@@ -206,6 +206,50 @@
           if (text) Module.printErr('[post-exception status] ' + text);
         };
       };
+
+      // ------------------------------------------------------
+      connection = new WebSocket('ws://localhost:9002');
+
+        connection.binaryType = "arraybuffer";
+
+        connection.onopen = function () {
+            // Send a small message to the console once the connection is established 
+            console.log('Connection open!');
+
+            console.log("hello1");
+
+            start = new Date().getTime();
+
+            connection.send('sssss');
+        }
+
+        connection.onclose = function () {
+            console.log('Connection closed');
+        }
+
+        connection.onerror = function (error) {
+            console.log('Error detected: ' + error);
+        }
+
+        connection.onmessage = function (e) {
+            var server_message = e.data;
+
+            console.log("server_message " + server_message);
+
+            if (e.data instanceof ArrayBuffer) {
+                console.log("Binary!");
+            }
+            else {
+                console.log("Not bin!");
+            }
+
+            console.log(e.data);
+
+            console.log("connection.onmessage");
+            console.log(server_message);
+        }
+      // ------------------------------------------------------
+
     </script>
     <script async type="text/javascript" src="webAsmPlay.js"></script>
 	<script>

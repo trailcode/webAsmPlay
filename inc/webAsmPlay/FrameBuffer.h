@@ -7,7 +7,7 @@
     #include <GL/glew.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
-#endif // __EMSCRIPTEN__
+#endif
 #include <tceGeom/vec2.h>
 
 class FrameBuffer

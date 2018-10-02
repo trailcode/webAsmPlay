@@ -1,9 +1,12 @@
 
 #include <webAsmPlay/Debug.h>
+#include <geoServer/GeoServer.h>
 
 int main(const int argc, char ** argv)
 {
-    dmess("Hello World!");
-    
+    GeoServer s;
+
+    s.start();
+
     return 0;
 }

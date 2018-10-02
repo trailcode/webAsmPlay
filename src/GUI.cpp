@@ -7,6 +7,8 @@
     #include <GL/glew.h>
     #define IMGUI_API
     #include <imgui_impl_glfw_gl3.h>
+    #include <emscripten/emscripten.h>
+    #include <emscripten/bind.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
     #define IMGUI_IMPL_API // What about for windows?
@@ -85,6 +87,13 @@ void refresh(GLFWwindow* window)
 #endif
 }
 
+int counter = 0;
+
+void cback(char* data, int size, void* arg) {
+    std::cout << "Callback " << data << " " << size << std::endl;
+    counter++;
+}
+
 void mainLoop(GLFWwindow* window)
 {
     // Game loop
@@ -112,6 +121,11 @@ void mainLoop(GLFWwindow* window)
 
                     cout << "Open" << endl;
 
+                    worker_handle worker = emscripten_create_worker("worker.js");
+                    emscripten_call_worker(worker, "one", 0, 0, cback, (void*)42);
+
+                    //emscripten_set_main_loop(loop, 2, true);
+
                     //emscripten_run_script("fileInput.click();");
                     //emscripten_run_script("alert(fileSelector)");
                     //emscripten_run_script("Module.my_js();");
@@ -121,6 +135,8 @@ void mainLoop(GLFWwindow* window)
                     //EM_ASM("Module.my_js();");
 
                     //my_js();
+
+
                 }
                 ImGui::EndMenu();
             }
