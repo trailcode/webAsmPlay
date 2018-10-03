@@ -147,10 +147,6 @@
               element.value += text + "\n";
               element.scrollTop = element.scrollHeight; // focus on bottom
             }
-			
-			console.log(Module);
-			//var i = Module.doIta();
-			//console.log(i);
           };
         })(),
         printErr: function(text) {
@@ -195,6 +191,9 @@
         monitorRunDependencies: function(left) {
           this.totalDependencies = Math.max(this.totalDependencies, left);
           Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        },
+        onRuntimeInitialized: function() {
+          console.log('lerp result: ' + Module.lerp(1, 2, 0.5));
         }
       };
       Module.setStatus('Downloading...');
@@ -208,11 +207,11 @@
       };
 
       // ------------------------------------------------------
-      connection = new WebSocket('ws://localhost:9002');
+      Module.connection = new WebSocket('ws://localhost:9002');
 
-        connection.binaryType = "arraybuffer";
+        Module.connection.binaryType = "arraybuffer";
 
-        connection.onopen = function () {
+        Module.connection.onopen = function () {
             // Send a small message to the console once the connection is established 
             console.log('Connection open!');
 
@@ -220,21 +219,36 @@
 
             start = new Date().getTime();
 
-            connection.send('sssss');
+            Module.connection.send('\0');
         }
 
-        connection.onclose = function () {
+        Module.connection.onclose = function () {
             console.log('Connection closed');
         }
 
-        connection.onerror = function (error) {
+        Module.connection.onerror = function (error) {
             console.log('Error detected: ' + error);
         }
 
-        connection.onmessage = function (e) {
+        Module.connection.onmessage = function (e) {
             var server_message = e.data;
 
             console.log("server_message " + server_message);
+            console.log(Module.lerp(1, 2, 0.5));
+            Module.onConnection(server_message);
+
+            var dataView = new DataView(server_message);
+            var command = dataView.getInt8(0);
+            console.log('command' + command);
+            switch(command)
+            {
+              case 1:
+                console.log('This one!');
+                var u32bytes = server_message.slice(-4); // last four bytes as a new `ArrayBuffer`
+                var numGeoms = new Uint32Array(u32bytes)[0];
+                console.log("Num geoms " + numGeoms);
+              break;
+            }
 
             if (e.data instanceof ArrayBuffer) {
                 console.log("Binary!");
@@ -247,9 +261,13 @@
 
             console.log("connection.onmessage");
             console.log(server_message);
+
+            
         }
       // ------------------------------------------------------
-
+        console.log(Module);
+        console.log('aaaaaaaa');
+        //console.log(Module.lerp(1, 2, 0.5));
     </script>
     <script async type="text/javascript" src="webAsmPlay.js"></script>
 	<script>

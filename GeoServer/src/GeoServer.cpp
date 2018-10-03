@@ -1,3 +1,4 @@
+#include <ctpl.h>
 #include "ogrsf_frmts.h"
 #include <webAsmPlay/Debug.h>
 #include <geoServer/GeoServer.h>
@@ -7,9 +8,48 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
-GeoServer::GeoServer()
+namespace
+{
+    ctpl::thread_pool pool(1);
+}
+
+GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
 {
     GDALAllRegister();
+
+    GDALDataset * poDS = (GDALDataset *)GDALOpenEx(geomFile.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+
+    if(!poDS) { dmess("Error opening: " << geomFile) ;}
+
+    OGRLayer * poLayer = poDS->GetLayer(0);
+
+    if(!poLayer) { dmess("Error!") ;}
+
+    poLayer->ResetReading();
+
+    for(OGRFeature * poFeature; (poFeature = poLayer->GetNextFeature()) != NULL ;)
+    {
+        OGRGeometry * poGeometry = poFeature->GetGeometryRef();
+
+        //dmess("poGeometry " << poGeometry);
+
+        unsigned char * data = new unsigned char[poGeometry->WkbSize()];
+
+        poGeometry->exportToWkb(
+                                //wkbXDR,
+                                wkbNDR, // little-endian (least significant byte first)
+                                data);
+
+        dmess("poGeometry->getGeometryName() " << poGeometry->getGeometryName() << " " << poGeometry->WkbSize());
+
+        geoms.push_back(WkbGeom(data, poGeometry->WkbSize()));
+
+        OGRFeature::DestroyFeature( poFeature );
+    }
+    
+    GDALClose( poDS );
+
+    dmess("geoms " << geoms.size());
 }
 
 GeoServer::~GeoServer()
@@ -31,136 +71,58 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
         Server * s = &server->serverEndPoint;
 
-        /*
         switch(data[0])
         {
-            case PointCloudServer::GET_POINT_CLOUD_ID_REQUEST:
-            {
-                const uint32_t pointCloudID = server->ensurePointCloud(++data);
+            case GET_NUM_GEOMETRIES_REQUEST:
 
-                pool.push([hdl, s, pointCloudID](int ID)
+                dmess("GET_NUM_GEOMETRIES_REQUEST");
+
+                pool.push([hdl, s, server](int ID)
                 {
                     vector<char> data(sizeof(char) + sizeof(uint32_t));
 
-                    data[0] = GET_POINT_CLOUD_ID_RESPONCE;
+                    data[0] = GET_NUM_GEOMETRIES_RESPONCE;
 
-                    *(uint32_t *)&data[1] = pointCloudID;
+                    *(uint32_t *)&data[1] = server->getNumGeoms();
+
+                    dmess("*(uint32_t *)&data[1] " << *(uint32_t *)&data[1]);
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
 
-                break;
-            }
+            break;
 
-            case PointCloudServer::GET_NUMBER_OF_SECTORS_REQUEST:
-            {
-                const uint32_t pointCloudID = *(uint32_t *)&data[1];
-               
-                vector<char> data(sizeof(char) + sizeof(uint32_t));
-
-                data[0] = GET_NUMBER_OF_SECTORS_RESPONCE;
-
-                *(uint32_t *)&data[1] = server->pointClouds[pointCloudID]->getAllGeneralizedSectors().size();
-
-                s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
-
-                break;
-            }
-            case PointCloudServer::GET_GENERALIZED_SECTOR_REQUEST:
-            {
-                const char *dataPtr = &data[1];
-
-                const uint32_t pointCloudID = *(uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
-
-                const uint32_t sectorIndex = *(uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
-
-                PointCloud *pc = server->pointClouds[pointCloudID];
-
-                GeneralizedPointCloudSectorBase *sector = pc->getGeneralizedSector(sectorIndex);
-
-                const AABB3Dd bounds = sector->getBoundingBox();
-
-                vector<char> data(sizeof(char) + sizeof(AABB3Dd) + sizeof(size_t));
-
-                data[0] = GET_GENERALIZED_SECTOR_RESPONCE;
-
-                char * dataOutPtr = &data[1];
-
-                memcpy(dataOutPtr, &bounds, sizeof(AABB3Dd));
-                dataOutPtr += sizeof(AABB3Dd);
-
-                const size_t numLevels = sector->getNumLevels();
-
-                memcpy(dataOutPtr, &numLevels, sizeof(size_t));
-                dataOutPtr += sizeof(size_t);
-
-                s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
-
-                break;
-            }
-            case GET_GENERALIZED_SECTOR_LEVEL_REQUEST:
-            {
-                const char *dataPtr = &data[1];
-
-                const uint32_t pointCloudID = *(uint32_t *)dataPtr;
-                dataPtr += sizeof(uint32_t);
-
-                const uint32_t sectorID = *(uint32_t *)dataPtr;
-                dataPtr += sizeof(uint32_t);
-
-                const uint32_t level = *(uint32_t *)dataPtr;
-                dataPtr += sizeof(uint32_t);
-
-                pool.push([hdl, s, pointCloudID, sectorID, level, server](int ID)
+            case GET_GEOMETRY_REQUEST:
                 {
-                    PointCloud * pointCloud = server->pointClouds[pointCloudID];
+                    const uint32_t geomID = *(uint32_t *)&data[1];
 
-                    GeneralizedPointCloudSectorBase * sector = pointCloud->getGeneralizedSector(sectorID - 1); // TODO use another ID function
+                    dmess("GET_GEOMETRY_REQUEST " << geomID);
 
-                    sector->ensureLevel(level);
+                    pool.push([hdl, s, server, geomID](int ID)
+                    {
+                        const WkbGeom & geom = server->getGeom(geomID);
 
-                    const uint32_t numVerts = sector->getNumVerts(level);
+                        //vector<char> data(sizeof(char) + sizeof(uint32_t) + geom.second);
+                        vector<char> data(sizeof(char) + geom.second);
 
-                    vector<char> dataOut(sizeof(char) +
-                                        sizeof(uint32_t) +
-                                        sizeof(uint32_t) +
-                                        sizeof(uint32_t) +
-                                        sizeof(uint32_t) +
-                                        sizeof(Vec3f) * numVerts * 2);
+                        data[0] = GET_GEOMETRY_RESPONCE;
 
-                    char * dataOutPtr = &dataOut[0];
+                        //*(uint32_t *)&data[1] = geom.second;
 
-                    *dataOutPtr = GET_GENERALIZED_SECTOR_LEVEL_RESPONCE; dataOutPtr += sizeof(char);
+                        dmess("geom.second " << geom.second);
 
-                    *(uint32_t *)dataOutPtr = pointCloudID; 
-                    dataOutPtr += sizeof(uint32_t);
+                        memcpy(&data[1], geom.first, geom.second);
 
-                    *(uint32_t *)dataOutPtr = sectorID;
-                    dataOutPtr += sizeof(uint32_t);
+                        s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
+                    });
 
-                    *(uint32_t *)dataOutPtr = level;
-                    dataOutPtr += sizeof(uint32_t);
+                    break;
+                }
 
-                    *(uint32_t *)dataOutPtr = numVerts;
-                    dataOutPtr += sizeof(uint32_t);
-
-                    memcpy(dataOutPtr, sector->getVertsPtr(level), sizeof(Vec3f) * numVerts);
-                    dataOutPtr += sizeof(Vec3f) * numVerts;
-
-                    memcpy(dataOutPtr, sector->getColorsPtr(level), sizeof(Vec3f) * numVerts);
-                    dataOutPtr += sizeof(Vec3f) * numVerts;
-
-                    s->send(hdl, &dataOut[0], dataOut.size(), websocketpp::frame::opcode::BINARY);
-                    
-                });
-
-                break;
-            }
             default:
 
                 dmess("Error!");
-        }
-        */
+        };
     }
     catch (const websocketpp::lib::error_code &e)
     {
@@ -211,3 +173,7 @@ void GeoServer::start()
 
     dmess("Exit");
 }
+
+size_t GeoServer::getNumGeoms() const { return geoms.size() ;}
+
+GeoServer::WkbGeom GeoServer::getGeom(const size_t index) const { return geoms[index] ;}

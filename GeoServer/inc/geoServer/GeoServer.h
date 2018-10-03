@@ -1,17 +1,24 @@
 #ifndef __WEB_ASM_PLAY_GEO_SERVER_H__
 #define __WEB_ASM_PLAY_GEO_SERVER_H__
 
+#include <string>
+#include <vector>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
+#include <geoServer/GeoServerBase.h>
 
-class GeoServer
+class GeoServer : public GeoServerBase
 {
 public:
 
-    GeoServer();
+    GeoServer(const std::string & geomFile);
     ~GeoServer();
 
     void start();
+
+    size_t getNumGeoms() const;
+
+    WkbGeom getGeom(const size_t index) const;
 
 private:
     
@@ -22,6 +29,10 @@ private:
     Server serverEndPoint;
 
     static void on_message(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
+
+    const std::string & geomFile;
+
+    std::vector<WkbGeom> geoms;
 };
 
 #endif // __WEB_ASM_PLAY_GEO_SERVER_H__

@@ -1,16 +1,21 @@
+#include <istream>
+#include <streambuf>
+#include <geos.h>
+#include <emscripten/bind.h>
+#include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Debug.h>
 #define GLEW_STATIC
 #include <GL/glew.h>
-
-// GLFW
 #include <GLFW/glfw3.h>
-
 #include <imgui.h>
 #include "imgui_impl_glfw_gl3.h"
 
+using namespace std;
+using namespace geos::io;
+using namespace geos::geom;
+
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
-
 
 void errorCallback(int error, const char* description);
 
@@ -83,4 +88,67 @@ int main()
     refresh(window);
 
     return 0;
+}
+
+namespace
+{
+    bool doaShow = true;
+
+    float lerp(float a, float b, float t)
+    {
+        doaShow = false;
+
+        return (1 - t) * a + t * b;
+    }
+
+    struct MemBuf : std::streambuf
+    {
+        MemBuf(char* begin, char* end) {
+            this->setg(begin, begin, end);
+        }
+    };
+
+    void onConnection(const string data)
+    {
+        dmess("onConnection " << data.length());
+
+        char * ptr = (char *)data.data();
+
+        switch(ptr[0])
+        {
+            case GeoServerBase::GET_NUM_GEOMETRIES_RESPONCE:
+            {
+                const uint32_t numGeoms = *(uint32_t *)++ptr;
+
+                dmess("     aaaaaaGET_NUM_GEOMETRIES_RESPONCE " << numGeoms);
+
+                break;
+            }
+
+            case GeoServerBase::GET_GEOMETRY_RESPONCE:
+            {
+                const uint32_t dataSize = *(uint32_t *)++ptr;
+
+                dmess("GET_GEOMETRY_RESPONCE " << dataSize);
+
+                const GeometryFactory * factory = GeometryFactory::getDefaultInstance();
+
+                WKBReader reader(*factory);
+
+                MemBuf buf(ptr, ptr + data.length() - 1);
+                istream in(&buf);
+                Geometry * geom = reader.read(in);
+
+                dmess("geom->getGeometryType() " << geom->getGeometryType());
+
+                break;
+            }
+        }
+    }
+}
+
+EMSCRIPTEN_BINDINGS(WebAsmPlayBindings)
+{
+    emscripten::function("lerp", &lerp);
+    emscripten::function("onConnection", &onConnection);
 }

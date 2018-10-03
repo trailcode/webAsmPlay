@@ -9,6 +9,7 @@ find_package(websocketpp REQUIRED)
 
 include_directories(./inc)
 include_directories(../inc)
+include_directories(../ctpl)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GDAL_INCLUDE_DIR})
 include_directories(${Websocketpp_INCLUDE_DIRS})

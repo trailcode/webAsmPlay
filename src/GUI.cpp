@@ -128,7 +128,7 @@ void mainLoop(GLFWwindow* window)
 
                     //emscripten_run_script("fileInput.click();");
                     //emscripten_run_script("alert(fileSelector)");
-                    //emscripten_run_script("Module.my_js();");
+                    emscripten_run_script("Module.my_js();");
 
                     //my_c_function(0);
 
@@ -138,6 +138,21 @@ void mainLoop(GLFWwindow* window)
 
 
                 }
+                if(ImGui::MenuItem("Test Web Worker"))
+                {
+                    worker_handle worker = emscripten_create_worker("worker.js");
+                    emscripten_call_worker(worker, "one", 0, 0, cback, (void*)42);
+                }
+                if(ImGui::MenuItem("Test"))
+                {
+                    emscripten_run_script("Module.connection.send(\"\\0\");");
+                }
+
+                if(ImGui::MenuItem("Test 2"))
+                {
+                    emscripten_run_script("Module.connection.send(\"\\2\");");
+                }
+
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Edit"))
