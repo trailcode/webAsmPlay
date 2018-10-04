@@ -8,9 +8,20 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
+#include <geos.h>
+using namespace geos::io;
+using namespace geos::geom;
+
 namespace
 {
     ctpl::thread_pool pool(1);
+
+    struct MemBuf : std::streambuf
+    {
+        MemBuf(char* begin, char* end) {
+            this->setg(begin, begin, end);
+        }
+    };
 }
 
 GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
@@ -33,16 +44,28 @@ GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
 
         //dmess("poGeometry " << poGeometry);
 
+        /*
         unsigned char * data = new unsigned char[poGeometry->WkbSize()];
 
         poGeometry->exportToWkb(
                                 //wkbXDR,
                                 wkbNDR, // little-endian (least significant byte first)
                                 data);
-
+        
         dmess("poGeometry->getGeometryName() " << poGeometry->getGeometryName() << " " << poGeometry->WkbSize());
 
         geoms.push_back(WkbGeom(data, poGeometry->WkbSize()));
+        */
+
+        char * data;
+
+        poGeometry->exportToWkt(&data);
+
+        const size_t len = strlen(data);
+
+        dmess("len " << len);
+
+        geoms.push_back(WkbGeom(data, len));
 
         OGRFeature::DestroyFeature( poFeature );
     }
@@ -111,7 +134,8 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                     pool.push([hdl, s, server, geomID](int ID)
                     {
-                        const WkbGeom & geom = server->getGeom(geomID);
+                        //const WkbGeom & geom = server->getGeom(geomID);
+                        const WkbGeom & geom = server->getGeom(10);
 
                         //vector<char> data(sizeof(char) + sizeof(uint32_t) + geom.second);
                         vector<char> data(sizeof(char) + geom.second);

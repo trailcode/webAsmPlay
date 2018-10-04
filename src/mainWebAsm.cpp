@@ -90,6 +90,10 @@ int main()
     return 0;
 }
 
+void setLayerBounds(const tuple<double, double, double, double> & bounds);
+
+void addGeometry(Geometry * geom);
+
 namespace
 {
     bool doaShow = true;
@@ -103,7 +107,8 @@ namespace
 
     struct MemBuf : std::streambuf
     {
-        MemBuf(char* begin, char* end) {
+        MemBuf(char* begin, char* end)
+        {
             this->setg(begin, begin, end);
         }
     };
@@ -133,13 +138,21 @@ namespace
 
                 const GeometryFactory * factory = GeometryFactory::getDefaultInstance();
 
+                /*
                 WKBReader reader(*factory);
 
                 MemBuf buf(ptr, ptr + data.length() - 1);
                 istream in(&buf);
                 Geometry * geom = reader.read(in);
+                */
+
+                WKTReader reader(factory);
+
+                Geometry * geom = reader.read(string(ptr));
 
                 dmess("geom->getGeometryType() " << geom->getGeometryType());
+
+                addGeometry(geom);
 
                 break;
             }
@@ -153,6 +166,8 @@ namespace
                 const AABB2D & bounds = *(AABB2D *)++ptr;
 
                 dmess("minX " << get<0>(bounds) << " minY " << get<1>(bounds) << " maxX " << get<2>(bounds) << " maxY " << get<3>(bounds));
+
+                setLayerBounds(bounds);
 
                 break;
             }

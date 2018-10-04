@@ -469,3 +469,33 @@ void initGeometry()
 
     canvas->addRenderiable(r);
 }
+
+namespace
+{
+    typedef const tuple<double, double, double, double> AABB2D;
+
+    AABB2D bounds;
+
+    mat4 trans;
+}
+
+void setLayerBounds(const tuple<double, double, double, double> & bounds)
+{
+    trans = translate(  mat4(1.0),
+                        vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
+                             (get<1>(bounds) + get<3>(bounds)) * -0.5,
+                             0.0));
+}
+
+void addGeometry(Geometry * geom)
+{
+    dmess("trans " << mat4ToStr(trans));
+
+    Renderiable * r = Renderiable::create(geom, trans);
+
+    r->setFillColor(vec4(0.3,0.0,0.3,1));
+        
+    r->setOutlineColor(vec4(1,0,0,1));
+
+    canvas->addRenderiable(r);
+}

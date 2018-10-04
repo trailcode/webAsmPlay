@@ -49,6 +49,8 @@ namespace
 
         const vector<Coordinate> & coords = *ring->getCoordinates()->toVector();
 
+        dmess("coords.size() " << coords.size());
+
         if(coords.size() < 4)
         {
             dmess("Bad gemetry!");
@@ -70,11 +72,15 @@ namespace
         }
         else
         {
+            dmess("trans");
+
             for(size_t i = 0; i < coords.size() - 1; ++i)
             {
                 const Coordinate & C = coords[i];
 
                 const vec4 v = trans * vec4(C.x, C.y, 0, 1);
+
+                cout << " " << C.x << " " << C.y << " " << v.x << " " << v.y << endl;
 
                 verts.push_back(v.x);
                 verts.push_back(v.y);
@@ -86,9 +92,13 @@ namespace
         
         //dmess("verts.size() " << verts.size());
 
+        dmess("poly->getNumInteriorRing() " << poly->getNumInteriorRing());
+
         for(size_t i = 0; i < poly->getNumInteriorRing(); ++i)
         {
             const vector<Coordinate> & coords = *poly->getInteriorRingN(i)->getCoordinates()->toVector();
+
+            dmess("   coords.size() " << coords.size());
 
             if(coords.size() < 4)
             {

@@ -17,7 +17,8 @@ public:
         GET_LAYER_BOUNDS_RESPONCE,
     };
 
-    typedef std::pair<unsigned char *, const size_t> WkbGeom;
+    //typedef std::pair<unsigned char *, const size_t> WkbGeom;
+    typedef std::pair<char *, const size_t> WkbGeom;
 
     virtual ~GeoServerBase() {}
 
