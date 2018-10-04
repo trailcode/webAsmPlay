@@ -17,17 +17,19 @@ NPC positions will be calculated on a server and the client application running 
 can query bot positions and states for the given viewport. The server will also be responsible for geometry
 generalization, bot AI, navigation graphs generated from Open Street Map data and state persistence. 
 
-#### Dependencies
+### Dependencies
 
 Unfortunately during development notes on build depends were not tracked. Development is currently
-being done on OSX. Macports and Brew is being used to install third party dependencies. 
+being done on OSX. Macports (https://www.macports.org/) and Brew (https://brew.sh/) is being used to
+install third party dependencies. 
 
 * Cmake: https://cmake.org
 * Emscripten: http://kripken.github.io/emscripten-site
-* glfw3
-* Boost
-* websocketpp
-* gdal
+* Glfw3: https://www.glfw.org/
+* Glew: http://glew.sourceforge.net/
+* Boost: https://www.boost.org/
+* Websocketpp: https://www.zaphoyd.com/websocketpp
+* Gdal: https://www.gdal.org/
 
 Some third party dependencies are built into the WebAsmPlay source tree to make emscripten compilation easer:  
 * Geos https://trac.osgeo.org/geos
