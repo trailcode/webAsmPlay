@@ -47,6 +47,17 @@ GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
         OGRFeature::DestroyFeature( poFeature );
     }
     
+    OGREnvelope extent;
+
+    poLayer->GetExtent(&extent);
+
+    boundsMinX = extent.MinX;
+    boundsMinY = extent.MinY;
+    boundsMaxX = extent.MaxX;
+    boundsMaxY = extent.MaxY;
+
+    dmess("MinX " << extent.MinX << " " << extent.MinY << " " << extent.MaxX << " " << extent.MaxY);
+
     GDALClose( poDS );
 
     dmess("geoms " << geoms.size());
@@ -112,6 +123,29 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
                         dmess("geom.second " << geom.second);
 
                         memcpy(&data[1], geom.first, geom.second);
+
+                        s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
+                    });
+
+                    break;
+                }
+
+            case GET_LAYER_BOUNDS_REQUEST:
+                {
+                    dmess("GET_LAYER_BOUNDS_REQUEST");
+
+                    pool.push([hdl, s, server](int ID)
+                    {
+                        typedef tuple<double, double, double, double> AABB2D;
+
+                        vector<char> data(sizeof(char) + sizeof(AABB2D)); // TODO make a AABB2D class
+
+                        data[0] = GET_LAYER_BOUNDS_RESPONCE;
+
+                        *((AABB2D *)&data[1]) = AABB2D( server->boundsMinX,
+                                                        server->boundsMinY,
+                                                        server->boundsMaxX,
+                                                        server->boundsMaxY);
 
                         s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                     });

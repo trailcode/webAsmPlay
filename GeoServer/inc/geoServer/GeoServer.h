@@ -33,6 +33,11 @@ private:
     const std::string & geomFile;
 
     std::vector<WkbGeom> geoms;
+
+    double boundsMinX;
+    double boundsMinY;
+    double boundsMaxX;
+    double boundsMaxY;
 };
 
 #endif // __WEB_ASM_PLAY_GEO_SERVER_H__

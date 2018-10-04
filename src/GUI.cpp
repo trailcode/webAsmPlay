@@ -153,6 +153,11 @@ void mainLoop(GLFWwindow* window)
                     emscripten_run_script("Module.connection.send(\"\\2\");");
                 }
 
+                if(ImGui::MenuItem("Test 3"))
+                {
+                    emscripten_run_script("Module.connection.send(\"\\4\");");
+                }
+
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Edit"))

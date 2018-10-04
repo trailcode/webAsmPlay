@@ -143,6 +143,19 @@ namespace
 
                 break;
             }
+
+            case GeoServerBase::GET_LAYER_BOUNDS_RESPONCE:
+            {
+                dmess("GET_LAYER_BOUNDS_RESPONCE");
+
+                typedef tuple<double, double, double, double> AABB2D;
+
+                const AABB2D & bounds = *(AABB2D *)++ptr;
+
+                dmess("minX " << get<0>(bounds) << " minY " << get<1>(bounds) << " maxX " << get<2>(bounds) << " maxY " << get<3>(bounds));
+
+                break;
+            }
         }
     }
 }
