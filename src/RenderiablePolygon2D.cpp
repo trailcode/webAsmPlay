@@ -41,7 +41,7 @@ namespace
         vector<GLuint> counterVertIndices;
     };
 
-    TesselationResult tessellatePolygon(const Polygon  * poly)
+    TesselationResult tessellatePolygon(const Polygon  * poly, const mat4 & trans)
     {
         TesselationResult ret;
 
@@ -58,12 +58,27 @@ namespace
 
         vector<double> verts;
         
-        for(size_t i = 0; i < coords.size() - 1; ++i)
+        if(trans == mat4(1.0))
         {
-            const Coordinate & C = coords[i];
+            for(size_t i = 0; i < coords.size() - 1; ++i)
+            {
+                const Coordinate & C = coords[i];
 
-            verts.push_back(C.x);
-            verts.push_back(C.y);
+                verts.push_back(C.x);
+                verts.push_back(C.y);
+            }
+        }
+        else
+        {
+            for(size_t i = 0; i < coords.size() - 1; ++i)
+            {
+                const Coordinate & C = coords[i];
+
+                const vec4 v = trans * vec4(C.x, C.y, 0, 1);
+
+                verts.push_back(v.x);
+                verts.push_back(v.y);
+            }
         }
 
         ret.counterVertIndices.push_back(0);
@@ -82,12 +97,21 @@ namespace
                 return ret;
             }
 
-            for(size_t i = 0; i < coords.size() - 1; ++i)
+            if(trans == mat4(1.0))
             {
-                const Coordinate & C = coords[i];
+                for(size_t i = 0; i < coords.size() - 1; ++i)
+                {
+                    const Coordinate & C = coords[i];
 
-                verts.push_back(C.x);
-                verts.push_back(C.y);
+                    const vec4 v = trans * vec4(C.x, C.y, 0, 1);
+
+                    verts.push_back(v.x);
+                    verts.push_back(v.y);
+                }
+            }
+            else
+            {
+
             }
 
             ret.counterVertIndices.push_back(verts.size());
@@ -110,11 +134,11 @@ namespace
     }
 }
 
-Renderiable * RenderiablePolygon2D::create(const Polygon * poly)
+Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & trans)
 {
     ensureShader();
 
-    const TesselationResult tess = tessellatePolygon(poly);
+    const TesselationResult tess = tessellatePolygon(poly, trans);
 
     if(!tess.vertsOut) { return NULL ;}
 
@@ -149,7 +173,7 @@ Renderiable * RenderiablePolygon2D::create(const Polygon * poly)
                                     tess.counterVertIndices);
 }
 
-Renderiable * RenderiablePolygon2D::create(const MultiPolygon * multyPoly)
+Renderiable * RenderiablePolygon2D::create(const MultiPolygon * multyPoly, const mat4 & trans)
 {
     ensureShader();
 
@@ -159,7 +183,7 @@ Renderiable * RenderiablePolygon2D::create(const MultiPolygon * multyPoly)
     {
         const Polygon * poly = dynamic_cast<const Polygon *>(multyPoly->getGeometryN(i));
 
-        tesselationResults.push_back(tessellatePolygon(poly));
+        tesselationResults.push_back(tessellatePolygon(poly, trans));
             
         if(!tesselationResults.rbegin()->vertsOut) { return NULL ;}
     }

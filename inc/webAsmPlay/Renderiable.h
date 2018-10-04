@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <glm/glm.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace geos
 {
@@ -28,7 +29,7 @@ public:
 
     virtual void render(const glm::mat4 & MVP) const = 0;
 
-    static Renderiable * create(const geos::geom::Geometry * geom);
+    static Renderiable * create(const geos::geom::Geometry * geom, const glm::mat4 & trans = glm::mat4(1.0));
 
     glm::vec4 setFillColor(const glm::vec4 & fillColor);
     glm::vec4 getFillColor() const;

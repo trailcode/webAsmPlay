@@ -228,8 +228,6 @@ void mainLoop(GLFWwindow* window)
 
     isFirst = false;
 
-    
-
     ImGui::Begin("Scene Window");
 
     //dmess("ImGui::IsWindowFocused() " << ImGui::IsWindowFocused());
@@ -459,7 +457,11 @@ void initGeometry()
 
     p = scopedGeosGeometry(p->difference(pppp));
 
-    Renderiable * r = Renderiable::create(p);
+    const mat4 trans = scale(mat4(1.0), vec3(0.1, 0.1, 0.1));
+
+    dmess("trans " << mat4ToStr(trans));
+
+    Renderiable * r = Renderiable::create(p, trans);
 
     r->setFillColor(vec4(0.3,0.3,0,1));
         

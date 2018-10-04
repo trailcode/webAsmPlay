@@ -93,17 +93,17 @@ void Renderiable::ensureShader()
     dmess("colorAttrib " << colorAttrib);
 }
 
-Renderiable * Renderiable::create(const Geometry * geom)
+Renderiable * Renderiable::create(const Geometry * geom, const mat4 & trans)
 {
     switch(geom->getGeometryTypeId())
     {
         case GEOS_POINT:                dmess("Implement me!"); return NULL;
         case GEOS_LINESTRING:           dmess("Implement me!"); return NULL;
-        case GEOS_LINEARRING:           return RenderiableLineString2D  ::create(dynamic_cast<const LineString *>(geom));
-        case GEOS_POLYGON:              return RenderiablePolygon2D     ::create(dynamic_cast<const Polygon *>(geom));
+        case GEOS_LINEARRING:           return RenderiableLineString2D  ::create(dynamic_cast<const LineString *>   (geom), trans);
+        case GEOS_POLYGON:              return RenderiablePolygon2D     ::create(dynamic_cast<const Polygon *>      (geom), trans);
         case GEOS_MULTIPOINT:           dmess("Implement me!"); return NULL;
         case GEOS_MULTILINESTRING:      dmess("Implement me!"); return NULL;
-        case GEOS_MULTIPOLYGON:         return RenderiablePolygon2D     ::create(dynamic_cast<const MultiPolygon *>(geom));
+        case GEOS_MULTIPOLYGON:         return RenderiablePolygon2D     ::create(dynamic_cast<const MultiPolygon *> (geom), trans);
         case GEOS_GEOMETRYCOLLECTION:   dmess("Implement me!"); return NULL;
         default:
             dmess("Error!");

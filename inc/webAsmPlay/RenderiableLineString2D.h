@@ -17,7 +17,7 @@ public:
 
     ~RenderiableLineString2D();
 
-    static Renderiable * create(const geos::geom::LineString * lineString);
+    static Renderiable * create(const geos::geom::LineString * lineString, const glm::mat4 & trans = glm::mat4(1.0));
 
     void render(const glm::mat4 & MVP) const;
 

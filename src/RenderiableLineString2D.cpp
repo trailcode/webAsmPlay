@@ -21,7 +21,7 @@ RenderiableLineString2D::~RenderiableLineString2D()
     //glDeleteBuffers     (1, &vbo);
 }
 
-Renderiable * RenderiableLineString2D::create(const LineString * lineString)
+Renderiable * RenderiableLineString2D::create(const LineString * lineString, const mat4 & trans)
 {
     ensureShader();
 
@@ -46,10 +46,23 @@ Renderiable * RenderiableLineString2D::create(const LineString * lineString)
 
     GLfloat * vertsPtr = &verts[0];
 
-    for(size_t i = 0; i < coords.size(); ++i)
+    if(trans == mat4(1.0))
     {
-        *vertsPtr = coords[i].x; ++vertsPtr;
-        *vertsPtr = coords[i].y; ++vertsPtr;
+        for(size_t i = 0; i < coords.size(); ++i)
+        {
+            *vertsPtr = coords[i].x; ++vertsPtr;
+            *vertsPtr = coords[i].y; ++vertsPtr;
+        }
+    }
+    else
+    {
+        for(size_t i = 0; i < coords.size(); ++i)
+        {
+            const vec4 v = trans * vec4(coords[i].x, coords[i].y, 0, 1);
+
+            *vertsPtr = v.x; ++vertsPtr;
+            *vertsPtr = v.y; ++vertsPtr;
+        }
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);

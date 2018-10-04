@@ -18,9 +18,9 @@ public:
 
     ~RenderiablePolygon2D();
 
-    static Renderiable * create(const geos::geom::Polygon * poly);
+    static Renderiable * create(const geos::geom::Polygon * poly, const glm::mat4 & trans = glm::mat4(1.0));
 
-    static Renderiable * create(const geos::geom::MultiPolygon * multyPoly);
+    static Renderiable * create(const geos::geom::MultiPolygon * multyPoly, const glm::mat4 & trans = glm::mat4(1.0));
 
     void render(const glm::mat4 & MVP) const;
 
