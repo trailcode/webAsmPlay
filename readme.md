@@ -4,7 +4,7 @@ WebAsmPlay
 
 WebAsmPlay was initially developed to evaluate web application development using Emscripten.
 
-Currently a handful of C++ libraries have been compiled with Emscripten to run in the browser
+Currently a handful of C++ libraries have been compiled with Emscripten in this project to run in the browser
 and run natively. The idea is to test a cross platform development environment where an application
 is developed and debugged both as a web application and a browser application.
 Another goal is to discover the limitations and capabilities of Emscipten web application development.
