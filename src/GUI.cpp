@@ -170,6 +170,24 @@ void mainLoop(GLFWwindow* window)
                     });
                 }
 
+                if(ImGui::MenuItem("Test 5"))
+                {
+                    GeoClient::getInstance()->getLayerBounds([](const AABB2D & bounds)
+                    {
+                        dmess("bounds " << get<0>(bounds) << " " << get<1>(bounds) << " " << get<2>(bounds) << " " << get<3>(bounds));
+                    });
+                }
+
+                if(ImGui::MenuItem("Test 6"))
+                {
+                    std::function<void (geos::geom::Geometry *)> callback = [](geos::geom::Geometry * geom)
+                    {
+                        dmess("geom " << geom);
+                    };
+
+                    GeoClient::getInstance()->getGeometry(14, callback);
+                }
+
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Edit"))

@@ -1,6 +1,7 @@
 #include <ctpl.h>
 #include "ogrsf_frmts.h"
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Types.h>
 #include <geoServer/GeoServer.h>
 
 using namespace std;
@@ -103,7 +104,9 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
         const char * data = (char *)msg->get_payload().data();
 
-        const uint32_t requestID = *(const uint32_t *)&data[1];
+        const char * dataPtr = &data[1];
+
+        const uint32_t requestID = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
 
         dmess("requestID " << requestID);
 
@@ -134,25 +137,27 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
             case GET_GEOMETRY_REQUEST:
                 {
-                    const uint32_t geomID = *(uint32_t *)&data[1];
+                    const uint32_t geomID = *(const uint32_t *)dataPtr;
 
                     dmess("GET_GEOMETRY_REQUEST " << geomID);
 
-                    pool.push([hdl, s, server, geomID](int ID)
+                    pool.push([hdl, s, server, requestID, geomID](int ID)
                     {
                         const WkbGeom & geom = server->getGeom(geomID);
                         //const WkbGeom & geom = server->getGeom(10);
 
                         //vector<char> data(sizeof(char) + sizeof(uint32_t) + geom.second);
-                        vector<char> data(sizeof(char) + geom.second);
+                        vector<char> data(sizeof(char) + sizeof(uint32_t) * 2 + geom.second);
 
                         data[0] = GET_GEOMETRY_RESPONCE;
 
-                        //*(uint32_t *)&data[1] = geom.second;
+                        char * ptr = &data[1];
 
-                        dmess("geom.second " << geom.second);
+                        *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                        memcpy(&data[1], geom.first, geom.second);
+                        *(uint32_t *)ptr = geom.second; ptr += sizeof(uint32_t);
+
+                        memcpy(ptr, geom.first, geom.second);
 
                         s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                     });
@@ -162,20 +167,24 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
             case GET_LAYER_BOUNDS_REQUEST:
                 {
-                    dmess("GET_LAYER_BOUNDS_REQUEST");
+                    dmess("GET_LAYER_BOUNDS_REQUEST " << requestID);
 
-                    pool.push([hdl, s, server](int ID)
+                    pool.push([hdl, s, server, requestID](int ID)
                     {
-                        typedef tuple<double, double, double, double> AABB2D;
+                        dmess("requestID " << requestID);
 
-                        vector<char> data(sizeof(char) + sizeof(AABB2D)); // TODO make a AABB2D class
+                        vector<char> data(sizeof(char) + sizeof(uint32_t) + sizeof(AABB2D)); // TODO make a AABB2D class
 
                         data[0] = GET_LAYER_BOUNDS_RESPONCE;
 
-                        *((AABB2D *)&data[1]) = AABB2D( server->boundsMinX,
-                                                        server->boundsMinY,
-                                                        server->boundsMaxX,
-                                                        server->boundsMaxY);
+                        char * ptr = &data[1];
+
+                        *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
+
+                        *((AABB2D *)ptr) = AABB2D(  server->boundsMinX,
+                                                    server->boundsMinY,
+                                                    server->boundsMaxX,
+                                                    server->boundsMaxY);
 
                         s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                     });

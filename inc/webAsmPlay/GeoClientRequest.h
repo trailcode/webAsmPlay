@@ -2,20 +2,17 @@
 #define __WEB_ASM_PLAY_GEO_CLIENT_REQUEST_H__
 
 #include <functional>
+#include <webAsmPlay/Types.h>
 
 class GeoClient;
 
-class GeoClientRequest
+namespace geos
 {
-public:
-
-    GeoClientRequest(const uint8_t type, const std::function<void ()> & callback);
-
-protected:
-private:
-    
-    const std::function<void ()> callback;
-};
+    namespace geom
+    {
+        class Geometry;
+    }
+}
 
 class GeoRequestGetNumGeoms
 {
@@ -23,14 +20,43 @@ public:
 
     GeoRequestGetNumGeoms(const std::function<void (const size_t numGeoms)> & callback);
 
-protected:
 private:
 
     friend class GeoClient;
 
     const std::function<void (const size_t)> callback;
 
-    const size_t requestID;
+    const size_t ID;
+};
+
+class GeoRequestLayerBounds
+{
+public:
+
+    GeoRequestLayerBounds(const std::function<void (const AABB2D &)> & callback);
+
+private:
+
+    friend class GeoClient;
+
+    const std::function<void (const AABB2D &)> callback;
+
+    const size_t ID;
+};
+
+class GeoRequestGeometry
+{
+public:
+
+    GeoRequestGeometry(const std::function<void (geos::geom::Geometry *)> & callback);
+
+private:
+
+    friend class GeoClient;
+
+    const std::function<void (geos::geom::Geometry *)> callback;
+
+    const size_t ID;
 };
 
 #endif // __WEB_ASM_PLAY_GEO_CLIENT_REQUEST_H__
