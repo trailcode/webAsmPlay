@@ -119,7 +119,7 @@ void GeoClient::onMessage(const string & data)
 
             const uint32_t dataSize = *(uint32_t *)ptr; ptr += sizeof(uint32_t);
 
-            dmess("GET_GEOMETRY_RESPONCE requestID " << requestID << " dataSize " << dataSize);
+            //dmess("GET_GEOMETRY_RESPONCE requestID " << requestID << " dataSize " << dataSize);
 
             const GeometryFactory * factory = GeometryFactory::getDefaultInstance();
 
@@ -135,9 +135,9 @@ void GeoClient::onMessage(const string & data)
 
             Geometry * geom = reader.read(string(ptr));
 
-            dmess("geom " << geom);
+            //dmess("geom " << geom);
 
-            dmess("geom->getGeometryType() " << geom->getGeometryType());
+            //dmess("geom->getGeometryType() " << geom->getGeometryType());
 
             GeometryRequests::const_iterator i = getInstance()->geometryRequests.find(requestID);
 

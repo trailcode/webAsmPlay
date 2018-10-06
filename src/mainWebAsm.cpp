@@ -115,7 +115,7 @@ namespace
 
     void onConnection(const string data)
     {
-        dmess("onConnection " << data.length());
+        //dmess("onConnection " << data.length());
 
         return;
 
