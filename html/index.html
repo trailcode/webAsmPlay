@@ -193,7 +193,7 @@
           Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
         },
         onRuntimeInitialized: function() {
-          console.log('lerp result: ' + Module.lerp(1, 2, 0.5));
+          
         },
         swap32: function(val) {
            return ((val & 0xFF) << 24)
@@ -237,39 +237,7 @@
         }
 
         Module.connection.onmessage = function (e) {
-            var server_message = e.data;
-
-            console.log("server_message " + server_message);
-            console.log(Module.lerp(1, 2, 0.5));
-            Module.onConnection(server_message);
-            Module.onMessage(server_message);
-
-            var dataView = new DataView(server_message);
-            var command = dataView.getInt8(0);
-            console.log('command' + command);
-            switch(command)
-            {
-              case 1:
-                console.log('This one!');
-                var u32bytes = server_message.slice(-4); // last four bytes as a new `ArrayBuffer`
-                var numGeoms = new Uint32Array(u32bytes)[0];
-                console.log("Num geoms " + numGeoms);
-              break;
-            }
-
-            if (e.data instanceof ArrayBuffer) {
-                console.log("Binary!");
-            }
-            else {
-                console.log("Not bin!");
-            }
-
-            console.log(e.data);
-
-            console.log("connection.onmessage");
-            console.log(server_message);
-
-            
+            Module.onMessage(e.data);
         }
       // ------------------------------------------------------
         console.log(Module);

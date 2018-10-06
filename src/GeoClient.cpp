@@ -1,3 +1,4 @@
+#include <memory>
 #include <emscripten/emscripten.h>
 #include <emscripten/bind.h>
 #include <geos/geom/GeometryFactory.h>
@@ -98,17 +99,13 @@ void GeoClient::onMessage(const string & data)
 
             const uint32_t numGeoms = *(uint32_t *)ptr;
 
-            dmess("     aaaaaaGET_NUM_GEOMETRIES_RESPONCE " << requestID << " numGeoms " << numGeoms);
-
             NumGeomsRequests::const_iterator i = getInstance()->numGeomsRequests.find(requestID);
 
-            GeoRequestGetNumGeoms * request = i->second;
+            unique_ptr<GeoRequestGetNumGeoms> request(i->second);
 
             request->callback(numGeoms);
 
             getInstance()->numGeomsRequests.erase(i);
-
-            delete request;
 
             break;
         }
@@ -119,66 +116,34 @@ void GeoClient::onMessage(const string & data)
 
             const uint32_t dataSize = *(uint32_t *)ptr; ptr += sizeof(uint32_t);
 
-            //dmess("GET_GEOMETRY_RESPONCE requestID " << requestID << " dataSize " << dataSize);
-
-            const GeometryFactory * factory = GeometryFactory::getDefaultInstance();
-
-            /*
-            WKBReader reader(*factory);
-
-            MemBuf buf(ptr, ptr + data.length() - 1);
-            istream in(&buf);
-            Geometry * geom = reader.read(in);
-            */
-
-            WKTReader reader(factory);
+            WKTReader reader(GeometryFactory::getDefaultInstance());
 
             Geometry * geom = reader.read(string(ptr));
 
-            //dmess("geom " << geom);
-
-            //dmess("geom->getGeometryType() " << geom->getGeometryType());
-
             GeometryRequests::const_iterator i = getInstance()->geometryRequests.find(requestID);
 
-            GeoRequestGeometry * request = i->second;
+            unique_ptr<GeoRequestGeometry> request(i->second);
 
             request->callback(geom);
 
             getInstance()->geometryRequests.erase(i);
-
-            delete request;
-
-            //addGeometry(geom);
 
             break;
         }
 
         case GeoServerBase::GET_LAYER_BOUNDS_RESPONCE:
         {
-            dmess("GET_LAYER_BOUNDS_RESPONCE");
-
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
-
-            dmess("      requestID " << requestID);
-
-            typedef tuple<double, double, double, double> AABB2D;
 
             const AABB2D & bounds = *(AABB2D *)ptr;
 
-            dmess("minX " << get<0>(bounds) << " minY " << get<1>(bounds) << " maxX " << get<2>(bounds) << " maxY " << get<3>(bounds));
-
             LayerBoundsRequests::const_iterator i = getInstance()->layerBoundsRequests.find(requestID);
 
-            GeoRequestLayerBounds * request = i->second;
+            unique_ptr<GeoRequestLayerBounds> request(i->second);
 
             request->callback(bounds);
 
             getInstance()->layerBoundsRequests.erase(i);
-
-            delete request;
-
-            //setLayerBounds(bounds);
 
             break;
         }

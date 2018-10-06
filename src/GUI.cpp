@@ -244,20 +244,10 @@ void mainLoop(GLFWwindow* window)
 
     if(doTest7)
     {
-        //size_t * _numGeoms = new size_t;
-
         std::function<void (const size_t)> getNumGeoms = [&](const size_t numGeoms)
         {
-            //dmess("numGeoms " << numGeoms);
-
-            //*_numGeoms = numGeoms;
-
             GeoClient::getInstance()->getLayerBounds([numGeoms](const AABB2D & bounds)
             {
-                //dmess("bounds " << get<0>(bounds) << " " << get<1>(bounds) << " " << get<2>(bounds) << " " << get<3>(bounds));
-
-                //dmess("_numGeoms " << numGeoms);
-
                 const mat4 trans = translate(   mat4(1.0),
                                                 vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
                                                      (get<1>(bounds) + get<3>(bounds)) * -0.5,
@@ -265,10 +255,6 @@ void mainLoop(GLFWwindow* window)
 
                 std::function<void (geos::geom::Geometry *)> getGeom = [trans](geos::geom::Geometry * geom)
                 {
-                    //dmess("geom " << geom);
-
-                    //dmess("trans " << mat4ToStr(trans));
-
                     Renderiable * r = Renderiable::create(geom, trans);
 
                     r->setFillColor(vec4(0.3,0.0,0.3,1));
@@ -279,7 +265,6 @@ void mainLoop(GLFWwindow* window)
                 };
 
                 for(size_t i = 0; i < numGeoms; ++i)
-                //for(size_t i = 0; i < 100; ++i)
                 {
                     GeoClient::getInstance()->getGeometry(i, getGeom);
                 }
@@ -287,16 +272,6 @@ void mainLoop(GLFWwindow* window)
         };
 
         GeoClient::getInstance()->getNumGeoms(getNumGeoms);
-        
-
-        /*
-        std::function<void (geos::geom::Geometry *)> getGeom = [](geos::geom::Geometry * geom)
-        {
-            dmess("geom " << geom);
-        };
-
-        GeoClient::getInstance()->getGeometry(14, getGeom);
-        //*/
     }
 
     // Rendering
@@ -594,34 +569,4 @@ void initGeometry()
 
     canvas->addRenderiable(r);
     //*/
-}
-
-namespace
-{
-    typedef const tuple<double, double, double, double> AABB2D;
-
-    AABB2D bounds;
-
-    mat4 trans;
-}
-
-void setLayerBounds(const tuple<double, double, double, double> & bounds)
-{
-    trans = translate(  mat4(1.0),
-                        vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
-                             (get<1>(bounds) + get<3>(bounds)) * -0.5,
-                             0.0));
-}
-
-void addGeometry(Geometry * geom)
-{
-    dmess("trans " << mat4ToStr(trans));
-
-    Renderiable * r = Renderiable::create(geom, trans);
-
-    r->setFillColor(vec4(0.3,0.0,0.3,1));
-        
-    r->setOutlineColor(vec4(1,0,0,1));
-
-    canvas->addRenderiable(r);
 }
