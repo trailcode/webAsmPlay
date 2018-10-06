@@ -117,6 +117,8 @@ namespace
     {
         dmess("onConnection " << data.length());
 
+        return;
+
         char * ptr = (char *)data.data();
 
         switch(ptr[0])

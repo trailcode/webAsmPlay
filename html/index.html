@@ -242,6 +242,7 @@
             console.log("server_message " + server_message);
             console.log(Module.lerp(1, 2, 0.5));
             Module.onConnection(server_message);
+            Module.onMessage(server_message);
 
             var dataView = new DataView(server_message);
             var command = dataView.getInt8(0);

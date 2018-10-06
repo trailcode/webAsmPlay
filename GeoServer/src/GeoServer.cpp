@@ -103,21 +103,29 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
         const char * data = (char *)msg->get_payload().data();
 
+        const uint32_t requestID = *(const uint32_t *)&data[1];
+
+        dmess("requestID " << requestID);
+
         switch(data[0])
         {
             case GET_NUM_GEOMETRIES_REQUEST:
 
                 dmess("GET_NUM_GEOMETRIES_REQUEST");
 
-                pool.push([hdl, s, server](int ID)
+                pool.push([hdl, s, server, requestID](int ID)
                 {
-                    vector<char> data(sizeof(char) + sizeof(uint32_t));
+                    vector<char> data(sizeof(char) + sizeof(uint32_t) * 2);
 
                     data[0] = GET_NUM_GEOMETRIES_RESPONCE;
 
-                    *(uint32_t *)&data[1] = server->getNumGeoms();
+                    char * ptr = &data[1];
 
-                    dmess("*(uint32_t *)&data[1] " << *(uint32_t *)&data[1]);
+                    *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
+
+                    *(uint32_t *)ptr = server->getNumGeoms();
+
+                    dmess("*(uint32_t *)&data[1] " << *(uint32_t *)&data[1] << " requestID " << requestID);
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });

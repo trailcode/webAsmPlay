@@ -38,6 +38,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GeosUtil.h>
 
 using namespace std;
@@ -159,6 +160,14 @@ void mainLoop(GLFWwindow* window)
                 if(ImGui::MenuItem("Test 3"))
                 {
                     emscripten_run_script("Module.connection.send(\"\\4\");");
+                }
+
+                if(ImGui::MenuItem("Test 4"))
+                {
+                    GeoClient::getInstance()->getNumGeoms([](const size_t numGeoms)
+                    {
+                        dmess("numGeoms " << numGeoms);
+                    });
                 }
 
                 ImGui::EndMenu();
