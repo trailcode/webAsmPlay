@@ -194,6 +194,12 @@
         },
         onRuntimeInitialized: function() {
           console.log('lerp result: ' + Module.lerp(1, 2, 0.5));
+        },
+        swap32: function(val) {
+           return ((val & 0xFF) << 24)
+                | ((val & 0xFF00) << 8)
+                | ((val >> 8) & 0xFF00)
+                | ((val >> 24) & 0xFF);
         }
       };
       Module.setStatus('Downloading...');

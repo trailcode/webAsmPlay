@@ -109,6 +109,8 @@ void mainLoop(GLFWwindow* window)
     ImGui_ImplGlfwGL3_NewFrame();
 #endif
 
+    bool doIt = false;
+
     {
         if (ImGui::BeginMainMenuBar())
         {
@@ -150,7 +152,8 @@ void mainLoop(GLFWwindow* window)
 
                 if(ImGui::MenuItem("Test 2"))
                 {
-                    emscripten_run_script("Module.connection.send(\"\\2\");");
+                    doIt = true;
+                    
                 }
 
                 if(ImGui::MenuItem("Test 3"))
@@ -187,6 +190,23 @@ void mainLoop(GLFWwindow* window)
 
             ImGui::EndMainMenuBar();
         }
+    }
+
+    if(doIt)
+    {
+        dmess("doIt " << doIt);
+
+        char buf[2048];
+
+        sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
+                        "var dv = new DataView(buffer); \r\n"
+                        "dv.setUint8(0,2); \r\n"
+                        "dv.setUint32(1, Module.swap32(%i)); \r\n"
+                        "//var view = new DataView(buffer, 1, 4); \r\n"
+                        "//view.setUint32(12); \r\n"
+                        "Module.connection.send(buffer); \r\n", 13);
+                    
+        emscripten_run_script(buf);
     }
 
     // Rendering
@@ -449,6 +469,7 @@ void initGeometry()
 
     Geometry * pppp = scopedGeosGeometry(GeosUtil::makeBox(-0.6,-0.05,0.6,0.05));
 
+    /*
     p = scopedGeosGeometry(p->buffer(0.1));
 
     p = scopedGeosGeometry(p->difference(pp));
@@ -456,18 +477,33 @@ void initGeometry()
     p = scopedGeosGeometry(p->difference(ppp));
 
     p = scopedGeosGeometry(p->difference(pppp));
+    */
 
     const mat4 trans = scale(mat4(1.0), vec3(0.1, 0.1, 0.1));
 
     dmess("trans " << mat4ToStr(trans));
 
     Renderiable * r = Renderiable::create(p, trans);
+    //Renderiable * r = Renderiable::create(p);
 
     r->setFillColor(vec4(0.3,0.3,0,1));
         
     r->setOutlineColor(vec4(1,0,0,1));
 
     canvas->addRenderiable(r);
+
+    //*
+    p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,-4,0.4));
+
+    //r = Renderiable::create(p, trans);
+    r = Renderiable::create(p);
+
+    r->setFillColor(vec4(0.3,0.0,0.3,1));
+        
+    r->setOutlineColor(vec4(1,0,0,1));
+
+    canvas->addRenderiable(r);
+    //*/
 }
 
 namespace
@@ -497,5 +533,5 @@ void addGeometry(Geometry * geom)
         
     r->setOutlineColor(vec4(1,0,0,1));
 
-    canvas->addRenderiable(r);
+    //canvas->addRenderiable(r);
 }

@@ -99,11 +99,9 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
     try {
 
-        string message = msg->get_payload();
+        Server * s = &server->serverEndPoint;
 
         const char * data = (char *)msg->get_payload().data();
-
-        Server * s = &server->serverEndPoint;
 
         switch(data[0])
         {
@@ -134,8 +132,8 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                     pool.push([hdl, s, server, geomID](int ID)
                     {
-                        //const WkbGeom & geom = server->getGeom(geomID);
-                        const WkbGeom & geom = server->getGeom(10);
+                        const WkbGeom & geom = server->getGeom(geomID);
+                        //const WkbGeom & geom = server->getGeom(10);
 
                         //vector<char> data(sizeof(char) + sizeof(uint32_t) + geom.second);
                         vector<char> data(sizeof(char) + geom.second);

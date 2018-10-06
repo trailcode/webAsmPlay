@@ -49,7 +49,7 @@ namespace
 
         const vector<Coordinate> & coords = *ring->getCoordinates()->toVector();
 
-        dmess("coords.size() " << coords.size());
+        //dmess("coords.size() " << coords.size());
 
         if(coords.size() < 4)
         {
@@ -72,7 +72,7 @@ namespace
         }
         else
         {
-            dmess("trans");
+            //dmess("trans");
 
             for(size_t i = 0; i < coords.size() - 1; ++i)
             {
@@ -80,7 +80,7 @@ namespace
 
                 const vec4 v = trans * vec4(C.x, C.y, 0, 1);
 
-                cout << " " << C.x << " " << C.y << " " << v.x << " " << v.y << endl;
+                //cout << " " << C.x << " " << C.y << " " << v.x << " " << v.y << endl;
 
                 verts.push_back(v.x);
                 verts.push_back(v.y);
@@ -92,13 +92,13 @@ namespace
         
         //dmess("verts.size() " << verts.size());
 
-        dmess("poly->getNumInteriorRing() " << poly->getNumInteriorRing());
+        //dmess("poly->getNumInteriorRing() " << poly->getNumInteriorRing());
 
         for(size_t i = 0; i < poly->getNumInteriorRing(); ++i)
         {
             const vector<Coordinate> & coords = *poly->getInteriorRingN(i)->getCoordinates()->toVector();
 
-            dmess("   coords.size() " << coords.size());
+            //dmess("   coords.size() " << coords.size());
 
             if(coords.size() < 4)
             {
@@ -113,15 +113,21 @@ namespace
                 {
                     const Coordinate & C = coords[i];
 
+                    verts.push_back(C.x);
+                    verts.push_back(C.y);
+                }
+            }
+            else
+            {
+                for(size_t i = 0; i < coords.size() - 1; ++i)
+                {
+                    const Coordinate & C = coords[i];
+
                     const vec4 v = trans * vec4(C.x, C.y, 0, 1);
 
                     verts.push_back(v.x);
                     verts.push_back(v.y);
                 }
-            }
-            else
-            {
-
             }
 
             ret.counterVertIndices.push_back(verts.size());
@@ -157,6 +163,7 @@ Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & tr
     GLuint vbo = 0;
 
     glGenVertexArrays(1, &vao);
+
     glBindVertexArray(vao);
 
     glGenBuffers(1, &vbo);
@@ -166,6 +173,7 @@ Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & tr
     for(size_t i = 0; i < tess.numVerts * 2; ++i) { verts2[i] = tess.vertsOut[i] ;}
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * tess.numVerts * 2, &verts2[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &ebo);
@@ -175,6 +183,8 @@ Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & tr
     
     free(tess.vertsOut);
     free(tess.triangleIndices);
+
+    glBindVertexArray(0);
 
     return new RenderiablePolygon2D(vao,
                                     ebo,
@@ -266,7 +276,9 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
     glUniform4f(colorAttrib, fillColor.x, fillColor.y, fillColor.z, fillColor.w);
 
     glBindVertexArray(vao);
-    
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
     // Specify the layout of the vertex data
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -288,5 +300,7 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
 
         glDrawArrays(GL_LINE_LOOP, a, (b - a));
     }
+
+    glBindVertexArray(0); 
 }
 
