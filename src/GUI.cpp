@@ -492,7 +492,7 @@ void initGeometry()
 
     canvas->addRenderiable(r);
 
-    //*
+    /*
     p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,-4,0.4));
 
     //r = Renderiable::create(p, trans);
@@ -533,5 +533,5 @@ void addGeometry(Geometry * geom)
         
     r->setOutlineColor(vec4(1,0,0,1));
 
-    //canvas->addRenderiable(r);
+    canvas->addRenderiable(r);
 }
