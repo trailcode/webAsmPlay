@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
  
 set (CMAKE_CXX_STANDARD 11)
 
@@ -86,6 +86,8 @@ file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
                             "src/Canvas.cpp"
                             "src/GeoClient.cpp"
                             "src/GeoClientRequest.cpp"
+                            "src/SkyBox.cpp"
+                            "src/Shader.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
                             ${tceOpenSteer_SRC}
@@ -269,7 +271,6 @@ endif()
 # Use Cocoa for window creation and NSOpenGL for context creation
 #--------------------------------------------------------------------
 if (_GLFW_COCOA)
-    message("_GLFW_COCOA")
     list(APPEND glfw_LIBRARIES
         "-framework Cocoa"
         "-framework IOKit"

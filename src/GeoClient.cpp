@@ -1,6 +1,8 @@
 #include <memory>
-#include <emscripten/emscripten.h>
-#include <emscripten/bind.h>
+#ifdef __EMSCRIPTEN__
+    #include <emscripten/emscripten.h>
+    #include <emscripten/bind.h>
+#endif
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Polygon.h>
 #include <geos/io/WKTReader.h>
@@ -41,6 +43,8 @@ void GeoClient::getNumGeoms(const function<void (const size_t)> & callback)
 
     numGeomsRequests[request->ID] = request;
 
+#ifdef __EMSCRIPTEN__
+
     char buf[2048];
 
     sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
@@ -50,6 +54,12 @@ void GeoClient::getNumGeoms(const function<void (const size_t)> & callback)
                     "Module.connection.send(buffer); \r\n", request->ID);
                 
     emscripten_run_script(buf);
+
+#else
+
+    dmess("Implement me!");
+
+#endif
 }
 
 void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
@@ -57,6 +67,8 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
     GeoRequestLayerBounds * request = new GeoRequestLayerBounds(callback);
 
     layerBoundsRequests[request->ID] = request;
+
+#ifdef __EMSCRIPTEN__
 
     char buf[2048];
 
@@ -67,6 +79,12 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
                     "Module.connection.send(buffer); \r\n", request->ID);
 
     emscripten_run_script(buf);
+
+#else
+
+    dmess("Implement me!");
+
+#endif
 }
 
 void GeoClient::getGeometry(const size_t geomIndex, function<void (Geometry * geom)> & callback)
@@ -74,6 +92,8 @@ void GeoClient::getGeometry(const size_t geomIndex, function<void (Geometry * ge
     GeoRequestGeometry * request = new GeoRequestGeometry(callback);
 
     geometryRequests[request->ID] = request;
+
+#ifdef __EMSCRIPTEN__
 
     char buf[2048];
 
@@ -85,6 +105,12 @@ void GeoClient::getGeometry(const size_t geomIndex, function<void (Geometry * ge
                     "Module.connection.send(buffer); \r\n", request->ID, geomIndex);
 
     emscripten_run_script(buf);
+
+#else
+
+    dmess("Implement me!");
+
+#endif
 }
 
 void GeoClient::onMessage(const string & data)
@@ -150,7 +176,11 @@ void GeoClient::onMessage(const string & data)
     }
 }
 
+#ifdef __EMSCRIPTEN__
+
 EMSCRIPTEN_BINDINGS(GeoClientBindings)
 {
     emscripten::function("onMessage", &GeoClient::onMessage);
 }
+
+#endif

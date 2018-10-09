@@ -109,7 +109,6 @@ void mainLoop(GLFWwindow* window)
     ImGui_ImplGlfwGL3_NewFrame();
 #endif
 
-    bool doIt = false;
     bool doTest7 = false;
 
     {
@@ -117,77 +116,19 @@ void mainLoop(GLFWwindow* window)
         {
             if (ImGui::BeginMenu("File"))
             {
-                //ShowExampleMenuFile();
-                //ImGui::MenuItem("(dummy menu)", NULL, false, false);
                 if (ImGui::MenuItem("New")) {}
                 if (ImGui::MenuItem("Open", "Ctrl+O")) {
-
-                    cout << "Open" << endl;
-
-                    worker_handle worker = emscripten_create_worker("worker.js");
-                    emscripten_call_worker(worker, "one", 0, 0, cback, (void*)42);
-
-                    //emscripten_set_main_loop(loop, 2, true);
-
-                    //emscripten_run_script("fileInput.click();");
-                    //emscripten_run_script("alert(fileSelector)");
-                    emscripten_run_script("Module.my_js();");
-
-                    //my_c_function(0);
-
-                    //EM_ASM("Module.my_js();");
-
-                    //my_js();
-
 
                 }
                 if(ImGui::MenuItem("Test Web Worker"))
                 {
-                    worker_handle worker = emscripten_create_worker("worker.js");
-                    emscripten_call_worker(worker, "one", 0, 0, cback, (void*)42);
+                    #ifdef __EMSCRIPTEN__
+                        worker_handle worker = emscripten_create_worker("worker.js");
+                        emscripten_call_worker(worker, "one", 0, 0, cback, (void*)42);
+                    #else
+                        dmess("Implement me!");
+                    #endif
                 }
-                if(ImGui::MenuItem("Test"))
-                {
-                    emscripten_run_script("Module.connection.send(\"\\0\");");
-                }
-
-                if(ImGui::MenuItem("Test 2"))
-                {
-                    doIt = true;
-                    
-                }
-
-                if(ImGui::MenuItem("Test 3"))
-                {
-                    emscripten_run_script("Module.connection.send(\"\\4\");");
-                }
-
-                if(ImGui::MenuItem("Test 4"))
-                {
-                    GeoClient::getInstance()->getNumGeoms([](const size_t numGeoms)
-                    {
-                        dmess("numGeoms " << numGeoms);
-                    });
-                }
-
-                if(ImGui::MenuItem("Test 5"))
-                {
-                    GeoClient::getInstance()->getLayerBounds([](const AABB2D & bounds)
-                    {
-                        dmess("bounds " << get<0>(bounds) << " " << get<1>(bounds) << " " << get<2>(bounds) << " " << get<3>(bounds));
-                    });
-                }
-
-                if(ImGui::MenuItem("Test 6"))
-                {
-                    std::function<void (geos::geom::Geometry *)> callback = [](geos::geom::Geometry * geom)
-                    {
-                        dmess("geom " << geom);
-                    };
-
-                    GeoClient::getInstance()->getGeometry(14, callback);
-                }
-
                 if(ImGui::MenuItem("Test 7"))
                 {
                     doTest7 = true;
@@ -222,23 +163,6 @@ void mainLoop(GLFWwindow* window)
 
             ImGui::EndMainMenuBar();
         }
-    }
-
-    if(doIt)
-    {
-        dmess("doIt " << doIt);
-
-        char buf[2048];
-
-        sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
-                        "var dv = new DataView(buffer); \r\n"
-                        "dv.setUint8(0,2); \r\n"
-                        "dv.setUint32(1, Module.swap32(%i)); \r\n"
-                        "//var view = new DataView(buffer, 1, 4); \r\n"
-                        "//view.setUint32(12); \r\n"
-                        "Module.connection.send(buffer); \r\n", 13);
-                    
-        emscripten_run_script(buf);
     }
 
     if(doTest7)
