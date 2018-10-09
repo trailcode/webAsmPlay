@@ -465,4 +465,10 @@ void initGeometry()
 
     canvas->addRenderiable(r);
     //*/
+
+    FILE * fp = fopen("xneg.png", "rb");
+
+    dmess("fp " << fp);
+
+    
 }
