@@ -171,16 +171,16 @@ void mainLoop(GLFWwindow* window)
 
         canvas->addRenderiable(layer);
 
-        std::function<void (const size_t)> getNumGeoms = [layer](const size_t numGeoms)
+        std::function<void (const size_t)> getNumGeoms = [layer, window](const size_t numGeoms)
         {
-            GeoClient::getInstance()->getLayerBounds([numGeoms, layer](const AABB2D & bounds)
+            GeoClient::getInstance()->getLayerBounds([numGeoms, layer, window](const AABB2D & bounds)
             {
                 const mat4 trans = translate(   mat4(1.0),
                                                 vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
                                                      (get<1>(bounds) + get<3>(bounds)) * -0.5,
                                                      0.0));
 
-                std::function<void (geos::geom::Geometry *)> getGeom = [trans, layer](geos::geom::Geometry * geom)
+                std::function<void (geos::geom::Geometry *)> getGeom = [trans, layer, window](geos::geom::Geometry * geom)
                 {
                     Renderiable * r = Renderiable::create(geom, trans);
 
@@ -190,6 +190,8 @@ void mainLoop(GLFWwindow* window)
 
                     //canvas->addRenderiable(r);
                     layer->addRenderiable(r);
+
+                    refresh(window);
                 };
 
                 for(size_t i = 0; i < numGeoms; ++i)
@@ -220,17 +222,12 @@ void mainLoop(GLFWwindow* window)
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 
-    /*
-    const mat4 view = camera->getMatrix();
-    const mat4 model = mat4(1.0);
-    const mat4 projection = perspective(45.0, double(screenWidth) / double(screenHeight), 0.1, 100.0);
-    const mat4 MVP = projection * view * model;
-    */
-
     if(showViewMatrixPanel)
     {
         ImGui::Begin("View Matrix", &showViewMatrixPanel);
-        //ImGui::Text(mat4ToStr(view).c_str());
+
+            ImGui::Text(mat4ToStr(canvas->getViewRef()).c_str());
+
         ImGui::End();
     }
     
@@ -239,7 +236,9 @@ void mainLoop(GLFWwindow* window)
     if(showMVP_MatrixPanel)
     {
         ImGui::Begin("MVP Matrix", &showMVP_MatrixPanel);
-        //ImGui::Text(mat4ToStr(MVP).c_str());
+
+            ImGui::Text(mat4ToStr(canvas->getMVP_Ref()).c_str());
+
         ImGui::End();
     }
 

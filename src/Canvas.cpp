@@ -28,10 +28,12 @@ using namespace glm;
 using namespace geos::geom;
 using namespace tce::geom;
 
-Canvas::Canvas(const bool useFrameBuffer) : trackBallInteractor (NULL),
-                                            frameBuffer         (NULL),
-                                            wantMouseCapture    (true),
-                                            useFrameBuffer      (useFrameBuffer)
+Canvas::Canvas( const bool   useFrameBuffer,
+                const vec4 & clearColor) : trackBallInteractor (NULL),
+                                            frameBuffer        (NULL),
+                                            wantMouseCapture   (true),
+                                            useFrameBuffer     (useFrameBuffer),
+                                            clearColor         (clearColor)
 {
     trackBallInteractor = new TrackBallInteractor();
 }
@@ -63,10 +65,10 @@ GLuint Canvas::render()
 
     Camera * camera = trackBallInteractor->getCamera();
 
-    const mat4 view         = camera->getMatrix();
-    const mat4 model        = mat4(1.0);
-    const mat4 projection   = perspective(45.0, double(size.x) / double(size.y), 0.1, 100.0);
-    const mat4 MVP          = projection * view * model;
+    view         = camera->getMatrix();
+    model        = mat4(1.0);
+    projection   = perspective(45.0, double(size.x) / double(size.y), 0.1, 100.0);
+    MVP          = projection * view * model;
 
     if(useFrameBuffer)
     {
@@ -75,7 +77,8 @@ GLuint Canvas::render()
         glViewport(0,0,size.x,size.y);
     }
 
-    glClearColor(0,0,0,1);
+    glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     for(Renderiable * r : renderiables) { r->render(MVP) ;}
@@ -181,3 +184,18 @@ Renderiable * Canvas::addRenderiable(Renderiable * renderiable)
     
     return renderiable;
 }
+
+vec4 Canvas::setClearColor(const vec4 & clearColor)
+{
+    return this->clearColor = clearColor;
+}
+
+mat4 Canvas::getView()       const { return view ;}
+mat4 Canvas::getModel()      const { return model ;}
+mat4 Canvas::getProjection() const { return projection ;}
+mat4 Canvas::getMVP()        const { return MVP ;}
+
+const mat4 & Canvas::getViewRef()       const { return view ;}
+const mat4 & Canvas::getModelRef()      const { return model ;}
+const mat4 & Canvas::getProjectionRef() const { return projection ;}
+const mat4 & Canvas::getMVP_Ref()       const { return MVP ;}
