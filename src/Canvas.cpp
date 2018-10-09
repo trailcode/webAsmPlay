@@ -28,9 +28,10 @@ using namespace glm;
 using namespace geos::geom;
 using namespace tce::geom;
 
-Canvas::Canvas() :  trackBallInteractor (NULL),
-                    frameBuffer         (NULL),
-                    wantMouseCapture    (true)
+Canvas::Canvas(const bool useFrameBuffer) : trackBallInteractor (NULL),
+                                            frameBuffer         (NULL),
+                                            wantMouseCapture    (true),
+                                            useFrameBuffer      (useFrameBuffer)
 {
     trackBallInteractor = new TrackBallInteractor();
 }
@@ -46,7 +47,7 @@ void Canvas::setArea(const Vec2i & upperLeft, const Vec2i & size)
     this->upperLeft = upperLeft;
     this->size      = size;
 
-    frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, size);
+    if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, size) ;}
 
     trackBallInteractor->setScreenSize(size.x, size.y);
 }
@@ -67,15 +68,21 @@ GLuint Canvas::render()
     const mat4 projection   = perspective(45.0, double(size.x) / double(size.y), 0.1, 100.0);
     const mat4 MVP          = projection * view * model;
 
-    frameBuffer->bind();
+    if(useFrameBuffer)
+    {
+        frameBuffer->bind();
     
-    glViewport(0,0,size.x,size.y);
+        glViewport(0,0,size.x,size.y);
+    }
+
     glClearColor(0,0,0,1);
     glClear(GL_COLOR_BUFFER_BIT);
 
     for(Renderiable * r : renderiables) { r->render(MVP) ;}
 
-    return frameBuffer->getTextureID();
+    if(useFrameBuffer) { return frameBuffer->getTextureID() ;}
+
+    return 0;
 }
 
 GLuint Canvas::getTextureID() const

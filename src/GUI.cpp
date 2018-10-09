@@ -54,10 +54,11 @@ static int mouse_buttons_down = 0;
 
 static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
 
+Canvas * auxCanvas = NULL;
 Canvas * canvas = NULL;
 
-TrackBallInteractor trackBallInteractor;
-Camera * camera = NULL;
+//TrackBallInteractor trackBallInteractor;
+//Camera * camera = NULL;
 
 bool showViewMatrixPanel = true;
 bool showMVP_MatrixPanel = true;
@@ -281,6 +282,8 @@ void mainLoop(GLFWwindow* window)
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    canvas->render();
+
     static float time = 0.f;
     //if (!paused)
     {
@@ -290,15 +293,17 @@ void mainLoop(GLFWwindow* window)
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 
+    /*
     const mat4 view = camera->getMatrix();
     const mat4 model = mat4(1.0);
     const mat4 projection = perspective(45.0, double(screenWidth) / double(screenHeight), 0.1, 100.0);
     const mat4 MVP = projection * view * model;
+    */
 
     if(showViewMatrixPanel)
     {
         ImGui::Begin("View Matrix", &showViewMatrixPanel);
-        ImGui::Text(mat4ToStr(view).c_str());
+        //ImGui::Text(mat4ToStr(view).c_str());
         ImGui::End();
     }
     
@@ -307,7 +312,7 @@ void mainLoop(GLFWwindow* window)
     if(showMVP_MatrixPanel)
     {
         ImGui::Begin("MVP Matrix", &showMVP_MatrixPanel);
-        ImGui::Text(mat4ToStr(MVP).c_str());
+        //ImGui::Text(mat4ToStr(MVP).c_str());
         ImGui::End();
     }
 
@@ -319,11 +324,11 @@ void mainLoop(GLFWwindow* window)
 
     ImVec2 pos = ImGui::GetCursorScreenPos();
 
-    canvas->setArea(__(pos), __(sceneWindowSize));
+    auxCanvas->setArea(__(pos), __(sceneWindowSize));
 
-    canvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+    auxCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
-    ImGui::GetWindowDrawList()->AddImage(   (void *)canvas->render(),
+    ImGui::GetWindowDrawList()->AddImage(   (void *)auxCanvas->render(),
                                             pos,
                                             ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
                                             ImVec2(0, 1),
@@ -352,7 +357,12 @@ void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
         return;
     }
 
-    canvas->onMouseButton(window, button, action, mods);
+    auxCanvas->onMouseButton(window, button, action, mods);
+
+    if(!GImGui->IO.WantCaptureMouse)
+    {
+        canvas->onMouseButton(window, button, action, mods);
+    }
 
     if (mouse_buttons[button] != action) {
       mouse_buttons[button] = action;
@@ -374,11 +384,13 @@ void cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 {
     //dmess("x " << xpos << " y " << ypos);
 
+    auxCanvas->onMousePosition(window, Vec2d(xpos, ypos));
+
     canvas->onMousePosition(window, Vec2d(xpos, ypos));
 
-    trackBallInteractor.setClickPoint(xpos, ypos);
+    //trackBallInteractor.setClickPoint(xpos, ypos);
 
-    trackBallInteractor.update();
+    //trackBallInteractor.update();
 
     //if (render_when_mouse_up || mouse_buttons_down)
     {
@@ -390,36 +402,11 @@ void scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 {
     //dmess("ScrollCallback " << xoffset << " " << yoffset);
 
-    canvas->onMouseScroll(window, Vec2d(xoffset, yoffset));
+    auxCanvas->onMouseScroll(window, Vec2d(xoffset, yoffset));
 
-    ImGuiContext & g = *GImGui;
-
-    if(!g.IO.WantCaptureMouse)
+    if(!GImGui->IO.WantCaptureMouse)
     {
-        int state = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
-        
-        if (state == GLFW_PRESS)
-        {
-            //dmess("GLFW_KEY_LEFT_SHIFT");
-            int display_w, display_h;
-            glfwGetFramebufferSize(window, &display_w, &display_h);
-            lastShiftKeyDownMousePos += Vec2d(xoffset, 0);
-            trackBallInteractor.setClickPoint(lastShiftKeyDownMousePos.x % display_w, lastShiftKeyDownMousePos.y % display_h);
-            trackBallInteractor.update();
-            //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
-        }
-
-        state = glfwGetKey(window, GLFW_KEY_LEFT_ALT);
-
-        if (state == GLFW_PRESS)
-        {
-            dmess("GLFW_KEY_LEFT_ALT");
-        }
-
-        const double delta = yoffset;
-
-        trackBallInteractor.setScrollDirection(delta > 0);
-        trackBallInteractor.update();
+        canvas->onMouseScroll(window, Vec2d(xoffset, yoffset));
     }
 
 #ifdef __EMSCRIPTEN__
@@ -432,33 +419,10 @@ void scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 
 void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods)
 {
-    canvas->onKey(window, key, scancode, action, mods);
+    auxCanvas->onKey(window, key, scancode, action, mods);
 
-    //dmess("key " << key << " scancode " << scancode << " action " << action << " mods " << mods);
-    switch(key)
-    {
-        case GLFW_KEY_LEFT_SHIFT:
-        case GLFW_KEY_LEFT_ALT:
-
-            trackBallInteractor.setLeftClicked(action);
-
-            if(action)
-            {
-                double xPos;
-                double yPos;
-                glfwGetCursorPos(window, &xPos, &yPos);
-                lastShiftKeyDownMousePos = Vec2i(xPos, yPos);
-            }
-
-            break;
-    }
-
-    switch(key)
-    {
-        case GLFW_KEY_LEFT_SHIFT: trackBallInteractor.setMotionLeftClick(ARC); break;
-        case GLFW_KEY_LEFT_ALT:   trackBallInteractor.setMotionLeftClick(PAN); break;
-    }
-     
+    if(!GImGui->IO.WantCaptureKeyboard) { canvas->onKey(window, key, scancode, action, mods) ;}
+ 
 #ifdef __EMSCRIPTEN__
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
 #else
@@ -470,6 +434,8 @@ void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mod
 
 void charCallback(GLFWwindow * window, unsigned int c)
 {
+    auxCanvas->onChar(window, c);
+
     canvas->onChar(window, c);
 
 #ifdef __EMSCRIPTEN__
@@ -482,9 +448,11 @@ void charCallback(GLFWwindow * window, unsigned int c)
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-    //dmess("width " << width << " height " << height);
+    dmess("width " << width << " height " << height);
 
-    trackBallInteractor.setScreenSize(width, height);
+    //trackBallInteractor.setScreenSize(width, height);
+
+    canvas->setArea(Vec2i(0,0), Vec2i(width, height));
 
     refresh(window);
 }
@@ -515,13 +483,19 @@ void initOpenGL(GLFWwindow* window)
     glfwGetFramebufferSize(window, &width, &height);  
     glViewport(0, 0, width, height);
 
+    /*
     trackBallInteractor.setScreenSize(width, height);
 
     camera = trackBallInteractor.getCamera();
     trackBallInteractor.getCamera()->reset();
     trackBallInteractor.setSpeed(3);
+    */
 
-    canvas = new Canvas();
+    canvas = new Canvas(false);
+
+    canvas->setArea(Vec2i(0,0), Vec2i(width, height));
+
+    auxCanvas = new Canvas();
 }
 
 void initGeometry()
@@ -555,6 +529,7 @@ void initGeometry()
         
     r->setOutlineColor(vec4(1,0,0,1));
 
+    auxCanvas->addRenderiable(r);
     canvas->addRenderiable(r);
 
     /*

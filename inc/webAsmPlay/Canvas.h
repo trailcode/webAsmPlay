@@ -26,7 +26,7 @@ class Canvas
 {
 public:
 
-    Canvas();
+    Canvas(const bool useFrameBuffer = true);
     virtual ~Canvas();
 
     void setArea(const tce::geom::Vec2i & upperLeft, const tce::geom::Vec2i & size);
@@ -65,6 +65,8 @@ private:
     tce::geom::Vec2i lastShiftKeyDownMousePos;
 
     std::list<Renderiable *> renderiables;
+
+    const bool useFrameBuffer;
 };
 
 #endif // __WEB_ASM_PLAY_CANVAS_H__

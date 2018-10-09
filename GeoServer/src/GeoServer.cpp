@@ -43,30 +43,11 @@ GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
     {
         OGRGeometry * poGeometry = poFeature->GetGeometryRef();
 
-        //dmess("poGeometry " << poGeometry);
-
-        /*
-        unsigned char * data = new unsigned char[poGeometry->WkbSize()];
-
-        poGeometry->exportToWkb(
-                                //wkbXDR,
-                                wkbNDR, // little-endian (least significant byte first)
-                                data);
-        
-        dmess("poGeometry->getGeometryName() " << poGeometry->getGeometryName() << " " << poGeometry->WkbSize());
-
-        geoms.push_back(WkbGeom(data, poGeometry->WkbSize()));
-        */
-
         char * data;
 
         poGeometry->exportToWkt(&data);
 
-        const size_t len = strlen(data);
-
-        dmess("len " << len);
-
-        geoms.push_back(WkbGeom(data, len));
+        geoms.push_back(WkbGeom(data, strlen(data)));
 
         OGRFeature::DestroyFeature( poFeature );
     }
@@ -79,8 +60,6 @@ GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
     boundsMinY = extent.MinY;
     boundsMaxX = extent.MaxX;
     boundsMaxY = extent.MaxY;
-
-    dmess("MinX " << extent.MinX << " " << extent.MinY << " " << extent.MaxX << " " << extent.MaxY);
 
     GDALClose( poDS );
 
@@ -96,8 +75,6 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 {
     hdl.lock().get();
 
-    dmess("on_message");
-
     try {
 
         Server * s = &server->serverEndPoint;
@@ -108,13 +85,9 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
         const uint32_t requestID = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
 
-        dmess("requestID " << requestID);
-
         switch(data[0])
         {
             case GET_NUM_GEOMETRIES_REQUEST:
-
-                dmess("GET_NUM_GEOMETRIES_REQUEST");
 
                 pool.push([hdl, s, server, requestID](int ID)
                 {
@@ -128,8 +101,6 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                     *(uint32_t *)ptr = server->getNumGeoms();
 
-                    dmess("*(uint32_t *)&data[1] " << *(uint32_t *)&data[1] << " requestID " << requestID);
-
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
 
@@ -139,14 +110,10 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
                 {
                     const uint32_t geomID = *(const uint32_t *)dataPtr;
 
-                    dmess("GET_GEOMETRY_REQUEST " << geomID);
-
                     pool.push([hdl, s, server, requestID, geomID](int ID)
                     {
                         const WkbGeom & geom = server->getGeom(geomID);
-                        //const WkbGeom & geom = server->getGeom(10);
-
-                        //vector<char> data(sizeof(char) + sizeof(uint32_t) + geom.second);
+                        
                         vector<char> data(sizeof(char) + sizeof(uint32_t) * 2 + geom.second);
 
                         data[0] = GET_GEOMETRY_RESPONCE;
@@ -167,12 +134,8 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
             case GET_LAYER_BOUNDS_REQUEST:
                 {
-                    dmess("GET_LAYER_BOUNDS_REQUEST " << requestID);
-
                     pool.push([hdl, s, server, requestID](int ID)
                     {
-                        dmess("requestID " << requestID);
-
                         vector<char> data(sizeof(char) + sizeof(uint32_t) + sizeof(AABB2D)); // TODO make a AABB2D class
 
                         data[0] = GET_LAYER_BOUNDS_RESPONCE;

@@ -220,12 +220,6 @@
         Module.connection.onopen = function () {
             // Send a small message to the console once the connection is established 
             console.log('Connection open!');
-
-            console.log("hello1");
-
-            start = new Date().getTime();
-
-            Module.connection.send('\0');
         }
 
         Module.connection.onclose = function () {
