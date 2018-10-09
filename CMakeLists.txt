@@ -88,6 +88,7 @@ file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
                             "src/GeoClientRequest.cpp"
                             "src/SkyBox.cpp"
                             "src/Shader.cpp"
+                            "src/Textures.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
                             ${tceOpenSteer_SRC}
@@ -192,9 +193,20 @@ endif()
 #add_library(imgui ${imguiSrc})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
-    #SET(CMAKE_CXX_LINK_FLAGS "-s USE_PTHREADS=1 -s FULL_ES2=1 -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'setValue']\"")
-    SET(CMAKE_CXX_LINK_FLAGS "-s FULL_ES2=1")
-    SET(CMAKE_CXX_LINK_FLAGS "--bind -s ALLOW_MEMORY_GROWTH=1 -s NO_EXIT_RUNTIME=1 -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 --js-library ../glfw-imgui-emscripten/library_glfw.js --js-library ../glfw-imgui-emscripten/library_gl.js ")
+    
+    SET(CMAKE_CXX_LINK_FLAGS   "--bind \
+                                -s ALLOW_MEMORY_GROWTH=1 \
+                                --no-heap-copy \
+                                -s NO_EXIT_RUNTIME=1 \
+                                -s WASM=1 \
+                                -s USE_WEBGL2=1 \
+                                -s USE_GLFW=3 \
+                                --js-library ${CMAKE_CURRENT_SOURCE_DIR}/glfw-imgui-emscripten/library_glfw.js \
+                                --js-library ${CMAKE_CURRENT_SOURCE_DIR}/glfw-imgui-emscripten/library_gl.js \
+                                -s USE_SDL_IMAGE=2 \
+                                -s SDL2_IMAGE_FORMATS='[\"png\"]' \
+                                --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/")
+
     add_definitions(-D__EMSCRIPTEN__)
 
     set(WEB_FILES

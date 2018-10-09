@@ -469,6 +469,4 @@ void initGeometry()
     FILE * fp = fopen("xneg.png", "rb");
 
     dmess("fp " << fp);
-
-    
 }
