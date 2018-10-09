@@ -36,6 +36,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <tceGeom/vec2.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/RenderiableCollection.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
@@ -57,11 +58,8 @@ static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
 Canvas * auxCanvas = NULL;
 Canvas * canvas = NULL;
 
-//TrackBallInteractor trackBallInteractor;
-//Camera * camera = NULL;
-
-bool showViewMatrixPanel = true;
-bool showMVP_MatrixPanel = true;
+bool showViewMatrixPanel = false;
+bool showMVP_MatrixPanel = false;
 bool showSceneViewPanel  = true;
 
 bool isFirst = true;
@@ -245,16 +243,20 @@ void mainLoop(GLFWwindow* window)
 
     if(doTest7)
     {
-        std::function<void (const size_t)> getNumGeoms = [&](const size_t numGeoms)
+        RenderiableCollection * layer = new RenderiableCollection();
+
+        canvas->addRenderiable(layer);
+
+        std::function<void (const size_t)> getNumGeoms = [layer](const size_t numGeoms)
         {
-            GeoClient::getInstance()->getLayerBounds([numGeoms](const AABB2D & bounds)
+            GeoClient::getInstance()->getLayerBounds([numGeoms, layer](const AABB2D & bounds)
             {
                 const mat4 trans = translate(   mat4(1.0),
                                                 vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
                                                      (get<1>(bounds) + get<3>(bounds)) * -0.5,
                                                      0.0));
 
-                std::function<void (geos::geom::Geometry *)> getGeom = [trans](geos::geom::Geometry * geom)
+                std::function<void (geos::geom::Geometry *)> getGeom = [trans, layer](geos::geom::Geometry * geom)
                 {
                     Renderiable * r = Renderiable::create(geom, trans);
 
@@ -262,7 +264,8 @@ void mainLoop(GLFWwindow* window)
                         
                     r->setOutlineColor(vec4(1,0,0,1));
 
-                    canvas->addRenderiable(r);
+                    //canvas->addRenderiable(r);
+                    layer->addRenderiable(r);
                 };
 
                 for(size_t i = 0; i < numGeoms; ++i)

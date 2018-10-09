@@ -17,8 +17,8 @@ RenderiableLineString2D::RenderiableLineString2D(   const GLuint vao,
 
 RenderiableLineString2D::~RenderiableLineString2D()
 {
-    //glDeleteVertexArrays(1, &vao);
-    //glDeleteBuffers     (1, &vbo);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers     (1, &vbo);
 }
 
 Renderiable * RenderiableLineString2D::create(const LineString * lineString, const mat4 & trans)
