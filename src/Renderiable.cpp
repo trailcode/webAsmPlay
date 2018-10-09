@@ -3,6 +3,7 @@
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Shader.h>
 #include <webAsmPlay/RenderiableLineString2D.h>
 #include <webAsmPlay/RenderiablePolygon2D.h>
 #include <webAsmPlay/Renderiable.h>
@@ -16,9 +17,13 @@ GLint   Renderiable::posAttrib     = 0;
 GLint   Renderiable::MVP_Attrib    = 0;
 GLint   Renderiable::colorAttrib   = 0;
 
+Shader * Renderiable::defaultShader = NULL;
+
 void Renderiable::ensureShader()
 {
-    if(shaderProgram) { return ;}
+    if(defaultShader) { return ;}
+    
+    //if(shaderProgram) { return ;}
 
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
@@ -43,6 +48,10 @@ void Renderiable::ensureShader()
             outColor = vertexColor;
         }
     )glsl";
+
+    defaultShader = Shader::create(vertexSource, fragmentSource);
+
+    return;
 
     // Create and compile the vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);

@@ -423,6 +423,8 @@ void initOpenGL(GLFWwindow* window)
     canvas->setArea(Vec2i(0,0), Vec2i(width, height));
 
     auxCanvas = new Canvas();
+
+    Renderiable::ensureShader();
 }
 
 void initGeometry()

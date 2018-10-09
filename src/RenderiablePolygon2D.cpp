@@ -4,6 +4,7 @@
 #include <geos/geom/LineString.h>
 #include "../GLUTesselator/include/GLU/tessellate.h"
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Shader.h>
 #include <webAsmPlay/RenderiablePolygon2D.h>
 
 using namespace std;
@@ -269,19 +270,28 @@ Renderiable * RenderiablePolygon2D::create(const MultiPolygon * multyPoly, const
 
 void RenderiablePolygon2D::render(const mat4 & MVP) const
 {
-    glUseProgram(shaderProgram);
+    //glUseProgram(shaderProgram);
+    //ensureShader();
 
-    glUniformMatrix4fv(MVP_Attrib, 1, false, glm::value_ptr(MVP));
+    defaultShader->bind();
 
-    glUniform4f(colorAttrib, fillColor.x, fillColor.y, fillColor.z, fillColor.w);
+    //glUniformMatrix4fv(MVP_Attrib, 1, false, glm::value_ptr(MVP));
+
+    defaultShader->setMVP(MVP);
+
+    //glUniform4f(colorAttrib, fillColor.x, fillColor.y, fillColor.z, fillColor.w);
+
+    defaultShader->setFillColor(fillColor);
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
     // Specify the layout of the vertex data
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    //glEnableVertexAttribArray(posAttrib);
+    //glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    defaultShader->enableVertexAttribArray();
 
     glEnable(GL_BLEND);
 
@@ -291,7 +301,8 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
     
     glDisable(GL_BLEND);
 
-    glUniform4f(colorAttrib, outlineColor.x, outlineColor.y, outlineColor.z, outlineColor.w);
+    //glUniform4f(colorAttrib, outlineColor.x, outlineColor.y, outlineColor.z, outlineColor.w);
+    defaultShader->setOutlineColor(outlineColor);
     
     for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
     {

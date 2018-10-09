@@ -21,6 +21,8 @@ namespace geos
     }
 }
 
+class Shader;
+
 class Renderiable
 {
 public:
@@ -30,6 +32,8 @@ public:
     virtual void render(const glm::mat4 & MVP) const = 0;
 
     static Renderiable * create(const geos::geom::Geometry * geom, const glm::mat4 & trans = glm::mat4(1.0));
+
+    static void ensureShader();
 
     glm::vec4 setFillColor(const glm::vec4 & fillColor);
     glm::vec4 getFillColor() const;
@@ -41,8 +45,6 @@ protected:
 
     Renderiable();
 
-    static void ensureShader();
-
     glm::vec4 fillColor;
     glm::vec4 outlineColor;
 
@@ -50,6 +52,8 @@ protected:
     static GLint   posAttrib;
     static GLint   MVP_Attrib;
     static GLint   colorAttrib;
+
+    static Shader * defaultShader;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__
