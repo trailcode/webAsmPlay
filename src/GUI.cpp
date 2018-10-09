@@ -186,7 +186,7 @@ void mainLoop(GLFWwindow* window)
 
                     r->setFillColor(vec4(0.3,0.0,0.3,1));
                         
-                    r->setOutlineColor(vec4(1,0,0,1));
+                    r->setOutlineColor(vec4(0,1,0,1));
 
                     //canvas->addRenderiable(r);
                     layer->addRenderiable(r);
@@ -410,14 +410,6 @@ void initOpenGL(GLFWwindow* window)
     glfwGetFramebufferSize(window, &width, &height);  
     glViewport(0, 0, width, height);
 
-    /*
-    trackBallInteractor.setScreenSize(width, height);
-
-    camera = trackBallInteractor.getCamera();
-    trackBallInteractor.getCamera()->reset();
-    trackBallInteractor.setSpeed(3);
-    */
-
     canvas = new Canvas(false);
 
     canvas->setArea(Vec2i(0,0), Vec2i(width, height));
@@ -452,7 +444,7 @@ void initGeometry()
     dmess("trans " << mat4ToStr(trans));
 
     Renderiable * r = Renderiable::create(p, trans);
-    //Renderiable * r = Renderiable::create(p);
+    //Renderiable * r = Renderiable::create(dynamic_cast<Polygon *>(p)->getExteriorRing());
 
     r->setFillColor(vec4(0.3,0.3,0,1));
         

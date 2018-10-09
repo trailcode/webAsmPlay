@@ -48,11 +48,6 @@ protected:
     glm::vec4 fillColor;
     glm::vec4 outlineColor;
 
-    static GLuint  shaderProgram;
-    static GLint   posAttrib;
-    static GLint   MVP_Attrib;
-    static GLint   colorAttrib;
-
     static Shader * defaultShader;
 };
 

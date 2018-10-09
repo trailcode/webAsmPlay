@@ -270,26 +270,15 @@ Renderiable * RenderiablePolygon2D::create(const MultiPolygon * multyPoly, const
 
 void RenderiablePolygon2D::render(const mat4 & MVP) const
 {
-    //glUseProgram(shaderProgram);
-    //ensureShader();
-
     defaultShader->bind();
-
-    //glUniformMatrix4fv(MVP_Attrib, 1, false, glm::value_ptr(MVP));
 
     defaultShader->setMVP(MVP);
 
-    //glUniform4f(colorAttrib, fillColor.x, fillColor.y, fillColor.z, fillColor.w);
-
-    defaultShader->setFillColor(fillColor);
+    defaultShader->setColor(fillColor);
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-    // Specify the layout of the vertex data
-    //glEnableVertexAttribArray(posAttrib);
-    //glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     defaultShader->enableVertexAttribArray();
 
@@ -301,8 +290,7 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
     
     glDisable(GL_BLEND);
 
-    //glUniform4f(colorAttrib, outlineColor.x, outlineColor.y, outlineColor.z, outlineColor.w);
-    defaultShader->setOutlineColor(outlineColor);
+    defaultShader->setColor(outlineColor);
     
     for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
     {

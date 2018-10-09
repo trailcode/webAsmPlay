@@ -1,6 +1,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Shader.h>
 #include <webAsmPlay/RenderiableLineString2D.h>
 
 using namespace std;
@@ -75,17 +76,15 @@ Renderiable * RenderiableLineString2D::create(const LineString * lineString, con
 
 void RenderiableLineString2D::render(const mat4 & MVP) const
 {
-    glUseProgram(shaderProgram);
+    defaultShader->bind();
 
-    glUniformMatrix4fv(MVP_Attrib, 1, false, glm::value_ptr(MVP));
+    defaultShader->setMVP(MVP);
 
-    glUniform4f(colorAttrib, fillColor.x, fillColor.y, fillColor.z, fillColor.w);
-
+    defaultShader->setColor(outlineColor);
+    
     glBindVertexArray(vao);
-    //glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    // Specify the layout of the vertex data
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    
+    defaultShader->enableVertexAttribArray();
 
     glDrawArrays(GL_LINE_STRIP, 0, numVerts);
 }

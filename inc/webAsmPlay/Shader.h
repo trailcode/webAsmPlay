@@ -26,9 +26,7 @@ public:
 
     GLuint getProgramHandle() const;
 
-    glm::vec4 setFillColor(const glm::vec4 & fillColor);
-
-    glm::vec4 setOutlineColor(const glm::vec4 & outlineColor);
+    glm::vec4 setColor(const glm::vec4 & color);
 
     glm::mat4 setMVP(const glm::mat4 & MVP);
 

@@ -12,19 +12,12 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-GLuint  Renderiable::shaderProgram = 0;
-GLint   Renderiable::posAttrib     = 0;
-GLint   Renderiable::MVP_Attrib    = 0;
-GLint   Renderiable::colorAttrib   = 0;
-
 Shader * Renderiable::defaultShader = NULL;
 
 void Renderiable::ensureShader()
 {
     if(defaultShader) { return ;}
     
-    //if(shaderProgram) { return ;}
-
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
         in vec2 position;
@@ -50,56 +43,6 @@ void Renderiable::ensureShader()
     )glsl";
 
     defaultShader = Shader::create(vertexSource, fragmentSource);
-
-    return;
-
-    // Create and compile the vertex shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexSource, NULL);
-    glCompileShader(vertexShader);
-    GLint success = 0;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-    GLchar infoLog[512];
-
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        dmess("ERROR::SHADER::VERTEX::COMPILATION_FAILED: " << infoLog);
-        return;
-    }
-
-    // Create and compile the fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        dmess("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED: " << infoLog);
-        return;
-    }
-
-    // Link the vertex and fragment shader into a shader program
-    shaderProgram = glCreateProgram();
-
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram (shaderProgram);
-    glUseProgram  (shaderProgram);
-
-    // Specify the layout of the vertex data
-    posAttrib = glGetAttribLocation(shaderProgram, "position");
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
-
-    MVP_Attrib = glGetUniformLocation(shaderProgram, "MVP");
-
-    colorAttrib = glGetUniformLocation(shaderProgram, "vertexColorIn");
-
-    dmess("colorAttrib " << colorAttrib);
 }
 
 Renderiable * Renderiable::create(const Geometry * geom, const mat4 & trans)

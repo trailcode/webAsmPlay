@@ -96,18 +96,11 @@ void Shader::unbind()
 
 GLuint Shader::getProgramHandle() const { return shaderProgram ;}
 
-vec4 Shader::setFillColor(const vec4 & fillColor)
+vec4 Shader::setColor(const vec4 & color)
 {
-    glUniform4f(colorAttrib, fillColor.x, fillColor.y, fillColor.z, fillColor.w);
+    glUniform4f(colorAttrib, color.x, color.y, color.z, color.w);
 
-    return fillColor;
-}
-
-vec4 Shader::setOutlineColor(const vec4 & outlineColor)
-{
-    glUniform4f(colorAttrib, outlineColor.x, outlineColor.y, outlineColor.z, outlineColor.w);
-
-    return outlineColor;
+    return color;
 }
 
 mat4 Shader::setMVP(const mat4 & MVP)
