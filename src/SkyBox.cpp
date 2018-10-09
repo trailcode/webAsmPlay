@@ -1,5 +1,6 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Shader.h>
+#include <webAsmPlay/Textures.h>
 #include <webAsmPlay/SkyBox.h>
 
 namespace
@@ -37,4 +38,33 @@ void SkyBox::ensureShader()
 
     skyboxShader = Shader::create(vertexSource, fragmentSource);
 }
+
+SkyBox::SkyBox() :  xpos(Textures::load("xpos.png")),
+                    xneg(Textures::load("xneg.png")),
+                    ypos(Textures::load("ypos.png")),
+                    yneg(Textures::load("yneg.png")),
+                    zpos(Textures::load("zpos.png")),
+                    zneg(Textures::load("zneg.png"))
+{
+    ensureShader();
+
+    dmess("xpos " << xpos);
+    dmess("xneg " << xneg);
+    dmess("ypos " << ypos);
+    dmess("yneg " << yneg);
+    dmess("zpos " << zpos);
+    dmess("zneg " << zneg);
+
+}
+
+SkyBox::~SkyBox()
+{
+
+}
+
+void SkyBox::render()
+{
+
+}
+
 

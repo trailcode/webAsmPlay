@@ -1,4 +1,3 @@
-//#include <geos/geom/Envelope.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>

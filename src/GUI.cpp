@@ -416,7 +416,7 @@ void initOpenGL(GLFWwindow* window)
 
     Renderiable::ensureShader();
 
-    SkyBox::ensureShader();
+    SkyBox * skyBox = new SkyBox();
 }
 
 void initGeometry()
