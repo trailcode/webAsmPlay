@@ -39,6 +39,7 @@
 #include <webAsmPlay/RenderiableCollection.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GeosUtil.h>
 
@@ -208,9 +209,7 @@ void mainLoop(GLFWwindow* window)
     int screenWidth, screenHeight;
     glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
     glViewport(0, 0, screenWidth, screenHeight);
-    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
-
+    
     canvas->render();
 
     static float time = 0.f;
@@ -416,6 +415,8 @@ void initOpenGL(GLFWwindow* window)
     auxCanvas = new Canvas();
 
     Renderiable::ensureShader();
+
+    SkyBox::ensureShader();
 }
 
 void initGeometry()

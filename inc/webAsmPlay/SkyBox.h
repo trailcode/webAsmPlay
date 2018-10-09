@@ -4,6 +4,9 @@
 class SkyBox
 {
 public:
+
+    static void ensureShader();
+
 private:
 };
 
