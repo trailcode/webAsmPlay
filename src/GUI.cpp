@@ -58,6 +58,7 @@ static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
 
 Canvas * auxCanvas = NULL;
 Canvas * canvas = NULL;
+SkyBox * skyBox = NULL;
 
 bool showViewMatrixPanel = false;
 bool showMVP_MatrixPanel = false;
@@ -210,6 +211,8 @@ void mainLoop(GLFWwindow* window)
     glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
     glViewport(0, 0, screenWidth, screenHeight);
     
+    skyBox->render(canvas->getCamera()->getMatrix(), canvas->getProjectionRef());
+
     canvas->render();
 
     static float time = 0.f;
@@ -416,7 +419,7 @@ void initOpenGL(GLFWwindow* window)
 
     Renderiable::ensureShader();
 
-    SkyBox * skyBox = new SkyBox();
+    skyBox = new SkyBox();
 }
 
 void initGeometry()

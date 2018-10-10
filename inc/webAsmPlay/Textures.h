@@ -9,6 +9,7 @@
     #include <GL/gl3w.h>
 #endif
 
+#include <vector>
 #include <string>
 
 class Textures
@@ -18,6 +19,8 @@ public:
     static Textures * getInstance();
 
     static GLuint load(const std::string & filename);
+
+    static GLuint loadCube(const std::vector<std::string> & files);
 
 private:
 

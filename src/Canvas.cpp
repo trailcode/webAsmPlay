@@ -77,9 +77,9 @@ GLuint Canvas::render()
         glViewport(0,0,size.x,size.y);
     }
 
-    glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+    //glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 
-    glClear(GL_COLOR_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT);
 
     for(Renderiable * r : renderiables) { r->render(MVP) ;}
 

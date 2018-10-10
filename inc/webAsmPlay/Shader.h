@@ -36,12 +36,15 @@ public:
                                     const GLsizei     stride        = 0,
                                     const GLvoid    * pointer       = NULL);
 
+    GLuint setTexture1Slot(const GLuint slot) const;
+
 protected:
 
     Shader( const GLuint shaderProgram,
             const GLint  posAttrib,
             const GLint  MVP_Attrib,
-            const GLint  colorAttrib);
+            const GLint  colorAttrib,
+            const GLint  textureCoordsAttrib);
 
 private:
 
@@ -49,6 +52,7 @@ private:
     GLint  posAttrib;
     GLint  MVP_Attrib;
     GLint  colorAttrib;
+    GLint  textureCoordsAttrib;
 };
 
 #endif // __WEB_ASM_PLAY_SHADER_H__

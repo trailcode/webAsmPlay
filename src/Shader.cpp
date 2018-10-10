@@ -7,11 +7,12 @@ using namespace glm;
 
 Shader * Shader::create(const GLchar * vertexSource, const GLchar * fragmentSource)
 {
-    GLuint shaderProgram = 0;
-    GLint  posAttrib     = 0;
-    GLint  MVP_Attrib    = 0;
-    GLint  colorAttrib   = 0;
-    GLint  success       = 0;
+    GLuint shaderProgram        = 0;
+    GLint  posAttrib            = 0;
+    GLint  MVP_Attrib           = 0;
+    GLint  colorAttrib          = 0;
+    GLint  textureCoordsAttrib  = 0;
+    GLint  success              = 0;
 
     // Create and compile the vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -63,19 +64,24 @@ Shader * Shader::create(const GLchar * vertexSource, const GLchar * fragmentSour
 
     colorAttrib = glGetUniformLocation(shaderProgram, "vertexColorIn");
 
+    textureCoordsAttrib = glGetUniformLocation(shaderProgram, "cube_texture");
+
     return new Shader(  shaderProgram,
                         posAttrib,
                         MVP_Attrib,
-                        colorAttrib);
+                        colorAttrib,
+                        textureCoordsAttrib);
 }
 
 Shader::Shader( const GLuint shaderProgram,
                 const GLint  posAttrib,
                 const GLint  MVP_Attrib,
-                const GLint  colorAttrib) : shaderProgram   (shaderProgram),
-                                            posAttrib       (posAttrib),
-                                            MVP_Attrib      (MVP_Attrib),
-                                            colorAttrib     (colorAttrib)
+                const GLint  colorAttrib,
+                const GLint  textureCoordsAttrib) : shaderProgram       (shaderProgram),
+                                                    posAttrib           (posAttrib),
+                                                    MVP_Attrib          (MVP_Attrib),
+                                                    colorAttrib         (colorAttrib),
+                                                    textureCoordsAttrib (textureCoordsAttrib)
 {
 } 
 
@@ -121,3 +127,11 @@ void Shader::enableVertexAttribArray(   const GLint       size,
 
     glVertexAttribPointer(posAttrib, size, type, normalized, stride, pointer);
 }
+
+GLuint Shader::setTexture1Slot(const GLuint slot) const
+{
+    glUniform1i(textureCoordsAttrib, slot);
+
+    return slot;
+}
+

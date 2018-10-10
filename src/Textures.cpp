@@ -114,6 +114,8 @@ GLuint Textures::load(const string & filename)
             format = GL_RGBA;
         }
 
+        dmess("formattedSurf aaaaa " << formattedSurf->w);
+
         invertImage(formattedSurf->w*formattedSurf->format->BytesPerPixel, formattedSurf->h, (char *) formattedSurf->pixels);
 
         /* Generate The Texture */
@@ -131,4 +133,47 @@ GLuint Textures::load(const string & filename)
     }
 
     return texture;
+}
+
+GLuint Textures::loadCube(const vector<string> & files)
+{
+    if(files.size() != 6)
+    {
+        dmess("Error, cube texture incorrect number of files!")
+    }
+
+    SDL_Surface * xpos = IMG_Load(files[0].c_str());
+    SDL_Surface * xneg = IMG_Load(files[1].c_str());
+    SDL_Surface * ypos = IMG_Load(files[2].c_str());
+    SDL_Surface * yneg = IMG_Load(files[3].c_str());
+    SDL_Surface * zpos = IMG_Load(files[4].c_str());
+    SDL_Surface * zneg = IMG_Load(files[5].c_str());
+
+    //SDL_Surface * _xpos = SDL_ConvertSurfaceFormat(xpos, SDL_PIXELFORMAT_RGB24, 0);
+
+    dmess("xpos " << xpos);
+    dmess("xneg " << xneg);
+    dmess("ypos " << ypos);
+    dmess("yneg " << yneg);
+    dmess("zpos " << zpos);
+    dmess("zneg " << zneg);
+
+    GLuint texCube;
+
+    
+    glGenTextures(1, &texCube);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texCube);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, xpos->w, xpos->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, xpos->pixels);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, xneg->w, xneg->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, xneg->pixels);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, ypos->w, ypos->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, ypos->pixels);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, yneg->w, yneg->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, yneg->pixels);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, zpos->w, zpos->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, zpos->pixels);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, zneg->w, zneg->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, zneg->pixels);
+    
+    dmess("texCube " << texCube);
+
+    return texCube;
 }
