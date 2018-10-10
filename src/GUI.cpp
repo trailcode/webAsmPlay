@@ -229,7 +229,7 @@ void mainLoop(GLFWwindow* window)
 
                         Renderiable * r = RenderiablePolygon2D::create(geoms, trans);
 
-                        r->setFillColor(vec4(0.3,0.0,0.3,1));
+                        r->setFillColor(vec4(0.3,0.0,0.3,0.3));
                             
                         r->setOutlineColor(vec4(0,1,0,1));
 
@@ -271,7 +271,7 @@ void mainLoop(GLFWwindow* window)
             frameTimes[ARRAYSIZE(frameTimes) - 1] = ImGui::GetIO().Framerate;
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::PlotLines("Frame History", frameTimes, ARRAYSIZE(frameTimes), 0, "", 0.0f, 100.0f, ImVec2(0, 50));
-            
+
         ImGui::End();
     }
 
