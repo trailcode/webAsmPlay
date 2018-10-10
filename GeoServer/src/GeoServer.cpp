@@ -43,19 +43,41 @@ GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
 
     size_t c = 0;
 
+    const GEOSContextHandle_t gctx = OGRGeometry::createGEOSContext();
+
     for(OGRFeature * poFeature; (poFeature = poLayer->GetNextFeature()) != NULL ;)
     {
         OGRGeometry * poGeometry = poFeature->GetGeometryRef();
 
+        const double simplifyAmount = 0.00001;
+
+        OGRGeometry * g = poGeometry->Simplify(simplifyAmount);
+
+        geos::geom::Geometry * geom = (geos::geom::Geometry *)g->exportToGEOS(gctx);
+
+        const double area = geom->getArea();
+
+        if(area < simplifyAmount)
+        {
+            dmess("geom " << geom << " " << area);
+
+            continue;
+        }
+
+        //if(!g) dmess("poGeometry " << g);
+
+        //dmess("g->get_Area() " << g->area
+
         char * data;
 
-        poGeometry->exportToWkt(&data);
+        //poGeometry->exportToWkt(&data);
+        g->exportToWkt(&data);
 
         geoms.push_back(WkbGeom(data, strlen(data)));
 
         OGRFeature::DestroyFeature( poFeature );
 
-        if(++c > 1000) { break ;}
+        //if(++c > 100) { break ;}
     }
     
     OGREnvelope extent;
