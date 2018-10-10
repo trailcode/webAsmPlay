@@ -218,14 +218,17 @@ void mainLoop(GLFWwindow* window)
     {
         ImGui::Begin("Render Settings", &showRenderSettingsPanel);
 
-            static bool fillPolygons = true;
-            static bool renderPolygonOutlines = true;
+            static bool fillPolygons            = true;
+            static bool renderPolygonOutlines   = true;
+            static bool renderSkyBox            = true;
 
-            static bool _fillPolygons = true;
-            static bool _renderPolygonOutlines = true;
+            static bool _fillPolygons           = true;
+            static bool _renderPolygonOutlines  = true;
+            static bool _renderSkyBox           = true;
 
             ImGui::Checkbox("Fill Polygons", &_fillPolygons);
             ImGui::Checkbox("Polygon Outlines", &_renderPolygonOutlines);
+            ImGui::Checkbox("SkyBox", &_renderSkyBox);
 
             if(fillPolygons != _fillPolygons)
             {
@@ -239,6 +242,14 @@ void mainLoop(GLFWwindow* window)
                 renderPolygonOutlines = _renderPolygonOutlines;
 
                 for(Renderiable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
+            }
+
+            if(renderSkyBox != _renderSkyBox)
+            {
+                renderSkyBox = _renderSkyBox;
+
+                if(renderSkyBox) { canvas->setSkyBox(skyBox) ;}
+                else             { canvas->setSkyBox(NULL)   ;}
             }
 
         ImGui::End();
