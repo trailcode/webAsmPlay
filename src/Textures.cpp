@@ -79,8 +79,6 @@ GLuint Textures::load(const string & filename)
                             std::istreambuf_iterator<char>(input)),
                             (std::istreambuf_iterator<char>()));
 
-    dmess(filename <<" size "<< buffer.size());
-
     /* Load The Bitmap, Check For Errors, If Bitmap's Not Found Quit */
     if ( ( TextureImage[0] = IMG_Load( filename.c_str() ) ) )
     {
@@ -92,9 +90,6 @@ GLuint Textures::load(const string & filename)
 
         /* Typical Texture Generation Using Data From The Bitmap */
         glBindTexture( GL_TEXTURE_2D, texture );
-
-        dmess("Loaded "<<TextureImage[0]->w<<" "<<TextureImage[0]->h);
-
 
         // Enforce RGB/RGBA
         int format;
@@ -113,8 +108,6 @@ GLuint Textures::load(const string & filename)
                                                     0);
             format = GL_RGBA;
         }
-
-        dmess("formattedSurf aaaaa " << formattedSurf->w);
 
         invertImage(formattedSurf->w*formattedSurf->format->BytesPerPixel, formattedSurf->h, (char *) formattedSurf->pixels);
 
@@ -149,17 +142,7 @@ GLuint Textures::loadCube(const vector<string> & files)
     SDL_Surface * zpos = IMG_Load(files[4].c_str());
     SDL_Surface * zneg = IMG_Load(files[5].c_str());
 
-    //SDL_Surface * _xpos = SDL_ConvertSurfaceFormat(xpos, SDL_PIXELFORMAT_RGB24, 0);
-
-    dmess("xpos " << xpos);
-    dmess("xneg " << xneg);
-    dmess("ypos " << ypos);
-    dmess("yneg " << yneg);
-    dmess("zpos " << zpos);
-    dmess("zneg " << zneg);
-
     GLuint texCube;
-
     
     glGenTextures(1, &texCube);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texCube);
@@ -173,7 +156,5 @@ GLuint Textures::loadCube(const vector<string> & files)
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, zpos->w, zpos->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, zpos->pixels);
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, zneg->w, zneg->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, zneg->pixels);
     
-    dmess("texCube " << texCube);
-
     return texCube;
 }

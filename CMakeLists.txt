@@ -90,6 +90,7 @@ file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
                             "src/SkyBox.cpp"
                             "src/Shader.cpp"
                             "src/Textures.cpp"
+                            "src/GridPlane.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
                             ${tceOpenSteer_SRC}

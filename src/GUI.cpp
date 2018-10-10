@@ -43,6 +43,7 @@
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/SkyBox.h>
+#include <webAsmPlay/GridPlane.h>
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GeosUtil.h>
 
@@ -425,6 +426,7 @@ void initOpenGL(GLFWwindow* window)
     auxCanvas = new Canvas();
 
     Renderiable::ensureShader();
+    GridPlane  ::ensureShader();
 
     skyBox = new SkyBox();
 
@@ -452,8 +454,6 @@ void initGeometry()
     //*/
 
     const mat4 trans = scale(mat4(1.0), vec3(0.1, 0.1, 0.1));
-
-    dmess("trans " << mat4ToStr(trans));
 
     Renderiable * r = Renderiable::create(p, trans);
     //Renderiable * r = Renderiable::create(dynamic_cast<Polygon *>(p)->getExteriorRing());
