@@ -183,8 +183,6 @@ void Canvas::onChar(GLFWwindow * window, const size_t c)
 
 }
 
-Camera * Canvas::getCamera() const { return trackBallInteractor->getCamera() ;}
-
 Renderiable * Canvas::addRenderiable(Renderiable * renderiable)
 {
     renderiables.push_back(renderiable);
@@ -192,10 +190,9 @@ Renderiable * Canvas::addRenderiable(Renderiable * renderiable)
     return renderiable;
 }
 
-vec4 Canvas::setClearColor(const vec4 & clearColor)
-{
-    return this->clearColor = clearColor;
-}
+vec4 Canvas::setClearColor(const vec4 & clearColor) { return this->clearColor = clearColor ;}
+
+Camera * Canvas::getCamera() const { return trackBallInteractor->getCamera() ;}
 
 mat4 Canvas::getView()       const { return view ;}
 mat4 Canvas::getModel()      const { return model ;}
@@ -209,3 +206,7 @@ const mat4 & Canvas::getMVP_Ref()       const { return MVP ;}
 
 SkyBox * Canvas::setSkyBox(SkyBox * skyBox) { return this->skyBox = skyBox ;}
 SkyBox * Canvas::getSkyBox() const          { return skyBox ;}
+
+const list<Renderiable *> & Canvas::getRenderiablesRef() const { return renderiables ;}
+
+list<Renderiable *> Canvas::getRenderiables() const { return renderiables ;}

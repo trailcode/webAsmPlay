@@ -41,6 +41,12 @@ public:
     glm::vec4 setOutlineColor(const glm::vec4 & outlineColor);
     glm::vec4 getOutlineColor() const;
 
+    bool setRenderOutline(const bool renderOutline);
+    bool getRenderOutline() const;
+
+    bool setRenderFill(const bool renderFill);
+    bool getRenderFill() const;
+
 protected:
 
     Renderiable();
@@ -49,6 +55,9 @@ protected:
     glm::vec4 outlineColor;
 
     static Shader * defaultShader;
+
+    bool renderOutline;
+    bool renderFill;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__

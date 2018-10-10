@@ -64,10 +64,11 @@ Canvas * auxCanvas = NULL;
 Canvas * canvas = NULL;
 SkyBox * skyBox = NULL;
 
-bool showViewMatrixPanel  = false;
-bool showMVP_MatrixPanel  = false;
-bool showSceneViewPanel   = false;
-bool showPerformancePanel = false;
+bool showViewMatrixPanel     = false;
+bool showMVP_MatrixPanel     = false;
+bool showSceneViewPanel      = false;
+bool showPerformancePanel    = false;
+bool showRenderSettingsPanel = false;
 
 bool isFirst = true;
 
@@ -158,10 +159,11 @@ void mainLoop(GLFWwindow* window)
 
             if(ImGui::BeginMenu("View"))
             {
-                if(ImGui::MenuItem("View Matrix")) { showViewMatrixPanel  = !showViewMatrixPanel  ;}
-                if(ImGui::MenuItem("MVP Matrix"))  { showMVP_MatrixPanel  = !showMVP_MatrixPanel  ;}
-                if(ImGui::MenuItem("Aux Canvas"))  { showSceneViewPanel   = !showSceneViewPanel   ;}
-                if(ImGui::MenuItem("Performance")) { showPerformancePanel = !showPerformancePanel ;}
+                if(ImGui::MenuItem("View Matrix"))     { showViewMatrixPanel     = !showViewMatrixPanel     ;}
+                if(ImGui::MenuItem("MVP Matrix"))      { showMVP_MatrixPanel     = !showMVP_MatrixPanel     ;}
+                if(ImGui::MenuItem("Aux Canvas"))      { showSceneViewPanel      = !showSceneViewPanel      ;}
+                if(ImGui::MenuItem("Performance"))     { showPerformancePanel    = !showPerformancePanel    ;}
+                if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel = !showRenderSettingsPanel ;}
 
                 ImGui::EndMenu();
             }
@@ -252,8 +254,6 @@ void mainLoop(GLFWwindow* window)
     glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
     glViewport(0, 0, screenWidth, screenHeight);
     
-    canvas->render();
-
     static float time = 0.f;
     
     time += ImGui::GetIO().DeltaTime;
@@ -264,12 +264,14 @@ void mainLoop(GLFWwindow* window)
     if(showPerformancePanel)
     {
         ImGui::Begin("Performance", &showPerformancePanel);
+
             static float f = 0.0f;
             static float frameTimes[100] = {0.f};
             memcpy(&frameTimes[0], &frameTimes[1], sizeof(frameTimes) - sizeof(frameTimes[0]));
             frameTimes[ARRAYSIZE(frameTimes) - 1] = ImGui::GetIO().Framerate;
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::PlotLines("Frame History", frameTimes, ARRAYSIZE(frameTimes), 0, "", 0.0f, 100.0f, ImVec2(0, 50));
+            
         ImGui::End();
     }
 
@@ -295,28 +297,58 @@ void mainLoop(GLFWwindow* window)
 
     isFirst = false;
 
+    if(showRenderSettingsPanel)
+    {
+        ImGui::Begin("Render Settings", &showRenderSettingsPanel);
+
+            static bool fillPolygons = true;
+            static bool renderPolygonOutlines = true;
+
+            static bool _fillPolygons = true;
+            static bool _renderPolygonOutlines = true;
+
+            ImGui::Checkbox("Fill Polygons", &_fillPolygons);
+            ImGui::Checkbox("Polygon Outlines", &_renderPolygonOutlines);
+
+            if(fillPolygons != _fillPolygons)
+            {
+                fillPolygons = _fillPolygons;
+
+                for(Renderiable * r : canvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
+            }
+
+            if(renderPolygonOutlines != _renderPolygonOutlines)
+            {
+                renderPolygonOutlines = _renderPolygonOutlines;
+
+                for(Renderiable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
+            }
+
+        ImGui::End();
+    }
+
     if(showSceneViewPanel)
     {
         ImGui::Begin("Scene Window", &showSceneViewPanel);
 
-        //dmess("ImGui::IsWindowFocused() " << ImGui::IsWindowFocused());
+            ImVec2 pos = ImGui::GetCursorScreenPos();
 
-        ImVec2 pos = ImGui::GetCursorScreenPos();
+            auxCanvas->setArea(__(pos), __(sceneWindowSize));
 
-        auxCanvas->setArea(__(pos), __(sceneWindowSize));
+            auxCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
-        auxCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
-
-        ImGui::GetWindowDrawList()->AddImage(   (void *)auxCanvas->render(),
-                                                pos,
-                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-                                                ImVec2(0, 1),
-                                                ImVec2(1, 0));
-            
-        sceneWindowSize = ImGui::GetWindowSize();
+            ImGui::GetWindowDrawList()->AddImage(   (void *)auxCanvas->render(),
+                                                    pos,
+                                                    ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+                                                    ImVec2(0, 1),
+                                                    ImVec2(1, 0));
+                
+            sceneWindowSize = ImGui::GetWindowSize();
 
         ImGui::End();
     }
+
+    canvas->render();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

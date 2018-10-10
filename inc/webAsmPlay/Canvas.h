@@ -69,6 +69,10 @@ public:
     SkyBox * setSkyBox(SkyBox * skyBox);
     SkyBox * getSkyBox() const;
 
+    const std::list<Renderiable *> & getRenderiablesRef() const;
+
+    std::list<Renderiable *> getRenderiables() const;
+
 private:
 
     rsmz::TrackBallInteractor * trackBallInteractor;

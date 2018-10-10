@@ -64,7 +64,10 @@ Renderiable * Renderiable::create(const Geometry * geom, const mat4 & trans)
     return NULL;
 }
 
-Renderiable::Renderiable()
+Renderiable::Renderiable() :    fillColor       (0.5,0,0,0.5),
+                                outlineColor    (1,1,0,1),
+                                renderOutline   (true),
+                                renderFill      (true)
 {
 }
 
@@ -72,22 +75,19 @@ Renderiable::~Renderiable()
 {
 }
 
-vec4 Renderiable::setFillColor(const vec4 & fillColor)
-{
-    return this->fillColor = fillColor;
-}
+vec4 Renderiable::setFillColor(const vec4 & fillColor) { return this->fillColor = fillColor ;}
 
-vec4 Renderiable::getFillColor() const
-{
-    return fillColor;
-}
+vec4 Renderiable::getFillColor() const { return fillColor ;}
 
-vec4 Renderiable::setOutlineColor(const vec4 & outlineColor)
-{
-    return this->outlineColor = outlineColor;
-}
+vec4 Renderiable::setOutlineColor(const vec4 & outlineColor) { return this->outlineColor = outlineColor ;}
 
-vec4 Renderiable::getOutlineColor() const
-{
-    return outlineColor;
-}
+vec4 Renderiable::getOutlineColor() const { return outlineColor ;}
+
+bool Renderiable::setRenderOutline(const bool renderOutline) { return this->renderOutline = renderOutline ;}
+
+bool Renderiable::getRenderOutline() const { return renderOutline ;}
+
+bool Renderiable::setRenderFill(const bool renderFill) { return this->renderFill = renderFill ;}
+
+bool Renderiable::getRenderFill() const { return renderFill ;}
+

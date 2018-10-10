@@ -312,30 +312,36 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
 
     defaultShader->setMVP(MVP);
 
-    defaultShader->setColor(fillColor);
-
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
     defaultShader->enableVertexAttribArray();
 
-    glEnable(GL_BLEND);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, 0);
-    
-    glDisable(GL_BLEND);
-
-    defaultShader->setColor(outlineColor);
-    
-    for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
+    if(getRenderFill())
     {
-        const size_t a = counterVertIndices[i];
-        const size_t b = counterVertIndices[i + 1];
+        defaultShader->setColor(fillColor);
 
-        glDrawArrays(GL_LINE_LOOP, a, (b - a));
+        glEnable(GL_BLEND);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, 0);
+        
+        glDisable(GL_BLEND);
+    }
+
+    if(getRenderOutline())
+    {
+        defaultShader->setColor(outlineColor);
+        
+        for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
+        {
+            const size_t a = counterVertIndices[i];
+            const size_t b = counterVertIndices[i + 1];
+
+            glDrawArrays(GL_LINE_LOOP, a, (b - a));
+        }
     }
 
     glBindVertexArray(0); 
