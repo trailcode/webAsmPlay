@@ -50,7 +50,7 @@ using namespace rsmz;
 using namespace glm;
 using namespace tce::geom;
 
-//#define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
+#define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
 static ImVec4 clear_color = ImColor(114, 144, 154);
 static int mouse_buttons_down = 0;
@@ -61,9 +61,10 @@ Canvas * auxCanvas = NULL;
 Canvas * canvas = NULL;
 SkyBox * skyBox = NULL;
 
-bool showViewMatrixPanel = false;
-bool showMVP_MatrixPanel = false;
-bool showSceneViewPanel  = false;
+bool showViewMatrixPanel  = false;
+bool showMVP_MatrixPanel  = false;
+bool showSceneViewPanel   = false;
+bool showPerformancePanel = false;
 
 bool isFirst = true;
 
@@ -154,18 +155,10 @@ void mainLoop(GLFWwindow* window)
 
             if(ImGui::BeginMenu("View"))
             {
-                if(ImGui::MenuItem("View Matrix"))
-                {
-                    showViewMatrixPanel = !showViewMatrixPanel;
-                }
-                if(ImGui::MenuItem("MVP Matrix"))
-                {
-                    showMVP_MatrixPanel = !showMVP_MatrixPanel;
-                }
-                if(ImGui::MenuItem("Aux Canvas"))
-                {
-                    showSceneViewPanel = !showSceneViewPanel;
-                }
+                if(ImGui::MenuItem("View Matrix")) { showViewMatrixPanel  = !showViewMatrixPanel  ;}
+                if(ImGui::MenuItem("MVP Matrix"))  { showMVP_MatrixPanel  = !showMVP_MatrixPanel  ;}
+                if(ImGui::MenuItem("Aux Canvas"))  { showSceneViewPanel   = !showSceneViewPanel   ;}
+                if(ImGui::MenuItem("Performance")) { showPerformancePanel = !showPerformancePanel ;}
 
                 ImGui::EndMenu();
             }
@@ -254,6 +247,18 @@ void mainLoop(GLFWwindow* window)
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
+
+    if(showPerformancePanel)
+    {
+        ImGui::Begin("Performance", &showPerformancePanel);
+        static float f = 0.0f;
+        static float frameTimes[100] = {0.f};
+        memcpy(&frameTimes[0], &frameTimes[1], sizeof(frameTimes) - sizeof(frameTimes[0]));
+        frameTimes[ARRAYSIZE(frameTimes) - 1] = ImGui::GetIO().Framerate;
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::PlotLines("Frame History", frameTimes, ARRAYSIZE(frameTimes), 0, "", 0.0f, 100.0f, ImVec2(0, 50));
+        ImGui::End();
+    }
 
     if(showViewMatrixPanel)
     {
