@@ -72,6 +72,12 @@ GeoServer::~GeoServer()
 {
 }
 
+string GeoServer::addGeoFile(const string & geomFile)
+{
+
+    return geomFile;
+}
+
 // Define a callback to handle incoming messages
 void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg)
 {

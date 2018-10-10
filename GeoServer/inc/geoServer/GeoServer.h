@@ -14,6 +14,8 @@ public:
     GeoServer(const std::string & geomFile);
     ~GeoServer();
 
+    std::string addGeoFile(const std::string & geomFile);
+
     void start();
 
     size_t getNumGeoms() const;
