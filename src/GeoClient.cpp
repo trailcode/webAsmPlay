@@ -3,15 +3,22 @@
     #include <emscripten/emscripten.h>
     #include <emscripten/bind.h>
 #endif
+#include <glm/glm.hpp>
+//#include <glm/mat4x4.hpp>
+//#include <glm/vec3.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Polygon.h>
 #include <geos/io/WKTReader.h>
 #include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/RenderiablePolygon2D.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GeoClient.h>
 
 using namespace std;
+using namespace glm;
 using namespace geos::io;
 using namespace geos::geom;
 
@@ -174,6 +181,58 @@ void GeoClient::onMessage(const string & data)
             break;
         }
     }
+}
+
+void GeoClient::loadGeometry(Canvas * canvas)
+{
+    dmess("GeoClient::loadGeometry");
+
+    GeoClient * _ = this;
+
+    std::function<void (const size_t)> getNumGeomsFunctor = [_, canvas](const size_t numGeoms)
+    {
+        _->getLayerBounds([_, numGeoms, canvas](const AABB2D & bounds)
+        {
+            const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
+
+            const mat4 trans = translate(   
+                                            //mat4(1.0),
+                                            s,
+                                            vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
+                                                    (get<1>(bounds) + get<3>(bounds)) * -0.5,
+                                                    0.0));
+
+            std::function<void (Geometry *)> getGeom = [_,
+                                                        trans,
+                                                        canvas,
+                                                        numGeoms](Geometry * geom)
+            {
+                _->geoms.push_back(geom);
+
+                if(_->geoms.size() == numGeoms)
+                {
+                    dmess("Done!");
+
+                    Renderiable * r = RenderiablePolygon2D::create(_->geoms, trans);
+
+                    r->setFillColor(vec4(0.3,0.0,0.3,0.3));
+                        
+                    r->setOutlineColor(vec4(0,1,0,1));
+
+                    canvas->addRenderiable(r);
+
+                    dmess("Done creating renderiable.");
+                }
+            };
+
+            for(size_t i = 0; i < numGeoms; ++i)
+            {
+                _->getGeometry(i, getGeom);
+            }
+        });
+    };
+
+    getNumGeoms(getNumGeomsFunctor);
 }
 
 #ifdef __EMSCRIPTEN__

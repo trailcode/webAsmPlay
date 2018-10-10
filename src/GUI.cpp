@@ -102,8 +102,6 @@ void cback(char* data, int size, void* arg) {
     counter++;
 }
 
-vector<const Geometry *> geoms;
-
 void mainLoop(GLFWwindow* window)
 {
     // Game loop
@@ -118,8 +116,6 @@ void mainLoop(GLFWwindow* window)
 
     ImGui_ImplGlfwGL3_NewFrame();
 #endif
-
-    bool doTest7 = false;
 
     {
         if (ImGui::BeginMainMenuBar())
@@ -139,10 +135,8 @@ void mainLoop(GLFWwindow* window)
                         dmess("Implement me!");
                     #endif
                 }
-                if(ImGui::MenuItem("Test 7"))
-                {
-                    doTest7 = true;
-                }
+
+                if(ImGui::MenuItem("Load Geometry")) { GeoClient::getInstance()->loadGeometry(canvas) ;}
 
                 ImGui::EndMenu();
             }
@@ -170,83 +164,6 @@ void mainLoop(GLFWwindow* window)
 
             ImGui::EndMainMenuBar();
         }
-    }
-
-    if(doTest7)
-    {
-        RenderiableCollection * layer = new RenderiableCollection();
-
-        canvas->addRenderiable(layer);
-
-        std::function<void (const size_t)> getNumGeoms = [layer, window](const size_t numGeoms)
-        {
-            GeoClient::getInstance()->getLayerBounds([numGeoms, layer, window](const AABB2D & bounds)
-            {
-                const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
-
-                const mat4 trans = translate(   
-                                                //mat4(1.0),
-                                                s,
-                                                vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
-                                                     (get<1>(bounds) + get<3>(bounds)) * -0.5,
-                                                     0.0));
-
-                std::function<void (Geometry *)> getGeom = [trans,
-                                                            layer,
-                                                            window,
-                                                            numGeoms](Geometry * geom)
-                {
-                    /*
-                    Renderiable * r = Renderiable::create(geom, trans);
-
-                    r->setFillColor(vec4(0.3,0.0,0.3,1));
-                        
-                    r->setOutlineColor(vec4(0,1,0,1));
-
-                    //canvas->addRenderiable(r);
-                    layer->addRenderiable(r);
-
-                    //refresh(window);
-                    */
-
-                    /*
-                    //TopologyPreservingSimplifier simplifier(geom);
-
-                    DouglasPeuckerSimplifier simplifier(geom);
-
-                    simplifier.setDistanceTolerance(0.0001);
-
-                    Geometry * g = simplifier.getResultGeometry().release();
-
-                    if(g) { geoms.push_back(g) ;}
-                    */
-
-                    geoms.push_back(geom);
-
-                    if(geoms.size() == numGeoms)
-                    {
-                        dmess("Done!");
-
-                        Renderiable * r = RenderiablePolygon2D::create(geoms, trans);
-
-                        r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-                            
-                        r->setOutlineColor(vec4(0,1,0,1));
-
-                        canvas->addRenderiable(r);
-
-                        dmess("Done creating renderiable.");
-                    }
-                };
-
-                for(size_t i = 0; i < numGeoms; ++i)
-                {
-                    GeoClient::getInstance()->getGeometry(i, getGeom);
-                }
-            });
-        };
-
-        GeoClient::getInstance()->getNumGeoms(getNumGeoms);
     }
 
     // Rendering

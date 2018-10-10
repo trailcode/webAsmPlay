@@ -3,12 +3,14 @@
 
 #include <string>
 #include <functional>
+#include <vector>
 #include <unordered_map>
 #include <webAsmPlay/Types.h>
 
 class GeoRequestGetNumGeoms;
 class GeoRequestLayerBounds;
 class GeoRequestGeometry;
+class Canvas;
 
 namespace geos
 {
@@ -32,6 +34,8 @@ public:
 
     void getGeometry(const size_t geomIndex, std::function<void (geos::geom::Geometry *)> & callback);
 
+    void loadGeometry(Canvas * canvas);
+
 private:
 
     GeoClient();
@@ -44,6 +48,8 @@ private:
     NumGeomsRequests    numGeomsRequests;
     LayerBoundsRequests layerBoundsRequests;
     GeometryRequests    geometryRequests;
+
+    std::vector<const geos::geom::Geometry *> geoms;
 };
 
 #endif // __WEB_ASM_PLAY_GEO_CLIENT_H__
