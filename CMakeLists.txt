@@ -52,7 +52,8 @@ file(GLOB geosSrc   "geos/src/util/*.cpp"
                     "geos/src/planargraph/*.cpp"
                     "geos/src/planargraph/algorithm/*.cpp"
                     "geos/src/precision/*.cpp"
-                    "geos/src/linearref/*.cpp")
+                    "geos/src/linearref/*.cpp"
+                    "geos/src/simplify/*.cpp")
 
 file(GLOB GLUTesselatorSrc  "GLUTesselator/src/dict.cpp"
                             "GLUTesselator/src/mesh.cpp"

@@ -26,6 +26,8 @@
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>
+#include <geos/simplify/TopologyPreservingSimplifier.h>
+#include <geos/simplify/DouglasPeuckerSimplifier.h>
 #include "../GLUTesselator/include/GLU/tessellate.h"
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Camera.h>
@@ -46,6 +48,7 @@
 
 using namespace std;
 using namespace geos::geom;
+using namespace geos::simplify;
 using namespace rsmz;
 using namespace glm;
 using namespace tce::geom;
@@ -204,6 +207,18 @@ void mainLoop(GLFWwindow* window)
                     //refresh(window);
                     */
 
+                    /*
+                    //TopologyPreservingSimplifier simplifier(geom);
+
+                    DouglasPeuckerSimplifier simplifier(geom);
+
+                    simplifier.setDistanceTolerance(0.0001);
+
+                    Geometry * g = simplifier.getResultGeometry().release();
+
+                    if(g) { geoms.push_back(g) ;}
+                    */
+
                     geoms.push_back(geom);
 
                     if(geoms.size() == numGeoms)
@@ -240,10 +255,8 @@ void mainLoop(GLFWwindow* window)
     canvas->render();
 
     static float time = 0.f;
-    //if (!paused)
-    {
-        time += ImGui::GetIO().DeltaTime;
-    }
+    
+    time += ImGui::GetIO().DeltaTime;
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -251,12 +264,12 @@ void mainLoop(GLFWwindow* window)
     if(showPerformancePanel)
     {
         ImGui::Begin("Performance", &showPerformancePanel);
-        static float f = 0.0f;
-        static float frameTimes[100] = {0.f};
-        memcpy(&frameTimes[0], &frameTimes[1], sizeof(frameTimes) - sizeof(frameTimes[0]));
-        frameTimes[ARRAYSIZE(frameTimes) - 1] = ImGui::GetIO().Framerate;
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::PlotLines("Frame History", frameTimes, ARRAYSIZE(frameTimes), 0, "", 0.0f, 100.0f, ImVec2(0, 50));
+            static float f = 0.0f;
+            static float frameTimes[100] = {0.f};
+            memcpy(&frameTimes[0], &frameTimes[1], sizeof(frameTimes) - sizeof(frameTimes[0]));
+            frameTimes[ARRAYSIZE(frameTimes) - 1] = ImGui::GetIO().Framerate;
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::PlotLines("Frame History", frameTimes, ARRAYSIZE(frameTimes), 0, "", 0.0f, 100.0f, ImVec2(0, 50));
         ImGui::End();
     }
 
@@ -306,12 +319,16 @@ void mainLoop(GLFWwindow* window)
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     ImGui::Render();
 
 #ifndef __EMSCRIPTEN__
+
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 #endif
     glfwMakeContextCurrent(window);
+
     glfwSwapBuffers(window);
 
     //refresh(window);

@@ -41,6 +41,8 @@ GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
 
     poLayer->ResetReading();
 
+    size_t c = 0;
+
     for(OGRFeature * poFeature; (poFeature = poLayer->GetNextFeature()) != NULL ;)
     {
         OGRGeometry * poGeometry = poFeature->GetGeometryRef();
@@ -52,6 +54,8 @@ GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
         geoms.push_back(WkbGeom(data, strlen(data)));
 
         OGRFeature::DestroyFeature( poFeature );
+
+        if(++c > 1000) { break ;}
     }
     
     OGREnvelope extent;
