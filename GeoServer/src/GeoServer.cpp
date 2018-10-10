@@ -17,12 +17,14 @@ namespace
 {
     ctpl::thread_pool pool(1);
 
+    /*
     struct MemBuf : std::streambuf
     {
         MemBuf(char* begin, char* end) {
             this->setg(begin, begin, end);
         }
     };
+    */
 }
 
 GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)

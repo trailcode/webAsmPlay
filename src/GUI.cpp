@@ -37,6 +37,7 @@
 #include <tceGeom/vec2.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/RenderiableCollection.h>
+#include <webAsmPlay/RenderiablePolygon2D.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/SkyBox.h>
@@ -62,7 +63,7 @@ SkyBox * skyBox = NULL;
 
 bool showViewMatrixPanel = false;
 bool showMVP_MatrixPanel = false;
-bool showSceneViewPanel  = true;
+bool showSceneViewPanel  = false;
 
 bool isFirst = true;
 
@@ -95,6 +96,8 @@ void cback(char* data, int size, void* arg) {
     std::cout << "Callback " << data << " " << size << std::endl;
     counter++;
 }
+
+vector<const Geometry *> geoms;
 
 void mainLoop(GLFWwindow* window)
 {
@@ -159,6 +162,10 @@ void mainLoop(GLFWwindow* window)
                 {
                     showMVP_MatrixPanel = !showMVP_MatrixPanel;
                 }
+                if(ImGui::MenuItem("Aux Canvas"))
+                {
+                    showSceneViewPanel = !showSceneViewPanel;
+                }
 
                 ImGui::EndMenu();
             }
@@ -177,13 +184,21 @@ void mainLoop(GLFWwindow* window)
         {
             GeoClient::getInstance()->getLayerBounds([numGeoms, layer, window](const AABB2D & bounds)
             {
-                const mat4 trans = translate(   mat4(1.0),
+                const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
+
+                const mat4 trans = translate(   
+                                                //mat4(1.0),
+                                                s,
                                                 vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
                                                      (get<1>(bounds) + get<3>(bounds)) * -0.5,
                                                      0.0));
 
-                std::function<void (geos::geom::Geometry *)> getGeom = [trans, layer, window](geos::geom::Geometry * geom)
+                std::function<void (Geometry *)> getGeom = [trans,
+                                                            layer,
+                                                            window,
+                                                            numGeoms](Geometry * geom)
                 {
+                    /*
                     Renderiable * r = Renderiable::create(geom, trans);
 
                     r->setFillColor(vec4(0.3,0.0,0.3,1));
@@ -193,7 +208,25 @@ void mainLoop(GLFWwindow* window)
                     //canvas->addRenderiable(r);
                     layer->addRenderiable(r);
 
-                    refresh(window);
+                    //refresh(window);
+                    */
+
+                    geoms.push_back(geom);
+
+                    if(geoms.size() == numGeoms)
+                    {
+                        dmess("Done!");
+
+                        Renderiable * r = RenderiablePolygon2D::create(geoms, trans);
+
+                        r->setFillColor(vec4(0.3,0.0,0.3,1));
+                            
+                        r->setOutlineColor(vec4(0,1,0,1));
+
+                        canvas->addRenderiable(r);
+
+                        dmess("Done creating renderiable.");
+                    }
                 };
 
                 for(size_t i = 0; i < numGeoms; ++i)
@@ -244,25 +277,28 @@ void mainLoop(GLFWwindow* window)
 
     isFirst = false;
 
-    ImGui::Begin("Scene Window");
+    if(showSceneViewPanel)
+    {
+        ImGui::Begin("Scene Window", &showSceneViewPanel);
 
-    //dmess("ImGui::IsWindowFocused() " << ImGui::IsWindowFocused());
+        //dmess("ImGui::IsWindowFocused() " << ImGui::IsWindowFocused());
 
-    ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImVec2 pos = ImGui::GetCursorScreenPos();
 
-    auxCanvas->setArea(__(pos), __(sceneWindowSize));
+        auxCanvas->setArea(__(pos), __(sceneWindowSize));
 
-    auxCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+        auxCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
-    ImGui::GetWindowDrawList()->AddImage(   (void *)auxCanvas->render(),
-                                            pos,
-                                            ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-                                            ImVec2(0, 1),
-                                            ImVec2(1, 0));
-        
-    sceneWindowSize = ImGui::GetWindowSize();
+        ImGui::GetWindowDrawList()->AddImage(   (void *)auxCanvas->render(),
+                                                pos,
+                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+                                                ImVec2(0, 1),
+                                                ImVec2(1, 0));
+            
+        sceneWindowSize = ImGui::GetWindowSize();
 
-    ImGui::End();
+        ImGui::End();
+    }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     ImGui::Render();
@@ -423,7 +459,7 @@ void initGeometry()
 
     Geometry * pppp = scopedGeosGeometry(GeosUtil::makeBox(-0.6,-0.05,0.6,0.05));
 
-    /*
+    //*
     p = scopedGeosGeometry(p->buffer(0.1));
 
     p = scopedGeosGeometry(p->difference(pp));
@@ -431,7 +467,7 @@ void initGeometry()
     p = scopedGeosGeometry(p->difference(ppp));
 
     p = scopedGeosGeometry(p->difference(pppp));
-    */
+    //*/
 
     const mat4 trans = scale(mat4(1.0), vec3(0.1, 0.1, 0.1));
 
