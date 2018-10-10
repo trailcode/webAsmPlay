@@ -22,6 +22,7 @@ namespace rsmz
 class FrameBuffer;
 class GLFWwindow;
 class Renderiable;
+class SkyBox;
 
 class Canvas
 {
@@ -65,6 +66,9 @@ public:
     const glm::mat4 & getProjectionRef() const;
     const glm::mat4 & getMVP_Ref() const;
 
+    SkyBox * setSkyBox(SkyBox * skyBox);
+    SkyBox * getSkyBox() const;
+
 private:
 
     rsmz::TrackBallInteractor * trackBallInteractor;
@@ -88,6 +92,8 @@ private:
     glm::mat4 model;
     glm::mat4 projection;
     glm::mat4 MVP;
+
+    SkyBox * skyBox;
 };
 
 #endif // __WEB_ASM_PLAY_CANVAS_H__

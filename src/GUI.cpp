@@ -211,8 +211,6 @@ void mainLoop(GLFWwindow* window)
     glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
     glViewport(0, 0, screenWidth, screenHeight);
     
-    skyBox->render(canvas->getCamera()->getMatrix(), canvas->getProjectionRef());
-
     canvas->render();
 
     static float time = 0.f;
@@ -316,11 +314,6 @@ void cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 
     canvas->onMousePosition(window, Vec2d(xpos, ypos));
 
-    //trackBallInteractor.setClickPoint(xpos, ypos);
-
-    //trackBallInteractor.update();
-
-    //if (render_when_mouse_up || mouse_buttons_down)
     {
         refresh(window);
     }
@@ -376,10 +369,6 @@ void charCallback(GLFWwindow * window, unsigned int c)
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-    dmess("width " << width << " height " << height);
-
-    //trackBallInteractor.setScreenSize(width, height);
-
     canvas->setArea(Vec2i(0,0), Vec2i(width, height));
 
     refresh(window);
@@ -420,6 +409,8 @@ void initOpenGL(GLFWwindow* window)
     Renderiable::ensureShader();
 
     skyBox = new SkyBox();
+
+    canvas->setSkyBox(skyBox);
 }
 
 void initGeometry()
@@ -468,8 +459,4 @@ void initGeometry()
 
     canvas->addRenderiable(r);
     //*/
-
-    FILE * fp = fopen("xneg.png", "rb");
-
-    dmess("fp " << fp);
 }

@@ -28,7 +28,7 @@ void SkyBox::ensureShader()
         void main()
         {
             texcoords = position;
-            //gl_Position = P * V * M * vec4(position, 1.0);
+
             gl_Position = MVP * vec4(position, 1.0);
         }
     )glsl";
@@ -41,7 +41,6 @@ void SkyBox::ensureShader()
         void main()
         {
             frag_colour = texture(cube_texture, texcoords);
-            //frag_colour = vec4(1,0,0,1);
         }
     )glsl";
 
@@ -65,9 +64,9 @@ SkyBox::SkyBox()
 
     const GLfloat verts[] = {   -10.0,  10.0, -10.0,
                                 -10.0, -10.0, -10.0,
-                                10.0, -10.0, -10.0,
-                                10.0, -10.0, -10.0,
-                                10.0,  10.0, -10.0,
+                                 10.0, -10.0, -10.0,
+                                 10.0, -10.0, -10.0,
+                                 10.0,  10.0, -10.0,
                                 -10.0,  10.0, -10.0,
 
                                 -10.0, -10.0,  10.0,
@@ -77,60 +76,54 @@ SkyBox::SkyBox()
                                 -10.0,  10.0,  10.0,
                                 -10.0, -10.0,  10.0,
 
-                                10.0, -10.0, -10.0,
-                                10.0, -10.0,  10.0,
-                                10.0,  10.0,  10.0,
-                                10.0,  10.0,  10.0,
-                                10.0,  10.0, -10.0,
-                                10.0, -10.0, -10.0,
+                                 10.0, -10.0, -10.0,
+                                 10.0, -10.0,  10.0,
+                                 10.0,  10.0,  10.0,
+                                 10.0,  10.0,  10.0,
+                                 10.0,  10.0, -10.0,
+                                 10.0, -10.0, -10.0,
 
                                 -10.0, -10.0,  10.0,
                                 -10.0,  10.0,  10.0,
-                                10.0,  10.0,  10.0,
-                                10.0,  10.0,  10.0,
-                                10.0, -10.0,  10.0,
+                                 10.0,  10.0,  10.0,
+                                 10.0,  10.0,  10.0,
+                                 10.0, -10.0,  10.0,
                                 -10.0, -10.0,  10.0,
 
                                 -10.0,  10.0, -10.0,
-                                10.0,  10.0, -10.0,
-                                10.0,  10.0,  10.0,
-                                10.0,  10.0,  10.0,
+                                 10.0,  10.0, -10.0,
+                                 10.0,  10.0,  10.0,
+                                 10.0,  10.0,  10.0,
                                 -10.0,  10.0,  10.0,
                                 -10.0,  10.0, -10.0,
 
                                 -10.0, -10.0, -10.0,
                                 -10.0, -10.0,  10.0,
-                                10.0, -10.0, -10.0,
-                                10.0, -10.0, -10.0,
+                                 10.0, -10.0, -10.0,
+                                 10.0, -10.0, -10.0,
                                 -10.0, -10.0,  10.0,
-                                10.0, -10.0,  10.0 };
+                                 10.0, -10.0,  10.0 };
 
     glGenBuffers(1, &vbo);
-
-    dmess("vbo " << vbo);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-    dmess("vao " << vao);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-    //model = rotate(radians(90), vec3(1,0,0))
     model = rotate(radians(90.0f), vec3(1.0f,0.0f,0.0f));
 }
 
 SkyBox::~SkyBox()
 {
-
+    // TODO cleanup!
 }
 
 void SkyBox::render(const mat4 & _view, const mat4 & projection)
 {
-    //dmess("render " << texID);
-
     skyboxShader->bind();
 
     mat4 centeredView = mat4(_view);
@@ -141,20 +134,11 @@ void SkyBox::render(const mat4 & _view, const mat4 & projection)
 
     const mat4 MVP = projection * centeredView * model;
 
-    //dmess("centeredView " << mat4ToStr(centeredView));
-
-    //glUniform1i(self.program.uniformLocation('cube_texture'), 1);
     skyboxShader->setTexture1Slot(1);
 
     skyboxShader->setMVP(MVP);
 
-    //skyboxShader->enableVertexAttribArray(3);
-
-    //*
-    
-    //glUniformMatrix4fv(self.program.uniformLocation('P'), 1, false, value_ptr(projection));
-    //glUniformMatrix4fv(self.program.uniformLocation('V'), 1, false, centeredView);
-    //glUniformMatrix4fv(self.program.uniformLocation('M'), 1, false, value_ptr(model));
+    //skyboxShader->enableVertexAttribArray(3); // TODO Why is this not required here?
 
     glDepthMask(GL_FALSE);
     glActiveTexture(GL_TEXTURE1);
@@ -163,7 +147,6 @@ void SkyBox::render(const mat4 & _view, const mat4 & projection)
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
     glFlush();
-    //*/
 }
 
 

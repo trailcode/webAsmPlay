@@ -20,6 +20,7 @@
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Renderiable.h>
+#include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/Canvas.h>
 
 using namespace std;
@@ -33,7 +34,8 @@ Canvas::Canvas( const bool   useFrameBuffer,
                                             frameBuffer        (NULL),
                                             wantMouseCapture   (true),
                                             useFrameBuffer     (useFrameBuffer),
-                                            clearColor         (clearColor)
+                                            clearColor         (clearColor),
+                                            skyBox             (NULL)
 {
     trackBallInteractor = new TrackBallInteractor();
 }
@@ -77,9 +79,14 @@ GLuint Canvas::render()
         glViewport(0,0,size.x,size.y);
     }
 
-    //glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+    if(skyBox) { skyBox->render(getCamera()->getMatrix(), getProjectionRef()) ;}
 
-    //glClear(GL_COLOR_BUFFER_BIT);
+    else
+    {
+        glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
     for(Renderiable * r : renderiables) { r->render(MVP) ;}
 
@@ -199,3 +206,6 @@ const mat4 & Canvas::getViewRef()       const { return view ;}
 const mat4 & Canvas::getModelRef()      const { return model ;}
 const mat4 & Canvas::getProjectionRef() const { return projection ;}
 const mat4 & Canvas::getMVP_Ref()       const { return MVP ;}
+
+SkyBox * Canvas::setSkyBox(SkyBox * skyBox) { return this->skyBox = skyBox ;}
+SkyBox * Canvas::getSkyBox() const          { return skyBox ;}
