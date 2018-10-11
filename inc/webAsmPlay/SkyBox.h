@@ -9,6 +9,7 @@
     #include <GL/gl3w.h>
 #endif
 
+#include <vector>
 #include <glm/mat4x4.hpp>
 
 class SkyBox
@@ -20,6 +21,10 @@ public:
     virtual ~SkyBox();
 
     void render(const glm::mat4 & view, const glm::mat4 & projection);
+
+    void setPermutation(size_t n);
+
+    static std::vector<SkyBox *> getInstances();
 
 private:
 

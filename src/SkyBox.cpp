@@ -1,3 +1,7 @@
+#ifdef __EMSCRIPTEN__
+    #include <emscripten/emscripten.h>
+    #include <emscripten/bind.h>
+#endif
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -10,9 +14,15 @@
 using namespace std;
 using namespace glm;
 
+#ifdef __EMSCRIPTEN__
+    using namespace emscripten;
+#endif
+
 namespace
 {
     Shader * skyboxShader = NULL;
+
+    vector<SkyBox *> instances;
 }
 
 void SkyBox::ensureShader()
@@ -49,17 +59,30 @@ void SkyBox::ensureShader()
 
 SkyBox::SkyBox()
 {
+    instances.push_back(this);
+
     ensureShader();
 
     vector<string> files;
 
+    /*
     files.push_back("xpos.png");
     files.push_back("xneg.png");
     files.push_back("ypos.png");
     files.push_back("yneg.png");
     files.push_back("zpos.png");
     files.push_back("zneg.png");
+    */
 
+    files.push_back("bot.png");
+    files.push_back("top.png");
+
+    files.push_back("back.png");
+    files.push_back("front.png");
+    
+    files.push_back("right.png");
+    files.push_back("left.png");
+    
     texID = Textures::loadCube(files);
 
     const GLfloat verts[] = {   -10.0,  10.0, -10.0,
@@ -119,7 +142,12 @@ SkyBox::SkyBox()
 
 SkyBox::~SkyBox()
 {
-    // TODO cleanup!
+    // TODO cleanup! Remove from instances
+}
+
+void SkyBox::setPermutation(size_t n)
+{
+    dmess("SkyBox::setPermutation " << n);
 }
 
 void SkyBox::render(const mat4 & _view, const mat4 & projection)
@@ -149,4 +177,17 @@ void SkyBox::render(const mat4 & _view, const mat4 & projection)
     glFlush();
 }
 
+vector<SkyBox *> SkyBox::getInstances() { return instances ;}
 
+#ifdef __EMSCRIPTEN__
+
+EMSCRIPTEN_BINDINGS(SkyBoxBindings)
+{
+    register_vector<SkyBox *>("VectorSkyBoxPtr");
+    class_<SkyBox>("SkyBox")
+    .function("setPermutation", &SkyBox::setPermutation)
+    .class_function("getInstances", &SkyBox::getInstances)
+    ;
+}
+
+#endif

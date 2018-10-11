@@ -4,6 +4,8 @@
     #include <GL/glew.h>
     #define IMGUI_API
     #include <imgui_impl_glfw_gl3.h>
+    #include <emscripten/emscripten.h>
+    #include <emscripten/bind.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
     #define IMGUI_IMPL_API // What about for windows?
@@ -23,11 +25,22 @@
 #include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/Canvas.h>
 
+#ifdef __EMSCRIPTEN__
+
+    using namespace emscripten;
+
+#endif
+
 using namespace std;
 using namespace rsmz;
 using namespace glm;
 using namespace geos::geom;
 using namespace tce::geom;
+
+namespace
+{
+    std::vector<Canvas *> instances;
+}
 
 Canvas::Canvas( const bool   useFrameBuffer,
                 const vec4 & clearColor) : trackBallInteractor (NULL),
@@ -38,12 +51,16 @@ Canvas::Canvas( const bool   useFrameBuffer,
                                             skyBox             (NULL)
 {
     trackBallInteractor = new TrackBallInteractor();
+
+    instances.push_back(this);
 }
 
 Canvas::~Canvas()
 {
     delete trackBallInteractor;
     delete frameBuffer;
+
+    // TODO remove from instances!
 }
 
 void Canvas::setArea(const Vec2i & upperLeft, const Vec2i & size)
@@ -210,3 +227,21 @@ SkyBox * Canvas::getSkyBox() const          { return skyBox ;}
 const list<Renderiable *> & Canvas::getRenderiablesRef() const { return renderiables ;}
 
 list<Renderiable *> Canvas::getRenderiables() const { return renderiables ;}
+
+vector<Canvas *> Canvas::getInstances()
+{
+    return instances;
+}
+
+#ifdef __EMSCRIPTEN__
+
+EMSCRIPTEN_BINDINGS(CanvasBindings)
+{
+    register_vector<Canvas *>("VectorCanvasPtr");
+    class_<Canvas>("Canvas")
+    .function("getTextureID", &Canvas::getTextureID)
+    .class_function("getInstances", &Canvas::getInstances)
+    ;
+}
+
+#endif

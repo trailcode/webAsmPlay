@@ -73,6 +73,8 @@ public:
 
     std::list<Renderiable *> getRenderiables() const;
 
+    static std::vector<Canvas *> getInstances();
+
 private:
 
     rsmz::TrackBallInteractor * trackBallInteractor;

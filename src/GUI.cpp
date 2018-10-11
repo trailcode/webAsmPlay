@@ -431,6 +431,10 @@ void initOpenGL(GLFWwindow* window)
     skyBox = new SkyBox();
 
     canvas->setSkyBox(skyBox);
+
+    GridPlane * gridPlane = new GridPlane();
+
+    canvas->addRenderiable(gridPlane);
 }
 
 void initGeometry()
