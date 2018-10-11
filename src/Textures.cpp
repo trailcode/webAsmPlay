@@ -145,12 +145,14 @@ GLuint Textures::loadCube(const vector<string> & files)
     SDL_Surface * zpos = IMG_Load(files[4].c_str());
     SDL_Surface * zneg = IMG_Load(files[5].c_str());
 
+    /*
     invertImage(xpos);
     invertImage(xneg);
     invertImage(ypos);
     invertImage(yneg);
     invertImage(zpos);
     invertImage(zneg);
+    */
 
     GLuint texCube;
     

@@ -73,16 +73,15 @@ SkyBox::SkyBox()
     files.push_back("zpos.png");
     files.push_back("zneg.png");
     */
-
-    files.push_back("bot.png");
-    files.push_back("top.png");
-
-    files.push_back("back.png");
-    files.push_back("front.png");
+ 
+    files.push_back("right.png"); // xpos
+    files.push_back("left.png");  // xneg
+    files.push_back("top.png");   // ypos
+    files.push_back("bot.png");   // yneg
+    files.push_back("front.png"); // zpos
+    files.push_back("back.png");  // zneg
     
-    files.push_back("right.png");
-    files.push_back("left.png");
-    
+
     texID = Textures::loadCube(files);
 
     const GLfloat verts[] = {   -10.0,  10.0, -10.0,
@@ -145,11 +144,6 @@ SkyBox::~SkyBox()
     // TODO cleanup! Remove from instances
 }
 
-void SkyBox::setPermutation(size_t n)
-{
-    dmess("SkyBox::setPermutation " << n);
-}
-
 void SkyBox::render(const mat4 & _view, const mat4 & projection)
 {
     skyboxShader->bind();
@@ -185,7 +179,6 @@ EMSCRIPTEN_BINDINGS(SkyBoxBindings)
 {
     register_vector<SkyBox *>("VectorSkyBoxPtr");
     class_<SkyBox>("SkyBox")
-    .function("setPermutation", &SkyBox::setPermutation)
     .class_function("getInstances", &SkyBox::getInstances)
     ;
 }

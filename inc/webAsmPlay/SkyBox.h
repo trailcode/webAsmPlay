@@ -22,8 +22,6 @@ public:
 
     void render(const glm::mat4 & view, const glm::mat4 & projection);
 
-    void setPermutation(size_t n);
-
     static std::vector<SkyBox *> getInstances();
 
 private:
