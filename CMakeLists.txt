@@ -236,6 +236,10 @@ else()
     link_libraries(${GLEW_LIBRARIES})
     link_libraries(glfw)
 
+    find_package(SDL2 REQUIRED)
+    message("SDL: ${SDL2_INCLUDE_DIRS}")
+    include_directories(${SDL2_INCLUDE_DIRS})
+
     #--------------------------------------------------------------------
     # Detect and select backend APIs
     #--------------------------------------------------------------------

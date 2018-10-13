@@ -6,6 +6,7 @@
     #include <imgui_impl_glfw_gl3.h>
     #include <emscripten/emscripten.h>
     #include <emscripten/bind.h>
+    #include <GL/glu.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
     #define IMGUI_IMPL_API // What about for windows?
@@ -14,7 +15,9 @@
     #include <imgui_impl_glfw.h>
 #endif // __EMSCRIPTEN__
 #include <GLFW/glfw3.h>
+
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp> // value_ptr
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
@@ -142,6 +145,31 @@ void Canvas::onMousePosition(GLFWwindow * window, const Vec2d & mousePos)
 
     trackBallInteractor->setClickPoint(pos.x, pos.y);
     trackBallInteractor->update();
+
+    /*
+    // From: http://antongerdelan.net/opengl/raycasting.html
+    float x = (2.0f * mousePos.x) / size.x - 1.0f;
+    float y = 1.0f - (2.0f * mousePos.y) / size.y;
+    float z = 1.0f;
+    vec3 ray_nds = vec3(x, y, z);
+    dmess("ray_nds " << ray_nds << " mousePos " << mousePos);
+    //vec4 ray_clip = vec4(ray_nds.xy, -1.0, 1.0);
+    vec4 ray_clip = vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
+    vec4 ray_eye = inverse(projection) * ray_clip;
+    ray_eye = vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
+    //vec3 ray_wor = (inverse(getCamera()->getView() ) * ray_eye).xyz;
+    //vec3 ray_wor = inverse(view) * ray_eye;
+    vec3 ray_wor = inverse(getCamera()->getMatrixConstRef()) * ray_eye;
+    ray_wor = normalize(ray_wor); // don't forget to normalise the vector at some point
+    //dmess("ray " << ray_wor.x << " " << ray_wor.y << " " << ray_wor.z);
+    vec3 eye = getCamera()->getEye();
+    //dmess("ray " << ray_wor << " eye " << getCamera()->getEye());
+    vec3 n(0,0,1);
+    float t = -dot(eye, n) / dot(ray_wor, n);
+    //dmess("t " << t);
+    vec3 interPos = eye + ray_wor * t;
+    //dmess("interPos " << interPos << " " << mousePos << " " << eye);
+    */
 }
 
 void Canvas::onMouseScroll(GLFWwindow * window, const Vec2d & mouseScroll)

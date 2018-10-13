@@ -27,6 +27,8 @@ public:
 
     void render(const glm::mat4 & MVP) const;
 
+    static void ensureShaders();
+
 private:
 
     struct TesselationResult
@@ -53,11 +55,15 @@ private:
                                         const glm::mat4                      & trans,
                                         std::vector<const TesselationResult> & tesselationResults);
 
+    static void ensureOutlineShader();
+
     const GLuint                vao;
     const GLuint                ebo;
     const GLuint                vbo;
     const int                   numTriangles;
     const std::vector<GLuint>   counterVertIndices;
+
+    static Shader * outlineShader;
 }; 
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__

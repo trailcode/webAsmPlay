@@ -335,6 +335,9 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
     {
         defaultShader->setColor(outlineColor);
         
+        //dmess("counterVertIndices.size() " << counterVertIndices.size());
+        
+        //*
         for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
         {
             const size_t a = counterVertIndices[i];
@@ -342,8 +345,34 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
 
             glDrawArrays(GL_LINE_LOOP, a, (b - a));
         }
+        //*/
+
+        /*
+        vector<GLsizei> counts;
+
+        for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
+        {
+            const size_t a = counterVertIndices[i];
+            const size_t b = counterVertIndices[i + 1];
+
+            counts.push_back(b - a);
+        }
+
+        //glMultiDrawArraysEXT(GL_LINE_LOOP, (const GLint *)&counterVertIndices[0], &counts[0], counterVertIndices.size() - 1);
+        */
+
     }
 
     glBindVertexArray(0); 
+}
+
+void RenderiablePolygon2D::ensureShaders()
+{
+    ensureOutlineShader();
+}
+
+void RenderiablePolygon2D::ensureOutlineShader()
+{
+
 }
 

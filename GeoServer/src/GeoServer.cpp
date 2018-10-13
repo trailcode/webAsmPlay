@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <ctpl.h>
+#include <geos/io/WKTWriter.h>
 #include "ogrsf_frmts.h"
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Types.h>
@@ -27,7 +29,16 @@ namespace
     */
 }
 
-GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
+GeoServer::GeoServer(const string & geomFile)
+{
+    addGeoFile(geomFile);
+}
+
+GeoServer::~GeoServer()
+{
+}
+
+string GeoServer::addGeoFile(const string & geomFile)
 {
     GDALAllRegister();
 
@@ -45,12 +56,17 @@ GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
 
     const GEOSContextHandle_t gctx = OGRGeometry::createGEOSContext();
 
+    typedef pair<Geometry *, double> GeomAndArea;
+
+    vector<GeomAndArea> geoms;
+
     for(OGRFeature * poFeature; (poFeature = poLayer->GetNextFeature()) != NULL ;)
     {
         OGRGeometry * poGeometry = poFeature->GetGeometryRef();
 
         const double simplifyAmount = 0.00001;
 
+        /*
         OGRGeometry * g = poGeometry->Simplify(simplifyAmount);
 
         geos::geom::Geometry * geom = (geos::geom::Geometry *)g->exportToGEOS(gctx);
@@ -63,23 +79,167 @@ GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
 
             continue;
         }
+        */
+
+        Geometry * geom = (Geometry *)poGeometry->exportToGEOS(gctx);
+
+        const double area = geom->getArea();
+
+        if(area < simplifyAmount)
+        {
+            dmess("geom " << geom << " " << area);
+
+            continue;
+        }
+
+        geoms.push_back(GeomAndArea(geom, area));
 
         //if(!g) dmess("poGeometry " << g);
 
         //dmess("g->get_Area() " << g->area
 
+        /*
         char * data;
 
         //poGeometry->exportToWkt(&data);
         g->exportToWkt(&data);
 
-        geoms.push_back(WkbGeom(data, strlen(data)));
+        wkbGeoms.push_back(WkbGeom(data, strlen(data)));
 
         OGRFeature::DestroyFeature( poFeature );
+        */
 
         //if(++c > 100) { break ;}
     }
     
+    sort(geoms.begin(), geoms.end(), [](const GeomAndArea & lhs, const GeomAndArea & rhs)
+    {
+        return get<1>(lhs) < get<1>(rhs);
+    });
+
+    for(const GeomAndArea & g : geoms)
+    {
+        dmess("g " << get<1>(g));
+    }
+
+    //*
+    for(size_t i = 0; i < geoms.size(); ++i)
+    {
+        Geometry * A = get<0>(geoms[i]);
+        
+        if(!A) { continue ;}
+
+        for(size_t j = i + 1; j < geoms.size(); ++j)
+        {
+            Geometry * B = get<0>(geoms[j]);
+
+            if(!B) { continue ;}
+
+            const bool contains   = B->contains(A);
+            const bool touches    = B->touches(A);
+            const bool intersects = B->intersects(A);
+
+            if(contains || touches || intersects)
+            {
+                //dmess("contains " << (int)contains << " touches " << (int)touches << " intersects " << (int)intersects);
+            }
+
+            if(contains)
+            {
+                Geometry * diff = B->difference(A);
+
+                if(!diff)
+                {
+                    dmess("Diff Error!");
+
+                    continue;
+                }
+
+                // TODO cleanup.
+
+                delete get<0>(geoms[j]);
+
+                get<0>(geoms[j]) = diff;
+            }
+
+            /*
+            if(!contains && !touches && intersects)
+            {
+                Geometry * diff = B->difference(A);
+
+                if(!diff)
+                {
+                    dmess("Diff Error!");
+
+                    continue;
+                }
+
+                // TODO cleanup.
+
+                get<0>(geoms[j]) = diff;
+            }
+            //*/
+        }
+    }
+    //*/
+
+    /*
+    for(size_t i = 0; i < geoms.size(); ++i)
+    {
+        Geometry * A = get<0>(geoms[i]);
+        
+        if(!A) { continue ;}
+
+        for(size_t j = i + 1; j < geoms.size(); ++j)
+        {
+            Geometry * B = get<0>(geoms[j]);
+
+            if(!B) { continue ;}
+
+            const bool contains   = B->contains(A);
+            const bool touches    = B->touches(A);
+            const bool intersects = B->intersects(A);
+
+            if(contains || touches || intersects)
+            {
+                dmess("contains " << (int)contains << " touches " << (int)touches << " intersects " << (int)intersects);
+            }
+        }
+    }
+    */
+
+    WKTWriter * wkt = new WKTWriter();
+
+    wkt->setOutputDimension(2);
+
+    dmess("geoms " << geoms.size());
+
+    for(const GeomAndArea & g : geoms)
+    {
+        //dmess("g " << get<1>(g));
+
+        OGRGeometry * gg = OGRGeometryFactory::createFromGEOS(gctx, (GEOSGeom_t *)get<0>(g));
+
+        //dmess(gg);
+
+        char * data;
+
+        //poGeometry->exportToWkt(&data);
+        gg->exportToWkt(&data);
+
+        //dmess("data " << data);
+
+        string wktStr(data);
+
+        wkbGeoms.push_back(WkbGeom(wktStr, wktStr.length()));
+
+        /*
+        string wktStr = wkt->write(get<0>(g));
+
+        wkbGeoms.push_back(WkbGeom(wktStr, wktStr.length()));
+        */
+    }
+
     OGREnvelope extent;
 
     poLayer->GetExtent(&extent);
@@ -91,15 +251,7 @@ GeoServer::GeoServer(const string & geomFile) : geomFile(geomFile)
 
     GDALClose( poDS );
 
-    dmess("geoms " << geoms.size());
-}
-
-GeoServer::~GeoServer()
-{
-}
-
-string GeoServer::addGeoFile(const string & geomFile)
-{
+    dmess("wkbGeoms " << wkbGeoms.size());
 
     return geomFile;
 }
@@ -158,7 +310,9 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                         *(uint32_t *)ptr = geom.second; ptr += sizeof(uint32_t);
 
-                        memcpy(ptr, geom.first, geom.second);
+                        dmess("geom.second " << geom.second);
+
+                        memcpy(ptr, geom.first.c_str(), geom.second);
 
                         s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                     });
@@ -244,6 +398,6 @@ void GeoServer::start()
     dmess("Exit");
 }
 
-size_t GeoServer::getNumGeoms() const { return geoms.size() ;}
+size_t GeoServer::getNumGeoms() const { return wkbGeoms.size() ;}
 
-GeoServer::WkbGeom GeoServer::getGeom(const size_t index) const { return geoms[index] ;}
+GeoServer::WkbGeom GeoServer::getGeom(const size_t index) const { return wkbGeoms[index] ;}

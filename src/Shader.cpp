@@ -5,7 +5,9 @@
 using namespace std;
 using namespace glm;
 
-Shader * Shader::create(const GLchar * vertexSource, const GLchar * fragmentSource)
+Shader * Shader::create(const GLchar * vertexSource,
+                        const GLchar * fragmentSource,
+                        const GLchar * geometrySource)
 {
     GLuint shaderProgram        = 0;
     GLint  posAttrib            = 0;

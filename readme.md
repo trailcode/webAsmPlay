@@ -30,6 +30,7 @@ install third party dependencies.
 * Boost: https://www.boost.org/
 * Websocketpp: https://www.zaphoyd.com/websocketpp
 * Gdal: https://www.gdal.org/
+* SDL2: https://www.libsdl.org/
 
 Some third party dependencies are built into the WebAsmPlay source tree to make emscripten compilation easer:  
 * Geos https://trac.osgeo.org/geos

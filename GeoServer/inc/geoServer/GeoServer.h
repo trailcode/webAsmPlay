@@ -32,9 +32,7 @@ private:
 
     static void on_message(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
 
-    const std::string & geomFile;
-
-    std::vector<WkbGeom> geoms;
+    std::vector<WkbGeom> wkbGeoms;
 
     double boundsMinX;
     double boundsMinY;

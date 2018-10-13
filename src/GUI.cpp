@@ -67,7 +67,7 @@ SkyBox * skyBox = NULL;
 
 bool showViewMatrixPanel     = false;
 bool showMVP_MatrixPanel     = false;
-bool showSceneViewPanel      = false;
+bool showSceneViewPanel      = true;
 bool showPerformancePanel    = false;
 bool showRenderSettingsPanel = false;
 
@@ -256,6 +256,8 @@ void mainLoop(GLFWwindow* window)
         ImGui::End();
     }
 
+    canvas->render();
+
     if(showSceneViewPanel)
     {
         ImGui::Begin("Scene Window", &showSceneViewPanel);
@@ -277,7 +279,7 @@ void mainLoop(GLFWwindow* window)
         ImGui::End();
     }
 
-    canvas->render();
+    
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -427,6 +429,7 @@ void initOpenGL(GLFWwindow* window)
 
     Renderiable::ensureShader();
     GridPlane  ::ensureShader();
+    RenderiablePolygon2D::ensureShaders();
 
     skyBox = new SkyBox();
 

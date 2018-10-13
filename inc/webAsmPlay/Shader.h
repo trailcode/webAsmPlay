@@ -16,7 +16,9 @@ class Shader
 {
 public:
 
-    static Shader * create(const GLchar * vertexSource, const GLchar * fragmentSource);
+    static Shader * create( const GLchar * vertexSource,
+                            const GLchar * fragmentSource,
+                            const GLchar * geometrySource = NULL);
 
     virtual ~Shader();
 
