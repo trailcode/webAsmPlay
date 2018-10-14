@@ -11,6 +11,8 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
+Shader * RenderiablePolygon2D::outlineShader = NULL;
+
 RenderiablePolygon2D::RenderiablePolygon2D( const GLuint            vao,
                                             const GLuint            ebo,
                                             const GLuint            vbo,
@@ -373,6 +375,47 @@ void RenderiablePolygon2D::ensureShaders()
 
 void RenderiablePolygon2D::ensureOutlineShader()
 {
+    if(outlineShader) { return ;}
 
+    const GLchar* vertexSource = R"glsl(#version 330 core
+        in vec2 position;
+        out vec4 vertexColor;
+        uniform mat4 MVP;
+        uniform vec4 vertexColorIn;
+
+        void main()
+        {
+            gl_Position = MVP * vec4(position.xy, 0, 1);
+            vertexColor = vertexColorIn;
+        }
+    )glsl";
+
+    const GLchar* fragmentSource = R"glsl(#version 330 core
+        out vec4 outColor;
+        in vec4 vertexColor;
+
+        void main()
+        {
+            outColor = vertexColor;
+        }
+    )glsl";
+
+    const GLchar* geometrySource = R"glsl(#version 330 core
+        
+        layout(points) in;
+        layout(points, max_vertices = 1) out;
+
+        void main()
+        {
+            gl_Position = gl_in[0].gl_Position;
+            EmitVertex();
+            EndPrimitive();
+        }
+
+    )glsl";
+
+    outlineShader = Shader::create(vertexSource, fragmentSource, geometrySource);
+
+    dmess("outlineShader " << outlineShader);
 }
 

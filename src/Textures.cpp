@@ -1,10 +1,10 @@
 
 #include <fstream>
 #include <vector>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+//#include <SDL/SDL.h>
+//#include <SDL/SDL_image.h>
 //#include <SDL.h>
-//#include <SDL_image.h>
+#include <SDL_image.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Textures.h>
 
@@ -146,6 +146,13 @@ GLuint Textures::loadCube(const vector<string> & files)
     SDL_Surface * yneg = IMG_Load(files[3].c_str());
     SDL_Surface * zpos = IMG_Load(files[4].c_str());
     SDL_Surface * zneg = IMG_Load(files[5].c_str());
+
+    if(!xpos) { dmess("Error cannot load: " << files[0]); return 0 ;}
+    if(!xneg) { dmess("Error cannot load: " << files[1]); return 0 ;}
+    if(!ypos) { dmess("Error cannot load: " << files[2]); return 0 ;}
+    if(!yneg) { dmess("Error cannot load: " << files[3]); return 0 ;}
+    if(!zpos) { dmess("Error cannot load: " << files[4]); return 0 ;}
+    if(!zneg) { dmess("Error cannot load: " << files[5]); return 0 ;}
 
     /*
     invertImage(xpos);

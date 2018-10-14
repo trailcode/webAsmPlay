@@ -49,11 +49,39 @@ Shader * Shader::create(const GLchar * vertexSource,
         return NULL;
     }
 
+    GLuint geometryShader = 0;
+
+    if(geometrySource)
+    {
+        dmess("Start!");
+
+        // WebGL does not support geometry shaders :(
+
+        /*
+        geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+        dmess("geometryShader " << geometryShader);
+        glShaderSource(geometryShader, 1, &geometrySource, NULL);
+        glCompileShader(geometryShader);
+        glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
+
+        if (!success)
+        {
+            glGetShaderInfoLog(geometryShader, 512, NULL, infoLog);
+
+            dmess("ERROR::SHADER::GEOMETRY::COMPILATION_FAILED: " << infoLog);
+
+            return NULL;
+        }
+        */
+    }
+
     // Link the vertex and fragment shader into a shader program
     shaderProgram = glCreateProgram();
 
     glAttachShader(shaderProgram, vertexShader);
+    //if(geometrySource) { glAttachShader(shaderProgram, geometryShader) ;}
     glAttachShader(shaderProgram, fragmentShader);
+
     glLinkProgram (shaderProgram);
     glUseProgram  (shaderProgram);
 
@@ -136,4 +164,3 @@ GLuint Shader::setTexture1Slot(const GLuint slot) const
 
     return slot;
 }
-

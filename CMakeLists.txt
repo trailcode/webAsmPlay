@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
  
 set (CMAKE_CXX_STANDARD 11)
 
@@ -231,14 +231,19 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
 else()
 
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
+
     find_package(glfw3 REQUIRED)
     include_directories(${GLEW_INCLUDE_DIRS})
     link_libraries(${GLEW_LIBRARIES})
     link_libraries(glfw)
 
     find_package(SDL2 REQUIRED)
-    message("SDL: ${SDL2_INCLUDE_DIRS}")
+    find_package(SDL2_image REQUIRED)
     include_directories(${SDL2_INCLUDE_DIRS})
+    include_directories(${SDL2_IMAGE_INCLUDE_DIR})
+    link_libraries(${SDL2_IMAGE_LIBRARY})
+    link_libraries(${SDL2_LIBRARIES})
 
     #--------------------------------------------------------------------
     # Detect and select backend APIs
@@ -264,6 +269,33 @@ else()
     else()
     message(FATAL_ERROR "No supported platform was detected")
     endif()
+
+    set(ASSET_FILES
+            back.png
+            bot.png
+            front.png
+            left.png
+            right.png
+            top.png
+            xneg.png
+            xpos.png
+            yneg.png
+            ypos.png
+            zneg.png
+            zpos.png
+        )
+
+    foreach(assetFile ${ASSET_FILES})
+        ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}"
+                COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}"
+                "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}"
+                DEPENDS   "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}"
+                )
+        list(APPEND assetFileDest "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}")
+
+    endforeach(assetFile)
+
+    ADD_CUSTOM_TARGET(assets ALL DEPENDS ${assetFileDest})
 
 endif()
 

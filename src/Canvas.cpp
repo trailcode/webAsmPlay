@@ -51,7 +51,8 @@ Canvas::Canvas( const bool   useFrameBuffer,
                                             wantMouseCapture   (true),
                                             useFrameBuffer     (useFrameBuffer),
                                             clearColor         (clearColor),
-                                            skyBox             (NULL)
+                                            skyBox             (NULL),
+                                            enabled            (true)
 {
     trackBallInteractor = new TrackBallInteractor();
 
@@ -78,6 +79,8 @@ void Canvas::setArea(const Vec2i & upperLeft, const Vec2i & size)
 
 GLuint Canvas::render()
 {
+    if(!enabled) { return 0 ;}
+
     if(!size.x || !size.y)
     {
         dmess("Error canvas size is not valid!");
@@ -134,11 +137,13 @@ bool Canvas::setWantMouseCapture(const bool wantMouseCapture)
 
 void Canvas::onMouseButton(GLFWwindow * window, const int button, const int action, const int mods)
 {
-
+    if(!enabled) { return ;}
 }
 
 void Canvas::onMousePosition(GLFWwindow * window, const Vec2d & mousePos)
 {
+    if(!enabled) { return ;}
+
     const Vec2d pos = mousePos - upperLeft;
 
     //dmess("mousePos " << pos);
@@ -174,7 +179,7 @@ void Canvas::onMousePosition(GLFWwindow * window, const Vec2d & mousePos)
 
 void Canvas::onMouseScroll(GLFWwindow * window, const Vec2d & mouseScroll)
 {
-    if(!wantMouseCapture) { return ;}
+    if(!enabled || !wantMouseCapture) { return ;}
 
     int state = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
 
@@ -194,7 +199,7 @@ void Canvas::onMouseScroll(GLFWwindow * window, const Vec2d & mouseScroll)
 
 void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods)
 {
-    if(!wantMouseCapture) { return ;}
+    if(!enabled || !wantMouseCapture) { return ;}
 
     switch(key)
     {
@@ -225,7 +230,7 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
 
 void Canvas::onChar(GLFWwindow * window, const size_t c)
 {
-
+    if(!enabled) { return ;}
 }
 
 Renderiable * Canvas::addRenderiable(Renderiable * renderiable)
@@ -256,10 +261,10 @@ const list<Renderiable *> & Canvas::getRenderiablesRef() const { return renderia
 
 list<Renderiable *> Canvas::getRenderiables() const { return renderiables ;}
 
-vector<Canvas *> Canvas::getInstances()
-{
-    return instances;
-}
+vector<Canvas *> Canvas::getInstances() { return instances ;}
+
+bool Canvas::setEnabled(const bool enabled) { return this->enabled = enabled ;}
+bool Canvas::getEnabled() const             { return enabled ;}
 
 #ifdef __EMSCRIPTEN__
 

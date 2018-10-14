@@ -67,7 +67,7 @@ SkyBox * skyBox = NULL;
 
 bool showViewMatrixPanel     = false;
 bool showMVP_MatrixPanel     = false;
-bool showSceneViewPanel      = true;
+bool showSceneViewPanel      = false;
 bool showPerformancePanel    = false;
 bool showRenderSettingsPanel = false;
 
@@ -257,6 +257,8 @@ void mainLoop(GLFWwindow* window)
     }
 
     canvas->render();
+
+    auxCanvas->setEnabled(showSceneViewPanel);
 
     if(showSceneViewPanel)
     {

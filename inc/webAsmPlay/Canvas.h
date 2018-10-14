@@ -75,6 +75,9 @@ public:
 
     static std::vector<Canvas *> getInstances();
 
+    bool setEnabled(const bool enabled);
+    bool getEnabled() const;
+
 private:
 
     rsmz::TrackBallInteractor * trackBallInteractor;
@@ -100,6 +103,8 @@ private:
     glm::mat4 MVP;
 
     SkyBox * skyBox;
+
+    bool enabled;
 };
 
 #endif // __WEB_ASM_PLAY_CANVAS_H__
