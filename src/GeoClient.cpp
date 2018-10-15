@@ -13,8 +13,6 @@
     #include "imgui.h"
     #include "imgui_impl_glfw.h"
     #include "imgui_impl_opengl3.h"
-    #include <stdio.h>
-    #include <webAsmPlay/Debug.h>
 
     // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
     // Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.

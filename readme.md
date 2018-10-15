@@ -21,7 +21,7 @@ generalization, bot AI, navigation graphs generated from Open Street Map data an
 
 Unfortunately during development notes on build depends were not tracked. Development is currently
 being done on OSX. Macports (https://www.macports.org/) and Brew (https://brew.sh/) is being used to
-install third party dependencies. 
+install third party dependencies. C++ 17 is being used.
 
 * Cmake: https://cmake.org
 * Emscripten: http://kripken.github.io/emscripten-site
@@ -32,7 +32,8 @@ install third party dependencies.
 * Gdal: https://www.gdal.org/
 * SDL2_image: https://www.libsdl.org/
 
-Some third party dependencies are built into the WebAsmPlay source tree to make emscripten compilation easer:  
+Some third party dependencies are built into the WebAsmPlay source tree to make emscripten compilation easer
+and allow C++ 17 compilation:  
 * Geos https://trac.osgeo.org/geos
 * OpenSteer http://opensteer.sourceforge.net
 * Ctpl https://github.com/vit-vit/CTPL
@@ -40,6 +41,7 @@ Some third party dependencies are built into the WebAsmPlay source tree to make 
 * GLUTesselator https://github.com/mbebenita/GLUTesselator
 * Native Dear Imgui https://github.com/ocornut/imgui
 * Emscripten Dear Imgui https://github.com/greggman/doodles/tree/master/glfw-imgui
+* Websocketpp https://github.com/zaphoyd/websocketpp
 
 #### Building
 

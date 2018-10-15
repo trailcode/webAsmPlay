@@ -12,6 +12,7 @@
 #include <list>
 #include <glm/vec4.hpp>
 #include <tceGeom/vec2.h>
+#include "Types.h"
 
 namespace rsmz
 {
@@ -105,6 +106,9 @@ private:
     SkyBox * skyBox;
 
     bool enabled;
+
+    //Mutex renderiablesMutex;
+    std::mutex renderiablesMutex;
 };
 
 #endif // __WEB_ASM_PLAY_CANVAS_H__

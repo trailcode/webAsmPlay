@@ -111,6 +111,8 @@ GLuint Canvas::render()
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
+    //ScopedLock _(renderiablesMutex);
+
     for(Renderiable * r : renderiables) { r->render(MVP) ;}
 
     if(useFrameBuffer) { return frameBuffer->getTextureID() ;}

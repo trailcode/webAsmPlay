@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
  
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
@@ -243,6 +243,7 @@ else()
     include_directories(${SDL2_INCLUDE_DIRS})
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
     include_directories(./ctpl)
+    include_directories(./)
     
     link_libraries(${GLEW_LIBRARIES})
     link_libraries(glfw)
