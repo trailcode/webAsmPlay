@@ -18,13 +18,17 @@ namespace
 
 RenderiablePolygon2D::RenderiablePolygon2D( const GLuint            vao,
                                             const GLuint            ebo,
+                                            const GLuint            ebo2,
                                             const GLuint            vbo,
                                             const int               numTriangles,
-                                            const vector<GLuint> &  counterVertIndices) :   vao                 (vao),
-                                                                                            ebo                 (ebo),
-                                                                                            vbo                 (vbo),
-                                                                                            numTriangles        (numTriangles),
-                                                                                            counterVertIndices  (counterVertIndices)
+                                            const vector<GLuint> &  counterVertIndices,
+                                            const size_t            numContourLines) :  vao                 (vao),
+                                                                                        ebo                 (ebo),
+                                                                                        ebo2                (ebo2),
+                                                                                        vbo                 (vbo),
+                                                                                        numTriangles        (numTriangles),
+                                                                                        counterVertIndices  (counterVertIndices),
+                                                                                        numContourLines     (numContourLines)
 {
 }
 
@@ -33,6 +37,7 @@ RenderiablePolygon2D::~RenderiablePolygon2D()
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers     (1, &vbo);
     glDeleteBuffers     (1, &ebo);
+    glDeleteBuffers     (1, &ebo2);
 }
 
 RenderiablePolygon2D::TesselationResult RenderiablePolygon2D::tessellatePolygon(const Polygon  * poly, const mat4 & trans)
@@ -43,8 +48,6 @@ RenderiablePolygon2D::TesselationResult RenderiablePolygon2D::tessellatePolygon(
 
     const vector<Coordinate> & coords = *ring->getCoordinates()->toVector();
 
-    //dmess("coords.size() " << coords.size());
-
     if(coords.size() < 4)
     {
         dmess("Bad gemetry!");
@@ -54,45 +57,43 @@ RenderiablePolygon2D::TesselationResult RenderiablePolygon2D::tessellatePolygon(
 
     vector<double> verts;
     
+    const size_t num = coords.size() - 1;
+
     if(trans == mat4(1.0))
     {
-        for(size_t i = 0; i < coords.size() - 1; ++i)
+        for(size_t i = 0; i < num; ++i)
         {
             const Coordinate & C = coords[i];
 
             verts.push_back(C.x);
             verts.push_back(C.y);
+
+            ret.counterVertIndices2.push_back(i);
+            ret.counterVertIndices2.push_back((i + 1) % num);
         }
     }
     else
     {
-        //dmess("trans");
-
-        for(size_t i = 0; i < coords.size() - 1; ++i)
+        for(size_t i = 0; i < num; ++i)
         {
             const Coordinate & C = coords[i];
 
             const vec4 v = trans * vec4(C.x, C.y, 0, 1);
 
-            //cout << " " << C.x << " " << C.y << " " << v.x << " " << v.y << endl;
-
             verts.push_back(v.x);
             verts.push_back(v.y);
+
+            ret.counterVertIndices2.push_back(i);
+            ret.counterVertIndices2.push_back((i + 1) % num);
         }
     }
 
     ret.counterVertIndices.push_back(0);
     ret.counterVertIndices.push_back(verts.size());
-    
-    //dmess("verts.size() " << verts.size());
-
-    //dmess("poly->getNumInteriorRing() " << poly->getNumInteriorRing());
 
     for(size_t i = 0; i < poly->getNumInteriorRing(); ++i)
     {
         const vector<Coordinate> & coords = *poly->getInteriorRingN(i)->getCoordinates()->toVector();
-
-        //dmess("   coords.size() " << coords.size());
 
         if(coords.size() < 4)
         {
@@ -101,19 +102,24 @@ RenderiablePolygon2D::TesselationResult RenderiablePolygon2D::tessellatePolygon(
             return ret;
         }
 
+        const size_t num = coords.size() - 1;
+
         if(trans == mat4(1.0))
         {
-            for(size_t i = 0; i < coords.size() - 1; ++i)
+            for(size_t i = 0; i < num; ++i)
             {
                 const Coordinate & C = coords[i];
 
                 verts.push_back(C.x);
                 verts.push_back(C.y);
+
+                ret.counterVertIndices2.push_back(i);
+                ret.counterVertIndices2.push_back((i + 1) % num);
             }
         }
         else
         {
-            for(size_t i = 0; i < coords.size() - 1; ++i)
+            for(size_t i = 0; i < num; ++i)
             {
                 const Coordinate & C = coords[i];
 
@@ -121,6 +127,9 @@ RenderiablePolygon2D::TesselationResult RenderiablePolygon2D::tessellatePolygon(
 
                 verts.push_back(v.x);
                 verts.push_back(v.y);
+
+                ret.counterVertIndices2.push_back(i);
+                ret.counterVertIndices2.push_back((i + 1) % num);
             }
         }
 
@@ -169,21 +178,25 @@ Renderiable * RenderiablePolygon2D::createFromTesselations(const vector<const Te
     size_t numVerts                 = 0;
     size_t numTriangles             = 0;
     size_t numCounterVertIndices    = 0;
+    size_t numCounterVertIndices2   = 0;
 
     for(const TesselationResult & tess : tesselations)
     {
         numVerts                += tess.numVerts;
         numTriangles            += tess.numTriangles;
         numCounterVertIndices   += tess.counterVertIndices.size();
+        numCounterVertIndices2  += tess.counterVertIndices2.size();
     }
 
-    vector<GLfloat> verts               (numVerts * 2);
-    vector<GLuint>  triangleIndices     (numTriangles * 3);
-    vector<GLuint>  counterVertIndices  (numCounterVertIndices);
+    vector<GLfloat> verts                (numVerts * 2);
+    vector<GLuint>  triangleIndices      (numTriangles * 3);
+    vector<GLuint>  counterVertIndices   (numCounterVertIndices);
+    vector<GLuint>  counterVertIndices2  (numCounterVertIndices2);
 
-    GLfloat * vertsPtr              = &verts[0];
-    GLuint  * triangleIndicesPtr    = &triangleIndices[0];
-    GLuint  * counterVertIndicesPtr = &counterVertIndices[0];
+    GLfloat * vertsPtr               = &verts[0];
+    GLuint  * triangleIndicesPtr     = &triangleIndices[0];
+    GLuint  * counterVertIndicesPtr  = &counterVertIndices[0];
+    GLuint  * counterVertIndicesPtr2 = &counterVertIndices2[0];
 
     size_t offset = 0;
 
@@ -195,6 +208,8 @@ Renderiable * RenderiablePolygon2D::createFromTesselations(const vector<const Te
 
         for(size_t i = 0; i < tess.counterVertIndices.size(); ++i, ++counterVertIndicesPtr) { *counterVertIndicesPtr = tess.counterVertIndices[i] + offset ;}
 
+        for(size_t i = 0; i < tess.counterVertIndices2.size(); ++i, ++counterVertIndicesPtr2) { *counterVertIndicesPtr2 = tess.counterVertIndices2[i] + offset ;}
+
         offset += tess.numVerts;
 
         free(tess.vertsOut);
@@ -203,6 +218,7 @@ Renderiable * RenderiablePolygon2D::createFromTesselations(const vector<const Te
 
     GLuint vao = 0;
     GLuint ebo = 0;
+    GLuint ebo2 = 0;
     GLuint vbo = 0;
 
     glGenVertexArrays(1, &vao);
@@ -215,14 +231,23 @@ Renderiable * RenderiablePolygon2D::createFromTesselations(const vector<const Te
 
     glGenBuffers(1, &ebo);
 
+    dmess("counterVertIndices2.size() " << counterVertIndices2.size());
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, &triangleIndices[0], GL_STATIC_DRAW);
     
+    glGenBuffers(1, &ebo2);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * counterVertIndices2.size(), &counterVertIndices2[0], GL_STATIC_DRAW);
+
     return new RenderiablePolygon2D(vao,
                                     ebo,
+                                    ebo2,
                                     vbo,
                                     numTriangles,
-                                    counterVertIndices);
+                                    counterVertIndices,
+                                    counterVertIndices2.size());
 }
 
 Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & trans)
@@ -233,6 +258,7 @@ Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & tr
 
     GLuint vao = 0;
     GLuint ebo = 0;
+    GLuint ebo2 = 0;
     GLuint vbo = 0;
 
     glGenVertexArrays(1, &vao);
@@ -253,6 +279,11 @@ Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & tr
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * tess.numTriangles * 3, tess.triangleIndices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &ebo2);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * tess.counterVertIndices2.size(), &tess.counterVertIndices2[0], GL_STATIC_DRAW);
     
     free(tess.vertsOut);
     free(tess.triangleIndices);
@@ -261,9 +292,11 @@ Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & tr
 
     return new RenderiablePolygon2D(vao,
                                     ebo,
+                                    ebo2,
                                     vbo,
                                     tess.numTriangles,
-                                    tess.counterVertIndices);
+                                    tess.counterVertIndices,
+                                    tess.counterVertIndices2.size());
 }
 
 Renderiable * RenderiablePolygon2D::create(const MultiPolygon * multiPoly, const mat4 & trans)
@@ -331,7 +364,7 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, NULL);
         
         glDisable(GL_BLEND);
     }
@@ -340,13 +373,9 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
     {
         getDefaultShader()->setColor(outlineColor);
         
-        for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
-        {
-            const size_t a = counterVertIndices[i];
-            const size_t b = counterVertIndices[i + 1];
-
-            glDrawArrays(GL_LINE_LOOP, a, (b - a));
-        }
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+        
+        glDrawElements(GL_LINES, numContourLines, GL_UNSIGNED_INT, NULL);
     }
 
     glBindVertexArray(0); 

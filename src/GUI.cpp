@@ -453,8 +453,8 @@ void initGeometry()
 
     Geometry * pppp = scopedGeosGeometry(GeosUtil::makeBox(-0.6,-0.05,0.6,0.05));
 
-    //*
     p = scopedGeosGeometry(p->buffer(0.1));
+    //*
 
     p = scopedGeosGeometry(p->difference(pp));
 
@@ -463,7 +463,7 @@ void initGeometry()
     p = scopedGeosGeometry(p->difference(pppp));
     //*/
 
-    const mat4 trans = scale(mat4(1.0), vec3(0.1, 0.1, 0.1));
+    const mat4 trans = scale(mat4(1.0), vec3(0.6, 0.6, 0.6));
 
     Renderiable * r = Renderiable::create(p, trans);
     //Renderiable * r = Renderiable::create(dynamic_cast<Polygon *>(p)->getExteriorRing());

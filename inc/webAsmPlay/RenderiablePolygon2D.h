@@ -39,13 +39,16 @@ private:
         int       numTriangles      = 0;
 
         std::vector<GLuint> counterVertIndices;
+        std::vector<GLuint> counterVertIndices2;
     };
 
     RenderiablePolygon2D(   const GLuint                vao,
                             const GLuint                ebo,
+                            const GLuint                ebo2,
                             const GLuint                vbo,
                             const int                   numTriangles,
-                            const std::vector<GLuint> & counterVertIndices);
+                            const std::vector<GLuint> & counterVertIndices,
+                            const size_t                numContourLines);
 
     static Renderiable * createFromTesselations(const std::vector<const TesselationResult> & tesselations);
 
@@ -59,9 +62,11 @@ private:
 
     const GLuint                vao;
     const GLuint                ebo;
+    const GLuint                ebo2;
     const GLuint                vbo;
     const int                   numTriangles;
     const std::vector<GLuint>   counterVertIndices;
+    const size_t                numContourLines;
 }; 
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__
