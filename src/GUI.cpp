@@ -143,7 +143,7 @@ void mainLoop(GLFWwindow* window)
                 {
                     //GeoClient::getInstance()->loadGeometry(canvas);
 
-                    if(!client) { client = new GeoClient() ;}
+                    if(!client) { client = new GeoClient(window) ;}
 
                     client->loadGeometry(canvas);
                 }

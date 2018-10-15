@@ -8,6 +8,28 @@
     #include <ctpl.h>
     #include <chrono>
     #include <thread>
+    
+
+    #include "imgui.h"
+    #include "imgui_impl_glfw.h"
+    #include "imgui_impl_opengl3.h"
+    #include <stdio.h>
+    #include <webAsmPlay/Debug.h>
+
+    // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
+    // Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
+    // You may use another loader/header of your choice (glext, glLoadGen, etc.), or chose to manually implement your own.
+    #if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+    #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
+    #include <GL/glew.h>    // Initialize with glewInit()
+    #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
+    #include <glad/glad.h>  // Initialize with gladLoadGL()
+    #else
+    #include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
+    #endif
+
+    #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
 
 #endif
 #include <glm/glm.hpp>
@@ -37,16 +59,12 @@ typedef vector<const Geometry *> GeomVector;
 
 namespace
 {
-    uint32_t lastID = 0;
-
     NumGeomsRequests    numGeomsRequests;
     LayerBoundsRequests layerBoundsRequests;
     GeometryRequests    geometryRequests;
-
-    //std::vector<const geos::geom::Geometry *> geoms;
 }
 
-GeoClient::GeoClient() : ID(++lastID)
+GeoClient::GeoClient(GLFWwindow * window)
 {
 #ifndef __EMSCRIPTEN__
 
@@ -74,9 +92,19 @@ GeoClient::GeoClient() : ID(++lastID)
 
     Client * _client = client;
 
-    clientThread = new thread([_client]()
+    clientThread = new thread([_client, window]()
     {
+        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, window);
+
+        glfwMakeContextCurrent(threadWin);
+
+        gl3wInit();
+
         _client->run();
+
+        // TODO cleanup threadWin!
     });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(150)); // Find a better way
@@ -143,8 +171,6 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
     vector<char> data(5);
 
     data[0] = GeoServerBase::GET_LAYER_BOUNDS_REQUEST;
-
-    dmess("request->ID " << request->ID);
 
     *(uint32_t *)&data[1] = request->ID;
 
@@ -241,8 +267,6 @@ void GeoClient::onMessage(const string & data)
 
             const AABB2D & bounds = *(AABB2D *)ptr;
 
-            dmess("requestID " << requestID);
-
             LayerBoundsRequests::const_iterator i = layerBoundsRequests.find(requestID);
 
             unique_ptr<GeoRequestLayerBounds> request(i->second);
@@ -309,8 +333,6 @@ void GeoClient::loadGeometry(Canvas * canvas)
     getNumGeoms(getNumGeomsFunctor);
 }
 
-uint32_t GeoClient::getID() const { return ID ;}
-
 #ifndef __EMSCRIPTEN__
 
 void GeoClient::on_open(GeoClient * client, websocketpp::connection_hdl hdl)
@@ -320,8 +342,6 @@ void GeoClient::on_open(GeoClient * client, websocketpp::connection_hdl hdl)
 
 void GeoClient::on_message(GeoClient * client, websocketpp::connection_hdl hdl, message_ptr msg)
 {
-    dmess("On message");
-
     Client::connection_ptr con = client->client->get_con_from_hdl(hdl);
 
     onMessage(msg->get_payload());

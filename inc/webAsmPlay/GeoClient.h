@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <webAsmPlay/Types.h>
 
+class GLFWwindow;
 class GeoRequestGetNumGeoms;
 class GeoRequestLayerBounds;
 class GeoRequestGeometry;
@@ -30,7 +31,8 @@ class GeoClient
 {
 public:
 
-    GeoClient();
+    GeoClient(GLFWwindow * window);
+
     virtual ~GeoClient();
 
     static void onMessage(const std::string & data);
@@ -42,8 +44,6 @@ public:
     void getGeometry(const size_t geomIndex, std::function<void (geos::geom::Geometry *)> & callback);
 
     void loadGeometry(Canvas * canvas);
-
-    uint32_t getID() const;
 
 private:
 
@@ -65,8 +65,6 @@ private:
     std::thread * clientThread;
 
 #endif
-
-    const uint32_t ID;
 };
 
 #endif // __WEB_ASM_PLAY_GEO_CLIENT_H__
