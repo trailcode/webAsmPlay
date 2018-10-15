@@ -53,13 +53,17 @@ Shader * Shader::create(const GLchar * vertexSource,
 
     if(geometrySource)
     {
-        dmess("Start!");
+        #ifdef __EMSCRIPTEN__
+
+            dmess("Error: WebGL does not support geometry shaders :(");
+
+            abort();
+
+        #endif
 
         // WebGL does not support geometry shaders :(
 
-        /*
         geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-        dmess("geometryShader " << geometryShader);
         glShaderSource(geometryShader, 1, &geometrySource, NULL);
         glCompileShader(geometryShader);
         glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
@@ -72,14 +76,14 @@ Shader * Shader::create(const GLchar * vertexSource,
 
             return NULL;
         }
-        */
+        
     }
 
     // Link the vertex and fragment shader into a shader program
     shaderProgram = glCreateProgram();
 
     glAttachShader(shaderProgram, vertexShader);
-    //if(geometrySource) { glAttachShader(shaderProgram, geometryShader) ;}
+    if(geometrySource) { glAttachShader(shaderProgram, geometryShader) ;}
     glAttachShader(shaderProgram, fragmentShader);
 
     glLinkProgram (shaderProgram);

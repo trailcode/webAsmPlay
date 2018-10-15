@@ -138,6 +138,8 @@ int main(int, char**)
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
+        if (glfwWindowShouldClose(window)) { break ;}
+        
         glfwPollEvents();
 
         // Start the Dear ImGui frame

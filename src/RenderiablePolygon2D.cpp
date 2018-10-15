@@ -335,11 +335,9 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
 
     if(getRenderOutline())
     {
+
         defaultShader->setColor(outlineColor);
         
-        //dmess("counterVertIndices.size() " << counterVertIndices.size());
-        
-        //*
         for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
         {
             const size_t a = counterVertIndices[i];
@@ -347,22 +345,6 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
 
             glDrawArrays(GL_LINE_LOOP, a, (b - a));
         }
-        //*/
-
-        /*
-        vector<GLsizei> counts;
-
-        for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
-        {
-            const size_t a = counterVertIndices[i];
-            const size_t b = counterVertIndices[i + 1];
-
-            counts.push_back(b - a);
-        }
-
-        //glMultiDrawArraysEXT(GL_LINE_LOOP, (const GLint *)&counterVertIndices[0], &counts[0], counterVertIndices.size() - 1);
-        */
-
     }
 
     glBindVertexArray(0); 
@@ -375,6 +357,12 @@ void RenderiablePolygon2D::ensureShaders()
 
 void RenderiablePolygon2D::ensureOutlineShader()
 {
+#ifdef __EMSCRIPTEN__
+
+    return; // WebGL does not support geometry shaders.
+
+#endif
+
     if(outlineShader) { return ;}
 
     const GLchar* vertexSource = R"glsl(#version 330 core
@@ -396,19 +384,23 @@ void RenderiablePolygon2D::ensureOutlineShader()
 
         void main()
         {
-            outColor = vertexColor;
+            outColor = vec4(1,0,0,1);
         }
     )glsl";
 
     const GLchar* geometrySource = R"glsl(#version 330 core
         
         layout(points) in;
-        layout(points, max_vertices = 1) out;
+        layout(line_strip, max_vertices = 2) out;
 
         void main()
         {
-            gl_Position = gl_in[0].gl_Position;
+            gl_Position = gl_in[0].gl_Position + vec4(-0.1, 0.0, 0.0, 0.0);
             EmitVertex();
+
+            gl_Position = gl_in[0].gl_Position + vec4(0.1, 0.0, 0.0, 0.0);
+            EmitVertex();
+
             EndPrimitive();
         }
 

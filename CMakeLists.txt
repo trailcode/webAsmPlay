@@ -81,6 +81,7 @@ file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
                             "src/RenderiableLineString2D.cpp"
                             "src/RenderiablePolygon2D.cpp"
                             "src/RenderiableCollection.cpp"
+                            "src/RenderiablePoint.cpp"
                             "src/GeosUtil.cpp"
                             "src/Util.cpp"
                             "src/FrameBuffer.cpp"
@@ -345,8 +346,6 @@ endif()
 file(GLOB sources   ${webAsmPlay_SRC}
                     ${geosSrc}
                     ${GLUTesselatorSrc}
-                    #${globjectsSrc}
-                    #${opensteerSrc}
                     ${ICON}
                     )
 

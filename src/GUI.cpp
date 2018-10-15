@@ -81,12 +81,6 @@ void errorCallback(int error, const char* description)
     fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
-void cleanup()
-{
-    // Properly de-allocate all resources once they've outlived their purpose
-    glfwTerminate();
-}
-
 void refresh(GLFWwindow* window)
 {
 #ifdef __EMSCRIPTEN__
@@ -103,14 +97,10 @@ void cback(char* data, int size, void* arg) {
     counter++;
 }
 
-void mainLoop(GLFWwindow* window)
+void mainLoop(GLFWwindow * window)
 {
     // Game loop
-    if (glfwWindowShouldClose(window)) {
-      cleanup();
-      return;
-    }
-
+    
 #ifdef __EMSCRIPTEN__
     // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
     glfwPollEvents();
@@ -304,8 +294,6 @@ void mainLoop(GLFWwindow* window)
     glfwMakeContextCurrent(window);
 
     glfwSwapBuffers(window);
-
-    //refresh(window);
 }
 
 void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
