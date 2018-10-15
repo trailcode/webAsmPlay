@@ -234,16 +234,21 @@ else()
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
 
     find_package(glfw3 REQUIRED)
-    include_directories(${GLEW_INCLUDE_DIRS})
-    link_libraries(${GLEW_LIBRARIES})
-    link_libraries(glfw)
-
+    find_package(Boost COMPONENTS filesystem REQUIRED)
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
+    
+    include_directories(${GLEW_INCLUDE_DIRS})
+    include_directories(${Boost_INCLUDE_DIRS})
     include_directories(${SDL2_INCLUDE_DIRS})
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
+    include_directories(./ctpl)
+    
+    link_libraries(${GLEW_LIBRARIES})
+    link_libraries(glfw)
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
+    link_libraries(${Boost_LIBRARIES})
 
     #--------------------------------------------------------------------
     # Detect and select backend APIs

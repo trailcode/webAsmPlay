@@ -1,6 +1,12 @@
 #ifndef __WEB_ASM_PLAY_GEO_CLIENT_H__
 #define __WEB_ASM_PLAY_GEO_CLIENT_H__
 
+#ifndef __EMSCRIPTEN__
+#include <websocketpp/config/asio_no_tls_client.hpp>
+#include <websocketpp/client.hpp>
+#include <thread>
+#endif
+
 #include <string>
 #include <functional>
 #include <vector>
@@ -24,7 +30,8 @@ class GeoClient
 {
 public:
 
-    static GeoClient * getInstance();
+    GeoClient();
+    virtual ~GeoClient();
 
     static void onMessage(const std::string & data);
 
@@ -36,20 +43,30 @@ public:
 
     void loadGeometry(Canvas * canvas);
 
+    uint32_t getID() const;
+
 private:
 
-    GeoClient();
-    ~GeoClient();
+#ifndef __EMSCRIPTEN__
 
-    typedef std::unordered_map<size_t, GeoRequestGetNumGeoms *> NumGeomsRequests;
-    typedef std::unordered_map<size_t, GeoRequestLayerBounds *> LayerBoundsRequests;
-    typedef std::unordered_map<size_t, GeoRequestGeometry    *> GeometryRequests;
+    static void on_open(GeoClient * client, websocketpp::connection_hdl hdl);
 
-    NumGeomsRequests    numGeomsRequests;
-    LayerBoundsRequests layerBoundsRequests;
-    GeometryRequests    geometryRequests;
+    // pull out the type of messages sent by our config
+    typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
-    std::vector<const geos::geom::Geometry *> geoms;
+    static void on_message(GeoClient * client, websocketpp::connection_hdl hdl, message_ptr msg);
+
+    typedef websocketpp::client<websocketpp::config::asio_client> Client;
+    
+    Client::connection_ptr con;
+
+    Client * client;
+
+    std::thread * clientThread;
+
+#endif
+
+    const uint32_t ID;
 };
 
 #endif // __WEB_ASM_PLAY_GEO_CLIENT_H__

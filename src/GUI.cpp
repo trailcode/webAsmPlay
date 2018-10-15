@@ -118,6 +118,8 @@ void mainLoop(GLFWwindow* window)
     ImGui_ImplGlfwGL3_NewFrame();
 #endif
 
+    GeoClient * client = NULL;
+
     {
         if (ImGui::BeginMainMenuBar())
         {
@@ -137,7 +139,14 @@ void mainLoop(GLFWwindow* window)
                     #endif
                 }
 
-                if(ImGui::MenuItem("Load Geometry")) { GeoClient::getInstance()->loadGeometry(canvas) ;}
+                if(ImGui::MenuItem("Load Geometry"))
+                {
+                    //GeoClient::getInstance()->loadGeometry(canvas);
+
+                    if(!client) { client = new GeoClient() ;}
+
+                    client->loadGeometry(canvas);
+                }
 
                 ImGui::EndMenu();
             }
@@ -420,11 +429,15 @@ void initOpenGL(GLFWwindow* window)
 {
     // Define the viewport dimensions
     static int width, height;
-    glfwGetFramebufferSize(window, &width, &height);  
+    //glfwGetFramebufferSize(window, &width, &height); 
+    glfwGetWindowSize(window, &width, &height);
     glViewport(0, 0, width, height);
 
     canvas = new Canvas(false);
 
+    dmess("width " << width << " height " << height);
+
+    //canvas->setArea(Vec2i(0,0), Vec2i(width / 2, height / 2));
     canvas->setArea(Vec2i(0,0), Vec2i(width, height));
 
     auxCanvas = new Canvas();
