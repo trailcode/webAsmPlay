@@ -11,7 +11,10 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-Shader * Renderiable::defaultShader = NULL;
+namespace
+{
+    Shader * defaultShader = NULL;
+}
 
 void Renderiable::ensureShader()
 {
@@ -43,6 +46,8 @@ void Renderiable::ensureShader()
 
     defaultShader = Shader::create(vertexSource, fragmentSource);
 }
+
+Shader * Renderiable::getDefaultShader() { return defaultShader ;}
 
 Renderiable * Renderiable::create(const Geometry * geom, const mat4 & trans)
 {

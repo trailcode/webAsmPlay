@@ -11,7 +11,10 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-Shader * RenderiablePolygon2D::outlineShader = NULL;
+namespace
+{
+    Shader * outlineShader = NULL;
+}
 
 RenderiablePolygon2D::RenderiablePolygon2D( const GLuint            vao,
                                             const GLuint            ebo,
@@ -310,19 +313,19 @@ Renderiable * RenderiablePolygon2D::create(const vector<const Geometry *> & poly
 
 void RenderiablePolygon2D::render(const mat4 & MVP) const
 {
-    defaultShader->bind();
+    getDefaultShader()->bind();
 
-    defaultShader->setMVP(MVP);
+    getDefaultShader()->setMVP(MVP);
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    defaultShader->enableVertexAttribArray();
+    getDefaultShader()->enableVertexAttribArray();
 
     if(getRenderFill())
     {
-        defaultShader->setColor(fillColor);
+        getDefaultShader()->setColor(fillColor);
 
         glEnable(GL_BLEND);
 
@@ -335,8 +338,7 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
 
     if(getRenderOutline())
     {
-
-        defaultShader->setColor(outlineColor);
+        getDefaultShader()->setColor(outlineColor);
         
         for(size_t i = 0; i < counterVertIndices.size() - 1; ++i)
         {

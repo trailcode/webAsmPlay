@@ -16,6 +16,8 @@ public:
     static void ensureShaders();
 
 private:
+
+    RenderiablePoint();
 };
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_POINT_H__

@@ -62,8 +62,6 @@ private:
     const GLuint                vbo;
     const int                   numTriangles;
     const std::vector<GLuint>   counterVertIndices;
-
-    static Shader * outlineShader;
 }; 
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__

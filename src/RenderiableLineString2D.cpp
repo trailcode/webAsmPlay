@@ -76,15 +76,15 @@ Renderiable * RenderiableLineString2D::create(const LineString * lineString, con
 
 void RenderiableLineString2D::render(const mat4 & MVP) const
 {
-    defaultShader->bind();
+    getDefaultShader()->bind();
 
-    defaultShader->setMVP(MVP);
+    getDefaultShader()->setMVP(MVP);
 
-    defaultShader->setColor(outlineColor);
+    getDefaultShader()->setColor(outlineColor);
     
     glBindVertexArray(vao);
     
-    defaultShader->enableVertexAttribArray();
+    getDefaultShader()->enableVertexAttribArray();
 
     glDrawArrays(GL_LINE_STRIP, 0, numVerts);
 }

@@ -35,6 +35,8 @@ public:
 
     static void ensureShader();
 
+    static Shader * getDefaultShader();
+
     glm::vec4 setFillColor(const glm::vec4 & fillColor);
     glm::vec4 getFillColor() const;
 
@@ -53,8 +55,6 @@ protected:
 
     glm::vec4 fillColor;
     glm::vec4 outlineColor;
-
-    static Shader * defaultShader;
 
     bool renderOutline;
     bool renderFill;

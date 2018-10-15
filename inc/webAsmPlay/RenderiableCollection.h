@@ -1,7 +1,7 @@
 #ifndef __WEB_ASM_PLAY_RENDERIABLE_COLLECTION_H__
 #define __WEB_ASM_PLAY_RENDERIABLE_COLLECTION_H__
 
-#include <webAsmPLay/Renderiable.h>
+#include <webAsmPlay/Renderiable.h>
 
 class RenderiableLineString2D;
 class RenderiablePolygon2D;
