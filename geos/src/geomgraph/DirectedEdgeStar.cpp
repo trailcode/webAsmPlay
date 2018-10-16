@@ -414,6 +414,11 @@ DirectedEdgeStar::computeDepths(DirectedEdge *de)
 
 	EdgeEndStar::iterator edgeIterator=find(de);
 
+	if(edgeMap.end() == edgeIterator)
+	{
+		return; // MLT 10/15/2018
+	}
+
 	int startDepth=de->getDepth(Position::LEFT);
 	int targetLastDepth=de->getDepth(Position::RIGHT);
 
@@ -437,9 +442,12 @@ DirectedEdgeStar::computeDepths(EdgeEndStar::iterator startIt,
 	int currDepth=startDepth;
 	for (EdgeEndStar::iterator it=startIt; it!=endIt; ++it)
 	{
-		assert(*it);
-        	assert(dynamic_cast<DirectedEdge*>(*it));
-        	DirectedEdge *nextDe=static_cast<DirectedEdge*>(*it);
+		//assert(*it);
+		if(!*it) { continue ;}
+		
+		assert(dynamic_cast<DirectedEdge*>(*it));
+		
+		DirectedEdge *nextDe=static_cast<DirectedEdge*>(*it);
 
 		nextDe->setEdgeDepths(Position::RIGHT, currDepth);
 		currDepth=nextDe->getDepth(Position::LEFT);

@@ -238,8 +238,15 @@ void Canvas::onChar(GLFWwindow * window, const size_t c)
 Renderiable * Canvas::addRenderiable(Renderiable * renderiable)
 {
     lock_guard _(renderiablesMutex);
-    
+
     renderiables.push_back(renderiable);
+
+    renderiable->addOnDeleteCallback([this](Renderiable * r)
+    {
+        lock_guard _(renderiablesMutex);
+
+        renderiables.remove(r);
+    });
     
     return renderiable;
 }

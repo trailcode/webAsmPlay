@@ -10,6 +10,7 @@
 #endif
 
 #include <vector>
+#include <functional>
 #include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
 
@@ -26,6 +27,8 @@ class Shader;
 class Renderiable
 {
 public:
+
+    typedef std::function<void (Renderiable *)> OnDelete;
 
     virtual ~Renderiable();
 
@@ -49,6 +52,8 @@ public:
     bool setRenderFill(const bool renderFill);
     bool getRenderFill() const;
 
+    void addOnDeleteCallback(const OnDelete & callback);
+
 protected:
 
     Renderiable();
@@ -58,6 +63,8 @@ protected:
 
     bool renderOutline;
     bool renderFill;
+
+    std::vector<OnDelete> onDeleteCallbacks;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__

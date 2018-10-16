@@ -2,11 +2,13 @@
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/CoordinateSequence.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
+#include <geos/operation/union/CascadedPolygonUnion.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GeosUtil.h>
 
 using namespace std;
 using namespace geos::geom;
+using namespace geos::operation::geounion;
 
 Polygon * GeosUtil::makeBox(const double xmin, const double ymin, const double xmax, const double ymax)
 {
@@ -30,9 +32,36 @@ Polygon * GeosUtil::makeBox(const double xmin, const double ymin, const double x
     return geomFact->createPolygon(shell, NULL);
 }
 
+Geometry * GeosUtil::unionPolygonsOwned(const initializer_list<Polygon *> & polys)
+{
+    vector<Polygon *> _polys(polys);
+
+    CascadedPolygonUnion unioner(&_polys);
+
+    return unioner.Union();
+}
+
 _ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : geom(geom) {}
 
 _ScopedGeosGeometry::~_ScopedGeosGeometry()
 {
     GeometryFactory::getDefaultInstance()->destroyGeometry(geom);
 }
+
+/*
+Geometry * unionGeoms(const initializer_list<const Geometry *> & geoms)
+{
+    for(const Geometry * g;
+    return NULL;
+}
+
+Geometry * unionGeomsOwned(const initializer_list<Geometry *> & geoms)
+{
+    return NULL;
+}
+*/
+
+
+
+
+

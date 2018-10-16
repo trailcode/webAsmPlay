@@ -45,6 +45,7 @@
 #include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/GridPlane.h>
 #include <webAsmPlay/GeoClient.h>
+#include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/GeosUtil.h>
 
 using namespace std;
@@ -61,9 +62,9 @@ static int mouse_buttons_down = 0;
 
 static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
 
-Canvas * auxCanvas = NULL;
-Canvas * canvas = NULL;
-SkyBox * skyBox = NULL;
+GeosTestCanvas  * geosTestCanvas = NULL;
+Canvas          * canvas         = NULL;
+SkyBox          * skyBox         = NULL;
 
 bool showViewMatrixPanel     = false;
 bool showMVP_MatrixPanel     = false;
@@ -74,7 +75,6 @@ bool showRenderSettingsPanel = false;
 bool isFirst = true;
 
 FrameBuffer * frameBuffer = NULL;
-ImVec2 sceneWindowSize;
 
 void errorCallback(int error, const char* description)
 {
@@ -155,7 +155,7 @@ void mainLoop(GLFWwindow * window)
             {
                 if(ImGui::MenuItem("View Matrix"))     { showViewMatrixPanel     = !showViewMatrixPanel     ;}
                 if(ImGui::MenuItem("MVP Matrix"))      { showMVP_MatrixPanel     = !showMVP_MatrixPanel     ;}
-                if(ImGui::MenuItem("Aux Canvas"))      { showSceneViewPanel      = !showSceneViewPanel      ;}
+                if(ImGui::MenuItem("Geos Tests"))      { showSceneViewPanel      = !showSceneViewPanel      ;}
                 if(ImGui::MenuItem("Performance"))     { showPerformancePanel    = !showPerformancePanel    ;}
                 if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel = !showRenderSettingsPanel ;}
 
@@ -257,30 +257,36 @@ void mainLoop(GLFWwindow * window)
 
     canvas->render();
 
-    auxCanvas->setEnabled(showSceneViewPanel);
+    geosTestCanvas->setEnabled(showSceneViewPanel);
 
     if(showSceneViewPanel)
     {
-        ImGui::Begin("Scene Window", &showSceneViewPanel);
+        ImGui::Begin("Geos Tests", &showSceneViewPanel);
 
-            ImVec2 pos = ImGui::GetCursorScreenPos();
+            const ImVec2 pos = ImGui::GetCursorScreenPos();
 
-            auxCanvas->setArea(__(pos), __(sceneWindowSize));
+            const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-            auxCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+            geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
 
-            ImGui::GetWindowDrawList()->AddImage(   (void *)auxCanvas->render(),
+            geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+
+            ImGui::GetWindowDrawList()->AddImage(   (void *)geosTestCanvas->render(),
                                                     pos,
                                                     ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
                                                     ImVec2(0, 1),
                                                     ImVec2(1, 0));
-                
-            sceneWindowSize = ImGui::GetWindowSize();
+            
+            static float buffer1 = 0.1;
+            static float buffer2 = 0.02;
+
+            ImGui::SliderFloat("buffer1", &buffer1, 0.0f, 0.3f, "buffer1 = %.3f");
+            ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");
+
+            geosTestCanvas->setGeomParameters(buffer1, buffer2);
 
         ImGui::End();
     }
-
-    
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -303,7 +309,7 @@ void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
         return;
     }
 
-    auxCanvas->onMouseButton(window, button, action, mods);
+    geosTestCanvas->onMouseButton(window, button, action, mods);
 
     if(!GImGui->IO.WantCaptureMouse)
     {
@@ -330,7 +336,7 @@ void cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 {
     //dmess("x " << xpos << " y " << ypos);
 
-    auxCanvas->onMousePosition(window, Vec2d(xpos, ypos));
+    geosTestCanvas->onMousePosition(window, Vec2d(xpos, ypos));
 
     canvas->onMousePosition(window, Vec2d(xpos, ypos));
 
@@ -343,7 +349,7 @@ void scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 {
     //dmess("ScrollCallback " << xoffset << " " << yoffset);
 
-    auxCanvas->onMouseScroll(window, Vec2d(xoffset, yoffset));
+    geosTestCanvas->onMouseScroll(window, Vec2d(xoffset, yoffset));
 
     if(!GImGui->IO.WantCaptureMouse)
     {
@@ -360,7 +366,7 @@ void scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 
 void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods)
 {
-    auxCanvas->onKey(window, key, scancode, action, mods);
+    geosTestCanvas->onKey(window, key, scancode, action, mods);
 
     if(!GImGui->IO.WantCaptureKeyboard) { canvas->onKey(window, key, scancode, action, mods) ;}
  
@@ -375,7 +381,7 @@ void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mod
 
 void charCallback(GLFWwindow * window, unsigned int c)
 {
-    auxCanvas->onChar(window, c);
+    geosTestCanvas->onChar(window, c);
 
     canvas->onChar(window, c);
 
@@ -389,7 +395,7 @@ void charCallback(GLFWwindow * window, unsigned int c)
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-    canvas->setArea(Vec2i(0,0), Vec2i(width, height));
+    geosTestCanvas->setArea(Vec2i(0,0), Vec2i(width, height));
 
     refresh(window);
 }
@@ -428,7 +434,7 @@ void initOpenGL(GLFWwindow* window)
     //canvas->setArea(Vec2i(0,0), Vec2i(width / 2, height / 2));
     canvas->setArea(Vec2i(0,0), Vec2i(width, height));
 
-    auxCanvas = new Canvas();
+    geosTestCanvas = new GeosTestCanvas();
 
     Renderiable::ensureShader();
     GridPlane  ::ensureShader();
@@ -472,7 +478,7 @@ void initGeometry()
         
     r->setOutlineColor(vec4(1,0,0,1));
 
-    auxCanvas->addRenderiable(r);
+    //geosTestCanvas->addRenderiable(r);
     canvas->addRenderiable(r);
 
     /*

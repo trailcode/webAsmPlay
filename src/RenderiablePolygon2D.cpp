@@ -104,6 +104,8 @@ RenderiablePolygon2D::TesselationResult RenderiablePolygon2D::tessellatePolygon(
 
         const size_t num = coords.size() - 1;
 
+        const size_t offset = verts.size() / 2;
+
         if(trans == mat4(1.0))
         {
             for(size_t i = 0; i < num; ++i)
@@ -113,8 +115,8 @@ RenderiablePolygon2D::TesselationResult RenderiablePolygon2D::tessellatePolygon(
                 verts.push_back(C.x);
                 verts.push_back(C.y);
 
-                ret.counterVertIndices2.push_back(i);
-                ret.counterVertIndices2.push_back((i + 1) % num);
+                ret.counterVertIndices2.push_back(i + offset);
+                ret.counterVertIndices2.push_back(((i + 1) % num) + offset);
             }
         }
         else
@@ -128,8 +130,8 @@ RenderiablePolygon2D::TesselationResult RenderiablePolygon2D::tessellatePolygon(
                 verts.push_back(v.x);
                 verts.push_back(v.y);
 
-                ret.counterVertIndices2.push_back(i);
-                ret.counterVertIndices2.push_back((i + 1) % num);
+                ret.counterVertIndices2.push_back(i + offset);
+                ret.counterVertIndices2.push_back(((i + 1) % num) + offset);
             }
         }
 
@@ -230,14 +232,10 @@ Renderiable * RenderiablePolygon2D::createFromTesselations(const vector<const Te
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2, &verts[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &ebo);
-
-    dmess("counterVertIndices2.size() " << counterVertIndices2.size());
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, &triangleIndices[0], GL_STATIC_DRAW);
     
     glGenBuffers(1, &ebo2);
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * counterVertIndices2.size(), &counterVertIndices2[0], GL_STATIC_DRAW);
 

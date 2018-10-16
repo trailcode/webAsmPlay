@@ -1,6 +1,8 @@
 #ifndef __WEB_ASM_PLAY_GEOS_UTIL_H__
 #define __WEB_ASM_PLAY_GEOS_UTIL_H__
 
+#include <initializer_list>
+
 namespace geos
 {
     namespace geom
@@ -34,10 +36,19 @@ public:
 
     static geos::geom::Polygon * makeBox(const double xmin, const double ymin, const double xmax, const double ymax);
     
+    static geos::geom::Geometry * unionPolygonsOwned(const std::initializer_list<geos::geom::Polygon *> & polys);
+
 private:
 
     GeosUtil() {}
     ~GeosUtil() {}
 };
+
+/*
+geos::geom::Geometry * unionGeoms     (const std::initializer_list<const geos::geom::Geometry *> & geoms);
+geos::geom::Geometry * unionGeomsOwned(const std::initializer_list<geos::geom::Geometry *>       & geoms);
+*/
+
+
 
 #endif

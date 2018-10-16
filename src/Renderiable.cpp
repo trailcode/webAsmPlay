@@ -78,6 +78,7 @@ Renderiable::Renderiable() :    fillColor       (0.5,0,0,0.5),
 
 Renderiable::~Renderiable()
 {
+    for(OnDelete & callback : onDeleteCallbacks) { callback(this) ;}
 }
 
 vec4 Renderiable::setFillColor(const vec4 & fillColor) { return this->fillColor = fillColor ;}
@@ -96,3 +97,4 @@ bool Renderiable::setRenderFill(const bool renderFill) { return this->renderFill
 
 bool Renderiable::getRenderFill() const { return renderFill ;}
 
+void Renderiable::addOnDeleteCallback(const OnDelete & callback) { onDeleteCallbacks.push_back(callback) ;}

@@ -11,6 +11,7 @@
 
 #include <list>
 #include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 #include <tceGeom/vec2.h>
 #include "Types.h"
 
