@@ -443,7 +443,7 @@ DirectedEdgeStar::computeDepths(EdgeEndStar::iterator startIt,
 	for (EdgeEndStar::iterator it=startIt; it!=endIt; ++it)
 	{
 		//assert(*it);
-		if(!*it) { continue ;}
+		if(!*it) { continue ;} // MLT 10/15/2018
 		
 		assert(dynamic_cast<DirectedEdge*>(*it));
 		

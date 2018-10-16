@@ -10,7 +10,7 @@ using namespace std;
 using namespace geos::geom;
 using namespace geos::operation::geounion;
 
-Polygon * GeosUtil::makeBox(const double xmin, const double ymin, const double xmax, const double ymax)
+Geometry::Ptr geosUtil::makeBox(const double xmin, const double ymin, const double xmax, const double ymax)
 {
     const GeometryFactory * geomFact = GeometryFactory::getDefaultInstance();
 
@@ -29,16 +29,25 @@ Polygon * GeosUtil::makeBox(const double xmin, const double ymin, const double x
 
     // NULL in this case could instead be a collection of one or more holes
     // in the interior of the polygon
-    return geomFact->createPolygon(shell, NULL);
+    return Geometry::Ptr(geomFact->createPolygon(shell, NULL));
 }
 
-Geometry * GeosUtil::unionPolygonsOwned(const initializer_list<Polygon *> & polys)
+Geometry::Ptr geosUtil::unionPolygons(const initializer_list<Geometry::Ptr> & polys)
 {
-    vector<Polygon *> _polys(polys);
+    vector<Polygon *> _polys;
+
+    for(const Geometry::Ptr & g : polys)
+    {
+        Polygon * p = dynamic_cast<Polygon *>(g.get());
+
+        if(p) { _polys.push_back(p) ;}
+
+        else { dmess("Warning not a polygon!") ;}
+    }
 
     CascadedPolygonUnion unioner(&_polys);
 
-    return unioner.Union();
+    return Geometry::Ptr(unioner.Union());
 }
 
 _ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : geom(geom) {}

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
  
 set (CMAKE_CXX_STANDARD 17)
 
@@ -209,6 +209,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
                                 --js-library ${CMAKE_CURRENT_SOURCE_DIR}/glfw-imgui-emscripten/library_gl.js \
                                 -s USE_SDL_IMAGE=2 \
                                 -s SDL2_IMAGE_FORMATS='[\"png\"]' \
+                                -s DISABLE_EXCEPTION_CATCHING=0 \
                                 --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/")
 
     add_definitions(-D__EMSCRIPTEN__)

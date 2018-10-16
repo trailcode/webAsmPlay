@@ -451,6 +451,8 @@ void initOpenGL(GLFWwindow* window)
 
 void initGeometry()
 {
+    #ifdef WORKING
+
     Geometry * pp = scopedGeosGeometry(GeosUtil::makeBox(-0.1,-0.1,0.1,0.1));
 
     Geometry * p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,0.5,0.5));
@@ -493,4 +495,6 @@ void initGeometry()
 
     canvas->addRenderiable(r);
     //*/
+
+    #endif
 }
