@@ -20,6 +20,8 @@ void Renderiable::ensureShader()
 {
     if(defaultShader) { return ;}
     
+    dmess("Renderiable::ensureShader");
+
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
         in vec2 position;

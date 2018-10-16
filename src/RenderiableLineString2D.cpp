@@ -9,8 +9,10 @@ using namespace glm;
 using namespace geos::geom;
 
 RenderiableLineString2D::RenderiableLineString2D(   const GLuint vao,
+                                                    const GLuint ebo,
                                                     const GLuint vbo,
                                                     const GLuint numVerts) :    vao     (vao),
+                                                                                ebo     (ebo),
                                                                                 vbo     (vbo),
                                                                                 numVerts(numVerts)
 {
@@ -19,12 +21,18 @@ RenderiableLineString2D::RenderiableLineString2D(   const GLuint vao,
 RenderiableLineString2D::~RenderiableLineString2D()
 {
     glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers     (1, &ebo);
     glDeleteBuffers     (1, &vbo);
 }
 
 Renderiable * RenderiableLineString2D::create(const LineString * lineString, const mat4 & trans)
 {
-    ensureShader();
+    if(!lineString)
+    {
+        dmess("Error lineString is NULL!");
+
+        return NULL;
+    }
 
     const vector<Coordinate> & coords = *lineString->getCoordinates()->toVector();
 
@@ -35,15 +43,8 @@ Renderiable * RenderiableLineString2D::create(const LineString * lineString, con
         return NULL;
     }
 
-    GLuint vao = 0;
-    GLuint vbo = 0;
-
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    glGenBuffers(1, &vbo);
-
     vector<GLfloat> verts(coords.size() * 2);
+    vector<GLuint> indices(coords.size());
 
     GLfloat * vertsPtr = &verts[0];
 
@@ -53,6 +54,8 @@ Renderiable * RenderiableLineString2D::create(const LineString * lineString, con
         {
             *vertsPtr = coords[i].x; ++vertsPtr;
             *vertsPtr = coords[i].y; ++vertsPtr;
+
+            indices[i] = i;
         }
     }
     else
@@ -63,15 +66,31 @@ Renderiable * RenderiableLineString2D::create(const LineString * lineString, con
 
             *vertsPtr = v.x; ++vertsPtr;
             *vertsPtr = v.y; ++vertsPtr;
+
+            indices[i] = i;
         }
     }
+
+    GLuint vao = 0;
+    GLuint ebo = 0; // Try to remove
+    GLuint vbo = 0;
+
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &ebo);
+    glGenBuffers(1, &vbo);
+    
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * coords.size() * 2, &verts[0], GL_STATIC_DRAW);
 
     return new RenderiableLineString2D( vao,
+                                        ebo,
                                         vbo,
-                                        coords.size());
+                                        indices.size());
 }
 
 void RenderiableLineString2D::render(const mat4 & MVP) const
@@ -83,8 +102,10 @@ void RenderiableLineString2D::render(const mat4 & MVP) const
     getDefaultShader()->setColor(outlineColor);
     
     glBindVertexArray(vao);
-    
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
     getDefaultShader()->enableVertexAttribArray();
 
-    glDrawArrays(GL_LINE_STRIP, 0, numVerts);
+    glDrawElements(GL_LINE_STRIP, numVerts, GL_UNSIGNED_INT, NULL);
 }

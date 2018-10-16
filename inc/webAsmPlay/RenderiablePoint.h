@@ -17,7 +17,13 @@ public:
 
 private:
 
-    RenderiablePoint();
+    RenderiablePoint(   const GLuint vao,
+                        const GLuint eao,
+                        const GLuint vbo);
+
+    const GLuint vao;
+    const GLuint eao;
+    const GLuint vbo;
 };
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_POINT_H__

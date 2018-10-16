@@ -1,4 +1,5 @@
 #include <geos/geom/Polygon.h>
+#include <geos/geom/LineString.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/CoordinateSequence.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
@@ -48,6 +49,47 @@ Geometry::Ptr geosUtil::unionPolygons(const initializer_list<Geometry::Ptr> & po
     CascadedPolygonUnion unioner(&_polys);
 
     return Geometry::Ptr(unioner.Union());
+}
+
+vector<const LineString *> geosUtil::getExternalRings(const Geometry::Ptr & geom)
+{
+    return getExternalRings(geom.get());
+}
+
+vector<const LineString *> geosUtil::getExternalRings(const Geometry * geom)
+{
+    vector<const LineString *> ret;
+
+    getExternalRings(ret, geom);
+
+    return ret;
+}
+
+void geosUtil::getExternalRings(vector<const LineString *> & rings, const Geometry * geom)
+{
+    switch(geom->getGeometryTypeId())
+    {
+        case GEOS_POLYGON: rings.push_back(dynamic_cast<const Polygon *>(geom)->getExteriorRing()); break;
+
+        case GEOS_GEOMETRYCOLLECTION:
+        case GEOS_MULTIPOLYGON:
+        {
+            const GeometryCollection * collection = dynamic_cast<const GeometryCollection *>(geom);
+
+            for(size_t i = 0; i < collection->getNumGeometries(); ++i) { getExternalRings(rings, collection->getGeometryN(i)) ;}
+
+            break;
+        }
+    }
+}
+
+vector<Geometry::Ptr> __(const vector<const LineString *> & lineStrings)
+{
+    vector<Geometry::Ptr> ret(lineStrings.size());
+
+    for(size_t i = 0; i < lineStrings.size(); ++i) { ret.push_back(Geometry::Ptr(lineStrings[i]->clone())) ;}
+
+    return ret;
 }
 
 _ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : geom(geom) {}

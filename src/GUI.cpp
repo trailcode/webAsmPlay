@@ -226,9 +226,9 @@ void mainLoop(GLFWwindow * window)
             static bool _renderPolygonOutlines  = true;
             static bool _renderSkyBox           = true;
 
-            ImGui::Checkbox("Fill Polygons", &_fillPolygons);
+            ImGui::Checkbox("Fill Polygons",    &_fillPolygons);
             ImGui::Checkbox("Polygon Outlines", &_renderPolygonOutlines);
-            ImGui::Checkbox("SkyBox", &_renderSkyBox);
+            ImGui::Checkbox("SkyBox",           &_renderSkyBox);
 
             if(fillPolygons != _fillPolygons)
             {
@@ -279,11 +279,13 @@ void mainLoop(GLFWwindow * window)
             
             static float buffer1 = 0.1;
             static float buffer2 = 0.02;
+            static float buffer3 = 0.22;
 
             ImGui::SliderFloat("buffer1", &buffer1, 0.0f, 0.3f, "buffer1 = %.3f");
             ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");
+            ImGui::SliderFloat("buffer3", &buffer3, 0.0f, 0.3f, "buffer3 = %.3f");
 
-            geosTestCanvas->setGeomParameters(buffer1, buffer2);
+            geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
 
         ImGui::End();
     }
@@ -427,6 +429,10 @@ void initOpenGL(GLFWwindow* window)
     glfwGetWindowSize(window, &width, &height);
     glViewport(0, 0, width, height);
 
+    Renderiable::ensureShader();
+    GridPlane  ::ensureShader();
+    RenderiablePolygon2D::ensureShaders();
+
     canvas = new Canvas(false);
 
     dmess("width " << width << " height " << height);
@@ -435,10 +441,6 @@ void initOpenGL(GLFWwindow* window)
     canvas->setArea(Vec2i(0,0), Vec2i(width, height));
 
     geosTestCanvas = new GeosTestCanvas();
-
-    Renderiable::ensureShader();
-    GridPlane  ::ensureShader();
-    RenderiablePolygon2D::ensureShaders();
 
     skyBox = new SkyBox();
 

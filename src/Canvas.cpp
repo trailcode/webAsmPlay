@@ -24,7 +24,7 @@
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/TrackBallInteractor.h>
-#include <webAsmPlay/Renderiable.h>
+#include <webAsmPlay/RenderiablePoint.h>
 #include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/Canvas.h>
 
@@ -57,6 +57,11 @@ Canvas::Canvas( const bool   useFrameBuffer,
     trackBallInteractor = new TrackBallInteractor();
 
     instances.push_back(this);
+
+    //cursor = RenderiablePoint::create(vec3(0,0,0));
+    cursor = NULL;
+
+    //addRenderiable(cursor);
 }
 
 Canvas::~Canvas()
@@ -114,6 +119,10 @@ GLuint Canvas::render()
     lock_guard _(renderiablesMutex);
 
     for(Renderiable * r : renderiables) { r->render(MVP) ;}
+
+    //if(!cursor) { cursor = RenderiablePoint::create(vec3(0,0,0)) ;}
+
+    //cursor->render(MVP);
 
     if(useFrameBuffer) { return frameBuffer->getTextureID() ;}
 

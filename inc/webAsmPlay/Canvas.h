@@ -24,6 +24,7 @@ namespace rsmz
 class FrameBuffer;
 class GLFWwindow;
 class Renderiable;
+class RenderiablePoint;
 class SkyBox;
 
 class Canvas
@@ -108,8 +109,9 @@ private:
 
     bool enabled;
 
-    //Mutex renderiablesMutex;
     std::mutex renderiablesMutex;
+
+    RenderiablePoint * cursor;
 };
 
 #endif // __WEB_ASM_PLAY_CANVAS_H__

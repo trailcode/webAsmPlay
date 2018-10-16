@@ -24,10 +24,12 @@ public:
 private:
 
     RenderiableLineString2D(const GLuint vao,
+                            const GLuint ebo,
                             const GLuint vbo,
                             const GLuint numVerts);
 
     const GLuint vao;
+    const GLuint ebo;
     const GLuint vbo;
     const GLuint numVerts;
 };

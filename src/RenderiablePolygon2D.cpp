@@ -254,31 +254,28 @@ Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & tr
 
     if(!tess.vertsOut) { return NULL ;}
 
+    vector<GLfloat> verts2(tess.numVerts * 2);
+
+    for(size_t i = 0; i < tess.numVerts * 2; ++i) { verts2[i] = tess.vertsOut[i] ;}
+
     GLuint vao = 0;
     GLuint ebo = 0;
     GLuint ebo2 = 0;
     GLuint vbo = 0;
 
-    glGenVertexArrays(1, &vao);
+    glGenVertexArrays   (1, &vao);
+    glGenBuffers        (1, &vbo);
+    glGenBuffers        (1, &ebo);
+    glGenBuffers        (1, &ebo2);
 
     glBindVertexArray(vao);
-
-    glGenBuffers(1, &vbo);
-
-    vector<GLfloat> verts2(tess.numVerts * 2);
-
-    for(size_t i = 0; i < tess.numVerts * 2; ++i) { verts2[i] = tess.vertsOut[i] ;}
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * tess.numVerts * 2, &verts2[0], GL_STATIC_DRAW);
 
-    glGenBuffers(1, &ebo);
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * tess.numTriangles * 3, tess.triangleIndices, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &ebo2);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * tess.counterVertIndices2.size(), &tess.counterVertIndices2[0], GL_STATIC_DRAW);
@@ -375,8 +372,6 @@ void RenderiablePolygon2D::render(const mat4 & MVP) const
         
         glDrawElements(GL_LINES, numContourLines, GL_UNSIGNED_INT, NULL);
     }
-
-    glBindVertexArray(0); 
 }
 
 void RenderiablePolygon2D::ensureShaders()
