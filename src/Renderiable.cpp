@@ -51,19 +51,55 @@ void Renderiable::ensureShader()
 
 Shader * Renderiable::getDefaultShader() { return defaultShader ;}
 
-Renderiable * Renderiable::create(const Geometry::Ptr & geom, const mat4 & trans) { return create(geom.get(), trans) ;}
+Renderiable * Renderiable::create(  const Geometry::Ptr & geom,
+                                    const mat4          & trans,
+                                    const vec4          & fillColor, 
+                                    const vec4          & outlineColor,
+                                    const bool            renderOutline,
+                                    const bool            renderFill)
+{
+    return create(  geom.get(),
+                    trans,
+                    fillColor,
+                    outlineColor,
+                    renderOutline,
+                    renderFill);
+}
 
-Renderiable * Renderiable::create(const Geometry * geom, const mat4 & trans)
+Renderiable * Renderiable::create(  const Geometry  * geom,
+                                    const mat4      & trans,
+                                    const vec4      & fillColor,
+                                    const vec4      & outlineColor,
+                                    const bool        renderOutline,
+                                    const bool        renderFill)
 {
     switch(geom->getGeometryTypeId())
     {
         case GEOS_POINT:                dmess("Implement me!"); return NULL;
         case GEOS_LINESTRING:           dmess("Implement me!"); return NULL;
-        case GEOS_LINEARRING:           return RenderiableLineString2D  ::create(dynamic_cast<const LineString *>   (geom), trans);
-        case GEOS_POLYGON:              return RenderiablePolygon2D     ::create(dynamic_cast<const Polygon *>      (geom), trans);
+        case GEOS_LINEARRING:           return RenderiableLineString2D::create( dynamic_cast<const LineString *>(geom),
+                                                                                trans,
+                                                                                fillColor,
+                                                                                outlineColor,
+                                                                                renderOutline,
+                                                                                renderFill);
+
+        case GEOS_POLYGON:              return RenderiablePolygon2D::create(dynamic_cast<const Polygon *>(geom),
+                                                                            trans,
+                                                                            fillColor,
+                                                                            outlineColor,
+                                                                            renderOutline,
+                                                                            renderFill);
+
         case GEOS_MULTIPOINT:           dmess("Implement me!"); return NULL;
         case GEOS_MULTILINESTRING:      dmess("Implement me!"); return NULL;
-        case GEOS_MULTIPOLYGON:         return RenderiablePolygon2D     ::create(dynamic_cast<const MultiPolygon *> (geom), trans);
+        case GEOS_MULTIPOLYGON:         return RenderiablePolygon2D::create(dynamic_cast<const MultiPolygon *>(geom),
+                                                                            trans,
+                                                                            fillColor,
+                                                                            outlineColor,
+                                                                            renderOutline,
+                                                                            renderFill);
+
         case GEOS_GEOMETRYCOLLECTION:   dmess("Implement me!"); return NULL;
         default:
             dmess("Error!");
@@ -79,8 +115,8 @@ Renderiable::Renderiable(   const bool   isMulti,
                             const bool   renderOutline,
                             const bool   renderFill) :  fillColor       (fillColor),
                                                         outlineColor    (outlineColor),
-                                                        renderOutline   (true),
-                                                        renderFill      (true),
+                                                        renderOutline   (renderOutline),
+                                                        renderFill      (renderFill),
                                                         isMulti         (isMulti)
 {
 }
@@ -107,3 +143,20 @@ bool Renderiable::setRenderFill(const bool renderFill) { return this->renderFill
 bool Renderiable::getRenderFill() const { return renderFill ;}
 
 void Renderiable::addOnDeleteCallback(const OnDelete & callback) { onDeleteCallbacks.push_back(callback) ;}
+
+namespace
+{
+    vec4 defaultFillColor(0.7, 0.5, 0, 0.5);
+    vec4 defaultOutlineColor(1,0,0,1);
+    bool defaultDoFill = true;
+    bool defaultDoOutline = true;
+}
+
+vec4 Renderiable::setDefaultFillColor(const vec4 & fillColor) { return defaultFillColor = fillColor ;}
+vec4 Renderiable::getDefaultFillColor() { return defaultFillColor ;}
+vec4 Renderiable::setDefaultOutlineColor(const vec4 & outlineColor) { return defaultOutlineColor = outlineColor ;}
+vec4 Renderiable::getDefaultOutlineColor() { return defaultOutlineColor ;}
+bool Renderiable::setDefaultRenderFill(const bool renderFill) { return defaultDoFill = renderFill ;}
+bool Renderiable::getDefaultRenderFill() { return defaultDoFill ;}
+bool Renderiable::setDefaultRenderOutline(const bool renderOutline) { return defaultDoOutline = renderOutline ;}
+bool Renderiable::getDefaultRenderOutline() { return defaultDoOutline ;}

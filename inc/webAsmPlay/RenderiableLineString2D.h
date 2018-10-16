@@ -19,10 +19,10 @@ public:
 
     static Renderiable * create(const geos::geom::LineString    * lineString,
                                 const glm::mat4                 & trans         = glm::mat4(1.0),
-                                const glm::vec4                 & fillColor     = glm::vec4(0.5,0.3,0,0.5),
-                                const glm::vec4                 & outlineColor  = glm::vec4(1,0,0,1),
-                                const bool                        renderOutline = true,
-                                const bool                        renderFill    = true);
+                                const glm::vec4                 & fillColor     = getDefaultFillColor(),
+                                const glm::vec4                 & outlineColor  = getDefaultOutlineColor(),
+                                const bool                        renderOutline = getDefaultRenderOutline(),
+                                const bool                        renderFill    = getDefaultRenderFill());
 
     void render(const glm::mat4 & MVP) const;
 

@@ -12,7 +12,9 @@ using namespace glm;
 using namespace geos::geom;
 using namespace geosUtil;
 
-GeosTestCanvas::GeosTestCanvas()
+GeosTestCanvas::GeosTestCanvas() :  buffer1(-1),
+                                    buffer2(-1),
+                                    buffer3(-1)
 {
     
 }
@@ -22,8 +24,18 @@ GeosTestCanvas::~GeosTestCanvas()
 
 }
 
-void GeosTestCanvas::setGeomParameters(const float buffer1, const float buffer2, const float buffer3)
+void GeosTestCanvas::setGeomParameters( const float buffer1,
+                                        const float buffer2,
+                                        const float buffer3)
 {
+    if( this->buffer1 == buffer1 &&
+        this->buffer2 == buffer2 &&
+        this->buffer3 == buffer3) { return ;}
+
+    this->buffer1 = buffer1;
+    this->buffer2 = buffer2;
+    this->buffer3 = buffer3;
+
     geoms.clear();
 
     Geometry::Ptr shape = makeBox(-0.5,-0.5,0.5,0.5);
@@ -42,9 +54,9 @@ void GeosTestCanvas::setGeomParameters(const float buffer1, const float buffer2,
 
     Renderiable * geom1 = Renderiable::create(shape, trans);
      
-    geom1->setFillColor(vec4(0.3,0.3,0,1));
+    //geom1->setFillColor(vec4(0.3,0.3,0,1));
         
-    geom1->setOutlineColor(vec4(1,0,0,1));
+    //geom1->setOutlineColor(vec4(1,0,0,1));
 
     addRenderiable(geom1);
 

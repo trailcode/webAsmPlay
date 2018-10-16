@@ -235,6 +235,10 @@ void mainLoop(GLFWwindow * window)
                 fillPolygons = _fillPolygons;
 
                 for(Renderiable * r : canvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
+
+                for(Renderiable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
+
+                Renderiable::setDefaultRenderFill(fillPolygons);
             }
 
             if(renderPolygonOutlines != _renderPolygonOutlines)
@@ -242,6 +246,10 @@ void mainLoop(GLFWwindow * window)
                 renderPolygonOutlines = _renderPolygonOutlines;
 
                 for(Renderiable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
+
+                for(Renderiable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
+
+                Renderiable::setDefaultRenderOutline(renderPolygonOutlines);
             }
 
             if(renderSkyBox != _renderSkyBox)

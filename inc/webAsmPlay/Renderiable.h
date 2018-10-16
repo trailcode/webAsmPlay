@@ -27,9 +27,19 @@ public:
 
     virtual void render(const glm::mat4 & MVP) const = 0;
 
-    static Renderiable * create(const geos::geom::Geometry::Ptr & geom, const glm::mat4 & trans = glm::mat4(1.0));
+    static Renderiable * create(const geos::geom::Geometry::Ptr & geom,
+                                const glm::mat4                 & trans         = glm::mat4(1.0),
+                                const glm::vec4                 & fillColor     = getDefaultFillColor(),
+                                const glm::vec4                 & outlineColor  = getDefaultOutlineColor(),
+                                const bool                        renderOutline = getDefaultRenderOutline(),
+                                const bool                        renderFill    = getDefaultRenderFill());
 
-    static Renderiable * create(const geos::geom::Geometry * geom, const glm::mat4 & trans = glm::mat4(1.0));
+    static Renderiable * create(const geos::geom::Geometry  * geom,
+                                const glm::mat4             & trans         = glm::mat4(1.0),
+                                const glm::vec4             & fillColor     = getDefaultFillColor(),
+                                const glm::vec4             & outlineColor  = getDefaultOutlineColor(),
+                                const bool                    renderOutline = getDefaultRenderOutline(),
+                                const bool                    renderFill    = getDefaultRenderFill());
 
     static void ensureShader();
 
@@ -48,6 +58,18 @@ public:
     bool getRenderFill() const;
 
     void addOnDeleteCallback(const OnDelete & callback);
+
+    static glm::vec4 setDefaultFillColor(const glm::vec4 & fillColor);
+    static glm::vec4 getDefaultFillColor();
+
+    static glm::vec4 setDefaultOutlineColor(const glm::vec4 & outlineColor);
+    static glm::vec4 getDefaultOutlineColor();
+
+    static bool setDefaultRenderFill(const bool renderFill);
+    static bool getDefaultRenderFill();
+
+    static bool setDefaultRenderOutline(const bool renderOutline);
+    static bool getDefaultRenderOutline();
 
 protected:
 

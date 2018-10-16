@@ -21,24 +21,24 @@ public:
 
     static Renderiable * create(const geos::geom::Polygon   * poly,
                                 const glm::mat4             & trans             = glm::mat4(1.0),
-                                const glm::vec4             & fillColor         = glm::vec4(0.5,0.3,0,0.5),
-                                const glm::vec4             & outlineColor      = glm::vec4(1,0,0,1),
-                                const bool                    renderOutline     = true,
-                                const bool                    renderFill        = true);
+                                const glm::vec4             & fillColor         = getDefaultFillColor(),
+                                const glm::vec4             & outlineColor      = getDefaultOutlineColor(),
+                                const bool                    renderOutline     = getDefaultRenderOutline(),
+                                const bool                    renderFill        = getDefaultRenderFill());
 
     static Renderiable * create(const geos::geom::MultiPolygon  * multyPoly,
                                 const glm::mat4                 & trans         = glm::mat4(1.0),
-                                const glm::vec4                 & fillColor     = glm::vec4(0.5,0.3,0,0.5),
-                                const glm::vec4                 & outlineColor  = glm::vec4(1,0,0,1),
-                                const bool                        renderOutline = true,
-                                const bool                        renderFill    = true);
+                                const glm::vec4                 & fillColor     = getDefaultFillColor(),
+                                const glm::vec4                 & outlineColor  = getDefaultOutlineColor(),
+                                const bool                        renderOutline = getDefaultRenderOutline(),
+                                const bool                        renderFill    = getDefaultRenderFill());
 
     static Renderiable * create(const std::vector<const geos::geom::Geometry *> & polygons,
                                 const glm::mat4                                 & trans         = glm::mat4(1.0),
-                                const glm::vec4                                 & fillColor     = glm::vec4(0.5,0.3,0,0.5),
-                                const glm::vec4                                 & outlineColor  = glm::vec4(1,0,0,1),
-                                const bool                                        renderOutline = true,
-                                const bool                                        renderFill    = true);
+                                const glm::vec4                                 & fillColor     = getDefaultFillColor(),
+                                const glm::vec4                                 & outlineColor  = getDefaultOutlineColor(),
+                                const bool                                        renderOutline = getDefaultRenderOutline(),
+                                const bool                                        renderFill    = getDefaultRenderFill());
 
     void render(const glm::mat4 & MVP) const;
 
@@ -65,10 +65,10 @@ private:
                             const std::vector<GLuint> & counterVertIndices,
                             const size_t                numContourLines,
                             const bool                  isMulti,
-                            const glm::vec4            & fillColor,
-                            const glm::vec4            & outlineColor,
-                            const bool                   renderOutline,
-                            const bool                   renderFill);
+                            const glm::vec4           & fillColor,
+                            const glm::vec4           & outlineColor,
+                            const bool                  renderOutline,
+                            const bool                  renderFill);
 
     static Renderiable * createFromTesselations(const std::vector<const TesselationResult>  & tesselations,
                                                 const glm::vec4                             & fillColor,
@@ -76,7 +76,7 @@ private:
                                                 const bool                                    renderOutline,
                                                 const bool                                    renderFill);
 
-    static TesselationResult tessellatePolygon(const geos::geom::Polygon  * poly, const glm::mat4 & trans);
+    static TesselationResult tessellatePolygon(const geos::geom::Polygon * poly, const glm::mat4 & trans);
 
     static void tesselateMultiPolygon(  const geos::geom::MultiPolygon       * multiPoly,
                                         const glm::mat4                      & trans,
