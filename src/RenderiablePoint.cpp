@@ -42,7 +42,8 @@ Renderiable * RenderiablePoint::create(const vec3 & pos)
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * tess.numTriangles * 3, tess.triangleIndices, GL_STATIC_DRAW);
 
-    return new RenderiablePoint(vao, ebo, vbo);
+    //return new RenderiablePoint(vao, ebo, vbo);
+    return NULL;
 }
 
 void RenderiablePoint::render(const mat4 & MVP) const
@@ -75,11 +76,21 @@ void RenderiablePoint::render(const mat4 & MVP) const
     //getDefaultShader()->enableVertexAttribArray(2);
 }
 
-RenderiablePoint::RenderiablePoint( const GLuint vao,
-                                    const GLuint eao,
-                                    const GLuint vbo) : vao(vao),
-                                                        eao(eao),
-                                                        vbo(vbo)
+RenderiablePoint::RenderiablePoint( const GLuint      vao,
+                                    const GLuint      eao,
+                                    const GLuint      vbo,
+                                    const bool        isMulti,
+                                    const vec4      & fillColor,
+                                    const vec4      & outlineColor,
+                                    const bool        renderOutline,
+                                    const bool        renderFill) : Renderiable(isMulti,
+                                                                                fillColor,
+                                                                                outlineColor,
+                                                                                renderOutline,
+                                                                                renderFill),
+                                                                    vao(vao),
+                                                                    eao(eao),
+                                                                    vbo(vbo)
 {
 
 }

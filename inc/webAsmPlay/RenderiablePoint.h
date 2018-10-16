@@ -17,9 +17,14 @@ public:
 
 private:
 
-    RenderiablePoint(   const GLuint vao,
-                        const GLuint eao,
-                        const GLuint vbo);
+    RenderiablePoint(   const GLuint      vao,
+                        const GLuint      eao,
+                        const GLuint      vbo,
+                        const bool        isMulti,
+                        const glm::vec4 & fillColor,
+                        const glm::vec4 & outlineColor,
+                        const bool        renderOutline,
+                        const bool        renderFill);
 
     const GLuint vao;
     const GLuint eao;

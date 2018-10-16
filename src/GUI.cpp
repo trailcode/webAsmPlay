@@ -342,9 +342,7 @@ void cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 
     canvas->onMousePosition(window, Vec2d(xpos, ypos));
 
-    {
-        refresh(window);
-    }
+    refresh(window);
 }
 
 void scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
@@ -404,7 +402,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 
 void windowFocusCallback(GLFWwindow* window, int focused)
 {
-    if (focused)
+    if(focused)
     {
         refresh(window);
     }
@@ -430,7 +428,7 @@ void initOpenGL(GLFWwindow* window)
     glViewport(0, 0, width, height);
 
     Renderiable::ensureShader();
-    GridPlane  ::ensureShader();
+    //GridPlane  ::ensureShader();
     RenderiablePolygon2D::ensureShaders();
 
     canvas = new Canvas(false);
@@ -446,9 +444,9 @@ void initOpenGL(GLFWwindow* window)
 
     canvas->setSkyBox(skyBox);
 
-    GridPlane * gridPlane = new GridPlane();
+    //GridPlane * gridPlane = new GridPlane();
 
-    canvas->addRenderiable(gridPlane);
+    //canvas->addRenderiable(gridPlane);
 }
 
 void initGeometry()

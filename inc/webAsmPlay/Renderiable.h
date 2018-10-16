@@ -13,14 +13,7 @@
 #include <functional>
 #include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
-
-namespace geos
-{
-    namespace geom
-    {
-        class Geometry;
-    }
-}
+#include <geos/geom/Geometry.h>
 
 class Shader;
 
@@ -33,6 +26,8 @@ public:
     virtual ~Renderiable();
 
     virtual void render(const glm::mat4 & MVP) const = 0;
+
+    static Renderiable * create(const geos::geom::Geometry::Ptr & geom, const glm::mat4 & trans = glm::mat4(1.0));
 
     static Renderiable * create(const geos::geom::Geometry * geom, const glm::mat4 & trans = glm::mat4(1.0));
 
@@ -56,15 +51,19 @@ public:
 
 protected:
 
-    Renderiable();
-
-    glm::vec4 fillColor;
-    glm::vec4 outlineColor;
-
-    bool renderOutline;
-    bool renderFill;
+    Renderiable(const bool        isMulti,
+                const glm::vec4 & fillColor,
+                const glm::vec4 & outlineColor,
+                const bool        renderOutline,
+                const bool        renderFill);
 
     std::vector<OnDelete> onDeleteCallbacks;
+
+    bool        isMulti;
+    glm::vec4   fillColor;
+    glm::vec4   outlineColor;
+    bool        renderOutline;
+    bool        renderFill;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__

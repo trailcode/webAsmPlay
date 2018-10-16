@@ -40,7 +40,7 @@ void GeosTestCanvas::setGeomParameters(const float buffer1, const float buffer2,
 
     const mat4 trans = scale(mat4(1.0), vec3(0.6, 0.6, 0.6));
 
-    Renderiable * geom1 = Renderiable::create(shape.get(), trans);
+    Renderiable * geom1 = Renderiable::create(shape, trans);
      
     geom1->setFillColor(vec4(0.3,0.3,0,1));
         
@@ -54,13 +54,13 @@ void GeosTestCanvas::setGeomParameters(const float buffer1, const float buffer2,
     {
         Geometry::Ptr buffered(ring->buffer(buffer3));
 
-        //Geometry::Ptr buffered2(ring->buffer(0.15));
+        Geometry::Ptr buffered2(ring->buffer(buffer3 + 0.15));
 
         buffered = Geometry::Ptr(buffered->difference(inside.get()));
 
         for(const LineString * ring : getExternalRings(buffered))
         {   
-            Renderiable * geom = RenderiableLineString2D::create(ring, trans);
+            Renderiable * geom = Renderiable::create(ring, trans);
 
             geom->setOutlineColor(vec4(0,1,0,1));
 
@@ -74,18 +74,21 @@ void GeosTestCanvas::setGeomParameters(const float buffer1, const float buffer2,
         {   
             Geometry * gg = ring->difference(inside.get());
 
-            dmess("gg " << gg->getGeometryType());
+            //dmess("gg " << gg->getGeometryType());
 
+            Renderiable * geom = Renderiable::create(gg, trans);
             //Renderiable * geom = RenderiableLineString2D::create(ring, trans);
-            Renderiable * geom = RenderiableLineString2D::create(dynamic_cast<const LineString *>(gg), trans);
+            //Renderiable * geom = RenderiableLineString2D::create(dynamic_cast<const LineString *>(gg), trans);
+            if(geom)
+            {
+                geom->setOutlineColor(vec4(0,1,0,1));
 
-            geom->setOutlineColor(vec4(0,1,0,1));
+                addRenderiable(geom);
 
-            addRenderiable(geom);
-
-            geoms.push_back(unique_ptr<Renderiable>(geom));
+                geoms.push_back(unique_ptr<Renderiable>(geom));
+            }
         }
-        */
+        //*/
     }
     
 }

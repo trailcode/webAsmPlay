@@ -8,10 +8,20 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-RenderiableLineString2D::RenderiableLineString2D(   const GLuint vao,
-                                                    const GLuint ebo,
-                                                    const GLuint vbo,
-                                                    const GLuint numVerts) :    vao     (vao),
+RenderiableLineString2D::RenderiableLineString2D(   const GLuint   vao,
+                                                    const GLuint   ebo,
+                                                    const GLuint   vbo,
+                                                    const GLuint   numVerts,
+                                                    const bool     isMulti,
+                                                    const vec4   & fillColor,
+                                                    const vec4   & outlineColor,
+                                                    const bool     renderOutline,
+                                                    const bool     renderFill) :    Renderiable( isMulti,
+                                                                                                fillColor,
+                                                                                                outlineColor,
+                                                                                                renderOutline,
+                                                                                                renderFill),
+                                                                                vao     (vao),
                                                                                 ebo     (ebo),
                                                                                 vbo     (vbo),
                                                                                 numVerts(numVerts)
@@ -25,7 +35,12 @@ RenderiableLineString2D::~RenderiableLineString2D()
     glDeleteBuffers     (1, &vbo);
 }
 
-Renderiable * RenderiableLineString2D::create(const LineString * lineString, const mat4 & trans)
+Renderiable * RenderiableLineString2D::create(  const LineString    * lineString,
+                                                const mat4          & trans,
+                                                const vec4          & fillColor,
+                                                const vec4          & outlineColor,
+                                                const bool            renderOutline,
+                                                const bool            renderFill)
 {
     if(!lineString)
     {
@@ -90,7 +105,12 @@ Renderiable * RenderiableLineString2D::create(const LineString * lineString, con
     return new RenderiableLineString2D( vao,
                                         ebo,
                                         vbo,
-                                        indices.size());
+                                        indices.size(),
+                                        false,
+                                        fillColor,
+                                        outlineColor,
+                                        renderOutline,
+                                        renderFill);
 }
 
 void RenderiableLineString2D::render(const mat4 & MVP) const

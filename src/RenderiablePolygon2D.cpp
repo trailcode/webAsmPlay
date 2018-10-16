@@ -16,19 +16,29 @@ namespace
     Shader * outlineShader = NULL;
 }
 
-RenderiablePolygon2D::RenderiablePolygon2D( const GLuint            vao,
-                                            const GLuint            ebo,
-                                            const GLuint            ebo2,
-                                            const GLuint            vbo,
-                                            const int               numTriangles,
-                                            const vector<GLuint> &  counterVertIndices,
-                                            const size_t            numContourLines) :  vao                 (vao),
-                                                                                        ebo                 (ebo),
-                                                                                        ebo2                (ebo2),
-                                                                                        vbo                 (vbo),
-                                                                                        numTriangles        (numTriangles),
-                                                                                        counterVertIndices  (counterVertIndices),
-                                                                                        numContourLines     (numContourLines)
+RenderiablePolygon2D::RenderiablePolygon2D( const GLuint           vao,
+                                            const GLuint           ebo,
+                                            const GLuint           ebo2,
+                                            const GLuint           vbo,
+                                            const int              numTriangles,
+                                            const vector<GLuint> & counterVertIndices,
+                                            const size_t           numContourLines,
+                                            const bool             isMulti,
+                                            const vec4           & fillColor,
+                                            const vec4           & outlineColor,
+                                            const bool             renderOutline,
+                                            const bool             renderFill) :    Renderiable(isMulti,
+                                                                                                fillColor,
+                                                                                                outlineColor,
+                                                                                                renderOutline,
+                                                                                                renderFill),
+                                                                                    vao                 (vao),
+                                                                                    ebo                 (ebo),
+                                                                                    ebo2                (ebo2),
+                                                                                    vbo                 (vbo),
+                                                                                    numTriangles        (numTriangles),
+                                                                                    counterVertIndices  (counterVertIndices),
+                                                                                    numContourLines     (numContourLines)
 {
 }
 
@@ -173,7 +183,11 @@ void RenderiablePolygon2D::tesselateMultiPolygon(   const MultiPolygon          
     }
 }
 
-Renderiable * RenderiablePolygon2D::createFromTesselations(const vector<const TesselationResult> & tesselations)
+Renderiable * RenderiablePolygon2D::createFromTesselations( const vector<const TesselationResult>   & tesselations,
+                                                            const vec4                              & fillColor,
+                                                            const vec4                              & outlineColor,
+                                                            const bool                                renderOutline,
+                                                            const bool                                renderFill)
 {
     if(!tesselations.size()) { return NULL ;}
 
@@ -245,10 +259,20 @@ Renderiable * RenderiablePolygon2D::createFromTesselations(const vector<const Te
                                     vbo,
                                     numTriangles,
                                     counterVertIndices,
-                                    counterVertIndices2.size());
+                                    counterVertIndices2.size(),
+                                    tesselations.size() > 1,
+                                    fillColor,
+                                    outlineColor,
+                                    renderOutline,
+                                    renderFill);
 }
 
-Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & trans)
+Renderiable * RenderiablePolygon2D::create( const Polygon   * poly,
+                                            const mat4      & trans,
+                                            const vec4      & fillColor,
+                                            const vec4      & outlineColor,
+                                            const bool        renderOutline, 
+                                            const bool        renderFill)
 {
     const TesselationResult tess = tessellatePolygon(poly, trans);
 
@@ -291,19 +315,38 @@ Renderiable * RenderiablePolygon2D::create(const Polygon * poly, const mat4 & tr
                                     vbo,
                                     tess.numTriangles,
                                     tess.counterVertIndices,
-                                    tess.counterVertIndices2.size());
+                                    tess.counterVertIndices2.size(),
+                                    false,
+                                    fillColor,
+                                    outlineColor,
+                                    renderOutline, 
+                                    renderFill);
 }
 
-Renderiable * RenderiablePolygon2D::create(const MultiPolygon * multiPoly, const mat4 & trans)
+Renderiable * RenderiablePolygon2D::create( const MultiPolygon  * multiPoly,
+                                            const mat4          & trans,
+                                            const vec4          & fillColor,
+                                            const vec4          & outlineColor,
+                                            const bool            renderOutline, 
+                                            const bool            renderFill)
 {
     vector<const TesselationResult> tesselationResults;
 
     tesselateMultiPolygon(multiPoly, trans, tesselationResults);
 
-    return createFromTesselations(tesselationResults);
+    return createFromTesselations(  tesselationResults,
+                                    fillColor,
+                                    outlineColor,
+                                    renderOutline, 
+                                    renderFill);
 }
 
-Renderiable * RenderiablePolygon2D::create(const vector<const Geometry *> & polygons, const mat4 & trans)
+Renderiable * RenderiablePolygon2D::create( const vector<const Geometry *>  & polygons,
+                                            const mat4                      & trans,
+                                            const vec4                      & fillColor,
+                                            const vec4                      & outlineColor,
+                                            const bool                        renderOutline, 
+                                            const bool                        renderFill)
 {
     vector<const TesselationResult> tesselationResults;
 
@@ -336,7 +379,11 @@ Renderiable * RenderiablePolygon2D::create(const vector<const Geometry *> & poly
 
     dmess("tesselationResults " << tesselationResults.size());
 
-    return createFromTesselations(tesselationResults);
+    return createFromTesselations(  tesselationResults,
+                                    fillColor,
+                                    outlineColor,
+                                    renderOutline,
+                                    renderFill);
 }
 
 void RenderiablePolygon2D::render(const mat4 & MVP) const

@@ -1,6 +1,8 @@
 #ifndef __WEB_ASM_PLAY_RENDERIABLE_COLLECTION_H__
 #define __WEB_ASM_PLAY_RENDERIABLE_COLLECTION_H__
 
+#ifdef WORKING
+
 #include <webAsmPlay/Renderiable.h>
 
 class RenderiableLineString2D;
@@ -27,5 +29,7 @@ private:
     std::vector<RenderiableLineString2D *> lineStrings2D;
     std::vector<RenderiablePolygon2D    *> polygons2D;
 };
+
+#endif
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_COLLECTION_H__

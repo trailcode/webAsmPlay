@@ -51,6 +51,8 @@ void Renderiable::ensureShader()
 
 Shader * Renderiable::getDefaultShader() { return defaultShader ;}
 
+Renderiable * Renderiable::create(const Geometry::Ptr & geom, const mat4 & trans) { return create(geom.get(), trans) ;}
+
 Renderiable * Renderiable::create(const Geometry * geom, const mat4 & trans)
 {
     switch(geom->getGeometryTypeId())
@@ -71,10 +73,15 @@ Renderiable * Renderiable::create(const Geometry * geom, const mat4 & trans)
     return NULL;
 }
 
-Renderiable::Renderiable() :    fillColor       (0.5,0,0,0.5),
-                                outlineColor    (1,1,0,1),
-                                renderOutline   (true),
-                                renderFill      (true)
+Renderiable::Renderiable(   const bool   isMulti,
+                            const vec4 & fillColor,
+                            const vec4 & outlineColor,
+                            const bool   renderOutline,
+                            const bool   renderFill) :  fillColor       (fillColor),
+                                                        outlineColor    (outlineColor),
+                                                        renderOutline   (true),
+                                                        renderFill      (true),
+                                                        isMulti         (isMulti)
 {
 }
 

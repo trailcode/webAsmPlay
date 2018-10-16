@@ -1,3 +1,5 @@
+#ifdef WORKING
+
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/RenderiableLineString2D.h>
 #include <webAsmPlay/RenderiablePolygon2D.h>
@@ -11,7 +13,8 @@ RenderiableCollection::RenderiableCollection(const bool takeOwnership) : takeOwn
 
 }
 
-RenderiableCollection::RenderiableCollection(const vector<Renderiable *> & renderiables, const bool takeOwnership) : takeOwnership(takeOwnership)
+RenderiableCollection::RenderiableCollection(   const vector<Renderiable *> & renderiables,
+                                                const bool takeOwnership) : takeOwnership(takeOwnership)
 {
     for(Renderiable * r : renderiables) { addRenderiable(r) ;}
 }
@@ -45,3 +48,5 @@ Renderiable * RenderiableCollection::addRenderiable(Renderiable * renderiable)
 
     return renderiable;
 }
+
+#endif

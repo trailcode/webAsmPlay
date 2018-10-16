@@ -5,6 +5,8 @@
 #include <webAsmPlay/Shader.h>
 #include <webAsmPlay/GridPlane.h>
 
+#ifdef WORKING
+
 using namespace std;
 using namespace glm;
 
@@ -148,3 +150,5 @@ void GridPlane::render(const mat4 & MVP) const
     glDepthMask(GL_TRUE);
     glFlush();
 }
+
+#endif // WORKING
