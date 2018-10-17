@@ -38,6 +38,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <tceGeom/vec2.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/RenderiableCollection.h>
 #include <webAsmPlay/RenderiablePolygon2D.h>
 #include <webAsmPlay/FrameBuffer.h>
@@ -97,8 +98,59 @@ void cback(char* data, int size, void* arg) {
     counter++;
 }
 
+ImGuiTextBuffer * Buf = NULL;
+
+struct AppLog
+{
+    //ImGuiTextBuffer     Buf;
+    bool                ScrollToBottom;
+
+    void    Clear()     { Buf->clear(); }
+
+    void    AddLog(const char* fmt, ...)
+    {
+        va_list args;
+        va_start(args, fmt);
+        //Buf.appendv(fmt, args);
+        //Buf.appendf("%s", "fdasdfasd");
+        va_end(args);
+        ScrollToBottom = true;
+    }
+
+    void    Draw(const char* title, bool* p_opened = NULL)
+    {
+        ImGui::SetNextWindowSize(ImVec2(500,400), ImGuiSetCond_FirstUseEver);
+        ImGui::Begin(title, p_opened);
+        if (ImGui::Button("Clear")) Clear();
+        ImGui::SameLine();
+        bool copy = ImGui::Button("Copy");
+        ImGui::Separator();
+        ImGui::BeginChild("scrolling");
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,1));
+        if (copy) ImGui::LogToClipboard();
+        ImGui::TextUnformatted(Buf->begin());
+        if (ScrollToBottom)
+            ImGui::SetScrollHere(1.0f);
+        ScrollToBottom = false;
+        ImGui::PopStyleVar();
+        ImGui::EndChild();
+        ImGui::End();
+    }
+};
+
+AppLog logPanel;
+
+void dmessCallback(const string & file, const size_t line, const string & message)
+{
+    //cout << file << " " << line << " " << message;
+    if(Buf) { Buf->append("%s %i %s", file.c_str(), line, message.c_str()) ;}
+}
+
+//extern void (*debugLoggerFunc)(const std::string & file, const std::string & line, const std::string & message);
+
 void mainLoop(GLFWwindow * window)
 {
+    if(!Buf) {  Buf = new ImGuiTextBuffer() ;}
     // Game loop
     
 #ifdef __EMSCRIPTEN__
@@ -260,8 +312,25 @@ void mainLoop(GLFWwindow * window)
                 else             { canvas->setSkyBox(NULL)   ;}
             }
 
+            static vec4 fillColor(Renderiable::getDefaultFillColor());
+            static vec4 outlineColor(Renderiable::getDefaultOutlineColor());
+            
+            ImGui::ColorEdit4("Fill", (float*)&fillColor, true);
+            ImGui::ColorEdit4("Outline", (float*)&outlineColor, true);
+
+            /*
+            static vec4 fillColor(Renderiable::getDefaultFillColor());
+
+            ImGui::ColorPicker4("##picker",
+                                (float*)&fillColor,
+                                //ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview);
+                                0);
+                                */
+
         ImGui::End();
     }
+    bool p_opened = true;
+    logPanel.Draw("Log", &p_opened);
 
     canvas->render();
 
@@ -429,6 +498,8 @@ void keyCallback1(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void initOpenGL(GLFWwindow* window)
 {
+    debugLoggerFunc = &dmessCallback;
+
     // Define the viewport dimensions
     static int width, height;
     //glfwGetFramebufferSize(window, &width, &height); 

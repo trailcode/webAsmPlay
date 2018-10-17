@@ -1,4 +1,4 @@
 #include <webAsmPlay/Debug.h>
 
-void (*debugLoggerFunc)(const std::string & file, const std::string & line, const std::string & message) = NULL;
+void (*debugLoggerFunc)(const std::string & file, const size_t line, const std::string & message) = NULL;
 
