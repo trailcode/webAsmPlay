@@ -11,7 +11,7 @@
     #include <emscripten/bind.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
-    #define IMGUI_IMPL_API // What about for windows?
+    //#define IMGUI_IMPL_API // What about for windows?
     #include <imgui_impl_opengl3.h>
     #include <imgui_impl_glfw.h>
 #endif // __EMSCRIPTEN__
@@ -143,7 +143,11 @@ AppLog logPanel;
 void dmessCallback(const string & file, const size_t line, const string & message)
 {
     //cout << file << " " << line << " " << message;
-    if(Buf) { Buf->append("%s %i %s", file.c_str(), line, message.c_str()) ;}
+#ifdef __EMSCRIPTEN__
+    if(Buf) { Buf->append("%s %i %s", file.c_str(), (int)line, message.c_str()) ;}
+#else
+    if(Buf) { Buf->appendf("%s %i %s", file.c_str(), (int)line, message.c_str()) ;}
+#endif
 }
 
 //extern void (*debugLoggerFunc)(const std::string & file, const std::string & line, const std::string & message);
@@ -472,7 +476,10 @@ void charCallback(GLFWwindow * window, unsigned int c)
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-    geosTestCanvas->setArea(Vec2i(0,0), Vec2i(width, height));
+    // Need to use this to get true size because of retina displays.
+    glfwGetWindowSize(window, &width, &height);
+
+    canvas->setArea(Vec2i(0,0), Vec2i(width, height));
 
     refresh(window);
 }
