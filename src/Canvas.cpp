@@ -120,9 +120,9 @@ GLuint Canvas::render()
 
     for(Renderiable * r : renderiables) { r->render(MVP) ;}
 
-    //if(!cursor) { cursor = RenderiablePoint::create(vec3(0,0,0)) ;}
+    if(!cursor) { cursor = RenderiablePoint::create(vec3(0,0,0)) ;}
 
-    //cursor->render(MVP);
+    cursor->render(MVP);
 
     if(useFrameBuffer) { return frameBuffer->getTextureID() ;}
 

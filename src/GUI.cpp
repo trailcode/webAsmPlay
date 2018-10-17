@@ -72,6 +72,7 @@ bool showMVP_MatrixPanel     = false;
 bool showSceneViewPanel      = false;
 bool showPerformancePanel    = false;
 bool showRenderSettingsPanel = false;
+bool showLogPanel            = false;
 
 bool isFirst = true;
 
@@ -214,6 +215,7 @@ void mainLoop(GLFWwindow * window)
                 if(ImGui::MenuItem("Geos Tests"))      { showSceneViewPanel      = !showSceneViewPanel      ;}
                 if(ImGui::MenuItem("Performance"))     { showPerformancePanel    = !showPerformancePanel    ;}
                 if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel = !showRenderSettingsPanel ;}
+                if(ImGui::MenuItem("Log"))             { showLogPanel            = !showLogPanel            ;}
 
                 ImGui::EndMenu();
             }
@@ -333,8 +335,8 @@ void mainLoop(GLFWwindow * window)
 
         ImGui::End();
     }
-    bool p_opened = true;
-    logPanel.Draw("Log", &p_opened);
+    
+    logPanel.Draw("Log", &showLogPanel);
 
     canvas->render();
 

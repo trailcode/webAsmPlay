@@ -190,7 +190,10 @@ include_directories(tceRender/inc)
 include_directories(inc)
 
 add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
-    
+
+set(sourcePath ${CMAKE_CURRENT_SOURCE_DIR})
+add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")
+
 if(APPLE)
     SET(CMAKE_CXX_LINK_FLAGS "-framework OpenGL")
 endif()
