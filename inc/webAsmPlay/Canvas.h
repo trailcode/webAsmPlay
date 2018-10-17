@@ -104,6 +104,8 @@ private:
     glm::mat4 model;
     glm::mat4 projection;
     glm::mat4 MVP;
+    
+    glm::vec3 cursorPosWC;
 
     SkyBox * skyBox;
 
