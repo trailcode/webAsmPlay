@@ -17,24 +17,24 @@
 
 class Shader;
 
-class Renderiable
+class Renderable
 {
 public:
 
-    typedef std::function<void (Renderiable *)> OnDelete;
+    typedef std::function<void (Renderable *)> OnDelete;
 
-    virtual ~Renderiable();
+    virtual ~Renderable();
 
     virtual void render(const glm::mat4 & MVP) const = 0;
 
-    static Renderiable * create(const geos::geom::Geometry::Ptr & geom,
+    static Renderable * create( const geos::geom::Geometry::Ptr & geom,
                                 const glm::mat4                 & trans         = glm::mat4(1.0),
                                 const glm::vec4                 & fillColor     = getDefaultFillColor(),
                                 const glm::vec4                 & outlineColor  = getDefaultOutlineColor(),
                                 const bool                        renderOutline = getDefaultRenderOutline(),
                                 const bool                        renderFill    = getDefaultRenderFill());
 
-    static Renderiable * create(const geos::geom::Geometry  * geom,
+    static Renderable * create( const geos::geom::Geometry  * geom,
                                 const glm::mat4             & trans         = glm::mat4(1.0),
                                 const glm::vec4             & fillColor     = getDefaultFillColor(),
                                 const glm::vec4             & outlineColor  = getDefaultOutlineColor(),
@@ -73,7 +73,7 @@ public:
 
 protected:
 
-    Renderiable(const bool        isMulti,
+    Renderable( const bool        isMulti,
                 const glm::vec4 & fillColor,
                 const glm::vec4 & outlineColor,
                 const bool        renderOutline,

@@ -3,8 +3,8 @@
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GeosUtil.h>
-#include <webAsmPlay/RenderiablePolygon2D.h>
-#include <webAsmPlay/RenderiableLineString2D.h>
+#include <webAsmPlay/RenderablePolygon.h>
+#include <webAsmPlay/RenderableLineString.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 
 using namespace std;
@@ -52,7 +52,7 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
     const mat4 trans = scale(mat4(1.0), vec3(0.6, 0.6, 0.6));
 
-    Renderiable * geom1 = Renderiable::create(shape, trans);
+    Renderable * geom1 = Renderable::create(shape, trans);
      
     //geom1->setFillColor(vec4(0.3,0.3,0,1));
         
@@ -60,7 +60,7 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
     addRenderiable(geom1);
 
-    geoms.push_back(unique_ptr<Renderiable>(geom1));
+    geoms.push_back(unique_ptr<Renderable>(geom1));
 
     for(const LineString * ring : getExternalRings(shape))
     {
@@ -72,13 +72,13 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
         for(const LineString * ring : getExternalRings(buffered))
         {   
-            Renderiable * geom = Renderiable::create(ring, trans);
+            Renderable * geom = Renderable::create(ring, trans);
 
             geom->setOutlineColor(vec4(0,1,0,1));
 
             addRenderiable(geom);
 
-            geoms.push_back(unique_ptr<Renderiable>(geom));
+            geoms.push_back(unique_ptr<Renderable>(geom));
         }
 
         /*
@@ -88,16 +88,16 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
             //dmess("gg " << gg->getGeometryType());
 
-            Renderiable * geom = Renderiable::create(gg, trans);
-            //Renderiable * geom = RenderiableLineString2D::create(ring, trans);
-            //Renderiable * geom = RenderiableLineString2D::create(dynamic_cast<const LineString *>(gg), trans);
+            Renderable * geom = Renderable::create(gg, trans);
+            //Renderable * geom = RenderableLineString::create(ring, trans);
+            //Renderable * geom = RenderableLineString::create(dynamic_cast<const LineString *>(gg), trans);
             if(geom)
             {
                 geom->setOutlineColor(vec4(0,1,0,1));
 
                 addRenderiable(geom);
 
-                geoms.push_back(unique_ptr<Renderiable>(geom));
+                geoms.push_back(unique_ptr<Renderable>(geom));
             }
         }
         //*/

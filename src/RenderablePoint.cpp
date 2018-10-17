@@ -1,6 +1,6 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Shader.h>
-#include <webAsmPlay/RenderiablePoint.h>
+#include <webAsmPlay/RenderablePoint.h>
 
 using namespace std;
 using namespace glm;
@@ -10,9 +10,9 @@ namespace
     Shader * defaultShader = NULL;
 }
 
-Renderiable * RenderiablePoint::create(const vec3 & pos)
+Renderable * RenderablePoint::create(const vec3 & pos)
 {
-    dmess("RenderiablePoint::create");
+    dmess("RenderablePoint::create");
 
     const float size = 0.05;
 
@@ -39,7 +39,7 @@ Renderiable * RenderiablePoint::create(const vec3 & pos)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    return new RenderiablePoint(vao, ebo, vbo,
+    return new RenderablePoint(vao, ebo, vbo,
     false,
                         getDefaultFillColor(),
                         getDefaultOutlineColor(),
@@ -47,7 +47,7 @@ Renderiable * RenderiablePoint::create(const vec3 & pos)
                         true);
 }
 
-void RenderiablePoint::render(const mat4 & MVP) const
+void RenderablePoint::render(const mat4 & MVP) const
 {
     getDefaultShader()->bind();
 
@@ -64,14 +64,14 @@ void RenderiablePoint::render(const mat4 & MVP) const
     glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL);
 }
 
-RenderiablePoint::RenderiablePoint( const GLuint      vao,
+RenderablePoint::RenderablePoint(   const GLuint      vao,
                                     const GLuint      ebo,
                                     const GLuint      vbo,
                                     const bool        isMulti,
                                     const vec4      & fillColor,
                                     const vec4      & outlineColor,
                                     const bool        renderOutline,
-                                    const bool        renderFill) : Renderiable(isMulti,
+                                    const bool        renderFill) : Renderable(isMulti,
                                                                                 fillColor,
                                                                                 outlineColor,
                                                                                 renderOutline,
@@ -83,7 +83,7 @@ RenderiablePoint::RenderiablePoint( const GLuint      vao,
 
 }
 
-RenderiablePoint::~RenderiablePoint()
+RenderablePoint::~RenderablePoint()
 {
     //glDeleteVertexArrays(1, &vao);
     glDeleteBuffers     (1, &vbo);

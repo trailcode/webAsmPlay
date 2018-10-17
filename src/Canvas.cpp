@@ -24,7 +24,7 @@
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/TrackBallInteractor.h>
-#include <webAsmPlay/RenderiablePoint.h>
+#include <webAsmPlay/RenderablePoint.h>
 #include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/Canvas.h>
 
@@ -58,7 +58,7 @@ Canvas::Canvas( const bool   useFrameBuffer,
 
     instances.push_back(this);
 
-    //cursor = RenderiablePoint::create(vec3(0,0,0));
+    //cursor = RenderablePoint::create(vec3(0,0,0));
     cursor = NULL;
 
     //addRenderiable(cursor);
@@ -118,9 +118,9 @@ GLuint Canvas::render()
 
     lock_guard _(renderiablesMutex);
 
-    for(Renderiable * r : renderiables) { r->render(MVP) ;}
+    for(Renderable * r : renderiables) { r->render(MVP) ;}
 
-    if(!cursor) { cursor = RenderiablePoint::create(vec3(0,0,0)) ;}
+    if(!cursor) { cursor = RenderablePoint::create(vec3(0,0,0)) ;}
 
     cursor->render(MVP);
 
@@ -244,13 +244,13 @@ void Canvas::onChar(GLFWwindow * window, const size_t c)
     if(!enabled) { return ;}
 }
 
-Renderiable * Canvas::addRenderiable(Renderiable * renderiable)
+Renderable * Canvas::addRenderiable(Renderable * renderiable)
 {
     lock_guard _(renderiablesMutex);
 
     renderiables.push_back(renderiable);
 
-    renderiable->addOnDeleteCallback([this](Renderiable * r)
+    renderiable->addOnDeleteCallback([this](Renderable * r)
     {
         lock_guard _(renderiablesMutex);
 
@@ -277,9 +277,9 @@ const mat4 & Canvas::getMVP_Ref()       const { return MVP ;}
 SkyBox * Canvas::setSkyBox(SkyBox * skyBox) { return this->skyBox = skyBox ;}
 SkyBox * Canvas::getSkyBox() const          { return skyBox ;}
 
-const list<Renderiable *> & Canvas::getRenderiablesRef() const { return renderiables ;}
+const list<Renderable *> & Canvas::getRenderiablesRef() const { return renderiables ;}
 
-list<Renderiable *> Canvas::getRenderiables() const { return renderiables ;}
+list<Renderable *> Canvas::getRenderiables() const { return renderiables ;}
 
 vector<Canvas *> Canvas::getInstances() { return instances ;}
 

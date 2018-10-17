@@ -18,7 +18,7 @@ public:
 
 private:
 
-    std::vector<std::unique_ptr<Renderiable> > geoms;
+    std::vector<std::unique_ptr<Renderable> > geoms;
 
     float buffer1;
     float buffer2;

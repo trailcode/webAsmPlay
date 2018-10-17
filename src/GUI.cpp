@@ -32,15 +32,15 @@
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Renderiable.h>
+#include <webAsmPlay/Renderable.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <tceGeom/vec2.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/RenderiableCollection.h>
-#include <webAsmPlay/RenderiablePolygon2D.h>
+#include <webAsmPlay/RenderableCollection.h>
+#include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/SkyBox.h>
@@ -292,22 +292,22 @@ void mainLoop(GLFWwindow * window)
             {
                 fillPolygons = _fillPolygons;
 
-                for(Renderiable * r : canvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
+                for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
 
-                for(Renderiable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
+                for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
 
-                Renderiable::setDefaultRenderFill(fillPolygons);
+                Renderable::setDefaultRenderFill(fillPolygons);
             }
 
             if(renderPolygonOutlines != _renderPolygonOutlines)
             {
                 renderPolygonOutlines = _renderPolygonOutlines;
 
-                for(Renderiable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
+                for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
 
-                for(Renderiable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
+                for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
 
-                Renderiable::setDefaultRenderOutline(renderPolygonOutlines);
+                Renderable::setDefaultRenderOutline(renderPolygonOutlines);
             }
 
             if(renderSkyBox != _renderSkyBox)
@@ -318,14 +318,14 @@ void mainLoop(GLFWwindow * window)
                 else             { canvas->setSkyBox(NULL)   ;}
             }
 
-            static vec4 fillColor(Renderiable::getDefaultFillColor());
-            static vec4 outlineColor(Renderiable::getDefaultOutlineColor());
+            static vec4 fillColor(Renderable::getDefaultFillColor());
+            static vec4 outlineColor(Renderable::getDefaultOutlineColor());
             
             ImGui::ColorEdit4("Fill", (float*)&fillColor, true);
             ImGui::ColorEdit4("Outline", (float*)&outlineColor, true);
 
             /*
-            static vec4 fillColor(Renderiable::getDefaultFillColor());
+            static vec4 fillColor(Renderable::getDefaultFillColor());
 
             ImGui::ColorPicker4("##picker",
                                 (float*)&fillColor,
@@ -515,9 +515,9 @@ void initOpenGL(GLFWwindow* window)
     glfwGetWindowSize(window, &width, &height);
     glViewport(0, 0, width, height);
 
-    Renderiable::ensureShader();
+    Renderable::ensureShader();
     //GridPlane  ::ensureShader();
-    RenderiablePolygon2D::ensureShaders();
+    RenderablePolygon::ensureShaders();
 
     canvas = new Canvas(false);
 
@@ -561,8 +561,8 @@ void initGeometry()
 
     const mat4 trans = scale(mat4(1.0), vec3(0.6, 0.6, 0.6));
 
-    Renderiable * r = Renderiable::create(p, trans);
-    //Renderiable * r = Renderiable::create(dynamic_cast<Polygon *>(p)->getExteriorRing());
+    Renderable * r = Renderable::create(p, trans);
+    //Renderable * r = Renderable::create(dynamic_cast<Polygon *>(p)->getExteriorRing());
 
     r->setFillColor(vec4(0.3,0.3,0,1));
         
@@ -574,8 +574,8 @@ void initGeometry()
     /*
     p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,-4,0.4));
 
-    //r = Renderiable::create(p, trans);
-    r = Renderiable::create(p);
+    //r = Renderable::create(p, trans);
+    r = Renderable::create(p);
 
     r->setFillColor(vec4(0.3,0.0,0.3,1));
         

@@ -1,7 +1,7 @@
 #ifndef __WEB_ASM_PLAY_RENDERIABLE_LINE_STRING_2D_H__
 #define __WEB_ASM_PLAY_RENDERIABLE_LINE_STRING_2D_H__
 
-#include <webAsmPlay/Renderiable.h>
+#include <webAsmPlay/Renderable.h>
 
 namespace geos
 {
@@ -11,13 +11,13 @@ namespace geos
     }
 }
 
-class RenderiableLineString2D : public Renderiable
+class RenderableLineString : public Renderable
 {
 public:
 
-    ~RenderiableLineString2D();
+    ~RenderableLineString();
 
-    static Renderiable * create(const geos::geom::LineString    * lineString,
+    static Renderable * create( const geos::geom::LineString    * lineString,
                                 const glm::mat4                 & trans         = glm::mat4(1.0),
                                 const glm::vec4                 & fillColor     = getDefaultFillColor(),
                                 const glm::vec4                 & outlineColor  = getDefaultOutlineColor(),
@@ -28,7 +28,7 @@ public:
 
 private:
 
-    RenderiableLineString2D(const GLuint      vao,
+    RenderableLineString(   const GLuint      vao,
                             const GLuint      ebo,
                             const GLuint      vbo,
                             const GLuint      numVerts,

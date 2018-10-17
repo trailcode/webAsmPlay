@@ -40,7 +40,7 @@
 #include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/RenderiablePolygon2D.h>
+#include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GeoClient.h>
 
@@ -310,7 +310,7 @@ void GeoClient::loadGeometry(Canvas * canvas)
                 {
                     dmess("Done!");
 
-                    Renderiable * r = RenderiablePolygon2D::create(*geoms, trans);
+                    Renderable * r = RenderablePolygon::create(*geoms, trans);
 
                     delete geoms;
 

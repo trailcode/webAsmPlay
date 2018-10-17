@@ -1,11 +1,11 @@
 #ifndef __WEB_ASM_PLAY_GRID_PLANE_H__
 #define __WEB_ASM_PLAY_GRID_PLANE_H__
 
-#include <webAsmPlay/Renderiable.h>
+#include <webAsmPlay/Renderable.h>
 
 #ifdef WORKING
 
-class GridPlane : public Renderiable
+class GridPlane : public Renderable
 {
 public:
 

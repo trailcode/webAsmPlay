@@ -23,7 +23,7 @@ namespace rsmz
 
 class FrameBuffer;
 class GLFWwindow;
-class Renderiable;
+class Renderable;
 class SkyBox;
 
 class Canvas
@@ -32,6 +32,7 @@ public:
 
     Canvas( const bool        useFrameBuffer = true,
             const glm::vec4 & clearColor     = glm::vec4(0.5, 0.5, 1, 1));
+    
     virtual ~Canvas();
 
     void setArea(const tce::geom::Vec2i & upperLeft, const tce::geom::Vec2i & size);
@@ -54,7 +55,7 @@ public:
 
     rsmz::Camera * getCamera() const;
 
-    Renderiable * addRenderiable(Renderiable * renderiable);
+    Renderable * addRenderiable(Renderable * renderiable);
 
     glm::vec4 setClearColor(const glm::vec4 & clearColor);
 
@@ -71,9 +72,9 @@ public:
     SkyBox * setSkyBox(SkyBox * skyBox);
     SkyBox * getSkyBox() const;
 
-    const std::list<Renderiable *> & getRenderiablesRef() const;
+    const std::list<Renderable *> & getRenderiablesRef() const;
 
-    std::list<Renderiable *> getRenderiables() const;
+    std::list<Renderable *> getRenderiables() const;
 
     static std::vector<Canvas *> getInstances();
 
@@ -93,7 +94,7 @@ private:
 
     tce::geom::Vec2i lastShiftKeyDownMousePos;
 
-    std::list<Renderiable *> renderiables;
+    std::list<Renderable *> renderiables;
 
     const bool useFrameBuffer;
 
@@ -110,7 +111,7 @@ private:
 
     std::mutex renderiablesMutex;
 
-    Renderiable * cursor;
+    Renderable * cursor;
 };
 
 #endif // __WEB_ASM_PLAY_CANVAS_H__
