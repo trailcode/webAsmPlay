@@ -281,6 +281,8 @@ vector<Canvas *> Canvas::getInstances() { return instances ;}
 bool Canvas::setEnabled(const bool enabled) { return this->enabled = enabled ;}
 bool Canvas::getEnabled() const             { return enabled ;}
 
+vec3 Canvas::getCursorPosWC() const { return cursorPosWC ;}
+
 #ifdef __EMSCRIPTEN__
 
 EMSCRIPTEN_BINDINGS(CanvasBindings)

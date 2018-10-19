@@ -80,6 +80,8 @@ public:
 
     bool setEnabled(const bool enabled);
     bool getEnabled() const;
+    
+    glm::vec3 getCursorPosWC() const;
 
 private:
 

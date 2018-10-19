@@ -143,15 +143,21 @@ AppLog logPanel;
 
 void dmessCallback(const string & file, const size_t line, const string & message)
 {
-    //cout << file << " " << line << " " << message;
+    cout << file << " " << line << " " << message;
+    /*
 #ifdef __EMSCRIPTEN__
     if(Buf) { Buf->append("%s %i %s", file.c_str(), (int)line, message.c_str()) ;}
 #else
     if(Buf) { Buf->appendf("%s %i %s", file.c_str(), (int)line, message.c_str()) ;}
 #endif
+     */
 }
 
+//vector<Renderable *> pickedRenderiables;
+
 //extern void (*debugLoggerFunc)(const std::string & file, const std::string & line, const std::string & message);
+
+GeoClient * client = NULL;
 
 void mainLoop(GLFWwindow * window)
 {
@@ -165,7 +171,6 @@ void mainLoop(GLFWwindow * window)
     ImGui_ImplGlfwGL3_NewFrame();
 #endif
 
-    GeoClient * client = NULL;
 
     {
         if (ImGui::BeginMainMenuBar())
@@ -336,9 +341,11 @@ void mainLoop(GLFWwindow * window)
         ImGui::End();
     }
     
-    logPanel.Draw("Log", &showLogPanel);
+    if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
 
     canvas->render();
+    
+    if(client) { client->pickRenderables(canvas->getCursorPosWC()) ;}
 
     geosTestCanvas->setEnabled(showSceneViewPanel);
 

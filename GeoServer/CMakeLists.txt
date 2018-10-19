@@ -24,4 +24,7 @@ link_libraries(${Boost_LIBRARIES})
 link_libraries(${GDAL_LIBRARY})
 link_libraries(${GEOS_LIBRARY})
 
+set(sourcePath "${CMAKE_CURRENT_SOURCE_DIR}../")
+add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")
+
 add_executable(geoServer src/GeoServer.cpp src/main.cpp)

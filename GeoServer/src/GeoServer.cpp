@@ -122,7 +122,7 @@ string GeoServer::addGeoFile(const string & geomFile)
         dmess("g " << get<1>(g));
     }
 
-    //*
+    /*
     for(size_t i = 0; i < geoms.size(); ++i)
     {
         Geometry * A = get<0>(geoms[i]);
@@ -162,7 +162,7 @@ string GeoServer::addGeoFile(const string & geomFile)
                 get<0>(geoms[j]) = diff;
             }
 
-            /*
+            *
             if(!contains && !touches && intersects)
             {
                 Geometry * diff = B->difference(A);
@@ -178,7 +178,6 @@ string GeoServer::addGeoFile(const string & geomFile)
 
                 get<0>(geoms[j]) = diff;
             }
-            //*/
         }
     }
     //*/
@@ -296,6 +295,8 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
                 {
                     const uint32_t geomID = *(const uint32_t *)dataPtr;
 
+                    dmess("geomID " << geomID);
+
                     pool.push([hdl, s, server, requestID, geomID](int ID)
                     {
                         const WkbGeom & geom = server->getGeom(geomID);
@@ -310,7 +311,7 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                         *(uint32_t *)ptr = geom.second; ptr += sizeof(uint32_t);
 
-                        dmess("geom.second " << geom.second);
+                        //dmess("geom.second " << geom.second);
 
                         memcpy(ptr, geom.first.c_str(), geom.second);
 
@@ -361,8 +362,14 @@ void GeoServer::start()
     try
     {
         // Set logging settings
-        serverEndPoint.set_access_channels(websocketpp::log::alevel::all);
-        serverEndPoint.clear_access_channels(websocketpp::log::alevel::frame_payload);
+        //serverEndPoint.set_access_channels(websocketpp::log::alevel::all);
+        //serverEndPoint.clear_access_channels(websocketpp::log::alevel::frame_payload);
+
+        // this will turn off console output for frame header and payload
+        serverEndPoint.clear_access_channels(websocketpp::log::alevel::frame_header | websocketpp::log::alevel::frame_payload); 
+        
+        // this will turn off everything in console output
+        serverEndPoint.clear_access_channels(websocketpp::log::alevel::all); 
 
         Server::connection_type; // Does nothing?
 

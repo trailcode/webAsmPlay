@@ -37,6 +37,7 @@
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Polygon.h>
 #include <geos/io/WKTReader.h>
+#include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
@@ -48,12 +49,11 @@ using namespace std;
 using namespace glm;
 using namespace geos::io;
 using namespace geos::geom;
+using namespace geos::index::quadtree;
 
 typedef unordered_map<size_t, GeoRequestGetNumGeoms *> NumGeomsRequests;
 typedef unordered_map<size_t, GeoRequestLayerBounds *> LayerBoundsRequests;
 typedef unordered_map<size_t, GeoRequestGeometry    *> GeometryRequests;
-
-typedef vector<const Geometry *> GeomVector;
 
 namespace
 {
@@ -70,12 +70,12 @@ GeoClient::GeoClient(GLFWwindow * window)
 
     // We expect there to be a lot of errors, so suppress them
     client->clear_access_channels(websocketpp::log::alevel::all);
-    client->clear_error_channels(websocketpp::log::elevel::all);
+    client->clear_error_channels (websocketpp::log::elevel::all);
    
     // Initialize ASIO
     client->init_asio();
 
-    client->set_open_handler(bind(&on_open, this, placeholders::_1));
+    client->set_open_handler   (bind(&on_open,    this, placeholders::_1));
     client->set_message_handler(bind(&on_message, this, placeholders::_1, placeholders::_2));
 
     websocketpp::lib::error_code ec;
@@ -108,6 +108,8 @@ GeoClient::GeoClient(GLFWwindow * window)
     std::this_thread::sleep_for(std::chrono::milliseconds(150)); // Find a better way
 
 #endif
+
+    quadTree = new Quadtree();
 }
 
 GeoClient::~GeoClient()
@@ -278,57 +280,91 @@ void GeoClient::onMessage(const string & data)
     }
 }
 
+void GeoClient::createRenderiables(GeomVector * _geoms, const mat4 trans, Canvas * canvas)
+{
+    GeomVector & geoms = *_geoms;
+    //for(const Geometry * g : *geoms)
+    for(int i = geoms.size() - 1; i >= 0; --i)
+    {
+        const Geometry * g = geoms[i];
+
+        Renderable * r = Renderable::create(g, trans);
+        
+        if(!r) { continue ;}
+        
+        quadTree->insert(g->getEnvelopeInternal(), r);
+    }
+
+    dmess("quadTree " << quadTree->depth() << " " << geoms.size());
+    
+    Renderable * r = RenderablePolygon::create(geoms, trans);
+    
+    delete _geoms;
+    
+    r->setFillColor(vec4(0.3,0.0,0.3,0.3));
+    
+    r->setOutlineColor(vec4(0,1,0,1));
+    
+    canvas->addRenderiable(r);
+    
+    dmess("Done creating renderiable.");
+}
+
 void GeoClient::loadGeometry(Canvas * canvas)
 {
     dmess("GeoClient::loadGeometry");
 
-    GeoClient * _ = this;
-
+    // TODO we need a class to hold the request data. What if there are multiple calls to this function and one or more has not finished.
+    
     GeomVector * geoms = new GeomVector;
 
-    std::function<void (const size_t)> getNumGeomsFunctor = [_, canvas, geoms](const size_t numGeoms)
+    std::function<void (const size_t)> getNumGeomsFunctor = [this, canvas, geoms](const size_t numGeoms)
     {
-        _->getLayerBounds([_, numGeoms, canvas, geoms](const AABB2D & bounds)
+        getLayerBounds([this, numGeoms, canvas, geoms](const AABB2D & bounds)
         {
             const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
 
-            const mat4 trans = translate(   
-                                            //mat4(1.0),
-                                            s,
-                                            vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
-                                                    (get<1>(bounds) + get<3>(bounds)) * -0.5,
-                                                    0.0));
+            trans = translate(  s,
+                                vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
+                                     (get<1>(bounds) + get<3>(bounds)) * -0.5,
+                                     0.0));
+            
+            inverseTrans = inverse(trans);
 
-            std::function<void (Geometry *)> getGeom = [trans,
+            std::function<void (Geometry *)> getGeom = [this,
                                                         canvas,
                                                         numGeoms,
                                                         geoms](Geometry * geom)
             {
                 geoms->push_back(geom);
 
-                if(geoms->size() == numGeoms)
-                {
-                    dmess("Done!");
-
-                    Renderable * r = RenderablePolygon::create(*geoms, trans);
-
-                    delete geoms;
-
-                    r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-                        
-                    r->setOutlineColor(vec4(0,1,0,1));
-
-                    canvas->addRenderiable(r);
-
-                    dmess("Done creating renderiable.");
-                }
+                if(geoms->size() == numGeoms) { createRenderiables(geoms, trans, canvas) ;}
             };
 
-            for(size_t i = 0; i < numGeoms; ++i) { _->getGeometry(i, getGeom) ;}
+            for(size_t i = 0; i < numGeoms; ++i) { getGeometry(i, getGeom) ;}
         });
     };
 
     getNumGeoms(getNumGeomsFunctor);
+}
+
+vector<Renderable *> GeoClient::pickRenderables(const vec3 & _pos)
+{
+    vec4 pos = inverseTrans * vec4(_pos, 1.0);
+    
+    //dmess("pos " << pos);
+
+    vector<Renderable *> ret;
+    
+    vector< void * > query;
+    
+    Envelope bounds(pos.x, pos.x, pos.y, pos.y);
+    
+    quadTree->query(&bounds, query);
+    
+    //dmess("query " << query.size());
+    
+    return ret;
 }
 
 #ifndef __EMSCRIPTEN__

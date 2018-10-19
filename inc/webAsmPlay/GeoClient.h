@@ -11,6 +11,7 @@
 #include <functional>
 #include <vector>
 #include <unordered_map>
+#include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
 
 class GLFWwindow;
@@ -18,12 +19,21 @@ class GeoRequestGetNumGeoms;
 class GeoRequestLayerBounds;
 class GeoRequestGeometry;
 class Canvas;
+class Renderable;
 
 namespace geos
 {
     namespace geom
     {
         class Geometry;
+    }
+    
+    namespace index
+    {
+        namespace quadtree
+        {
+            class Quadtree;
+        }
     }
 }
 
@@ -44,13 +54,24 @@ public:
     void getGeometry(const size_t geomIndex, std::function<void (geos::geom::Geometry *)> & callback);
 
     void loadGeometry(Canvas * canvas);
+    
+    std::vector<Renderable *> pickRenderables(const glm::vec3 & pos);
 
 private:
-
+    
+    typedef std::vector<const geos::geom::Geometry *> GeomVector;
+    
+    void createRenderiables(GeomVector * geoms, const glm::mat4 trans, Canvas * canvas);
+    
+    geos::index::quadtree::Quadtree * quadTree;
+    
+    glm::mat4 trans;
+    glm::mat4 inverseTrans;
+    
 #ifndef __EMSCRIPTEN__
 
     static void on_open(GeoClient * client, websocketpp::connection_hdl hdl);
-
+    
     // pull out the type of messages sent by our config
     typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
