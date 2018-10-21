@@ -13,16 +13,35 @@ using namespace geos::geom;
 
 PolygonWrapper::PolygonWrapper(const Polygon * poly)
 {
-    writeLineString(poly->getExteriorRing());
+    convert(poly, data);
+}
+
+void PolygonWrapper::convert(const Polygon * poly, stringstream & data)
+{
+    convert(poly->getExteriorRing(), data);
 
     const uint32_t numInteriorRings = poly->getNumInteriorRing();
 
     data.write(reinterpret_cast<const char*>(&numInteriorRings), sizeof(uint32_t));
 
-    for(size_t i = 0; i < numInteriorRings; ++i) { writeLineString(poly->getInteriorRingN(i)) ;}
+    for(size_t i = 0; i < numInteriorRings; ++i) { convert(poly->getInteriorRingN(i), data) ;}
+}
+
+void PolygonWrapper::convert(const vector<const Polygon *> & polygons, stringstream & data)
+{
+    const uint32_t numPolygons = polygons.size();
+
+    data.write(reinterpret_cast<const char*>(&numPolygons), sizeof(uint32_t));
+
+    for(size_t i = 0; i < numPolygons; ++i) { convert(polygons[i], data) ;}
 }
 
 void PolygonWrapper::writeLineString(const LineString * lineString)
+{
+    convert(lineString, data);
+}
+
+void PolygonWrapper::convert(const LineString * lineString, stringstream & data)
 {
     const vector<Coordinate> & coords = *lineString->getCoordinatesRO()->toVector();
 
@@ -73,6 +92,17 @@ Polygon * PolygonWrapper::getGeosPolygon(const char *& poly)
     }
 
     return factory->createPolygon(externalRing, holes);
+}
+
+vector<Polygon *> PolygonWrapper::getGeosPolygons(const char *& polys)
+{
+    const uint32_t numPolygons = *(uint32_t *)polys; polys += sizeof(uint32_t);
+
+    vector<Polygon *> ret(numPolygons);
+
+    for(size_t i = 0; i < numPolygons; ++i) { ret[i] = getGeosPolygon(polys) ;}
+
+    return ret;
 }
 
 const stringstream & PolygonWrapper::getDataRef() const { return data ;}
