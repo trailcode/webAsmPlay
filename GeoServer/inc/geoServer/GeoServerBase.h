@@ -16,6 +16,8 @@ public:
         GET_GEOMETRY_RESPONCE,
         GET_LAYER_BOUNDS_REQUEST,
         GET_LAYER_BOUNDS_RESPONCE,
+        GET_ALL_GEOMETRIES_REQUEST,
+        GET_ALL_GEOMETRIES_RESPONCE,
     };
 
     //typedef std::pair<unsigned char *, const size_t> WkbGeom;

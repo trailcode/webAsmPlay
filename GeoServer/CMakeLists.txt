@@ -10,11 +10,12 @@ find_package(gdal REQUIRED)
 find_package(websocketpp REQUIRED)
 find_package(geos REQUIRED)
 
+message("${GEOS_INCLUDE_DIR}")
 
+include_directories(${GEOS_INCLUDE_DIR})
 include_directories(./inc)
 include_directories(../inc)
 include_directories(../ctpl)
-include_directories(${GEOS_INCLUDE_DIR})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GDAL_INCLUDE_DIR})
 include_directories(${Websocketpp_INCLUDE_DIRS})
@@ -22,9 +23,13 @@ include_directories(${Websocketpp_INCLUDE_DIRS})
 
 link_libraries(${Boost_LIBRARIES})
 link_libraries(${GDAL_LIBRARY})
-link_libraries(${GEOS_LIBRARY})
+link_libraries(${GEOS_LIBRARIES})
+link_libraries(/usr/local/Cellar/geos/3.7.0/lib/libgeos-3.7.0.dylib)
+
+message("${GEOS_LIBRARIES}")
+message("${GDAL_LIBRARY}")
 
 set(sourcePath "${CMAKE_CURRENT_SOURCE_DIR}../")
 add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")
 
-add_executable(geoServer src/GeoServer.cpp src/main.cpp)
+add_executable(geoServer ../src/PolygonWrapper.cpp src/GeoServer.cpp src/main.cpp)

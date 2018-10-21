@@ -1,0 +1,149 @@
+cmake_minimum_required(VERSION 2.8.9)
+project(geoServer)
+set(CMAKE_BUILD_TYPE Debug)
+
+set (CMAKE_CXX_STANDARD 11)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+
+find_package(Boost COMPONENTS filesystem REQUIRED)
+#find_package(gdal REQUIRED)
+find_package(websocketpp REQUIRED)
+#find_package(geos REQUIRED)
+find_package(json-c REQUIRED)
+find_package(zlib REQUIRED)
+#find_package(tiff REQUIRED)
+find_package(expat REQUIRED)
+find_package(iconv REQUIRED)
+
+
+file(GLOB geosSrc   "../geos/src/util/*.cpp"
+                    "../geos/src/geom/*.cpp"
+                    "../geos/src/index/bintree/*.cpp"
+                    "../geos/src/index/chain/*.cpp"
+                    "../geos/src/index/intervalrtree/*.cpp"
+                    "../geos/src/index/quadtree/*.cpp"
+                    "../geos/src/index/strtree/*.cpp"
+                    "../geos/src/index/sweepline/*.cpp"
+                    "../geos/src/geom/prep/*.cpp"
+                    "../geos/src/geom/util/*.cpp"
+                    "../geos/src/io/*.cpp"
+                    "../geos/src/algorithm/*.cpp"
+                    "../geos/src/algorithm/distance/*.cpp"
+                    "../geos/src/algorithm/locate/*.cpp"
+                    "../geos/src/geomgraph/*.cpp"
+                    "../geos/src/geomgraph/index/*.cpp"
+                    "../geos/src/noding/*.cpp"
+                    "../geos/src/noding/snapround/*.cpp"
+                    "../geos/src/operation/*.cpp"
+                    "../geos/src/operation/buffer/*.cpp"
+                    "../geos/src/operation/distance/*.cpp"
+                    "../geos/src/operation/intersection/*.cpp"
+                    "../geos/src/operation/linemerge/*.cpp"
+                    "../geos/src/operation/overlay/*.cpp"
+                    "../geos/src/operation/overlay/validate/*.cpp"
+                    "../geos/src/operation/overlay/snap/*.cpp"
+                    "../geos/src/operation/polygonize/*.cpp"
+                    "../geos/src/operation/predicate/*.cpp"
+                    "../geos/src/operation/relate/*.cpp"
+                    "../geos/src/operation/sharedpaths/*.cpp"
+                    "../geos/src/operation/union/*.cpp"
+                    "../geos/src/operation/valid/*.cpp"
+                    "../geos/src/planargraph/*.cpp"
+                    "../geos/src/planargraph/algorithm/*.cpp"
+                    "../geos/src/precision/*.cpp"
+                    "../geos/src/linearref/*.cpp"
+                    "../geos/src/simplify/*.cpp")
+
+file(GLOB gdalCodeSrc   "/Users/trailcode/gdal-2.3.2/gcore/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/gcore/mdreader/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/port/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/frmts/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/frmts/mem/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/frmts/vrt/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/frmts/raw/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/frmts/derived/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/frmts/derived/*.c"
+                        "/Users/trailcode/gdal-2.3.2/frmts/gtiff/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/frmts/gtiff/*.c"
+                        "/Users/trailcode/gdal-2.3.2/frmts/gtiff/libgeotiff/*.c"
+                        "/Users/trailcode/gdal-2.3.2/frmts/gtiff/libtiff/*.c"
+                        #"/Users/trailcode/gdal-2.3.2/frmts/hfa/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/frmts/hfa/hfa_overviews.cpp"
+                        "/Users/trailcode/gdal-2.3.2/alg/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/alg/*.c"
+                        "/Users/trailcode/gdal-2.3.2/apps/gdalbuildvrt_lib.cpp"
+                        "/Users/trailcode/gdal-2.3.2/apps/ogr2ogr_lib.cpp"
+                        "/Users/trailcode/gdal-2.3.2/apps/commonutils.cpp"
+                        #"/Users/trailcode/gdal-2.3.2/apps/daltransformer.cpp"
+                        "/Users/trailcode/gdal-2.3.2/ogr/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/ogr/*.c"
+                        "/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts/generic/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts/mem/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts/mitab/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts/geojson/*.cpp"
+                        "/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts/kml/*.cpp"
+                    )
+
+file(GLOB gdalSources ${gdalCodeSrc})
+
+include_directories(./inc)
+include_directories(../inc)
+include_directories(../ctpl)
+include_directories(/Users/trailcode/gdal-2.3.2/gcore)
+include_directories(/Users/trailcode/gdal-2.3.2/ogr)
+include_directories(/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts/geojson/libjson)
+include_directories(/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts/geojson)
+include_directories(/Users/trailcode/gdal-2.3.2/port)
+include_directories(/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts)
+include_directories(/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts/geojson/libjson)
+include_directories(/Users/trailcode/gdal-2.3.2/frmts/gtiff)
+include_directories(/Users/trailcode/gdal-2.3.2/frmts/vrt)
+include_directories(/Users/trailcode/gdal-2.3.2/frmts/raw)
+include_directories(/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts/mem)
+include_directories(/Users/trailcode/gdal-2.3.2/ogr/ogrsf_frmts/generic)
+include_directories(/Users/trailcode/gdal-2.3.2/alg)
+include_directories(/Users/trailcode/gdal-2.3.2/apps)
+include_directories(/Users/trailcode/gdal-2.3.2/gnm)
+
+include_directories(../geos/include)
+#include_directories(${GEOS_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIRS})
+#include_directories(${GDAL_INCLUDE_DIR})
+include_directories(${Websocketpp_INCLUDE_DIRS})
+include_directories(${ICONV_INCLUDE_DIR})
+message("${ICONV_INCLUDE_DIR}")
+
+
+
+
+link_libraries(${Boost_LIBRARIES})
+#link_libraries(${GDAL_LIBRARY})
+#link_libraries(${GEOS_LIBRARY})
+link_libraries(${JSON-C_LIBRARY})
+link_libraries(${ZLIB_LIBRARY})
+#link_libraries(${TIFF_LIBRARY})
+link_libraries(${EXPAT_LIBRARY})
+#link_libraries(${ICONV_LIBRARIES})
+link_libraries("/opt/local/lib/libiconv.dylib")
+message("${ICONV_LIBRARIES}")
+
+
+set(sourcePath "${CMAKE_CURRENT_SOURCE_DIR}../")
+add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")
+
+add_definitions(-DGDAL_COMPILATION)
+add_definitions(-DGDAL_RELEASE_NAME=\"gdalMLT\")
+add_definitions(-DHAVE_EXPAT)
+add_definitions(-DHAVE_LIBZ)
+add_definitions(-DHAVE_ICONV)
+add_definitions(-DHAVE_FCNTL_H)
+add_definitions(-DINTERNAL_LIBGEOTIFF)
+
+add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
+
+#add_executable(geoServer ${geosSrc} src/GeoServer.cpp src/main.cpp)
+add_executable(geoServer
+                ${geosSrc}
+                ${gdalCodeSrc}
+                src/GeoServer.cpp src/main.cpp ../src/PolygonWrapper.cpp)

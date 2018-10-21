@@ -95,6 +95,7 @@ file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
                             "src/GridPlane.cpp"
                             "src/AppLog.cpp"
                             "src/K2DTree.cpp"
+                            "src/PolygonWrapper.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
                             ${tceOpenSteer_SRC}

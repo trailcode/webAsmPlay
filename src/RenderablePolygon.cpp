@@ -56,7 +56,7 @@ RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(const 
 
     const LineString * ring = poly->getExteriorRing();
 
-    const vector<Coordinate> & coords = *ring->getCoordinates()->toVector();
+    const vector<Coordinate> & coords = *ring->getCoordinatesRO()->toVector();
 
     if(coords.size() < 4)
     {

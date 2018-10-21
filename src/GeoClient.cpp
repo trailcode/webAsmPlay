@@ -37,6 +37,7 @@
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Polygon.h>
 #include <geos/io/WKTReader.h>
+#include <geos/io/WKBReader.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Debug.h>
@@ -246,9 +247,31 @@ void GeoClient::onMessage(const string & data)
 
             const uint32_t dataSize = *(uint32_t *)ptr; ptr += sizeof(uint32_t);
 
+            dmess("requestID " << requestID);
+
+            //*
             WKTReader reader(GeometryFactory::getDefaultInstance());
 
             Geometry * geom = reader.read(string(ptr));
+            //*/
+
+            /*
+            WKBReader reader(*GeometryFactory::getDefaultInstance());
+
+            struct MemBuf : streambuf
+            {
+                MemBuf(char* begin, char* end) {
+                    this->setg(begin, begin, end);
+                }
+            };
+
+            MemBuf buf(ptr, ptr + dataSize);
+
+            std::istream in(&buf);
+
+            //Geometry * geom = reader.read(string(ptr));
+            Geometry * geom = reader.read(in);
+            */
 
             GeometryRequests::const_iterator i = geometryRequests.find(requestID);
 

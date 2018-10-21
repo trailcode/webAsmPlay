@@ -4,6 +4,8 @@
 #include "ogrsf_frmts.h"
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Types.h>
+#include <webAsmPlay/PolygonWrapper.h>
+
 #include <geoServer/GeoServer.h>
 
 using namespace std;
@@ -55,6 +57,7 @@ string GeoServer::addGeoFile(const string & geomFile)
     size_t c = 0;
 
     const GEOSContextHandle_t gctx = OGRGeometry::createGEOSContext();
+    //const GEOSContextHandle_t gctx = 0;
 
     typedef pair<Geometry *, double> GeomAndArea;
 
@@ -87,9 +90,9 @@ string GeoServer::addGeoFile(const string & geomFile)
 
         if(area < simplifyAmount)
         {
-            dmess("geom " << geom << " " << area);
+            dmess("geom " << geom << " " << area << " type " << geom->getGeometryType());
 
-            continue;
+            //continue;
         }
 
         geoms.push_back(GeomAndArea(geom, area));
@@ -119,7 +122,7 @@ string GeoServer::addGeoFile(const string & geomFile)
 
     for(const GeomAndArea & g : geoms)
     {
-        dmess("g " << get<1>(g));
+        dmess("g " << get<1>(g) << " " << get<0>(g)->getGeometryType());
     }
 
     /*
@@ -208,6 +211,7 @@ string GeoServer::addGeoFile(const string & geomFile)
     */
 
     WKTWriter * wkt = new WKTWriter();
+    WKBWriter * wkb = new WKBWriter();
 
     wkt->setOutputDimension(2);
 
@@ -217,26 +221,58 @@ string GeoServer::addGeoFile(const string & geomFile)
     {
         //dmess("g " << get<1>(g));
 
+        if(!dynamic_cast<const Polygon *>(get<0>(g)))
+        {
+            string s = get<0>(g)->getGeometryType();
+
+            dmess("Not a poly! "  << s);
+
+            continue;
+        }
+
+        //PolygonWrapper pw(dynamic_cast<const Polygon *>(get<0>(g)));
+
         OGRGeometry * gg = OGRGeometryFactory::createFromGEOS(gctx, (GEOSGeom_t *)get<0>(g));
 
         //dmess(gg);
 
         char * data;
-
+        //*
         //poGeometry->exportToWkt(&data);
         gg->exportToWkt(&data);
 
         //dmess("data " << data);
+        
 
         string wktStr(data);
 
+        dmess("wktStr.length() " << wktStr.length());
+
         wkbGeoms.push_back(WkbGeom(wktStr, wktStr.length()));
+        //*/
 
         /*
         string wktStr = wkt->write(get<0>(g));
 
         wkbGeoms.push_back(WkbGeom(wktStr, wktStr.length()));
-        */
+        //*/
+
+        if(!get<0>(g))
+        {
+            dmess("Empty");
+
+            continue;
+        }
+
+       /*
+       stringstream s(ios_base::binary|ios_base::in|ios_base::out);
+
+       wkb->write(*get<0>(g), s);
+
+       string ss = s.str();
+
+       wkbGeoms.push_back(WkbGeom(ss, ss.length()));
+       //*/
     }
 
     OGREnvelope extent;
@@ -343,6 +379,28 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                     break;
                 }
+
+            case GET_ALL_GEOMETRIES_REQUEST:
+                
+                pool.push([hdl, s, server, requestID](int ID)
+                {
+                    /*
+                    vector<char> data(sizeof(char) + sizeof(uint32_t) + sizeof(AABB2D)); // TODO make a AABB2D class
+
+                    data[0] = GET_LAYER_BOUNDS_RESPONCE;
+
+                    char * ptr = &data[1];
+
+                    *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
+
+                    *((AABB2D *)ptr) = AABB2D(  server->boundsMinX,
+                                                server->boundsMinY,
+                                                server->boundsMaxX,
+                                                server->boundsMaxY);
+
+                    s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
+                    */
+                });
 
             default:
 

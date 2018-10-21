@@ -49,7 +49,7 @@ Renderable * RenderableLineString::create(  const LineString    * lineString,
         return NULL;
     }
 
-    const vector<Coordinate> & coords = *lineString->getCoordinates()->toVector();
+    const vector<Coordinate> & coords = *lineString->getCoordinatesRO()->toVector();
 
     if(coords.size() < 2)
     {
