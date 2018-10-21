@@ -21,7 +21,7 @@ public:
 
     static geos::geom::Polygon * getGeosPolygon(const char *& poly);
 
-    static std::vector<geos::geom::Polygon *> getGeosPolygons(const char *& polys);
+    static std::vector<geos::geom::Geometry *> getGeosPolygons(const char *& polys);
 
     static geos::geom::CoordinateSequence * getGeosCoordinateSequence(const char *& lineString);
 

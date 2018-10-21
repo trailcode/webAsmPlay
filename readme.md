@@ -39,7 +39,7 @@ and allow C++ 17 compilation:
 * OpenSteer http://opensteer.sourceforge.net
 * Ctpl https://github.com/vit-vit/CTPL
 * Glm https://glm.g-truc.net/0.9.9/index.html
-* GLUTesselator https://github.com/mbebenita/GLUTesselator
+* GLUTessellator https://github.com/mbebenita/GLUTesselator
 * Native Dear Imgui https://github.com/ocornut/imgui
 * Emscripten Dear Imgui https://github.com/greggman/doodles/tree/master/glfw-imgui
 * Websocketpp https://github.com/zaphoyd/websocketpp

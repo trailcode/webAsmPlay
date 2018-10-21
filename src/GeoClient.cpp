@@ -53,15 +53,17 @@ using namespace geos::io;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
 
-typedef unordered_map<size_t, GeoRequestGetNumGeoms *> NumGeomsRequests;
-typedef unordered_map<size_t, GeoRequestLayerBounds *> LayerBoundsRequests;
-typedef unordered_map<size_t, GeoRequestGeometry    *> GeometryRequests;
+typedef unordered_map<size_t, GeoRequestGetNumGeoms      *> NumGeomsRequests;
+typedef unordered_map<size_t, GeoRequestLayerBounds      *> LayerBoundsRequests;
+typedef unordered_map<size_t, GeoRequestGeometry         *> GeometryRequests;
+typedef unordered_map<size_t, GetRequestGetAllGeometries *> GetAllGeometriesRequests;
 
 namespace
 {
-    NumGeomsRequests    numGeomsRequests;
-    LayerBoundsRequests layerBoundsRequests;
-    GeometryRequests    geometryRequests;
+    NumGeomsRequests            numGeomsRequests;
+    LayerBoundsRequests         layerBoundsRequests;
+    GeometryRequests            geometryRequests;
+    GetAllGeometriesRequests    getAllGeometriesRequests;
 }
 
 GeoClient::GeoClient(GLFWwindow * window)
@@ -181,6 +183,33 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 #endif
 }
 
+void GeoClient::getAllGeometries(function<void (vector<Geometry *> geoms)> callback)
+{
+    dmess("getAllGeometries");
+
+    GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
+
+    getAllGeometriesRequests[request->ID] = request;
+
+#ifdef __EMSCRIPTEN__
+
+
+
+#else
+
+    vector<char> data(5);
+
+    data[0] = GeoServerBase::GET_ALL_GEOMETRIES_REQUEST;
+
+    char * ptr = &data[1];
+
+    *(uint32_t *)ptr = request->ID; ptr += sizeof(uint32_t);
+
+    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+
+#endif
+}
+
 void GeoClient::getGeometry(const size_t geomIndex, function<void (Geometry * geom)> & callback)
 {
     GeoRequestGeometry * request = new GeoRequestGeometry(callback);
@@ -246,15 +275,8 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
-            const uint32_t dataSize = *(uint32_t *)ptr; ptr += sizeof(uint32_t);
+            const uint32_t dataSize = *(uint32_t *)ptr; ptr += sizeof(uint32_t); // TODO Might not need
 
-            //dmess("requestID " << requestID);
-
-            /*
-            WKTReader reader(GeometryFactory::getDefaultInstance());
-
-            Geometry * geom = reader.read(string(ptr));
-            //*/
             const char * ptr2 = ptr;
 
             Geometry * geom = PolygonWrapper::getGeosPolygon(ptr2);
@@ -288,8 +310,33 @@ void GeoClient::onMessage(const string & data)
             break;
         }
 
+        case GeoServerBase::GET_ALL_GEOMETRIES_RESPONCE:
+        {
+            dmess("GET_ALL_GEOMETRIES_RESPONCE");
+
+            const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
+
+            dmess("requestID " << requestID);
+            
+            const char * ptr2 = ptr;
+
+            GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
+
+            dmess("i->second " << i->second);
+
+            unique_ptr<GetRequestGetAllGeometries> request(i->second);
+
+            request->callback(PolygonWrapper::getGeosPolygons(ptr2));
+
+            getAllGeometriesRequests.erase(i);
+
+            break;
+        }
+
         case GeoServerBase::GET_LAYER_BOUNDS_RESPONCE:
         {
+            dmess("GET_LAYER_BOUNDS_RESPONCE");
+
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
             const AABB2D & bounds = *(AABB2D *)ptr;
@@ -373,6 +420,64 @@ void GeoClient::loadGeometry(Canvas * canvas)
     };
 
     getNumGeoms(getNumGeomsFunctor);
+}
+
+void GeoClient::loadAllGeometry(Canvas * canvas)
+{
+    dmess("GeoClient::loadAllGeometry");
+
+    GeomVector * geomsOut = new GeomVector;
+
+    getAllGeometries([this, canvas, geomsOut](vector<Geometry *> geomsIn)
+    {
+        dmess("geomsIn " << geomsIn.size());
+
+        getLayerBounds([this, canvas, geomsOut, geomsIn](const AABB2D & bounds)
+        {
+            const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
+
+            trans = translate(  s,
+                                vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
+                                     (get<1>(bounds) + get<3>(bounds)) * -0.5,
+                                     0.0));
+            
+            inverseTrans = inverse(trans);
+
+            dmess("    geomsIn " << geomsIn.size());
+            
+            /*
+            //createRenderiables(&geomsIn, trans, canvas);
+            for(int i = geoms.size() - 1; i >= 0; --i)
+            {
+                const Geometry * g = geoms[i];
+
+                Renderable * r = Renderable::create(g, trans);
+                
+                if(!r) { continue ;}
+                
+                quadTree->insert(g->getEnvelopeInternal(), r);
+            }
+
+            dmess("quadTree " << quadTree->depth() << " " << geoms.size());
+            */
+            
+            vector<const Geometry *> polys(geomsIn.size());
+
+            for(size_t i = 0; i < polys.size(); ++i) { polys[i] = dynamic_cast<const Geometry *>(geomsIn[i]) ;}
+
+            Renderable * r = RenderablePolygon::create(polys, trans);
+            
+            //delete _geoms;
+            
+            r->setFillColor(vec4(0.3,0.0,0.3,0.3));
+            
+            r->setOutlineColor(vec4(0,1,0,1));
+            
+            canvas->addRenderiable(r);
+            
+            dmess("Done creating renderiable.");
+        });
+    });
 }
 
 vector<Renderable *> GeoClient::pickRenderables(const vec3 & _pos)

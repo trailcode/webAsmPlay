@@ -12,6 +12,8 @@ find_package(geos REQUIRED)
 
 message("${GEOS_INCLUDE_DIR}")
 
+message("boost ${Boost_INCLUDE_DIRS}")
+
 include_directories(${GEOS_INCLUDE_DIR})
 include_directories(./inc)
 include_directories(../inc)

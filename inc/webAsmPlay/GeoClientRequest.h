@@ -59,4 +59,19 @@ private:
     const size_t ID;
 };
 
+class GetRequestGetAllGeometries
+{
+public:
+
+    GetRequestGetAllGeometries(const std::function<void (std::vector<geos::geom::Geometry *> geoms)> & callback);
+
+private:
+
+    friend class GeoClient;
+
+    const std::function<void (std::vector<geos::geom::Geometry *> geoms)> callback;
+
+    const size_t ID;
+};
+
 #endif // __WEB_ASM_PLAY_GEO_CLIENT_REQUEST_H__

@@ -195,34 +195,48 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
                     break;
                 }
 
-            case GET_LAYER_BOUNDS_REQUEST:
-                {
-                    pool.push([hdl, s, server, requestID](int ID)
-                    {
-                        vector<char> data(sizeof(char) + sizeof(uint32_t) + sizeof(AABB2D)); // TODO make a AABB2D class
-
-                        data[0] = GET_LAYER_BOUNDS_RESPONCE;
-
-                        char * ptr = &data[1];
-
-                        *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
-
-                        *((AABB2D *)ptr) = AABB2D(  server->boundsMinX,
-                                                    server->boundsMinY,
-                                                    server->boundsMaxX,
-                                                    server->boundsMaxY);
-
-                        s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
-                    });
-
-                    break;
-                }
-
             case GET_ALL_GEOMETRIES_REQUEST:
                 
+                dmess("GET_ALL_GEOMETRIES_REQUEST");
+
                 pool.push([hdl, s, server, requestID](int ID)
                 {
-                    /*
+                    const vector<string> & serializedGeoms = server->serializedGeoms;
+
+                    const uint32_t numGeoms = serializedGeoms.size();
+
+                    uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
+
+                    for(uint i = 0; i < numGeoms; ++i) { bufferSize += serializedGeoms[i].length() ;}
+
+                    vector<char> data(bufferSize);
+
+                    char * ptr = &data[0];
+                    
+                    *ptr = GET_ALL_GEOMETRIES_RESPONCE; ptr += sizeof(char);
+
+                    *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
+
+                    *(uint32_t *)ptr = numGeoms; ptr += sizeof(uint32_t);
+
+                    for(const string & geom : serializedGeoms)
+                    {
+                        memcpy(ptr, geom.data(), geom.length()); 
+
+                        ptr += geom.length();
+                    }
+
+                    s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
+                });
+
+                break;
+
+            case GET_LAYER_BOUNDS_REQUEST:
+
+                dmess("GET_LAYER_BOUNDS_REQUEST");
+
+                pool.push([hdl, s, server, requestID](int ID)
+                {
                     vector<char> data(sizeof(char) + sizeof(uint32_t) + sizeof(AABB2D)); // TODO make a AABB2D class
 
                     data[0] = GET_LAYER_BOUNDS_RESPONCE;
@@ -237,8 +251,9 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
                                                 server->boundsMaxY);
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
-                    */
                 });
+
+                break;
 
             default:
 

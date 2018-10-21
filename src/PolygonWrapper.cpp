@@ -94,11 +94,11 @@ Polygon * PolygonWrapper::getGeosPolygon(const char *& poly)
     return factory->createPolygon(externalRing, holes);
 }
 
-vector<Polygon *> PolygonWrapper::getGeosPolygons(const char *& polys)
+vector<Geometry *> PolygonWrapper::getGeosPolygons(const char *& polys)
 {
     const uint32_t numPolygons = *(uint32_t *)polys; polys += sizeof(uint32_t);
 
-    vector<Polygon *> ret(numPolygons);
+    vector<Geometry *> ret(numPolygons);
 
     for(size_t i = 0; i < numPolygons; ++i) { ret[i] = getGeosPolygon(polys) ;}
 
