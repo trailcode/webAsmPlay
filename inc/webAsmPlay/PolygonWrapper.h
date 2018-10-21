@@ -23,6 +23,8 @@ public:
 
     static geos::geom::CoordinateSequence * getGeosCoordinateSequence(const char *& lineString);
 
+    const std::stringstream & getDataRef() const;
+
 private:
 
     void writeLineString(const geos::geom::LineString * lineString);

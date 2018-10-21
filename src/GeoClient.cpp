@@ -42,6 +42,7 @@
 #include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/PolygonWrapper.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GeoClient.h>
@@ -247,13 +248,16 @@ void GeoClient::onMessage(const string & data)
 
             const uint32_t dataSize = *(uint32_t *)ptr; ptr += sizeof(uint32_t);
 
-            dmess("requestID " << requestID);
+            //dmess("requestID " << requestID);
 
-            //*
+            /*
             WKTReader reader(GeometryFactory::getDefaultInstance());
 
             Geometry * geom = reader.read(string(ptr));
             //*/
+            const char * ptr2 = ptr;
+
+            Geometry * geom = PolygonWrapper::getGeosPolygon(ptr2);
 
             /*
             WKBReader reader(*GeometryFactory::getDefaultInstance());
@@ -271,7 +275,7 @@ void GeoClient::onMessage(const string & data)
 
             //Geometry * geom = reader.read(string(ptr));
             Geometry * geom = reader.read(in);
-            */
+            //*/
 
             GeometryRequests::const_iterator i = geometryRequests.find(requestID);
 

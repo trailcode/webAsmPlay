@@ -90,29 +90,12 @@ string GeoServer::addGeoFile(const string & geomFile)
 
         if(area < simplifyAmount)
         {
-            dmess("geom " << geom << " " << area << " type " << geom->getGeometryType());
+            //dmess("geom " << geom << " " << area << " type " << geom->getGeometryType());
 
             //continue;
         }
 
         geoms.push_back(GeomAndArea(geom, area));
-
-        //if(!g) dmess("poGeometry " << g);
-
-        //dmess("g->get_Area() " << g->area
-
-        /*
-        char * data;
-
-        //poGeometry->exportToWkt(&data);
-        g->exportToWkt(&data);
-
-        wkbGeoms.push_back(WkbGeom(data, strlen(data)));
-
-        OGRFeature::DestroyFeature( poFeature );
-        */
-
-        //if(++c > 100) { break ;}
     }
     
     sort(geoms.begin(), geoms.end(), [](const GeomAndArea & lhs, const GeomAndArea & rhs)
@@ -124,91 +107,6 @@ string GeoServer::addGeoFile(const string & geomFile)
     {
         dmess("g " << get<1>(g) << " " << get<0>(g)->getGeometryType());
     }
-
-    /*
-    for(size_t i = 0; i < geoms.size(); ++i)
-    {
-        Geometry * A = get<0>(geoms[i]);
-        
-        if(!A) { continue ;}
-
-        for(size_t j = i + 1; j < geoms.size(); ++j)
-        {
-            Geometry * B = get<0>(geoms[j]);
-
-            if(!B) { continue ;}
-
-            const bool contains   = B->contains(A);
-            const bool touches    = B->touches(A);
-            const bool intersects = B->intersects(A);
-
-            if(contains || touches || intersects)
-            {
-                //dmess("contains " << (int)contains << " touches " << (int)touches << " intersects " << (int)intersects);
-            }
-
-            if(contains)
-            {
-                Geometry * diff = B->difference(A);
-
-                if(!diff)
-                {
-                    dmess("Diff Error!");
-
-                    continue;
-                }
-
-                // TODO cleanup.
-
-                delete get<0>(geoms[j]);
-
-                get<0>(geoms[j]) = diff;
-            }
-
-            *
-            if(!contains && !touches && intersects)
-            {
-                Geometry * diff = B->difference(A);
-
-                if(!diff)
-                {
-                    dmess("Diff Error!");
-
-                    continue;
-                }
-
-                // TODO cleanup.
-
-                get<0>(geoms[j]) = diff;
-            }
-        }
-    }
-    //*/
-
-    /*
-    for(size_t i = 0; i < geoms.size(); ++i)
-    {
-        Geometry * A = get<0>(geoms[i]);
-        
-        if(!A) { continue ;}
-
-        for(size_t j = i + 1; j < geoms.size(); ++j)
-        {
-            Geometry * B = get<0>(geoms[j]);
-
-            if(!B) { continue ;}
-
-            const bool contains   = B->contains(A);
-            const bool touches    = B->touches(A);
-            const bool intersects = B->intersects(A);
-
-            if(contains || touches || intersects)
-            {
-                dmess("contains " << (int)contains << " touches " << (int)touches << " intersects " << (int)intersects);
-            }
-        }
-    }
-    */
 
     WKTWriter * wkt = new WKTWriter();
     WKBWriter * wkb = new WKBWriter();
@@ -232,12 +130,12 @@ string GeoServer::addGeoFile(const string & geomFile)
 
         //PolygonWrapper pw(dynamic_cast<const Polygon *>(get<0>(g)));
 
-        OGRGeometry * gg = OGRGeometryFactory::createFromGEOS(gctx, (GEOSGeom_t *)get<0>(g));
+        //OGRGeometry * gg = OGRGeometryFactory::createFromGEOS(gctx, (GEOSGeom_t *)get<0>(g));
 
         //dmess(gg);
 
         char * data;
-        //*
+        /*
         //poGeometry->exportToWkt(&data);
         gg->exportToWkt(&data);
 
@@ -246,7 +144,7 @@ string GeoServer::addGeoFile(const string & geomFile)
 
         string wktStr(data);
 
-        dmess("wktStr.length() " << wktStr.length());
+        //dmess("wktStr.length() " << wktStr.length());
 
         wkbGeoms.push_back(WkbGeom(wktStr, wktStr.length()));
         //*/
@@ -263,6 +161,40 @@ string GeoServer::addGeoFile(const string & geomFile)
 
             continue;
         }
+
+        //*
+        {
+        PolygonWrapper pw(dynamic_cast<const Polygon *>(get<0>(g)));
+
+        const stringstream & data = pw.getDataRef();
+
+        string d = data.str();
+
+        const char * dd = d.data();
+
+        char * ddd = new char[d.length()];
+
+        //memcpy(ddd, dd, d.length());
+        memcpy(ddd, data.str().data(), d.length());
+
+        wkbGeoms.push_back(WkbGeom(data.str(), 0));
+
+        /*
+        const char * dddd = ddd;
+        Geometry * gg = PolygonWrapper::getGeosPolygon(dddd);
+
+        dmess("d " << d.length() << " " << (int)(dddd - ddd));
+
+        stringstream s(ios_base::binary|ios_base::in|ios_base::out);
+
+       wkb->write(*gg, s);
+
+       string ss = s.str();
+
+       wkbGeoms.push_back(WkbGeom(ss, ss.length()));
+       //*/
+        }
+        //*/
 
        /*
        stringstream s(ios_base::binary|ios_base::in|ios_base::out);
@@ -331,13 +263,13 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
                 {
                     const uint32_t geomID = *(const uint32_t *)dataPtr;
 
-                    dmess("geomID " << geomID);
+                    //dmess("geomID " << geomID);
 
                     pool.push([hdl, s, server, requestID, geomID](int ID)
                     {
                         const WkbGeom & geom = server->getGeom(geomID);
                         
-                        vector<char> data(sizeof(char) + sizeof(uint32_t) * 2 + geom.second);
+                        vector<char> data(sizeof(char) + sizeof(uint32_t) * 2 + geom.first.length());
 
                         data[0] = GET_GEOMETRY_RESPONCE;
 
@@ -345,11 +277,13 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                         *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                        *(uint32_t *)ptr = geom.second; ptr += sizeof(uint32_t);
+                        //*(uint32_t *)ptr = geom.second; ptr += sizeof(uint32_t);
+                        *(uint32_t *)ptr = geom.first.length(); ptr += sizeof(uint32_t);
 
                         //dmess("geom.second " << geom.second);
 
-                        memcpy(ptr, geom.first.c_str(), geom.second);
+                        //memcpy(ptr, geom.first.c_str(), geom.second);
+                        memcpy(ptr, geom.first.data(), geom.first.length());
 
                         s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                     });

@@ -1,5 +1,6 @@
 #include <glm/vec2.hpp>
 #include <geos/geom/Polygon.h>
+#include <geos/geom/LinearRing.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/GeometryFactory.h>
@@ -43,14 +44,14 @@ CoordinateSequence * PolygonWrapper::getGeosCoordinateSequence(const char *& lin
 {
     const uint32_t numVerts = *(uint32_t *)lineString; lineString += sizeof(uint32_t);
 
-    vector<Coordinate> * coords = new vector<Coordinate>();
+    vector<Coordinate> * coords = new vector<Coordinate>(numVerts);
 
     for(size_t i = 0; i < numVerts; ++i)
     {
         const double x = *(double *)lineString; lineString += sizeof(double);
         const double y = *(double *)lineString; lineString += sizeof(double);
 
-        coords->push_back(Coordinate(x,y));
+        (*coords)[i] = Coordinate(x,y);
     }
 
     return new CoordinateArraySequence(coords, 2);
@@ -73,3 +74,5 @@ Polygon * PolygonWrapper::getGeosPolygon(const char *& poly)
 
     return factory->createPolygon(externalRing, holes);
 }
+
+const stringstream & PolygonWrapper::getDataRef() const { return data ;}

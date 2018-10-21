@@ -30,9 +30,8 @@ install third party dependencies. C++ 17 is being used.
 * Boost: https://www.boost.org/
 * Websocketpp: https://www.zaphoyd.com/websocketpp
 * Gdal: https://www.gdal.org/
+* Geos https://trac.osgeo.org/geos
 * SDL2_image: https://www.libsdl.org/
-* Json-c: https://github.com/json-c/json-c
-* Expat: https://libexpat.github.io/
 
 Some third party dependencies are built into the WebAsmPlay source tree to make emscripten compilation easer
 and allow C++ 17 compilation:  
