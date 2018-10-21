@@ -20,15 +20,6 @@ using namespace geos::geom;
 namespace
 {
     ctpl::thread_pool pool(1);
-
-    /*
-    struct MemBuf : std::streambuf
-    {
-        MemBuf(char* begin, char* end) {
-            this->setg(begin, begin, end);
-        }
-    };
-    */
 }
 
 GeoServer::GeoServer(const string & geomFile)
@@ -57,7 +48,6 @@ string GeoServer::addGeoFile(const string & geomFile)
     size_t c = 0;
 
     const GEOSContextHandle_t gctx = OGRGeometry::createGEOSContext();
-    //const GEOSContextHandle_t gctx = 0;
 
     typedef pair<Geometry *, double> GeomAndArea;
 
@@ -68,21 +58,6 @@ string GeoServer::addGeoFile(const string & geomFile)
         OGRGeometry * poGeometry = poFeature->GetGeometryRef();
 
         const double simplifyAmount = 0.00001;
-
-        /*
-        OGRGeometry * g = poGeometry->Simplify(simplifyAmount);
-
-        geos::geom::Geometry * geom = (geos::geom::Geometry *)g->exportToGEOS(gctx);
-
-        const double area = geom->getArea();
-
-        if(area < simplifyAmount)
-        {
-            dmess("geom " << geom << " " << area);
-
-            continue;
-        }
-        */
 
         Geometry * geom = (Geometry *)poGeometry->exportToGEOS(gctx);
 
@@ -117,8 +92,6 @@ string GeoServer::addGeoFile(const string & geomFile)
 
     for(const GeomAndArea & g : geoms)
     {
-        //dmess("g " << get<1>(g));
-
         if(!dynamic_cast<const Polygon *>(get<0>(g)))
         {
             string s = get<0>(g)->getGeometryType();
@@ -128,33 +101,6 @@ string GeoServer::addGeoFile(const string & geomFile)
             continue;
         }
 
-        //PolygonWrapper pw(dynamic_cast<const Polygon *>(get<0>(g)));
-
-        //OGRGeometry * gg = OGRGeometryFactory::createFromGEOS(gctx, (GEOSGeom_t *)get<0>(g));
-
-        //dmess(gg);
-
-        char * data;
-        /*
-        //poGeometry->exportToWkt(&data);
-        gg->exportToWkt(&data);
-
-        //dmess("data " << data);
-        
-
-        string wktStr(data);
-
-        //dmess("wktStr.length() " << wktStr.length());
-
-        wkbGeoms.push_back(WkbGeom(wktStr, wktStr.length()));
-        //*/
-
-        /*
-        string wktStr = wkt->write(get<0>(g));
-
-        wkbGeoms.push_back(WkbGeom(wktStr, wktStr.length()));
-        //*/
-
         if(!get<0>(g))
         {
             dmess("Empty");
@@ -162,49 +108,11 @@ string GeoServer::addGeoFile(const string & geomFile)
             continue;
         }
 
-        //*
-        {
         PolygonWrapper pw(dynamic_cast<const Polygon *>(get<0>(g)));
 
         const stringstream & data = pw.getDataRef();
-
-        string d = data.str();
-
-        const char * dd = d.data();
-
-        char * ddd = new char[d.length()];
-
-        //memcpy(ddd, dd, d.length());
-        memcpy(ddd, data.str().data(), d.length());
-
-        wkbGeoms.push_back(WkbGeom(data.str(), 0));
-
-        /*
-        const char * dddd = ddd;
-        Geometry * gg = PolygonWrapper::getGeosPolygon(dddd);
-
-        dmess("d " << d.length() << " " << (int)(dddd - ddd));
-
-        stringstream s(ios_base::binary|ios_base::in|ios_base::out);
-
-       wkb->write(*gg, s);
-
-       string ss = s.str();
-
-       wkbGeoms.push_back(WkbGeom(ss, ss.length()));
-       //*/
-        }
-        //*/
-
-       /*
-       stringstream s(ios_base::binary|ios_base::in|ios_base::out);
-
-       wkb->write(*get<0>(g), s);
-
-       string ss = s.str();
-
-       wkbGeoms.push_back(WkbGeom(ss, ss.length()));
-       //*/
+        
+        serializedGeoms.push_back(data.str());
     }
 
     OGREnvelope extent;
@@ -218,7 +126,7 @@ string GeoServer::addGeoFile(const string & geomFile)
 
     GDALClose( poDS );
 
-    dmess("wkbGeoms " << wkbGeoms.size());
+    dmess("serializedGeoms " << serializedGeoms.size());
 
     return geomFile;
 }
@@ -267,9 +175,9 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                     pool.push([hdl, s, server, requestID, geomID](int ID)
                     {
-                        const WkbGeom & geom = server->getGeom(geomID);
+                        const string & geom = server->getGeom(geomID);
                         
-                        vector<char> data(sizeof(char) + sizeof(uint32_t) * 2 + geom.first.length());
+                        vector<char> data(sizeof(char) + sizeof(uint32_t) * 2 + geom.length());
 
                         data[0] = GET_GEOMETRY_RESPONCE;
 
@@ -277,13 +185,9 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                         *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                        //*(uint32_t *)ptr = geom.second; ptr += sizeof(uint32_t);
-                        *(uint32_t *)ptr = geom.first.length(); ptr += sizeof(uint32_t);
+                        *(uint32_t *)ptr = geom.length(); ptr += sizeof(uint32_t);
 
-                        //dmess("geom.second " << geom.second);
-
-                        //memcpy(ptr, geom.first.c_str(), geom.second);
-                        memcpy(ptr, geom.first.data(), geom.first.length());
+                        memcpy(ptr, geom.data(), geom.length());
 
                         s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                     });
@@ -397,6 +301,6 @@ void GeoServer::start()
     dmess("Exit");
 }
 
-size_t GeoServer::getNumGeoms() const { return wkbGeoms.size() ;}
+size_t GeoServer::getNumGeoms() const { return serializedGeoms.size() ;}
 
-GeoServer::WkbGeom GeoServer::getGeom(const size_t index) const { return wkbGeoms[index] ;}
+const string & GeoServer::getGeom(const size_t index) const { return serializedGeoms[index] ;}

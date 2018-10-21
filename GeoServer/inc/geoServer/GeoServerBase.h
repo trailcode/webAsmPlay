@@ -1,7 +1,7 @@
 #ifndef __WEB_ASM_PLAY_GEO_SERVER_BASE_H__
 #define __WEB_ASM_PLAY_GEO_SERVER_BASE_H__
 
-#include <utility>
+//#include <utility>
 //#include <string>
 
 class GeoServerBase
@@ -22,7 +22,7 @@ public:
 
     //typedef std::pair<unsigned char *, const size_t> WkbGeom;
     //typedef std::pair<char *, const size_t> WkbGeom;
-    typedef std::pair<std::string, const size_t> WkbGeom;
+    //typedef std::pair<std::string, const size_t> WkbGeom;
 
     virtual ~GeoServerBase() {}
 

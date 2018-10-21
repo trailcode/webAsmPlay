@@ -20,7 +20,7 @@ public:
 
     size_t getNumGeoms() const;
 
-    WkbGeom getGeom(const size_t index) const;
+    const std::string & getGeom(const size_t index) const;
 
 private:
     
@@ -32,7 +32,7 @@ private:
 
     static void on_message(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
 
-    std::vector<WkbGeom> wkbGeoms;
+    std::vector<std::string> serializedGeoms;
 
     double boundsMinX;
     double boundsMinY;
