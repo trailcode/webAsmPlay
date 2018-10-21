@@ -30,7 +30,7 @@
     #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
 
 #endif
-#include <glm/glm.hpp>
+//#include <glm/glm.hpp>
 //#include <glm/mat4x4.hpp>
 //#include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -109,7 +109,7 @@ GeoClient::GeoClient(GLFWwindow * window)
         // TODO cleanup threadWin!
     });
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(150)); // Find a better way
+    std::this_thread::sleep_for(std::chrono::milliseconds(150)); // TODO Find a better way
 
 #endif
 
@@ -131,11 +131,11 @@ void GeoClient::getNumGeoms(const function<void (const size_t)> & callback)
 
     char buf[2048];
 
-    sprintf(buf,    "var buffer = new ArrayBuffer(9); \r\n"
+    sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
                     "var dv = new DataView(buffer); \r\n"
-                    "dv.setUint8(0,0); \r\n"                        // GET_NUM_GEOMETRIES_REQUEST
+                    "dv.setUint8(0,%i); \r\n"
                     "dv.setUint32(1, Module.swap32(%i)); \r\n"
-                    "Module.connection.send(buffer); \r\n", request->ID);
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_NUM_GEOMETRIES_REQUEST, request->ID);
                 
     emscripten_run_script(buf);
 
@@ -164,9 +164,9 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 
     sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
                     "var dv = new DataView(buffer); \r\n"
-                    "dv.setUint8(0,4); \r\n"                        // GET_LAYER_BOUNDS_REQUEST
+                    "dv.setUint8(0,%i); \r\n"
                     "dv.setUint32(1, Module.swap32(%i)); \r\n"
-                    "Module.connection.send(buffer); \r\n", request->ID);
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_LAYER_BOUNDS_REQUEST, request->ID);
 
     emscripten_run_script(buf);
 
@@ -185,15 +185,21 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 
 void GeoClient::getAllGeometries(function<void (vector<Geometry *> geoms)> callback)
 {
-    dmess("getAllGeometries");
-
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
     getAllGeometriesRequests[request->ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
+    char buf[2048];
 
+    sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
+                    "var dv = new DataView(buffer); \r\n"
+                    "dv.setUint8(0,%i); \r\n"
+                    "dv.setUint32(1, Module.swap32(%i)); \r\n"
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_ALL_GEOMETRIES_REQUEST, request->ID);
+                
+    emscripten_run_script(buf);
 
 #else
 
@@ -222,10 +228,10 @@ void GeoClient::getGeometry(const size_t geomIndex, function<void (Geometry * ge
 
     sprintf(buf,    "var buffer = new ArrayBuffer(9); \r\n"
                     "var dv = new DataView(buffer); \r\n"
-                    "dv.setUint8(0,2); \r\n"                        // GET_GEOMETRY_REQUEST
+                    "dv.setUint8(0,%i); \r\n"
                     "dv.setUint32(1, Module.swap32(%i)); \r\n"
                     "dv.setUint32(5, Module.swap32(%i)); \r\n"
-                    "Module.connection.send(buffer); \r\n", request->ID, geomIndex);
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_GEOMETRY_REQUEST, request->ID, geomIndex);
 
     emscripten_run_script(buf);
 
@@ -312,17 +318,11 @@ void GeoClient::onMessage(const string & data)
 
         case GeoServerBase::GET_ALL_GEOMETRIES_RESPONCE:
         {
-            dmess("GET_ALL_GEOMETRIES_RESPONCE");
-
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
-            dmess("requestID " << requestID);
-            
             const char * ptr2 = ptr;
 
             GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
-
-            dmess("i->second " << i->second);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
@@ -335,8 +335,6 @@ void GeoClient::onMessage(const string & data)
 
         case GeoServerBase::GET_LAYER_BOUNDS_RESPONCE:
         {
-            dmess("GET_LAYER_BOUNDS_RESPONCE");
-
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
             const AABB2D & bounds = *(AABB2D *)ptr;
