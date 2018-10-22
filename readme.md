@@ -33,6 +33,8 @@ install third party dependencies. C++ 17 is being used.
 * Geos https://trac.osgeo.org/geos
 * SDL2_image: https://www.libsdl.org/
 
+### Sources
+
 Some third party dependencies are built into the WebAsmPlay source tree to make emscripten compilation easer
 and allow C++ 17 compilation:  
 * Geos: https://trac.osgeo.org/geos
@@ -44,6 +46,9 @@ and allow C++ 17 compilation:
 * Imgui-addons: https://github.com/wflohry/imgui-addons
 * Emscripten Dear Imgui: https://github.com/greggman/doodles/tree/master/glfw-imgui
 * Websocketpp: https://github.com/zaphoyd/websocketpp
+
+### Art and Data
+* https://www.iconfinder.com/iconsets/32x32-free-design-icons
 
 #### Building
 

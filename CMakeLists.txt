@@ -300,6 +300,7 @@ else()
             ypos.png
             zneg.png
             zpos.png
+            if_Info_131908.png
         )
 
     foreach(assetFile ${ASSET_FILES})
