@@ -2,6 +2,7 @@
 #define __WEB_ASM_PLAY_POLYGON_H__
 
 #include <sstream>
+#include <webAsmPlay/Types.h>
 
 namespace geos
 {
@@ -13,23 +14,25 @@ namespace geos
     }
 }
 
+class Attributes;
+
 class PolygonWrapper
 {
 public:
 
-    PolygonWrapper(const geos::geom::Polygon * poly);
+    PolygonWrapper(const geos::geom::Polygon * poly, const Attributes * attrs);
 
-    static geos::geom::Polygon * getGeosPolygon(const char *& poly);
+    static AttributedGeometry getGeosPolygon(const char *& poly);
 
-    static std::vector<geos::geom::Geometry *> getGeosPolygons(const char *& polys);
+    static std::vector<AttributedGeometry> getGeosPolygons(const char *& polys);
 
     static geos::geom::CoordinateSequence * getGeosCoordinateSequence(const char *& lineString);
 
     const std::stringstream & getDataRef() const;
 
-    static void convert(const geos::geom::Polygon * poly, std::stringstream & data);
+    static void convert(const geos::geom::Polygon * poly, const Attributes * attrs, std::stringstream & data);
 
-    static void convert(const std::vector<const geos::geom::Polygon *> & polygons, std::stringstream & data);
+    //static void convert(const std::vector<const geos::geom::Polygon *> & polygons, std::stringstream & data);
 
     static void convert(const geos::geom::LineString * lineString, std::stringstream & data);
 

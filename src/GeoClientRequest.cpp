@@ -14,4 +14,4 @@ GeoRequestLayerBounds::GeoRequestLayerBounds(const function<void (const AABB2D &
 
 GeoRequestGeometry::GeoRequestGeometry(const function<void (Geometry *)> & callback) : callback(callback), ID(++lastRequestID) {}
 
-GetRequestGetAllGeometries::GetRequestGetAllGeometries(const function<void (vector<Geometry *> geoms)> & callback) : callback(callback), ID(++lastRequestID) {}
+GetRequestGetAllGeometries::GetRequestGetAllGeometries(const function<void (vector<AttributedGeometry> geoms)> & callback) : callback(callback), ID(++lastRequestID) {}

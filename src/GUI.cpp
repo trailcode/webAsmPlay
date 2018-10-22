@@ -354,7 +354,12 @@ void mainLoop(GLFWwindow * window)
 
     canvas->render();
     
-    if(client) { client->pickRenderables(canvas->getCursorPosWC()) ;}
+    if(client)
+    {
+        vector<Renderable *> picked = client->pickRenderables(canvas->getCursorPosWC());
+
+        for(Renderable * r : picked) { r->render(canvas->getMVP_Ref()) ;}
+    }
 
     geosTestCanvas->setEnabled(showSceneViewPanel);
 

@@ -3,9 +3,9 @@
 #include <geos/io/WKTWriter.h>
 #include "ogrsf_frmts.h"
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/PolygonWrapper.h>
-
 #include <geoServer/GeoServer.h>
 
 using namespace std;
@@ -49,12 +49,31 @@ string GeoServer::addGeoFile(const string & geomFile)
 
     const GEOSContextHandle_t gctx = OGRGeometry::createGEOSContext();
 
-    typedef pair<Geometry *, double> GeomAndArea;
+    typedef tuple<Geometry *, double, Attributes *> GeomAndArea;
 
     vector<GeomAndArea> geoms;
 
-    for(OGRFeature * poFeature; (poFeature = poLayer->GetNextFeature()) != NULL ;)
+    //for(OGRFeature * poFeature; (poFeature = poLayer->GetNextFeature()) != NULL ;)
+    for(const auto & poFeature : *poLayer)
     {
+        Attributes * attrs = new Attributes();
+
+        for(const auto & oField: *poFeature)
+        {
+            if(oField.IsNull()) { continue ;}
+
+            const string key = oField.GetName();
+
+            switch(oField.GetType())
+            {
+                case OFTInteger   : attrs->ints32 [key] = oField.GetInteger();   break;
+                case OFTInteger64 : attrs->ints64 [key] = oField.GetInteger64(); break;
+                case OFTReal      : attrs->doubles[key] = oField.GetDouble();    break;
+                case OFTString    : attrs->strings[key] = oField.GetString();    break;
+                default           : attrs->strings[key] = oField.GetAsString();  break;
+            }
+        }
+
         OGRGeometry * poGeometry = poFeature->GetGeometryRef();
 
         const double simplifyAmount = 0.00001;
@@ -63,14 +82,7 @@ string GeoServer::addGeoFile(const string & geomFile)
 
         const double area = geom->getArea();
 
-        if(area < simplifyAmount)
-        {
-            //dmess("geom " << geom << " " << area << " type " << geom->getGeometryType());
-
-            //continue;
-        }
-
-        geoms.push_back(GeomAndArea(geom, area));
+        geoms.push_back(GeomAndArea(geom, area, attrs));
     }
     
     sort(geoms.begin(), geoms.end(), [](const GeomAndArea & lhs, const GeomAndArea & rhs)
@@ -80,7 +92,7 @@ string GeoServer::addGeoFile(const string & geomFile)
 
     for(const GeomAndArea & g : geoms)
     {
-        dmess("g " << get<1>(g) << " " << get<0>(g)->getGeometryType());
+        //dmess("g " << get<1>(g) << " " << get<0>(g)->getGeometryType());
     }
 
     WKTWriter * wkt = new WKTWriter();
@@ -108,7 +120,7 @@ string GeoServer::addGeoFile(const string & geomFile)
             continue;
         }
 
-        PolygonWrapper pw(dynamic_cast<const Polygon *>(get<0>(g)));
+        PolygonWrapper pw(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g));
 
         const stringstream & data = pw.getDataRef();
         
@@ -171,8 +183,6 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
                 {
                     const uint32_t geomID = *(const uint32_t *)dataPtr;
 
-                    //dmess("geomID " << geomID);
-
                     pool.push([hdl, s, server, requestID, geomID](int ID)
                     {
                         const string & geom = server->getGeom(geomID);
@@ -201,15 +211,21 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                 pool.push([hdl, s, server, requestID](int ID)
                 {
+                    dmess("    GET_ALL_GEOMETRIES_REQUEST");
+
                     const vector<string> & serializedGeoms = server->serializedGeoms;
 
                     const uint32_t numGeoms = serializedGeoms.size();
+
+                    dmess("numGeoms " << numGeoms);
 
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
                     for(uint i = 0; i < numGeoms; ++i) { bufferSize += serializedGeoms[i].length() ;}
 
                     vector<char> data(bufferSize);
+
+                    dmess("bufferSize " << bufferSize);
 
                     char * ptr = &data[0];
                     
@@ -226,6 +242,8 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
                         ptr += geom.length();
                     }
 
+                    dmess("data.size() " << data.size());
+
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
 
@@ -237,6 +255,8 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
                 pool.push([hdl, s, server, requestID](int ID)
                 {
+                    dmess("   GET_LAYER_BOUNDS_REQUEST");
+
                     vector<char> data(sizeof(char) + sizeof(uint32_t) + sizeof(AABB2D)); // TODO make a AABB2D class
 
                     data[0] = GET_LAYER_BOUNDS_RESPONCE;

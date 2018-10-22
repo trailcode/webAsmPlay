@@ -63,13 +63,13 @@ class GetRequestGetAllGeometries
 {
 public:
 
-    GetRequestGetAllGeometries(const std::function<void (std::vector<geos::geom::Geometry *> geoms)> & callback);
+    GetRequestGetAllGeometries(const std::function<void (std::vector<AttributedGeometry> geoms)> & callback);
 
 private:
 
     friend class GeoClient;
 
-    const std::function<void (std::vector<geos::geom::Geometry *> geoms)> callback;
+    const std::function<void (std::vector<AttributedGeometry> geoms)> callback;
 
     const size_t ID;
 };

@@ -1,3 +1,4 @@
+#include <utility>
 #include <memory>
 #ifdef __EMSCRIPTEN__
 
@@ -36,11 +37,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Polygon.h>
+#include <geos/geom/Point.h>
 #include <geos/io/WKTReader.h>
 #include <geos/io/WKBReader.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/PolygonWrapper.h>
 #include <webAsmPlay/RenderablePolygon.h>
@@ -183,7 +186,7 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 #endif
 }
 
-void GeoClient::getAllGeometries(function<void (vector<Geometry *> geoms)> callback)
+void GeoClient::getAllGeometries(function<void (vector<AttributedGeometry> geoms)> callback)
 {
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
@@ -285,7 +288,7 @@ void GeoClient::onMessage(const string & data)
 
             const char * ptr2 = ptr;
 
-            Geometry * geom = PolygonWrapper::getGeosPolygon(ptr2);
+            AttributedGeometry geom = PolygonWrapper::getGeosPolygon(ptr2);
 
             /*
             WKBReader reader(*GeometryFactory::getDefaultInstance());
@@ -305,6 +308,9 @@ void GeoClient::onMessage(const string & data)
             Geometry * geom = reader.read(in);
             //*/
 
+            abort();
+
+            /*
             GeometryRequests::const_iterator i = geometryRequests.find(requestID);
 
             unique_ptr<GeoRequestGeometry> request(i->second);
@@ -312,12 +318,15 @@ void GeoClient::onMessage(const string & data)
             request->callback(geom);
 
             geometryRequests.erase(i);
+            */
 
             break;
         }
 
         case GeoServerBase::GET_ALL_GEOMETRIES_RESPONCE:
         {
+            dmess("GET_ALL_GEOMETRIES_RESPONCE");
+
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
             const char * ptr2 = ptr;
@@ -335,6 +344,8 @@ void GeoClient::onMessage(const string & data)
 
         case GeoServerBase::GET_LAYER_BOUNDS_RESPONCE:
         {
+            dmess("GET_ALL_GEOMETRIES_RESPONCE");
+            
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
             const AABB2D & bounds = *(AABB2D *)ptr;
@@ -426,7 +437,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
     GeomVector * geomsOut = new GeomVector;
 
-    getAllGeometries([this, canvas, geomsOut](vector<Geometry *> geomsIn)
+    getAllGeometries([this, canvas, geomsOut](vector<AttributedGeometry> geomsIn)
     {
         dmess("geomsIn " << geomsIn.size());
 
@@ -441,27 +452,27 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
             
             inverseTrans = inverse(trans);
 
-            dmess("    geomsIn " << geomsIn.size());
-            
-            /*
-            //createRenderiables(&geomsIn, trans, canvas);
-            for(int i = geoms.size() - 1; i >= 0; --i)
+            for(int i = geomsIn.size() - 1; i >= 0; --i) // TODO code duplication
             {
-                const Geometry * g = geoms[i];
+                Attributes * attrs;
+                const Geometry * g;
+                
+                tie(attrs, g) = geomsIn[i];
 
                 Renderable * r = Renderable::create(g, trans);
                 
                 if(!r) { continue ;}
                 
-                quadTree->insert(g->getEnvelopeInternal(), r);
+                pair<Renderable *, const Geometry *> * data = new pair<Renderable *, const Geometry *>(r, g);
+
+                quadTree->insert(g->getEnvelopeInternal(), data);
             }
 
-            dmess("quadTree " << quadTree->depth() << " " << geoms.size());
-            */
+            dmess("quadTree " << quadTree->depth() << " " << geomsIn.size());
             
             vector<const Geometry *> polys(geomsIn.size());
 
-            for(size_t i = 0; i < polys.size(); ++i) { polys[i] = dynamic_cast<const Geometry *>(geomsIn[i]) ;}
+            for(size_t i = 0; i < polys.size(); ++i) { polys[i] = dynamic_cast<const Geometry *>(geomsIn[i].second) ;}
 
             Renderable * r = RenderablePolygon::create(polys, trans);
             
@@ -493,6 +504,37 @@ vector<Renderable *> GeoClient::pickRenderables(const vec3 & _pos)
     quadTree->query(&bounds, query);
     
     //dmess("query " << query.size());
+
+    Point * p = scopedGeosGeometry(GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y)));
+
+    double minArea = numeric_limits<double>::max();
+
+    Renderable * smallest = NULL;
+
+    for(const void * _data : query)
+    {
+        pair<Renderable *, const Geometry *> * data = (pair<Renderable *, const Geometry *> *)_data;
+
+        const Geometry * geom = data->second;
+
+        //if(p->within(geom)) { ret.push_back(data->first) ;}
+        if(!p->within(geom)) { continue ;}
+
+        const double area = geom->getArea();
+
+        if(area < minArea)
+        {
+            minArea = area; 
+
+            smallest = data->first; 
+        }
+    }
+
+    ret.clear();
+
+    //dmess("minArea " << minArea << " " << smallest);
+
+    if(smallest) { ret.push_back(smallest) ;}
     
     return ret;
 }

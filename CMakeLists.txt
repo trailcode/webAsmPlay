@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
  
 set (CMAKE_CXX_STANDARD 17)
 
@@ -96,6 +96,7 @@ file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
                             "src/AppLog.cpp"
                             "src/K2DTree.cpp"
                             "src/PolygonWrapper.cpp"
+                            "src/Attributes.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
                             ${tceOpenSteer_SRC}
