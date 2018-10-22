@@ -71,64 +71,25 @@ Textures::~Textures()
 
 GLuint Textures::load(const string & filename)
 {
-    /* Status indicator */
-    int Status = false;
+    SDL_Surface * img = IMG_Load(filename.c_str());
+
     GLuint texture;
 
-    /* Create storage space for the texture */
-    SDL_Surface *TextureImage[1];
+    glGenTextures( 1, &texture );
 
-    std::ifstream input( filename, std::ios::binary );
-    // copies all data into buffer
-    std::vector<char> buffer((
-                            std::istreambuf_iterator<char>(input)),
-                            (std::istreambuf_iterator<char>()));
+    /* Typical Texture Generation Using Data From The Bitmap */
+    glBindTexture( GL_TEXTURE_2D, texture );
 
-    /* Load The Bitmap, Check For Errors, If Bitmap's Not Found Quit */
-    if ( ( TextureImage[0] = IMG_Load( filename.c_str() ) ) )
-    {
-        /* Set the status to true */
-        Status = true;
+    /* Generate The Texture */
+    glTexImage2D(   GL_TEXTURE_2D, 0, GL_RGBA, img->w,
+                    img->h, 0, GL_RGBA,
+                    GL_UNSIGNED_BYTE, img->pixels );
 
-        /* Create The Texture */
-        glGenTextures( 1, &texture );
+    /* Linear Filtering */
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-        /* Typical Texture Generation Using Data From The Bitmap */
-        glBindTexture( GL_TEXTURE_2D, texture );
-
-        // Enforce RGB/RGBA
-        int format;
-        SDL_Surface* formattedSurf;
-        if (TextureImage[0]->format->BytesPerPixel==3) {
-
-            formattedSurf = SDL_ConvertSurfaceFormat(TextureImage[0],
-                                                    SDL_PIXELFORMAT_RGB24,
-                                                    0);
-            format = GL_RGB;
-        }
-        else
-        {
-            formattedSurf = SDL_ConvertSurfaceFormat(TextureImage[0],
-                                                    SDL_PIXELFORMAT_ABGR8888,
-                                                    0);
-            format = GL_RGBA;
-        }
-
-        invertImage(formattedSurf->w*formattedSurf->format->BytesPerPixel, formattedSurf->h, (char *) formattedSurf->pixels);
-
-        /* Generate The Texture */
-        glTexImage2D( GL_TEXTURE_2D, 0, format, formattedSurf->w,
-                    formattedSurf->h, 0, format,
-                    GL_UNSIGNED_BYTE, formattedSurf->pixels );
-
-        /* Linear Filtering */
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-        SDL_FreeSurface(formattedSurf);
-        SDL_FreeSurface( TextureImage[0] );
-    } else {
-        dmess("Cannot load "<<filename);
-    }
+    SDL_FreeSurface(img);
 
     return texture;
 }
@@ -177,5 +138,12 @@ GLuint Textures::loadCube(const vector<string> & files)
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, zpos->w, zpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zpos->pixels);
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, zneg->w, zneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zneg->pixels);
     
+    SDL_FreeSurface(xpos);
+    SDL_FreeSurface(xneg);
+    SDL_FreeSurface(ypos);
+    SDL_FreeSurface(yneg);
+    SDL_FreeSurface(zpos);
+    SDL_FreeSurface(zneg);
+
     return texCube;
 }

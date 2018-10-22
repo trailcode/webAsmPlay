@@ -21,6 +21,8 @@
  #include <imgui.h>
  #endif //IMGUI_API
  
+ #include <webAsmPlay/Debug.h>
+
  // SOME EXAMPLE CODE
  /*
  Outside any ImGui::Window:
@@ -240,6 +242,7 @@
                      nextSpacingAmount = 0;
                  }
                  ImGui::PushID(i);
+                 //dmess("tb.user_texture_id " << tb.user_texture_id);
                  if (ImGui::ImageButton(tb.user_texture_id,tbsz,tb.uv0,tb.uv1,0,bg_col,tint_col)) {
                      if (tb.isToggleButton) tb.isDown=!tb.isDown;
                      else if (keepAButtonSelected) selectedButtonIndex = (selectedButtonIndex==i && !inWindowMode) ? -1 : i;
