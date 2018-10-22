@@ -18,6 +18,7 @@
 
 #include <GLFW/glfw3.h>
 #include <imgui_internal.h>
+#include <imguitoolbar.h>
 #include <iostream>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
@@ -240,6 +241,29 @@ void mainLoop(GLFWwindow * window)
             ImGui::EndMainMenuBar();
         }
     }
+
+    {
+        uint32_t myImageTextureId2 = 1;
+             static ImGui::Toolbar toolbar("myFirstToolbar##foo");
+             if (toolbar.getNumButtons()==0)  {
+                 char tmp[1024];ImVec2 uv0(0,0),uv1(0,0);
+                 for (int i=0;i<9;i++) {
+                     strcpy(tmp,"toolbutton ");
+                     sprintf(&tmp[strlen(tmp)],"%d",i+1);
+                     uv0 = ImVec2((float)(i%3)/3.f,(float)(i/3)/3.f);
+                     uv1 = ImVec2(uv0.x+1.f/3.f,uv0.y+1.f/3.f);
+ 
+                     toolbar.addButton(ImGui::Toolbutton(tmp,(void*)myImageTextureId2,uv0,uv1));
+                 }
+                 toolbar.addSeparator(16);
+                 toolbar.addButton(ImGui::Toolbutton("toolbutton 11",(void*)myImageTextureId2,uv0,uv1,ImVec2(32,32),true,false,ImVec4(0.8,0.8,1.0,1)));  // Note that separator "eats" one toolbutton index as if it was a real button
+                 toolbar.addButton(ImGui::Toolbutton("toolbutton 12",(void*)myImageTextureId2,uv0,uv1,ImVec2(48,24),true,false,ImVec4(1.0,0.8,0.8,1)));  // Note that separator "eats" one toolbutton index as if it was a real button
+ 
+                 toolbar.setProperties(false,false,true,ImVec2(0.5f,0.f));
+             }
+             const int pressed = toolbar.render();
+             if (pressed>=0) fprintf(stderr,"Toolbar1: pressed:%d\n",pressed);
+         }
 
     // Rendering
     int screenWidth, screenHeight;

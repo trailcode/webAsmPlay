@@ -35,14 +35,15 @@ install third party dependencies. C++ 17 is being used.
 
 Some third party dependencies are built into the WebAsmPlay source tree to make emscripten compilation easer
 and allow C++ 17 compilation:  
-* Geos https://trac.osgeo.org/geos
-* OpenSteer http://opensteer.sourceforge.net
-* Ctpl https://github.com/vit-vit/CTPL
-* Glm https://glm.g-truc.net/0.9.9/index.html
-* GLUTessellator https://github.com/mbebenita/GLUTesselator
-* Native Dear Imgui https://github.com/ocornut/imgui
-* Emscripten Dear Imgui https://github.com/greggman/doodles/tree/master/glfw-imgui
-* Websocketpp https://github.com/zaphoyd/websocketpp
+* Geos: https://trac.osgeo.org/geos
+* OpenSteer: http://opensteer.sourceforge.net
+* Ctpl: https://github.com/vit-vit/CTPL
+* Glm: https://glm.g-truc.net/0.9.9/index.html
+* GLUTessellator: https://github.com/mbebenita/GLUTesselator
+* Native Dear Imgui: https://github.com/ocornut/imgui
+* Imgui-addons: https://github.com/wflohry/imgui-addons
+* Emscripten Dear Imgui: https://github.com/greggman/doodles/tree/master/glfw-imgui
+* Websocketpp: https://github.com/zaphoyd/websocketpp
 
 #### Building
 
