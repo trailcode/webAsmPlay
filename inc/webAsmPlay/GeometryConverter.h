@@ -16,11 +16,11 @@ namespace geos
 
 class Attributes;
 
-class PolygonWrapper
+class GeometryConverter
 {
 public:
 
-    PolygonWrapper(const geos::geom::Polygon * poly, const Attributes * attrs);
+    static std::string convert(const geos::geom::Polygon * poly, const Attributes * attrs);
 
     static AttributedGeometry getGeosPolygon(const char *& poly);
 
@@ -28,19 +28,14 @@ public:
 
     static geos::geom::CoordinateSequence * getGeosCoordinateSequence(const char *& lineString);
 
-    const std::stringstream & getDataRef() const;
-
     static void convert(const geos::geom::Polygon * poly, const Attributes * attrs, std::stringstream & data);
-
-    //static void convert(const std::vector<const geos::geom::Polygon *> & polygons, std::stringstream & data);
 
     static void convert(const geos::geom::LineString * lineString, std::stringstream & data);
 
 private:
 
-    void writeLineString(const geos::geom::LineString * lineString);
-
-    std::stringstream data;
+    GeometryConverter() {}
+    ~GeometryConverter() {}
 };
 
 #endif // __WEB_ASM_PLAY_POLYGON_H__

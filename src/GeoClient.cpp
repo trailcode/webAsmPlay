@@ -45,7 +45,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/PolygonWrapper.h>
+#include <webAsmPlay/GeometryConverter.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GeoClient.h>
@@ -259,7 +259,7 @@ void GeoClient::getGeometry(const size_t geomIndex, function<void (Geometry * ge
 
 void GeoClient::onMessage(const string & data)
 {
-    char * ptr = (char *)data.data();
+    const char * ptr = (const char *)data.data();
 
     switch(ptr[0])
     {
@@ -286,9 +286,7 @@ void GeoClient::onMessage(const string & data)
 
             const uint32_t dataSize = *(uint32_t *)ptr; ptr += sizeof(uint32_t); // TODO Might not need
 
-            const char * ptr2 = ptr;
-
-            AttributedGeometry geom = PolygonWrapper::getGeosPolygon(ptr2);
+            AttributedGeometry geom = GeometryConverter::getGeosPolygon(ptr);
 
             /*
             WKBReader reader(*GeometryFactory::getDefaultInstance());
@@ -327,13 +325,11 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
-            const char * ptr2 = ptr;
-
             GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
-            request->callback(PolygonWrapper::getGeosPolygons(ptr2));
+            request->callback(GeometryConverter::getGeosPolygons(ptr));
 
             getAllGeometriesRequests.erase(i);
 
@@ -359,14 +355,10 @@ void GeoClient::onMessage(const string & data)
     }
 }
 
-void GeoClient::createRenderiables(GeomVector * _geoms, const mat4 trans, Canvas * canvas)
+void GeoClient::createRenderiables(GeomVector * geoms, const mat4 trans, Canvas * canvas)
 {
-    GeomVector & geoms = *_geoms;
-    //for(const Geometry * g : *geoms)
-    for(int i = geoms.size() - 1; i >= 0; --i)
+    for(const Geometry * g : *geoms)
     {
-        const Geometry * g = geoms[i];
-
         Renderable * r = Renderable::create(g, trans);
         
         if(!r) { continue ;}
@@ -374,11 +366,11 @@ void GeoClient::createRenderiables(GeomVector * _geoms, const mat4 trans, Canvas
         quadTree->insert(g->getEnvelopeInternal(), r);
     }
 
-    dmess("quadTree " << quadTree->depth() << " " << geoms.size());
+    dmess("quadTree " << quadTree->depth() << " " << geoms->size());
     
-    Renderable * r = RenderablePolygon::create(geoms, trans);
+    Renderable * r = RenderablePolygon::create(*geoms, trans);
     
-    delete _geoms;
+    delete geoms;
     
     r->setFillColor(vec4(0.3,0.0,0.3,0.3));
     
@@ -397,7 +389,7 @@ void GeoClient::loadGeometry(Canvas * canvas)
     
     GeomVector * geoms = new GeomVector;
 
-    std::function<void (const size_t)> getNumGeomsFunctor = [this, canvas, geoms](const size_t numGeoms)
+    getNumGeoms([this, canvas, geoms](const size_t numGeoms)
     {
         getLayerBounds([this, numGeoms, canvas, geoms](const AABB2D & bounds)
         {
@@ -422,22 +414,18 @@ void GeoClient::loadGeometry(Canvas * canvas)
 
             for(size_t i = 0; i < numGeoms; ++i) { getGeometry(i, getGeom) ;}
         });
-    };
-
-    getNumGeoms(getNumGeomsFunctor);
+    });
 }
 
 void GeoClient::loadAllGeometry(Canvas * canvas)
 {
     dmess("GeoClient::loadAllGeometry");
 
-    GeomVector * geomsOut = new GeomVector;
-
-    getAllGeometries([this, canvas, geomsOut](vector<AttributedGeometry> geomsIn)
+    getAllGeometries([this, canvas](vector<AttributedGeometry> geomsIn)
     {
         dmess("geomsIn " << geomsIn.size());
 
-        getLayerBounds([this, canvas, geomsOut, geomsIn](const AABB2D & bounds)
+        getLayerBounds([this, canvas, geomsIn](const AABB2D & bounds)
         {
             const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
 
@@ -451,6 +439,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
             for(int i = geomsIn.size() - 1; i >= 0; --i) // TODO code duplication
             {
                 Attributes * attrs;
+
                 const Geometry * g;
                 
                 tie(attrs, g) = geomsIn[i];
@@ -472,8 +461,6 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
             Renderable * r = RenderablePolygon::create(polys, trans);
             
-            //delete _geoms;
-            
             r->setFillColor(vec4(0.3,0.0,0.3,0.3));
             
             r->setOutlineColor(vec4(0,1,0,1));
@@ -492,7 +479,7 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickRenderables(const vec3 
     //dmess("pos " << pos);
 
     vector<pair<Renderable *, Attributes *> > ret;
-    
+
     vector< void * > query;
     
     Envelope bounds(pos.x, pos.x, pos.y, pos.y);

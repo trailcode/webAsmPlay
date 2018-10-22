@@ -6,18 +6,22 @@
 #include <geos/geom/GeometryFactory.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Attributes.h>
-#include <webAsmPlay/PolygonWrapper.h>
+#include <webAsmPlay/GeometryConverter.h>
 
 using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-PolygonWrapper::PolygonWrapper(const Polygon * poly, const Attributes * attrs)
+string GeometryConverter::convert(const geos::geom::Polygon * poly, const Attributes * attrs)
 {
-    convert(poly, attrs, data);
+    stringstream ret;
+
+    convert(poly, attrs, ret);
+
+    return ret.str();
 }
 
-void PolygonWrapper::convert(const Polygon * poly, const Attributes * attrs, stringstream & data)
+void GeometryConverter::convert(const Polygon * poly, const Attributes * attrs, stringstream & data)
 {
     attrs->write(data);
 
@@ -30,23 +34,7 @@ void PolygonWrapper::convert(const Polygon * poly, const Attributes * attrs, str
     for(size_t i = 0; i < numInteriorRings; ++i) { convert(poly->getInteriorRingN(i), data) ;}
 }
 
-/*
-void PolygonWrapper::convert(const vector<const Polygon *> & polygons, stringstream & data)
-{
-    const uint32_t numPolygons = polygons.size();
-
-    data.write((const char *)&numPolygons, sizeof(uint32_t));
-
-    for(size_t i = 0; i < numPolygons; ++i) { convert(polygons[i], data) ;}
-}
-*/
-
-void PolygonWrapper::writeLineString(const LineString * lineString)
-{
-    convert(lineString, data);
-}
-
-void PolygonWrapper::convert(const LineString * lineString, stringstream & data)
+void GeometryConverter::convert(const LineString * lineString, stringstream & data)
 {
     const vector<Coordinate> & coords = *lineString->getCoordinatesRO()->toVector();
 
@@ -64,7 +52,7 @@ void PolygonWrapper::convert(const LineString * lineString, stringstream & data)
     }
 }
 
-CoordinateSequence * PolygonWrapper::getGeosCoordinateSequence(const char *& lineString)
+CoordinateSequence * GeometryConverter::getGeosCoordinateSequence(const char *& lineString)
 {
     const uint32_t numVerts = *(uint32_t *)lineString; lineString += sizeof(uint32_t);
 
@@ -81,7 +69,7 @@ CoordinateSequence * PolygonWrapper::getGeosCoordinateSequence(const char *& lin
     return new CoordinateArraySequence(coords, 2);
 }
 
-AttributedGeometry PolygonWrapper::getGeosPolygon(const char *& poly)
+AttributedGeometry GeometryConverter::getGeosPolygon(const char *& poly)
 {
     Attributes * attrs = new Attributes(poly);
 
@@ -101,7 +89,7 @@ AttributedGeometry PolygonWrapper::getGeosPolygon(const char *& poly)
     return AttributedGeometry(attrs, factory->createPolygon(externalRing, holes));
 }
 
-vector<AttributedGeometry> PolygonWrapper::getGeosPolygons(const char *& polys)
+vector<AttributedGeometry> GeometryConverter::getGeosPolygons(const char *& polys)
 {
     const uint32_t numPolygons = *(uint32_t *)polys; polys += sizeof(uint32_t);
 
@@ -114,5 +102,3 @@ vector<AttributedGeometry> PolygonWrapper::getGeosPolygons(const char *& polys)
 
     return ret;
 }
-
-const stringstream & PolygonWrapper::getDataRef() const { return data ;}

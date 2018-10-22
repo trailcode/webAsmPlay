@@ -363,33 +363,11 @@ void mainLoop(GLFWwindow * window)
     {
         vector<pair<Renderable *, Attributes *> > picked = client->pickRenderables(canvas->getCursorPosWC());
 
-        stringstream attrsStrStream;
-
         for(pair<Renderable *, Attributes *> & r : picked)
         {
             get<0>(r)->render(canvas->getMVP_Ref());
 
-            for(Attributes::Ints32::value_type & i : get<1>(r)->ints32)
-            {
-                attrsStrStream << i.first << ": " << i.second << endl;
-            }
-
-            for(Attributes::Ints64::value_type & i : get<1>(r)->ints64)
-            {
-                attrsStrStream << i.first << ": " << i.second << endl;
-            }
-
-            for(Attributes::Doubles::value_type & i : get<1>(r)->doubles)
-            {
-                attrsStrStream << i.first << ": " << i.second << endl;
-            }
-
-            for(Attributes::Strings::value_type & i : get<1>(r)->strings)
-            {
-                attrsStrStream << i.first << ": " << i.second << endl;
-            }
-
-            attrsStr = attrsStrStream.str();
+            attrsStr += r.second->toString();
         }
     }
 

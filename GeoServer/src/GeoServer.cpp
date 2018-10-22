@@ -1,11 +1,12 @@
 #include <algorithm>
 #include <ctpl.h>
+#include <geos/geom/Polygon.h>
 #include <geos/io/WKTWriter.h>
 #include "ogrsf_frmts.h"
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Types.h>
-#include <webAsmPlay/PolygonWrapper.h>
+#include <webAsmPlay/GeometryConverter.h>
 #include <geoServer/GeoServer.h>
 
 using namespace std;
@@ -13,7 +14,6 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
-#include <geos.h>
 using namespace geos::io;
 using namespace geos::geom;
 
@@ -83,6 +83,8 @@ string GeoServer::addGeoFile(const string & geomFile)
         const double area = geom->getArea();
 
         geoms.push_back(GeomAndArea(geom, area, attrs));
+
+        if(++c > 100000) { break ;}
     }
     
     sort(geoms.begin(), geoms.end(), [](const GeomAndArea & lhs, const GeomAndArea & rhs)
@@ -94,13 +96,6 @@ string GeoServer::addGeoFile(const string & geomFile)
     {
         //dmess("g " << get<1>(g) << " " << get<0>(g)->getGeometryType());
     }
-
-    WKTWriter * wkt = new WKTWriter();
-    WKBWriter * wkb = new WKBWriter();
-
-    wkt->setOutputDimension(2);
-
-    dmess("geoms " << geoms.size());
 
     for(const GeomAndArea & g : geoms)
     {
@@ -120,16 +115,17 @@ string GeoServer::addGeoFile(const string & geomFile)
             continue;
         }
 
-        PolygonWrapper pw(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g));
-
-        const stringstream & data = pw.getDataRef();
-        
-        serializedGeoms.push_back(data.str());
+        serializedGeoms.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g)));
     }
 
     OGREnvelope extent;
 
-    poLayer->GetExtent(&extent);
+    if(poLayer->GetExtent(&extent) != CPLE_None)
+    {
+       dmess("Error getting extent!");
+
+       abort();
+    }
 
     boundsMinX = extent.MinX;
     boundsMinY = extent.MinY;
@@ -207,25 +203,17 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
             case GET_ALL_GEOMETRIES_REQUEST:
                 
-                dmess("GET_ALL_GEOMETRIES_REQUEST");
-
                 pool.push([hdl, s, server, requestID](int ID)
                 {
-                    dmess("    GET_ALL_GEOMETRIES_REQUEST");
-
                     const vector<string> & serializedGeoms = server->serializedGeoms;
 
                     const uint32_t numGeoms = serializedGeoms.size();
-
-                    dmess("numGeoms " << numGeoms);
 
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
                     for(uint i = 0; i < numGeoms; ++i) { bufferSize += serializedGeoms[i].length() ;}
 
                     vector<char> data(bufferSize);
-
-                    dmess("bufferSize " << bufferSize);
 
                     char * ptr = &data[0];
                     
@@ -242,8 +230,6 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
                         ptr += geom.length();
                     }
 
-                    dmess("data.size() " << data.size());
-
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
 
@@ -251,12 +237,8 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
             case GET_LAYER_BOUNDS_REQUEST:
 
-                dmess("GET_LAYER_BOUNDS_REQUEST");
-
                 pool.push([hdl, s, server, requestID](int ID)
                 {
-                    dmess("   GET_LAYER_BOUNDS_REQUEST");
-
                     vector<char> data(sizeof(char) + sizeof(uint32_t) + sizeof(AABB2D)); // TODO make a AABB2D class
 
                     data[0] = GET_LAYER_BOUNDS_RESPONCE;
@@ -301,8 +283,6 @@ void GeoServer::start()
         
         // this will turn off everything in console output
         serverEndPoint.clear_access_channels(websocketpp::log::alevel::all); 
-
-        Server::connection_type; // Does nothing?
 
         // Initialize ASIO
         serverEndPoint.init_asio();
