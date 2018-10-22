@@ -33,6 +33,7 @@
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Renderable.h>
+#include <webAsmPlay/Attributes.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -73,6 +74,7 @@ bool showSceneViewPanel      = false;
 bool showPerformancePanel    = false;
 bool showRenderSettingsPanel = false;
 bool showLogPanel            = false;
+bool showAttributePanel      = false;
 
 bool isFirst = true;
 
@@ -230,6 +232,7 @@ void mainLoop(GLFWwindow * window)
                 if(ImGui::MenuItem("Performance"))     { showPerformancePanel    = !showPerformancePanel    ;}
                 if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel = !showRenderSettingsPanel ;}
                 if(ImGui::MenuItem("Log"))             { showLogPanel            = !showLogPanel            ;}
+                if(ImGui::MenuItem("Attributes"))      { showAttributePanel      = !showAttributePanel      ;}
 
                 ImGui::EndMenu();
             }
@@ -354,11 +357,49 @@ void mainLoop(GLFWwindow * window)
 
     canvas->render();
     
+    string attrsStr;
+
     if(client)
     {
-        vector<Renderable *> picked = client->pickRenderables(canvas->getCursorPosWC());
+        vector<pair<Renderable *, Attributes *> > picked = client->pickRenderables(canvas->getCursorPosWC());
 
-        for(Renderable * r : picked) { r->render(canvas->getMVP_Ref()) ;}
+        stringstream attrsStrStream;
+
+        for(pair<Renderable *, Attributes *> & r : picked)
+        {
+            get<0>(r)->render(canvas->getMVP_Ref());
+
+            for(Attributes::Ints32::value_type & i : get<1>(r)->ints32)
+            {
+                attrsStrStream << i.first << ": " << i.second << endl;
+            }
+
+            for(Attributes::Ints64::value_type & i : get<1>(r)->ints64)
+            {
+                attrsStrStream << i.first << ": " << i.second << endl;
+            }
+
+            for(Attributes::Doubles::value_type & i : get<1>(r)->doubles)
+            {
+                attrsStrStream << i.first << ": " << i.second << endl;
+            }
+
+            for(Attributes::Strings::value_type & i : get<1>(r)->strings)
+            {
+                attrsStrStream << i.first << ": " << i.second << endl;
+            }
+
+            attrsStr = attrsStrStream.str();
+        }
+    }
+
+    if(showAttributePanel)
+    {
+        ImGui::Begin("Attributes", &showAttributePanel);
+
+            ImGui::Text(attrsStr.c_str());
+
+        ImGui::End();
     }
 
     geosTestCanvas->setEnabled(showSceneViewPanel);

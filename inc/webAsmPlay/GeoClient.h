@@ -20,11 +20,6 @@ class Renderable;
 
 namespace geos
 {
-    namespace geom
-    {
-        class Geometry;
-    }
-    
     namespace index
     {
         namespace quadtree
@@ -57,7 +52,7 @@ public:
 
     void loadAllGeometry(Canvas * canvas);
     
-    std::vector<Renderable *> pickRenderables(const glm::vec3 & pos);
+    std::vector<std::pair<Renderable *, Attributes *> > pickRenderables(const glm::vec3 & pos);
 
 private:
     

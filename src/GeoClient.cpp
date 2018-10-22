@@ -325,8 +325,6 @@ void GeoClient::onMessage(const string & data)
 
         case GeoServerBase::GET_ALL_GEOMETRIES_RESPONCE:
         {
-            dmess("GET_ALL_GEOMETRIES_RESPONCE");
-
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
             const char * ptr2 = ptr;
@@ -344,8 +342,6 @@ void GeoClient::onMessage(const string & data)
 
         case GeoServerBase::GET_LAYER_BOUNDS_RESPONCE:
         {
-            dmess("GET_ALL_GEOMETRIES_RESPONCE");
-            
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
             const AABB2D & bounds = *(AABB2D *)ptr;
@@ -463,7 +459,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
                 
                 if(!r) { continue ;}
                 
-                pair<Renderable *, const Geometry *> * data = new pair<Renderable *, const Geometry *>(r, g);
+                tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
 
                 quadTree->insert(g->getEnvelopeInternal(), data);
             }
@@ -489,13 +485,13 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
     });
 }
 
-vector<Renderable *> GeoClient::pickRenderables(const vec3 & _pos)
+vector<pair<Renderable *, Attributes *> > GeoClient::pickRenderables(const vec3 & _pos)
 {
     vec4 pos = inverseTrans * vec4(_pos, 1.0);
     
     //dmess("pos " << pos);
 
-    vector<Renderable *> ret;
+    vector<pair<Renderable *, Attributes *> > ret;
     
     vector< void * > query;
     
@@ -510,12 +506,13 @@ vector<Renderable *> GeoClient::pickRenderables(const vec3 & _pos)
     double minArea = numeric_limits<double>::max();
 
     Renderable * smallest = NULL;
+    Attributes * smallestAttrs = NULL;
 
     for(const void * _data : query)
     {
-        pair<Renderable *, const Geometry *> * data = (pair<Renderable *, const Geometry *> *)_data;
+        tuple<Renderable *, const Geometry *, Attributes *> * data = (tuple<Renderable *, const Geometry *, Attributes *> *)_data;
 
-        const Geometry * geom = data->second;
+        const Geometry * geom = get<1>(*data);
 
         //if(p->within(geom)) { ret.push_back(data->first) ;}
         if(!p->within(geom)) { continue ;}
@@ -526,7 +523,9 @@ vector<Renderable *> GeoClient::pickRenderables(const vec3 & _pos)
         {
             minArea = area; 
 
-            smallest = data->first; 
+            smallest = get<0>(*data);
+
+            smallestAttrs = get<2>(*data); 
         }
     }
 
@@ -534,7 +533,7 @@ vector<Renderable *> GeoClient::pickRenderables(const vec3 & _pos)
 
     //dmess("minArea " << minArea << " " << smallest);
 
-    if(smallest) { ret.push_back(smallest) ;}
+    if(smallest) { ret.push_back(make_pair(smallest, smallestAttrs)) ;}
     
     return ret;
 }
