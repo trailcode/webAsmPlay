@@ -108,6 +108,8 @@ void cback(char* data, int size, void* arg) {
 
 ImGuiTextBuffer * Buf = NULL;
 
+uint32_t infoIcon = 0;
+
 struct AppLog
 {
     //ImGuiTextBuffer     Buf;
@@ -165,6 +167,15 @@ void dmessCallback(const string & file, const size_t line, const string & messag
 //extern void (*debugLoggerFunc)(const std::string & file, const std::string & line, const std::string & message);
 
 GeoClient * client = NULL;
+
+enum
+{
+    NORMAL_MODE = 0,
+    PICK_MODE_SINGLE,
+    PICK_MODE_MULTIPLE,
+};
+
+static char mode = NORMAL_MODE;
 
 void mainLoop(GLFWwindow * window)
 {
@@ -247,35 +258,37 @@ void mainLoop(GLFWwindow * window)
     }
 
     {
-        static uint32_t myImageTextureId2 = 0;
-        if(!myImageTextureId2) { myImageTextureId2 = Textures::load("if_Info_131908.png") ;}
+        //static uint32_t infoIcon = 0;
+        //if(!infoIcon) { infoIcon = Textures::load("if_Info_131908.png") ;}
+        //if(!infoIcon) { infoIcon = Textures::load("xpos.png") ;}
+        //dmess("infoIcon " << infoIcon);
         //dmess("myImageTextureId2 " << myImageTextureId2);
-             static ImGui::Toolbar toolbar("myFirstToolbar##foo");
-             if (toolbar.getNumButtons()==0)  {
-                 char tmp[1024];ImVec2 uv0(0,0),uv1(0,0);
-                 for (int i=0;i<9;i++) {
-                     strcpy(tmp,"toolbutton ");
-                     sprintf(&tmp[strlen(tmp)],"%d",i+1);
-                     //uv0 = ImVec2((float)(i%3)/3.f,(float)(i/3)/3.f);
-                     //uv1 = ImVec2(uv0.x+1.f/3.f,uv0.y+1.f/3.f);
-                     uv0 = ImVec2(0,0);
-                     uv1 = ImVec2(1,1);
- 
-                     toolbar.addButton(ImGui::Toolbutton(tmp,(void*)myImageTextureId2,uv0,uv1));
-                 }
-                 //toolbar.addSeparator(16);
-                 //toolbar.addButton(ImGui::Toolbutton("toolbutton 11",(void*)myImageTextureId2,uv0,uv1,ImVec2(32,32),true,false,ImVec4(0.8,0.8,1.0,1)));  // Note that separator "eats" one toolbutton index as if it was a real button
-                 //toolbar.addButton(ImGui::Toolbutton("toolbutton 12",(void*)myImageTextureId2,uv0,uv1,ImVec2(48,24),true,false,ImVec4(1.0,0.8,0.8,1)));  // Note that separator "eats" one toolbutton index as if it was a real button
- 
-                 toolbar.setProperties(false,false,true,ImVec2(0.5f,0.f));
+        static ImGui::Toolbar toolbar("myFirstToolbar##foo");
+        if (toolbar.getNumButtons()==0)
+        {
+            ImVec2 uv0(0,0);
+            ImVec2 uv1(1,1);
+            //ImVec2 size(16,16);
+            ImVec2 size(32,32);
+            toolbar.addButton(ImGui::Toolbutton("Normal Mode",(void*)infoIcon,uv0,uv1,size));
+            toolbar.addButton(ImGui::Toolbutton("Get Info Mode",(void*)infoIcon,uv0,uv1,size));
+            toolbar.addButton(ImGui::Toolbutton("Get Info Mode Multiple",(void*)infoIcon,uv0,uv1,size));
 
-                 //toolbar.setProperties(true,true,false,ImVec2(0.0f,0.0f),ImVec2(0.25f,0.9f),ImVec4(0.85,0.85,1,1));
- 
-                 //toolbar.setScaling(2.0f,1.1f);
-             }
-             const int pressed = toolbar.render();
-             if (pressed>=0) fprintf(stderr,"Toolbar1: pressed:%d\n",pressed);
-         }
+            toolbar.setProperties(false,false,true,ImVec2(0.5f,0.f));
+
+            //toolbar.setScaling(0.5f,0.5f);
+        }
+        
+        const int pressed = toolbar.render();
+        if (pressed>=0) fprintf(stderr,"Toolbar1: pressed:%d\n",pressed);
+        switch(pressed)
+        {
+            case 0: mode = NORMAL_MODE; break;
+            case 1: mode = PICK_MODE_SINGLE; break;
+            case 2: mode = PICK_MODE_MULTIPLE; break;
+        }
+        //dmess("infoIcon " << infoIcon);
+    }
 
     // Rendering
     int screenWidth, screenHeight;
@@ -395,15 +408,18 @@ void mainLoop(GLFWwindow * window)
     
     string attrsStr;
 
-    if(client)
+    if(client && mode == PICK_MODE_SINGLE)
     {
-        vector<pair<Renderable *, Attributes *> > picked = client->pickRenderables(canvas->getCursorPosWC());
+        Renderable * renderiable;
+        Attributes * attrs;
 
-        for(pair<Renderable *, Attributes *> & r : picked)
+        tie(renderiable, attrs) = client->pickRenderable(canvas->getCursorPosWC());
+
+        if(renderiable)
         {
-            get<0>(r)->render(canvas->getMVP_Ref());
+            renderiable->render(canvas->getMVP_Ref());
 
-            attrsStr += r.second->toString();
+            attrsStr = attrs->toString();
         }
     }
 
@@ -584,6 +600,10 @@ void keyCallback1(GLFWwindow* window, int key, int scancode, int action, int mod
 void initOpenGL(GLFWwindow* window)
 {
     debugLoggerFunc = &dmessCallback;
+
+    infoIcon = Textures::load("if_Info_131908.png");
+    //if(!infoIcon) { infoIcon = Textures::load("if_Info_131908.png") ;}
+    //if(!infoIcon) { infoIcon = Textures::load("xpos.png") ;}
 
     // Define the viewport dimensions
     static int width, height;

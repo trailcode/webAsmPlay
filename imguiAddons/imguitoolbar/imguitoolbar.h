@@ -295,7 +295,7 @@
              sz.x=b.size.x*scaling.x;sz.y=b.size.y*scaling.y;
              if (vertical)   {
                  if (!isSeparator && toolbarWindowSize.x < sz.x) toolbarWindowSize.x = sz.x;
-                 toolbarWindowSize.y+=sz.y;
+                 //toolbarWindowSize.y+=sz.y;
              }
              else {
                  if (!isSeparator && toolbarWindowSize.y < sz.y) toolbarWindowSize.y = sz.y;

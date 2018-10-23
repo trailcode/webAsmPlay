@@ -472,6 +472,45 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
     });
 }
 
+pair<Renderable *, Attributes *> GeoClient::pickRenderable(const vec3 & _pos)
+{
+    const vec4 pos = inverseTrans * vec4(_pos, 1.0);
+    
+    vector< void * > query;
+    
+    const Envelope bounds(pos.x, pos.x, pos.y, pos.y);
+    
+    quadTree->query(&bounds, query);
+    
+    Point * p = scopedGeosGeometry(GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y)));
+
+    double minArea = numeric_limits<double>::max();
+
+    Renderable * smallest      = NULL;
+    Attributes * smallestAttrs = NULL;
+
+    for(const void * _data : query)
+    {
+        tuple<Renderable *, const Geometry *, Attributes *> * data = (tuple<Renderable *, const Geometry *, Attributes *> *)_data;
+
+        const Geometry * geom = get<1>(*data);
+
+        if(!p->within(geom)) { continue ;}
+
+        const double area = geom->getArea();
+
+        if(area >= minArea) { continue ;}
+
+        minArea = area; 
+
+        smallest = get<0>(*data);
+
+        smallestAttrs = get<2>(*data); 
+    }
+
+    return make_pair(smallest, smallestAttrs);
+}
+
 vector<pair<Renderable *, Attributes *> > GeoClient::pickRenderables(const vec3 & _pos)
 {
     vec4 pos = inverseTrans * vec4(_pos, 1.0);

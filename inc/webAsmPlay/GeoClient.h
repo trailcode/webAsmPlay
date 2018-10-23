@@ -52,6 +52,8 @@ public:
 
     void loadAllGeometry(Canvas * canvas);
     
+    std::pair<Renderable *, Attributes *> pickRenderable(const glm::vec3 & pos);
+
     std::vector<std::pair<Renderable *, Attributes *> > pickRenderables(const glm::vec3 & pos);
 
 private:

@@ -1,9 +1,5 @@
-
 #include <fstream>
 #include <vector>
-//#include <SDL/SDL.h>
-//#include <SDL/SDL_image.h>
-//#include <SDL.h>
 #include <SDL_image.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Textures.h>
@@ -89,7 +85,7 @@ GLuint Textures::load(const string & filename)
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-    SDL_FreeSurface(img);
+    //SDL_FreeSurface(img);
 
     return texture;
 }
@@ -138,12 +134,14 @@ GLuint Textures::loadCube(const vector<string> & files)
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, zpos->w, zpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zpos->pixels);
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, zneg->w, zneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zneg->pixels);
     
-    SDL_FreeSurface(xpos);
+    /*
+    SDL_FreeSurface(xpos); // TODO Causes crashing. MUst not be the correct way to free memory.
     SDL_FreeSurface(xneg);
     SDL_FreeSurface(ypos);
     SDL_FreeSurface(yneg);
     SDL_FreeSurface(zpos);
     SDL_FreeSurface(zneg);
+    */
 
     return texCube;
 }
