@@ -140,7 +140,8 @@ int main(int, char**)
     {
         if (glfwWindowShouldClose(window)) { break ;}
         
-        glfwPollEvents();
+        //glfwPollEvents();
+        glfwWaitEvents();
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();

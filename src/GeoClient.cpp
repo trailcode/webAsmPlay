@@ -513,26 +513,17 @@ pair<Renderable *, Attributes *> GeoClient::pickRenderable(const vec3 & _pos)
 
 vector<pair<Renderable *, Attributes *> > GeoClient::pickRenderables(const vec3 & _pos)
 {
-    vec4 pos = inverseTrans * vec4(_pos, 1.0);
+    const vec4 pos = inverseTrans * vec4(_pos, 1.0);
     
-    //dmess("pos " << pos);
-
-    vector<pair<Renderable *, Attributes *> > ret;
-
     vector< void * > query;
     
-    Envelope bounds(pos.x, pos.x, pos.y, pos.y);
+    const Envelope bounds(pos.x, pos.x, pos.y, pos.y);
     
     quadTree->query(&bounds, query);
     
-    //dmess("query " << query.size());
-
     Point * p = scopedGeosGeometry(GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y)));
 
-    double minArea = numeric_limits<double>::max();
-
-    Renderable * smallest = NULL;
-    Attributes * smallestAttrs = NULL;
+    vector<tuple<Renderable *, Attributes *, double> > picked;
 
     for(const void * _data : query)
     {
@@ -540,26 +531,17 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickRenderables(const vec3 
 
         const Geometry * geom = get<1>(*data);
 
-        //if(p->within(geom)) { ret.push_back(data->first) ;}
         if(!p->within(geom)) { continue ;}
 
-        const double area = geom->getArea();
-
-        if(area < minArea)
-        {
-            minArea = area; 
-
-            smallest = get<0>(*data);
-
-            smallestAttrs = get<2>(*data); 
-        }
+        picked.push_back(make_tuple(get<0>(*data), get<2>(*data), geom->getArea()));
     }
 
-    ret.clear();
+    // Sort by area, smallest first.
+    sort(picked.begin(), picked.end(), [](const auto & lhs, const auto & rhs) { return get<2>(lhs) < get<2>(rhs) ;});
 
-    //dmess("minArea " << minArea << " " << smallest);
+    vector<pair<Renderable *, Attributes *> > ret(picked.size());
 
-    if(smallest) { ret.push_back(make_pair(smallest, smallestAttrs)) ;}
+    for(size_t i = 0; i < picked.size(); ++i) { ret[i] = make_pair(get<0>(picked[i]), get<1>(picked[i])) ;}
     
     return ret;
 }

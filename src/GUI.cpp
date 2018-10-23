@@ -96,6 +96,10 @@ void refresh(GLFWwindow* window)
     glfwPollEvents();
 
     glfwMarkWindowForRefresh(window);
+#else
+
+    glfwPostEmptyEvent();
+
 #endif
 }
 
@@ -258,11 +262,6 @@ void mainLoop(GLFWwindow * window)
     }
 
     {
-        //static uint32_t infoIcon = 0;
-        //if(!infoIcon) { infoIcon = Textures::load("if_Info_131908.png") ;}
-        //if(!infoIcon) { infoIcon = Textures::load("xpos.png") ;}
-        //dmess("infoIcon " << infoIcon);
-        //dmess("myImageTextureId2 " << myImageTextureId2);
         static ImGui::Toolbar toolbar("myFirstToolbar##foo");
         if (toolbar.getNumButtons()==0)
         {
@@ -408,18 +407,44 @@ void mainLoop(GLFWwindow * window)
     
     string attrsStr;
 
-    if(client && mode == PICK_MODE_SINGLE)
-    {
-        Renderable * renderiable;
-        Attributes * attrs;
-
-        tie(renderiable, attrs) = client->pickRenderable(canvas->getCursorPosWC());
-
-        if(renderiable)
+    if(client)
+    { // TODO move this code to GeoClient
+        if(mode == PICK_MODE_SINGLE)
         {
-            renderiable->render(canvas->getMVP_Ref());
+            Renderable * renderiable;
+            Attributes * attrs;
 
-            attrsStr = attrs->toString();
+            tie(renderiable, attrs) = client->pickRenderable(canvas->getCursorPosWC());
+
+            if(renderiable)
+            {
+                renderiable->render(canvas->getMVP_Ref());
+
+                attrsStr = attrs->toString();
+            }
+        }
+        else if(mode == PICK_MODE_MULTIPLE)
+        {
+            vector<pair<Renderable *, Attributes *> > picked = client->pickRenderables(canvas->getCursorPosWC());
+
+            if(picked.size())
+            {
+                Renderable * renderiable;
+                Attributes * attrs;
+
+                tie(renderiable, attrs) = picked[0];
+
+                renderiable->render(canvas->getMVP_Ref());
+
+                attrsStr = attrs->toString();
+
+                for(size_t i = 1; i < picked.size(); ++i)
+                {
+                    attrsStr += "\n";
+
+                    attrsStr += get<1>(picked[i])->toString();
+                }
+            }
         }
     }
 
@@ -481,11 +506,8 @@ void mainLoop(GLFWwindow * window)
 
 void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
 {
-    if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
-    {
-        return;
-    }
-
+    //dmess("mouseButtonCallback button: " << button << " action " << action << " mods " << mods);
+    
     geosTestCanvas->onMouseButton(window, button, action, mods);
 
     if(!GImGui->IO.WantCaptureMouse)
@@ -503,7 +525,7 @@ void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
 #else
     ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
 #endif
-    
+
     refresh(window);
 }
 
