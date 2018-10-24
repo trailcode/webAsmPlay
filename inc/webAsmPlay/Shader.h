@@ -38,12 +38,19 @@ public:
                                     const GLsizei     stride        = 0,
                                     const GLvoid    * pointer       = NULL);
 
+    void enableColorAttribArray(    const GLint       size          = 4,
+                                    const GLenum      type          = GL_FLOAT,
+                                    const GLboolean   normalized    = GL_FALSE,
+                                    const GLsizei     stride        = 0,
+                                    const GLvoid    * pointer       = NULL);
+
     GLuint setTexture1Slot(const GLuint slot) const;
 
 protected:
 
     Shader( const GLuint shaderProgram,
             const GLint  vertInAttrib,
+            const GLint  colorInAttrib,
             const GLint  MVP_In_Uniform,
             const GLint  colorUniform,
             const GLint  textureCoordsUniform);
@@ -52,6 +59,7 @@ private:
 
     GLuint shaderProgram;
     GLint  vertInAttrib;
+    GLint  colorInAttrib;
     GLint  MVP_In_Uniform;
     GLint  colorUniform;
     GLint  textureCoordsUniform;

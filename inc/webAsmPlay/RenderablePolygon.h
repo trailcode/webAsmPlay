@@ -98,6 +98,8 @@ private:
 
     static void ensureOutlineShader();
 
+    static void ensureColorPolygonShader();
+
     const GLuint                vao;
     const GLuint                ebo;
     const GLuint                ebo2;

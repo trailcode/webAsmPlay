@@ -544,6 +544,7 @@ void RenderablePolygon::render(const mat4 & MVP) const
 void RenderablePolygon::ensureShaders()
 {
     ensureOutlineShader();
+    ensureColorPolygonShader();
 }
 
 void RenderablePolygon::ensureOutlineShader()
@@ -602,3 +603,7 @@ void RenderablePolygon::ensureOutlineShader()
     dmess("outlineShader " << outlineShader);
 }
 
+void RenderablePolygon::ensureColorPolygonShader()
+{
+
+}
