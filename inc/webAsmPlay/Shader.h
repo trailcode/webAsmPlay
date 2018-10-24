@@ -43,18 +43,18 @@ public:
 protected:
 
     Shader( const GLuint shaderProgram,
-            const GLint  posAttrib,
-            const GLint  MVP_Attrib,
-            const GLint  colorAttrib,
-            const GLint  textureCoordsAttrib);
+            const GLint  vertInAttrib,
+            const GLint  MVP_In_Uniform,
+            const GLint  colorUniform,
+            const GLint  textureCoordsUniform);
 
 private:
 
     GLuint shaderProgram;
-    GLint  posAttrib;
-    GLint  MVP_Attrib;
-    GLint  colorAttrib;
-    GLint  textureCoordsAttrib;
+    GLint  vertInAttrib;
+    GLint  MVP_In_Uniform;
+    GLint  colorUniform;
+    GLint  textureCoordsUniform;
 };
 
 #endif // __WEB_ASM_PLAY_SHADER_H__

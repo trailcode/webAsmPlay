@@ -557,15 +557,15 @@ void RenderablePolygon::ensureOutlineShader()
     if(outlineShader) { return ;}
 
     const GLchar* vertexSource = R"glsl(#version 330 core
-        in vec2 position;
+        in vec2 vertIn;
         out vec4 vertexColor;
         uniform mat4 MVP;
-        uniform vec4 vertexColorIn;
+        uniform vec4 colorIn;
 
         void main()
         {
-            gl_Position = MVP * vec4(position.xy, 0, 1);
-            vertexColor = vertexColorIn;
+            gl_Position = MVP * vec4(vertIn.xy, 0, 1);
+            vertexColor = colorIn;
         }
     )glsl";
 

@@ -10,10 +10,10 @@ Shader * Shader::create(const GLchar * vertexSource,
                         const GLchar * geometrySource)
 {
     GLuint shaderProgram        = 0;
-    GLint  posAttrib            = 0;
-    GLint  MVP_Attrib           = 0;
-    GLint  colorAttrib          = 0;
-    GLint  textureCoordsAttrib  = 0;
+    GLint  vertInAttrib         = 0;
+    GLint  MVP_In_Uniform       = 0;
+    GLint  colorUniform         = 0;
+    GLint  textureCoordsUniform = 0;
     GLint  success              = 0;
 
     // Create and compile the vertex shader
@@ -90,32 +90,35 @@ Shader * Shader::create(const GLchar * vertexSource,
     glUseProgram  (shaderProgram);
 
     // Specify the layout of the vertex data
-    posAttrib = glGetAttribLocation(shaderProgram, "position");
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+    vertInAttrib         = glGetAttribLocation (shaderProgram, "vertIn");
+    MVP_In_Uniform       = glGetUniformLocation(shaderProgram, "MVP");
+    colorUniform         = glGetUniformLocation(shaderProgram, "colorIn");
+    textureCoordsUniform = glGetUniformLocation(shaderProgram, "cube_texture");
 
-    MVP_Attrib = glGetUniformLocation(shaderProgram, "MVP");
+    dmess("vertInAttrib  "           << vertInAttrib);
+    dmess("MVP_In_Uniform "           << MVP_In_Uniform);
+    dmess("colorUniform "          << colorUniform);
+    dmess("textureCoordsUniform "  << textureCoordsUniform);
 
-    colorAttrib = glGetUniformLocation(shaderProgram, "vertexColorIn");
-
-    textureCoordsAttrib = glGetUniformLocation(shaderProgram, "cube_texture");
+    glEnableVertexAttribArray(vertInAttrib);
+    glVertexAttribPointer(vertInAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
 
     return new Shader(  shaderProgram,
-                        posAttrib,
-                        MVP_Attrib,
-                        colorAttrib,
-                        textureCoordsAttrib);
+                        vertInAttrib,
+                        MVP_In_Uniform,
+                        colorUniform,
+                        textureCoordsUniform);
 }
 
 Shader::Shader( const GLuint shaderProgram,
-                const GLint  posAttrib,
-                const GLint  MVP_Attrib,
-                const GLint  colorAttrib,
-                const GLint  textureCoordsAttrib) : shaderProgram       (shaderProgram),
-                                                    posAttrib           (posAttrib),
-                                                    MVP_Attrib          (MVP_Attrib),
-                                                    colorAttrib         (colorAttrib),
-                                                    textureCoordsAttrib (textureCoordsAttrib)
+                const GLint  vertInAttrib,
+                const GLint  MVP_In_Uniform,
+                const GLint  colorUniform,
+                const GLint  textureCoordsUniform) : shaderProgram        (shaderProgram),
+                                                     vertInAttrib         (vertInAttrib),
+                                                     MVP_In_Uniform       (MVP_In_Uniform),
+                                                     colorUniform         (colorUniform),
+                                                     textureCoordsUniform (textureCoordsUniform)
 {
 } 
 
@@ -138,14 +141,14 @@ GLuint Shader::getProgramHandle() const { return shaderProgram ;}
 
 vec4 Shader::setColor(const vec4 & color)
 {
-    glUniform4f(colorAttrib, color.x, color.y, color.z, color.w);
+    glUniform4f(colorUniform, color.x, color.y, color.z, color.w);
 
     return color;
 }
 
 mat4 Shader::setMVP(const mat4 & MVP)
 {
-    glUniformMatrix4fv(MVP_Attrib, 1, false, glm::value_ptr(MVP));
+    glUniformMatrix4fv(MVP_In_Uniform, 1, false, glm::value_ptr(MVP));
 
     return MVP;
 }
@@ -157,14 +160,14 @@ void Shader::enableVertexAttribArray(   const GLint       size,
                                         const GLvoid    * pointer)
 {
     // Specify the layout of the vertex data
-    glEnableVertexAttribArray(posAttrib);
+    glEnableVertexAttribArray(vertInAttrib);
 
-    glVertexAttribPointer(posAttrib, size, type, normalized, stride, pointer);
+    glVertexAttribPointer(vertInAttrib, size, type, normalized, stride, pointer);
 }
 
 GLuint Shader::setTexture1Slot(const GLuint slot) const
 {
-    glUniform1i(textureCoordsAttrib, slot);
+    glUniform1i(textureCoordsUniform, slot);
 
     return slot;
 }
