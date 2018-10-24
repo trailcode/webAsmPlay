@@ -16,6 +16,8 @@ public:
 
     std::string toString() const;
 
+    bool hasStringKey(const std::string & key) const;
+
     typedef std::unordered_map<std::string, int32_t>        Ints32;
     typedef std::unordered_map<std::string, int64_t>        Ints64;
     typedef std::unordered_map<std::string, double >        Doubles;

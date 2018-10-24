@@ -47,6 +47,7 @@
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeometryConverter.h>
 #include <webAsmPlay/RenderablePolygon.h>
+#include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GeoClient.h>
 
@@ -455,17 +456,60 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
             dmess("quadTree " << quadTree->depth() << " " << geomsIn.size());
             
+            //*
             vector<const Geometry *> polys(geomsIn.size());
 
             for(size_t i = 0; i < polys.size(); ++i) { polys[i] = dynamic_cast<const Geometry *>(geomsIn[i].second) ;}
 
             Renderable * r = RenderablePolygon::create(polys, trans);
-            
+
             r->setFillColor(vec4(0.3,0.0,0.3,0.3));
             
             r->setOutlineColor(vec4(0,1,0,1));
             
             canvas->addRenderiable(r);
+            //*/
+
+            /*
+            //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors(geomsIn.size());
+            vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors;
+
+            //for(size_t i = 0; i < polysAndColors.size(); ++i)
+            for(size_t i = 0; i < geomsIn.size(); ++i)
+            {
+                //polys[i] = dynamic_cast<const Geometry *>(geomsIn[i].second);
+                Attributes * attrs = geomsIn[i].first;
+
+                //dmess("attrs " << attrs);
+
+                const Geometry * geom = dynamic_cast<const Geometry *>(geomsIn[i].second);
+
+                if(!geom)
+                {
+                    dmess("!geom");
+                }
+
+                const vec4 outlineColor(0,1,0,1);
+
+                vec4 fillColor = vec4(0,0,1,0.5);
+
+                if(attrs && attrs->hasStringKey("building")) { fillColor = vec4(1,0.5,0,0.5) ;}
+                
+                polysAndColors.push_back(make_tuple(geom, fillColor, outlineColor));
+            }
+            
+            dmess("polysAndColors " << polysAndColors.size());
+
+            Renderable * r = RenderablePolygon::create(polysAndColors, trans);
+
+            dmess("after " << r);
+            
+            //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
+            
+            //r->setOutlineColor(vec4(0,1,0,1));
+            
+            canvas->addRenderiable(r);
+            //*/
             
             dmess("Done creating renderiable.");
         });

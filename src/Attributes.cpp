@@ -94,3 +94,5 @@ string Attributes::toString() const
 
     return attrsStrStream.str();
 }
+
+bool Attributes::hasStringKey(const string & key) const { strings.find(key) != strings.end() ;}
