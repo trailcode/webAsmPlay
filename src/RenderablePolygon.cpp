@@ -375,8 +375,6 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
 {
     if(!tesselations.size()) { return NULL ;}
 
-    dmess("Herrrrr " << tesselations.size());
-
     size_t numVerts                 = 0;
     size_t numTriangles             = 0;
     size_t numCounterVertIndices    = 0;
@@ -463,8 +461,6 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * counterVertIndices2.size(), &counterVertIndices2[0], GL_STATIC_DRAW);
 
-    dmess("counterVertIndices2.size() " << counterVertIndices2.size());
-
     return new RenderablePolygon(   vao,
                                     ebo,
                                     ebo2,
@@ -495,11 +491,9 @@ void RenderablePolygon::render(const mat4 & MVP) const
 
         colorPolygonShader->setMVP(MVP);
 
-        glEnableVertexAttribArray(colorPolygonShader->vertInAttrib);
-        glVertexAttribPointer(colorPolygonShader->vertInAttrib, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+        colorPolygonShader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
 
-        glEnableVertexAttribArray(colorPolygonShader->colorInAttrib);
-        glVertexAttribPointer(colorPolygonShader->colorInAttrib, 4, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)(2*sizeof(GLfloat)));
+        colorPolygonShader->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)(2*sizeof(GLfloat)));
     }
     else
     {
@@ -522,6 +516,8 @@ void RenderablePolygon::render(const mat4 & MVP) const
         
         glDisable(GL_BLEND);
     }
+
+    //glDisable(GL_DEPTH_TEST);
 
     if(getRenderOutline())
     {

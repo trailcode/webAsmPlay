@@ -421,10 +421,6 @@ void mainLoop(GLFWwindow * window)
                 renderiable->render(canvas->getMVP_Ref());
 
                 attrsStr = attrs->toString();
-
-                dmess("attrsStr " << attrsStr);
-
-                dmess("Has attr " << (int)attrs->hasStringKey("building"));
             }
         }
         else if(mode == PICK_MODE_MULTIPLE)

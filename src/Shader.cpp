@@ -182,7 +182,6 @@ void Shader::enableColorAttribArray(    const GLint       size,
                                         const GLvoid    * pointer)
 {
     // Specify the layout of the vertex data
-    dmess("colorInAttrib aaa " << colorInAttrib); 
     glEnableVertexAttribArray(colorInAttrib);
 
     glVertexAttribPointer(colorInAttrib, size, type, normalized, stride, pointer);

@@ -474,13 +474,10 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
             //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors(geomsIn.size());
             vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors;
 
-            //for(size_t i = 0; i < polysAndColors.size(); ++i)
-            for(size_t i = 0; i < geomsIn.size(); ++i)
+            //for(size_t i = 0; i < geomsIn.size(); ++i)
+            for(int i = geomsIn.size() - 1; i >= 0; --i)
             {
-                //polys[i] = dynamic_cast<const Geometry *>(geomsIn[i].second);
                 Attributes * attrs = geomsIn[i].first;
-
-                //dmess("attrs " << attrs);
 
                 const Geometry * geom = dynamic_cast<const Geometry *>(geomsIn[i].second);
 
@@ -509,12 +506,8 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
                 polysAndColors.push_back(make_tuple(geom, fillColor, outlineColor));
             }
             
-            dmess("polysAndColors " << polysAndColors.size());
-
             Renderable * r = RenderablePolygon::create(polysAndColors, trans);
 
-            dmess("after " << r);
-            
             //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
             
             r->setOutlineColor(vec4(0,1,0,1));

@@ -21,7 +21,8 @@ generalization, bot AI, navigation graphs generated from Open Street Map data an
 
 Unfortunately during development notes on build depends were not tracked. Development is currently
 being done on OSX. Macports (https://www.macports.org/) and Brew (https://brew.sh/) is being used to
-install third party dependencies. C++ 17 is being used.
+install third party dependencies. C++ 14 is being used. Currently emscripten is using clang 5.0 which
+does not fully support c++ 17. 
 
 * Cmake: https://cmake.org
 * Emscripten: http://kripken.github.io/emscripten-site

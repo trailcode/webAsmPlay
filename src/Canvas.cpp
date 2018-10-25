@@ -116,7 +116,7 @@ GLuint Canvas::render()
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    lock_guard _(renderiablesMutex);
+    lock_guard<mutex> _(renderiablesMutex);
 
     for(Renderable * r : renderiables) { r->render(MVP) ;}
 
@@ -241,13 +241,13 @@ void Canvas::onChar(GLFWwindow * window, const size_t c)
 
 Renderable * Canvas::addRenderiable(Renderable * renderiable)
 {
-    lock_guard _(renderiablesMutex);
+    lock_guard<mutex> _(renderiablesMutex);
 
     renderiables.push_back(renderiable);
 
     renderiable->addOnDeleteCallback([this](Renderable * r)
     {
-        lock_guard _(renderiablesMutex);
+        lock_guard<mutex> _(renderiablesMutex);
 
         renderiables.remove(r);
     });

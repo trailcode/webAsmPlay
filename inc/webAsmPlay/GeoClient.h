@@ -45,7 +45,6 @@ public:
 
     void getGeometry(const size_t geomIndex, std::function<void (geos::geom::Geometry *)> & callback);
 
-    //void getAllGeometries(std::function<void (std::vector<geos::geom::Geometry *> geoms)> & callback);
     void getAllGeometries(std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
     void loadGeometry(Canvas * canvas);
