@@ -13,7 +13,8 @@ using namespace geos::geom;
 
 namespace
 {
-    Shader * outlineShader = NULL;
+    Shader * outlineShader      = NULL;
+    Shader * colorPolygonShader = NULL;
 }
 
 // TODO Create better variable names. Try to simplify this class.
@@ -327,6 +328,8 @@ Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, con
                                         const bool                        renderOutline,
                                         const bool                        renderFill)
 {
+    dmess("THis one!");
+
     vector<const TesselationResult> tesselationResults;
 
     for(const tuple<const Geometry *, const vec4, const vec4> & polyAndColors : polygons)
@@ -395,7 +398,8 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
         numCounterVertIndices2  += tess.counterVertIndices2.size();
     }
 
-    vector<GLfloat> verts                (numVerts * 2);
+    //vector<GLfloat> verts                (numVerts * 2);
+    vector<GLfloat> verts                (numVerts * (2 + 4));
     vector<GLuint>  triangleIndices      (numTriangles * 3);
     vector<GLuint>  counterVertIndices   (numCounterVertIndices);
     vector<GLuint>  counterVertIndices2  (numCounterVertIndices2);
@@ -420,13 +424,25 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
     {
         const TesselationResult & tess = tesselations[i];
 
-        if(seperateFillColors) // TODO template or make two loops to avoid so many if checks
+        if(true || seperateFillColors) // TODO template or make two loops to avoid so many if checks
         {
+            /*
             for(size_t j = 0; j < tess.numVerts * 2; ++j, ++vertsPtr, ++colorIndicesPtr)
             {
                 *vertsPtr = tess.vertsOut[j];
 
                 *colorIndicesPtr = i; // TODO should try and reduce, most of the colors are going to be the same!
+            }
+            */
+            for(size_t j = 0; j < tess.numVerts; ++j)
+            {
+                *vertsPtr = tess.vertsOut[j * 2 + 0]; ++vertsPtr;
+                *vertsPtr = tess.vertsOut[j * 2 + 1]; ++vertsPtr;
+
+                *vertsPtr = tesselations[i].fillColor.x; ++vertsPtr;
+                *vertsPtr = tesselations[i].fillColor.y; ++vertsPtr;
+                *vertsPtr = tesselations[i].fillColor.z; ++vertsPtr;
+                *vertsPtr = tesselations[i].fillColor.w; ++vertsPtr;
             }
         }
         else
@@ -461,7 +477,8 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
     glGenBuffers(1, &ebo2);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2, &verts[0], GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2, &verts[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * (2 + 4), &verts[0], GL_STATIC_DRAW);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, &triangleIndices[0], GL_STATIC_DRAW);
@@ -469,20 +486,28 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * counterVertIndices2.size(), &counterVertIndices2[0], GL_STATIC_DRAW);
 
-    if(seperateFillColors)
+    if(true || seperateFillColors)
     {
         glGenBuffers(1, &vbo2);
         glGenBuffers(1, &ebo3);
 
         vector<vec4> colors(tesselations.size());
 
-        for(size_t i = 0; i < tesselations.size(); ++i) { colors[i] = tesselations[i].fillColor ;}
+        for(size_t i = 0; i < tesselations.size(); ++i)
+        {
+            //colors[i] = tesselations[i].fillColor;
+            //colors[i] = vec4(1,0,0,1);
+        }
+
+        dmess("colors " << colors.size());
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo2);
         glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * colors.size() * 4, &colors[0], GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo3);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * colorIndices.size(), &colorIndices[0], GL_STATIC_DRAW);
+        dmess("colorIndices.size() " << colorIndices.size());
+
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo3);
+        //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * colorIndices.size(), &colorIndices[0], GL_STATIC_DRAW);
     }
 
     return new RenderablePolygon(   vao,
@@ -503,6 +528,7 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
 
 void RenderablePolygon::render(const mat4 & MVP) const
 {
+    /*
     getDefaultShader()->bind();
 
     getDefaultShader()->setMVP(MVP);
@@ -521,6 +547,56 @@ void RenderablePolygon::render(const mat4 & MVP) const
     if(getRenderFill())
     {
         getDefaultShader()->setColor(fillColor);
+
+        glEnable(GL_BLEND);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, NULL);
+        
+        glDisable(GL_BLEND);
+    }
+
+    if(getRenderOutline())
+    {
+        getDefaultShader()->setColor(outlineColor);
+        
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+        
+        glDrawElements(GL_LINES, numContourLines, GL_UNSIGNED_INT, NULL);
+    }
+    */
+
+    colorPolygonShader->bind();
+
+    colorPolygonShader->setMVP(MVP);
+
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+    //colorPolygonShader->enableVertexAttribArray();
+
+    //colorPolygonShader->enableColorAttribArray();
+
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    
+    //glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0,0);
+
+    glEnableVertexAttribArray(colorPolygonShader->vertInAttrib);
+    glVertexAttribPointer(colorPolygonShader->vertInAttrib, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+
+    glEnableVertexAttribArray(colorPolygonShader->colorInAttrib);
+    glVertexAttribPointer(colorPolygonShader->colorInAttrib, 4, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)(2*sizeof(GLfloat)));
+
+    if(ebo3)
+    {
+
+    }
+
+    if(getRenderFill())
+    {
+        //getDefaultShader()->setColor(fillColor);
 
         glEnable(GL_BLEND);
 
@@ -605,5 +681,35 @@ void RenderablePolygon::ensureOutlineShader()
 
 void RenderablePolygon::ensureColorPolygonShader()
 {
+    if(colorPolygonShader) { return ;}
 
+    dmess("RenderablePolygon::ensureColorPolygonShader");
+
+    // Shader sources
+    const GLchar* vertexSource = R"glsl(#version 330 core
+        in vec2 vertIn;
+        in vec4 vertColorIn;
+        out vec4 vertexColor;
+
+        uniform mat4 MVP;
+
+        void main()
+        {
+            gl_Position = MVP * vec4(vertIn.xy, 0, 1);
+            vertexColor = vertColorIn;
+            //vertexColor = vec4(0,1,1,1);
+        }
+    )glsl";
+
+    const GLchar* fragmentSource = R"glsl(#version 330 core
+        out vec4 outColor;
+        in vec4 vertexColor;
+
+        void main()
+        {
+            outColor = vertexColor;
+        }
+    )glsl";
+
+    colorPolygonShader = Shader::create(vertexSource, fragmentSource);
 }

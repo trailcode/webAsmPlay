@@ -456,7 +456,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
             dmess("quadTree " << quadTree->depth() << " " << geomsIn.size());
             
-            //*
+            /*
             vector<const Geometry *> polys(geomsIn.size());
 
             for(size_t i = 0; i < polys.size(); ++i) { polys[i] = dynamic_cast<const Geometry *>(geomsIn[i].second) ;}
@@ -470,7 +470,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
             canvas->addRenderiable(r);
             //*/
 
-            /*
+            //*
             //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors(geomsIn.size());
             vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors;
 
@@ -493,7 +493,10 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
                 vec4 fillColor = vec4(0,0,1,0.5);
 
-                if(attrs && attrs->hasStringKey("building")) { fillColor = vec4(1,0.5,0,0.5) ;}
+                if(attrs->hasStringKey("building"))
+                {
+                    fillColor = vec4(1,0.5,0,0.5);
+                }
                 
                 polysAndColors.push_back(make_tuple(geom, fillColor, outlineColor));
             }
@@ -506,7 +509,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
             
             //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
             
-            //r->setOutlineColor(vec4(0,1,0,1));
+            r->setOutlineColor(vec4(0,1,0,1));
             
             canvas->addRenderiable(r);
             //*/

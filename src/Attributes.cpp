@@ -90,9 +90,9 @@ string Attributes::toString() const
     for(const Attributes::Ints32 ::value_type & i : ints32)  { attrsStrStream << i.first << ": " << i.second << endl ;}
     for(const Attributes::Ints64 ::value_type & i : ints64)  { attrsStrStream << i.first << ": " << i.second << endl ;}
     for(const Attributes::Doubles::value_type & i : doubles) { attrsStrStream << i.first << ": " << i.second << endl ;}
-    for(const Attributes::Strings::value_type & i : strings) { attrsStrStream << i.first << ": " << i.second << endl ;}
+    for(const Attributes::Strings::value_type & i : strings) { attrsStrStream << "[" << i.first << "]: " << i.second << endl ;}
 
     return attrsStrStream.str();
 }
 
-bool Attributes::hasStringKey(const string & key) const { strings.find(key) != strings.end() ;}
+bool Attributes::hasStringKey(const string & key) const { return strings.find(key) != strings.end() ;}

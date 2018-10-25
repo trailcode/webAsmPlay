@@ -92,7 +92,7 @@ Shader * Shader::create(const GLchar * vertexSource,
 
     // Specify the layout of the vertex data
     vertInAttrib         = glGetAttribLocation (shaderProgram, "vertIn");
-    colorInAttrib        = glGetAttribLocation (shaderProgram, "colorIn");
+    colorInAttrib        = glGetAttribLocation (shaderProgram, "vertColorIn");
     MVP_In_Uniform       = glGetUniformLocation(shaderProgram, "MVP");
     colorUniform         = glGetUniformLocation(shaderProgram, "colorIn");
     textureCoordsUniform = glGetUniformLocation(shaderProgram, "cube_texture");
@@ -105,6 +105,10 @@ Shader * Shader::create(const GLchar * vertexSource,
 
     glEnableVertexAttribArray(vertInAttrib);
     glVertexAttribPointer(vertInAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+
+    glEnableVertexAttribArray(colorInAttrib);
+
+    glVertexAttribPointer(colorInAttrib, 4, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
 
     return new Shader(  shaderProgram,
                         vertInAttrib,
@@ -178,6 +182,7 @@ void Shader::enableColorAttribArray(    const GLint       size,
                                         const GLvoid    * pointer)
 {
     // Specify the layout of the vertex data
+    dmess("colorInAttrib aaa " << colorInAttrib); 
     glEnableVertexAttribArray(colorInAttrib);
 
     glVertexAttribPointer(colorInAttrib, size, type, normalized, stride, pointer);

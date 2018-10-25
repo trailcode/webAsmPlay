@@ -46,7 +46,7 @@ public:
 
     GLuint setTexture1Slot(const GLuint slot) const;
 
-protected:
+//protected:
 
     Shader( const GLuint shaderProgram,
             const GLint  vertInAttrib,
@@ -55,7 +55,7 @@ protected:
             const GLint  colorUniform,
             const GLint  textureCoordsUniform);
 
-private:
+//private:
 
     GLuint shaderProgram;
     GLint  vertInAttrib;
