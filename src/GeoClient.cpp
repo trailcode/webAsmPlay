@@ -493,9 +493,17 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
                 vec4 fillColor = vec4(0,0,1,0.5);
 
-                if(attrs->hasStringKey("building"))
+                if(attrs->hasStringKey("addr_house"))
+                {
+                    fillColor = vec4(0.7,0.5,0,0.5);
+                }
+                else if(attrs->hasStringKey("building"))
                 {
                     fillColor = vec4(1,0.5,0,0.5);
+                }
+                else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
+                {
+                    fillColor = vec4(0,0.7,0,0.5);
                 }
                 
                 polysAndColors.push_back(make_tuple(geom, fillColor, outlineColor));

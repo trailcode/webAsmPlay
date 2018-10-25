@@ -96,3 +96,12 @@ string Attributes::toString() const
 }
 
 bool Attributes::hasStringKey(const string & key) const { return strings.find(key) != strings.end() ;}
+
+bool Attributes::hasStringKeyValue(const string & key, const string & value) const
+{
+    Strings::const_iterator i = strings.find(key);
+
+    if(i == strings.end()) { return false ;}
+
+    return i->second == value;
+}
