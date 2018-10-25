@@ -22,9 +22,7 @@ namespace
 RenderablePolygon::RenderablePolygon(   const GLuint           vao,
                                         const GLuint           ebo,
                                         const GLuint           ebo2,
-                                        const GLuint           ebo3,
                                         const GLuint           vbo,
-                                        const GLuint           vbo2,
                                         const int              numTriangles,
                                         const vector<GLuint> & counterVertIndices,
                                         const size_t           numContourLines,
@@ -41,9 +39,7 @@ RenderablePolygon::RenderablePolygon(   const GLuint           vao,
                                                                                 vao                 (vao),
                                                                                 ebo                 (ebo),
                                                                                 ebo2                (ebo2),
-                                                                                ebo3                (ebo3),
                                                                                 vbo                 (vbo),
-                                                                                vbo2                (vbo2),
                                                                                 numTriangles        (numTriangles),
                                                                                 counterVertIndices  (counterVertIndices),
                                                                                 numContourLines     (numContourLines),
@@ -56,7 +52,6 @@ RenderablePolygon::~RenderablePolygon()
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers     (1, &vbo);
     glDeleteBuffers     (1, &ebo);
-    glDeleteBuffers     (1, &ebo2);
 }
 
 RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  const Polygon * poly,
@@ -214,9 +209,7 @@ Renderable * RenderablePolygon::create( const Polygon   * poly,
     GLuint vao  = 0;
     GLuint ebo  = 0;
     GLuint ebo2 = 0;
-    GLuint ebo3 = 0;
     GLuint vbo  = 0;
-    GLuint vbo2 = 0;
 
     glGenVertexArrays   (1, &vao);
     glGenBuffers        (1, &vbo);
@@ -243,9 +236,7 @@ Renderable * RenderablePolygon::create( const Polygon   * poly,
     return new RenderablePolygon(   vao,
                                     ebo,
                                     ebo2,
-                                    ebo3,
                                     vbo,
-                                    vbo2,
                                     tess.numTriangles,
                                     tess.counterVertIndices,
                                     tess.counterVertIndices2.size(),
@@ -331,15 +322,13 @@ Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, con
                                         const bool                        renderOutline,
                                         const bool                        renderFill)
 {
-    dmess("THis one!");
-
     vector<const TesselationResult> tesselationResults;
 
     for(const tuple<const Geometry *, const vec4, const vec4> & polyAndColors : polygons)
     {
-        const Geometry * geom = get<0>(polyAndColors);
-        const vec4 & fillColor = get<1>(polyAndColors);
-        const vec4 & outlineColor = get<2>(polyAndColors);
+        const Geometry  * geom          = get<0>(polyAndColors);
+        const vec4      & fillColor     = get<1>(polyAndColors);
+        const vec4      & outlineColor  = get<2>(polyAndColors);
 
         const Polygon      * poly;
         const MultiPolygon * multiPoly;
@@ -369,8 +358,6 @@ Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, con
         }
     }
 
-    dmess("tesselationResults " << tesselationResults.size());
-
     return createFromTesselations(  tesselationResults,
                                     fillColor,
                                     outlineColor,
@@ -387,6 +374,8 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
                                                         const bool                                seperateFillColors)
 {
     if(!tesselations.size()) { return NULL ;}
+
+    dmess("Herrrrr " << tesselations.size());
 
     size_t numVerts                 = 0;
     size_t numTriangles             = 0;
@@ -454,10 +443,8 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
     GLuint vao  = 0;
     GLuint ebo  = 0;
     GLuint ebo2 = 0;
-    GLuint ebo3 = 0;
     GLuint vbo  = 0;
-    GLuint vbo2 = 0;
-
+    
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
@@ -476,12 +463,12 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * counterVertIndices2.size(), &counterVertIndices2[0], GL_STATIC_DRAW);
 
+    dmess("counterVertIndices2.size() " << counterVertIndices2.size());
+
     return new RenderablePolygon(   vao,
                                     ebo,
                                     ebo2,
-                                    ebo3,
                                     vbo,
-                                    vbo2,
                                     numTriangles,
                                     counterVertIndices,
                                     counterVertIndices2.size(),
@@ -498,6 +485,9 @@ void RenderablePolygon::render(const mat4 & MVP) const
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+    //glClear(GL_DEPTH_BUFFER_BIT);
+    //glEnable(GL_DEPTH_TEST);
 
     if(seperateFillColors)
     {
@@ -522,12 +512,8 @@ void RenderablePolygon::render(const mat4 & MVP) const
         getDefaultShader()->enableVertexAttribArray();
     }
 
-    
-
     if(getRenderFill())
     {
-        //getDefaultShader()->setColor(fillColor);
-
         glEnable(GL_BLEND);
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -539,6 +525,13 @@ void RenderablePolygon::render(const mat4 & MVP) const
 
     if(getRenderOutline())
     {
+        if(seperateFillColors)
+        {
+            getDefaultShader()->bind();
+
+            getDefaultShader()->setMVP(MVP);
+        } 
+        
         getDefaultShader()->setColor(outlineColor);
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);

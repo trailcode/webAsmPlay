@@ -69,9 +69,7 @@ private:
     RenderablePolygon(  const GLuint                vao,
                         const GLuint                ebo,
                         const GLuint                ebo2,
-                        const GLuint                ebo3,
                         const GLuint                vbo,
-                        const GLuint                vbo2,
                         const int                   numTriangles,
                         const std::vector<GLuint> & counterVertIndices,
                         const size_t                numContourLines,
@@ -104,9 +102,7 @@ private:
     const GLuint                vao;
     const GLuint                ebo;
     const GLuint                ebo2;
-    const GLuint                ebo3;
     const GLuint                vbo;
-    const GLuint                vbo2;
     const int                   numTriangles;
     const std::vector<GLuint>   counterVertIndices;
     const size_t                numContourLines;
