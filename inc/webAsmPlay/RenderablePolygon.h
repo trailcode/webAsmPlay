@@ -79,7 +79,8 @@ private:
                         const glm::vec4           & fillColor,
                         const glm::vec4           & outlineColor,
                         const bool                  renderOutline,
-                        const bool                  renderFill);
+                        const bool                  renderFill,
+                        const bool                  seperateFillColors);
 
     static Renderable * createFromTesselations( const std::vector<const TesselationResult>  & tesselations,
                                                 const glm::vec4                             & fillColor,
@@ -109,6 +110,7 @@ private:
     const int                   numTriangles;
     const std::vector<GLuint>   counterVertIndices;
     const size_t                numContourLines;
+    const bool                  seperateFillColors;
 }; 
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__
