@@ -1,3 +1,29 @@
+/**
+╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ // This software is provided 'as-is', without any express or implied
+ // warranty.  In no event will the authors be held liable for any damages
+ // arising from the use of this software.
+ // Permission is granted to anyone to use this software for any purpose,
+ // including commercial applications, and to alter it and redistribute it
+ // freely, subject to the following restrictions:
+ // 1. The origin of this software must not be misrepresented; you must not
+ //    claim that you wrote the original software. If you use this software
+ //    in a product, an acknowledgment in the product documentation would be
+ //    appreciated but is not required.
+ // 2. Altered source versions must be plainly marked as such, and must not be
+ //    misrepresented as being the original software.
+ // 3. This notice may not be removed or altered from any source distribution.
+
+  \author Matthew Tang
+  \email trailcode@gmail.com
+  \copyright 2018
+*/
+
 #include <glm/gtc/type_ptr.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
@@ -450,6 +476,9 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
     glGenBuffers(1, &ebo);
     glGenBuffers(1, &ebo2);
 
+    dmess("ebo " << ebo);
+    dmess("ebo2 " << ebo2);
+
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     if(!seperateFillColors) { glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2, &verts[0], GL_STATIC_DRAW) ;}
@@ -517,7 +546,7 @@ void RenderablePolygon::render(const mat4 & MVP) const
         glDisable(GL_BLEND);
     }
 
-    //glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
 
     if(getRenderOutline())
     {
@@ -530,6 +559,8 @@ void RenderablePolygon::render(const mat4 & MVP) const
         
         getDefaultShader()->setColor(outlineColor);
         
+        //dmess("ebo2 " << ebo2);
+
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
         
         glDrawElements(GL_LINES, numContourLines, GL_UNSIGNED_INT, NULL);
