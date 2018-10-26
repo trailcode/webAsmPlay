@@ -79,7 +79,6 @@ string GeoServer::addGeoFile(const string & geomFile)
 
     vector<GeomAndArea> geoms;
 
-    //for(OGRFeature * poFeature; (poFeature = poLayer->GetNextFeature()) != NULL ;)
     for(const auto & poFeature : *poLayer)
     {
         Attributes * attrs = new Attributes();

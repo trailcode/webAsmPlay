@@ -266,7 +266,7 @@ Renderable * RenderablePolygon::create( const Polygon   * poly,
                                     tess.numTriangles,
                                     tess.counterVertIndices,
                                     tess.counterVertIndices2.size(),
-                                    false,
+                                    false, // Is is a multi-polygon
                                     fillColor,
                                     outlineColor,
                                     renderOutline,
@@ -476,9 +476,6 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
     glGenBuffers(1, &ebo);
     glGenBuffers(1, &ebo2);
 
-    dmess("ebo " << ebo);
-    dmess("ebo2 " << ebo2);
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     if(!seperateFillColors) { glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2, &verts[0], GL_STATIC_DRAW) ;}
@@ -497,7 +494,7 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
                                     numTriangles,
                                     counterVertIndices,
                                     counterVertIndices2.size(),
-                                    tesselations.size() > 1,
+                                    tesselations.size() > 1, // Is is a multi-polygon
                                     fillColor,
                                     outlineColor,
                                     renderOutline,
@@ -555,12 +552,12 @@ void RenderablePolygon::render(const mat4 & MVP) const
             getDefaultShader()->bind();
 
             getDefaultShader()->setMVP(MVP);
+
+            getDefaultShader()->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
         } 
         
         getDefaultShader()->setColor(outlineColor);
         
-        //dmess("ebo2 " << ebo2);
-
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
         
         glDrawElements(GL_LINES, numContourLines, GL_UNSIGNED_INT, NULL);

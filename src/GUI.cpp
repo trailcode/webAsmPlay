@@ -349,7 +349,7 @@ void mainLoop(GLFWwindow * window)
 
         ImGui::End();
     }
-    
+
     if(isFirst) { ImGui::SetNextWindowPos(ImVec2(0,0)) ;}
 
     if(showMVP_MatrixPanel)
