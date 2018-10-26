@@ -47,6 +47,15 @@ string GeometryConverter::convert(const geos::geom::Polygon * poly, const Attrib
     return ret.str();
 }
 
+string GeometryConverter::convert(const AttributedLineString & lineString)
+{
+    stringstream ret;
+
+    convert(lineString, ret);
+
+    return ret.str();
+}
+
 void GeometryConverter::convert(const Polygon * poly, const Attributes * attrs, stringstream & data)
 {
     attrs->write(data);
@@ -76,6 +85,13 @@ void GeometryConverter::convert(const LineString * lineString, stringstream & da
         
         data.write((const char *)coord, sizeof(coord));
     }
+}
+
+void GeometryConverter::convert(const AttributedLineString & lineString, stringstream & data)
+{
+    get<1>(lineString)->write(data);
+
+    convert(get<0>(lineString), data);
 }
 
 CoordinateSequence * GeometryConverter::getGeosCoordinateSequence(const char *& lineString)

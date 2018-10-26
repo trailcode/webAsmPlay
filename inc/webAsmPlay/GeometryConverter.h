@@ -48,6 +48,8 @@ public:
 
     static std::string convert(const geos::geom::Polygon * poly, const Attributes * attrs);
 
+    static std::string convert(const AttributedLineString & lineString);
+
     static AttributedGeometry getGeosPolygon(const char *& poly);
 
     static std::vector<AttributedGeometry> getGeosPolygons(const char *& polys);
@@ -57,6 +59,8 @@ public:
     static void convert(const geos::geom::Polygon * poly, const Attributes * attrs, std::stringstream & data);
 
     static void convert(const geos::geom::LineString * lineString, std::stringstream & data);
+
+    static void convert(const AttributedLineString & lineString, std::stringstream & data);
 
 private:
 

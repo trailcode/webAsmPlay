@@ -37,16 +37,14 @@ class GeoServer : public GeoServerBase
 {
 public:
 
-    GeoServer(const std::string & geomFile);
+    GeoServer();
     ~GeoServer();
 
     std::string addGeoFile(const std::string & geomFile);
 
     void start();
 
-    size_t getNumPolygons() const;
-
-    const std::string & getPolygon(const size_t index) const;
+    //const std::string & getPolygon(const size_t index) const;
 
 private:
     
@@ -58,7 +56,10 @@ private:
 
     static void onMessage(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
 
+    //size_t getNumPolygons() const;
+
     std::vector<std::string> serializedPolygons;
+    std::vector<std::string> serializedLineStrings;
 
     double boundsMinX;
     double boundsMinY;

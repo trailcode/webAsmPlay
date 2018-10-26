@@ -25,8 +25,10 @@
 */
 
 #include <algorithm>
+#include <limits>
 #include <ctpl.h>
 #include <geos/geom/Polygon.h>
+#include <geos/geom/LineString.h>
 #include <geos/io/WKTWriter.h>
 #include "ogrsf_frmts.h"
 #include <webAsmPlay/Debug.h>
@@ -48,9 +50,11 @@ namespace
     ctpl::thread_pool pool(1);
 }
 
-GeoServer::GeoServer(const string & geomFile)
+GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
+                            boundsMinY( numeric_limits<double>::max()),
+                            boundsMaxX(-numeric_limits<double>::max()),
+                            boundsMaxY(-numeric_limits<double>::max())
 {
-    addGeoFile(geomFile);
 }
 
 GeoServer::~GeoServer()
@@ -75,9 +79,10 @@ string GeoServer::addGeoFile(const string & geomFile)
 
     const GEOSContextHandle_t gctx = OGRGeometry::createGEOSContext();
 
-    typedef tuple<Geometry *, double, Attributes *> GeomAndArea;
-
-    vector<GeomAndArea> geoms;
+    typedef tuple<Geometry *, double, Attributes *> PolyAndArea; // TODO better name.
+    
+    vector<PolyAndArea>          polys;
+    vector<AttributedLineString> lineStrings;
 
     for(const auto & poFeature : *poLayer)
     {
@@ -99,48 +104,34 @@ string GeoServer::addGeoFile(const string & geomFile)
             }
         }
 
-        OGRGeometry * poGeometry = poFeature->GetGeometryRef();
+        Geometry * geom = (Geometry *)poFeature->GetGeometryRef()->exportToGEOS(gctx);
 
-        const double simplifyAmount = 0.00001;
-
-        Geometry * geom = (Geometry *)poGeometry->exportToGEOS(gctx);
-
-        const double area = geom->getArea();
-
-        geoms.push_back(GeomAndArea(geom, area, attrs));
+        switch(geom->getGeometryTypeId())
+        {
+            case GEOS_POLYGON:    polys      .push_back(PolyAndArea(geom, geom->getArea(), attrs)); break;
+            case GEOS_LINESTRING: lineStrings.push_back(AttributedLineString(dynamic_cast<LineString *>(geom), attrs)); break;
+            default:
+                dmess("Implement for " << geom->getGeometryType());
+        }
 
         if(++c > 100000) { break ;}
     }
     
-    sort(geoms.begin(), geoms.end(), [](const GeomAndArea & lhs, const GeomAndArea & rhs)
-    {
-        return get<1>(lhs) < get<1>(rhs);
-    });
+    sort(polys.begin(), polys.end(), [](const PolyAndArea & lhs, const PolyAndArea & rhs) { return get<1>(lhs) < get<1>(rhs) ;});
 
-    for(const GeomAndArea & g : geoms)
+    for(const PolyAndArea & g : polys)
     {
         //dmess("g " << get<1>(g) << " " << get<0>(g)->getGeometryType());
     }
 
-    for(const GeomAndArea & g : geoms)
+    for(const PolyAndArea & g : polys)
     {
-        if(!dynamic_cast<const Polygon *>(get<0>(g)))
-        {
-            string s = get<0>(g)->getGeometryType();
-
-            dmess("Not a poly! "  << s);
-
-            continue;
-        }
-
-        if(!get<0>(g))
-        {
-            dmess("Empty");
-
-            continue;
-        }
-
         serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g)));
+    }
+
+    for(const AttributedLineString & l : lineStrings)
+    {
+        serializedLineStrings.push_back(GeometryConverter::convert(l));
     }
 
     OGREnvelope extent;
@@ -152,14 +143,12 @@ string GeoServer::addGeoFile(const string & geomFile)
        abort();
     }
 
-    boundsMinX = extent.MinX;
-    boundsMinY = extent.MinY;
-    boundsMaxX = extent.MaxX;
-    boundsMaxY = extent.MaxY;
+    if(boundsMinX > extent.MinX) { boundsMinX = extent.MinX ;}
+    if(boundsMinY > extent.MinY) { boundsMinY = extent.MinY ;}
+    if(boundsMaxX < extent.MaxX) { boundsMaxX = extent.MaxX ;}
+    if(boundsMaxY < extent.MaxY) { boundsMaxY = extent.MaxY ;}
 
-    GDALClose( poDS );
-
-    dmess("serializedPolygons " << serializedPolygons.size());
+    GDALClose(poDS);
 
     return geomFile;
 }
@@ -193,7 +182,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                    *(uint32_t *)ptr = server->getNumPolygons();
+                    *(uint32_t *)ptr = server->serializedPolygons.size();
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
@@ -271,6 +260,9 @@ void GeoServer::start()
 {
     dmess("GeoServer::start");
 
+    dmess("   serializedPolygons: " << serializedPolygons.size());
+    dmess("serializedLineStrings: " << serializedLineStrings.size());
+
     try
     {
         // Set logging settings
@@ -315,6 +307,6 @@ void GeoServer::start()
     dmess("Exit");
 }
 
-size_t GeoServer::getNumPolygons() const { return serializedPolygons.size() ;}
+//size_t GeoServer::getNumPolygons() const { return serializedPolygons.size() ;}
 
-const string & GeoServer::getPolygon(const size_t index) const { return serializedPolygons[index] ;}
+//const string & GeoServer::getPolygon(const size_t index) const { return serializedPolygons[index] ;}
