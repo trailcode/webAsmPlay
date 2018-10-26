@@ -47,7 +47,7 @@ int main(const int argc, char ** argv)
     
     //s.addGeoFile("/Users/trailcode/osmPolygon2.shp");
     s.addGeoFile("/Users/trailcode/osmPolygons.shp");
-    s.addGeoFile("/Users/trailcode/osmLines.shp");
+    s.addGeoFile("/Users/trailcode/osmPolylines2.shp");
 
     s.start();
 

@@ -69,6 +69,7 @@
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeometryConverter.h>
@@ -333,20 +334,22 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 {
     dmess("GeoClient::loadAllGeometry");
 
-    getAllPolygons([this, canvas](vector<AttributedGeometry> geomsIn)
+    getLayerBounds([this, canvas](const AABB2D & bounds)
     {
-        dmess("geomsIn " << geomsIn.size());
+        const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
 
-        getLayerBounds([this, canvas, geomsIn](const AABB2D & bounds)
+        trans = translate(  s,
+                            vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
+                                    (get<1>(bounds) + get<3>(bounds)) * -0.5,
+                                    0.0));
+        
+        inverseTrans = inverse(trans);
+
+        getAllPolygons([this, canvas](vector<AttributedGeometry> geomsIn)
         {
-            const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
+            dmess("geomsIn " << geomsIn.size());
 
-            trans = translate(  s,
-                                vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
-                                     (get<1>(bounds) + get<3>(bounds)) * -0.5,
-                                     0.0));
-            
-            inverseTrans = inverse(trans);
+            dmess("trans " << mat4ToStr(trans));
 
             for(int i = geomsIn.size() - 1; i >= 0; --i) // TODO code duplication
             {
