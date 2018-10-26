@@ -151,7 +151,7 @@ GeoClient::~GeoClient()
     // TODO cleanup!
 }
 
-void GeoClient::getNumGeoms(const function<void (const size_t)> & callback)
+void GeoClient::getNumPolygons(const function<void (const size_t)> & callback)
 {
     GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
 
@@ -165,7 +165,7 @@ void GeoClient::getNumGeoms(const function<void (const size_t)> & callback)
                     "var dv = new DataView(buffer); \r\n"
                     "dv.setUint8(0,%i); \r\n"
                     "dv.setUint32(1, Module.swap32(%i)); \r\n"
-                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_NUM_GEOMETRIES_REQUEST, request->ID);
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_NUM_POLYGONS_REQUEST, request->ID);
                 
     emscripten_run_script(buf);
 
@@ -173,7 +173,7 @@ void GeoClient::getNumGeoms(const function<void (const size_t)> & callback)
 
     vector<char> data(5);
 
-    data[0] = GeoServerBase::GET_NUM_GEOMETRIES_REQUEST;
+    data[0] = GeoServerBase::GET_NUM_POLYGONS_REQUEST;
 
     *(uint32_t *)&data[1] = request->ID;
 
@@ -213,7 +213,7 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 #endif
 }
 
-void GeoClient::getAllGeometries(function<void (vector<AttributedGeometry> geoms)> callback)
+void GeoClient::getAllPolygons(function<void (vector<AttributedGeometry> geoms)> callback)
 {
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
@@ -227,7 +227,7 @@ void GeoClient::getAllGeometries(function<void (vector<AttributedGeometry> geoms
                     "var dv = new DataView(buffer); \r\n"
                     "dv.setUint8(0,%i); \r\n"
                     "dv.setUint32(1, Module.swap32(%i)); \r\n"
-                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_ALL_GEOMETRIES_REQUEST, request->ID);
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_ALL_POLYGONS_REQUEST, request->ID);
                 
     emscripten_run_script(buf);
 
@@ -235,7 +235,7 @@ void GeoClient::getAllGeometries(function<void (vector<AttributedGeometry> geoms
 
     vector<char> data(5);
 
-    data[0] = GeoServerBase::GET_ALL_GEOMETRIES_REQUEST;
+    data[0] = GeoServerBase::GET_ALL_POLYGONS_REQUEST;
 
     char * ptr = &data[1];
 
@@ -245,44 +245,6 @@ void GeoClient::getAllGeometries(function<void (vector<AttributedGeometry> geoms
 
 #endif
 }
-
-void GeoClient::getGeometry(const size_t geomIndex, function<void (Geometry * geom)> & callback)
-{
-    GeoRequestGeometry * request = new GeoRequestGeometry(callback);
-
-    geometryRequests[request->ID] = request;
-
-#ifdef __EMSCRIPTEN__
-
-    char buf[2048];
-
-    sprintf(buf,    "var buffer = new ArrayBuffer(9); \r\n"
-                    "var dv = new DataView(buffer); \r\n"
-                    "dv.setUint8(0,%i); \r\n"
-                    "dv.setUint32(1, Module.swap32(%i)); \r\n"
-                    "dv.setUint32(5, Module.swap32(%i)); \r\n"
-                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_GEOMETRY_REQUEST, request->ID, geomIndex);
-
-    emscripten_run_script(buf);
-
-#else
-
-    vector<char> data(9);
-
-    data[0] = GeoServerBase::GET_GEOMETRY_REQUEST;
-
-    char * ptr = &data[1];
-
-    *(uint32_t *)ptr = request->ID; ptr += sizeof(uint32_t);
-
-    *(uint32_t *)ptr = geomIndex;
-
-    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
-
-#endif
-}
-
-// https://stackoverflow.com/questions/17779340/glfw-3-0-resource-loading-with-opengl
 
 void GeoClient::onMessage(const string & data)
 {
@@ -290,7 +252,7 @@ void GeoClient::onMessage(const string & data)
 
     switch(ptr[0])
     {
-        case GeoServerBase::GET_NUM_GEOMETRIES_RESPONCE:
+        case GeoServerBase::GET_NUM_POLYGONS_RESPONCE:
         {
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
@@ -307,48 +269,7 @@ void GeoClient::onMessage(const string & data)
             break;
         }
 
-        case GeoServerBase::GET_GEOMETRY_RESPONCE:
-        {
-            const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
-
-            const uint32_t dataSize = *(uint32_t *)ptr; ptr += sizeof(uint32_t); // TODO Might not need
-
-            AttributedGeometry geom = GeometryConverter::getGeosPolygon(ptr);
-
-            /*
-            WKBReader reader(*GeometryFactory::getDefaultInstance());
-
-            struct MemBuf : streambuf
-            {
-                MemBuf(char* begin, char* end) {
-                    this->setg(begin, begin, end);
-                }
-            };
-
-            MemBuf buf(ptr, ptr + dataSize);
-
-            std::istream in(&buf);
-
-            //Geometry * geom = reader.read(string(ptr));
-            Geometry * geom = reader.read(in);
-            //*/
-
-            abort();
-
-            /*
-            GeometryRequests::const_iterator i = geometryRequests.find(requestID);
-
-            unique_ptr<GeoRequestGeometry> request(i->second);
-
-            request->callback(geom);
-
-            geometryRequests.erase(i);
-            */
-
-            break;
-        }
-
-        case GeoServerBase::GET_ALL_GEOMETRIES_RESPONCE:
+        case GeoServerBase::GET_ALL_POLYGONS_RESPONCE:
         {
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
@@ -408,47 +329,11 @@ void GeoClient::createRenderiables(GeomVector * geoms, const mat4 trans, Canvas 
     dmess("Done creating renderiable.");
 }
 
-void GeoClient::loadGeometry(Canvas * canvas)
-{
-    dmess("GeoClient::loadGeometry");
-
-    // TODO we need a class to hold the request data. What if there are multiple calls to this function and one or more has not finished.
-    
-    GeomVector * geoms = new GeomVector;
-
-    getNumGeoms([this, canvas, geoms](const size_t numGeoms)
-    {
-        getLayerBounds([this, numGeoms, canvas, geoms](const AABB2D & bounds)
-        {
-            const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
-
-            trans = translate(  s,
-                                vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
-                                     (get<1>(bounds) + get<3>(bounds)) * -0.5,
-                                     0.0));
-            
-            inverseTrans = inverse(trans);
-
-            std::function<void (Geometry *)> getGeom = [this,
-                                                        canvas,
-                                                        numGeoms,
-                                                        geoms](Geometry * geom)
-            {
-                geoms->push_back(geom);
-
-                if(geoms->size() == numGeoms) { createRenderiables(geoms, trans, canvas) ;}
-            };
-
-            for(size_t i = 0; i < numGeoms; ++i) { getGeometry(i, getGeom) ;}
-        });
-    });
-}
-
 void GeoClient::loadAllGeometry(Canvas * canvas)
 {
     dmess("GeoClient::loadAllGeometry");
 
-    getAllGeometries([this, canvas](vector<AttributedGeometry> geomsIn)
+    getAllPolygons([this, canvas](vector<AttributedGeometry> geomsIn)
     {
         dmess("geomsIn " << geomsIn.size());
 

@@ -65,15 +65,11 @@ public:
 
     static void onMessage(const std::string & data);
 
-    void getNumGeoms(const std::function<void (const size_t)> & callback);
+    void getNumPolygons(const std::function<void (const size_t)> & callback);
 
     void getLayerBounds(const std::function<void (const AABB2D &)> & callback);
 
-    void getGeometry(const size_t geomIndex, std::function<void (geos::geom::Geometry *)> & callback);
-
-    void getAllGeometries(std::function<void (std::vector<AttributedGeometry> geoms)> callback);
-
-    void loadGeometry(Canvas * canvas);
+    void getAllPolygons(std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
     void loadAllGeometry(Canvas * canvas);
     

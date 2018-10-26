@@ -245,15 +245,6 @@ void mainLoop(GLFWwindow * window)
 
                     if(!client) { client = new GeoClient(window) ;}
 
-                    client->loadGeometry(canvas);
-                }
-
-                if(ImGui::MenuItem("Load All Geometry"))
-                {
-                    //GeoClient::getInstance()->loadGeometry(canvas);
-
-                    if(!client) { client = new GeoClient(window) ;}
-
                     client->loadAllGeometry(canvas);
                 }
 

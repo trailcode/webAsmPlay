@@ -140,7 +140,7 @@ string GeoServer::addGeoFile(const string & geomFile)
             continue;
         }
 
-        serializedGeoms.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g)));
+        serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g)));
     }
 
     OGREnvelope extent;
@@ -159,13 +159,13 @@ string GeoServer::addGeoFile(const string & geomFile)
 
     GDALClose( poDS );
 
-    dmess("serializedGeoms " << serializedGeoms.size());
+    dmess("serializedPolygons " << serializedPolygons.size());
 
     return geomFile;
 }
 
 // Define a callback to handle incoming messages
-void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg)
+void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg)
 {
     hdl.lock().get();
 
@@ -181,74 +181,48 @@ void GeoServer::on_message(GeoServer * server, websocketpp::connection_hdl hdl, 
 
         switch(data[0])
         {
-            case GET_NUM_GEOMETRIES_REQUEST:
+            case GET_NUM_POLYGONS_REQUEST:
 
                 pool.push([hdl, s, server, requestID](int ID)
                 {
                     vector<char> data(sizeof(char) + sizeof(uint32_t) * 2);
 
-                    data[0] = GET_NUM_GEOMETRIES_RESPONCE;
+                    data[0] = GET_NUM_POLYGONS_RESPONCE;
 
                     char * ptr = &data[1];
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                    *(uint32_t *)ptr = server->getNumGeoms();
+                    *(uint32_t *)ptr = server->getNumPolygons();
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
 
             break;
 
-            case GET_GEOMETRY_REQUEST:
-                {
-                    const uint32_t geomID = *(const uint32_t *)dataPtr;
-
-                    pool.push([hdl, s, server, requestID, geomID](int ID)
-                    {
-                        const string & geom = server->getGeom(geomID);
-                        
-                        vector<char> data(sizeof(char) + sizeof(uint32_t) * 2 + geom.length());
-
-                        data[0] = GET_GEOMETRY_RESPONCE;
-
-                        char * ptr = &data[1];
-
-                        *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
-
-                        *(uint32_t *)ptr = geom.length(); ptr += sizeof(uint32_t);
-
-                        memcpy(ptr, geom.data(), geom.length());
-
-                        s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
-                    });
-
-                    break;
-                }
-
-            case GET_ALL_GEOMETRIES_REQUEST:
+            case GET_ALL_POLYGONS_REQUEST:
                 
                 pool.push([hdl, s, server, requestID](int ID)
                 {
-                    const vector<string> & serializedGeoms = server->serializedGeoms;
+                    const vector<string> & serializedPolygons = server->serializedPolygons;
 
-                    const uint32_t numGeoms = serializedGeoms.size();
+                    const uint32_t numGeoms = serializedPolygons.size();
 
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
-                    for(uint i = 0; i < numGeoms; ++i) { bufferSize += serializedGeoms[i].length() ;}
+                    for(uint i = 0; i < numGeoms; ++i) { bufferSize += serializedPolygons[i].length() ;}
 
                     vector<char> data(bufferSize);
 
                     char * ptr = &data[0];
                     
-                    *ptr = GET_ALL_GEOMETRIES_RESPONCE; ptr += sizeof(char);
+                    *ptr = GET_ALL_POLYGONS_RESPONCE; ptr += sizeof(char);
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
                     *(uint32_t *)ptr = numGeoms; ptr += sizeof(uint32_t);
 
-                    for(const string & geom : serializedGeoms)
+                    for(const string & geom : serializedPolygons)
                     {
                         memcpy(ptr, geom.data(), geom.length()); 
 
@@ -313,7 +287,7 @@ void GeoServer::start()
         serverEndPoint.init_asio();
 
         // Register our message handler
-        serverEndPoint.set_message_handler(::bind(&on_message, this, ::_1, ::_2));
+        serverEndPoint.set_message_handler(::bind(&onMessage, this, ::_1, ::_2));
 
         // Listen on port 9002
         serverEndPoint.listen(9002);
@@ -341,6 +315,6 @@ void GeoServer::start()
     dmess("Exit");
 }
 
-size_t GeoServer::getNumGeoms() const { return serializedGeoms.size() ;}
+size_t GeoServer::getNumPolygons() const { return serializedPolygons.size() ;}
 
-const string & GeoServer::getGeom(const size_t index) const { return serializedGeoms[index] ;}
+const string & GeoServer::getPolygon(const size_t index) const { return serializedPolygons[index] ;}

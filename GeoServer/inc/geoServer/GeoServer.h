@@ -44,9 +44,9 @@ public:
 
     void start();
 
-    size_t getNumGeoms() const;
+    size_t getNumPolygons() const;
 
-    const std::string & getGeom(const size_t index) const;
+    const std::string & getPolygon(const size_t index) const;
 
 private:
     
@@ -56,9 +56,9 @@ private:
 
     Server serverEndPoint;
 
-    static void on_message(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
+    static void onMessage(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
 
-    std::vector<std::string> serializedGeoms;
+    std::vector<std::string> serializedPolygons;
 
     double boundsMinX;
     double boundsMinY;
