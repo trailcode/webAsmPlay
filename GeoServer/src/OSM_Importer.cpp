@@ -25,6 +25,7 @@
 */
 
 #include <cstdio>
+#include <functional>
 #include <expat.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -52,19 +53,61 @@
 using namespace std;
 using namespace glm;
 
-struct Node
+enum
 {
-    Node(const dvec2 & pos) : pos(pos)
+    OSM_KEY_MEMBER = 1,
+    OSM_KEY_TAG,
+    OSM_KEY_META,
+    OSM_KEY_NODE,
+    OSM_KEY_WAY,
+    OSM_KEY_RELATION,
+    OSM_KEY_ND,
+    OSM_KEY_OSM,
 
-    const dvec2 pos;
-
-    unordered_map<string, string> attrs;
+    OSM_KEY_ROLE,
+    OSM_KEY_REF,
+    OSM_KEY_TYPE,
+    OSM_KEY_V,
+    OSM_KEY_K,
+    OSM_KEY_OSM_BASE,
+    OSM_KEY_CHANGESET,
+    OSM_KEY_TIMESTAMP,
+    OSM_KEY_USER,
+    OSM_KEY_LAT,
+    OSM_KEY_LON,
+    OSM_KEY_VERSION,
+    OSM_KEY_UID,
+    OSM_KEY_ID,
+    OSM_KEY_GENERATOR,
 };
 
-//unordered_set<string> attrKeys;
-unordered_map<string, unordered_set<string> > structure;
+unordered_map<string, size_t> keyMap
+{
+    { "member", OSM_KEY_MEMBER },
+    { "tag", OSM_KEY_TAG },
+    { "meta", OSM_KEY_META },
+    { "node", OSM_KEY_NODE },
+    { "way", OSM_KEY_WAY },
+    { "relation", OSM_KEY_RELATION },
+    { "nd", OSM_KEY_ND },
+    { "osm", OSM_KEY_OSM },
 
-unordered_map<uint64_t, Node *> Nodes;
+    { "role", OSM_KEY_ROLE },
+    { "ref", OSM_KEY_REF },
+    { "type", OSM_KEY_TYPE },
+    { "v", OSM_KEY_V },
+    { "k", OSM_KEY_K },
+    { "osm_base", OSM_KEY_OSM_BASE },
+    { "changeset", OSM_KEY_CHANGESET },
+    { "timestamp", OSM_KEY_TIMESTAMP },
+    { "user", OSM_KEY_USER },
+    { "lat", OSM_KEY_LAT },
+    { "lon", OSM_KEY_LON },
+    { "version", OSM_KEY_VERSION },
+    { "uid", OSM_KEY_UID },
+    { "id", OSM_KEY_ID },
+    { "generator", OSM_KEY_GENERATOR },
+};
 
 /*
 c/OSM_Importer.cpp 141 [node: member
@@ -106,6 +149,22 @@ c/OSM_Importer.cpp 145 [  key: generator
 c/OSM_Importer.cpp 145 [  key: version
 */
 
+struct Node
+{
+    dvec2    pos;
+    uint64_t id;
+    uint64_t uid;
+    uint64_t changeset;
+    uint8_t  version;
+    string   user;
+    string   timestamp; // TODO convert to binary structure.
+};
+
+//unordered_set<string> attrKeys;
+unordered_map<string, unordered_set<string> > structure;
+
+unordered_map<uint64_t, Node *> Nodes;
+
 Node * currNode = NULL;
 
 static void XMLCALL
@@ -117,7 +176,64 @@ startElement(void *userData, const XML_Char *name, const XML_Char **atts)
 
     //for (i = 0; i < *depthPtr; i++) putchar('  ');
     //printf("%" XML_FMT_STR "\n", name);
+    if(!strcmp(name, "node"))
+    {
+        currNode = new Node;
+
+        for (i = 0; atts[i] != NULL; i += 2)
+        {
+            const XML_Char * key   = atts[i];
+            const XML_Char * value = atts[i + 1];
+
+        }
+    }
   
+    switch(keyMap[name])
+    {
+        case OSM_KEY_MEMBER: break;
+        case OSM_KEY_TAG: break;
+        case OSM_KEY_META: break;
+        case OSM_KEY_NODE:
+
+            currNode = new Node;
+
+            for (i = 0; atts[i] != NULL; i += 2)
+            {
+                const XML_Char * key   = atts[i];
+                const XML_Char * value = atts[i + 1];
+
+                switch(keyMap[key])
+                {
+                    case OSM_KEY_CHANGESET: currNode->changeset = stoull(value); break;
+                    case OSM_KEY_TIMESTAMP: currNode->timestamp = value; break;
+                    case OSM_KEY_USER:      currNode->user      = value; break;
+                    case OSM_KEY_LAT:       currNode->pos.x     = atof(value); break;
+                    case OSM_KEY_LON:       currNode->pos.y     = atof(value); break;
+                    case OSM_KEY_VERSION:   currNode->version   = atoi(value); break;
+                    case OSM_KEY_UID:       currNode->uid       = stoull(value); break;
+                    case OSM_KEY_ID:        currNode->id        = stoull(value); break;
+                }
+            }
+
+            break;
+
+        case OSM_KEY_WAY: break;
+        case OSM_KEY_RELATION: break;
+        case OSM_KEY_ND: break;
+        case OSM_KEY_OSM: break;
+
+        default:
+
+            dmess("Implment: " << name);
+
+            for (i = 0; atts[i] != NULL; i += 2)
+            {
+                const XML_Char * key   = atts[i];
+                const XML_Char * value = atts[i + 1];
+                dmess("   key: " << key << " value: " << value);
+            }
+    }
+
     for (i = 0; atts[i] != NULL; i += 2)
     {
         //for (i = 0; i < *depthPtr; i++) putchar('  ');
