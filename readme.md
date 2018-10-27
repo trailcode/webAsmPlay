@@ -128,3 +128,8 @@ No notes.
 * Try to classify the viewport to different attributes such as social economics, political distribution, city type, etc.
   Will require training. 
 
+### TODO
+
+* Make geometric teminology consistant with Geos.
+* Fix dmess for GeoServer
+

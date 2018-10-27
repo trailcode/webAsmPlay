@@ -29,6 +29,7 @@
 #include <expat.h>
 #include <unordered_map>
 #include <unordered_set>
+#include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Debug.h>
 #include <glm/vec2.hpp>
 #include <geoServer/OSM_Importer.h>
@@ -135,7 +136,7 @@ namespace
 
     struct Way : OSM_Base
     {
-        vector<Node *> nodes;
+        vector<const Node *> nodes;
     };
 
     struct Member
@@ -147,11 +148,8 @@ namespace
 
     struct Relation : OSM_Base
     {
-        vector<Member *> members;
+        vector<const Member *> members;
     };
-
-    //unordered_set<string> attrKeys;
-    unordered_map<string, unordered_set<string> > structure;
 
     typedef unordered_map<uint64_t, Node     *> Nodes;
     typedef unordered_map<uint64_t, Way      *> Ways;
@@ -313,6 +311,21 @@ namespace
     }
 
     static void XMLCALL endElement(void *userData, const XML_Char *name) { }
+
+    void getCoordinateSequence( const vector<const Node *>                    & nodes,
+                                stringstream                                  & data,
+                                unordered_map<string, unordered_set<string> > & attributes)
+    {
+        for(const Node * n : nodes)
+        {
+            for(const unordered_map<string, string>::value_type & i : n->keyValues)
+            {
+                attributes[i.first].insert(i.second);
+            }
+
+            data.write((const char *)&n->pos, sizeof(dvec2));
+        }
+    }
 }
 
 bool OSM_Importer::import(  const string   & fileName,
@@ -351,6 +364,59 @@ bool OSM_Importer::import(  const string   & fileName,
     dmess("nodes " << nodes.size());
     dmess("ways " << ways.size());
     dmess("relations " << relations.size());
+
+    // TODO wonder how many of the nodes are duplicated? 
+
+    size_t numPoints = 0;
+    size_t numLineStrings = 0;
+    size_t numPolygons = 0;
+
+    for(const Ways::value_type & i : ways)
+    {
+        const uint64_t   id  = i.first;
+        const Way      * way = i.second;
+
+        /*
+        uint64_t uid;
+
+        // TODO There might be a lot of repeating of the below. Good to hash to compress.
+        uint64_t changeset;
+        uint8_t  version;
+        string   user;
+        string   timestamp; // TODO convert to binary structure.
+
+        unordered_map<string, string> keyValues;
+        */
+
+        const vector<const Node *> & nodes = way->nodes;
+
+        stringstream data;
+
+        Attributes attrs;
+
+        unordered_map<string, unordered_set<string> > attributes;
+
+        getCoordinateSequence(nodes, data, attributes); // TODO grow layer AABBB
+
+        //dmess("data " << data.str().length());
+
+        if(nodes.size() == 1) // Seems to never happen.
+        {
+            ++numPoints;
+        }
+        else if((*nodes.begin())->pos != (*nodes.rbegin())->pos)
+        {
+            ++numLineStrings;
+        }
+        else
+        {
+            ++numPolygons;
+        }
+    }
+
+    dmess("points " << numPoints);
+    dmess("lineStrings " << numLineStrings);
+    dmess("polygons " << numPolygons);
 
     return true;
 }
