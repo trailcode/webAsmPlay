@@ -152,7 +152,6 @@ c/OSM_Importer.cpp 145 [  key: version
 struct Node
 {
     dvec2    pos;
-    uint64_t id;
     uint64_t uid;
     uint64_t changeset;
     uint8_t  version;
@@ -160,34 +159,33 @@ struct Node
     string   timestamp; // TODO convert to binary structure.
 };
 
+struct Way
+{
+    string         user;
+    uint64_t       uid;
+    string         timestamp; // TODO convert to binary structure.
+    uint64_t       changeset;
+    uint8_t        version;
+    vector<Node *> nodes;
+};
+
 //unordered_set<string> attrKeys;
 unordered_map<string, unordered_set<string> > structure;
 
-unordered_map<uint64_t, Node *> Nodes;
+typedef unordered_map<uint64_t, Node *> Nodes;
+typedef unordered_map<uint64_t, Way  *> Ways;
+
+Nodes nodes;
+Ways  ways;
 
 Node * currNode = NULL;
+Way * currWay = NULL;
 
-static void XMLCALL
-startElement(void *userData, const XML_Char *name, const XML_Char **atts)
+static void XMLCALL startElement(void *userData, const XML_Char *name, const XML_Char **atts)
 {
     int i;
     int *depthPtr = (int *)userData;
-    (void)atts;
-
-    //for (i = 0; i < *depthPtr; i++) putchar('  ');
-    //printf("%" XML_FMT_STR "\n", name);
-    if(!strcmp(name, "node"))
-    {
-        currNode = new Node;
-
-        for (i = 0; atts[i] != NULL; i += 2)
-        {
-            const XML_Char * key   = atts[i];
-            const XML_Char * value = atts[i + 1];
-
-        }
-    }
-  
+    
     switch(keyMap[name])
     {
         case OSM_KEY_MEMBER: break;
@@ -204,34 +202,86 @@ startElement(void *userData, const XML_Char *name, const XML_Char **atts)
 
                 switch(keyMap[key])
                 {
-                    case OSM_KEY_CHANGESET: currNode->changeset = stoull(value); break;
-                    case OSM_KEY_TIMESTAMP: currNode->timestamp = value; break;
-                    case OSM_KEY_USER:      currNode->user      = value; break;
-                    case OSM_KEY_LAT:       currNode->pos.x     = atof(value); break;
-                    case OSM_KEY_LON:       currNode->pos.y     = atof(value); break;
-                    case OSM_KEY_VERSION:   currNode->version   = atoi(value); break;
-                    case OSM_KEY_UID:       currNode->uid       = stoull(value); break;
-                    case OSM_KEY_ID:        currNode->id        = stoull(value); break;
+                    case OSM_KEY_CHANGESET: currNode->changeset  = stoull(value); break;
+                    case OSM_KEY_TIMESTAMP: currNode->timestamp  = value; break;
+                    case OSM_KEY_USER:      currNode->user       = value; break;
+                    case OSM_KEY_LAT:       currNode->pos.x      = atof(value); break;
+                    case OSM_KEY_LON:       currNode->pos.y      = atof(value); break;
+                    case OSM_KEY_VERSION:   currNode->version    = atoi(value); break;
+                    case OSM_KEY_UID:       currNode->uid        = stoull(value); break;
+
+                    case OSM_KEY_ID:        nodes[stoull(value)] = currNode; break;
+
+                    default:
+
+                        dmess("Implment: " << name);
+
+                        for (i = 0; atts[i] != NULL; i += 2) { dmess("key: " << atts[i] << " value: " << atts[i + 1]) ;}
                 }
             }
 
             break;
 
-        case OSM_KEY_WAY: break;
+        case OSM_KEY_WAY:
+
+            currWay = new Way;
+
+            for (i = 0; atts[i] != NULL; i += 2)
+            {
+                const XML_Char * key   = atts[i];
+                const XML_Char * value = atts[i + 1];
+
+                switch(keyMap[key])
+                {
+                    case OSM_KEY_USER:      currWay->user = value; break;
+                    case OSM_KEY_UID:       currWay->uid =  stoull(value); break;
+                    case OSM_KEY_TIMESTAMP: currWay->timestamp = value; break;
+                    case OSM_KEY_CHANGESET: currWay->changeset = stoull(value); break;
+                    case OSM_KEY_VERSION:   currWay->version = atoi(value); break;
+                    case OSM_KEY_ID:        ways[stoull(value)] = currWay; break;
+
+                    default:
+
+                        dmess("Implment: " << name);
+
+                        for (i = 0; atts[i] != NULL; i += 2) { dmess("key: " << atts[i] << " value: " << atts[i + 1]) ;}
+                }
+            }
+
+            break;
+
         case OSM_KEY_RELATION: break;
-        case OSM_KEY_ND: break;
+        case OSM_KEY_ND: 
+            for (i = 0; atts[i] != NULL; i += 2)
+            {
+                switch(keyMap[atts[i]])
+                {
+                    case OSM_KEY_REF:
+                    {
+                        Nodes::const_iterator n = nodes.find(stoull(atts[i + 1]));
+
+                        if(n == nodes.end()) // TODO assume data is correct?
+                        {
+                            dmess("Parse werror!");
+
+                            break;
+                        }
+
+                        currWay->nodes.push_back(n->second);
+
+                        break;
+                    }
+                }
+            }
+            break;
+
         case OSM_KEY_OSM: break;
 
         default:
 
             dmess("Implment: " << name);
 
-            for (i = 0; atts[i] != NULL; i += 2)
-            {
-                const XML_Char * key   = atts[i];
-                const XML_Char * value = atts[i + 1];
-                dmess("   key: " << key << " value: " << value);
-            }
+            for (i = 0; atts[i] != NULL; i += 2) { dmess("key: " << atts[i] << " value: " << atts[i + 1]) ;}
     }
 
     for (i = 0; atts[i] != NULL; i += 2)
