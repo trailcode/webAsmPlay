@@ -118,5 +118,13 @@ cd buildNative
 
 ### Notes
 
-  
+No notes.
+
+### Ideas
+
+* Create geometry summary for the current viewport. Pie charts representing the area of land use, surface type, surface color, etc
+  Also include roads, paths, and other linear features in this.
+* Building to other surface ratios, roads, paths, grass, water, etc
+* Try to classify the viewport to different attributes such as social economics, political distribution, city type, etc.
+  Will require training. 
 
