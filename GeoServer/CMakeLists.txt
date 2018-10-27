@@ -34,6 +34,7 @@ set(sourcePath "${CMAKE_CURRENT_SOURCE_DIR}../")
 
 add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")
 add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
+add_definitions(-DXML_LARGE_SIZE)
 
 add_executable(geoServer    ../src/GeometryConverter.cpp
                             ../src/Attributes.cpp

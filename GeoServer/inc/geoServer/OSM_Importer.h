@@ -34,7 +34,7 @@ class OSM_Importer
 {
 public:
 
-    static void import( const std::string        & fileName,
+    static bool import( const std::string        & fileName,
                         std::vector<std::string> & serializedPolygons,
                         std::vector<std::string> & serializedLineStrings,
                         std::vector<std::string> & serializedPoints);

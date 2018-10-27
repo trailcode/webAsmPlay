@@ -35,6 +35,7 @@
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/GeometryConverter.h>
+#include <geoServer/OSM_Importer.h>
 #include <geoServer/GeoServer.h>
 
 using namespace std;
@@ -55,6 +56,10 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
                             boundsMaxX(-numeric_limits<double>::max()),
                             boundsMaxY(-numeric_limits<double>::max())
 {
+    OSM_Importer::import(   "/Users/trailcode/osm1.osm",
+                            serializedPolygons,
+                            serializedLineStrings,
+                            serializedPoints);
 }
 
 GeoServer::~GeoServer()

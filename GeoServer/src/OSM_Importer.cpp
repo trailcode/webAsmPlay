@@ -24,14 +24,125 @@
   \copyright 2018
 */
 
+#include <cstdio>
+#include <expat.h>
+#include <unordered_map>
+#include <unordered_set>
+#include <webAsmPlay/Debug.h>
 #include <geoServer/OSM_Importer.h>
+
+#ifdef XML_LARGE_SIZE
+# if defined(XML_USE_MSC_EXTENSIONS) && _MSC_VER < 1400
+#  define XML_FMT_INT_MOD "I64"
+# else
+#  define XML_FMT_INT_MOD "ll"
+# endif
+#else
+# define XML_FMT_INT_MOD "l"
+#endif
+
+#ifdef XML_UNICODE_WCHAR_T
+# include <wchar.h>
+# define XML_FMT_STR "ls"
+#else
+# define XML_FMT_STR "s"
+#endif
 
 using namespace std;
 
-void OSM_Importer::import(  const string   & fileName,
+struct Node
+{
+
+};
+
+//unordered_set<string> attrKeys;
+unordered_map<string, unordered_set<string> > structure;
+
+static void XMLCALL
+startElement(void *userData, const XML_Char *name, const XML_Char **atts)
+{
+    int i;
+    int *depthPtr = (int *)userData;
+    (void)atts;
+
+    //for (i = 0; i < *depthPtr; i++) putchar('  ');
+    //printf("%" XML_FMT_STR "\n", name);
+  
+    for (i = 0; atts[i] != NULL; i += 2)
+    {
+        //for (i = 0; i < *depthPtr; i++) putchar('  ');
+        const XML_Char * key = atts[i];
+
+        //attrKeys.insert(key);
+        structure[name].insert(key);
+
+
+        //printf(" key: %" XML_FMT_STR " ", atts[i]);
+        //printf("value: %" XML_FMT_STR "\n", atts[i + 1]);
+    }
+
+    *depthPtr += 1;
+}
+
+static void XMLCALL
+endElement(void *userData, const XML_Char *name)
+{
+  int *depthPtr = (int *)userData;
+  (void)name;
+
+  *depthPtr -= 1;
+}
+
+
+bool OSM_Importer::import(  const string   & fileName,
                             vector<string> & serializedPolygons,
                             vector<string> & serializedLineStrings,
                             vector<string> & serializedPoints)
 {
+    char buf[BUFSIZ];
+    XML_Parser parser = XML_ParserCreate(NULL);
+    int done;
+    int depth = 0;
+    
+    XML_SetUserData(parser, &depth);
+    XML_SetElementHandler(parser, startElement, endElement);
 
+    FILE * fp = fopen(fileName.c_str(), "r");
+
+    do
+    {
+        size_t len = fread(buf, 1, sizeof(buf), fp);
+        done = len < sizeof(buf);
+        if (XML_Parse(parser, buf, (int)len, done) == XML_STATUS_ERROR)
+        {
+            fprintf(stderr,
+            "%" XML_FMT_STR " at line %" XML_FMT_INT_MOD "u\n",
+            XML_ErrorString(XML_GetErrorCode(parser)),
+            XML_GetCurrentLineNumber(parser));
+            return false;
+        }
+    } while (!done);
+
+    XML_ParserFree(parser);
+    
+    fclose(fp);
+
+    /*
+    for(const string key : attrKeys)
+    {
+        dmess("key: " << key);
+    }
+    */
+
+    for(unordered_map<string, unordered_set<string> >::value_type & i : structure)
+    {
+        dmess("node: " << i.first);
+
+        for(const string & j : i.second)
+        {
+            dmess("  key: " << j);
+        }
+    }
+
+    return true;
 }
