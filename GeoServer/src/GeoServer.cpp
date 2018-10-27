@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <limits>
 #include <ctpl.h>
+#include <boost/histogram.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/io/WKTWriter.h>
@@ -43,6 +44,7 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
+using namespace boost::histogram;
 using namespace geos::io;
 using namespace geos::geom;
 
@@ -56,7 +58,7 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
                             boundsMaxX(-numeric_limits<double>::max()),
                             boundsMaxY(-numeric_limits<double>::max())
 {
-    //*
+    /*
     vector<AttributedGeometry> polygons;
 
     OSM_Importer::import(  
@@ -79,10 +81,33 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
         if(boundsMaxX < extent->getMaxX()) { boundsMaxX = extent->getMaxX() ;}
         if(boundsMaxY < extent->getMaxY()) { boundsMaxY = extent->getMaxY() ;}
     }
-    //*/
 
     //dmess("shift x " << boundsMaxX + boundsMinX);
     //dmess("shift y " << boundsMinY + boundsMaxY);
+    //dmess("here " << int(boundsMinY < boundsMaxX) << " boundsMinY " << boundsMinY << " boundsMaxX " << boundsMaxX);
+
+    auto histX = make_static_histogram(axis::regular<>(1024, boundsMinX, boundsMaxX, "x"));
+    auto histY = make_static_histogram(axis::regular<>(1024, boundsMinY, boundsMaxY, "y"));
+
+    for(const AttributedGeometry & i : polygons)
+    {
+        CoordinateSequence * coords = i.second->getCoordinates(); // TODO memory leak.
+
+        for(size_t i = 0; i < coords->getSize(); ++i)
+        {
+            histX(coords->getX(i));
+            histY(coords->getY(i));
+        }
+    }
+
+    //histX.sum
+
+    for(size_t i = 0; i < 1024; ++i)
+    {
+        dmess(i << " " << histX.at(i).value());
+    }
+
+    //*/
 }
 
 GeoServer::~GeoServer()

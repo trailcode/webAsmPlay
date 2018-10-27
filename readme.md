@@ -47,6 +47,7 @@ and allow C++ 17 compilation:
 * Imgui-addons: https://github.com/wflohry/imgui-addons
 * Emscripten Dear Imgui: https://github.com/greggman/doodles/tree/master/glfw-imgui
 * Websocketpp: https://github.com/zaphoyd/websocketpp
+* Histogram: https://github.com/HDembinski/histogram
 
 ### Art and Data
 * https://www.iconfinder.com/iconsets/32x32-free-design-icons

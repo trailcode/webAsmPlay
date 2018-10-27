@@ -81,6 +81,9 @@ public:
 
     std::vector<std::pair<Renderable *, Attributes *> > pickRenderables(const glm::vec3 & pos);
 
+    glm::dmat4 getTrans() const;
+    glm::dmat4 getInverseTrans() const;
+
 private:
     
     typedef std::vector<const geos::geom::Geometry *> GeomVector;

@@ -689,6 +689,9 @@ void GeoClient::on_message(GeoClient * client, websocketpp::connection_hdl hdl, 
     onMessage(msg->get_payload());
 }
 
+dmat4 GeoClient::getTrans() const { return trans ;}
+dmat4 GeoClient::getInverseTrans() const { return inverseTrans ;}
+
 #else
 
 EMSCRIPTEN_BINDINGS(GeoClientBindings)

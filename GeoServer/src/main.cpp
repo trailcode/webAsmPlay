@@ -46,8 +46,8 @@ int main(const int argc, char ** argv)
     GeoServer s;
     
     //s.addGeoFile("/Users/trailcode/osmPolygon2.shp");
-    //s.addGeoFile("/Users/trailcode/osmPolygons.shp");
-    //s.addGeoFile("/Users/trailcode/osmPolylines2.shp");
+    s.addGeoFile("/Users/trailcode/osmPolygons.shp");
+    s.addGeoFile("/Users/trailcode/osmPolylines2.shp");
     //s.addGeoFile("/Users/trailcode/osmPolys.geojson");
     //s.addGeoFile("/Users/trailcode/osm1.osm");
 
