@@ -52,7 +52,11 @@ public:
 
     static AttributedGeometry getGeosPolygon(const char *& poly);
 
+    static AttributedGeometry getGeosLineString(const char *& lineString);
+
     static std::vector<AttributedGeometry> getGeosPolygons(const char *& polys);
+
+    static std::vector<AttributedGeometry> getGeosLineStrings(const char *& lineStrings);
 
     static geos::geom::CoordinateSequence * getGeosCoordinateSequence(const char *& lineString);
 

@@ -74,6 +74,7 @@
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeometryConverter.h>
 #include <webAsmPlay/RenderablePolygon.h>
+#include <webAsmPlay/RenderableLineString.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GeoClient.h>
@@ -183,6 +184,37 @@ void GeoClient::getNumPolygons(const function<void (const size_t)> & callback)
 #endif
 }
 
+void GeoClient::getNumPolylines(const function<void (const size_t)> & callback)
+{
+    GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
+
+    numGeomsRequests[request->ID] = request;
+
+#ifdef __EMSCRIPTEN__
+
+    char buf[2048];
+
+    sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
+                    "var dv = new DataView(buffer); \r\n"
+                    "dv.setUint8(0,%i); \r\n"
+                    "dv.setUint32(1, Module.swap32(%i)); \r\n"
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_NUM_POLYLINES_REQUEST, request->ID);
+                
+    emscripten_run_script(buf);
+
+#else
+
+    vector<char> data(5);
+
+    data[0] = GeoServerBase::GET_NUM_POLYLINES_REQUEST;
+
+    *(uint32_t *)&data[1] = request->ID;
+
+    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+
+#endif
+}
+
 void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 {
     GeoRequestLayerBounds * request = new GeoRequestLayerBounds(callback);
@@ -247,6 +279,39 @@ void GeoClient::getAllPolygons(function<void (vector<AttributedGeometry> geoms)>
 #endif
 }
 
+void GeoClient::getAllPolylines(function<void(vector<AttributedGeometry> geoms)> callback) // TODO Code duplication.
+{
+    GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
+
+    getAllGeometriesRequests[request->ID] = request;
+
+#ifdef __EMSCRIPTEN__
+
+    char buf[2048];
+
+    sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
+                    "var dv = new DataView(buffer); \r\n"
+                    "dv.setUint8(0,%i); \r\n"
+                    "dv.setUint32(1, Module.swap32(%i)); \r\n"
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_ALL_POLYLINES_REQUEST, request->ID);
+                
+    emscripten_run_script(buf);
+
+#else
+
+    vector<char> data(5);
+
+    data[0] = GeoServerBase::GET_ALL_POLYLINES_REQUEST;
+
+    char * ptr = &data[1];
+
+    *(uint32_t *)ptr = request->ID; ptr += sizeof(uint32_t);
+
+    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+
+#endif
+}
+
 void GeoClient::onMessage(const string & data)
 {
     const char * ptr = (const char *)data.data();
@@ -254,6 +319,7 @@ void GeoClient::onMessage(const string & data)
     switch(ptr[0])
     {
         case GeoServerBase::GET_NUM_POLYGONS_RESPONCE:
+        case GeoServerBase::GET_NUM_POLYLINES_RESPONCE:
         {
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
@@ -279,6 +345,21 @@ void GeoClient::onMessage(const string & data)
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
             request->callback(GeometryConverter::getGeosPolygons(ptr));
+
+            getAllGeometriesRequests.erase(i);
+
+            break;
+        }
+
+        case GeoServerBase::GET_ALL_POLYLINES_RESPONCE:
+        {
+            const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
+
+            GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
+
+            unique_ptr<GetRequestGetAllGeometries> request(i->second);
+
+            request->callback(GeometryConverter::getGeosLineStrings(ptr));
 
             getAllGeometriesRequests.erase(i);
 
@@ -425,6 +506,78 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
             //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
             
             r->setOutlineColor(vec4(0,1,0,1));
+            
+            canvas->addRenderiable(r);
+            //*/
+            
+            dmess("Done creating renderiable.");
+        });
+
+        getAllPolylines([this, canvas](vector<AttributedGeometry> geomsIn)
+        {
+            dmess("polylines geomsIn " << geomsIn.size());
+
+            dmess("trans " << mat4ToStr(trans));
+
+            /*
+            vector<const Geometry *> polys(geomsIn.size());
+
+            for(size_t i = 0; i < polys.size(); ++i) { polys[i] = dynamic_cast<const Geometry *>(geomsIn[i].second) ;}
+
+            Renderable * r = RenderablePolygon::create(polys, trans);
+
+            r->setFillColor(vec4(0.3,0.0,0.3,0.3));
+            
+            r->setOutlineColor(vec4(0,1,0,1));
+            
+            canvas->addRenderiable(r);
+            //*/
+
+            //*
+            //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors(geomsIn.size());
+            vector<const Geometry *> polylines;
+
+            //for(size_t i = 0; i < geomsIn.size(); ++i)
+            for(int i = geomsIn.size() - 1; i >= 0; --i)
+            {
+                Attributes * attrs = geomsIn[i].first;
+
+                const Geometry * geom = dynamic_cast<const Geometry *>(geomsIn[i].second);
+
+                if(!geom)
+                {
+                    dmess("!geom");
+                }
+
+                /*
+                const vec4 outlineColor(0,1,0,1);
+
+                vec4 fillColor = vec4(0,0,1,0.5);
+
+                if(attrs->hasStringKey("addr_house"))
+                {
+                    fillColor = vec4(0.7,0.5,0,0.5);
+                }
+                else if(attrs->hasStringKey("building"))
+                {
+                    fillColor = vec4(1,0.5,0,0.5);
+                }
+                else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
+                {
+                    fillColor = vec4(0,0.7,0,0.5);
+                }
+                */
+                
+                //polysAndColors.push_back(make_tuple(geom, fillColor, outlineColor));
+
+                polylines.push_back(geom);
+            }
+            
+            Renderable * r = RenderableLineString::create(polylines, trans);
+
+            //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
+            
+            r->setOutlineColor(vec4(1,1,0,1));
             
             canvas->addRenderiable(r);
             //*/

@@ -44,7 +44,7 @@ typedef std::tuple<double, double, double, double> AABB2D;
 
 typedef std::pair<Attributes *, geos::geom::Geometry *> AttributedGeometry;
 
-typedef std::tuple<geos::geom::LineString *, Attributes *> AttributedLineString;
+typedef std::tuple<Attributes *, geos::geom::LineString *> AttributedLineString;
 
 #endif // __WEB_ASM_PLAY_TYPES_H__
 

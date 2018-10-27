@@ -50,6 +50,13 @@ public:
                                 const bool                        renderOutline = getDefaultRenderOutline(),
                                 const bool                        renderFill    = getDefaultRenderFill());
 
+    static Renderable * create( const std::vector<const geos::geom::Geometry *> & lineStrings,
+                                const glm::mat4                 & trans         = glm::mat4(1.0),
+                                const glm::vec4                 & fillColor     = getDefaultFillColor(),
+                                const glm::vec4                 & outlineColor  = getDefaultOutlineColor(),
+                                const bool                        renderOutline = getDefaultRenderOutline(),
+                                const bool                        renderFill    = getDefaultRenderFill());
+
     void render(const glm::mat4 & MVP) const;
 
 private:

@@ -85,7 +85,7 @@ Renderable * RenderableLineString::create(  const LineString    * lineString,
     }
 
     vector<GLfloat> verts(coords.size() * 2);
-    vector<GLuint> indices(coords.size());
+    vector<GLuint>  indices(coords.size());
 
     GLfloat * vertsPtr = &verts[0];
 
@@ -139,6 +139,101 @@ Renderable * RenderableLineString::create(  const LineString    * lineString,
                                     renderFill);
 }
 
+Renderable * RenderableLineString::create(  const vector<const Geometry *> & lineStrings,
+                                            const mat4          & trans,
+                                            const vec4          & fillColor,
+                                            const vec4          & outlineColor,
+                                            const bool            renderOutline,
+                                            const bool            renderFill)
+{
+    dmess("RenderableLineString::create(  const vector<const LineString *> & lineStrings");
+
+    size_t numVerts = 0;
+
+    for(const Geometry * ls : lineStrings) { numVerts += dynamic_cast<const LineString *>(ls)->getNumPoints() ;}
+
+    dmess("numVerts " << numVerts);
+
+    vector<GLfloat> verts   (numVerts * 2);
+    //vector<GLuint>  indices (numVerts * 2 - 1);
+    vector<GLuint> indices;
+
+    GLfloat * vertsPtr   = &verts  [0];
+    //GLuint  * indicesPtr = &indices[0]; 
+
+    size_t index = 0;
+
+    for(const Geometry * ls : lineStrings)
+    {
+        const vector<Coordinate> & coords = *dynamic_cast<const LineString *>(ls)->getCoordinatesRO()->toVector();
+
+        if(trans == mat4(1.0))
+        {
+            dmess("Fix!");
+
+            abort();
+        }
+        else
+        {
+            vec4 v = trans * vec4(coords[0].x, coords[0].y, 0, 1);
+
+            *vertsPtr = v.x; ++vertsPtr;
+            *vertsPtr = v.y; ++vertsPtr;
+
+            indices.push_back(index++);
+
+            for(size_t i = 1; i < coords.size() - 1; ++i)
+            {
+                const vec4 v = trans * vec4(coords[i].x, coords[i].y, 0, 1);
+
+                *vertsPtr = v.x; ++vertsPtr;
+                *vertsPtr = v.y; ++vertsPtr;
+
+                indices.push_back(index);
+                indices.push_back(index);
+                
+                ++index;
+            }
+
+            v = trans * vec4(coords.rbegin()->x, coords.rbegin()->y, 0, 1);
+
+            *vertsPtr = v.x; ++vertsPtr;
+            *vertsPtr = v.y; ++vertsPtr;
+
+            indices.push_back(index++);
+        }
+
+        
+    }
+
+    // TODO code duplications
+    GLuint vao = 0;
+    GLuint ebo = 0; // Try to remove
+    GLuint vbo = 0;
+
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &ebo);
+    glGenBuffers(1, &vbo);
+    
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * verts.size(), &verts[0], GL_STATIC_DRAW);
+
+    return new RenderableLineString(vao,
+                                    ebo,
+                                    vbo,
+                                    indices.size(),
+                                    true,
+                                    fillColor,
+                                    outlineColor,
+                                    renderOutline,
+                                    renderFill);
+}
+
 void RenderableLineString::render(const mat4 & MVP) const
 {
     getDefaultShader()->bind();
@@ -153,5 +248,11 @@ void RenderableLineString::render(const mat4 & MVP) const
 
     getDefaultShader()->enableVertexAttribArray();
 
-    glDrawElements(GL_LINE_STRIP, numVerts, GL_UNSIGNED_INT, NULL);
+    if(!isMulti) { glDrawElements(GL_LINE_STRIP, numVerts, GL_UNSIGNED_INT, NULL) ;
+    }
+    else
+    {
+        glDrawElements(GL_LINES, numVerts, GL_UNSIGNED_INT, NULL);
+    }
+
 }
