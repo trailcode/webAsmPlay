@@ -149,40 +149,38 @@ c/OSM_Importer.cpp 145 [  key: generator
 c/OSM_Importer.cpp 145 [  key: version
 */
 
-struct Node
+struct OSM_Base
 {
-    dvec2    pos;
     uint64_t uid;
+
+    // TODO There might be a lot of repeating of the below. Good to hash to compress.
     uint64_t changeset;
     uint8_t  version;
     string   user;
     string   timestamp; // TODO convert to binary structure.
+
+    unordered_map<string, string> keyValues;
 };
 
-struct Way
+struct Node : OSM_Base
 {
-    string         user;
-    uint64_t       uid;
-    string         timestamp; // TODO convert to binary structure.
-    uint64_t       changeset;
-    uint8_t        version;
+    dvec2 pos;
+};
+
+struct Way : OSM_Base
+{
     vector<Node *> nodes;
 };
 
 struct Member
 {
-    string role;
+    string   role;
     uint64_t ref;
-    string type; // TODO Needed? Seems ref implies.
+    string   type; // TODO Needed? Seems ref implies.
 };
 
-struct Relation
+struct Relation : OSM_Base
 {
-    string user;
-    uint64_t uid;
-    string timestamp; // TODO convert to binary structure.
-    uint64_t changeset;
-    uint8_t version;
     vector<Member *> members;
 };
 
@@ -197,11 +195,10 @@ Nodes     nodes;
 Ways      ways;
 Relations relations;
 
+OSM_Base * curr         = NULL;
 Node     * currNode     = NULL;
 Way      * currWay      = NULL;
 Relation * currRelation = NULL;
-
-uint8_t currTagMode = 0;
 
 static void XMLCALL startElement(void *userData, const XML_Char *name, const XML_Char **atts)
 {
@@ -212,9 +209,7 @@ static void XMLCALL startElement(void *userData, const XML_Char *name, const XML
     {
         case OSM_KEY_RELATION:
         
-            currRelation = new Relation();
-
-            currTagMode = OSM_KEY_RELATION;
+            curr = currRelation = new Relation();
 
             for (i = 0; atts[i] != NULL; i += 2)
             {
@@ -244,8 +239,6 @@ static void XMLCALL startElement(void *userData, const XML_Char *name, const XML
 
             currRelation->members.push_back(member);
 
-            assert(currTagMode == OSM_KEY_RELATION);
-
             for (i = 0; atts[i] != NULL; i += 2)
             {
                 switch(keyMap[atts[i]])
@@ -266,38 +259,31 @@ static void XMLCALL startElement(void *userData, const XML_Char *name, const XML
         } 
 
         case OSM_KEY_TAG:
+        {
+            string key;
+            string value;
 
-            switch(currTagMode)
+            for (i = 0; atts[i] != NULL; i += 2)
             {
-                case OSM_KEY_NODE:
-
-                    //dmess("OSM_KEY_NODE");
-
-                    break;
-
-                case OSM_KEY_WAY:
-
-                    //dmess("OSM_KEY_WAY");
-
-                    break;
-
-                case OSM_KEY_RELATION:
-
-                    //dmess("OSM_KEY_RELATION");
-
-                    break;
-
-                default: dmess("Error!"); break;
+                switch(keyMap[atts[i]])
+                {
+                    case OSM_KEY_K: key   = atts[i + 1];  break;
+                    case OSM_KEY_V: value = atts[i + 1]; break;
+                }
             }
 
+            curr->keyValues[key] = value;
+
             break;
+        }
+
+        case OSM_KEY_META:
         
-        case OSM_KEY_META: break;
+            break;
+
         case OSM_KEY_NODE:
 
-            currTagMode = OSM_KEY_NODE;
-
-            currNode = new Node;
+            curr = currNode = new Node;
 
             for (i = 0; atts[i] != NULL; i += 2)
             {
@@ -325,9 +311,7 @@ static void XMLCALL startElement(void *userData, const XML_Char *name, const XML
 
         case OSM_KEY_WAY:
 
-            currTagMode = OSM_KEY_WAY;
-
-            currWay = new Way;
+            curr = currWay = new Way;
 
             for (i = 0; atts[i] != NULL; i += 2)
             {
