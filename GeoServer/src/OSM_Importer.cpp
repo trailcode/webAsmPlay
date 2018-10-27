@@ -29,6 +29,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <webAsmPlay/Debug.h>
+#include <glm/vec2.hpp>
 #include <geoServer/OSM_Importer.h>
 
 #ifdef XML_LARGE_SIZE
@@ -49,14 +50,63 @@
 #endif
 
 using namespace std;
+using namespace glm;
 
 struct Node
 {
+    Node(const dvec2 & pos) : pos(pos)
 
+    const dvec2 pos;
+
+    unordered_map<string, string> attrs;
 };
 
 //unordered_set<string> attrKeys;
 unordered_map<string, unordered_set<string> > structure;
+
+unordered_map<uint64_t, Node *> Nodes;
+
+/*
+c/OSM_Importer.cpp 141 [node: member
+c/OSM_Importer.cpp 145 [  key: role
+c/OSM_Importer.cpp 145 [  key: ref
+c/OSM_Importer.cpp 145 [  key: type
+c/OSM_Importer.cpp 141 [node: tag
+c/OSM_Importer.cpp 145 [  key: v
+c/OSM_Importer.cpp 145 [  key: k
+c/OSM_Importer.cpp 141 [node: meta
+c/OSM_Importer.cpp 145 [  key: osm_base
+c/OSM_Importer.cpp 141 [node: node
+c/OSM_Importer.cpp 145 [  key: changeset
+c/OSM_Importer.cpp 145 [  key: timestamp
+c/OSM_Importer.cpp 145 [  key: user
+c/OSM_Importer.cpp 145 [  key: lat
+c/OSM_Importer.cpp 145 [  key: version
+c/OSM_Importer.cpp 145 [  key: uid
+c/OSM_Importer.cpp 145 [  key: lon
+c/OSM_Importer.cpp 145 [  key: id
+c/OSM_Importer.cpp 141 [node: way
+c/OSM_Importer.cpp 145 [  key: user
+c/OSM_Importer.cpp 145 [  key: id
+c/OSM_Importer.cpp 145 [  key: uid
+c/OSM_Importer.cpp 145 [  key: timestamp
+c/OSM_Importer.cpp 145 [  key: changeset
+c/OSM_Importer.cpp 145 [  key: version
+c/OSM_Importer.cpp 141 [node: relation
+c/OSM_Importer.cpp 145 [  key: user
+c/OSM_Importer.cpp 145 [  key: id
+c/OSM_Importer.cpp 145 [  key: uid
+c/OSM_Importer.cpp 145 [  key: timestamp
+c/OSM_Importer.cpp 145 [  key: changeset
+c/OSM_Importer.cpp 145 [  key: version
+c/OSM_Importer.cpp 141 [node: nd
+c/OSM_Importer.cpp 145 [  key: ref
+c/OSM_Importer.cpp 141 [node: osm
+c/OSM_Importer.cpp 145 [  key: generator
+c/OSM_Importer.cpp 145 [  key: version
+*/
+
+Node * currNode = NULL;
 
 static void XMLCALL
 startElement(void *userData, const XML_Char *name, const XML_Char **atts)
@@ -133,6 +183,8 @@ bool OSM_Importer::import(  const string   & fileName,
         dmess("key: " << key);
     }
     */
+
+   //  Are ways always polygons?
 
     for(unordered_map<string, unordered_set<string> >::value_type & i : structure)
     {

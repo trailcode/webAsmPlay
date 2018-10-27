@@ -56,7 +56,9 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
                             boundsMaxX(-numeric_limits<double>::max()),
                             boundsMaxY(-numeric_limits<double>::max())
 {
-    OSM_Importer::import(   "/Users/trailcode/osm1.osm",
+    OSM_Importer::import(  
+                            //"/Users/trailcode/osm1.osm"
+                            "/Users/trailcode/osm.osm",
                             serializedPolygons,
                             serializedLineStrings,
                             serializedPoints);
