@@ -30,13 +30,22 @@
 #include <string>
 #include <ostream>
 #include <unordered_map>
+#include <unordered_set>
+#include <webAsmPlay/Types.h>
 
 class Attributes
 {
 public:
 
+    typedef std::unordered_map<std::string, int32_t>     Ints32;
+    typedef std::unordered_map<std::string, int64_t>     Ints64;
+    typedef std::unordered_map<std::string, double >     Doubles;
+    typedef std::unordered_map<std::string, std::string> Strings;
+    typedef std::unordered_map<std::string, StrVec>      MultiStrs;
+
     Attributes();
     Attributes(const char *& attrs);
+    Attributes(const std::unordered_map<std::string, std::unordered_set<std::string> > & multiStrs);
 
     void write(std::ostream & out) const;
 
@@ -46,15 +55,11 @@ public:
 
     bool hasStringKeyValue(const std::string & key, const std::string & value) const;
 
-    typedef std::unordered_map<std::string, int32_t>        Ints32;
-    typedef std::unordered_map<std::string, int64_t>        Ints64;
-    typedef std::unordered_map<std::string, double >        Doubles;
-    typedef std::unordered_map<std::string, std::string>    Strings;
-
-    Ints32  ints32;
-    Ints64  ints64;
-    Doubles doubles;
-    Strings strings;
+    Ints32    ints32;
+    Ints64    ints64;
+    Doubles   doubles;
+    Strings   strings;
+    MultiStrs multiStrs;
 };
 
 #endif // __WEB_ASM_PLAY_ATTRIBUTES_H__

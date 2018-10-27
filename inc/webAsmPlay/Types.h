@@ -28,6 +28,7 @@
 #define __WEB_ASM_PLAY_TYPES_H__
 
 #include <tuple>
+#include <vector>
 
 class Attributes;
 
@@ -51,6 +52,8 @@ typedef std::vector<const geos::geom::Geometry *> ConstGeosGeomVec;
 typedef std::vector<float> FloatVec;
 
 typedef std::vector<uint32_t> Uint32Vec;
+
+typedef std::vector<std::string> StrVec;
 
 #endif // __WEB_ASM_PLAY_TYPES_H__
 

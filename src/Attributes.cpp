@@ -70,6 +70,11 @@ Attributes::Attributes(const char *& attrs)
     }
 }
 
+Attributes::Attributes(const unordered_map<string, unordered_set<string> > & multiStrs)
+{
+
+}
+
 void Attributes::write(ostream & out) const
 {
     const uint16_t nums [] = {  (uint16_t)ints32.size(),

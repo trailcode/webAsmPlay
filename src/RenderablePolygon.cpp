@@ -92,6 +92,8 @@ RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  cons
 
     const vector<Coordinate> & coords = *ring->getCoordinatesRO()->toVector();
 
+    //dmess("coords " << coords.size());
+
     if(coords.size() < 4)
     {
         dmess("Bad gemetry!");
@@ -123,6 +125,11 @@ RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  cons
             const Coordinate & C = coords[i];
 
             const vec4 v = trans * vec4(C.x, C.y, 0, 1);
+
+            if(i < 2)
+            {
+                dmess(" " << C.x << " " << C.y << " " << v.x << " " << v.y);
+            }
 
             verts.push_back(v.x);
             verts.push_back(v.y);

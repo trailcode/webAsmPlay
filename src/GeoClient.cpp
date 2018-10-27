@@ -417,7 +417,13 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
     getLayerBounds([this, canvas](const AABB2D & bounds)
     {
-        const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
+        //const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
+        //const mat4 s = scale(mat4(1.0), vec3(300.0, 300.0, 300.0));
+        const mat4 s = scale(mat4(1.0), vec3(0.5, 0.5, 0.5));
+        //const mat4 s = scale(mat4(1.0), vec3(0.1, 0.1, 0.1));
+
+        dmess("Trans " << vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
+                                    (get<1>(bounds) + get<3>(bounds)) * -0.5, 0));
 
         trans = translate(  s,
                             vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
@@ -501,6 +507,8 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
                 polysAndColors.push_back(make_tuple(geom, fillColor, outlineColor));
             }
             
+            dmess("polysAndColors " << polysAndColors.size());
+
             Renderable * r = RenderablePolygon::create(polysAndColors, trans);
 
             //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
@@ -549,7 +557,6 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
                     dmess("!geom");
                 }
 
-                /*
                 const vec4 outlineColor(0,1,0,1);
 
                 vec4 fillColor = vec4(0,0,1,0.5);
@@ -566,7 +573,6 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
                 {
                     fillColor = vec4(0,0.7,0,0.5);
                 }
-                */
                 
                 //polysAndColors.push_back(make_tuple(geom, fillColor, outlineColor));
 

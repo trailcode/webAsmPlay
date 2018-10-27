@@ -29,9 +29,12 @@
 #include <expat.h>
 #include <unordered_map>
 #include <unordered_set>
+#include <glm/vec2.hpp>
+#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/geom/Polygon.h>
+#include <geos/geom/GeometryFactory.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Debug.h>
-#include <glm/vec2.hpp>
 #include <geoServer/OSM_Importer.h>
 
 #ifdef XML_LARGE_SIZE
@@ -53,6 +56,7 @@
 
 using namespace std;
 using namespace glm;
+using namespace geos::geom;
 
 #define WARN_UNKNOWN_TAG dmess("Implment: " << name); \
                          for(size_t i = 0; atts[i] != NULL; i += 2) { dmess("key: " << atts[i] << " value: " << atts[i + 1]) ;} \
@@ -245,8 +249,8 @@ namespace
                         case OSM_KEY_CHANGESET: currNode->changeset  = stoull(atts[i + 1]); break;
                         case OSM_KEY_TIMESTAMP: currNode->timestamp  = atts[i + 1]; break;
                         case OSM_KEY_USER:      currNode->user       = atts[i + 1]; break;
-                        case OSM_KEY_LAT:       currNode->pos.x      = atof(atts[i + 1]); break;
-                        case OSM_KEY_LON:       currNode->pos.y      = atof(atts[i + 1]); break;
+                        case OSM_KEY_LAT:       currNode->pos.y      = atof(atts[i + 1]); break;
+                        case OSM_KEY_LON:       currNode->pos.x      = atof(atts[i + 1]); break;
                         case OSM_KEY_VERSION:   currNode->version    = atoi(atts[i + 1]); break;
                         case OSM_KEY_UID:       currNode->uid        = stoull(atts[i + 1]); break;
 
@@ -312,24 +316,29 @@ namespace
 
     static void XMLCALL endElement(void *userData, const XML_Char *name) { }
 
-    void getCoordinateSequence( const vector<const Node *>                    & nodes,
-                                stringstream                                  & data,
-                                unordered_map<string, unordered_set<string> > & attributes)
+    CoordinateArraySequence * getCoordinateSequence( const vector<const Node *>                    & nodes,
+                                                     unordered_map<string, unordered_set<string> > & attributes)
     {
-        for(const Node * n : nodes)
+        vector<Coordinate> * coords = new vector<Coordinate>(nodes.size());
+
+        for(size_t i = 0; i < nodes.size(); ++i)
         {
+            const Node * n = nodes[i];
+
             for(const unordered_map<string, string>::value_type & i : n->keyValues)
             {
                 attributes[i.first].insert(i.second);
             }
 
-            data.write((const char *)&n->pos, sizeof(dvec2));
+            (*coords)[i] = Coordinate(n->pos.x, n->pos.y);
         }
+
+        return new CoordinateArraySequence(coords, 2);
     }
 }
 
 bool OSM_Importer::import(  const string   & fileName,
-                            vector<string> & serializedPolygons,
+                            vector<AttributedGeometry> & polygons,
                             vector<string> & serializedLineStrings,
                             vector<string> & serializedPoints)
 {
@@ -390,26 +399,26 @@ bool OSM_Importer::import(  const string   & fileName,
 
         const vector<const Node *> & nodes = way->nodes;
 
-        stringstream data;
+        unordered_map<string, unordered_set<string> > attributeMap;
 
-        Attributes attrs;
+        CoordinateArraySequence * coords = getCoordinateSequence(nodes, attributeMap); // TODO grow layer AABBB
 
-        unordered_map<string, unordered_set<string> > attributes;
+        Attributes * attrs = new Attributes(attributeMap);
 
-        getCoordinateSequence(nodes, data, attributes); // TODO grow layer AABBB
+        const GeometryFactory * factory = GeometryFactory::getDefaultInstance();
 
-        //dmess("data " << data.str().length());
-
-        if(nodes.size() == 1) // Seems to never happen.
-        {
-            ++numPoints;
-        }
-        else if((*nodes.begin())->pos != (*nodes.rbegin())->pos)
+        if((*nodes.begin())->pos != (*nodes.rbegin())->pos)
         {
             ++numLineStrings;
         }
         else
         {
+            if(coords->getSize() == 3) { coords->add(Coordinate(coords->getAt(0))) ;}
+            
+            LinearRing * externalRing = factory->createLinearRing(coords);
+
+            polygons.push_back(AttributedGeometry(attrs, factory->createPolygon(externalRing, NULL)));
+            
             ++numPolygons;
         }
     }

@@ -28,14 +28,14 @@
 #define __WEB_ASM_PLAY_OSM_IMPORTER_H__
 
 #include <string>
-#include <vector>
+#include <webAsmPlay/Types.h>
 
 class OSM_Importer
 {
 public:
 
     static bool import( const std::string        & fileName,
-                        std::vector<std::string> & serializedPolygons,
+                        std::vector<AttributedGeometry> & polygons,
                         std::vector<std::string> & serializedLineStrings,
                         std::vector<std::string> & serializedPoints);
 

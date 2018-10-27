@@ -56,12 +56,30 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
                             boundsMaxX(-numeric_limits<double>::max()),
                             boundsMaxY(-numeric_limits<double>::max())
 {
+    //*
+    vector<AttributedGeometry> polygons;
+
     OSM_Importer::import(  
                             //"/Users/trailcode/osm1.osm"
                             "/Users/trailcode/osm.osm",
-                            serializedPolygons,
+                            polygons,
                             serializedLineStrings,
                             serializedPoints);
+
+    dmess("polygons " << polygons.size());
+
+    for(const AttributedGeometry & i : polygons)
+    {
+        serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<Polygon *>(i.second), i.first));
+
+        const Envelope * extent = i.second->getEnvelopeInternal();
+
+        if(boundsMinX > extent->getMinX()) { boundsMinX = extent->getMinX() ;}
+        if(boundsMinY > extent->getMinY()) { boundsMinY = extent->getMinY() ;}
+        if(boundsMaxX < extent->getMaxX()) { boundsMaxX = extent->getMaxX() ;}
+        if(boundsMaxY < extent->getMaxY()) { boundsMaxY = extent->getMaxY() ;}
+    }
+    //*/
 }
 
 GeoServer::~GeoServer()
