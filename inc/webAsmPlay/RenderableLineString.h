@@ -27,6 +27,14 @@
 #ifndef __WEB_ASM_PLAY_RENDERIABLE_LINE_STRING_2D_H__
 #define __WEB_ASM_PLAY_RENDERIABLE_LINE_STRING_2D_H__
 
+#ifdef __EMSCRIPTEN__
+
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+#else
+    #include <GL/gl3w.h>
+#endif
+
 #include <webAsmPlay/Renderable.h>
 
 namespace geos
@@ -50,12 +58,12 @@ public:
                                 const bool                        renderOutline = getDefaultRenderOutline(),
                                 const bool                        renderFill    = getDefaultRenderFill());
 
-    static Renderable * create( const std::vector<const geos::geom::Geometry *> & lineStrings,
-                                const glm::mat4                 & trans         = glm::mat4(1.0),
-                                const glm::vec4                 & fillColor     = getDefaultFillColor(),
-                                const glm::vec4                 & outlineColor  = getDefaultOutlineColor(),
-                                const bool                        renderOutline = getDefaultRenderOutline(),
-                                const bool                        renderFill    = getDefaultRenderFill());
+    static Renderable * create( const ConstGeosGeomVec & lineStrings,
+                                const glm::mat4        & trans         = glm::mat4(1.0),
+                                const glm::vec4        & fillColor     = getDefaultFillColor(),
+                                const glm::vec4        & outlineColor  = getDefaultOutlineColor(),
+                                const bool               renderOutline = getDefaultRenderOutline(),
+                                const bool               renderFill    = getDefaultRenderFill());
 
     void render(const glm::mat4 & MVP) const;
 
@@ -64,17 +72,24 @@ private:
     RenderableLineString(   const GLuint      vao,
                             const GLuint      ebo,
                             const GLuint      vbo,
-                            const GLuint      numVerts,
+                            const GLuint      numElements,
                             const bool        isMulti,
                             const glm::vec4 & fillColor,
                             const glm::vec4 & outlineColor,
                             const bool        renderOutline,
                             const bool        renderFill);
 
+    static Renderable * create( const FloatVec   & verts,
+                                const Uint32Vec  & indices,
+                                const glm::vec4  & fillColor,
+                                const glm::vec4  & outlineColor,
+                                const bool         renderOutline,
+                                const bool         renderFill);
+
     const GLuint vao;
     const GLuint ebo;
     const GLuint vbo;
-    const GLuint numVerts;
+    const GLuint numElements;
 };
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_LINE_STRING_2D_H__

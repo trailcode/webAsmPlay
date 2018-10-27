@@ -46,5 +46,11 @@ typedef std::pair<Attributes *, geos::geom::Geometry *> AttributedGeometry;
 
 typedef std::tuple<Attributes *, geos::geom::LineString *> AttributedLineString;
 
+typedef std::vector<const geos::geom::Geometry *> ConstGeosGeomVec;
+
+typedef std::vector<float> FloatVec;
+
+typedef std::vector<uint32_t> Uint32Vec;
+
 #endif // __WEB_ASM_PLAY_TYPES_H__
 

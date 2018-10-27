@@ -45,23 +45,23 @@ namespace
 
 // TODO Create better variable names. Try to simplify this class.
 
-RenderablePolygon::RenderablePolygon(   const GLuint           vao,
-                                        const GLuint           ebo,
-                                        const GLuint           ebo2,
-                                        const GLuint           vbo,
-                                        const int              numTriangles,
-                                        const vector<GLuint> & counterVertIndices,
-                                        const size_t           numContourLines,
-                                        const bool             isMulti,
-                                        const vec4           & fillColor,
-                                        const vec4           & outlineColor,
-                                        const bool             renderOutline,
-                                        const bool             renderFill,
-                                        const bool             seperateFillColors) : Renderable(isMulti,
-                                                                                                fillColor,
-                                                                                                outlineColor,
-                                                                                                renderOutline,
-                                                                                                renderFill),
+RenderablePolygon::RenderablePolygon(   const GLuint      vao,
+                                        const GLuint      ebo,
+                                        const GLuint      ebo2,
+                                        const GLuint      vbo,
+                                        const int         numTriangles,
+                                        const Uint32Vec & counterVertIndices,
+                                        const size_t      numContourLines,
+                                        const bool        isMulti,
+                                        const vec4      & fillColor,
+                                        const vec4      & outlineColor,
+                                        const bool        renderOutline,
+                                        const bool        renderFill,
+                                        const bool        seperateFillColors) : Renderable( isMulti,
+                                                                                            fillColor,
+                                                                                            outlineColor,
+                                                                                            renderOutline,
+                                                                                            renderFill),
                                                                                 vao                 (vao),
                                                                                 ebo                 (ebo),
                                                                                 ebo2                (ebo2),
@@ -217,20 +217,20 @@ void RenderablePolygon::tesselateMultiPolygon(  const MultiPolygon              
     }
 }
 
-Renderable * RenderablePolygon::create( const Polygon   * poly,
-                                        const mat4      & trans,
-                                        const vec4      & fillColor,
-                                        const vec4      & outlineColor,
-                                        const bool        renderOutline,
-                                        const bool        renderFill)
+Renderable * RenderablePolygon::create( const Polygon * poly,
+                                        const mat4    & trans,
+                                        const vec4    & fillColor,
+                                        const vec4    & outlineColor,
+                                        const bool      renderOutline,
+                                        const bool      renderFill)
 {
     const TesselationResult tess = tessellatePolygon(poly, trans);
 
     if(!tess.vertsOut) { return NULL ;}
 
-    vector<GLfloat> verts2(tess.numVerts * 2);
+    FloatVec verts(tess.numVerts * 2);
 
-    for(size_t i = 0; i < tess.numVerts * 2; ++i) { verts2[i] = tess.vertsOut[i] ;}
+    for(size_t i = 0; i < tess.numVerts * 2; ++i) { verts[i] = tess.vertsOut[i] ;}
 
     GLuint vao  = 0;
     GLuint ebo  = 0;
@@ -246,7 +246,7 @@ Renderable * RenderablePolygon::create( const Polygon   * poly,
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * tess.numVerts * 2, &verts2[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * tess.numVerts * 2, &verts[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * tess.numTriangles * 3, tess.triangleIndices, GL_STATIC_DRAW);
@@ -293,12 +293,12 @@ Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
                                     false);
 }
 
-Renderable * RenderablePolygon::create( const vector<const Geometry *>  & polygons,
-                                        const mat4                      & trans,
-                                        const vec4                      & fillColor,
-                                        const vec4                      & outlineColor,
-                                        const bool                        renderOutline,
-                                        const bool                        renderFill)
+Renderable * RenderablePolygon::create( const ConstGeosGeomVec & polygons,
+                                        const mat4             & trans,
+                                        const vec4             & fillColor,
+                                        const vec4             & outlineColor,
+                                        const bool               renderOutline,
+                                        const bool               renderFill)
 {
     vector<const TesselationResult> tesselationResults;
 
@@ -414,14 +414,14 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
         numCounterVertIndices2  += tess.counterVertIndices2.size();
     }
 
-    vector<GLfloat> verts;
+    FloatVec verts;
     
     if(seperateFillColors)  { verts.resize(numVerts * (2 + 4)) ;}
     else                    { verts.resize(numVerts * 2 + 4) ;}
 
-    vector<GLuint>  triangleIndices      (numTriangles * 3);
-    vector<GLuint>  counterVertIndices   (numCounterVertIndices);
-    vector<GLuint>  counterVertIndices2  (numCounterVertIndices2);
+    Uint32Vec triangleIndices      (numTriangles * 3);
+    Uint32Vec counterVertIndices   (numCounterVertIndices);
+    Uint32Vec counterVertIndices2  (numCounterVertIndices2);
 
     GLfloat * vertsPtr               = &verts[0];
     GLuint  * triangleIndicesPtr     = &triangleIndices[0];
@@ -494,7 +494,7 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
                                     numTriangles,
                                     counterVertIndices,
                                     counterVertIndices2.size(),
-                                    tesselations.size() > 1, // Is is a multi-polygon
+                                    tesselations.size() > 1, // If is a multi-polygon
                                     fillColor,
                                     outlineColor,
                                     renderOutline,

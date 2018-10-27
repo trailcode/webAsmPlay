@@ -37,20 +37,20 @@ using namespace geos::geom;
 RenderableLineString::RenderableLineString( const GLuint   vao,
                                             const GLuint   ebo,
                                             const GLuint   vbo,
-                                            const GLuint   numVerts,
+                                            const GLuint   numElements,
                                             const bool     isMulti,
                                             const vec4   & fillColor,
                                             const vec4   & outlineColor,
                                             const bool     renderOutline,
-                                            const bool     renderFill) :    Renderable(isMulti,
+                                            const bool     renderFill) :    Renderable( isMulti,
                                                                                         fillColor,
                                                                                         outlineColor,
                                                                                         renderOutline,
                                                                                         renderFill),
-                                                                            vao     (vao),
-                                                                            ebo     (ebo),
-                                                                            vbo     (vbo),
-                                                                            numVerts(numVerts)
+                                                                            vao         (vao),
+                                                                            ebo         (ebo),
+                                                                            vbo         (vbo),
+                                                                            numElements (numElements)
 {
 }
 
@@ -84,8 +84,8 @@ Renderable * RenderableLineString::create(  const LineString    * lineString,
         return NULL;
     }
 
-    vector<GLfloat> verts(coords.size() * 2);
-    vector<GLuint>  indices(coords.size());
+    FloatVec  verts  (coords.size() * 2);
+    Uint32Vec indices(coords.size());
 
     GLfloat * vertsPtr = &verts[0];
 
@@ -112,54 +112,29 @@ Renderable * RenderableLineString::create(  const LineString    * lineString,
         }
     }
 
-    GLuint vao = 0;
-    GLuint ebo = 0; // Try to remove
-    GLuint vbo = 0;
-
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &ebo);
-    glGenBuffers(1, &vbo);
-    
-    glBindVertexArray(vao);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * coords.size() * 2, &verts[0], GL_STATIC_DRAW);
-
-    return new RenderableLineString(vao,
-                                    ebo,
-                                    vbo,
-                                    indices.size(),
-                                    false,
-                                    fillColor,
-                                    outlineColor,
-                                    renderOutline,
-                                    renderFill);
+    return create(  verts,
+                    indices,
+                    fillColor,
+                    outlineColor,
+                    renderOutline,
+                    renderFill);
 }
 
-Renderable * RenderableLineString::create(  const vector<const Geometry *> & lineStrings,
-                                            const mat4          & trans,
-                                            const vec4          & fillColor,
-                                            const vec4          & outlineColor,
-                                            const bool            renderOutline,
-                                            const bool            renderFill)
+Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineStrings,
+                                            const mat4              & trans,
+                                            const vec4              & fillColor,
+                                            const vec4              & outlineColor,
+                                            const bool                renderOutline,
+                                            const bool                renderFill)
 {
-    dmess("RenderableLineString::create(  const vector<const LineString *> & lineStrings");
-
     size_t numVerts = 0;
 
     for(const Geometry * ls : lineStrings) { numVerts += dynamic_cast<const LineString *>(ls)->getNumPoints() ;}
 
-    dmess("numVerts " << numVerts);
+    FloatVec  verts(numVerts * 2);
+    Uint32Vec indices; // TODO try not to push_back
 
-    vector<GLfloat> verts   (numVerts * 2);
-    //vector<GLuint>  indices (numVerts * 2 - 1);
-    vector<GLuint> indices;
-
-    GLfloat * vertsPtr   = &verts  [0];
-    //GLuint  * indicesPtr = &indices[0]; 
+    GLfloat * vertsPtr = &verts[0];
 
     size_t index = 0;
 
@@ -202,18 +177,30 @@ Renderable * RenderableLineString::create(  const vector<const Geometry *> & lin
 
             indices.push_back(index++);
         }
-
-        
     }
 
-    // TODO code duplications
+    return create(  verts,
+                    indices,
+                    fillColor,
+                    outlineColor,
+                    renderOutline,
+                    renderFill);
+}
+
+Renderable * RenderableLineString::create(  const FloatVec  & verts,
+                                            const Uint32Vec & indices,
+                                            const vec4      & fillColor,
+                                            const vec4      & outlineColor,
+                                            const bool        renderOutline,
+                                            const bool        renderFill)
+{
     GLuint vao = 0;
     GLuint ebo = 0; // Try to remove
     GLuint vbo = 0;
 
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &ebo);
-    glGenBuffers(1, &vbo);
+    glGenVertexArrays(1, &vao); // TODO check for errors! Return null if error!
+    glGenBuffers     (1, &ebo);
+    glGenBuffers     (1, &vbo);
     
     glBindVertexArray(vao);
 
@@ -248,11 +235,6 @@ void RenderableLineString::render(const mat4 & MVP) const
 
     getDefaultShader()->enableVertexAttribArray();
 
-    if(!isMulti) { glDrawElements(GL_LINE_STRIP, numVerts, GL_UNSIGNED_INT, NULL) ;
-    }
-    else
-    {
-        glDrawElements(GL_LINES, numVerts, GL_UNSIGNED_INT, NULL);
-    }
-
+    if(!isMulti) { glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL) ;}
+    else         { glDrawElements(GL_LINES,      numElements, GL_UNSIGNED_INT, NULL) ;}
 }

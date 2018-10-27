@@ -26,6 +26,8 @@ link_libraries(${GDAL_LIBRARY})
 link_libraries(${GEOS_LIBRARIES})
 link_libraries(/usr/local/Cellar/geos/3.7.0/lib/libgeos-3.7.0.dylib)
 
+message("${GDAL_LIBRARY}")
+
 set(sourcePath "${CMAKE_CURRENT_SOURCE_DIR}../")
 
 add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")

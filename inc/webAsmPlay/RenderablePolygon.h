@@ -27,6 +27,14 @@
 #ifndef __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__
 #define __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__
 
+#ifdef __EMSCRIPTEN__
+
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+#else
+    #include <GL/gl3w.h>
+#endif
+
 #include <vector>
 #include <webAsmPlay/Renderable.h>
 
@@ -59,12 +67,12 @@ public:
                                 const bool                        renderOutline = getDefaultRenderOutline(),
                                 const bool                        renderFill    = getDefaultRenderFill());
 
-    static Renderable * create( const std::vector<const geos::geom::Geometry *> & polygons,
-                                const glm::mat4                                 & trans         = glm::mat4(1.0),
-                                const glm::vec4                                 & fillColor     = getDefaultFillColor(),
-                                const glm::vec4                                 & outlineColor  = getDefaultOutlineColor(),
-                                const bool                                        renderOutline = getDefaultRenderOutline(),
-                                const bool                                        renderFill    = getDefaultRenderFill());
+    static Renderable * create( const ConstGeosGeomVec & polygons,
+                                const glm::mat4        & trans         = glm::mat4(1.0),
+                                const glm::vec4        & fillColor     = getDefaultFillColor(),
+                                const glm::vec4        & outlineColor  = getDefaultOutlineColor(),
+                                const bool               renderOutline = getDefaultRenderOutline(),
+                                const bool               renderFill    = getDefaultRenderFill());
 
     static Renderable * create( const std::vector<std::tuple<const geos::geom::Geometry *, const glm::vec4, const glm::vec4> > & polygons,
     const glm::mat4                                 & trans         = glm::mat4(1.0),
@@ -86,25 +94,25 @@ private:
         int       numVerts          = 0;
         int       numTriangles      = 0;
 
-        std::vector<GLuint> counterVertIndices;
-        std::vector<GLuint> counterVertIndices2;
+        Uint32Vec counterVertIndices;
+        Uint32Vec counterVertIndices2;
 
         glm::vec4 fillColor;
     };
 
-    RenderablePolygon(  const GLuint                vao,
-                        const GLuint                ebo,
-                        const GLuint                ebo2,
-                        const GLuint                vbo,
-                        const int                   numTriangles,
-                        const std::vector<GLuint> & counterVertIndices,
-                        const size_t                numContourLines,
-                        const bool                  isMulti,
-                        const glm::vec4           & fillColor,
-                        const glm::vec4           & outlineColor,
-                        const bool                  renderOutline,
-                        const bool                  renderFill,
-                        const bool                  seperateFillColors);
+    RenderablePolygon(  const GLuint      vao,
+                        const GLuint      ebo,
+                        const GLuint      ebo2,
+                        const GLuint      vbo,
+                        const int         numTriangles,
+                        const Uint32Vec & counterVertIndices,
+                        const size_t      numContourLines,
+                        const bool        isMulti,
+                        const glm::vec4 & fillColor,
+                        const glm::vec4 & outlineColor,
+                        const bool        renderOutline,
+                        const bool        renderFill,
+                        const bool        seperateFillColors);
 
     static Renderable * createFromTesselations( const std::vector<const TesselationResult>  & tesselations,
                                                 const glm::vec4                             & fillColor,
@@ -125,14 +133,14 @@ private:
 
     static void ensureColorPolygonShader();
 
-    const GLuint                vao;
-    const GLuint                ebo;
-    const GLuint                ebo2;
-    const GLuint                vbo;
-    const int                   numTriangles;
-    const std::vector<GLuint>   counterVertIndices;
-    const size_t                numContourLines;
-    const bool                  seperateFillColors;
+    const GLuint    vao;
+    const GLuint    ebo;
+    const GLuint    ebo2;
+    const GLuint    vbo;
+    const int       numTriangles;
+    const Uint32Vec counterVertIndices;
+    const size_t    numContourLines;
+    const bool      seperateFillColors;
 }; 
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__

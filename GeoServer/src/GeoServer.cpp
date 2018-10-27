@@ -104,26 +104,12 @@ string GeoServer::addGeoFile(const string & geomFile)
             }
         }
 
-        dmess("1 " << poFeature->GetGeometryRef()->getGeometryName());
-
-        Geometry * geom = NULL;
+        Geometry * geom = (Geometry *)poFeature->GetGeometryRef()->exportToGEOS(gctx);
         
-        try
-        {
-            geom = (Geometry *)poFeature->GetGeometryRef()->exportToGEOS(gctx);
-        } catch(...)
-        {
-            dmess("error!");
-
-            continue;
-        }
-
-        dmess("1 " << geom->getGeometryType());
-
         switch(geom->getGeometryTypeId())
         {
             case GEOS_POLYGON:    polys      .push_back(PolyAndArea(geom, geom->getArea(), attrs)); break;
-            case GEOS_LINESTRING: lineStrings.push_back(AttributedLineString(dynamic_cast<LineString *>(geom), attrs)); break;
+            case GEOS_LINESTRING: lineStrings.push_back(AttributedLineString(attrs, dynamic_cast<LineString *>(geom))); break;
             default:
                 dmess("Implement for " << geom->getGeometryType());
         }
