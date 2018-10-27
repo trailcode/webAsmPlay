@@ -89,8 +89,8 @@ private:
     
     geos::index::quadtree::Quadtree * quadTree;
     
-    glm::mat4 trans;
-    glm::mat4 inverseTrans;
+    glm::dmat4 trans;
+    glm::dmat4 inverseTrans;
     
 #ifndef __EMSCRIPTEN__
 

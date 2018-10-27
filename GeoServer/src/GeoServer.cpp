@@ -60,8 +60,8 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
     vector<AttributedGeometry> polygons;
 
     OSM_Importer::import(  
-                            //"/Users/trailcode/osm1.osm"
-                            "/Users/trailcode/osm.osm",
+                            "/Users/trailcode/osm1.osm",
+                            //"/Users/trailcode/osm.osm",
                             polygons,
                             serializedLineStrings,
                             serializedPoints);
@@ -80,6 +80,9 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
         if(boundsMaxY < extent->getMaxY()) { boundsMaxY = extent->getMaxY() ;}
     }
     //*/
+
+    //dmess("shift x " << boundsMaxX + boundsMinX);
+    //dmess("shift y " << boundsMinY + boundsMaxY);
 }
 
 GeoServer::~GeoServer()

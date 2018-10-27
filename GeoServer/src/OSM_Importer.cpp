@@ -135,7 +135,9 @@ namespace
 
     struct Node : OSM_Base
     {
-        dvec2 pos;
+        //dvec2 pos;
+        double lat;
+        double lon;
     };
 
     struct Way : OSM_Base
@@ -249,8 +251,8 @@ namespace
                         case OSM_KEY_CHANGESET: currNode->changeset  = stoull(atts[i + 1]); break;
                         case OSM_KEY_TIMESTAMP: currNode->timestamp  = atts[i + 1]; break;
                         case OSM_KEY_USER:      currNode->user       = atts[i + 1]; break;
-                        case OSM_KEY_LAT:       currNode->pos.y      = atof(atts[i + 1]); break;
-                        case OSM_KEY_LON:       currNode->pos.x      = atof(atts[i + 1]); break;
+                        case OSM_KEY_LAT:       currNode->lat        = atof(atts[i + 1]); break;
+                        case OSM_KEY_LON:       currNode->lon        = atof(atts[i + 1]); break;
                         case OSM_KEY_VERSION:   currNode->version    = atoi(atts[i + 1]); break;
                         case OSM_KEY_UID:       currNode->uid        = stoull(atts[i + 1]); break;
 
@@ -325,12 +327,13 @@ namespace
         {
             const Node * n = nodes[i];
 
+            //(*coords)[i] = Coordinate(n->lat, n->lon);
+            (*coords)[i] = Coordinate(n->lon, n->lat);
+
             for(const unordered_map<string, string>::value_type & i : n->keyValues)
             {
                 attributes[i.first].insert(i.second);
             }
-
-            (*coords)[i] = Coordinate(n->pos.x, n->pos.y);
         }
 
         return new CoordinateArraySequence(coords, 2);
@@ -407,13 +410,18 @@ bool OSM_Importer::import(  const string   & fileName,
 
         const GeometryFactory * factory = GeometryFactory::getDefaultInstance();
 
-        if((*nodes.begin())->pos != (*nodes.rbegin())->pos)
+        if((*nodes.begin())->lat != (*nodes.rbegin())->lat || (*nodes.begin())->lon != (*nodes.rbegin())->lon)
         {
             ++numLineStrings;
         }
         else
         {
-            if(coords->getSize() == 3) { coords->add(Coordinate(coords->getAt(0))) ;}
+            if(coords->getSize() == 3) 
+            {
+                coords->add(Coordinate(coords->getAt(0)));
+
+                continue;
+            }
             
             LinearRing * externalRing = factory->createLinearRing(coords);
 

@@ -81,7 +81,7 @@ RenderablePolygon::~RenderablePolygon()
 }
 
 RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  const Polygon * poly,
-                                                                            const mat4    & trans,
+                                                                            const dmat4   & trans,
                                                                             const vec4    & fillColor)
 {
     TesselationResult ret;
@@ -105,7 +105,7 @@ RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  cons
     
     const size_t num = coords.size() - 1;
 
-    if(trans == mat4(1.0))
+    if(trans == dmat4(1.0))
     {
         for(size_t i = 0; i < num; ++i)
         {
@@ -124,11 +124,11 @@ RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  cons
         {
             const Coordinate & C = coords[i];
 
-            const vec4 v = trans * vec4(C.x, C.y, 0, 1);
+            const dvec4 v = trans * dvec4(C.x, C.y, 0, 1);
 
             if(i < 2)
             {
-                dmess(" " << C.x << " " << C.y << " " << v.x << " " << v.y);
+                //dmess(" " << C.x << " " << C.y << " " << v.x << " " << v.y);
             }
 
             verts.push_back(v.x);
@@ -157,7 +157,7 @@ RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  cons
 
         const size_t offset = verts.size() / 2;
 
-        if(trans == mat4(1.0))
+        if(trans == dmat4(1.0))
         {
             for(size_t i = 0; i < num; ++i)
             {
@@ -206,7 +206,7 @@ RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  cons
 }
 
 void RenderablePolygon::tesselateMultiPolygon(  const MultiPolygon              * multiPoly,
-                                                const mat4                      & trans,
+                                                const dmat4                     & trans,
                                                 vector<const TesselationResult> & tesselationResults)
 {
     for(size_t i = 0; i < multiPoly->getNumGeometries(); ++i)
@@ -225,7 +225,7 @@ void RenderablePolygon::tesselateMultiPolygon(  const MultiPolygon              
 }
 
 Renderable * RenderablePolygon::create( const Polygon * poly,
-                                        const mat4    & trans,
+                                        const dmat4   & trans,
                                         const vec4    & fillColor,
                                         const vec4    & outlineColor,
                                         const bool      renderOutline,
@@ -282,7 +282,7 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
-                                        const mat4          & trans,
+                                        const dmat4         & trans,
                                         const vec4          & fillColor,
                                         const vec4          & outlineColor,
                                         const bool            renderOutline,
@@ -301,7 +301,7 @@ Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
 }
 
 Renderable * RenderablePolygon::create( const ConstGeosGeomVec & polygons,
-                                        const mat4             & trans,
+                                        const dmat4            & trans,
                                         const vec4             & fillColor,
                                         const vec4             & outlineColor,
                                         const bool               renderOutline,
@@ -349,7 +349,7 @@ Renderable * RenderablePolygon::create( const ConstGeosGeomVec & polygons,
 }
 
 Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, const vec4, const vec4> >  & polygons,
-                                        const mat4                      & trans,
+                                        const dmat4                     & trans,
                                         const vec4                      & fillColor,
                                         const vec4                      & outlineColor,
                                         const bool                        renderOutline,

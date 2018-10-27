@@ -54,28 +54,28 @@ public:
     ~RenderablePolygon();
 
     static Renderable * create( const geos::geom::Polygon   * poly,
-                                const glm::mat4             & trans             = glm::mat4(1.0),
+                                const glm::dmat4            & trans             = glm::dmat4(1.0),
                                 const glm::vec4             & fillColor         = getDefaultFillColor(),
                                 const glm::vec4             & outlineColor      = getDefaultOutlineColor(),
                                 const bool                    renderOutline     = getDefaultRenderOutline(),
                                 const bool                    renderFill        = getDefaultRenderFill());
 
     static Renderable * create( const geos::geom::MultiPolygon  * multyPoly,
-                                const glm::mat4                 & trans         = glm::mat4(1.0),
+                                const glm::dmat4                & trans         = glm::dmat4(1.0),
                                 const glm::vec4                 & fillColor     = getDefaultFillColor(),
                                 const glm::vec4                 & outlineColor  = getDefaultOutlineColor(),
                                 const bool                        renderOutline = getDefaultRenderOutline(),
                                 const bool                        renderFill    = getDefaultRenderFill());
 
     static Renderable * create( const ConstGeosGeomVec & polygons,
-                                const glm::mat4        & trans         = glm::mat4(1.0),
+                                const glm::dmat4       & trans         = glm::dmat4(1.0),
                                 const glm::vec4        & fillColor     = getDefaultFillColor(),
                                 const glm::vec4        & outlineColor  = getDefaultOutlineColor(),
                                 const bool               renderOutline = getDefaultRenderOutline(),
                                 const bool               renderFill    = getDefaultRenderFill());
 
     static Renderable * create( const std::vector<std::tuple<const geos::geom::Geometry *, const glm::vec4, const glm::vec4> > & polygons,
-    const glm::mat4                                 & trans         = glm::mat4(1.0),
+    const glm::dmat4                                & trans         = glm::mat4(1.0),
     const glm::vec4                                 & fillColor     = getDefaultFillColor(),
     const glm::vec4                                 & outlineColor  = getDefaultOutlineColor(),
     const bool                                        renderOutline = getDefaultRenderOutline(),
@@ -122,11 +122,11 @@ private:
                                                 const bool                                    seperateFillColors);
 
     static TesselationResult tessellatePolygon( const geos::geom::Polygon * poly,
-                                                const glm::mat4           & trans,
+                                                const glm::dmat4          & trans,
                                                 const glm::vec4           & fillColor = glm::vec4(0));
 
     static void tesselateMultiPolygon(  const geos::geom::MultiPolygon       * multiPoly,
-                                        const glm::mat4                      & trans,
+                                        const glm::dmat4                     & trans,
                                         std::vector<const TesselationResult> & tesselationResults);
 
     static void ensureOutlineShader();

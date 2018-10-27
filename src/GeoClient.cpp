@@ -417,17 +417,25 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
     getLayerBounds([this, canvas](const AABB2D & bounds)
     {
-        //const mat4 s = scale(mat4(1.0), vec3(30.0, 30.0, 30.0));
+        const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
+        //const dmat4 s = scale(dmat4(1.0), dvec3(3.0, 3.0, 3.0));
         //const mat4 s = scale(mat4(1.0), vec3(300.0, 300.0, 300.0));
-        const mat4 s = scale(mat4(1.0), vec3(0.5, 0.5, 0.5));
+        //const dmat4 s = scale(dmat4(1.0), dvec3(1, 1, 1));
+        //const mat4 s = scale(mat4(1.0), vec3(0.5, 0.5, 0.5));
         //const mat4 s = scale(mat4(1.0), vec3(0.1, 0.1, 0.1));
+        //const mat4 s = scale(mat4(1.0), vec3(0.01, 0.01, 0.01));
 
-        dmess("Trans " << vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
-                                    (get<1>(bounds) + get<3>(bounds)) * -0.5, 0));
+        dmess("get<0>(bounds) " << get<0>(bounds) << " get<2>(bounds) " << get<2>(bounds));
+        dmess("get<1>(bounds) " << get<1>(bounds) << " get<3>(bounds) " << get<3>(bounds));
 
-        trans = translate(  s,
-                            vec3((get<0>(bounds) + get<2>(bounds)) * -0.5,
-                                    (get<1>(bounds) + get<3>(bounds)) * -0.5,
+        dmess("Trans " << vec3((get<0>(bounds) + get<2>(bounds)) * 0.5,
+                                    (get<1>(bounds) + get<3>(bounds)) * 0.5, 0));
+
+        trans = translate(  
+                            s,
+                            //dmat4(1),
+                            dvec3((get<2>(bounds) + get<0>(bounds)) * -0.5,
+                                    (get<3>(bounds) + get<1>(bounds)) * -0.5,
                                     0.0));
         
         inverseTrans = inverse(trans);
