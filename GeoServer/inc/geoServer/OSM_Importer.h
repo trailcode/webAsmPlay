@@ -24,48 +24,25 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_GEO_SERVER_H__
-#define __WEB_ASM_PLAY_GEO_SERVER_H__
+#ifndef __WEB_ASM_PLAY_OSM_IMPORTER_H__
+#define __WEB_ASM_PLAY_OSM_IMPORTER_H__
 
 #include <string>
 #include <vector>
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
-#include <geoServer/GeoServerBase.h>
 
-class GeoServer : public GeoServerBase
+class OSM_Importer
 {
 public:
 
-    GeoServer();
-    ~GeoServer();
-
-    std::string addGeoFile(const std::string & geomFile);
-
-    void start();
-
-    //const std::string & getPolygon(const size_t index) const;
+    static void import( const std::string        & fileName,
+                        std::vector<std::string> & serializedPolygons,
+                        std::vector<std::string> & serializedLineStrings,
+                        std::vector<std::string> & serializedPoints);
 
 private:
-    
-    typedef websocketpp::server<websocketpp::config::asio> Server;
 
-    typedef Server::message_ptr message_ptr;
-
-    Server serverEndPoint;
-
-    static void onMessage(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
-
-    //size_t getNumPolygons() const;
-
-    std::vector<std::string> serializedPolygons;
-    std::vector<std::string> serializedLineStrings;
-    std::vector<std::string> serializedPoints;
-
-    double boundsMinX;
-    double boundsMinY;
-    double boundsMaxX;
-    double boundsMaxY;
+    OSM_Importer() {}
+    ~OSM_Importer() {}
 };
 
-#endif // __WEB_ASM_PLAY_GEO_SERVER_H__
+#endif // __WEB_ASM_PLAY_OSM_IMPORTER_H__

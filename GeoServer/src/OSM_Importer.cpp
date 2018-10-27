@@ -24,48 +24,14 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_GEO_SERVER_H__
-#define __WEB_ASM_PLAY_GEO_SERVER_H__
+#include <geoServer/OSM_Importer.h>
 
-#include <string>
-#include <vector>
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
-#include <geoServer/GeoServerBase.h>
+using namespace std;
 
-class GeoServer : public GeoServerBase
+void OSM_Importer::import(  const string   & fileName,
+                            vector<string> & serializedPolygons,
+                            vector<string> & serializedLineStrings,
+                            vector<string> & serializedPoints)
 {
-public:
 
-    GeoServer();
-    ~GeoServer();
-
-    std::string addGeoFile(const std::string & geomFile);
-
-    void start();
-
-    //const std::string & getPolygon(const size_t index) const;
-
-private:
-    
-    typedef websocketpp::server<websocketpp::config::asio> Server;
-
-    typedef Server::message_ptr message_ptr;
-
-    Server serverEndPoint;
-
-    static void onMessage(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
-
-    //size_t getNumPolygons() const;
-
-    std::vector<std::string> serializedPolygons;
-    std::vector<std::string> serializedLineStrings;
-    std::vector<std::string> serializedPoints;
-
-    double boundsMinX;
-    double boundsMinY;
-    double boundsMaxX;
-    double boundsMaxY;
-};
-
-#endif // __WEB_ASM_PLAY_GEO_SERVER_H__
+}

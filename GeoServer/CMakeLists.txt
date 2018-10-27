@@ -11,6 +11,7 @@ find_package(Boost COMPONENTS filesystem REQUIRED)
 find_package(gdal REQUIRED)
 find_package(websocketpp REQUIRED)
 find_package(geos REQUIRED)
+find_package(expat REQUIRED)
 
 include_directories(${GEOS_INCLUDE_DIR})
 include_directories(./inc)
@@ -18,12 +19,13 @@ include_directories(../inc)
 include_directories(../ctpl)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GDAL_INCLUDE_DIR})
+include_directories(${EXPAT_INCLUDE_DIRS})
 include_directories(${Websocketpp_INCLUDE_DIRS})
-
 
 link_libraries(${Boost_LIBRARIES})
 link_libraries(${GDAL_LIBRARY})
 link_libraries(${GEOS_LIBRARIES})
+link_libraries(${EXPAT_LIBRARIES})
 link_libraries(/usr/local/Cellar/geos/3.7.0/lib/libgeos-3.7.0.dylib)
 
 message("${GDAL_LIBRARY}")
@@ -35,5 +37,6 @@ add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
 
 add_executable(geoServer    ../src/GeometryConverter.cpp
                             ../src/Attributes.cpp
+                            src/OSM_Importer.cpp
                             src/GeoServer.cpp
                             src/main.cpp)
