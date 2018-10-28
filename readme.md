@@ -133,4 +133,5 @@ No notes.
 
 * Make geometric teminology consistant with Geos.
 * Fix dmess for GeoServer
+* Bring Emscripten ImGUI up to date with native version.
 

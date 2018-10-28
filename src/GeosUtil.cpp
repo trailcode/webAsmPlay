@@ -109,6 +109,28 @@ void geosUtil::getExternalRings(vector<const LineString *> & rings, const Geomet
     }
 }
 
+bool geosUtil::contains(const unique_ptr<Geometry> & A,
+                        const unique_ptr<Geometry> & B) { return A->contains(B.get()) ;}
+
+unique_ptr<Geometry> geosUtil::difference(  const unique_ptr<Geometry> & A,
+                                            const unique_ptr<Geometry> & B) { return unique_ptr<Geometry>(A->difference(B.get())) ;}
+
+bool geosUtil::difference(  const unique_ptr<Geometry> & A,
+                            const unique_ptr<Geometry> & B,
+                            unique_ptr<Geometry>       & out)
+{
+    Geometry * diff = A->difference(B.get());
+
+    if(!diff) { return false ;}
+
+    out = unique_ptr<Geometry>(diff);
+
+    return true;
+}
+
+bool geosUtil::subtract(      unique_ptr<Geometry> & A,
+                        const unique_ptr<Geometry> & B) { return difference(A, B, A) ;}
+
 vector<Geometry::Ptr> __(const vector<const LineString *> & lineStrings)
 {
     vector<Geometry::Ptr> ret(lineStrings.size());

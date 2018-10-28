@@ -33,7 +33,7 @@ Attributes::Attributes() {}
 
 Attributes::Attributes(const char *& attrs)
 {
-    uint16_t nums[4];
+    uint16_t nums[5];
 
     memcpy(nums, attrs, sizeof(nums));
 
@@ -68,19 +68,47 @@ Attributes::Attributes(const char *& attrs)
 
         strings[key] = value;
     }
+
+    //dmess("nums[4] " << nums[4]);
+
+    for(size_t i = 0; i < nums[4]; ++i)
+    {
+        const string key(attrs); attrs += key.length() + 1;
+
+        StrVec & values = multiStrs[key];
+
+        const uint16_t numValues = *(uint16_t *)attrs; attrs += sizeof(uint16_t);
+
+        for(size_t i = 0; i < numValues; ++i)
+        {
+            const string value = string(attrs);
+
+            values.push_back(value);
+
+            attrs += value.length() + 1;
+        }
+    }
+
+    //dmess("done");
 }
 
-Attributes::Attributes(const unordered_map<string, unordered_set<string> > & multiStrs)
+Attributes::Attributes(const unordered_map<string, unordered_set<string> > & multiStrsIn)
 {
+    //dmess("multiStrs " << multiStrs.size());
 
+    for(const unordered_map<string, unordered_set<string> >::value_type & i : multiStrsIn)
+    {
+        for(const string & value : i.second) { multiStrs[i.first].push_back(value) ;}
+    }
 }
 
 void Attributes::write(ostream & out) const
 {
-    const uint16_t nums [] = {  (uint16_t)ints32.size(),
-                                (uint16_t)ints64.size(),
-                                (uint16_t)doubles.size(),
-                                (uint16_t)strings.size()
+    const uint16_t nums [] = {  (uint16_t)ints32   .size(),
+                                (uint16_t)ints64   .size(),
+                                (uint16_t)doubles  .size(),
+                                (uint16_t)strings  .size(),
+                                (uint16_t)multiStrs.size(),
                              };
 
     out.write((const char *)nums, sizeof(nums));
@@ -112,6 +140,20 @@ void Attributes::write(ostream & out) const
 
         out.write(i.second.data(), i.second.length() + 1);
     }
+
+    for(const MultiStrs::value_type & i : multiStrs)
+    {
+        out.write(i.first.data(), i.first.length() + 1);
+
+        const uint16_t numValues = i.second.size();
+
+        out.write((const char *)&numValues, sizeof(uint16_t));
+
+        for(const string & value : i.second)
+        {
+            out.write(value.data(), value.length() + 1);
+        }
+    }
 }
 
 string Attributes::toString() const
@@ -122,6 +164,8 @@ string Attributes::toString() const
     for(const Attributes::Ints64 ::value_type & i : ints64)  { attrsStrStream << i.first << ": " << i.second << endl ;}
     for(const Attributes::Doubles::value_type & i : doubles) { attrsStrStream << i.first << ": " << i.second << endl ;}
     for(const Attributes::Strings::value_type & i : strings) { attrsStrStream << "[" << i.first << "]: " << i.second << endl ;}
+
+    dmess("multiStrs " << multiStrs.size());
 
     return attrsStrStream.str();
 }

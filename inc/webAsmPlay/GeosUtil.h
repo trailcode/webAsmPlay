@@ -28,6 +28,7 @@
 #define __WEB_ASM_PLAY_GEOS_UTIL_H__
 
 #include <vector>
+#include <memory>
 #include <initializer_list>
 #include <geos/geom/Geometry.h>
 
@@ -71,6 +72,17 @@ namespace geosUtil
     void getExternalRings(std::vector<const geos::geom::LineString *> & rings, const geos::geom::Geometry * geom);
 
     std::vector<geos::geom::Geometry::Ptr> __(const std::vector<const geos::geom::LineString *> & lineStrings);
+
+    bool contains(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
+
+    std::unique_ptr<geos::geom::Geometry> difference(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
+    
+    bool difference(const std::unique_ptr<geos::geom::Geometry> & A,
+                    const std::unique_ptr<geos::geom::Geometry> & B,
+                    std::unique_ptr<geos::geom::Geometry>       & out);
+
+    bool subtract(  std::unique_ptr<geos::geom::Geometry>       & A,
+                    const std::unique_ptr<geos::geom::Geometry> & B);
 };
 
 #endif

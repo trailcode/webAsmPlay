@@ -58,12 +58,12 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
                             boundsMaxX(-numeric_limits<double>::max()),
                             boundsMaxY(-numeric_limits<double>::max())
 {
-    /*
+    //*
     vector<AttributedGeometry> polygons;
 
     OSM_Importer::import(  
-                            "/Users/trailcode/osm1.osm",
                             //"/Users/trailcode/osm.osm",
+                            "/Users/trailcode/osm1.osm",
                             polygons,
                             serializedLineStrings,
                             serializedPoints);
@@ -76,16 +76,24 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
 
         const Envelope * extent = i.second->getEnvelopeInternal();
 
+        /*
         if(boundsMinX > extent->getMinX()) { boundsMinX = extent->getMinX() ;}
         if(boundsMinY > extent->getMinY()) { boundsMinY = extent->getMinY() ;}
         if(boundsMaxX < extent->getMaxX()) { boundsMaxX = extent->getMaxX() ;}
         if(boundsMaxY < extent->getMaxY()) { boundsMaxY = extent->getMaxY() ;}
+        */
     }
+
+    boundsMinX = -104.979;
+    boundsMinY = 39.75;
+    boundsMaxX = -104.961;
+    boundsMaxY = 39.7685;
 
     //dmess("shift x " << boundsMaxX + boundsMinX);
     //dmess("shift y " << boundsMinY + boundsMaxY);
     //dmess("here " << int(boundsMinY < boundsMaxX) << " boundsMinY " << boundsMinY << " boundsMaxX " << boundsMaxX);
 
+    /*
     auto histX = make_static_histogram(axis::regular<>(1024, boundsMinX, boundsMaxX, "x"));
     auto histY = make_static_histogram(axis::regular<>(1024, boundsMinY, boundsMaxY, "y"));
 
@@ -106,6 +114,7 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
     {
         dmess(i << " " << histX.at(i).value());
     }
+    */
 
     //*/
 }
