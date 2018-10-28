@@ -37,7 +37,7 @@
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/GeometryConverter.h>
-#include <geoServer/OSM_Importer.h>
+#include <geoServer/OSM_Reader.h>
 #include <geoServer/GeoServer.h>
 
 using namespace std;
@@ -61,24 +61,20 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
                             boundsMaxY(-numeric_limits<double>::max())
 {
     //*
-    vector<AttributedGeometry> polygons;
+    vector<AttributedGeometry> geometry = OSM_Reader::import(  
+                                                                //"/Users/trailcode/osm.osm",
+                                                                //"/Users/trailcode/osm1.osm",
+                                                                "/Users/trailcode/osmDenver.osm"
+                                                                );
 
-    OSM_Importer::import(  
-                            //"/Users/trailcode/osm.osm",
-                            //"/Users/trailcode/osm1.osm",
-                            "/Users/trailcode/osmDenver.osm",
-                            polygons,
-                            serializedLineStrings,
-                            serializedPoints);
-
-    dmess("polygons " << polygons.size());
+    dmess("geometry " << geometry.size());
 
     dvec2 center;
 
     Polygon * polygon;
     LineString * lineString;
 
-    for(const AttributedGeometry & i : polygons)
+    for(const AttributedGeometry & i : geometry)
     {
         if(polygon = dynamic_cast<Polygon *>(i.second))
         {
@@ -102,7 +98,7 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
                         (extent->getMinY() + extent->getMaxY()) * 0.5);
     }
 
-    center /= double(polygons.size());
+    center /= double(geometry.size());
 
     boundsMinX = center.x;
     boundsMaxX = center.x;

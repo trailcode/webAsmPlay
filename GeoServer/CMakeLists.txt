@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(geoServer)
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 
 set (CMAKE_CXX_STANDARD 11)
 
@@ -42,6 +42,6 @@ add_executable(geoServer    ../src/GeometryConverter.cpp
                             ../src/Relation.cpp
                             ../src/GeosUtil.cpp
                             src/DataModelOSM.cpp
-                            src/OSM_Importer.cpp
+                            src/OSM_Reader.cpp
                             src/GeoServer.cpp
                             src/main.cpp)

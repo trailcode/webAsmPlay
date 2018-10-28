@@ -24,20 +24,17 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_OSM_IMPORTER_H__
-#define __WEB_ASM_PLAY_OSM_IMPORTER_H__
+#ifndef __WEB_ASM_PLAY_OSM_READER_H__
+#define __WEB_ASM_PLAY_OSM_READER_H__
 
 #include <string>
 #include <webAsmPlay/Types.h>
 
-class OSM_Importer
+class OSM_Reader
 {
 public:
 
-    static bool import( const std::string        & fileName,
-                        std::vector<AttributedGeometry> & polygons,
-                        std::vector<std::string> & serializedLineStrings,
-                        std::vector<std::string> & serializedPoints);
+    static std::vector<AttributedGeometry> import(const std::string & fileName);
 
 private:
 
@@ -52,8 +49,8 @@ private:
     static void handleWay       (const char **atts);
     static void handleND        (const char **atts);
 
-    OSM_Importer() {}
-    ~OSM_Importer() {}
+    OSM_Reader() {}
+    ~OSM_Reader() {}
 };
 
-#endif // __WEB_ASM_PLAY_OSM_IMPORTER_H__
+#endif // __WEB_ASM_PLAY_OSM_READER_H__

@@ -245,7 +245,7 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 #endif
 }
 
-void GeoClient::getAllPolygons(const size_t startIndex, const size_t numPolys, function<void (vector<AttributedGeometry> geoms)> callback)
+void GeoClient::getPolygons(const size_t startIndex, const size_t numPolys, function<void (vector<AttributedGeometry> geoms)> callback)
 {
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
@@ -445,16 +445,14 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
                 const bool isLast = i + 1 >= numPolys / blockSize;
 
-                dmess("toLoad " << std::min(blockSize, numPolys - startIndex - blockSize) << " numPolys " << numPolys << " startIndex " << startIndex << " isLast " << (int)isLast);
-
-                getAllPolygons(startIndex, std::min(blockSize, numPolys - startIndex - blockSize),
+                getPolygons(startIndex, std::min(blockSize, numPolys - startIndex - blockSize),
                                 [this, geoms, canvas, isLast, startIndex, numPolys](vector<AttributedGeometry> geomsIn)
                 {
                     geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
 
-                    dmess("load " << startIndex);
-
                     if(!isLast) { return ;}
+
+                    dmess("Start quad tree...");
 
                     for(int i = geoms->size() - 1; i >= 0; --i) // TODO code duplication
                     {
@@ -475,6 +473,8 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
                     dmess("quadTree " << quadTree->depth() << " " << geomsIn.size());
                     
+                    dmess("Start base geom...");
+
                     /*
                     vector<const Geometry *> polys(geomsIn.size());
 
@@ -527,7 +527,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
                     canvas->addRenderiable(r);
                     //*/
                     
-                    dmess("Done creating renderiable.");
+                    dmess("End base geom");
                 });
             }
         });

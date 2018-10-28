@@ -37,7 +37,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Relation.h>
 #include <geoServer/DataModelOSM.h>
-#include <geoServer/OSM_Importer.h>
+#include <geoServer/OSM_Reader.h>
 
 #ifdef XML_LARGE_SIZE
 # if defined(XML_USE_MSC_EXTENSIONS) && _MSC_VER < 1400
@@ -77,10 +77,7 @@ namespace
 unordered_set<string> _types;
 unordered_set<string> _rolls;
 
-bool OSM_Importer::import(  const string   & fileName,
-                            vector<AttributedGeometry> & polygons,
-                            vector<string> & serializedLineStrings,
-                            vector<string> & serializedPoints)
+vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
 {
     char buf[BUFSIZ];
     XML_Parser parser = XML_ParserCreate(NULL);
@@ -92,16 +89,21 @@ bool OSM_Importer::import(  const string   & fileName,
 
     FILE * fp = fopen(fileName.c_str(), "r");
 
+    vector<AttributedGeometry> ret;
+
     do
     {
         size_t len = fread(buf, 1, sizeof(buf), fp);
+        
         done = len < sizeof(buf);
+
         if (XML_Parse(parser, buf, (int)len, done) == XML_STATUS_ERROR)
         {
             fprintf(stderr, "%" XML_FMT_STR " at line %" XML_FMT_INT_MOD "u\n",
             XML_ErrorString(XML_GetErrorCode(parser)),
             XML_GetCurrentLineNumber(parser));
-            return false;
+
+            return ret;
         }
     } while (!done);
 
@@ -256,7 +258,6 @@ bool OSM_Importer::import(  const string   & fileName,
         Relation * _realtion = new Relation();
     }
 
-
     size_t unusedWays = 0;
 
     for(const auto & i : ways)
@@ -268,7 +269,7 @@ bool OSM_Importer::import(  const string   & fileName,
         {
             Attributes * attrs = way->attrs.release();
 
-            polygons.push_back(AttributedGeometry(attrs, way->geom.get())); // TODO not safe!
+            ret.push_back(AttributedGeometry(attrs, way->geom.get())); // TODO not safe!
 
             if(way->relations.size() > 1) { dmess("way->relations.size() " << way->relations.size()) ;}
         }
@@ -290,10 +291,10 @@ bool OSM_Importer::import(  const string   & fileName,
     dmess("Rolls"); for(const string & i : _rolls) { dmess("   " << i) ;}
     //*/
 
-    return true;
+    return ret;
 }
 
-void OSM_Importer::startElement(void *userData, const char *name, const char **atts)
+void OSM_Reader::startElement(void *userData, const char *name, const char **atts)
 {
     switch(getKey(name))
     {
@@ -312,7 +313,7 @@ void OSM_Importer::startElement(void *userData, const char *name, const char **a
     }
 }
 
-void OSM_Importer::handleRelation(const char **atts)
+void OSM_Reader::handleRelation(const char **atts)
 {
     curr = currRelation = new OSM_Relation();
 
@@ -344,7 +345,7 @@ void OSM_Importer::handleRelation(const char **atts)
     }
 }
 
-void OSM_Importer::handleMember(const char **atts)
+void OSM_Reader::handleMember(const char **atts)
 {
     OSM_Member * member = new OSM_Member();
 
@@ -363,7 +364,7 @@ void OSM_Importer::handleMember(const char **atts)
     }
 }
 
-void OSM_Importer::handleTag(const char **atts)
+void OSM_Reader::handleTag(const char **atts)
 {
     string key;
     string value;
@@ -382,7 +383,7 @@ void OSM_Importer::handleTag(const char **atts)
     curr->attrs->strings[key] = value;
 }
 
-void OSM_Importer::handleNode(const char **atts)
+void OSM_Reader::handleNode(const char **atts)
 {
     curr = currNode = new OSM_Node;
 
@@ -416,7 +417,7 @@ void OSM_Importer::handleNode(const char **atts)
     }
 }
 
-void OSM_Importer::handleWay(const char **atts)
+void OSM_Reader::handleWay(const char **atts)
 {
     curr = currWay = new OSM_Way;
 
@@ -448,7 +449,7 @@ void OSM_Importer::handleWay(const char **atts)
     }
 }
 
-void OSM_Importer::handleND(const char **atts)
+void OSM_Reader::handleND(const char **atts)
 {
     for(size_t i = 0; atts[i] != NULL; i += 2)
     {
