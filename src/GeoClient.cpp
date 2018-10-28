@@ -284,7 +284,8 @@ void GeoClient::getPolygons(const size_t startIndex, const size_t numPolys, func
 #endif
 }
 
-void GeoClient::getAllPolylines(function<void(vector<AttributedGeometry> geoms)> callback) // TODO Code duplication.
+void GeoClient::getAllPolylines(const size_t startIndex, const size_t numPolylines,
+                                function<void(vector<AttributedGeometry> geoms)> callback) // TODO Code duplication.
 {
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
@@ -304,13 +305,17 @@ void GeoClient::getAllPolylines(function<void(vector<AttributedGeometry> geoms)>
 
 #else
 
-    vector<char> data(5);
+    vector<char> data(1 + sizeof(uint32_t) * 3);
 
     data[0] = GeoServerBase::GET_ALL_POLYLINES_REQUEST;
 
     char * ptr = &data[1];
 
     *(uint32_t *)ptr = request->ID; ptr += sizeof(uint32_t);
+
+    *(uint32_t *)ptr = startIndex; ptr += sizeof(uint32_t);
+
+    *(uint32_t *)ptr = numPolylines; ptr += sizeof(uint32_t);
 
     client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
@@ -433,9 +438,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
         getNumPolygons([this, canvas](const size_t numPolys)
         {
-            //const size_t blockSize = 2048;
-            const size_t blockSize = 4096;
-            //const size_t blockSize = 64;
+            const size_t blockSize = std::min((size_t)4096, numPolys);
 
             shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());
 
@@ -532,77 +535,67 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
             }
         });
 
-        #ifdef WORTKI
-        getAllPolylines([this, canvas](vector<AttributedGeometry> geomsIn)
+        getNumPolylines([this, canvas](const size_t numPolylines)
         {
-            dmess("polylines geomsIn " << geomsIn.size());
+            const size_t blockSize = std::min((size_t)4096, numPolylines);
 
-            dmess("trans " << mat4ToStr(trans));
+            shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());
 
-            /*
-            vector<const Geometry *> polys(geomsIn.size());
-
-            for(size_t i = 0; i < polys.size(); ++i) { polys[i] = dynamic_cast<const Geometry *>(geomsIn[i].second) ;}
-
-            Renderable * r = RenderablePolygon::create(polys, trans);
-
-            r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-            
-            r->setOutlineColor(vec4(0,1,0,1));
-            
-            canvas->addRenderiable(r);
-            //*/
-
-            //*
-            //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors(geomsIn.size());
-            vector<const Geometry *> polylines;
-
-            //for(size_t i = 0; i < geomsIn.size(); ++i)
-            for(int i = geomsIn.size() - 1; i >= 0; --i)
+            for(size_t i = 0; i < numPolylines / blockSize; ++i)
             {
-                Attributes * attrs = geomsIn[i].first;
+                const size_t startIndex = i * blockSize;
 
-                const Geometry * geom = dynamic_cast<const Geometry *>(geomsIn[i].second);
+                const bool isLast = i + 1 >= numPolylines / blockSize;
 
-                if(!geom)
+                getAllPolylines(startIndex, std::min(blockSize, numPolylines - startIndex - blockSize),
+                                [this, canvas, isLast, geoms, startIndex]
+                                (vector<AttributedGeometry> geomsIn)
                 {
-                    dmess("!geom");
-                }
+                    geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
 
-                const vec4 outlineColor(0,1,0,1);
+                    if(!isLast) { return ;}
 
-                vec4 fillColor = vec4(0,0,1,0.5);
+                    vector<const Geometry *> polylines;
 
-                if(attrs->hasStringKey("addr_house"))
-                {
-                    fillColor = vec4(0.7,0.5,0,0.5);
-                }
-                else if(attrs->hasStringKey("building"))
-                {
-                    fillColor = vec4(1,0.5,0,0.5);
-                }
-                else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
-                {
-                    fillColor = vec4(0,0.7,0,0.5);
-                }
-                
-                //polysAndColors.push_back(make_tuple(geom, fillColor, outlineColor));
+                    for(size_t i = 0; i < geoms->size(); ++i)
+                    {
+                        Attributes * attrs = (*geoms)[i].first;
 
-                polylines.push_back(geom);
+                        const Geometry * geom = (*geoms)[i].second;
+
+                        const vec4 outlineColor(0,1,0,1);
+
+                        vec4 fillColor = vec4(0,0,1,0.5);
+
+                        if(attrs->hasStringKey("addr_house"))
+                        {
+                            fillColor = vec4(0.7,0.5,0,0.5);
+                        }
+                        else if(attrs->hasStringKey("building"))
+                        {
+                            fillColor = vec4(1,0.5,0,0.5);
+                        }
+                        else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
+                        {
+                            fillColor = vec4(0,0.7,0,0.5);
+                        }
+                        
+                        polylines.push_back(geom);
+                    }
+                    
+                    Renderable * r = RenderableLineString::create(polylines, trans);
+
+                    //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
+                    
+                    r->setOutlineColor(vec4(1,1,0,1));
+                    
+                    canvas->addRenderiable(r);
+                    //*/
+                    
+                    dmess("Done creating renderiable.");
+                });
             }
-            
-            Renderable * r = RenderableLineString::create(polylines, trans);
-
-            //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-            
-            r->setOutlineColor(vec4(1,1,0,1));
-            
-            canvas->addRenderiable(r);
-            //*/
-            
-            dmess("Done creating renderiable.");
         });
-        #endif
     });
 }
 

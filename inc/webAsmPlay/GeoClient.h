@@ -73,7 +73,7 @@ public:
 
     void getPolygons(const size_t startIndex, const size_t numPolys, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
-    void getAllPolylines(std::function<void (std::vector<AttributedGeometry> geoms)> callback);
+    void getAllPolylines(const size_t startIndex, const size_t numPolylines, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
     void loadAllGeometry(Canvas * canvas);
     

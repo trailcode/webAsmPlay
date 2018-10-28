@@ -15,27 +15,28 @@ namespace rsmz
     const glm::vec3 TrackBallInteractor::Y(0.f, 1.f, 0.f);
     const glm::vec3 TrackBallInteractor::Z(0.f, 0.f, 1.f);
 
-    TrackBallInteractor::TrackBallInteractor() :
-            mCameraMotionLeftClick(ARC),
-            mCameraMotionMiddleClick(ROLL),
-            mCameraMotionRightClick(FIRSTPERSON),
-            mCameraMotionScroll(ZOOM),
-            mHeight(1),
-            mIsDragging(false),
-            mIsLeftClick(false),
-            mIsMiddleClick(false),
-            mIsRightClick(false),
-            mIsScrolling(false),
-            mPanScale(.005f),
-            mRollScale(.005f),
-            mRollSum(0.f),
-            mRotation(1.f, 0, 0, 0),
-            mRotationSum(1.f, 0, 0, 0),
-            mSpeed(1.f),
-            mWidth(1),
-            mZoomScale(.1f * 0.2f),
-            mZoomSum(0.f),
-            mCamera(NULL)
+    TrackBallInteractor::TrackBallInteractor() :    mCameraMotionLeftClick(ARC),
+                                                    mCameraMotionMiddleClick(ROLL),
+                                                    mCameraMotionRightClick(FIRSTPERSON),
+                                                    mCameraMotionScroll(ZOOM),
+                                                    mHeight(1),
+                                                    mIsDragging(false),
+                                                    mIsLeftClick(false),
+                                                    mIsMiddleClick(false),
+                                                    mIsRightClick(false),
+                                                    mIsScrolling(false),
+                                                    mPanScale(.005f),
+                                                    mRollScale(.005f),
+                                                    mRollSum(0.f),
+                                                    mRotation(1.f, 0, 0, 0),
+                                                    mRotationSum(1.f, 0, 0, 0),
+                                                    mSpeed(1.f),
+                                                    mWidth(1),
+                                                    //mZoomScale(.1f * 0.2f),
+                                                    //mZoomScale(5.0f * 0.2f),
+                                                    mZoomScale(1.0f * 0.2f),
+                                                    mZoomSum(0.f),
+                                                    mCamera(NULL)
     {
     }
 

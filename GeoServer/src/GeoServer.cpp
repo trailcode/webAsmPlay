@@ -62,9 +62,9 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
 {
     //*
     vector<AttributedGeometry> geometry = OSM_Reader::import(  
-                                                                //"/Users/trailcode/osm.osm",
+                                                                "/Users/trailcode/osm.osm"
                                                                 //"/Users/trailcode/osm1.osm",
-                                                                "/Users/trailcode/osmDenver.osm"
+                                                                //"/Users/trailcode/osmDenver.osm"
                                                                 );
 
     dmess("geometry " << geometry.size());
@@ -299,13 +299,9 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                 const uint32_t numGeoms = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
 
-                dmess("startIndex " << startIndex << " numGeoms " << numGeoms);
-
                 pool.push([hdl, s, server, requestID, startIndex, numGeoms](int ID)
                 {
                     const vector<string> & serializedPolygons = server->serializedPolygons;
-
-                    //const uint32_t numGeoms = serializedPolygons.size();
 
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
@@ -336,16 +332,18 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
                 break;
             }
             case GET_ALL_POLYLINES_REQUEST:
+            {
+                const uint32_t startIndex = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
 
-                pool.push([hdl, s, server, requestID](int ID)
+                const uint32_t numGeoms = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
+
+                pool.push([hdl, s, server, requestID, startIndex, numGeoms](int ID)
                 {
                     const vector<string> & serializedLineStrings = server->serializedLineStrings;
 
-                    const uint32_t numGeoms = serializedLineStrings.size();
-
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
-                    for(uint i = 0; i < numGeoms; ++i) { bufferSize += serializedLineStrings[i].length() ;}
+                    for(uint i = 0; i < numGeoms; ++i) { bufferSize += serializedLineStrings[startIndex + i].length() ;}
 
                     vector<char> data(bufferSize);
 
@@ -357,8 +355,10 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     *(uint32_t *)ptr = numGeoms; ptr += sizeof(uint32_t);
 
-                    for(const string & geom : serializedLineStrings)
+                    for(size_t i = 0; i < numGeoms; ++i)
                     {
+                        const string & geom = serializedLineStrings[startIndex + i];
+
                         memcpy(ptr, geom.data(), geom.length()); 
 
                         ptr += geom.length();
@@ -368,7 +368,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
                 });
 
                 break;
-
+            }
             case GET_LAYER_BOUNDS_REQUEST:
 
                 pool.push([hdl, s, server, requestID](int ID)
