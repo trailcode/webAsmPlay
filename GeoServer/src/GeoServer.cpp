@@ -74,9 +74,19 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
 
     dvec2 center;
 
+    Polygon * polygon;
+    LineString * lineString;
+
     for(const AttributedGeometry & i : polygons)
     {
-        serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<Polygon *>(i.second), i.first));
+        if(polygon = dynamic_cast<Polygon *>(i.second))
+        {
+            serializedPolygons.push_back(GeometryConverter::convert(polygon, i.first));
+        }
+        else if(lineString = dynamic_cast<LineString *>(i.second))
+        {
+            serializedLineStrings.push_back(GeometryConverter::convert(AttributedLineString(i.first, lineString)));
+        }
 
         const Envelope * extent = i.second->getEnvelopeInternal();
 

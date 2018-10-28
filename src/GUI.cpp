@@ -81,12 +81,33 @@
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/GeosUtil.h>
 
+// .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
+
+//  .-----------------------------------------------------------------.
+// /  .-.                                                         .-.  \
+//|  /   \                                                       /   \  |
+//| |\_.  |                                                     |    /| |
+//|\|  | /|                                                     |\  | |/|
+//| `---' |                                                     | `---' |
+//|       |-----------------------------------------------------|       |
+//\       |                                                     |       /
+// \     /                                                       \     /
+ // `---'                                                         `---'
+
+//  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .--.
+//:::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\
+//'      `--'      `.-'      `--'      `--'      `--'      `-.'      `--'      `
+
 using namespace std;
 using namespace geos::geom;
 using namespace geos::simplify;
 using namespace rsmz;
 using namespace glm;
 using namespace tce::geom;
+
+//  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .--.
+//:::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\
+//'      `--'      `.-'      `--'      `--'      `--'      `-.'      `--'      `
 
 #define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
@@ -157,7 +178,7 @@ struct AppLog
         ScrollToBottom = true;
     }
 
-    void    Draw(const char* title, bool* p_opened = NULL)
+    void Draw(const char* title, bool* p_opened = NULL)
     {
         ImGui::SetNextWindowSize(ImVec2(500,400), ImGuiSetCond_FirstUseEver);
         ImGui::Begin(title, p_opened);
@@ -201,10 +222,10 @@ static void showCursorPositionOverlay(bool* p_open, const dvec4 & cursorPos)
         if (ImGui::BeginPopupContextWindow())
         {
             if (ImGui::MenuItem("Custom",       NULL, corner == -1)) corner = -1;
-            if (ImGui::MenuItem("Top-left",     NULL, corner == 0)) corner = 0;
-            if (ImGui::MenuItem("Top-right",    NULL, corner == 1)) corner = 1;
-            if (ImGui::MenuItem("Bottom-left",  NULL, corner == 2)) corner = 2;
-            if (ImGui::MenuItem("Bottom-right", NULL, corner == 3)) corner = 3;
+            if (ImGui::MenuItem("Top-left",     NULL, corner ==  0)) corner =  0;
+            if (ImGui::MenuItem("Top-right",    NULL, corner ==  1)) corner =  1;
+            if (ImGui::MenuItem("Bottom-left",  NULL, corner ==  2)) corner =  2;
+            if (ImGui::MenuItem("Bottom-right", NULL, corner ==  3)) corner =  3;
             if (p_open && ImGui::MenuItem("Close")) *p_open = false;
             ImGui::EndPopup();
         }

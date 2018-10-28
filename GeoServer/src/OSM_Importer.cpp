@@ -31,6 +31,7 @@
 #include <unordered_set>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/Polygon.h>
+#include <geos/geom/LineString.h>
 #include <geos/geom/GeometryFactory.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Debug.h>
@@ -131,7 +132,7 @@ bool OSM_Importer::import(  const string   & fileName,
 
         if((*nodes.begin())->pos != (*nodes.rbegin())->pos)
         {
-            // TODO, implement!
+            way->geom = unique_ptr<Geometry>(factory->createLineString(coords));
         }
         else
         {
