@@ -39,6 +39,8 @@ public:
 
     typedef std::unordered_map<std::string, int32_t>     Ints32;
     typedef std::unordered_map<std::string, int64_t>     Ints64;
+    typedef std::unordered_map<std::string, uint32_t>    UInts32;
+    typedef std::unordered_map<std::string, uint64_t>    UInts64;
     typedef std::unordered_map<std::string, double >     Doubles;
     typedef std::unordered_map<std::string, std::string> Strings;
     typedef std::unordered_map<std::string, StrVec>      MultiStrs;
@@ -56,6 +58,8 @@ public:
     bool hasStringKeyValue(const std::string & key, const std::string & value) const;
 
     Ints32    ints32;
+    UInts32   uints32;
+    UInts64   uints64;
     Ints64    ints64;
     Doubles   doubles;
     Strings   strings;

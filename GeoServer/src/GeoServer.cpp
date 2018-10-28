@@ -64,8 +64,8 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
     vector<AttributedGeometry> polygons;
 
     OSM_Importer::import(  
-                            "/Users/trailcode/osm.osm",
-                            //"/Users/trailcode/osm1.osm",
+                            //"/Users/trailcode/osm.osm",
+                            "/Users/trailcode/osm1.osm",
                             polygons,
                             serializedLineStrings,
                             serializedPoints);

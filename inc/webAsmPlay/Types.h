@@ -29,6 +29,7 @@
 
 #include <tuple>
 #include <vector>
+#include <memory>
 
 class Attributes;
 
