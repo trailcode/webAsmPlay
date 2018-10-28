@@ -136,7 +136,13 @@ bool OSM_Importer::import(  const string   & fileName,
         }
         else
         {
-            if(coords->getSize() == 3) 
+            if(coords->getSize() < 3)
+            {
+                //dmess("coords->getSize() < 3 " << coords->getSize() << " " << id); // TODO Why is is happening? Clipping?
+
+                continue;
+            }
+            else if(coords->getSize() == 3) 
             {
                 coords->add(Coordinate(coords->getAt(0)));
 
@@ -167,6 +173,13 @@ bool OSM_Importer::import(  const string   & fileName,
                 case OSM_TYPE_WAY:
                 {  
                     OSM_Way * way = ways[member->ref];
+
+                    if(!way)
+                    {
+                        dmess("Could not get way!");
+
+                        continue;
+                    }
 
                     switch(getRelationKey(member->role))
                     {
@@ -222,9 +235,16 @@ bool OSM_Importer::import(  const string   & fileName,
                     continue;
                 }
 
-                if(!contains(outer->geom, inner->geom)) { continue ;}
+                try
+                {
+                    if(!contains(outer->geom, inner->geom)) { continue ;}
 
-                if(!subtract(outer->geom, inner->geom)) { dmess("Diff error!") ;}
+                    if(!subtract(outer->geom, inner->geom)) { dmess("Diff error!") ;}
+                }
+                catch(...)
+                {
+                    dmess("Geometry operation error!");
+                }
             }
         }
     }
@@ -244,7 +264,7 @@ bool OSM_Importer::import(  const string   & fileName,
         const uint64_t   id  = i.first;
         OSM_Way        * way = i.second;
 
-        if(way->geom)
+        if(way && way->geom)
         {
             Attributes * attrs = way->attrs.release();
 
@@ -438,9 +458,9 @@ void OSM_Importer::handleND(const char **atts)
             {
                 OSM_Nodes::const_iterator n = nodes.find(stoull(atts[i + 1]));
 
-                if(n == nodes.end()) // TODO assume data is correct?
+                if(n == nodes.end()) // TODO assume data is correct? No there are dupilicates!
                 {
-                    dmess("Parse werror!");
+                    //dmess("Parse werror!");
 
                     break;
                 }

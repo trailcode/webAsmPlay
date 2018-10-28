@@ -46,6 +46,10 @@ public:
         GET_ALL_POLYGONS_RESPONCE,
         GET_ALL_POLYLINES_REQUEST,
         GET_ALL_POLYLINES_RESPONCE,
+        GET_POLYGONS_REQUEST,
+        GET_POLYGONS_RESPONCE,
+        GET_POLYLINES_REQUEST,
+        GET_POLYLINES_RESPONCE,
     };
 
     virtual ~GeoServerBase() {}

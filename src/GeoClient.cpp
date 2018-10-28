@@ -1,10 +1,11 @@
 /**
-╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
-┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
-╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
-╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
-╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
-╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+ ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+ ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+ ╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+ ╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+ ╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ //
  // This software is provided 'as-is', without any express or implied
  // warranty.  In no event will the authors be held liable for any damages
  // arising from the use of this software.
@@ -57,9 +58,7 @@
     #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
 
 #endif
-//#include <glm/glm.hpp>
-//#include <glm/mat4x4.hpp>
-//#include <glm/vec3.hpp>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Polygon.h>
@@ -246,11 +245,13 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 #endif
 }
 
-void GeoClient::getAllPolygons(function<void (vector<AttributedGeometry> geoms)> callback)
+void GeoClient::getAllPolygons(const size_t startIndex, const size_t numPolys, function<void (vector<AttributedGeometry> geoms)> callback)
 {
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
     getAllGeometriesRequests[request->ID] = request;
+
+    dmess("getAllGeometriesRequests " << getAllGeometriesRequests.size());
 
 #ifdef __EMSCRIPTEN__
 
@@ -266,13 +267,17 @@ void GeoClient::getAllPolygons(function<void (vector<AttributedGeometry> geoms)>
 
 #else
 
-    vector<char> data(5);
+    vector<char> data(1 + sizeof(uint32_t) * 3);
 
     data[0] = GeoServerBase::GET_ALL_POLYGONS_REQUEST;
 
     char * ptr = &data[1];
 
     *(uint32_t *)ptr = request->ID; ptr += sizeof(uint32_t);
+
+    *(uint32_t *)ptr = startIndex; ptr += sizeof(uint32_t);
+
+    *(uint32_t *)ptr = numPolys; ptr += sizeof(uint32_t);
 
     client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
@@ -418,117 +423,116 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
     getLayerBounds([this, canvas](const AABB2D & bounds)
     {
         const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
-        //const dmat4 s = scale(dmat4(1.0), dvec3(3.0, 3.0, 3.0));
-        //const mat4 s = scale(mat4(1.0), vec3(300.0, 300.0, 300.0));
-        //const dmat4 s = scale(dmat4(1.0), dvec3(1, 1, 1));
-        //const mat4 s = scale(mat4(1.0), vec3(0.5, 0.5, 0.5));
-        //const mat4 s = scale(mat4(1.0), vec3(0.1, 0.1, 0.1));
-        //const mat4 s = scale(mat4(1.0), vec3(0.01, 0.01, 0.01));
 
-        dmess("get<0>(bounds) " << get<0>(bounds) << " get<2>(bounds) " << get<2>(bounds));
-        dmess("get<1>(bounds) " << get<1>(bounds) << " get<3>(bounds) " << get<3>(bounds));
-
-        dmess("Trans " << vec3((get<0>(bounds) + get<2>(bounds)) * 0.5,
-                                    (get<1>(bounds) + get<3>(bounds)) * 0.5, 0));
-
-        trans = translate(  
-                            s,
-                            //dmat4(1),
+        trans = translate(  s,
                             dvec3((get<2>(bounds) + get<0>(bounds)) * -0.5,
-                                    (get<3>(bounds) + get<1>(bounds)) * -0.5,
-                                    0.0));
+                                  (get<3>(bounds) + get<1>(bounds)) * -0.5,
+                                  0.0));
         
         inverseTrans = inverse(trans);
 
-        getAllPolygons([this, canvas](vector<AttributedGeometry> geomsIn)
+        getNumPolygons([this, canvas](const size_t numPolys)
         {
-            dmess("geomsIn " << geomsIn.size());
+            //const size_t blockSize = 2048;
+            const size_t blockSize = 4096;
+            //const size_t blockSize = 64;
 
-            dmess("trans " << mat4ToStr(trans));
+            shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());
 
-            for(int i = geomsIn.size() - 1; i >= 0; --i) // TODO code duplication
+            for(size_t i = 0; i < numPolys / blockSize; ++i)
             {
-                Attributes * attrs;
+                const size_t startIndex = i * blockSize;
 
-                const Geometry * g;
-                
-                tie(attrs, g) = geomsIn[i];
+                const bool isLast = i + 1 >= numPolys / blockSize;
 
-                Renderable * r = Renderable::create(g, trans);
-                
-                if(!r) { continue ;}
-                
-                tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
+                dmess("toLoad " << std::min(blockSize, numPolys - startIndex - blockSize) << " numPolys " << numPolys << " startIndex " << startIndex << " isLast " << (int)isLast);
 
-                quadTree->insert(g->getEnvelopeInternal(), data);
+                getAllPolygons(startIndex, std::min(blockSize, numPolys - startIndex - blockSize),
+                                [this, geoms, canvas, isLast, startIndex, numPolys](vector<AttributedGeometry> geomsIn)
+                {
+                    geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
+
+                    dmess("load " << startIndex);
+
+                    if(!isLast) { return ;}
+
+                    for(int i = geoms->size() - 1; i >= 0; --i) // TODO code duplication
+                    {
+                        Attributes * attrs;
+
+                        const Geometry * g;
+                        
+                        tie(attrs, g) = (*geoms)[i];
+
+                        Renderable * r = Renderable::create(g, trans);
+                        
+                        if(!r) { continue ;}
+                        
+                        tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
+
+                        quadTree->insert(g->getEnvelopeInternal(), data);
+                    }
+
+                    dmess("quadTree " << quadTree->depth() << " " << geomsIn.size());
+                    
+                    /*
+                    vector<const Geometry *> polys(geomsIn.size());
+
+                    for(size_t i = 0; i < polys.size(); ++i) { polys[i] = dynamic_cast<const Geometry *>(geomsIn[i].second) ;}
+
+                    Renderable * r = RenderablePolygon::create(polys, trans);
+
+                    r->setFillColor(vec4(0.3,0.0,0.3,0.3));
+                    
+                    r->setOutlineColor(vec4(0,1,0,1));
+                    
+                    canvas->addRenderiable(r);
+                    //*/
+
+                    //*
+                    //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors(geomsIn.size());
+                    vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors;
+
+                    //for(size_t i = 0; i < geomsIn.size(); ++i)
+                    for(int i = geoms->size() - 1; i >= 0; --i)
+                    {
+                        Attributes * attrs = (*geoms)[i].first;
+
+                        vec4 fillColor = vec4(0,0,1,0.5);
+
+                        if(attrs->hasStringKey("addr_house"))
+                        {
+                            fillColor = vec4(0.7,0.5,0,0.5);
+                        }
+                        else if(attrs->hasStringKey("building"))
+                        {
+                            fillColor = vec4(1,0.5,0,0.5);
+                        }
+                        else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
+                        {
+                            fillColor = vec4(0,0.7,0,0.5);
+                        }
+                        
+                        polysAndColors.push_back(make_tuple((*geoms)[i].second, fillColor, vec4(0,1,0,1)));
+                    }
+                    
+                    dmess("polysAndColors " << polysAndColors.size());
+
+                    Renderable * r = RenderablePolygon::create(polysAndColors, trans);
+
+                    //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
+                    
+                    r->setOutlineColor(vec4(0,1,0,1));
+                    
+                    canvas->addRenderiable(r);
+                    //*/
+                    
+                    dmess("Done creating renderiable.");
+                });
             }
-
-            dmess("quadTree " << quadTree->depth() << " " << geomsIn.size());
-            
-            /*
-            vector<const Geometry *> polys(geomsIn.size());
-
-            for(size_t i = 0; i < polys.size(); ++i) { polys[i] = dynamic_cast<const Geometry *>(geomsIn[i].second) ;}
-
-            Renderable * r = RenderablePolygon::create(polys, trans);
-
-            r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-            
-            r->setOutlineColor(vec4(0,1,0,1));
-            
-            canvas->addRenderiable(r);
-            //*/
-
-            //*
-            //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors(geomsIn.size());
-            vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors;
-
-            //for(size_t i = 0; i < geomsIn.size(); ++i)
-            for(int i = geomsIn.size() - 1; i >= 0; --i)
-            {
-                Attributes * attrs = geomsIn[i].first;
-
-                const Geometry * geom = dynamic_cast<const Geometry *>(geomsIn[i].second);
-
-                if(!geom)
-                {
-                    dmess("!geom");
-                }
-
-                const vec4 outlineColor(0,1,0,1);
-
-                vec4 fillColor = vec4(0,0,1,0.5);
-
-                if(attrs->hasStringKey("addr_house"))
-                {
-                    fillColor = vec4(0.7,0.5,0,0.5);
-                }
-                else if(attrs->hasStringKey("building"))
-                {
-                    fillColor = vec4(1,0.5,0,0.5);
-                }
-                else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
-                {
-                    fillColor = vec4(0,0.7,0,0.5);
-                }
-                
-                polysAndColors.push_back(make_tuple(geom, fillColor, outlineColor));
-            }
-            
-            dmess("polysAndColors " << polysAndColors.size());
-
-            Renderable * r = RenderablePolygon::create(polysAndColors, trans);
-
-            //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-            
-            r->setOutlineColor(vec4(0,1,0,1));
-            
-            canvas->addRenderiable(r);
-            //*/
-            
-            dmess("Done creating renderiable.");
         });
 
+        #ifdef WORTKI
         getAllPolylines([this, canvas](vector<AttributedGeometry> geomsIn)
         {
             dmess("polylines geomsIn " << geomsIn.size());
@@ -598,6 +602,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
             
             dmess("Done creating renderiable.");
         });
+        #endif
     });
 }
 

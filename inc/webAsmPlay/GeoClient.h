@@ -71,7 +71,7 @@ public:
 
     void getLayerBounds(const std::function<void (const AABB2D &)> & callback);
 
-    void getAllPolygons(std::function<void (std::vector<AttributedGeometry> geoms)> callback);
+    void getAllPolygons(const size_t startIndex, const size_t numPolys, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
     void getAllPolylines(std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
