@@ -255,11 +255,17 @@ void GeoClient::getPolygons(const size_t startIndex, const size_t numPolys, func
 
     char buf[2048];
 
-    sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
+    sprintf(buf,    "var buffer = new ArrayBuffer(13); \r\n"
                     "var dv = new DataView(buffer); \r\n"
                     "dv.setUint8(0,%i); \r\n"
                     "dv.setUint32(1, Module.swap32(%i)); \r\n"
-                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_POLYGONS_REQUEST, request->ID);
+                    "dv.setUint32(5, Module.swap32(%i)); \r\n"
+                    "dv.setUint32(9, Module.swap32(%i)); \r\n"
+                    "Module.connection.send(buffer); \r\n",
+                        GeoServerBase::GET_POLYGONS_REQUEST,
+                        request->ID,
+                        startIndex,
+                        numPolys);
                 
     emscripten_run_script(buf);
 
@@ -293,11 +299,17 @@ void GeoClient::getPolylines(const size_t startIndex, const size_t numPolylines,
 
     char buf[2048];
 
-    sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
+    sprintf(buf,    "var buffer = new ArrayBuffer(13); \r\n"
                     "var dv = new DataView(buffer); \r\n"
                     "dv.setUint8(0,%i); \r\n"
                     "dv.setUint32(1, Module.swap32(%i)); \r\n"
-                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_POLYLINES_REQUEST, request->ID);
+                    "dv.setUint32(5, Module.swap32(%i)); \r\n"
+                    "dv.setUint32(9, Module.swap32(%i)); \r\n"
+                    "Module.connection.send(buffer); \r\n",
+                        GeoServerBase::GET_POLYLINES_REQUEST,
+                        request->ID,
+                        startIndex,
+                        numPolylines);
                 
     emscripten_run_script(buf);
 
@@ -436,6 +448,8 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
         getNumPolygons([this, canvas](const size_t numPolys)
         {
+            dmess("numPolys " << numPolys);
+
             const size_t blockSize = std::min((size_t)4096, numPolys);
 
             shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());
