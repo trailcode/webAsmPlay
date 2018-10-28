@@ -285,6 +285,8 @@ vec4 Canvas::setClearColor(const vec4 & clearColor) { return this->clearColor = 
 
 Camera * Canvas::getCamera() const { return trackBallInteractor->getCamera() ;}
 
+TrackBallInteractor * Canvas::getTrackBallInteractor() const { return trackBallInteractor ;}
+
 mat4 Canvas::getView()       const { return view ;}
 mat4 Canvas::getModel()      const { return model ;}
 mat4 Canvas::getProjection() const { return projection ;}

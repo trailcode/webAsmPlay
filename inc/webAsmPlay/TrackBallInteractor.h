@@ -50,7 +50,7 @@ namespace rsmz
         void setSpeed(float s);
         void update();
 
-    protected:
+    //protected:
         char clickQuadrant(float x, float y);
         void computeCameraEye(glm::vec3 & eye);
         void computeCameraUp(glm::vec3 & up);
@@ -72,7 +72,7 @@ namespace rsmz
         void scroll();
         void updateCameraEyeUp(bool eye, bool up);
 
-    private:
+    //private:
         Camera *mCamera;
         CameraMotionType mCameraMotionLeftClick;
         CameraMotionType mCameraMotionMiddleClick;

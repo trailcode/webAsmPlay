@@ -477,6 +477,13 @@ void mainLoop(GLFWwindow * window)
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
 
     canvas->render();
+
+    const double dist = distance(canvas->getCamera()->getCenter(), canvas->getCamera()->getEye());
+
+    //const double scale = canvas->getTrackBallInteractor()->mZoomScale = dist * 0.02 - 0.01;
+    const double scale = canvas->getTrackBallInteractor()->mZoomScale = dist * 0.02;
+
+    //dmess("dist " << dist << " scale " << scale);
     
     string attrsStr;
 

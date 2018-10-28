@@ -81,6 +81,8 @@ public:
 
     rsmz::Camera * getCamera() const;
 
+    rsmz::TrackBallInteractor * getTrackBallInteractor() const;
+
     Renderable * addRenderiable(Renderable * renderiable);
 
     glm::vec4 setClearColor(const glm::vec4 & clearColor);
