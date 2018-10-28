@@ -75,11 +75,16 @@ namespace geosUtil
 
     bool contains(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
 
+    bool contains(const geos::geom::Geometry * A, const geos::geom::Geometry * B);
+
     std::unique_ptr<geos::geom::Geometry> difference(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
     
     bool difference(const std::unique_ptr<geos::geom::Geometry> & A,
                     const std::unique_ptr<geos::geom::Geometry> & B,
                     std::unique_ptr<geos::geom::Geometry>       & out);
+
+    bool subtract(  geos::geom::Geometry       *& A,
+                    const geos::geom::Geometry * B);
 
     bool subtract(  std::unique_ptr<geos::geom::Geometry>       & A,
                     const std::unique_ptr<geos::geom::Geometry> & B);

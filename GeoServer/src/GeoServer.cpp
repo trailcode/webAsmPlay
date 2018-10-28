@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <limits>
 #include <ctpl.h>
+#include <glm/vec2.hpp>
 #include <boost/histogram.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
@@ -40,6 +41,7 @@
 #include <geoServer/GeoServer.h>
 
 using namespace std;
+using namespace glm;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
@@ -62,13 +64,15 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
     vector<AttributedGeometry> polygons;
 
     OSM_Importer::import(  
-                            //"/Users/trailcode/osm.osm",
-                            "/Users/trailcode/osm1.osm",
+                            "/Users/trailcode/osm.osm",
+                            //"/Users/trailcode/osm1.osm",
                             polygons,
                             serializedLineStrings,
                             serializedPoints);
 
     dmess("polygons " << polygons.size());
+
+    dvec2 center;
 
     for(const AttributedGeometry & i : polygons)
     {
@@ -81,13 +85,25 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
         if(boundsMinY > extent->getMinY()) { boundsMinY = extent->getMinY() ;}
         if(boundsMaxX < extent->getMaxX()) { boundsMaxX = extent->getMaxX() ;}
         if(boundsMaxY < extent->getMaxY()) { boundsMaxY = extent->getMaxY() ;}
-        */
+        //*/
+
+        center += dvec2((extent->getMinX() + extent->getMaxX()) * 0.5,
+                        (extent->getMinY() + extent->getMaxY()) * 0.5);
     }
 
+    center /= double(polygons.size());
+
+    boundsMinX = center.x;
+    boundsMaxX = center.x;
+    boundsMinY = center.y;
+    boundsMaxY = center.y;
+
+    /*
     boundsMinX = -104.979;
     boundsMinY = 39.75;
     boundsMaxX = -104.961;
     boundsMaxY = 39.7685;
+    */
 
     //dmess("shift x " << boundsMaxX + boundsMinX);
     //dmess("shift y " << boundsMinY + boundsMaxY);

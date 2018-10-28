@@ -157,13 +157,14 @@ namespace
 
     struct Way : OSM_Base
     {
-        Way() : used(false) {}
+        Way() : used(false), geom(NULL) {}
 
         vector<const Node *> nodes;
 
         bool used;
 
-        unique_ptr<Geometry> geom;
+        //unique_ptr<Geometry> geom;
+        Geometry * geom;
     };
 
     struct Member
@@ -457,7 +458,8 @@ bool OSM_Importer::import(  const string   & fileName,
             
             LinearRing * externalRing = factory->createLinearRing(coords);
 
-            way->geom = unique_ptr<Geometry>(factory->createPolygon(externalRing, NULL));
+            //way->geom = unique_ptr<Geometry>(factory->createPolygon(externalRing, NULL));
+            way->geom = factory->createPolygon(externalRing, NULL);
         }
     }
 
@@ -542,7 +544,21 @@ bool OSM_Importer::import(  const string   & fileName,
 
                 if(!contains(outer->geom, inner->geom)) { continue ;}
 
-                if(!subtract(outer->geom, inner->geom)) { dmess("Diff error!") ;}
+                //if(!subtract(outer->geom, inner->geom)) { dmess("Diff error!") ;}
+
+                if(dynamic_cast<Polygon *>(outer->geom))
+                {
+                    //dmess("Before " << dynamic_cast<Polygon *>(outer->geom)->getNumInteriorRing());
+                }
+
+                outer->geom = outer->geom->difference(inner->geom);
+
+                if(dynamic_cast<Polygon *>(outer->geom))
+                {
+                    //dmess("After " << dynamic_cast<Polygon *>(outer->geom)->getNumInteriorRing());
+                }
+
+                outer->used = true;
             }
         }
     }
@@ -554,7 +570,7 @@ bool OSM_Importer::import(  const string   & fileName,
         const uint64_t   id  = i.first;
         const Way      * way = i.second;
 
-        //if(way->used) { continue ;}
+        if(!way->used) { continue ;}
 
         ++unusedWays;
 
@@ -572,6 +588,7 @@ bool OSM_Importer::import(  const string   & fileName,
         unordered_map<string, string> keyValues;
         */
 
+        /*
         const vector<const Node *> & nodes = way->nodes;
 
         unordered_map<string, unordered_set<string> > attributeMap;
@@ -600,6 +617,22 @@ bool OSM_Importer::import(  const string   & fileName,
             polygons.push_back(AttributedGeometry(attrs, factory->createPolygon(externalRing, NULL)));
             
             ++numPolygons;
+        }
+        */
+
+        if(way->geom)
+        {
+            unordered_map<string, unordered_set<string> > attributeMap;
+
+            //CoordinateArraySequence * coords = getCoordinateSequence(nodes, attributeMap); // TODO grow layer AABBB
+
+            Attributes * attrs = new Attributes(attributeMap);
+
+            polygons.push_back(AttributedGeometry(attrs, way->geom));
+        }
+        else
+        {
+            dmess("!way->geom");
         }
     }
 
