@@ -251,8 +251,6 @@ void GeoClient::getPolygons(const size_t startIndex, const size_t numPolys, func
 
     getAllGeometriesRequests[request->ID] = request;
 
-    dmess("getAllGeometriesRequests " << getAllGeometriesRequests.size());
-
 #ifdef __EMSCRIPTEN__
 
     char buf[2048];
@@ -261,7 +259,7 @@ void GeoClient::getPolygons(const size_t startIndex, const size_t numPolys, func
                     "var dv = new DataView(buffer); \r\n"
                     "dv.setUint8(0,%i); \r\n"
                     "dv.setUint32(1, Module.swap32(%i)); \r\n"
-                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_ALL_POLYGONS_REQUEST, request->ID);
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_POLYGONS_REQUEST, request->ID);
                 
     emscripten_run_script(buf);
 
@@ -269,7 +267,7 @@ void GeoClient::getPolygons(const size_t startIndex, const size_t numPolys, func
 
     vector<char> data(1 + sizeof(uint32_t) * 3);
 
-    data[0] = GeoServerBase::GET_ALL_POLYGONS_REQUEST;
+    data[0] = GeoServerBase::GET_POLYGONS_REQUEST;
 
     char * ptr = &data[1];
 
@@ -284,7 +282,7 @@ void GeoClient::getPolygons(const size_t startIndex, const size_t numPolys, func
 #endif
 }
 
-void GeoClient::getAllPolylines(const size_t startIndex, const size_t numPolylines,
+void GeoClient::getPolylines(const size_t startIndex, const size_t numPolylines,
                                 function<void(vector<AttributedGeometry> geoms)> callback) // TODO Code duplication.
 {
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
@@ -299,7 +297,7 @@ void GeoClient::getAllPolylines(const size_t startIndex, const size_t numPolylin
                     "var dv = new DataView(buffer); \r\n"
                     "dv.setUint8(0,%i); \r\n"
                     "dv.setUint32(1, Module.swap32(%i)); \r\n"
-                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_ALL_POLYLINES_REQUEST, request->ID);
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_POLYLINES_REQUEST, request->ID);
                 
     emscripten_run_script(buf);
 
@@ -307,7 +305,7 @@ void GeoClient::getAllPolylines(const size_t startIndex, const size_t numPolylin
 
     vector<char> data(1 + sizeof(uint32_t) * 3);
 
-    data[0] = GeoServerBase::GET_ALL_POLYLINES_REQUEST;
+    data[0] = GeoServerBase::GET_POLYLINES_REQUEST;
 
     char * ptr = &data[1];
 
@@ -346,7 +344,7 @@ void GeoClient::onMessage(const string & data)
             break;
         }
 
-        case GeoServerBase::GET_ALL_POLYGONS_RESPONCE:
+        case GeoServerBase::GET_POLYGONS_RESPONCE:
         {
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
@@ -361,7 +359,7 @@ void GeoClient::onMessage(const string & data)
             break;
         }
 
-        case GeoServerBase::GET_ALL_POLYLINES_RESPONCE:
+        case GeoServerBase::GET_POLYLINES_RESPONCE:
         {
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
@@ -453,84 +451,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
                 {
                     geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
 
-                    if(!isLast) { return ;}
-
-                    dmess("Start quad tree...");
-
-                    for(int i = geoms->size() - 1; i >= 0; --i) // TODO code duplication
-                    {
-                        Attributes * attrs;
-
-                        const Geometry * g;
-                        
-                        tie(attrs, g) = (*geoms)[i];
-
-                        Renderable * r = Renderable::create(g, trans);
-                        
-                        if(!r) { continue ;}
-                        
-                        tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
-
-                        quadTree->insert(g->getEnvelopeInternal(), data);
-                    }
-
-                    dmess("quadTree " << quadTree->depth() << " " << geomsIn.size());
-                    
-                    dmess("Start base geom...");
-
-                    /*
-                    vector<const Geometry *> polys(geomsIn.size());
-
-                    for(size_t i = 0; i < polys.size(); ++i) { polys[i] = dynamic_cast<const Geometry *>(geomsIn[i].second) ;}
-
-                    Renderable * r = RenderablePolygon::create(polys, trans);
-
-                    r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-                    
-                    r->setOutlineColor(vec4(0,1,0,1));
-                    
-                    canvas->addRenderiable(r);
-                    //*/
-
-                    //*
-                    //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors(geomsIn.size());
-                    vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors;
-
-                    //for(size_t i = 0; i < geomsIn.size(); ++i)
-                    for(int i = geoms->size() - 1; i >= 0; --i)
-                    {
-                        Attributes * attrs = (*geoms)[i].first;
-
-                        vec4 fillColor = vec4(0,0,1,0.5);
-
-                        if(attrs->hasStringKey("addr_house"))
-                        {
-                            fillColor = vec4(0.7,0.5,0,0.5);
-                        }
-                        else if(attrs->hasStringKey("building"))
-                        {
-                            fillColor = vec4(1,0.5,0,0.5);
-                        }
-                        else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
-                        {
-                            fillColor = vec4(0,0.7,0,0.5);
-                        }
-                        
-                        polysAndColors.push_back(make_tuple((*geoms)[i].second, fillColor, vec4(0,1,0,1)));
-                    }
-                    
-                    dmess("polysAndColors " << polysAndColors.size());
-
-                    Renderable * r = RenderablePolygon::create(polysAndColors, trans);
-
-                    //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-                    
-                    r->setOutlineColor(vec4(0,1,0,1));
-                    
-                    canvas->addRenderiable(r);
-                    //*/
-                    
-                    dmess("End base geom");
+                    if(isLast) { createPolygonRenderiables(*geoms.get(), canvas) ;}
                 });
             }
         });
@@ -547,56 +468,101 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
                 const bool isLast = i + 1 >= numPolylines / blockSize;
 
-                getAllPolylines(startIndex, std::min(blockSize, numPolylines - startIndex - blockSize),
-                                [this, canvas, isLast, geoms, startIndex]
-                                (vector<AttributedGeometry> geomsIn)
+                getPolylines(startIndex, std::min(blockSize, numPolylines - startIndex - blockSize),
+                             [this, canvas, isLast, geoms, startIndex]
+                             (vector<AttributedGeometry> geomsIn)
                 {
                     geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
 
-                    if(!isLast) { return ;}
-
-                    vector<const Geometry *> polylines;
-
-                    for(size_t i = 0; i < geoms->size(); ++i)
-                    {
-                        Attributes * attrs = (*geoms)[i].first;
-
-                        const Geometry * geom = (*geoms)[i].second;
-
-                        const vec4 outlineColor(0,1,0,1);
-
-                        vec4 fillColor = vec4(0,0,1,0.5);
-
-                        if(attrs->hasStringKey("addr_house"))
-                        {
-                            fillColor = vec4(0.7,0.5,0,0.5);
-                        }
-                        else if(attrs->hasStringKey("building"))
-                        {
-                            fillColor = vec4(1,0.5,0,0.5);
-                        }
-                        else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
-                        {
-                            fillColor = vec4(0,0.7,0,0.5);
-                        }
-                        
-                        polylines.push_back(geom);
-                    }
-                    
-                    Renderable * r = RenderableLineString::create(polylines, trans);
-
-                    //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-                    
-                    r->setOutlineColor(vec4(1,1,0,1));
-                    
-                    canvas->addRenderiable(r);
-                    //*/
-                    
-                    dmess("Done creating renderiable.");
+                    if(isLast) { createLineStringRenderiables(*geoms.get(), canvas) ;}
                 });
             }
         });
     });
+}
+
+void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms, Canvas * canvas)
+{
+    for(size_t i = 0; i < geoms.size(); ++i)
+    {
+        Attributes * attrs;
+
+        const Geometry * g;
+        
+        tie(attrs, g) = geoms[i];
+
+        Renderable * r = Renderable::create(g, trans);
+        
+        if(!r) { continue ;}
+        
+        tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
+
+        quadTree->insert(g->getEnvelopeInternal(), data);
+    }
+
+    dmess("quadTree " << quadTree->depth() << " " << geoms.size());
+    
+    dmess("Start base geom...");
+
+    vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors;
+
+    for(size_t i = 0; i < geoms.size(); ++i)
+    {
+        Attributes * attrs = geoms[i].first;
+
+        vec4 fillColor = vec4(0,0,1,0.5);
+
+        if(attrs->hasStringKey("addr_house"))
+        {
+            fillColor = vec4(0.7,0.5,0,0.5);
+        }
+        else if(attrs->hasStringKey("building"))
+        {
+            fillColor = vec4(1,0.5,0,0.5);
+        }
+        else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
+        {
+            fillColor = vec4(0,0.7,0,0.5);
+        }
+        
+        polysAndColors.push_back(make_tuple(geoms[i].second, fillColor, vec4(0,1,0,1)));
+    }
+    
+    dmess("polysAndColors " << polysAndColors.size());
+
+    Renderable * r = RenderablePolygon::create(polysAndColors, trans);
+
+    r->setOutlineColor(vec4(0,1,0,1));
+    
+    canvas->addRenderiable(r);
+    
+    dmess("End base geom");
+}
+
+void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & geoms, Canvas * canvas)
+{
+    dmess("Start create linestrings " << geoms.size());
+
+    vector<const Geometry *> polylines;
+
+    for(size_t i = 0; i < geoms.size(); ++i)
+    {
+        Attributes * attrs = geoms[i].first;
+
+        const Geometry * geom = geoms[i].second;
+
+        polylines.push_back(geom);
+    }
+    
+    Renderable * r = RenderableLineString::create(polylines, trans);
+
+    //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
+    
+    r->setOutlineColor(vec4(1,1,0,1));
+    
+    canvas->addRenderiable(r);
+    
+    dmess("Done creating renderiable.");
 }
 
 pair<Renderable *, Attributes *> GeoClient::pickRenderable(const vec3 & _pos)

@@ -73,7 +73,7 @@ public:
 
     void getPolygons(const size_t startIndex, const size_t numPolys, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
-    void getAllPolylines(const size_t startIndex, const size_t numPolylines, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
+    void getPolylines(const size_t startIndex, const size_t numPolylines, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
     void loadAllGeometry(Canvas * canvas);
     
@@ -89,6 +89,10 @@ private:
     typedef std::vector<const geos::geom::Geometry *> GeomVector;
     
     void createRenderiables(GeomVector * geoms, const glm::mat4 trans, Canvas * canvas);
+
+    void createPolygonRenderiables(const std::vector<AttributedGeometry> & geoms, Canvas * canvas);
+
+    void createLineStringRenderiables(const std::vector<AttributedGeometry> & geoms, Canvas * canvas);
     
     geos::index::quadtree::Quadtree * quadTree;
     

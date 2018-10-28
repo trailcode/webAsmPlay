@@ -62,9 +62,9 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
 {
     //*
     vector<AttributedGeometry> geometry = OSM_Reader::import(  
-                                                                "/Users/trailcode/osm.osm"
+                                                                //"/Users/trailcode/osm.osm"
                                                                 //"/Users/trailcode/osm1.osm",
-                                                                //"/Users/trailcode/osmDenver.osm"
+                                                                "/Users/trailcode/osmDenver.osm"
                                                                 );
 
     dmess("geometry " << geometry.size());
@@ -293,7 +293,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                 break;
 
-            case GET_ALL_POLYGONS_REQUEST:
+            case GET_POLYGONS_REQUEST:
             {
                 const uint32_t startIndex = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
 
@@ -311,7 +311,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     char * ptr = &data[0];
                     
-                    *ptr = GET_ALL_POLYGONS_RESPONCE; ptr += sizeof(char);
+                    *ptr = GET_POLYGONS_RESPONCE; ptr += sizeof(char);
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
@@ -331,7 +331,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                 break;
             }
-            case GET_ALL_POLYLINES_REQUEST:
+            case GET_POLYLINES_REQUEST:
             {
                 const uint32_t startIndex = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
 
@@ -349,7 +349,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     char * ptr = &data[0];
                     
-                    *ptr = GET_ALL_POLYLINES_RESPONCE; ptr += sizeof(char);
+                    *ptr = GET_POLYLINES_RESPONCE; ptr += sizeof(char);
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
@@ -388,14 +388,6 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
-
-                break;
-
-            case GET_POLYGONS_REQUEST:
-
-                break;
-
-            case GET_POLYLINES_REQUEST:
 
                 break;
 
