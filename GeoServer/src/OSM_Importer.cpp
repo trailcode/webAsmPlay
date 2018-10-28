@@ -596,15 +596,11 @@ bool OSM_Importer::import(  const string   & fileName,
     for(const auto & i : ways)
     {
         const uint64_t   id  = i.first;
-        const OSM_Way  * way = i.second;
+        OSM_Way        * way = i.second;
 
         if(way->geom)
         {
-            unordered_map<string, unordered_set<string> > attributeMap;
-
-            //CoordinateArraySequence * coords = getCoordinateSequence(nodes, attributeMap); // TODO grow layer AABBB
-
-            Attributes * attrs = new Attributes(attributeMap);
+            Attributes * attrs = way->attrs.release();
 
             polygons.push_back(AttributedGeometry(attrs, way->geom.get())); // TODO not safe!
 
