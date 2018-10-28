@@ -180,6 +180,7 @@ struct AppLog
 
 static void showCursorPositionOverlay(bool* p_open, const dvec4 & cursorPos)
 {
+#ifndef __EMSCRIPTEN__
     const float DISTANCE = 10.0f;
     static int corner = 2;
     ImVec2 window_pos = ImVec2((corner & 1) ? ImGui::GetIO().DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? ImGui::GetIO().DisplaySize.y - DISTANCE : DISTANCE);
@@ -209,6 +210,7 @@ static void showCursorPositionOverlay(bool* p_open, const dvec4 & cursorPos)
         }
     }
     ImGui::End();
+#endif
 }
 
 AppLog logPanel;

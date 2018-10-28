@@ -41,6 +41,17 @@ public:
 
 private:
 
+    static void startElement(void *userData, const char *name, const char **atts);
+
+    static void endElement(void *userData, const char *name) { }
+
+    static void handleRelation  (const char **atts);
+    static void handleMember    (const char **atts);
+    static void handleTag       (const char **atts);
+    static void handleNode      (const char **atts);
+    static void handleWay       (const char **atts);
+    static void handleND        (const char **atts);
+
     OSM_Importer() {}
     ~OSM_Importer() {}
 };

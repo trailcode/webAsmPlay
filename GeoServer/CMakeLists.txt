@@ -41,6 +41,7 @@ add_executable(geoServer    ../src/GeometryConverter.cpp
                             ../src/Attributes.cpp
                             ../src/Relation.cpp
                             ../src/GeosUtil.cpp
+                            src/DataModelOSM.cpp
                             src/OSM_Importer.cpp
                             src/GeoServer.cpp
                             src/main.cpp)

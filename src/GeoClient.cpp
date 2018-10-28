@@ -675,6 +675,10 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickRenderables(const vec3 
     return ret;
 }
 
+dmat4 GeoClient::getTrans() const { return trans ;}
+
+dmat4 GeoClient::getInverseTrans() const { return inverseTrans ;}
+
 #ifndef __EMSCRIPTEN__
 
 void GeoClient::on_open(GeoClient * client, websocketpp::connection_hdl hdl)
@@ -688,9 +692,6 @@ void GeoClient::on_message(GeoClient * client, websocketpp::connection_hdl hdl, 
 
     onMessage(msg->get_payload());
 }
-
-dmat4 GeoClient::getTrans() const { return trans ;}
-dmat4 GeoClient::getInverseTrans() const { return inverseTrans ;}
 
 #else
 
