@@ -138,19 +138,18 @@ namespace
         { "outer",      OSM_ROLE_OUTER },
     };
 
+    /*
     struct OSM_Base : Attributes
     {
-        /*
-        uint64_t uid;
+        
+    };
+    */
 
-        // TODO There might be a lot of repeating of the below. Good to hash to compress.
-        uint64_t changeset;
-        uint8_t  version;
-        string   user;
-        string   timestamp; // TODO convert to binary structure.
+    struct OSM_Base
+    {
+        OSM_Base() : attrs(new Attributes()) {}
 
-        unordered_map<string, string> keyValues;
-        */
+        unique_ptr<Attributes> attrs;
     };
 
     struct OSM_Member
@@ -162,7 +161,11 @@ namespace
 
     struct OSM_Relation : OSM_Base
     {
+        OSM_Relation() : relation(NULL) {}
+
         vector<const OSM_Member *> members;
+
+        Relation * relation;
     };
 
     struct OSM_Node : OSM_Base
@@ -221,18 +224,20 @@ namespace
         switch(getKey(name))
         {
             case OSM_KEY_RELATION:
-            
+            {
                 curr = currRelation = new OSM_Relation();
+
+                Attributes * attrs = curr->attrs.get();
 
                 for(size_t i = 0; atts[i] != NULL; i += 2)
                 {
                     switch(getKey(atts[i]))
                     {
-                        case OSM_KEY_USER:      currRelation->strings["userOSM"]      =        atts[i + 1];  break;
-                        case OSM_KEY_TIMESTAMP: currRelation->strings["timestampOSM"] =        atts[i + 1];  break;
-                        case OSM_KEY_VERSION:   currRelation->uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
-                        case OSM_KEY_CHANGESET: currRelation->uints64["changesetOSM"] = stoull(atts[i + 1]); break;
-                        case OSM_KEY_UID:       currRelation->uints32["uidOSM"]       = stoull(atts[i + 1]); break;
+                        case OSM_KEY_USER:      attrs->strings["userOSM"]      =        atts[i + 1];  break;
+                        case OSM_KEY_TIMESTAMP: attrs->strings["timestampOSM"] =        atts[i + 1];  break;
+                        case OSM_KEY_VERSION:   attrs->uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
+                        case OSM_KEY_CHANGESET: attrs->uints64["changesetOSM"] = stoull(atts[i + 1]); break;
+                        case OSM_KEY_UID:       attrs->uints32["uidOSM"]       = stoull(atts[i + 1]); break;
 
                         case OSM_KEY_ID:
                         {
@@ -240,7 +245,7 @@ namespace
 
                             relations[ID] = currRelation;
 
-                            currRelation->uints64["ID_OSM"] = ID;
+                            attrs->uints64["ID_OSM"] = ID;
 
                             break;
                         }
@@ -250,7 +255,7 @@ namespace
                 }
 
                 break;
-
+            }
             case OSM_KEY_MEMBER:
             {
                 OSM_Member * member = new OSM_Member();
@@ -287,7 +292,7 @@ namespace
                 }
 
                 //curr->keyValues[key] = value;
-                if(curr->strings.find(key) != curr->strings.end())
+                if(curr->attrs->strings.find(key) != curr->attrs->strings.end())
                 {
                     // Overflow into multi
                     dmess("Seen!");
@@ -296,7 +301,7 @@ namespace
                 }
                 else
                 {
-                    curr->strings[key] = value;
+                    curr->attrs->strings[key] = value;
                 }
 
                 break;
@@ -307,18 +312,20 @@ namespace
                 break;
 
             case OSM_KEY_NODE:
-
+            {
                 curr = currNode = new OSM_Node;
+
+                Attributes * attrs = curr->attrs.get();
 
                 for(size_t i = 0; atts[i] != NULL; i += 2)
                 {
                     switch(getKey(atts[i]))
                     {
-                        case OSM_KEY_CHANGESET: currNode->uints64["changesetOSM"] = stoull(atts[i + 1]); break;
-                        case OSM_KEY_TIMESTAMP: currNode->strings["timestampOSM"] =        atts[i + 1];  break;
-                        case OSM_KEY_USER:      currNode->strings["userOSM"]      =        atts[i + 1];  break;
-                        case OSM_KEY_VERSION:   currNode->uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
-                        case OSM_KEY_UID:       currNode->uints32["uidOSM"]       = stoull(atts[i + 1]); break;
+                        case OSM_KEY_CHANGESET: attrs   ->uints64["changesetOSM"] = stoull(atts[i + 1]); break;
+                        case OSM_KEY_TIMESTAMP: attrs   ->strings["timestampOSM"] =        atts[i + 1];  break;
+                        case OSM_KEY_USER:      attrs   ->strings["userOSM"]      =        atts[i + 1];  break;
+                        case OSM_KEY_VERSION:   attrs   ->uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
+                        case OSM_KEY_UID:       attrs   ->uints32["uidOSM"]       = stoull(atts[i + 1]); break;
                         case OSM_KEY_LAT:       currNode->pos.y                   =   atof(atts[i + 1]); break;
                         case OSM_KEY_LON:       currNode->pos.x                   =   atof(atts[i + 1]); break;
 
@@ -328,7 +335,7 @@ namespace
 
                             nodes[ID] = currNode;
 
-                            currNode->uints64["ID_OSM"] = ID;
+                            attrs->uints64["ID_OSM"] = ID;
                             
                             break;
                         }
@@ -338,20 +345,22 @@ namespace
                 }
 
                 break;
-
+            }
             case OSM_KEY_WAY:
-
+            {
                 curr = currWay = new OSM_Way;
+
+                Attributes * attrs = curr->attrs.get();
 
                 for(size_t i = 0; atts[i] != NULL; i += 2)
                 {
                     switch(getKey(atts[i]))
                     {
-                        case OSM_KEY_USER:      currWay->strings["userOSM"]      =        atts[i + 1];  break;
-                        case OSM_KEY_UID:       currWay->uints32["uidOSM"]       = stoull(atts[i + 1]); break;
-                        case OSM_KEY_TIMESTAMP: currWay->strings["timestampOSM"] =        atts[i + 1];  break;
-                        case OSM_KEY_CHANGESET: currWay->uints64["changesetOSM"] = stoull(atts[i + 1]); break;
-                        case OSM_KEY_VERSION:   currWay->uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
+                        case OSM_KEY_USER:      attrs->strings["userOSM"]      =        atts[i + 1];  break;
+                        case OSM_KEY_UID:       attrs->uints32["uidOSM"]       = stoull(atts[i + 1]); break;
+                        case OSM_KEY_TIMESTAMP: attrs->strings["timestampOSM"] =        atts[i + 1];  break;
+                        case OSM_KEY_CHANGESET: attrs->uints64["changesetOSM"] = stoull(atts[i + 1]); break;
+                        case OSM_KEY_VERSION:   attrs->uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
 
                         case OSM_KEY_ID:
                         {   
@@ -359,7 +368,7 @@ namespace
 
                             ways[ID] = currWay;
 
-                            currWay->uints64["ID_OSM"] = ID;
+                            attrs->uints64["ID_OSM"] = ID;
                             
                             break;
                         }
@@ -369,7 +378,7 @@ namespace
                 }
 
                 break;
-
+            }
             case OSM_KEY_ND:
 
                 for(size_t i = 0; atts[i] != NULL; i += 2)
@@ -403,8 +412,7 @@ namespace
 
     static void XMLCALL endElement(void *userData, const XML_Char *name) { }
 
-    CoordinateArraySequence * getCoordinateSequence( const vector<const OSM_Node *>                    & nodes,
-                                                     unordered_map<string, unordered_set<string> >     & attributes)
+    CoordinateArraySequence * getCoordinateSequence( const vector<const OSM_Node *> & nodes)
     {
         vector<Coordinate> * coords = new vector<Coordinate>(nodes.size());
 
@@ -413,13 +421,6 @@ namespace
             const OSM_Node * n = nodes[i];
 
             (*coords)[i] = Coordinate(n->pos.x, n->pos.y);
-
-            /*
-            for(const unordered_map<string, string>::value_type & i : n->keyValues)
-            {
-                attributes[i.first].insert(i.second);
-            }
-            */
         }
 
         return new CoordinateArraySequence(coords, 2);
@@ -479,11 +480,7 @@ bool OSM_Importer::import(  const string   & fileName,
 
         const vector<const OSM_Node *> & nodes = way->nodes;
 
-        unordered_map<string, unordered_set<string> > attributeMap; // TODO, do not need this here
-
-        CoordinateArraySequence * coords = getCoordinateSequence(nodes, attributeMap); // TODO grow layer AABBB
-
-        //Attributes * attrs = new Attributes(attributeMap);
+        CoordinateArraySequence * coords = getCoordinateSequence(nodes); // TODO grow layer AABBB
 
         const GeometryFactory * factory = GeometryFactory::getDefaultInstance();
 
@@ -503,18 +500,9 @@ bool OSM_Importer::import(  const string   & fileName,
             LinearRing * externalRing = factory->createLinearRing(coords);
 
             way->geom = unique_ptr<Geometry>(factory->createPolygon(externalRing, NULL));
-            //way->geom = factory->createPolygon(externalRing, NULL);
         }
     }
 
-    /*
-    struct Member
-    {
-        string   role;
-        uint64_t ref;
-        string   type; // TODO Needed? Seems ref implies.
-    };
-    */
     for(const OSM_Relations::value_type & i : relations)
     {
         vector<OSM_Way *> outers;
@@ -595,9 +583,17 @@ bool OSM_Importer::import(  const string   & fileName,
         }
     }
 
+    for(const auto & i : relations)
+    {
+        OSM_Relation * relation = i.second;
+
+        Relation * _realtion = new Relation();
+    }
+
+
     size_t unusedWays = 0;
 
-    for(const OSM_Ways::value_type & i : ways)
+    for(const auto & i : ways)
     {
         const uint64_t   id  = i.first;
         const OSM_Way  * way = i.second;

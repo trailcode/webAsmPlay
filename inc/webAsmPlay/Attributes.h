@@ -31,6 +31,8 @@
 #include <ostream>
 #include <unordered_map>
 #include <unordered_set>
+#include <memory>
+#include <webAsmPlay/Relation.h>
 #include <webAsmPlay/Types.h>
 
 class Attributes
@@ -64,6 +66,8 @@ public:
     Doubles   doubles;
     Strings   strings;
     MultiStrs multiStrs;
+
+    std::vector<std::unique_ptr<Relation> > relations;
 };
 
 #endif // __WEB_ASM_PLAY_ATTRIBUTES_H__

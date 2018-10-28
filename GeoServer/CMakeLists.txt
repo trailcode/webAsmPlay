@@ -39,6 +39,7 @@ add_definitions(-DXML_LARGE_SIZE)
 
 add_executable(geoServer    ../src/GeometryConverter.cpp
                             ../src/Attributes.cpp
+                            ../src/Relation.cpp
                             ../src/GeosUtil.cpp
                             src/OSM_Importer.cpp
                             src/GeoServer.cpp

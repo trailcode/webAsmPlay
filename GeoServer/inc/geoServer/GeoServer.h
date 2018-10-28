@@ -61,6 +61,7 @@ private:
     std::vector<std::string> serializedPolygons;
     std::vector<std::string> serializedLineStrings;
     std::vector<std::string> serializedPoints;
+    std::vector<std::string> serializedRelations;
 
     double boundsMinX;
     double boundsMinY;

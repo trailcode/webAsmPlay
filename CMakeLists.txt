@@ -98,6 +98,7 @@ file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
                             "src/K2DTree.cpp"
                             "src/GeometryConverter.cpp"
                             "src/Attributes.cpp"
+                            "src/Relation.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
                             ${tceOpenSteer_SRC}

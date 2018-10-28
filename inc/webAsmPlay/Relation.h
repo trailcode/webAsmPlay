@@ -1,14 +1,17 @@
 #ifndef __WEB_ASM_PLAY_RELATION_H__
 #define __WEB_ASM_PLAY_RELATION_H__
 
-#include <webAsmPlay/Attributes.h>
-//#include <
+class Attributes;
 
-class Relation : public Attributes
+class Relation
 {
 public:
-//private:
 
+    Relation();
+    ~Relation();
+    
+//private:
+    Attributes * attributes;
 };
 
 #endif // __WEB_ASM_PLAY_RELATION_H__
