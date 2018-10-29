@@ -136,9 +136,19 @@ No notes.
 
 * Create geometry summary for the current viewport. Pie charts representing the area of land use, surface type, surface color, etc
   Also include roads, paths, and other linear features in this.
+
 * Building to other surface ratios, roads, paths, grass, water, etc
+
 * Try to classify the viewport to different attributes such as social economics, political distribution, city type, etc.
-  Will require training. 
+  Will require training.
+
+* Split data into different layers. Possible layers could be transportation, linear feature infrastructure, rivers, etc. The objective
+  is to separate linear features from features with area. The layers will be rendered to different offscreen buffers allowing for image
+  processing.
+  
+    * One filter to test would be setting the transparency depending on the distance from the camera.
+    * Another filter would be to set the transparency based on the density of the features of similar color local to the current screen pixel.
+      This also might be a start at generalization.
 
 ### TODO
 
