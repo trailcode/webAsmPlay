@@ -7,7 +7,7 @@ WebAsmPlay was initially developed to evaluate web application development using
 Currently a handful of C++ libraries have been compiled with Emscripten in this project to run in the browser
 and run natively. The idea is to test a cross platform development environment where an application
 is developed and debugged both as a web application and a browser application.
-Another goal is to discover the limitations and capabilities of Emscipten web application development.
+Another goal is to discover the limitations and capabilities of Emscripten web application development.
 Cross platform development is achieved using cmake.
 
 After initial evaluation the next goal of this project is to create a Real-TIme Strategy game using
@@ -105,7 +105,7 @@ emrun --browser chrome index.html
 
 You will need to move the the matrix panels out of the way and resize the
 scene window panel. With the mouse in the scene window scrolling with the mouse
-zoomes in and out. Holding down the left shift key and moving the mouse rotates
+zooms in and out. Holding down the left shift key and moving the mouse rotates
 the camera around the object. Holding down the left alt or option key pans the
 camera on the XY plane.
 
@@ -131,7 +131,11 @@ No notes.
 
 ### TODO
 
-* Make geometric teminology consistant with Geos.
+* Make geometric terminology consistent with Geos.
 * Fix dmess for GeoServer
-* Bring Emscripten ImGUI up to date with native version.
+* Bring Emscripten ImGUI up to date with native version. Try: https://github.com/ggerganov/imgui-em
+* Present error if cannot connect to server
+* Move to a newer geos. 3.8.0Dev seems to have more functions.
+
+
 

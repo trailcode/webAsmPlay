@@ -76,25 +76,26 @@ public:
     void getPolylines(const size_t startIndex, const size_t numPolylines, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
     void loadAllGeometry(Canvas * canvas);
-    
-    std::pair<Renderable *, Attributes *> pickRenderable(const glm::vec3 & pos);
 
-    std::vector<std::pair<Renderable *, Attributes *> > pickRenderables(const glm::vec3 & pos);
+    std::pair<Renderable *, Attributes *> pickLineStringRenderable(const glm::vec3 & pos);
+
+    std::pair<Renderable *, Attributes *> pickPolygonRenderable(const glm::vec3 & pos);
+
+    std::vector<std::pair<Renderable *, Attributes *> > pickPolygonRenderables(const glm::vec3 & pos);
 
     glm::dmat4 getTrans() const;
     glm::dmat4 getInverseTrans() const;
 
-private:
+//private:
     
     typedef std::vector<const geos::geom::Geometry *> GeomVector;
     
-    void createRenderiables(GeomVector * geoms, const glm::mat4 trans, Canvas * canvas);
-
     void createPolygonRenderiables(const std::vector<AttributedGeometry> & geoms, Canvas * canvas);
 
     void createLineStringRenderiables(const std::vector<AttributedGeometry> & geoms, Canvas * canvas);
     
-    geos::index::quadtree::Quadtree * quadTree;
+    geos::index::quadtree::Quadtree * quadTreePolygons;
+    geos::index::quadtree::Quadtree * quadTreeLineStrings;
     
     glm::dmat4 trans;
     glm::dmat4 inverseTrans;

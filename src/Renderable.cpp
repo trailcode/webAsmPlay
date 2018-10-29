@@ -102,7 +102,7 @@ Renderable * Renderable::create(const Geometry  * geom,
     switch(geom->getGeometryTypeId())
     {
         case GEOS_POINT:                dmess("Implement me!"); return NULL;
-        case GEOS_LINESTRING:           dmess("Implement me!"); return NULL;
+        case GEOS_LINESTRING:           
         case GEOS_LINEARRING:           return RenderableLineString::create(dynamic_cast<const LineString *>(geom),
                                                                             trans,
                                                                             fillColor,

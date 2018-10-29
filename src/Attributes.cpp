@@ -165,7 +165,7 @@ string Attributes::toString() const
     for(const Attributes::Doubles::value_type & i : doubles) { attrsStrStream << i.first << ": " << i.second << endl ;}
     for(const Attributes::Strings::value_type & i : strings) { attrsStrStream << "[" << i.first << "]: " << i.second << endl ;}
 
-    dmess("multiStrs " << multiStrs.size());
+    //dmess("multiStrs " << multiStrs.size());
 
     return attrsStrStream.str();
 }

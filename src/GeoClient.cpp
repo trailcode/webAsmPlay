@@ -60,8 +60,11 @@
 #endif
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <geos/algorithm/distance/DistanceToPoint.h>
+#include <geos/algorithm/distance/PointPairDistance.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Polygon.h>
+#include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>
 #include <geos/io/WKTReader.h>
 #include <geos/io/WKBReader.h>
@@ -83,6 +86,7 @@ using namespace glm;
 using namespace geos::io;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
+using namespace geos::algorithm::distance;
 
 typedef unordered_map<size_t, GeoRequestGetNumGeoms      *> NumGeomsRequests;
 typedef unordered_map<size_t, GeoRequestLayerBounds      *> LayerBoundsRequests;
@@ -144,7 +148,8 @@ GeoClient::GeoClient(GLFWwindow * window)
 
 #endif
 
-    quadTree = new Quadtree();
+    quadTreePolygons    = new Quadtree();
+    quadTreeLineStrings = new Quadtree();
 }
 
 GeoClient::~GeoClient()
@@ -405,32 +410,6 @@ void GeoClient::onMessage(const string & data)
     }
 }
 
-void GeoClient::createRenderiables(GeomVector * geoms, const mat4 trans, Canvas * canvas)
-{
-    for(const Geometry * g : *geoms)
-    {
-        Renderable * r = Renderable::create(g, trans);
-        
-        if(!r) { continue ;}
-        
-        quadTree->insert(g->getEnvelopeInternal(), r);
-    }
-
-    dmess("quadTree " << quadTree->depth() << " " << geoms->size());
-    
-    Renderable * r = RenderablePolygon::create(*geoms, trans);
-    
-    delete geoms;
-    
-    r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-    
-    r->setOutlineColor(vec4(0,1,0,1));
-    
-    canvas->addRenderiable(r);
-    
-    dmess("Done creating renderiable.");
-}
-
 void GeoClient::loadAllGeometry(Canvas * canvas)
 {
     dmess("GeoClient::loadAllGeometry");
@@ -497,6 +476,8 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
 void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms, Canvas * canvas)
 {
+    dmess("Start polygon quadTree...");
+
     for(size_t i = 0; i < geoms.size(); ++i)
     {
         Attributes * attrs;
@@ -511,10 +492,10 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         
         tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
 
-        quadTree->insert(g->getEnvelopeInternal(), data);
+        quadTreePolygons->insert(g->getEnvelopeInternal(), data);
     }
 
-    dmess("quadTree " << quadTree->depth() << " " << geoms.size());
+    dmess("quadTree " << quadTreePolygons->depth() << " " << geoms.size());
     
     dmess("Start base geom...");
 
@@ -564,22 +545,40 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
         Attributes * attrs = geoms[i].first;
 
         const Geometry * geom = geoms[i].second;
+        
+        if(!geom)
+        {
+            dmess("!geom");
+
+            continue;
+        }
+
+        Renderable * r = Renderable::create(geom, trans);
+        
+        if(!r) { dmess("!r"); continue ;}
+        
+        tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, geom, attrs);
+
+        quadTreeLineStrings->insert(geom->getEnvelopeInternal(), data);
 
         polylines.push_back(geom);
     }
     
+    dmess("linestring quadTree " << quadTreeLineStrings->depth() << " " << geoms.size());
+
     Renderable * r = RenderableLineString::create(polylines, trans);
 
     //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
     
-    r->setOutlineColor(vec4(1,1,0,1));
+    //r->setOutlineColor(vec4(1,1,0,1));
+    r->setOutlineColor(vec4(0,1,1,0.4));
     
     canvas->addRenderiable(r);
     
     dmess("Done creating renderiable.");
 }
 
-pair<Renderable *, Attributes *> GeoClient::pickRenderable(const vec3 & _pos)
+pair<Renderable *, Attributes *> GeoClient::pickLineStringRenderable(const vec3 & _pos)
 {
     const vec4 pos = inverseTrans * vec4(_pos, 1.0);
     
@@ -587,14 +586,55 @@ pair<Renderable *, Attributes *> GeoClient::pickRenderable(const vec3 & _pos)
     
     const Envelope bounds(pos.x, pos.x, pos.y, pos.y);
     
-    quadTree->query(&bounds, query);
+    quadTreeLineStrings->query(&bounds, query);
     
+    double minDist = numeric_limits<double>::max();
+
+    Renderable * closest      = NULL;
+    Attributes * closestAttrs = NULL;
+
+    const Coordinate p(pos.x, pos.y);
+
+    for(const void * _data : query)
+    {
+        tuple<Renderable *, const Geometry *, Attributes *> * data = (tuple<Renderable *, const Geometry *, Attributes *> *)_data;
+
+        const LineString * geom = dynamic_cast<const LineString *>(get<1>(*data));
+
+        PointPairDistance ptDist;
+
+        DistanceToPoint::computeDistance(*geom, p, ptDist);
+
+        if(ptDist.getDistance() >= minDist) { continue ;}
+
+        minDist = ptDist.getDistance();
+
+        closest      = get<0>(*data);
+        closestAttrs = get<2>(*data);
+    }
+
+    return make_pair(closest, closestAttrs);
+}
+
+pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _pos)
+{
+    const vec4 pos = inverseTrans * vec4(_pos, 1.0);
+    
+    vector< void * > query;
+    
+    const Envelope bounds(pos.x, pos.x, pos.y, pos.y);
+    
+    quadTreePolygons->query(&bounds, query);
+    
+    // TODO, there might be a method accepting a Coordinate
     Point * p = scopedGeosGeometry(GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y)));
 
     double minArea = numeric_limits<double>::max();
 
     Renderable * smallest      = NULL;
     Attributes * smallestAttrs = NULL;
+
+    dmess("query " << query.size());
 
     for(const void * _data : query)
     {
@@ -618,7 +658,7 @@ pair<Renderable *, Attributes *> GeoClient::pickRenderable(const vec3 & _pos)
     return make_pair(smallest, smallestAttrs);
 }
 
-vector<pair<Renderable *, Attributes *> > GeoClient::pickRenderables(const vec3 & _pos)
+vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(const vec3 & _pos)
 {
     const vec4 pos = inverseTrans * vec4(_pos, 1.0);
     
@@ -626,7 +666,7 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickRenderables(const vec3 
     
     const Envelope bounds(pos.x, pos.x, pos.y, pos.y);
     
-    quadTree->query(&bounds, query);
+    quadTreePolygons->query(&bounds, query);
     
     Point * p = scopedGeosGeometry(GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y)));
 

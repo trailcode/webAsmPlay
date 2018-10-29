@@ -499,18 +499,46 @@ void mainLoop(GLFWwindow * window)
             Renderable * renderiable;
             Attributes * attrs;
 
-            tie(renderiable, attrs) = client->pickRenderable(canvas->getCursorPosWC());
+            //*
+            //tie(renderiable, attrs) = client->pickPolygonRenderable(canvas->getCursorPosWC());
+            tie(renderiable, attrs) = client->pickLineStringRenderable(canvas->getCursorPosWC());
 
             if(renderiable)
             {
+                glDisable(GL_DEPTH_TEST);
+                glDisable(GL_BLEND);
+
                 renderiable->render(canvas->getMVP_Ref());
 
                 attrsStr = attrs->toString();
             }
+            //*/
+
+            /*
+            vector<pair<Renderable *, Attributes *> > picked = client->pickLineStringRenderable(canvas->getCursorPosWC());
+
+            dmess("picked " << picked.size());
+
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_BLEND);
+
+            if(picked.size())
+            {
+                for(size_t i = 0; i < picked.size(); ++i)
+                {
+                    Renderable * renderiable;
+                    Attributes * attrs;
+
+                    tie(renderiable, attrs) = picked[i];
+
+                    renderiable->render(canvas->getMVP_Ref());
+                }
+            }
+            */
         }
         else if(mode == PICK_MODE_MULTIPLE)
         {
-            vector<pair<Renderable *, Attributes *> > picked = client->pickRenderables(canvas->getCursorPosWC());
+            vector<pair<Renderable *, Attributes *> > picked = client->pickPolygonRenderables(canvas->getCursorPosWC());
 
             if(picked.size())
             {
