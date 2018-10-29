@@ -117,7 +117,9 @@ Renderable * RenderableLineString::create(  const LineString    * lineString,
                     fillColor,
                     outlineColor,
                     renderOutline,
-                    renderFill);
+                    renderFill,
+                    false // isMulti
+                );
 }
 
 Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineStrings,
@@ -184,7 +186,9 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
                     fillColor,
                     outlineColor,
                     renderOutline,
-                    renderFill);
+                    renderFill,
+                    true // isMulti
+                );
 }
 
 Renderable * RenderableLineString::create(  const FloatVec  & verts,
@@ -192,7 +196,8 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
                                             const vec4      & fillColor,
                                             const vec4      & outlineColor,
                                             const bool        renderOutline,
-                                            const bool        renderFill)
+                                            const bool        renderFill,
+                                            const bool        isMulti)
 {
     GLuint vao = 0;
     GLuint ebo = 0; // Try to remove
@@ -214,7 +219,7 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
                                     ebo,
                                     vbo,
                                     indices.size(),
-                                    true,
+                                    isMulti,
                                     fillColor,
                                     outlineColor,
                                     renderOutline,

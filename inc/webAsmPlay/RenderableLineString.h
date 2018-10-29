@@ -84,7 +84,8 @@ private:
                                 const glm::vec4  & fillColor,
                                 const glm::vec4  & outlineColor,
                                 const bool         renderOutline,
-                                const bool         renderFill);
+                                const bool         renderFill,
+                                const bool         isMulti);
 
     const GLuint vao;
     const GLuint ebo;
