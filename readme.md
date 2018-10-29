@@ -17,6 +17,16 @@ NPC positions will be calculated on a server and the client application running 
 can query bot positions and states for the given viewport. The server will also be responsible for geometry
 generalization, bot AI, navigation graphs generated from Open Street Map data and state persistence. 
 
+### Features
+
+* Ability to run the client in a supported web browser or as a native client. 
+    * Object Picking where the picked object under the mouse cursor is highlighted and it's attributes are displayed.
+    * Skybox Renderer
+
+* Geometry Server
+    * ESRI Shapefile and OpenStreetMap XML GIS formats with line string and polygon ingestion with object attribution.
+    * Fast custom attributed transport protocol. 
+
 ### Dependencies
 
 Unfortunately during development notes on build depends were not tracked. Development is currently
@@ -103,6 +113,7 @@ cd buildEmscripten
 emrun --browser chrome index.html
 ```
 
+// TODO The instructions are out of date!
 You will need to move the the matrix panels out of the way and resize the
 scene window panel. With the mouse in the scene window scrolling with the mouse
 zooms in and out. Holding down the left shift key and moving the mouse rotates
