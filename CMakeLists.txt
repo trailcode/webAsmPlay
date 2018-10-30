@@ -318,6 +318,10 @@ else()
 
     ADD_CUSTOM_TARGET(assets ALL DEPENDS ${assetFileDest})
 
+    if(APPLE)
+	    SET(CMAKE_CXX_LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
+	endif()
+
 endif()
 
 #--------------------------------------------------------------------
