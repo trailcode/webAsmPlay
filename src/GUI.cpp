@@ -25,15 +25,18 @@
 */
 
 #include <cmath>
-//#include <imgui.h>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_glfw.h>
 
 #ifdef __EMSCRIPTEN__
     // GLEW
     #define GLEW_STATIC
     #include <GL/glew.h>
     #define IMGUI_API
-    #include <imgui.h>
+    //#include <imgui.h>
     //#include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/imgui_impl_glfw_gl3.h>
+    #include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/GLFW/glfw3.h>
     #include <emscripten/emscripten.h>
     #include <emscripten/bind.h>
 #else
@@ -42,15 +45,15 @@
     //#include <imgui/imgui.h>
     //#include <imgui_impl_opengl3.h>
     //#include <imgui_impl_glfw.h>
+    #include <GLFW/glfw3.h>
     
 #endif // __EMSCRIPTEN__
 
 //#include <imgui/imgui.h>
-#include <imgui_impl_opengl3.h>
-#include <imgui_impl_glfw.h>
 
-//#include <GLFW/glfw3.h>
-#include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/GLFW/glfw3.h>
+
+//
+
 #include <imgui_internal.h>
 #include <iostream>
 #include <geos/geom/Coordinate.h>

@@ -105,21 +105,30 @@ file(GLOB webAsmPlay_SRC    "src/Camera.cpp"
                             ${tceOpenSteer_SRC}
                             ${tceRender_SRC})
 
-file(GLOB imguiEmscriptenSrc    "glfw-imgui-emscripten/glfw-imgui.cpp"
-                                "glfw-imgui-emscripten/imgui_impl_glfw_gl3.cpp"
-                                "glfw-imgui-emscripten/imgui_impl_glfw_gl3.h"
-                                "glfw-imgui-emscripten/GLFW/glfw3.h"
-                                "glfw-imgui-emscripten/imgui/imconfig.h"
-                                "glfw-imgui-emscripten/imgui/imgui.cpp"
-                                "glfw-imgui-emscripten/imgui/imgui.h"
-                                "glfw-imgui-emscripten/imgui/imgui_demo.cpp"
-                                "glfw-imgui-emscripten/imgui/imgui_draw.cpp"
-                                "glfw-imgui-emscripten/imgui/imgui_internal.h"
-                                "glfw-imgui-emscripten/imgui/imguidock.cpp"
-                                "glfw-imgui-emscripten/imgui/imguidock.h"
-                                "glfw-imgui-emscripten/imgui/stb_rect_pack.h"
-                                "glfw-imgui-emscripten/imgui/stb_textedit.h"
-                                "glfw-imgui-emscripten/imgui/stb_truetype.h"
+file(GLOB imguiEmscriptenSrc    
+                                #"glfw-imgui-emscripten/glfw-imgui.cpp"
+                                #"glfw-imgui-emscripten/imgui_impl_glfw_gl3.cpp"
+                                #"glfw-imgui-emscripten/imgui_impl_glfw_gl3.h"
+                                #"glfw-imgui-emscripten/GLFW/glfw3.h"
+                                #"glfw-imgui-emscripten/imgui/imconfig.h"
+                                #"glfw-imgui-emscripten/imgui/imgui.cpp"
+                                #"glfw-imgui-emscripten/imgui/imgui.h"
+                                #"glfw-imgui-emscripten/imgui/imgui_demo.cpp"
+                                #"glfw-imgui-emscripten/imgui/imgui_draw.cpp"
+                                #"glfw-imgui-emscripten/imgui/imgui_internal.h"
+                                #"glfw-imgui-emscripten/imgui/imguidock.cpp"
+                                #"glfw-imgui-emscripten/imgui/imguidock.h"
+                                #"glfw-imgui-emscripten/imgui/stb_rect_pack.h"
+                                #"glfw-imgui-emscripten/imgui/stb_textedit.h"
+                                #"glfw-imgui-emscripten/imgui/stb_truetype.h"
+                                "imgui/imgui.cpp"
+                                "imgui/imgui_demo.cpp"
+                                "imgui/imgui_draw.cpp"
+                                "imgui/imgui_widgets.cpp"
+                                "imgui/imgui_impl_opengl3.cpp"
+                                #"imgui/imgui_impl_opengl3.h"
+                                #"imgui/gl3w/GL/gl3w.c"
+                                "imgui/imgui_impl_glfw.cpp"
                                 )
 
 file(GLOB imguiSrc              "imgui/imgui.cpp"
@@ -136,7 +145,7 @@ file(GLOB imguiSrc              "imgui/imgui.cpp"
                                 "imgui/imstb_truetype.h"
                                 "imgui/imgui_impl_opengl3.cpp"
                                 "imgui/imgui_impl_opengl3.h"
-                                "imgui/gl3w/GL/gl3w.c"                          
+                                "imgui/gl3w/GL/gl3w.c"
                                 )
 
 file(GLOB opensteerSrc  "opensteer/src/Clock.cpp"
@@ -172,14 +181,14 @@ file(GLOB opensteerSrc  "opensteer/src/Clock.cpp"
 
 file(GLOB globjectsSrc "globjects/source/*.cpp")
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
-    include_directories(glfw-imgui-emscripten)
-    include_directories(glfw-imgui-emscripten/imgui)
-else()
+#if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
+    #include_directories(glfw-imgui-emscripten)
+    #include_directories(glfw-imgui-emscripten/imgui)
+#else()
     include_directories(imgui)
     include_directories(imgui/glfw/include)
     include_directories(imgui/gl3w)
-endif()
+#endif()
 
 include_directories(GLUTesselator/include)
 include_directories(geos/include)
