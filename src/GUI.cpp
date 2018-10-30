@@ -33,19 +33,24 @@
     #include <GL/glew.h>
     #define IMGUI_API
     #include <imgui.h>
-    #include <imgui_impl_glfw_gl3.h>
+    //#include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/imgui_impl_glfw_gl3.h>
     #include <emscripten/emscripten.h>
     #include <emscripten/bind.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
     #define IMGUI_IMPL_API
-    #include <imgui/imgui.h>
-    #include <imgui_impl_opengl3.h>
-    #include <imgui_impl_glfw.h>
+    //#include <imgui/imgui.h>
+    //#include <imgui_impl_opengl3.h>
+    //#include <imgui_impl_glfw.h>
     
 #endif // __EMSCRIPTEN__
 
-#include <GLFW/glfw3.h>
+//#include <imgui/imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_glfw.h>
+
+//#include <GLFW/glfw3.h>
+#include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/GLFW/glfw3.h>
 #include <imgui_internal.h>
 #include <iostream>
 #include <geos/geom/Coordinate.h>
@@ -142,6 +147,7 @@ void refresh(GLFWwindow* window)
 #ifdef __EMSCRIPTEN__
     glfwPollEvents();
 
+    //dmess("Fix!");
     glfwMarkWindowForRefresh(window);
 #else
 
@@ -268,11 +274,18 @@ void mainLoop(GLFWwindow * window)
     if(!Buf) {  Buf = new ImGuiTextBuffer() ;}
     // Game loop
     
+    //dmess("mainLoop");
+
 #ifdef __EMSCRIPTEN__
     // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
     glfwPollEvents();
 
-    ImGui_ImplGlfwGL3_NewFrame();
+    //ImGui_ImplGlfwGL3_NewFrame();
+    //ImGui_ImplGlfw_NewFrame();
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
 #endif
 
 
@@ -459,8 +472,8 @@ void mainLoop(GLFWwindow * window)
             static vec4 fillColor(Renderable::getDefaultFillColor());
             static vec4 outlineColor(Renderable::getDefaultOutlineColor());
             
-            ImGui::ColorEdit4("Fill", (float*)&fillColor, true);
-            ImGui::ColorEdit4("Outline", (float*)&outlineColor, true);
+            //ImGui::ColorEdit4("Fill", (float*)&fillColor, true);
+            //ImGui::ColorEdit4("Outline", (float*)&outlineColor, true);
 
             /*
             static vec4 fillColor(Renderable::getDefaultFillColor());
@@ -607,11 +620,12 @@ void mainLoop(GLFWwindow * window)
 
     ImGui::Render();
 
-#ifndef __EMSCRIPTEN__
+//#ifndef __EMSCRIPTEN__
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-#endif
+//#endif
+    ImGui::EndFrame();
     glfwMakeContextCurrent(window);
 
     glfwSwapBuffers(window);
@@ -634,10 +648,12 @@ void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
     }
 
 #ifndef __EMSCRIPTEN__
-    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+    //ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 #else
-    ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
+    //ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
 #endif
+
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
     refresh(window);
 }
@@ -667,10 +683,12 @@ void scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
     }
 
 #ifdef __EMSCRIPTEN__
-    ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
+    //ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
 #else
-    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+    //ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 #endif
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+
     refresh(window);
 }
 
@@ -680,11 +698,14 @@ void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mod
 
     if(!GImGui->IO.WantCaptureKeyboard) { canvas->onKey(window, key, scancode, action, mods) ;}
  
+
 #ifdef __EMSCRIPTEN__
-    ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
+    //ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
 #else
-    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+    //ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 #endif
+
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 
     refresh(window);
 }
@@ -696,10 +717,13 @@ void charCallback(GLFWwindow * window, unsigned int c)
     canvas->onChar(window, c);
 
 #ifdef __EMSCRIPTEN__
-    ImGui_ImplGlfwGL3_CharCallback(window, c);
+    //ImGui_ImplGlfwGL3_CharCallback(window, c);
 #else
-    ImGui_ImplGlfw_CharCallback(window, c);
+    //ImGui_ImplGlfw_CharCallback(window, c);
 #endif
+
+    ImGui_ImplGlfw_CharCallback(window, c);
+
     refresh(window);
 }
 

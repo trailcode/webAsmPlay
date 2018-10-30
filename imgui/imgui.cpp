@@ -854,6 +854,8 @@ CODE
 #include <stdint.h>     // intptr_t
 #endif
 
+#include <webAsmPlay/Debug.h>
+
 #define IMGUI_DEBUG_NAV_SCORING     0
 #define IMGUI_DEBUG_NAV_RECTS       0
 

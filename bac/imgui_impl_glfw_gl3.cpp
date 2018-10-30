@@ -21,6 +21,8 @@
 
 #include <stdio.h>
 
+#include <webAsmPlay/Debug.h>
+
 // Data
 static GLFWwindow*  g_Window = NULL;
 static double       g_Time = 0.0f;
@@ -352,7 +354,8 @@ bool    ImGui_ImplGlfwGL3_Init(GLFWwindow* window, bool install_callbacks)
 void ImGui_ImplGlfwGL3_Shutdown()
 {
     ImGui_ImplGlfwGL3_InvalidateDeviceObjects();
-    ImGui::Shutdown();
+    dmess("Fix");
+    //ImGui::Shutdown();
 }
 
 void ImGui_ImplGlfwGL3_NewFrame()

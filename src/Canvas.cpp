@@ -29,18 +29,22 @@
     #define GLEW_STATIC
     #include <GL/glew.h>
     #define IMGUI_API
-    #include <imgui_impl_glfw_gl3.h>
+    //#include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/imgui_impl_glfw_gl3.h>
     #include <emscripten/emscripten.h>
     #include <emscripten/bind.h>
     #include <GL/glu.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
     #define IMGUI_IMPL_API // What about for windows?
-    #include <imgui.h>
-    #include <imgui_impl_opengl3.h>
-    #include <imgui_impl_glfw.h>
+    //#include <imgui.h>
+    //#include <imgui_impl_opengl3.h>
+    //#include <imgui_impl_glfw.h>
 #endif // __EMSCRIPTEN__
 #include <GLFW/glfw3.h>
+
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_glfw.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp> // value_ptr

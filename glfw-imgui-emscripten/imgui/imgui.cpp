@@ -635,6 +635,8 @@
 #pragma warning (disable: 4996) // 'This function or variable may be unsafe': strcpy, strdup, sprintf, vsnprintf, sscanf, fopen
 #endif
 
+#include <webAsmPlay/Debug.h>
+
 // Clang warnings with -Weverything
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wold-style-cast"         // warning : use of old-style cast                              // yes, they are more terse.
@@ -2124,6 +2126,7 @@ int ImGui::GetFrameCount()
 
 void ImGui::NewFrame()
 {
+    dmess("Calling this one!");
     ImGuiContext& g = *GImGui;
 
     // Check user data
