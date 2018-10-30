@@ -34,25 +34,16 @@
     #define GLEW_STATIC
     #include <GL/glew.h>
     #define IMGUI_API
-    //#include <imgui.h>
-    //#include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/imgui_impl_glfw_gl3.h>
+    
     #include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/GLFW/glfw3.h>
     #include <emscripten/emscripten.h>
     #include <emscripten/bind.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
     #define IMGUI_IMPL_API
-    //#include <imgui/imgui.h>
-    //#include <imgui_impl_opengl3.h>
-    //#include <imgui_impl_glfw.h>
     #include <GLFW/glfw3.h>
     
 #endif // __EMSCRIPTEN__
-
-//#include <imgui/imgui.h>
-
-
-//
 
 #include <imgui_internal.h>
 #include <iostream>
@@ -210,7 +201,6 @@ struct AppLog
 
 static void showCursorPositionOverlay(bool* p_open, const dvec4 & cursorPos)
 {
-#ifndef __EMSCRIPTEN__
     const float DISTANCE = 10.0f;
     static int corner = 2;
     ImVec2 window_pos = ImVec2((corner & 1) ? ImGui::GetIO().DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? ImGui::GetIO().DisplaySize.y - DISTANCE : DISTANCE);
@@ -240,7 +230,6 @@ static void showCursorPositionOverlay(bool* p_open, const dvec4 & cursorPos)
         }
     }
     ImGui::End();
-#endif
 }
 
 AppLog logPanel;

@@ -33,17 +33,12 @@
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
 // Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
 // You may use another loader/header of your choice (glext, glLoadGen, etc.), or chose to manually implement your own.
-#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
-#include <GL/gl3w.h>    // Initialize with gl3wInit()
-#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
-#include <GL/glew.h>    // Initialize with glewInit()
-#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-#include <glad/glad.h>  // Initialize with gladLoadGL()
-#else
-#include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
+#ifndef __EMSCRIPTEN__
+
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
 #endif
 
-#include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
+#include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions 
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -97,21 +92,14 @@ int main(int, char**)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
-/*
-    // Initialize OpenGL loader
-#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
-    bool err = gl3wInit() != 0;
-#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
-    bool err = glewInit() != GLEW_OK;
-#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-    bool err = gladLoadGL() != 0;
-#endif
-    if (err)
-    {
-        fprintf(stderr, "Failed to initialize OpenGL loader!\n");
-        return 1;
-    }
-    */
+    #ifndef __EMSCRIPTEN__
+        // Initialize OpenGL loader
+        if (gl3wInit() != 0)
+        {
+            fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+            return 1;
+        }
+    #endif
 
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
@@ -161,39 +149,38 @@ int main(int, char**)
 
     initGeometry();
 
-    //return 0;
-
-    /*
-    // Main loop
-    while (!glfwWindowShouldClose(window))
-    {
-        if (glfwWindowShouldClose(window)) { break ;}
+    #ifdef __EMSCRIPTEN__
         
-        //glfwPollEvents();
-        glfwWaitEvents();
+        glfwSetWindowRefreshCallback(window, mainLoop);
 
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        refresh(window);
 
-        mainLoop(window);
-    }
-    */
+    #else
 
-    glfwSetWindowRefreshCallback(window, mainLoop);
+        // Main loop
+        while (!glfwWindowShouldClose(window))
+        {
+            if (glfwWindowShouldClose(window)) { break ;}
+            
+            //glfwPollEvents();
+            glfwWaitEvents();
 
-    refresh(window);
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
-    /*
-    // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+            mainLoop(window);
+        }
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    */
+        // Cleanup
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+
+        glfwDestroyWindow(window);
+        glfwTerminate();
+    #endif
 
     return 0;
 }

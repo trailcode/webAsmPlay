@@ -33,17 +33,12 @@
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
 // Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
 // You may use another loader/header of your choice (glext, glLoadGen, etc.), or chose to manually implement your own.
-#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
-#include <GL/gl3w.h>    // Initialize with gl3wInit()
-#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
-#include <GL/glew.h>    // Initialize with glewInit()
-#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-#include <glad/glad.h>  // Initialize with gladLoadGL()
-#else
-#include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
+#ifndef __EMSCRIPTEN__
+
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
 #endif
 
-#include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
+#include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions 
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -97,19 +92,14 @@ int main(int, char**)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
-    // Initialize OpenGL loader
-#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
-    bool err = gl3wInit() != 0;
-#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
-    bool err = glewInit() != GLEW_OK;
-#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-    bool err = gladLoadGL() != 0;
-#endif
-    if (err)
-    {
-        fprintf(stderr, "Failed to initialize OpenGL loader!\n");
-        return 1;
-    }
+    #ifndef __EMSCRIPTEN__
+        // Initialize OpenGL loader
+        if (gl3wInit() != 0)
+        {
+            fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+            return 1;
+        }
+    #endif
 
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
@@ -120,6 +110,8 @@ int main(int, char**)
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
+
+    //return 0;
 
     // Setup style
     //ImGui::StyleColorsDark();
@@ -132,7 +124,7 @@ int main(int, char**)
     // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
     // - Read 'misc/fonts/README.txt' for more instructions and details.
     // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    //io.Fonts->AddFontDefault();
+    io.Fonts->AddFontDefault();
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
@@ -157,29 +149,38 @@ int main(int, char**)
 
     initGeometry();
 
-    // Main loop
-    while (!glfwWindowShouldClose(window))
-    {
-        if (glfwWindowShouldClose(window)) { break ;}
+    #ifdef __EMSCRIPTEN__
         
-        //glfwPollEvents();
-        glfwWaitEvents();
+        glfwSetWindowRefreshCallback(window, mainLoop);
 
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        refresh(window);
 
-        mainLoop(window);
-    }
+    #else
 
-    // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+        // Main loop
+        while (!glfwWindowShouldClose(window))
+        {
+            if (glfwWindowShouldClose(window)) { break ;}
+            
+            //glfwPollEvents();
+            glfwWaitEvents();
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            mainLoop(window);
+        }
+
+        // Cleanup
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+
+        glfwDestroyWindow(window);
+        glfwTerminate();
+    #endif
 
     return 0;
 }
