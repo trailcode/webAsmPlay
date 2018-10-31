@@ -35,8 +35,11 @@
     #include <GL/gl3w.h>
 #endif
 #include <string>
+#include <vector>
+#include <unordered_map>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#include <webAsmPlay/Types.h>
 
 class Shader
 {
@@ -44,7 +47,14 @@ public:
 
     static Shader * create( const GLchar * vertexSource,
                             const GLchar * fragmentSource,
-                            const GLchar * geometrySource = NULL);
+                            const GLchar * geometrySource   = NULL,
+                            const StrVec & uniforms         = StrVec(),
+                            const StrVec & attributes       = StrVec());
+
+    static Shader * create( const GLchar * vertexSource,
+                            const GLchar * fragmentSource,
+                            const StrVec & uniforms,
+                            const StrVec & attributes       = StrVec());
 
     virtual ~Shader();
 
@@ -72,14 +82,19 @@ public:
 
     GLuint setTexture1Slot(const GLuint slot) const;
 
+    GLint getUniformLoc(const std::string & name) const;
+    GLint getAttributeLoc(const std::string & name) const;
+
 protected:
 
-    Shader( const GLuint shaderProgram,
-            const GLint  vertInAttrib,
-            const GLint  colorInAttrib,
-            const GLint  MVP_In_Uniform,
-            const GLint  colorUniform,
-            const GLint  textureCoordsUniform);
+    Shader( const GLuint                                   shaderProgram,
+            const GLint                                    vertInAttrib,
+            const GLint                                    colorInAttrib,
+            const GLint                                    MVP_In_Uniform,
+            const GLint                                    colorUniform,
+            const GLint                                    textureCoordsUniform,
+            const std::unordered_map<std::string, GLint> & uniforms,
+            const std::unordered_map<std::string, GLint> & attributes);
 
 private:
 
@@ -89,6 +104,9 @@ private:
     GLint  MVP_In_Uniform;
     GLint  colorUniform;
     GLint  textureCoordsUniform;
+
+    std::unordered_map<std::string, GLint> uniforms;
+    std::unordered_map<std::string, GLint> attributes;
 };
 
 #endif // __WEB_ASM_PLAY_SHADER_H__

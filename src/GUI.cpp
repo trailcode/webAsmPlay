@@ -52,6 +52,7 @@
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/ColorDistanceShader.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
@@ -810,6 +811,7 @@ void GUI::initOpenGL(GLFWwindow* window)
     Renderable::ensureShader();
     //GridPlane  ::ensureShader();
     RenderablePolygon::ensureShaders();
+    ColorDistanceShader::ensureShader();
 
     canvas = new Canvas(false);
 

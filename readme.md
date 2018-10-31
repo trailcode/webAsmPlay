@@ -150,6 +150,8 @@ No notes.
     * One filter to test would be setting the transparency depending on the distance from the camera.
     * Another filter would be to set the transparency based on the density of the features of similar color local to the current screen pixel.
       This also might be a start at generalization.
+      
+* Interpolate line string color in relation to the distance to the camera.
 
 ### TODO
 

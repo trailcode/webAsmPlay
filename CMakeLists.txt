@@ -132,6 +132,7 @@ file(GLOB webAsmPlay_SRC        "src/Camera.cpp"
                                 "src/GeometryConverter.cpp"
                                 "src/Attributes.cpp"
                                 "src/Relation.cpp"
+                                "src/ColorDistanceShader.cpp"
                                 "src/main.cpp"
                                 ${tceGeom_SRC}
                                 ${tceCore_SRC}

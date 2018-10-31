@@ -1,10 +1,10 @@
 /**
-╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
-┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
-╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
-╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
-╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
-╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+ ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+ ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+ ╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+ ╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+ ╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
  // This software is provided 'as-is', without any express or implied
  // warranty.  In no event will the authors be held liable for any damages
  // arising from the use of this software.
@@ -33,7 +33,17 @@ using namespace glm;
 
 Shader * Shader::create(const GLchar * vertexSource,
                         const GLchar * fragmentSource,
-                        const GLchar * geometrySource)
+                        const StrVec & uniforms,
+                        const StrVec & attributes)
+{
+    return create(vertexSource, fragmentSource, NULL, uniforms, attributes);
+}
+
+Shader * Shader::create(const GLchar * vertexSource,
+                        const GLchar * fragmentSource,
+                        const GLchar * geometrySource,
+                        const StrVec & uniforms,
+                        const StrVec & attributes)
 {
     GLuint shaderProgram        = 0;
     GLint  vertInAttrib         = 0;
@@ -44,7 +54,7 @@ Shader * Shader::create(const GLchar * vertexSource,
     GLint  success              = 0;
 
     // Create and compile the vertex shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    const GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexSource, NULL);
     glCompileShader(vertexShader);
     
@@ -62,7 +72,7 @@ Shader * Shader::create(const GLchar * vertexSource,
     }
 
     // Create and compile the fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    const GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
     glCompileShader(fragmentShader);
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
@@ -123,11 +133,15 @@ Shader * Shader::create(const GLchar * vertexSource,
     colorUniform         = glGetUniformLocation(shaderProgram, "colorIn");
     textureCoordsUniform = glGetUniformLocation(shaderProgram, "cube_texture");
 
-    dmess("vertInAttrib  "         << vertInAttrib);
-    dmess("colorInAttrib "         << colorInAttrib);
-    dmess("MVP_In_Uniform "        << MVP_In_Uniform);
-    dmess("colorUniform "          << colorUniform);
-    dmess("textureCoordsUniform "  << textureCoordsUniform);
+    unordered_map<string, GLint> uniformMap({   {"MVP",             MVP_In_Uniform},
+                                                {"colorIn",         colorUniform},
+                                                {"cube_texture",    textureCoordsUniform}});
+
+    unordered_map<string, GLint> attributeMap({ {"vertIn",          vertInAttrib},
+                                                {"vertColorIn",     colorInAttrib}});
+
+    for(const auto & variable : uniforms)   { uniformMap  [variable] = glGetUniformLocation(shaderProgram, variable.c_str()) ;}
+    for(const auto & variable : attributes) { attributeMap[variable] = glGetAttribLocation(shaderProgram,  variable.c_str()) ;}
 
     glEnableVertexAttribArray(vertInAttrib);
     glVertexAttribPointer(vertInAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
@@ -135,26 +149,32 @@ Shader * Shader::create(const GLchar * vertexSource,
     glEnableVertexAttribArray(colorInAttrib);
 
     glVertexAttribPointer(colorInAttrib, 4, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
-
+    
     return new Shader(  shaderProgram,
                         vertInAttrib,
                         colorInAttrib,
                         MVP_In_Uniform,
                         colorUniform,
-                        textureCoordsUniform);
+                        textureCoordsUniform,
+                        uniformMap,
+                        attributeMap);
 }
 
-Shader::Shader( const GLuint shaderProgram,
-                const GLint  vertInAttrib,
-                const GLint  colorInAttrib,
-                const GLint  MVP_In_Uniform,
-                const GLint  colorUniform,
-                const GLint  textureCoordsUniform) : shaderProgram        (shaderProgram),
-                                                     vertInAttrib         (vertInAttrib),
-                                                     colorInAttrib        (colorInAttrib),
-                                                     MVP_In_Uniform       (MVP_In_Uniform),
-                                                     colorUniform         (colorUniform),
-                                                     textureCoordsUniform (textureCoordsUniform)
+Shader::Shader( const GLuint                         shaderProgram,
+                const GLint                          vertInAttrib,
+                const GLint                          colorInAttrib,
+                const GLint                          MVP_In_Uniform,
+                const GLint                          colorUniform,
+                const GLint                          textureCoordsUniform,
+                const unordered_map<string, GLint> & uniforms,
+                const unordered_map<string, GLint> & attributes) :  shaderProgram        (shaderProgram),
+                                                                    vertInAttrib         (vertInAttrib),
+                                                                    colorInAttrib        (colorInAttrib),
+                                                                    MVP_In_Uniform       (MVP_In_Uniform),
+                                                                    colorUniform         (colorUniform),
+                                                                    textureCoordsUniform (textureCoordsUniform),
+                                                                    uniforms             (uniforms),
+                                                                    attributes           (attributes)
 {
 } 
 
@@ -218,4 +238,23 @@ GLuint Shader::setTexture1Slot(const GLuint slot) const
     glUniform1i(textureCoordsUniform, slot);
 
     return slot;
+}
+
+GLint Shader::getUniformLoc(const string & name) const
+{
+    const auto i = uniforms.find(name);
+
+    if(i == uniforms.end())
+    {
+        dmess("Error uniform: " << name << " not found!");
+
+        return -1;
+    }
+
+    return i->second;
+}
+
+GLint Shader::getAttributeLoc(const string & name) const
+{
+    return 0;
 }

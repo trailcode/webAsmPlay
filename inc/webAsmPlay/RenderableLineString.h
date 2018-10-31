@@ -67,6 +67,8 @@ public:
 
     void render(const glm::mat4 & MVP) const;
 
+    static void ensureShaders();
+
 private:
 
     RenderableLineString(   const GLuint      vao,

@@ -497,7 +497,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     Renderable * r = RenderablePolygon::create(polysAndColors, trans);
 
-    r->setOutlineColor(vec4(0,1,0,1));
+    r->setOutlineColor(vec4(0.3,1,0,1));
     
     canvas->addRenderiable(r);
     
@@ -540,8 +540,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
     
-    //r->setOutlineColor(vec4(1,1,0,1));
-    r->setOutlineColor(vec4(0,1,1,0.4));
+    r->setOutlineColor(vec4(0.6,0.4,0,1));
+    //r->setOutlineColor(vec4(0,1,1,0.4));
     
     canvas->addRenderiable(r);
     
