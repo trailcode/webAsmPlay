@@ -25,7 +25,12 @@
 */
 
 #include <cmath>
+#include <memory>
 #include <iostream>
+#include <streambuf>
+#include <fstream>
+#include <locale>
+#include <codecvt>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
 #include <geos/geom/CoordinateSequence.h>
@@ -40,6 +45,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <imguitoolbar.h>
+#include <JSON.h>
 #include <webAsmPlay/ImguiInclude.h>
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Camera.h>
@@ -536,8 +542,6 @@ void GUI::mainLoop(GLFWwindow * window)
     glfwSwapBuffers(window);
 }
 
-Ini::IniConfig m_oIniConfig;
-
 void GUI::initOpenGL(GLFWwindow* window)
 {
     debugLoggerFunc = &dmessCallback;
@@ -587,4 +591,46 @@ void GUI::initOpenGL(GLFWwindow* window)
 
     fclose(fp);
     */
+
+    ifstream configFile("config.json");
+    
+    const string config((istreambuf_iterator<char>(configFile)), istreambuf_iterator<char>());
+
+    dmess("config " << config);
+
+    JSONValue * value = JSON::Parse(config.c_str());
+
+    if(value)
+    {
+        JSONObject root = value->AsObject();
+
+        showViewMatrixPanel     = root[L"showViewMatrixPanel"]->AsBool();
+        showMVP_MatrixPanel     = root[L"showMVP_MatrixPanel"]->AsBool();
+        showSceneViewPanel      = root[L"showSceneViewPanel"]->AsBool();
+        showPerformancePanel    = root[L"showPerformancePanel"]->AsBool();
+        showRenderSettingsPanel = root[L"showRenderSettingsPanel"]->AsBool();
+        showLogPanel            = root[L"showLogPanel"]->AsBool();
+        showAttributePanel      = root[L"showAttributePanel"]->AsBool();
+    }
+}
+
+void GUI::shutdown()
+{
+    JSONObject root;
+
+    root[L"showViewMatrixPanel"]     = new JSONValue(showViewMatrixPanel);
+    root[L"showMVP_MatrixPanel"]     = new JSONValue(showMVP_MatrixPanel);
+    root[L"showSceneViewPanel"]      = new JSONValue(showSceneViewPanel);
+    root[L"showPerformancePanel"]    = new JSONValue(showPerformancePanel);
+    root[L"showRenderSettingsPanel"] = new JSONValue(showRenderSettingsPanel);
+    root[L"showLogPanel"]            = new JSONValue(showLogPanel);
+    root[L"showAttributePanel"]      = new JSONValue(showAttributePanel);
+
+    wstring_convert<codecvt_utf8<wchar_t>, wchar_t> converter;
+
+    ofstream configFile("config.json");
+
+    configFile << converter.to_bytes(JSONValue(root).Stringify());
+
+    configFile.close();
 }

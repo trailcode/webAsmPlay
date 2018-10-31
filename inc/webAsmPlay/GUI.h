@@ -55,6 +55,8 @@ public:
 
     static void refresh(GLFWwindow * window);
 
+    static void shutdown();
+
 private:
 
     GUI() {}

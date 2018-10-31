@@ -162,5 +162,7 @@ int main(int, char**)
         glfwTerminate();
     #endif
 
+    GUI::shutdown();
+
     return 0;
 }
