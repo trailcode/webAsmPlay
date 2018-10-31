@@ -70,6 +70,7 @@ private:
     static void renderSettingsPanel();
     static void attributePanel(const std::string & attrsStr);
     static void sceneViewPanel();
+    static void configurationGUI_Panel();
 
     static void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods);
     static void cursorPosCallback(GLFWwindow * window, double xpos, double ypos);
@@ -87,6 +88,7 @@ private:
     static bool showRenderSettingsPanel;
     static bool showLogPanel;
     static bool showAttributePanel;
+    static bool showConfigurationGUI_Panel;
 
     static GeosTestCanvas  * geosTestCanvas;
     static Canvas          * canvas;
