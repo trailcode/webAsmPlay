@@ -24,47 +24,28 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_FRAME_BUFFER_H__
-#define __WEB_ASM_PLAY_FRAME_BUFFER_H__
+#ifndef __WEB_ASM_PLAY_IMGUI_INCLUDES_H__
+#define __WEB_ASM_PLAY_IMGUI_INCLUDES_H__
+
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_glfw.h>
 
 #ifdef __EMSCRIPTEN__
     // GLEW
     #define GLEW_STATIC
     #include <GL/glew.h>
+    #define IMGUI_API
+    
+    #include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/GLFW/glfw3.h>
+    #include <emscripten/emscripten.h>
+    #include <emscripten/bind.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
-#endif
-#include <glm/vec2.hpp>
-
-class FrameBuffer
-{
-public:
-
-    static FrameBuffer * create(const glm::ivec2 & bufferSize);
-
-    static FrameBuffer * ensureFrameBuffer(FrameBuffer * currBuffer, const glm::ivec2 & bufferSize);
-
-    ~FrameBuffer();
-
-    glm::ivec2 getBufferSize() const;
-
-    void bind();
-    void unbind();
-
-    GLuint getTextureID() const;
-
-private:
+    #include <GLFW/glfw3.h>
     
-    FrameBuffer(const GLuint       framebuffer,
-                const GLuint       textureColorbuffer,
-                const GLuint       rbo,
-                const glm::ivec2 & bufferSize);
+#endif // __EMSCRIPTEN__
 
-    const GLuint framebuffer;
-    const GLuint textureColorbuffer;
-    const GLuint rbo;
+#include <imgui_internal.h>
 
-    const glm::ivec2 bufferSize;
-};
-
-#endif // __WEB_ASM_PLAY_FRAME_BUFFER_H__
+#endif // __WEB_ASM_PLAY_IMGUI_INCLUDES_H__

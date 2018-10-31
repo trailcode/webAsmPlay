@@ -24,32 +24,11 @@
   \copyright 2018
 */
 
-#ifdef __EMSCRIPTEN__
-    // GLEW
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-    #define IMGUI_API
-    //#include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/imgui_impl_glfw_gl3.h>
-    #include <emscripten/emscripten.h>
-    #include <emscripten/bind.h>
-    #include <GL/glu.h>
-#else
-    #include <GL/gl3w.h>    // Initialize with gl3wInit()
-    #define IMGUI_IMPL_API // What about for windows?
-    //#include <imgui.h>
-    //#include <imgui_impl_opengl3.h>
-    //#include <imgui_impl_glfw.h>
-#endif // __EMSCRIPTEN__
-#include <GLFW/glfw3.h>
-
-#include <imgui.h>
-#include <imgui_impl_opengl3.h>
-#include <imgui_impl_glfw.h>
-
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp> // value_ptr
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
+#include <webAsmPlay/ImguiInclude.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/FrameBuffer.h>
@@ -58,17 +37,14 @@
 #include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/Canvas.h>
 
-#ifdef __EMSCRIPTEN__
-
-    using namespace emscripten;
-
-#endif
-
 using namespace std;
 using namespace rsmz;
 using namespace glm;
 using namespace geos::geom;
-using namespace tce::geom;
+
+#ifdef __EMSCRIPTEN__
+    using namespace emscripten;
+#endif
 
 namespace
 {
@@ -102,7 +78,7 @@ Canvas::~Canvas()
     // TODO remove from instances!
 }
 
-void Canvas::setArea(const Vec2i & upperLeft, const Vec2i & size)
+void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
 {
     this->upperLeft = upperLeft;
     this->size      = size;
@@ -152,7 +128,7 @@ GLuint Canvas::render()
 
     if(!cursor) { cursor = RenderablePoint::create(vec3(0,0,0)) ;}
 
-    mat4 m = translate(mat4(1.0), cursorPosWC);
+    dmat4 m = translate(dmat4(1.0), cursorPosWC);
     
     cursor->render(projection * view * m);
 
@@ -183,11 +159,11 @@ void Canvas::onMouseButton(GLFWwindow * window, const int button, const int acti
     if(!enabled) { return ;}
 }
 
-void Canvas::onMousePosition(GLFWwindow * window, const Vec2d & mousePos)
+void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
 {
     if(!enabled) { return ;}
 
-    const Vec2d pos = mousePos - upperLeft;
+    const vec2 pos = mousePos - vec2(upperLeft);
 
     //dmess("mousePos " << pos);
 
@@ -198,22 +174,22 @@ void Canvas::onMousePosition(GLFWwindow * window, const Vec2d & mousePos)
     const vec4 rayClip = vec4(  (2.0f * mousePos.x) / size.x - 1.0f,
                                 1.0f - (2.0f * mousePos.y) / size.y, -1.0, 1.0);
 
-    vec4 rayEye = inverse(projection) * rayClip;
+    dvec4 rayEye = inverse(projection) * rayClip;
     
-    rayEye = vec4(rayEye.x, rayEye.y, -1.0, 0.0);
+    rayEye = dvec4(rayEye.x, rayEye.y, -1.0, 0.0);
     
-    const vec3 rayWor = normalize(inverse(getCamera()->getMatrixConstRef()) * rayEye);
+    const dvec3 rayWor = normalize(inverse(getCamera()->getMatrixConstRef()) * rayEye);
     
-    const vec3 eye = getCamera()->getEye();
+    const dvec3 eye = getCamera()->getEye();
 
-    const vec3 n(0,0,1);
+    const dvec3 n(0,0,1);
 
-    const float t = -dot(eye, n) / dot(rayWor, n);
+    const double t = -dot(eye, n) / dot(rayWor, n);
 
     cursorPosWC = eye + rayWor * t;
 }
 
-void Canvas::onMouseScroll(GLFWwindow * window, const Vec2d & mouseScroll)
+void Canvas::onMouseScroll(GLFWwindow * window, const vec2 & mouseScroll)
 {
     if(!enabled || !wantMouseCapture) { return ;}
 
@@ -222,7 +198,8 @@ void Canvas::onMouseScroll(GLFWwindow * window, const Vec2d & mouseScroll)
     if (state == GLFW_PRESS)
     {
         // TODO This is not working correctly
-        lastShiftKeyDownMousePos += Vec2d(mouseScroll.x, 0);
+        lastShiftKeyDownMousePos += ivec2(mouseScroll.x, 0);
+
         trackBallInteractor->setClickPoint(lastShiftKeyDownMousePos.x % size.x, lastShiftKeyDownMousePos.y % size.y);
         trackBallInteractor->update();
 
@@ -249,7 +226,7 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
                 double xPos;
                 double yPos;
                 glfwGetCursorPos(window, &xPos, &yPos);
-                lastShiftKeyDownMousePos = Vec2i(xPos, yPos);
+                lastShiftKeyDownMousePos = ivec2(xPos, yPos);
 
                 //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
             }
@@ -291,15 +268,15 @@ Camera * Canvas::getCamera() const { return trackBallInteractor->getCamera() ;}
 
 TrackBallInteractor * Canvas::getTrackBallInteractor() const { return trackBallInteractor ;}
 
-mat4 Canvas::getView()       const { return view ;}
-mat4 Canvas::getModel()      const { return model ;}
-mat4 Canvas::getProjection() const { return projection ;}
-mat4 Canvas::getMVP()        const { return MVP ;}
+dmat4 Canvas::getView()       const { return view ;}
+dmat4 Canvas::getModel()      const { return model ;}
+dmat4 Canvas::getProjection() const { return projection ;}
+dmat4 Canvas::getMVP()        const { return MVP ;}
 
-const mat4 & Canvas::getViewRef()       const { return view ;}
-const mat4 & Canvas::getModelRef()      const { return model ;}
-const mat4 & Canvas::getProjectionRef() const { return projection ;}
-const mat4 & Canvas::getMVP_Ref()       const { return MVP ;}
+const dmat4 & Canvas::getViewRef()       const { return view ;}
+const dmat4 & Canvas::getModelRef()      const { return model ;}
+const dmat4 & Canvas::getProjectionRef() const { return projection ;}
+const dmat4 & Canvas::getMVP_Ref()       const { return MVP ;}
 
 SkyBox * Canvas::setSkyBox(SkyBox * skyBox) { return this->skyBox = skyBox ;}
 SkyBox * Canvas::getSkyBox() const          { return skyBox ;}
@@ -313,7 +290,7 @@ vector<Canvas *> Canvas::getInstances() { return instances ;}
 bool Canvas::setEnabled(const bool enabled) { return this->enabled = enabled ;}
 bool Canvas::getEnabled() const             { return enabled ;}
 
-vec3 Canvas::getCursorPosWC() const { return cursorPosWC ;}
+dvec3 Canvas::getCursorPosWC() const { return cursorPosWC ;}
 
 #ifdef __EMSCRIPTEN__
 

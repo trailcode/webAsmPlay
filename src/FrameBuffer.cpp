@@ -35,9 +35,9 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/FrameBuffer.h>
 
-using namespace tce::geom;
+using namespace glm;
 
-FrameBuffer * FrameBuffer::create(const Vec2i & bufferSize)
+FrameBuffer * FrameBuffer::create(const ivec2 & bufferSize)
 {
     GLuint framebuffer          = 0;
     GLuint textureColorbuffer   = 0;
@@ -77,7 +77,7 @@ FrameBuffer * FrameBuffer::create(const Vec2i & bufferSize)
                             bufferSize);
 }
 
-FrameBuffer * FrameBuffer::ensureFrameBuffer(FrameBuffer * currBuffer, const Vec2i & bufferSize)
+FrameBuffer * FrameBuffer::ensureFrameBuffer(FrameBuffer * currBuffer, const ivec2 & bufferSize)
 {
     if(!currBuffer || bufferSize != currBuffer->getBufferSize())
     {
@@ -89,13 +89,13 @@ FrameBuffer * FrameBuffer::ensureFrameBuffer(FrameBuffer * currBuffer, const Vec
     return currBuffer;
 }
 
-FrameBuffer::FrameBuffer(   const GLuint framebuffer,
-                            const GLuint textureColorbuffer,
-                            const GLuint rbo,
-                            const Vec2i & bufferSize) : framebuffer         (framebuffer),
-                                                        textureColorbuffer  (textureColorbuffer),
-                                                        rbo                 (rbo),
-                                                        bufferSize          (bufferSize)
+FrameBuffer::FrameBuffer(   const GLuint   framebuffer,
+                            const GLuint   textureColorbuffer,
+                            const GLuint   rbo,
+                            const ivec2  & bufferSize) : framebuffer         (framebuffer),
+                                                         textureColorbuffer  (textureColorbuffer),
+                                                         rbo                 (rbo),
+                                                         bufferSize          (bufferSize)
 {
 }
 
@@ -108,7 +108,7 @@ FrameBuffer::~FrameBuffer()
     glDeleteFramebuffers    (1, &framebuffer);
 }
 
-Vec2i FrameBuffer::getBufferSize() const
+ivec2 FrameBuffer::getBufferSize() const
 {
     return bufferSize;
 }

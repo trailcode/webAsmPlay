@@ -36,9 +36,9 @@
 #endif
 
 #include <list>
+#include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
-#include <tceGeom/vec2.h>
 #include "Types.h"
 
 namespace rsmz
@@ -61,7 +61,7 @@ public:
     
     virtual ~Canvas();
 
-    void setArea(const tce::geom::Vec2i & upperLeft, const tce::geom::Vec2i & size);
+    void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size);
 
     virtual GLuint render();
 
@@ -71,9 +71,9 @@ public:
 
     void onMouseButton(GLFWwindow * window, const int button, const int action, const int mods);
 
-    void onMousePosition(GLFWwindow * window, const tce::geom::Vec2d & mousePos);
+    void onMousePosition(GLFWwindow * window, const glm::vec2 & mousePos);
 
-    void onMouseScroll(GLFWwindow * window, const tce::geom::Vec2d & mouseScroll);
+    void onMouseScroll(GLFWwindow * window, const glm::vec2 & mouseScroll);
 
     void onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods);
 
@@ -87,15 +87,15 @@ public:
 
     glm::vec4 setClearColor(const glm::vec4 & clearColor);
 
-    glm::mat4 getView() const;
-    glm::mat4 getModel() const;
-    glm::mat4 getProjection() const;
-    glm::mat4 getMVP() const;
+    glm::dmat4 getView() const;
+    glm::dmat4 getModel() const;
+    glm::dmat4 getProjection() const;
+    glm::dmat4 getMVP() const;
 
-    const glm::mat4 & getViewRef() const;
-    const glm::mat4 & getModelRef() const;
-    const glm::mat4 & getProjectionRef() const;
-    const glm::mat4 & getMVP_Ref() const;
+    const glm::dmat4 & getViewRef() const;
+    const glm::dmat4 & getModelRef() const;
+    const glm::dmat4 & getProjectionRef() const;
+    const glm::dmat4 & getMVP_Ref() const;
 
     SkyBox * setSkyBox(SkyBox * skyBox);
     SkyBox * getSkyBox() const;
@@ -109,7 +109,7 @@ public:
     bool setEnabled(const bool enabled);
     bool getEnabled() const;
     
-    glm::vec3 getCursorPosWC() const;
+    glm::dvec3 getCursorPosWC() const;
 
 private:
 
@@ -117,12 +117,12 @@ private:
 
     FrameBuffer * frameBuffer;
 
-    tce::geom::Vec2i upperLeft;
-    tce::geom::Vec2i size;
+    glm::ivec2 upperLeft;
+    glm::ivec2 size;
 
     bool wantMouseCapture;
 
-    tce::geom::Vec2i lastShiftKeyDownMousePos;
+    glm::ivec2 lastShiftKeyDownMousePos;
 
     std::list<Renderable *> renderiables;
 
@@ -130,12 +130,12 @@ private:
 
     glm::vec4 clearColor;
 
-    glm::mat4 view;
-    glm::mat4 model;
-    glm::mat4 projection;
-    glm::mat4 MVP;
+    glm::dmat4 view;
+    glm::dmat4 model;
+    glm::dmat4 projection;
+    glm::dmat4 MVP;
     
-    glm::vec3 cursorPosWC;
+    glm::dvec3 cursorPosWC;
 
     SkyBox * skyBox;
 

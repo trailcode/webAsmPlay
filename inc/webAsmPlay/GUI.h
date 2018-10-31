@@ -31,6 +31,10 @@
 
 class GLFWwindow;
 
+class Canvas;
+class GeosTestCanvas;
+class SkyBox;
+
 class GUI
 {
 public:
@@ -43,9 +47,18 @@ public:
         PICK_MODE_POLYGON_MULTIPLE,
     };
 
+    static void setupCallbacks(GLFWwindow* window);
+
+    static void initOpenGL(GLFWwindow* window);
+
     static void mainLoop(GLFWwindow * window);
 
+    static void refresh(GLFWwindow * window);
+
 private:
+
+    GUI() {}
+    ~GUI() {}
 
     static void showMainToolBar();
     static void showMainMenuBar(GLFWwindow * window);
@@ -56,8 +69,26 @@ private:
     static void attributePanel(const std::string & attrsStr);
     static void sceneViewPanel();
 
-    GUI() {}
-    ~GUI() {}
+    static void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods);
+    static void cursorPosCallback(GLFWwindow * window, double xpos, double ypos);
+    static void scrollCallback(GLFWwindow * window, double xoffset, double yoffset);
+    static void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods);
+    static void charCallback(GLFWwindow * window, unsigned int c);
+    static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+    static void windowFocusCallback(GLFWwindow* window, int focused);
+    static void cursorEnterCallback(GLFWwindow * window, int entered);
+
+    static bool showViewMatrixPanel;
+    static bool showMVP_MatrixPanel;
+    static bool showSceneViewPanel;
+    static bool showPerformancePanel;
+    static bool showRenderSettingsPanel;
+    static bool showLogPanel;
+    static bool showAttributePanel;
+
+    static GeosTestCanvas  * geosTestCanvas;
+    static Canvas          * canvas;
+    static SkyBox          * skyBox;
 };
 
 #endif // __WEB_ASM_PLAY_GUI_H__

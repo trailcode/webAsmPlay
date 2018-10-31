@@ -88,9 +88,7 @@ public:
 
     std::string doPicking(const char mode, const glm::dvec4 & pos, Canvas * canvas) const;
 
-//private:
-    
-    typedef std::vector<const geos::geom::Geometry *> GeomVector;
+private:
     
     void createPolygonRenderiables(const std::vector<AttributedGeometry> & geoms, Canvas * canvas);
 

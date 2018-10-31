@@ -48,18 +48,6 @@ static void glfw_error_callback(int error, const char* description)
 
 void errorCallback(int error, const char* description);
 
-void mouseButtonCallback    (GLFWwindow* window, int button, int action, int mods);
-void scrollCallback         (GLFWwindow* window, double xoffset, double yoffset);
-void keyCallback            (GLFWwindow* window, int key, int scancode, int action, int mods);
-void charCallback           (GLFWwindow* window, unsigned int c);
-void windowFocusCallback    (GLFWwindow* window, int focused);
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-void cursorPosCallback      (GLFWwindow* window, double xpos, double ypos);
-void cursorEnterCallback    (GLFWwindow* window, int entered);
-void initOpenGL             (GLFWwindow* window);
-void initGeometry           ();
-void refresh                (GLFWwindow* window);
-
 int main(int, char**)
 {
     // Setup window
@@ -136,24 +124,15 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    glfwSetMouseButtonCallback      (window, mouseButtonCallback);
-    glfwSetScrollCallback           (window, scrollCallback);
-    glfwSetKeyCallback              (window, keyCallback);
-    glfwSetCharCallback             (window, charCallback);
-    glfwSetWindowFocusCallback      (window, windowFocusCallback);
-    glfwSetFramebufferSizeCallback  (window, framebufferSizeCallback);
-    glfwSetCursorPosCallback        (window, cursorPosCallback);
-    glfwSetCursorEnterCallback      (window, cursorEnterCallback);
+    GUI::setupCallbacks(window);
 
-    initOpenGL(window);
-
-    initGeometry();
+    GUI::initOpenGL(window);
 
     #ifdef __EMSCRIPTEN__
         
         glfwSetWindowRefreshCallback(window, GUI::mainLoop);
 
-        refresh(window);
+        GUI::refresh(window);
 
     #else
 

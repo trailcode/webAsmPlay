@@ -24,47 +24,43 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_FRAME_BUFFER_H__
-#define __WEB_ASM_PLAY_FRAME_BUFFER_H__
+#include <webAsmPlay/ImguiInclude.h>
+#include <webAsmPlay/GeosTestCanvas.h>
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/GUI.h>
 
-#ifdef __EMSCRIPTEN__
-    // GLEW
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-#else
-    #include <GL/gl3w.h>    // Initialize with gl3wInit()
-#endif
-#include <glm/vec2.hpp>
-
-class FrameBuffer
+void GUI::sceneViewPanel()
 {
-public:
+    geosTestCanvas->setEnabled(showSceneViewPanel);
 
-    static FrameBuffer * create(const glm::ivec2 & bufferSize);
-
-    static FrameBuffer * ensureFrameBuffer(FrameBuffer * currBuffer, const glm::ivec2 & bufferSize);
-
-    ~FrameBuffer();
-
-    glm::ivec2 getBufferSize() const;
-
-    void bind();
-    void unbind();
-
-    GLuint getTextureID() const;
-
-private:
+    if(!showSceneViewPanel) { return ;}
     
-    FrameBuffer(const GLuint       framebuffer,
-                const GLuint       textureColorbuffer,
-                const GLuint       rbo,
-                const glm::ivec2 & bufferSize);
+    ImGui::Begin("Geos Tests", &showSceneViewPanel);
 
-    const GLuint framebuffer;
-    const GLuint textureColorbuffer;
-    const GLuint rbo;
+        const ImVec2 pos = ImGui::GetCursorScreenPos();
 
-    const glm::ivec2 bufferSize;
-};
+        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-#endif // __WEB_ASM_PLAY_FRAME_BUFFER_H__
+        geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
+
+        geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+
+        ImGui::GetWindowDrawList()->AddImage(   (void *)geosTestCanvas->render(),
+                                                pos,
+                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+                                                ImVec2(0, 1),
+                                                ImVec2(1, 0));
+        
+        static float buffer1 = 0.1;
+        static float buffer2 = 0.02;
+        static float buffer3 = 0.22;
+
+        ImGui::SliderFloat("buffer1", &buffer1, 0.0f, 0.3f, "buffer1 = %.3f");
+        ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");
+        ImGui::SliderFloat("buffer3", &buffer3, 0.0f, 0.3f, "buffer3 = %.3f");
+
+        geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
+
+    ImGui::End();
+}
+

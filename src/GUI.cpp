@@ -1,10 +1,10 @@
 /**
-╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
-┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
-╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
-╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
-╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
-╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+ ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+ ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+ ╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+ ╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+ ╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
  // This software is provided 'as-is', without any express or implied
  // warranty.  In no event will the authors be held liable for any damages
  // arising from the use of this software.
@@ -25,26 +25,6 @@
 */
 
 #include <cmath>
-#include <imgui.h>
-#include <imgui_impl_opengl3.h>
-#include <imgui_impl_glfw.h>
-
-#ifdef __EMSCRIPTEN__
-    // GLEW
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-    #define IMGUI_API
-    
-    #include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/GLFW/glfw3.h>
-    #include <emscripten/emscripten.h>
-    #include <emscripten/bind.h>
-#else
-    #include <GL/gl3w.h>    // Initialize with gl3wInit()
-    #include <GLFW/glfw3.h>
-    
-#endif // __EMSCRIPTEN__
-
-#include <imgui_internal.h>
 #include <iostream>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
@@ -60,15 +40,12 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <imguitoolbar.h>
-#include <tceGeom/vec2.h>
+#include <webAsmPlay/ImguiInclude.h>
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Camera.h>
-#include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Renderable.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/RenderableCollection.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
@@ -94,7 +71,7 @@
  // `---'                                                         `---'
 
 //  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .--.
-//:::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\
+//:::::.\::::::::.\:Headers.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\
 //'      `--'      `.-'      `--'      `--'      `--'      `-.'      `--'      `
 
 using namespace std;
@@ -102,7 +79,6 @@ using namespace geos::geom;
 using namespace geos::simplify;
 using namespace rsmz;
 using namespace glm;
-using namespace tce::geom;
 
 //  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .--.
 //:::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\
@@ -115,17 +91,17 @@ static int mouse_buttons_down = 0;
 
 static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
 
-GeosTestCanvas  * geosTestCanvas = NULL;
-Canvas          * canvas         = NULL;
-SkyBox          * skyBox         = NULL;
+GeosTestCanvas  * GUI::geosTestCanvas = NULL;
+Canvas          * GUI::canvas         = NULL;
+SkyBox          * GUI::skyBox         = NULL;
 
-bool showViewMatrixPanel     = false;
-bool showMVP_MatrixPanel     = false;
-bool showSceneViewPanel      = false;
-bool showPerformancePanel    = false;
-bool showRenderSettingsPanel = false;
-bool showLogPanel            = false;
-bool showAttributePanel      = false;
+bool GUI::showViewMatrixPanel     = false;
+bool GUI::showMVP_MatrixPanel     = false;
+bool GUI::showSceneViewPanel      = false;
+bool GUI::showPerformancePanel    = false;
+bool GUI::showRenderSettingsPanel = false;
+bool GUI::showLogPanel            = false;
+bool GUI::showAttributePanel      = false;
 
 bool isFirst = true;
 
@@ -136,7 +112,7 @@ void errorCallback(int error, const char* description)
     fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
-void refresh(GLFWwindow* window)
+void GUI::refresh(GLFWwindow* window)
 {
 #ifdef __EMSCRIPTEN__
     glfwPollEvents();
@@ -445,41 +421,6 @@ void GUI::attributePanel(const string & attrsStr)
     ImGui::End();
 }
 
-void GUI::sceneViewPanel()
-{
-    geosTestCanvas->setEnabled(showSceneViewPanel);
-
-    if(!showSceneViewPanel) { return ;}
-    
-    ImGui::Begin("Geos Tests", &showSceneViewPanel);
-
-        const ImVec2 pos = ImGui::GetCursorScreenPos();
-
-        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
-
-        geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
-
-        geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
-
-        ImGui::GetWindowDrawList()->AddImage(   (void *)geosTestCanvas->render(),
-                                                pos,
-                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-                                                ImVec2(0, 1),
-                                                ImVec2(1, 0));
-        
-        static float buffer1 = 0.1;
-        static float buffer2 = 0.02;
-        static float buffer3 = 0.22;
-
-        ImGui::SliderFloat("buffer1", &buffer1, 0.0f, 0.3f, "buffer1 = %.3f");
-        ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");
-        ImGui::SliderFloat("buffer3", &buffer3, 0.0f, 0.3f, "buffer3 = %.3f");
-
-        geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
-
-    ImGui::End();
-}
-
 void GUI::mainLoop(GLFWwindow * window)
 {
     if(!Buf) {  Buf = new ImGuiTextBuffer() ;}
@@ -551,143 +492,16 @@ void GUI::mainLoop(GLFWwindow * window)
 
     ImGui::Render();
 
-//#ifndef __EMSCRIPTEN__
-
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-//#endif
     ImGui::EndFrame();
+
     glfwMakeContextCurrent(window);
 
     glfwSwapBuffers(window);
 }
 
-void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
-{
-    //dmess("mouseButtonCallback button: " << button << " action " << action << " mods " << mods);
-    
-    geosTestCanvas->onMouseButton(window, button, action, mods);
-
-    if(!GImGui->IO.WantCaptureMouse)
-    {
-        canvas->onMouseButton(window, button, action, mods);
-    }
-
-    if (mouse_buttons[button] != action) {
-      mouse_buttons[button] = action;
-      mouse_buttons_down += action == GLFW_PRESS ? 1 : -1;
-    }
-
-#ifndef __EMSCRIPTEN__
-    //ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-#else
-    //ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
-#endif
-
-    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-
-    refresh(window);
-}
-
-Vec2i lastShiftKeyDownMousePos;
-
-void cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
-{
-    //dmess("x " << xpos << " y " << ypos);
-
-    geosTestCanvas->onMousePosition(window, Vec2d(xpos, ypos));
-
-    canvas->onMousePosition(window, Vec2d(xpos, ypos));
-
-    refresh(window);
-}
-
-void scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
-{
-    //dmess("ScrollCallback " << xoffset << " " << yoffset);
-
-    geosTestCanvas->onMouseScroll(window, Vec2d(xoffset, yoffset));
-
-    if(!GImGui->IO.WantCaptureMouse)
-    {
-        canvas->onMouseScroll(window, Vec2d(xoffset, yoffset));
-    }
-
-#ifdef __EMSCRIPTEN__
-    //ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
-#else
-    //ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
-#endif
-    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
-
-    refresh(window);
-}
-
-void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods)
-{
-    geosTestCanvas->onKey(window, key, scancode, action, mods);
-
-    if(!GImGui->IO.WantCaptureKeyboard) { canvas->onKey(window, key, scancode, action, mods) ;}
- 
-
-#ifdef __EMSCRIPTEN__
-    //ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
-#else
-    //ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
-#endif
-
-    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
-
-    refresh(window);
-}
-
-void charCallback(GLFWwindow * window, unsigned int c)
-{
-    geosTestCanvas->onChar(window, c);
-
-    canvas->onChar(window, c);
-
-#ifdef __EMSCRIPTEN__
-    //ImGui_ImplGlfwGL3_CharCallback(window, c);
-#else
-    //ImGui_ImplGlfw_CharCallback(window, c);
-#endif
-
-    ImGui_ImplGlfw_CharCallback(window, c);
-
-    refresh(window);
-}
-
-void framebufferSizeCallback(GLFWwindow* window, int width, int height)
-{
-    // Need to use this to get true size because of retina displays.
-    glfwGetWindowSize(window, &width, &height);
-
-    canvas->setArea(Vec2i(0,0), Vec2i(width, height));
-
-    refresh(window);
-}
-
-void windowFocusCallback(GLFWwindow* window, int focused)
-{
-    if(focused)
-    {
-        refresh(window);
-    }
-}
-
-void cursorEnterCallback(GLFWwindow * window, int /* entered */)
-{
-    refresh(window);
-}
-
-// Is called whenever a key is pressed/released via GLFW
-void keyCallback1(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) { glfwSetWindowShouldClose(window, GL_TRUE) ;}
-}
-
-void initOpenGL(GLFWwindow* window)
+void GUI::initOpenGL(GLFWwindow* window)
 {
     debugLoggerFunc = &dmessCallback;
 
@@ -697,8 +511,9 @@ void initOpenGL(GLFWwindow* window)
 
     // Define the viewport dimensions
     static int width, height;
-    //glfwGetFramebufferSize(window, &width, &height); 
+    
     glfwGetWindowSize(window, &width, &height);
+
     glViewport(0, 0, width, height);
 
     Renderable::ensureShader();
@@ -707,10 +522,7 @@ void initOpenGL(GLFWwindow* window)
 
     canvas = new Canvas(false);
 
-    dmess("width " << width << " height " << height);
-
-    //canvas->setArea(Vec2i(0,0), Vec2i(width / 2, height / 2));
-    canvas->setArea(Vec2i(0,0), Vec2i(width, height));
+    canvas->setArea(ivec2(0,0), ivec2(width, height));
 
     geosTestCanvas = new GeosTestCanvas();
 
@@ -721,54 +533,4 @@ void initOpenGL(GLFWwindow* window)
     //GridPlane * gridPlane = new GridPlane();
 
     //canvas->addRenderiable(gridPlane);
-}
-
-void initGeometry()
-{
-    #ifdef WORKING
-
-    Geometry * pp = scopedGeosGeometry(GeosUtil::makeBox(-0.1,-0.1,0.1,0.1));
-
-    Geometry * p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,0.5,0.5));
-
-    Geometry * ppp = scopedGeosGeometry(GeosUtil::makeBox(-0.05,-0.6,0.05,0.6));
-
-    Geometry * pppp = scopedGeosGeometry(GeosUtil::makeBox(-0.6,-0.05,0.6,0.05));
-
-    p = scopedGeosGeometry(p->buffer(0.1));
-    //*
-
-    p = scopedGeosGeometry(p->difference(pp));
-
-    p = scopedGeosGeometry(p->difference(ppp));
-
-    p = scopedGeosGeometry(p->difference(pppp));
-    //*/
-
-    const mat4 trans = scale(mat4(1.0), vec3(0.6, 0.6, 0.6));
-
-    Renderable * r = Renderable::create(p, trans);
-    //Renderable * r = Renderable::create(dynamic_cast<Polygon *>(p)->getExteriorRing());
-
-    r->setFillColor(vec4(0.3,0.3,0,1));
-        
-    r->setOutlineColor(vec4(1,0,0,1));
-
-    //geosTestCanvas->addRenderiable(r);
-    canvas->addRenderiable(r);
-
-    /*
-    p = scopedGeosGeometry(GeosUtil::makeBox(-0.5,-0.5,-4,0.4));
-
-    //r = Renderable::create(p, trans);
-    r = Renderable::create(p);
-
-    r->setFillColor(vec4(0.3,0.0,0.3,1));
-        
-    r->setOutlineColor(vec4(1,0,0,1));
-
-    canvas->addRenderiable(r);
-    //*/
-
-    #endif
 }
