@@ -536,6 +536,8 @@ void GUI::mainLoop(GLFWwindow * window)
     glfwSwapBuffers(window);
 }
 
+Ini::IniConfig m_oIniConfig;
+
 void GUI::initOpenGL(GLFWwindow* window)
 {
     debugLoggerFunc = &dmessCallback;
@@ -568,4 +570,21 @@ void GUI::initOpenGL(GLFWwindow* window)
     //GridPlane * gridPlane = new GridPlane();
 
     //canvas->addRenderiable(gridPlane);
+
+    /*
+    FILE * fp = fopen("Config.ini");
+
+    if(fp)
+    {
+        fread(&showViewMatrixPanel;
+        fread(&showMVP_MatrixPanel;
+        fread(&showSceneViewPanel;
+        fread(&showPerformancePanel;
+        fread(&showRenderSettingsPanel;
+        fread(&showLogPanel;
+        fread(&showAttributePanel;
+    }
+
+    fclose(fp);
+    */
 }

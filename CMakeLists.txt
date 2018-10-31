@@ -101,7 +101,9 @@ file(GLOB tceOpenSteer_SRC  "./tceOpenSteer/src/*.cpp")
 file(GLOB tceCore_SRC       "./tceCore/inc/tceCore/*.cpp")
 file(GLOB tceRender_SRC     "./tceRender/src/*.cpp")
 
-file(GLOB imguiSrc "imgui/*.cpp")
+file(GLOB simpleJSON_SRC "SimpleJSON/src/*.cpp")
+
+file(GLOB imguiSrc  "imgui/*.cpp")
 
 file(GLOB webAsmPlay_SRC        "src/Camera.cpp"
                                 "src/Debug.cpp"
@@ -152,6 +154,7 @@ include_directories(opensteer/include)
 include_directories(GeoServer/inc)
 include_directories(imgui)
 include_directories(imguiAddons/imguitoolbar)
+include_directories(SimpleJSON/inc)
 include_directories(tceGeom/inc)
 include_directories(tceCore/inc)
 include_directories(tceOpenSteer/inc)
@@ -258,7 +261,7 @@ endif()
 file(GLOB sources   ${webAsmPlay_SRC}
                     ${geosSrc}
                     ${GLUTesselatorSrc}
-                    ${ICON}
+                    ${simpleJSON_SRC}
                     )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")

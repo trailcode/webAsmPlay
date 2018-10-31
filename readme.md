@@ -58,6 +58,7 @@ and allow C++ 17 compilation:
 * Emscripten Dear Imgui: https://github.com/greggman/doodles/tree/master/glfw-imgui
 * Websocketpp: https://github.com/zaphoyd/websocketpp
 * Histogram: https://github.com/HDembinski/histogram
+* SimpleJSON: https://github.com/MJPA/SimpleJSON
 
 ### Art and Data
 * https://www.iconfinder.com/iconsets/32x32-free-design-icons
@@ -157,6 +158,8 @@ No notes.
 * ~~Bring Emscripten ImGUI up to date with native version~~.
 * Present error if cannot connect to server
 * Move to a newer geos. 3.8.0Dev seems to have more functions.
+* Make a third party directory.
+* Make a project Talent Stack Document/Panel
 
 ### Bugs
 
