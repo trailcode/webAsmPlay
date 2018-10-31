@@ -437,6 +437,39 @@ void GUI::mainLoop(GLFWwindow * window)
     ImGui::NewFrame();
 #endif
 
+    static bool opt_fullscreen_persistant = true;
+    static ImGuiDockNodeFlags opt_flags = ImGuiDockNodeFlags_None;
+    bool opt_fullscreen = opt_fullscreen_persistant;
+
+    // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+    // because it would be confusing to have two docking targets within each others.
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+
+    {
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->Pos);
+        ImGui::SetNextWindowSize(viewport->Size);
+        ImGui::SetNextWindowViewport(viewport->ID);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+    }
+
+    opt_flags |= ImGuiDockNodeFlags_PassthruDockspace;
+
+    window_flags |= ImGuiWindowFlags_NoBackground;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("DockSpace Demo", NULL, window_flags);
+    ImGui::PopStyleVar();
+
+    ImGui::PopStyleVar(2); // Full screen
+
+    // Dockspace
+    ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), opt_flags);
+    
     showMainToolBar();
 
     showMainMenuBar(window);
@@ -487,6 +520,8 @@ void GUI::mainLoop(GLFWwindow * window)
     attributePanel(attrsStr);
 
     sceneViewPanel();
+
+    ImGui::End();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

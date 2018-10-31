@@ -53,7 +53,7 @@ and allow C++ 17 compilation:
 * Ctpl: https://github.com/vit-vit/CTPL
 * Glm: https://glm.g-truc.net/0.9.9/index.html
 * GLUTessellator: https://github.com/mbebenita/GLUTesselator
-* Native Dear Imgui: https://github.com/ocornut/imgui
+* Native Dear Imgui: https://github.com/ocornut/imgui [Docking branch]
 * Imgui-addons: https://github.com/wflohry/imgui-addons
 * Emscripten Dear Imgui: https://github.com/greggman/doodles/tree/master/glfw-imgui
 * Websocketpp: https://github.com/zaphoyd/websocketpp
@@ -154,9 +154,13 @@ No notes.
 
 * Make geometric terminology consistent with Geos.
 * Fix dmess for GeoServer
-* Bring Emscripten ImGUI up to date with native version. Try: https://github.com/ggerganov/imgui-em
+* ~~Bring Emscripten ImGUI up to date with native version~~.
 * Present error if cannot connect to server
 * Move to a newer geos. 3.8.0Dev seems to have more functions.
+
+### Bugs
+
+* Holding down shift and moving outside the Geos test panel keeps it as if the shift key is still held down when the mouse is brought back in the panel.
 
 
 

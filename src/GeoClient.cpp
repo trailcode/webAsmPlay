@@ -27,25 +27,6 @@
 
 #include <utility>
 #include <memory>
-#ifdef __EMSCRIPTEN__
-
-    #include <emscripten/emscripten.h>
-    #include <emscripten/bind.h>
-#else
-
-    #include <ctpl.h>
-    #include <chrono>
-    #include <thread>
-
-    #include "imgui.h"
-    #include "imgui_impl_glfw.h"
-    #include "imgui_impl_opengl3.h"
-
-    #include <GL/gl3w.h>    // Initialize with gl3wInit()
-    #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
-
-#endif
-
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/algorithm/distance/DistanceToPoint.h>
 #include <geos/algorithm/distance/PointPairDistance.h>
@@ -57,6 +38,7 @@
 #include <geos/io/WKBReader.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
+#include <webAsmPlay/ImguiInclude.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GeosUtil.h>
