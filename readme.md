@@ -164,6 +164,7 @@ No notes.
 ### Bugs
 
 * Holding down shift and moving outside the Geos test panel keeps it as if the shift key is still held down when the mouse is brought back in the panel.
+* Camera still has a bug with window resizing and trackball. Seems to only happen in emscripten build.
 
 
 

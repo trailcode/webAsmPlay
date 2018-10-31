@@ -180,7 +180,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
                                 -s USE_SDL_IMAGE=2 \
                                 -s SDL2_IMAGE_FORMATS='[\"png\"]' \
                                 -s DISABLE_EXCEPTION_CATCHING=0 \
-                                --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/")
+                                --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/ \
+                                --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/config@/")
 
     add_definitions(-D__EMSCRIPTEN__)
 
@@ -251,6 +252,20 @@ else()
     endforeach(assetFile)
 
     ADD_CUSTOM_TARGET(assets ALL DEPENDS ${assetFileDest})
+
+    set(config_files imgui.ini config.json)
+
+    foreach(configFile ${config_files})
+        ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${configFile}"
+                COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}"
+                "${CMAKE_CURRENT_BINARY_DIR}/${configFile}"
+                DEPENDS   "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}"
+                )
+        list(APPEND configFileDest "${CMAKE_CURRENT_BINARY_DIR}/${configFile}")
+
+    endforeach(assetFile)
+
+    ADD_CUSTOM_TARGET(configs ALL DEPENDS ${configFileDest})
 
     if(APPLE)
 	    SET(CMAKE_CXX_LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
