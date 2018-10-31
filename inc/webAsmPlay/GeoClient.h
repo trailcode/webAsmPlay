@@ -1,10 +1,10 @@
 /**
-╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
-┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
-╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
-╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
-╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
-╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+ ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+ ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+ ╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+ ╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+ ╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
  // This software is provided 'as-is', without any express or implied
  // warranty.  In no event will the authors be held liable for any damages
  // arising from the use of this software.
@@ -77,14 +77,16 @@ public:
 
     void loadAllGeometry(Canvas * canvas);
 
-    std::pair<Renderable *, Attributes *> pickLineStringRenderable(const glm::vec3 & pos);
+    std::pair<Renderable *, Attributes *> pickLineStringRenderable(const glm::vec3 & pos) const;
 
-    std::pair<Renderable *, Attributes *> pickPolygonRenderable(const glm::vec3 & pos);
+    std::pair<Renderable *, Attributes *> pickPolygonRenderable(const glm::vec3 & pos) const;
 
-    std::vector<std::pair<Renderable *, Attributes *> > pickPolygonRenderables(const glm::vec3 & pos);
+    std::vector<std::pair<Renderable *, Attributes *> > pickPolygonRenderables(const glm::vec3 & pos) const;
 
     glm::dmat4 getTrans() const;
     glm::dmat4 getInverseTrans() const;
+
+    std::string doPicking(const char mode, const glm::dvec4 & pos, Canvas * canvas) const;
 
 //private:
     
@@ -99,7 +101,7 @@ public:
     
     glm::dmat4 trans;
     glm::dmat4 inverseTrans;
-    
+
 #ifndef __EMSCRIPTEN__
 
     static void on_open(GeoClient * client, websocketpp::connection_hdl hdl);

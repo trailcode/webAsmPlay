@@ -140,8 +140,19 @@
      };
  
  
-     Toolbar(const char* _name="",bool _visible=true,bool _keepAButtonSelected=false,bool _vertical=false,bool _lightAllBarWhenHovered=true,const ImVec2& _hvAlignmentsIn01=ImVec2(0.5f,0.f),const ImVec2& _opacityOffAndOn=ImVec2(-1.f,-1.f),const ImVec4& _bg_col=ImVec4(1,1,1,1),const ImVec4& _displayPortion=ImVec4(0,0,-1,-1))
-     : visible(_visible),toolbarWindowPos(0,0),toolbarWindowSize(0,0),scaling(1,1),tooltipsDisabled(false)
+     Toolbar(   const char* _name="",
+                bool _visible=true,
+                bool _keepAButtonSelected=false,
+                bool _vertical=false,
+                bool _lightAllBarWhenHovered=true,
+                const ImVec2& _hvAlignmentsIn01=ImVec2(0.5f,0.f),
+                const ImVec2& _opacityOffAndOn=ImVec2(-1.f,-1.f),
+                const ImVec4& _bg_col=ImVec4(1,1,1,1),
+                const ImVec4& _displayPortion=ImVec4(0,0,-1,-1)) :  visible(_visible),
+                                                                    toolbarWindowPos(0,0),
+                                                                    toolbarWindowSize(0,0),
+                                                                    scaling(1,1),
+                                                                    tooltipsDisabled(false)
      {
          IM_ASSERT(_name!=NULL && strlen(_name)<1024);  // _name must be valid
          strcpy(name,_name);

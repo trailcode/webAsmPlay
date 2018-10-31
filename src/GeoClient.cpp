@@ -79,6 +79,7 @@
 #include <webAsmPlay/RenderableLineString.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeoClientRequest.h>
+#include <webAsmPlay/GUI.h>
 #include <webAsmPlay/GeoClient.h>
 
 using namespace std;
@@ -578,7 +579,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     dmess("Done creating renderiable.");
 }
 
-pair<Renderable *, Attributes *> GeoClient::pickLineStringRenderable(const vec3 & _pos)
+pair<Renderable *, Attributes *> GeoClient::pickLineStringRenderable(const vec3 & _pos) const
 {
     const vec4 pos = inverseTrans * vec4(_pos, 1.0);
     
@@ -616,7 +617,7 @@ pair<Renderable *, Attributes *> GeoClient::pickLineStringRenderable(const vec3 
     return make_pair(closest, closestAttrs);
 }
 
-pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _pos)
+pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _pos) const
 {
     const vec4 pos = inverseTrans * vec4(_pos, 1.0);
     
@@ -633,8 +634,6 @@ pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _
 
     Renderable * smallest      = NULL;
     Attributes * smallestAttrs = NULL;
-
-    dmess("query " << query.size());
 
     for(const void * _data : query)
     {
@@ -658,7 +657,7 @@ pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _
     return make_pair(smallest, smallestAttrs);
 }
 
-vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(const vec3 & _pos)
+vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(const vec3 & _pos) const
 {
     const vec4 pos = inverseTrans * vec4(_pos, 1.0);
     
@@ -696,6 +695,65 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(cons
 dmat4 GeoClient::getTrans() const { return trans ;}
 
 dmat4 GeoClient::getInverseTrans() const { return inverseTrans ;}
+
+string GeoClient::doPicking(const char mode, const dvec4 & pos, Canvas * canvas) const
+{
+    Renderable * renderiable;
+    Attributes * attrs;
+
+    string attrsStr;
+
+    if(mode == GUI::PICK_MODE_LINESTRING)
+    {
+        tie(renderiable, attrs) = pickLineStringRenderable(canvas->getCursorPosWC());
+
+        if(renderiable)
+        {
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_BLEND);
+
+            renderiable->render(canvas->getMVP_Ref());
+
+            attrsStr = attrs->toString();
+        }
+    }
+    if(mode == GUI::PICK_MODE_POLYGON_SINGLE)
+    {
+        tie(renderiable, attrs) = pickPolygonRenderable(canvas->getCursorPosWC());
+
+        if(renderiable)
+        {
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_BLEND);
+
+            renderiable->render(canvas->getMVP_Ref());
+
+            attrsStr = attrs->toString();
+        }
+    }
+    else if(mode == GUI::PICK_MODE_POLYGON_MULTIPLE)
+    {
+        vector<pair<Renderable *, Attributes *> > picked = pickPolygonRenderables(canvas->getCursorPosWC());
+
+        if(picked.size())
+        {
+            tie(renderiable, attrs) = picked[0];
+
+            renderiable->render(canvas->getMVP_Ref());
+
+            attrsStr = attrs->toString();
+
+            for(size_t i = 1; i < picked.size(); ++i)
+            {
+                attrsStr += "\n";
+
+                attrsStr += get<1>(picked[i])->toString();
+            }
+        }
+    }
+
+    return attrsStr;
+}
 
 #ifndef __EMSCRIPTEN__
 

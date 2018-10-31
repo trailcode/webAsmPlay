@@ -40,7 +40,6 @@
     #include <emscripten/bind.h>
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
-    #define IMGUI_IMPL_API
     #include <GLFW/glfw3.h>
     
 #endif // __EMSCRIPTEN__
@@ -57,16 +56,16 @@
 #include <geos/simplify/TopologyPreservingSimplifier.h>
 #include <geos/simplify/DouglasPeuckerSimplifier.h>
 #include "../GLUTesselator/include/GLU/tessellate.h"
-#include <webAsmPlay/TrackBallInteractor.h>
-#include <webAsmPlay/Camera.h>
-#include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Renderable.h>
-#include <webAsmPlay/Attributes.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <imguitoolbar.h>
 #include <tceGeom/vec2.h>
+#include <webAsmPlay/TrackBallInteractor.h>
+#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Renderable.h>
+#include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/RenderableCollection.h>
@@ -79,6 +78,7 @@
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/GUI.h>
 
 // .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
 
@@ -237,31 +237,250 @@ AppLog logPanel;
 void dmessCallback(const string & file, const size_t line, const string & message)
 {
     cout << file << " " << line << " " << message;
-    /*
-#ifdef __EMSCRIPTEN__
-    if(Buf) { Buf->append("%s %i %s", file.c_str(), (int)line, message.c_str()) ;}
-#else
+    
     if(Buf) { Buf->appendf("%s %i %s", file.c_str(), (int)line, message.c_str()) ;}
-#endif
-     */
 }
-
-//vector<Renderable *> pickedRenderiables;
-
-//extern void (*debugLoggerFunc)(const std::string & file, const std::string & line, const std::string & message);
 
 GeoClient * client = NULL;
 
-enum
+static char mode = GUI::NORMAL_MODE;
+
+void GUI::showMainToolBar()
 {
-    NORMAL_MODE = 0,
-    PICK_MODE_SINGLE,
-    PICK_MODE_MULTIPLE,
-};
+    static ImGui::Toolbar toolbar("myFirstToolbar##foo");
+    if (toolbar.getNumButtons()==0)
+    {
+        ImVec2 uv0(0,0);
+        ImVec2 uv1(1,1);
+        //ImVec2 size(16,16);
+        ImVec2 size(32,32);
+        toolbar.addButton(ImGui::Toolbutton("Normal Mode",(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",(void*)infoIcon,uv0,uv1,size));
 
-static char mode = NORMAL_MODE;
+        toolbar.setProperties(false,false,true,ImVec2(0.5f,0.f));
 
-void mainLoop(GLFWwindow * window)
+        //toolbar.setScaling(0.5f,0.5f);
+    }
+    
+    const int pressed = toolbar.render();
+    if (pressed>=0) fprintf(stderr,"Toolbar1: pressed:%d\n",pressed);
+    switch(pressed)
+    {
+        case 0: mode = NORMAL_MODE; break;
+        case 1: mode = PICK_MODE_LINESTRING; break;
+        case 2: mode = PICK_MODE_POLYGON_SINGLE; break;
+        case 3: mode = PICK_MODE_POLYGON_MULTIPLE; break;
+    }
+}
+
+void GUI::showMainMenuBar(GLFWwindow * window)
+{
+    if (!ImGui::BeginMainMenuBar()) { return ;}
+
+    if (ImGui::BeginMenu("File"))
+    {
+        if (ImGui::MenuItem("New")) {}
+        if (ImGui::MenuItem("Open", "Ctrl+O")) {
+
+        }
+        if(ImGui::MenuItem("Test Web Worker"))
+        {
+            #ifdef __EMSCRIPTEN__
+                worker_handle worker = emscripten_create_worker("worker.js");
+                emscripten_call_worker(worker, "one", 0, 0, cback, (void*)42);
+            #else
+                dmess("Implement me!");
+            #endif
+        }
+
+        if(ImGui::MenuItem("Load Geometry"))
+        {
+            //GeoClient::getInstance()->loadGeometry(canvas);
+
+            if(!client) { client = new GeoClient(window) ;}
+
+            client->loadAllGeometry(canvas);
+        }
+
+        ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Edit"))
+    {
+        if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+        if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+        ImGui::Separator();
+        if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+        if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+        if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+        ImGui::EndMenu();
+    }
+
+    if(ImGui::BeginMenu("View"))
+    {
+        if(ImGui::MenuItem("View Matrix"))     { showViewMatrixPanel     = !showViewMatrixPanel     ;}
+        if(ImGui::MenuItem("MVP Matrix"))      { showMVP_MatrixPanel     = !showMVP_MatrixPanel     ;}
+        if(ImGui::MenuItem("Geos Tests"))      { showSceneViewPanel      = !showSceneViewPanel      ;}
+        if(ImGui::MenuItem("Performance"))     { showPerformancePanel    = !showPerformancePanel    ;}
+        if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel = !showRenderSettingsPanel ;}
+        if(ImGui::MenuItem("Log"))             { showLogPanel            = !showLogPanel            ;}
+        if(ImGui::MenuItem("Attributes"))      { showAttributePanel      = !showAttributePanel      ;}
+
+        ImGui::EndMenu();
+    }
+
+    ImGui::EndMainMenuBar();
+}
+
+void GUI::performacePanel()
+{
+    if(!showPerformancePanel) { return ;}
+    
+    ImGui::Begin("Performance", &showPerformancePanel);
+
+        static float f = 0.0f;
+        static float frameTimes[100] = {0.f};
+        memcpy(&frameTimes[0], &frameTimes[1], sizeof(frameTimes) - sizeof(frameTimes[0]));
+        frameTimes[ARRAYSIZE(frameTimes) - 1] = ImGui::GetIO().Framerate;
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::PlotLines("Frame History", frameTimes, ARRAYSIZE(frameTimes), 0, "", 0.0f, 100.0f, ImVec2(0, 50));
+
+    ImGui::End();
+}
+
+void GUI::viewMatrixPanel()
+{
+    if(!showViewMatrixPanel) { return ;}
+
+    ImGui::Begin("View Matrix", &showViewMatrixPanel);
+
+        ImGui::Text(mat4ToStr(canvas->getViewRef()).c_str());
+
+    ImGui::End();
+}
+
+void GUI::MVP_MatrixPanel()
+{
+    if(!showMVP_MatrixPanel) { return ;}
+    
+    ImGui::Begin("MVP Matrix", &showMVP_MatrixPanel);
+
+        ImGui::Text(mat4ToStr(canvas->getMVP_Ref()).c_str());
+
+    ImGui::End();
+}
+
+void GUI::renderSettingsPanel()
+{
+    if(!showRenderSettingsPanel) { return ;}
+
+    ImGui::Begin("Render Settings", &showRenderSettingsPanel);
+
+        static bool fillPolygons            = true;
+        static bool renderPolygonOutlines   = true;
+        static bool renderSkyBox            = true;
+
+        static bool _fillPolygons           = true;
+        static bool _renderPolygonOutlines  = true;
+        static bool _renderSkyBox           = true;
+
+        ImGui::Checkbox("Fill Polygons",    &_fillPolygons);
+        ImGui::Checkbox("Polygon Outlines", &_renderPolygonOutlines);
+        ImGui::Checkbox("SkyBox",           &_renderSkyBox);
+
+        if(fillPolygons != _fillPolygons)
+        {
+            fillPolygons = _fillPolygons;
+
+            for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
+
+            for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
+
+            Renderable::setDefaultRenderFill(fillPolygons);
+        }
+
+        if(renderPolygonOutlines != _renderPolygonOutlines)
+        {
+            renderPolygonOutlines = _renderPolygonOutlines;
+
+            for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
+
+            for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
+
+            Renderable::setDefaultRenderOutline(renderPolygonOutlines);
+        }
+
+        if(renderSkyBox != _renderSkyBox)
+        {
+            renderSkyBox = _renderSkyBox;
+
+            if(renderSkyBox) { canvas->setSkyBox(skyBox) ;}
+            else             { canvas->setSkyBox(NULL)   ;}
+        }
+
+        static vec4 fillColor(Renderable::getDefaultFillColor());
+        static vec4 outlineColor(Renderable::getDefaultOutlineColor());
+        
+        //ImGui::ColorEdit4("Fill", (float*)&fillColor, true);
+        //ImGui::ColorEdit4("Outline", (float*)&outlineColor, true);
+
+        
+        ImGui::ColorPicker4("##picker",
+                            (float*)&fillColor,
+                            //ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview);
+                            0);
+
+    ImGui::End();
+}
+
+void GUI::attributePanel(const string & attrsStr)
+{
+    if(!showAttributePanel) { return ;}
+
+    ImGui::Begin("Attributes", &showAttributePanel);
+
+        ImGui::Text(attrsStr.c_str());
+
+    ImGui::End();
+}
+
+void GUI::sceneViewPanel()
+{
+    geosTestCanvas->setEnabled(showSceneViewPanel);
+
+    if(!showSceneViewPanel) { return ;}
+    
+    ImGui::Begin("Geos Tests", &showSceneViewPanel);
+
+        const ImVec2 pos = ImGui::GetCursorScreenPos();
+
+        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+
+        geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
+
+        geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+
+        ImGui::GetWindowDrawList()->AddImage(   (void *)geosTestCanvas->render(),
+                                                pos,
+                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+                                                ImVec2(0, 1),
+                                                ImVec2(1, 0));
+        
+        static float buffer1 = 0.1;
+        static float buffer2 = 0.02;
+        static float buffer3 = 0.22;
+
+        ImGui::SliderFloat("buffer1", &buffer1, 0.0f, 0.3f, "buffer1 = %.3f");
+        ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");
+        ImGui::SliderFloat("buffer3", &buffer3, 0.0f, 0.3f, "buffer3 = %.3f");
+
+        geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
+
+    ImGui::End();
+}
+
+void GUI::mainLoop(GLFWwindow * window)
 {
     if(!Buf) {  Buf = new ImGuiTextBuffer() ;}
     // Game loop
@@ -272,100 +491,14 @@ void mainLoop(GLFWwindow * window)
     // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
     glfwPollEvents();
 
-    //ImGui_ImplGlfwGL3_NewFrame();
-    //ImGui_ImplGlfw_NewFrame();
-
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 #endif
 
+    showMainToolBar();
 
-    {
-        if (ImGui::BeginMainMenuBar())
-        {
-            if (ImGui::BeginMenu("File"))
-            {
-                if (ImGui::MenuItem("New")) {}
-                if (ImGui::MenuItem("Open", "Ctrl+O")) {
-
-                }
-                if(ImGui::MenuItem("Test Web Worker"))
-                {
-                    #ifdef __EMSCRIPTEN__
-                        worker_handle worker = emscripten_create_worker("worker.js");
-                        emscripten_call_worker(worker, "one", 0, 0, cback, (void*)42);
-                    #else
-                        dmess("Implement me!");
-                    #endif
-                }
-
-                if(ImGui::MenuItem("Load Geometry"))
-                {
-                    //GeoClient::getInstance()->loadGeometry(canvas);
-
-                    if(!client) { client = new GeoClient(window) ;}
-
-                    client->loadAllGeometry(canvas);
-                }
-
-                ImGui::EndMenu();
-            }
-            if (ImGui::BeginMenu("Edit"))
-            {
-                if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-                if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-                ImGui::Separator();
-                if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-                if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-                if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-                ImGui::EndMenu();
-            }
-
-            if(ImGui::BeginMenu("View"))
-            {
-                if(ImGui::MenuItem("View Matrix"))     { showViewMatrixPanel     = !showViewMatrixPanel     ;}
-                if(ImGui::MenuItem("MVP Matrix"))      { showMVP_MatrixPanel     = !showMVP_MatrixPanel     ;}
-                if(ImGui::MenuItem("Geos Tests"))      { showSceneViewPanel      = !showSceneViewPanel      ;}
-                if(ImGui::MenuItem("Performance"))     { showPerformancePanel    = !showPerformancePanel    ;}
-                if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel = !showRenderSettingsPanel ;}
-                if(ImGui::MenuItem("Log"))             { showLogPanel            = !showLogPanel            ;}
-                if(ImGui::MenuItem("Attributes"))      { showAttributePanel      = !showAttributePanel      ;}
-
-                ImGui::EndMenu();
-            }
-
-            ImGui::EndMainMenuBar();
-        }
-    }
-
-    {
-        static ImGui::Toolbar toolbar("myFirstToolbar##foo");
-        if (toolbar.getNumButtons()==0)
-        {
-            ImVec2 uv0(0,0);
-            ImVec2 uv1(1,1);
-            //ImVec2 size(16,16);
-            ImVec2 size(32,32);
-            toolbar.addButton(ImGui::Toolbutton("Normal Mode",(void*)infoIcon,uv0,uv1,size));
-            toolbar.addButton(ImGui::Toolbutton("Get Info Mode",(void*)infoIcon,uv0,uv1,size));
-            toolbar.addButton(ImGui::Toolbutton("Get Info Mode Multiple",(void*)infoIcon,uv0,uv1,size));
-
-            toolbar.setProperties(false,false,true,ImVec2(0.5f,0.f));
-
-            //toolbar.setScaling(0.5f,0.5f);
-        }
-        
-        const int pressed = toolbar.render();
-        if (pressed>=0) fprintf(stderr,"Toolbar1: pressed:%d\n",pressed);
-        switch(pressed)
-        {
-            case 0: mode = NORMAL_MODE; break;
-            case 1: mode = PICK_MODE_SINGLE; break;
-            case 2: mode = PICK_MODE_MULTIPLE; break;
-        }
-        //dmess("infoIcon " << infoIcon);
-    }
+    showMainMenuBar(window);
 
     // Rendering
     int screenWidth, screenHeight;
@@ -379,234 +512,40 @@ void mainLoop(GLFWwindow * window)
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 
-    if(showPerformancePanel)
-    {
-        ImGui::Begin("Performance", &showPerformancePanel);
+    performacePanel();
 
-            static float f = 0.0f;
-            static float frameTimes[100] = {0.f};
-            memcpy(&frameTimes[0], &frameTimes[1], sizeof(frameTimes) - sizeof(frameTimes[0]));
-            frameTimes[ARRAYSIZE(frameTimes) - 1] = ImGui::GetIO().Framerate;
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::PlotLines("Frame History", frameTimes, ARRAYSIZE(frameTimes), 0, "", 0.0f, 100.0f, ImVec2(0, 50));
+    viewMatrixPanel();
 
-        ImGui::End();
-    }
+    //if(isFirst) { ImGui::SetNextWindowPos(ImVec2(0,0)) ;}
 
-    if(showViewMatrixPanel)
-    {
-        ImGui::Begin("View Matrix", &showViewMatrixPanel);
-
-            ImGui::Text(mat4ToStr(canvas->getViewRef()).c_str());
-
-        ImGui::End();
-    }
-
-    if(isFirst) { ImGui::SetNextWindowPos(ImVec2(0,0)) ;}
-
-    if(showMVP_MatrixPanel)
-    {
-        ImGui::Begin("MVP Matrix", &showMVP_MatrixPanel);
-
-            ImGui::Text(mat4ToStr(canvas->getMVP_Ref()).c_str());
-
-        ImGui::End();
-    }
+    MVP_MatrixPanel();
 
     isFirst = false;
 
-    if(showRenderSettingsPanel)
-    {
-        ImGui::Begin("Render Settings", &showRenderSettingsPanel);
+    renderSettingsPanel();
 
-            static bool fillPolygons            = true;
-            static bool renderPolygonOutlines   = true;
-            static bool renderSkyBox            = true;
-
-            static bool _fillPolygons           = true;
-            static bool _renderPolygonOutlines  = true;
-            static bool _renderSkyBox           = true;
-
-            ImGui::Checkbox("Fill Polygons",    &_fillPolygons);
-            ImGui::Checkbox("Polygon Outlines", &_renderPolygonOutlines);
-            ImGui::Checkbox("SkyBox",           &_renderSkyBox);
-
-            if(fillPolygons != _fillPolygons)
-            {
-                fillPolygons = _fillPolygons;
-
-                for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
-
-                for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
-
-                Renderable::setDefaultRenderFill(fillPolygons);
-            }
-
-            if(renderPolygonOutlines != _renderPolygonOutlines)
-            {
-                renderPolygonOutlines = _renderPolygonOutlines;
-
-                for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
-
-                for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
-
-                Renderable::setDefaultRenderOutline(renderPolygonOutlines);
-            }
-
-            if(renderSkyBox != _renderSkyBox)
-            {
-                renderSkyBox = _renderSkyBox;
-
-                if(renderSkyBox) { canvas->setSkyBox(skyBox) ;}
-                else             { canvas->setSkyBox(NULL)   ;}
-            }
-
-            static vec4 fillColor(Renderable::getDefaultFillColor());
-            static vec4 outlineColor(Renderable::getDefaultOutlineColor());
-            
-            //ImGui::ColorEdit4("Fill", (float*)&fillColor, true);
-            //ImGui::ColorEdit4("Outline", (float*)&outlineColor, true);
-
-            /*
-            static vec4 fillColor(Renderable::getDefaultFillColor());
-
-            ImGui::ColorPicker4("##picker",
-                                (float*)&fillColor,
-                                //ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview);
-                                0);
-                                */
-
-        ImGui::End();
-    }
-    
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
 
     canvas->render();
 
     const double dist = distance(canvas->getCamera()->getCenter(), canvas->getCamera()->getEye());
 
-    //const double scale = canvas->getTrackBallInteractor()->mZoomScale = dist * 0.02 - 0.01;
     const double scale = canvas->getTrackBallInteractor()->mZoomScale = dist * 0.02;
 
-    //dmess("dist " << dist << " scale " << scale);
-    
     string attrsStr;
 
     if(client)
-    { // TODO move this code to GeoClient
-
+    {
         const dvec4 pos(canvas->getCursorPosWC(), 1.0);
 
         showCursorPositionOverlay(NULL, client->getInverseTrans() * pos);
 
-        if(mode == PICK_MODE_SINGLE)
-        {
-            Renderable * renderiable;
-            Attributes * attrs;
-
-            //*
-            //tie(renderiable, attrs) = client->pickPolygonRenderable(canvas->getCursorPosWC());
-            tie(renderiable, attrs) = client->pickLineStringRenderable(canvas->getCursorPosWC());
-
-            if(renderiable)
-            {
-                glDisable(GL_DEPTH_TEST);
-                glDisable(GL_BLEND);
-
-                renderiable->render(canvas->getMVP_Ref());
-
-                attrsStr = attrs->toString();
-            }
-            //*/
-
-            /*
-            vector<pair<Renderable *, Attributes *> > picked = client->pickLineStringRenderable(canvas->getCursorPosWC());
-
-            dmess("picked " << picked.size());
-
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_BLEND);
-
-            if(picked.size())
-            {
-                for(size_t i = 0; i < picked.size(); ++i)
-                {
-                    Renderable * renderiable;
-                    Attributes * attrs;
-
-                    tie(renderiable, attrs) = picked[i];
-
-                    renderiable->render(canvas->getMVP_Ref());
-                }
-            }
-            */
-        }
-        else if(mode == PICK_MODE_MULTIPLE)
-        {
-            vector<pair<Renderable *, Attributes *> > picked = client->pickPolygonRenderables(canvas->getCursorPosWC());
-
-            if(picked.size())
-            {
-                Renderable * renderiable;
-                Attributes * attrs;
-
-                tie(renderiable, attrs) = picked[0];
-
-                renderiable->render(canvas->getMVP_Ref());
-
-                attrsStr = attrs->toString();
-
-                for(size_t i = 1; i < picked.size(); ++i)
-                {
-                    attrsStr += "\n";
-
-                    attrsStr += get<1>(picked[i])->toString();
-                }
-            }
-        }
+        attrsStr = client->doPicking(mode, pos, canvas);
     }
 
-    if(showAttributePanel)
-    {
-        ImGui::Begin("Attributes", &showAttributePanel);
+    attributePanel(attrsStr);
 
-            ImGui::Text(attrsStr.c_str());
-
-        ImGui::End();
-    }
-
-    geosTestCanvas->setEnabled(showSceneViewPanel);
-
-    if(showSceneViewPanel)
-    {
-        ImGui::Begin("Geos Tests", &showSceneViewPanel);
-
-            const ImVec2 pos = ImGui::GetCursorScreenPos();
-
-            const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
-
-            geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
-
-            geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
-
-            ImGui::GetWindowDrawList()->AddImage(   (void *)geosTestCanvas->render(),
-                                                    pos,
-                                                    ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-                                                    ImVec2(0, 1),
-                                                    ImVec2(1, 0));
-            
-            static float buffer1 = 0.1;
-            static float buffer2 = 0.02;
-            static float buffer3 = 0.22;
-
-            ImGui::SliderFloat("buffer1", &buffer1, 0.0f, 0.3f, "buffer1 = %.3f");
-            ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");
-            ImGui::SliderFloat("buffer3", &buffer3, 0.0f, 0.3f, "buffer3 = %.3f");
-
-            geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
-
-        ImGui::End();
-    }
+    sceneViewPanel();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

@@ -29,6 +29,7 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/GUI.h>
 
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
 // Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
@@ -57,7 +58,6 @@ void cursorPosCallback      (GLFWwindow* window, double xpos, double ypos);
 void cursorEnterCallback    (GLFWwindow* window, int entered);
 void initOpenGL             (GLFWwindow* window);
 void initGeometry           ();
-void mainLoop               (GLFWwindow* window);
 void refresh                (GLFWwindow* window);
 
 int main(int, char**)
@@ -151,7 +151,7 @@ int main(int, char**)
 
     #ifdef __EMSCRIPTEN__
         
-        glfwSetWindowRefreshCallback(window, mainLoop);
+        glfwSetWindowRefreshCallback(window, GUI::mainLoop);
 
         refresh(window);
 
@@ -170,7 +170,7 @@ int main(int, char**)
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            mainLoop(window);
+            GUI::mainLoop(window);
         }
 
         // Cleanup
