@@ -27,6 +27,8 @@
 #ifndef __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
 #define __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
 
+#include <glm/vec4.hpp>
+
 class ColorDistanceShader
 {
 public:
@@ -40,6 +42,12 @@ public:
 
     static glm::vec4 getMinColor();
     static glm::vec4 getMaxColor();
+
+    static float setMinDist(const float & value);
+    static float setMaxDist(const float & value);
+
+    static float getMinDist();
+    static float getMaxDist();
 
 private:
 };

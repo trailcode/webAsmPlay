@@ -40,9 +40,14 @@ namespace
     GLint MV_Uniform            = -1;
     GLint minVertexColorUniform = -1;
     GLint maxVertexColorUniform = -1;
+    GLint minDistUniform        = -1;
+    GLint maxDistUniform        = -1;
 
-    vec4 minColor(1,1,0,1);
-    vec4 maxColor(0,0.4,0.4,0.4);
+    vec4 minColor(1,0,0,1);
+    vec4 maxColor(0,1,0,1);
+
+    float minDist = 0;
+    float maxDist = 30;
 }
 
 void ColorDistanceShader::ensureShader()
@@ -51,16 +56,21 @@ void ColorDistanceShader::ensureShader()
 
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
+        
         in vec2 vertIn;
         
-        uniform mat4 MVP;
-        uniform mat4 MV;
-        uniform vec4 minVertexColorIn;
-        uniform vec4 maxVertexColorIn;
+        uniform mat4  MVP;
+        uniform mat4  MV;
+        uniform vec4  minVertexColorIn;
+        uniform vec4  maxVertexColorIn;
+        uniform float minDistIn;
+        uniform float maxDistIn;
 
-        out vec4 minVertexColor;
-        out vec4 maxVertexColor;
-        out vec4 position_in_view_space;
+        out vec4  minVertexColor;
+        out vec4  maxVertexColor;
+        out float minDist;
+        out float maxDist;
+        out vec4  position_in_view_space;
 
         void main()
         {
@@ -72,14 +82,19 @@ void ColorDistanceShader::ensureShader()
 
             minVertexColor = minVertexColorIn;
             maxVertexColor = maxVertexColorIn;
+
+            minDist = minDistIn;
+            maxDist = maxDistIn;
         }
     )glsl";
 
     const GLchar* fragmentSource = R"glsl(#version 330 core
         
-        in vec4 minVertexColor;
-        in vec4 maxVertexColor;
-        in vec4 position_in_view_space;
+        in vec4  minVertexColor;
+        in vec4  maxVertexColor;
+        in float minDist;
+        in float maxDist;
+        in vec4  position_in_view_space;
 
         out vec4 outColor;
 
@@ -89,11 +104,9 @@ void ColorDistanceShader::ensureShader()
             // and the origin (4th coordinate should always be 1 
             // for points). The origin in view space is actually 
             // the camera position.
-            float dist = distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0));
+            float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
             
-            float farDist = 10.0f;
-
-            dist = min(farDist, dist) / farDist;
+            dist = min(maxDist, dist) / maxDist;
 
             outColor = minVertexColor * (1 - dist) + maxVertexColor * dist;
         }
@@ -103,21 +116,29 @@ void ColorDistanceShader::ensureShader()
                                 fragmentSource,
                                 StrVec({"MV",
                                         "minVertexColorIn",
-                                        "maxVertexColorIn"}));
+                                        "maxVertexColorIn",
+                                        "minDistIn",
+                                        "maxDistIn"}));
 
     MV_Uniform            = instance->getUniformLoc("MV");
     minVertexColorUniform = instance->getUniformLoc("minVertexColorIn");
     maxVertexColorUniform = instance->getUniformLoc("maxVertexColorIn");
-    
+    minDistUniform = instance->getUniformLoc("minDistIn");
+    maxDistUniform = instance->getUniformLoc("maxDistIn");
 }
 
 void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV)
 {
     instance->Shader::bind(MVP, MV);
 
-    instance->setUniform(MV_Uniform, MV);
+    instance->setUniform(MV_Uniform,            MV);
     instance->setUniform(minVertexColorUniform, minColor);
     instance->setUniform(maxVertexColorUniform, maxColor);
+    instance->setUniform(minDistUniform,        minDist);
+    instance->setUniform(maxDistUniform,        maxDist);
+
+    glEnable   (GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 vec4 ColorDistanceShader::setMinColor(const vec4 & _minColor) { return minColor = _minColor ;}
@@ -125,3 +146,9 @@ vec4 ColorDistanceShader::setMaxColor(const vec4 & _maxColor) { return maxColor 
 
 vec4 ColorDistanceShader::getMinColor() { return minColor ;}
 vec4 ColorDistanceShader::getMaxColor() { return maxColor ;}
+
+float ColorDistanceShader::setMinDist(const float & value) { return minDist = value ;}
+float ColorDistanceShader::setMaxDist(const float & value) { return maxDist = value ;}
+
+float ColorDistanceShader::getMinDist() { return minDist ;}
+float ColorDistanceShader::getMaxDist() { return maxDist ;}

@@ -153,6 +153,9 @@ No notes.
       
 * Interpolate line string color in relation to the distance to the camera.
 
+* Auto parse shader source to determine uniforms and attributes.
+    * Or better, pass into shader name and location reference pairs.
+
 ### TODO
 
 * Make geometric terminology consistent with Geos.
@@ -161,7 +164,7 @@ No notes.
 * Present error if cannot connect to server
 * Move to a newer geos. 3.8.0Dev seems to have more functions.
 * Make a third party directory.
-* Make a project Talent Stack Document/Panel
+* Make a project Talent Stack Document/Panel.
 
 ### Bugs
 

@@ -97,23 +97,17 @@ void GUI::renderSettingsPanel()
 
         if(ImGui::CollapsingHeader("Line strings"))
         {
-            static float minDist = 0;
-            static float maxDist = 10.0;
+            static float minDist = ColorDistanceShader::getMinDist();
+            static float maxDist = ColorDistanceShader::getMaxDist();
             
-            if (ImGui::SliderFloat("Min", &minDist, 0.0f, 30.0f, "%.0f"))
-            {
-                dmess("minDist " << minDist);
-            }
-
-            if (ImGui::SliderFloat("Max", &maxDist, 0.0f, 30.0f, "%.0f"))
-            {
-                dmess("maxDist " << maxDist);
-            }
-
+            if (ImGui::SliderFloat("Min", &minDist, -10.0f, 30.0f,  "%.0f")) { ColorDistanceShader::setMinDist(minDist) ;}
+            if (ImGui::SliderFloat("Max", &maxDist, 0.0f,   100.0f, "%.0f")) { ColorDistanceShader::setMaxDist(maxDist) ;}
+            
             static ImGuiColorEditFlags alpha_flags = 0;
-            ImGui::RadioButton("Opaque", &alpha_flags, 0); ImGui::SameLine();
-            ImGui::RadioButton("Alpha", &alpha_flags, ImGuiColorEditFlags_AlphaPreview); ImGui::SameLine();
-            ImGui::RadioButton("Both", &alpha_flags, ImGuiColorEditFlags_AlphaPreviewHalf);
+
+            ImGui::RadioButton("Opaque", &alpha_flags, 0);                                  ImGui::SameLine();
+            ImGui::RadioButton("Alpha",  &alpha_flags, ImGuiColorEditFlags_AlphaPreview);   ImGui::SameLine();
+            ImGui::RadioButton("Both",   &alpha_flags, ImGuiColorEditFlags_AlphaPreviewHalf);
 
             static ImVec4 minColor = __(ColorDistanceShader::getMinColor());
             static ImVec4 maxColor(0,0.5,0.5,0.5);

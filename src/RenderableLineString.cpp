@@ -229,10 +229,6 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
 
 void RenderableLineString::render(const mat4 & MVP, const mat4 & MV) const
 {
-    //getDefaultShader()->bind(MVP, MV);
-
-    //getDefaultShader()->setColor(outlineColor);
-
     ColorDistanceShader::bind(MVP, MV);
     
     glBindVertexArray(vao);
