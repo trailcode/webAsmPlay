@@ -20,6 +20,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * Modified by Matthew Tang (trailcode@gmail.com) 2018
  */
 
 #include <stdio.h>
@@ -30,7 +32,7 @@
 #include <sstream>
 #include <iostream>
 #include <math.h>
-
+#include "JSON.h"
 #include "JSONValue.h"
 
 #ifdef __MINGW32__
@@ -380,6 +382,16 @@ JSONValue::JSONValue(int m_integer_value)
 	number_value = (double) m_integer_value;
 }
 
+JSONValue::JSONValue(const glm::vec4 & value)
+{
+	type = JSONType_Array;
+
+	array_value = new JSONArray({	new JSONValue(value.x),
+									new JSONValue(value.y),
+									new JSONValue(value.z),
+									new JSONValue(value.w)});
+}
+
 /**
  * Basic constructor for creating a JSON Value of type Array
  *
@@ -599,6 +611,14 @@ bool JSONValue::AsBool() const
 double JSONValue::AsNumber() const
 {
 	return number_value;
+}
+
+glm::vec4 JSONValue::AsVec4() const
+{
+	return glm::vec4(	(*array_value)[0]->AsNumber(),
+						(*array_value)[1]->AsNumber(),
+						(*array_value)[2]->AsNumber(),
+						(*array_value)[3]->AsNumber());
 }
 
 /**

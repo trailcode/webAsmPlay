@@ -20,6 +20,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * Modified by Matthew Tang (trailcode@gmail.com) 2018
  */
 
 #ifndef _JSONVALUE_H_
@@ -27,12 +29,26 @@
 
 #include <vector>
 #include <string>
-
-#include "JSON.h"
+#include <map>
+#include <glm/vec4.hpp>
 
 class JSON;
 
-enum JSONType { JSONType_Null, JSONType_String, JSONType_Bool, JSONType_Number, JSONType_Array, JSONType_Object };
+enum JSONType
+{
+	JSONType_Null,
+	JSONType_String,
+	JSONType_Bool,
+	JSONType_Number,
+	JSONType_Array,
+	JSONType_Object,
+	JSONType_vec4,
+};
+
+class JSONValue;
+
+typedef std::vector<JSONValue*> JSONArray;
+typedef std::map<std::wstring, JSONValue*> JSONObject;
 
 class JSONValue
 {
@@ -45,6 +61,7 @@ class JSONValue
 		JSONValue(bool m_bool_value);
 		JSONValue(double m_number_value);
 		JSONValue(int m_integer_value);
+		JSONValue(const glm::vec4 & value);
 		JSONValue(const JSONArray &m_array_value);
 		JSONValue(const JSONObject &m_object_value);
 		JSONValue(const JSONValue &m_source);
@@ -60,6 +77,7 @@ class JSONValue
 		const std::wstring &AsString() const;
 		bool AsBool() const;
 		double AsNumber() const;
+		glm::vec4 AsVec4() const;
 		const JSONArray &AsArray() const;
 		const JSONObject &AsObject() const;
 

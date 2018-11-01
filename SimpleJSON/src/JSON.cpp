@@ -20,8 +20,11 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
+ * Modified by Matthew Tang (trailcode@gmail.com) 2018
  */
 
+#include "JSONValue.h"
 #include "JSON.h"
 
 /**

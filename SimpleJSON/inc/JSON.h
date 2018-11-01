@@ -20,6 +20,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * Modified by Matthew Tang (trailcode@gmail.com) 2018
  */
 
 #ifndef _JSON_H_
@@ -32,9 +34,7 @@
 	static inline bool isinf(double x) { return !isnan(x) && isnan(x - x); }
 #endif
 
-#include <vector>
-#include <string>
-#include <map>
+#include "JSONValue.h"
 
 // Linux compile fix - from quaker66
 #ifdef __GNUC__
@@ -84,13 +84,6 @@ static inline bool simplejson_wcsnlen(const wchar_t *s, size_t n) {
 
 	return true;
 }
-
-// Custom types
-class JSONValue;
-typedef std::vector<JSONValue*> JSONArray;
-typedef std::map<std::wstring, JSONValue*> JSONObject;
-
-#include "JSONValue.h"
 
 class JSON
 {
