@@ -55,7 +55,8 @@ public:
 
     static void refresh(GLFWwindow * window);
 
-    static void shutdown();
+    static void loadState();
+    static void saveState();
 
 private:
 
@@ -70,7 +71,9 @@ private:
     static void renderSettingsPanel();
     static void attributePanel(const std::string & attrsStr);
     static void sceneViewPanel();
-    static void configurationGUI_Panel();
+    static void GUI_Settings_Panel();
+
+    static void showHelpMarker(const char* desc);
 
     static void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods);
     static void cursorPosCallback(GLFWwindow * window, double xpos, double ypos);
@@ -88,7 +91,7 @@ private:
     static bool showRenderSettingsPanel;
     static bool showLogPanel;
     static bool showAttributePanel;
-    static bool showConfigurationGUI_Panel;
+    static bool showGUI_Settings_Panel;
 
     static GeosTestCanvas  * geosTestCanvas;
     static Canvas          * canvas;

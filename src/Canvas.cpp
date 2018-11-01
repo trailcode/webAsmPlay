@@ -103,7 +103,7 @@ GLuint Canvas::render()
 
     view         = camera->getMatrix();
     model        = mat4(1.0);
-    projection   = perspective(45.0, double(size.x) / double(size.y), 0.01, 30.0);
+    projection   = perspective(45.0, double(size.x) / double(size.y), 0.01, 300.0);
     MV           = view * model;
     MVP          = projection * MV;
 

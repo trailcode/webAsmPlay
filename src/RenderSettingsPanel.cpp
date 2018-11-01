@@ -110,7 +110,7 @@ void GUI::renderSettingsPanel()
             ImGui::RadioButton("Both",   &alpha_flags, ImGuiColorEditFlags_AlphaPreviewHalf);
 
             static ImVec4 minColor = __(ColorDistanceShader::getMinColor());
-            static ImVec4 maxColor(0,0.5,0.5,0.5);
+            static ImVec4 maxColor = __(ColorDistanceShader::getMaxColor());
 
             if(ImGui::ColorEdit4("Min", (float*)&minColor, ImGuiColorEditFlags_AlphaBar | alpha_flags))
             {

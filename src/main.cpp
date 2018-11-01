@@ -127,6 +127,8 @@ int main(int, char**)
 
     GUI::setupCallbacks(window);
 
+    GUI::loadState();
+
     GUI::initOpenGL(window);
 
     #ifdef __EMSCRIPTEN__
@@ -162,7 +164,7 @@ int main(int, char**)
         glfwTerminate();
     #endif
 
-    GUI::shutdown();
+    GUI::saveState();
 
     return 0;
 }
