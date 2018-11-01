@@ -172,8 +172,6 @@ SkyBox::~SkyBox()
 
 void SkyBox::render(const mat4 & _view, const mat4 & projection)
 {
-    skyboxShader->bind();
-
     mat4 centeredView = mat4(_view);
 
     value_ptr(centeredView)[12] = 0;
@@ -182,9 +180,9 @@ void SkyBox::render(const mat4 & _view, const mat4 & projection)
 
     const mat4 MVP = projection * centeredView * model;
 
-    skyboxShader->setTexture1Slot(1);
+    skyboxShader->bind(MVP, mat4(1.0));
 
-    skyboxShader->setMVP(MVP);
+    skyboxShader->setTexture1Slot(1);
 
     //skyboxShader->enableVertexAttribArray(3); // TODO Why is this not required here?
 

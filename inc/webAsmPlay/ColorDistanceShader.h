@@ -27,15 +27,13 @@
 #ifndef __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
 #define __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
 
-class Camera;
-
 class ColorDistanceShader
 {
 public:
 
     static void ensureShader();
 
-    static void bind(const Camera * camera);
+    static void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
 
 private:
 };

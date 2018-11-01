@@ -37,7 +37,7 @@ public:
 
     static Renderable * create(const glm::vec3 & pos);
 
-    void render(const glm::mat4 & MVP) const;
+    void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
     static void ensureShaders();
 

@@ -73,11 +73,9 @@ Renderable * RenderablePoint::create(const vec3 & pos)
                         true);
 }
 
-void RenderablePoint::render(const mat4 & MVP) const
+void RenderablePoint::render(const mat4 & MVP, const mat4 & MV) const
 {
-    getDefaultShader()->bind();
-
-    getDefaultShader()->setMVP(MVP);
+    getDefaultShader()->bind(MVP, MV);
 
     getDefaultShader()->setColor(outlineColor);
     

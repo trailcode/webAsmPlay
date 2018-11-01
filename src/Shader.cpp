@@ -183,9 +183,11 @@ Shader::~Shader()
     // TODO Cleanup!
 }
 
-void Shader::bind()
+void Shader::bind(const mat4 & MVP, const mat4 & MV)
 {
     glUseProgram(shaderProgram);
+
+    glUniformMatrix4fv(MVP_In_Uniform, 1, false, glm::value_ptr(MVP));
 }
 
 void Shader::unbind()
@@ -200,13 +202,6 @@ vec4 Shader::setColor(const vec4 & color)
     glUniform4f(colorUniform, color.x, color.y, color.z, color.w);
 
     return color;
-}
-
-mat4 Shader::setMVP(const mat4 & MVP)
-{
-    glUniformMatrix4fv(MVP_In_Uniform, 1, false, glm::value_ptr(MVP));
-
-    return MVP;
 }
 
 void Shader::enableVertexAttribArray(   const GLint       size,

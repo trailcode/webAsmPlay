@@ -41,6 +41,11 @@
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
 
+namespace rsmz
+{
+    class Canvas;
+}
+
 class Shader
 {
 public:
@@ -58,15 +63,13 @@ public:
 
     virtual ~Shader();
 
-    void bind();
+    virtual void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
 
     void unbind();
 
     GLuint getProgramHandle() const;
 
     glm::vec4 setColor(const glm::vec4 & color);
-
-    glm::mat4 setMVP(const glm::mat4 & MVP);
 
     void enableVertexAttribArray(   const GLint       size          = 2,
                                     const GLenum      type          = GL_FLOAT,

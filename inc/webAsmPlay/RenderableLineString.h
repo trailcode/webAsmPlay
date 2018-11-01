@@ -65,7 +65,7 @@ public:
                                 const bool               renderOutline = getDefaultRenderOutline(),
                                 const bool               renderFill    = getDefaultRenderFill());
 
-    void render(const glm::mat4 & MVP) const;
+    void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
     static void ensureShaders();
 

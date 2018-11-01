@@ -226,11 +226,9 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
                                     renderFill);
 }
 
-void RenderableLineString::render(const mat4 & MVP) const
+void RenderableLineString::render(const mat4 & MVP, const mat4 & MV) const
 {
-    getDefaultShader()->bind();
-
-    getDefaultShader()->setMVP(MVP);
+    getDefaultShader()->bind(MVP, MV);
 
     getDefaultShader()->setColor(outlineColor);
     

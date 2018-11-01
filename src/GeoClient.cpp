@@ -681,7 +681,7 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos, Canvas * canvas)
             glDisable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
 
-            renderiable->render(canvas->getMVP_Ref());
+            renderiable->render(canvas);
 
             attrsStr = attrs->toString();
         }
@@ -695,7 +695,7 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos, Canvas * canvas)
             glDisable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
 
-            renderiable->render(canvas->getMVP_Ref());
+            renderiable->render(canvas);
 
             attrsStr = attrs->toString();
         }
@@ -708,7 +708,7 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos, Canvas * canvas)
         {
             tie(renderiable, attrs) = picked[0];
 
-            renderiable->render(canvas->getMVP_Ref());
+            renderiable->render(canvas);
 
             attrsStr = attrs->toString();
 

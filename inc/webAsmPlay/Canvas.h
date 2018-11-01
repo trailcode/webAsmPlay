@@ -91,11 +91,13 @@ public:
     glm::dmat4 getModel() const;
     glm::dmat4 getProjection() const;
     glm::dmat4 getMVP() const;
+    glm::dmat4 getMV() const;
 
     const glm::dmat4 & getViewRef() const;
     const glm::dmat4 & getModelRef() const;
     const glm::dmat4 & getProjectionRef() const;
     const glm::dmat4 & getMVP_Ref() const;
+    const glm::dmat4 & getMV_Ref() const;
 
     SkyBox * setSkyBox(SkyBox * skyBox);
     SkyBox * getSkyBox() const;
@@ -133,6 +135,7 @@ private:
     glm::dmat4 view;
     glm::dmat4 model;
     glm::dmat4 projection;
+    glm::dmat4 MV;
     glm::dmat4 MVP;
     
     glm::dvec3 cursorPosWC;

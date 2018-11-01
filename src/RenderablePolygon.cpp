@@ -509,20 +509,16 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
                                     seperateFillColors);
 }
 
-void RenderablePolygon::render(const mat4 & MVP) const
+void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 {
     glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    
+    glBindBuffer(GL_ARRAY_BUFFER,         vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-    //glClear(GL_DEPTH_BUFFER_BIT);
-    //glEnable(GL_DEPTH_TEST);
 
     if(seperateFillColors)
     {
-        colorPolygonShader->bind();
-
-        colorPolygonShader->setMVP(MVP);
+        colorPolygonShader->bind(MVP, MV);
 
         colorPolygonShader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
 
@@ -530,9 +526,7 @@ void RenderablePolygon::render(const mat4 & MVP) const
     }
     else
     {
-        getDefaultShader()->bind();
-
-        getDefaultShader()->setMVP(MVP);
+        getDefaultShader()->bind(MVP, MV);
 
         if(getRenderFill()) { getDefaultShader()->setColor(fillColor) ;}
 
@@ -556,9 +550,7 @@ void RenderablePolygon::render(const mat4 & MVP) const
     {
         if(seperateFillColors)
         {
-            getDefaultShader()->bind();
-
-            getDefaultShader()->setMVP(MVP);
+            getDefaultShader()->bind(MVP, MV);
 
             getDefaultShader()->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
         } 

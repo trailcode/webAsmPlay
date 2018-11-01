@@ -30,6 +30,8 @@
 #include <webAsmPlay/Shader.h>
 #include <webAsmPlay/ColorDistanceShader.h>
 
+using namespace glm;
+
 namespace
 {
     Shader * instance = NULL;
@@ -75,9 +77,11 @@ void ColorDistanceShader::ensureShader()
     dmess("MV_Uniform " << MV_Uniform);
 }
 
-void ColorDistanceShader::bind(const Camera * camera)
+void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV)
 {
+    //instance->bind();
 
+    //instance->setMVP(camera->get
 }
 
 
