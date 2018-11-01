@@ -187,7 +187,7 @@ void Shader::bind(const mat4 & MVP, const mat4 & MV)
 {
     glUseProgram(shaderProgram);
 
-    glUniformMatrix4fv(MVP_In_Uniform, 1, false, glm::value_ptr(MVP));
+    setUniform(MVP_In_Uniform, MVP);
 }
 
 void Shader::unbind()
@@ -251,5 +251,19 @@ GLint Shader::getUniformLoc(const string & name) const
 
 GLint Shader::getAttributeLoc(const string & name) const
 {
-    return 0;
+    const auto i = attributes.find(name);
+
+    if(i == attributes.end())
+    {
+        dmess("Error uniform: " << name << " not found!");
+
+        return -1;
+    }
+
+    return i->second;
+}
+
+void Shader::setUniform(const GLint location, const mat4 & value) const
+{
+    glUniformMatrix4fv(location, 1, false, value_ptr(value));
 }

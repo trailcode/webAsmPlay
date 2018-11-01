@@ -28,6 +28,7 @@
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Shader.h>
+#include <webAsmPlay/ColorDistanceShader.h>
 #include <webAsmPlay/RenderableLineString.h>
 
 using namespace std;
@@ -228,9 +229,11 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
 
 void RenderableLineString::render(const mat4 & MVP, const mat4 & MV) const
 {
-    getDefaultShader()->bind(MVP, MV);
+    //getDefaultShader()->bind(MVP, MV);
 
-    getDefaultShader()->setColor(outlineColor);
+    //getDefaultShader()->setColor(outlineColor);
+
+    ColorDistanceShader::bind(MVP, MV);
     
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);

@@ -85,8 +85,10 @@ public:
 
     GLuint setTexture1Slot(const GLuint slot) const;
 
-    GLint getUniformLoc(const std::string & name) const;
+    GLint getUniformLoc  (const std::string & name) const;
     GLint getAttributeLoc(const std::string & name) const;
+
+    void setUniform(const GLint location, const glm::mat4 & value) const;
 
 protected:
 

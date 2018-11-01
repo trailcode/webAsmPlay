@@ -51,10 +51,15 @@ void ColorDistanceShader::ensureShader()
         uniform mat4 MV;
         uniform vec4 colorIn;
 
+        out vec4 position_in_view_space;
+
         void main()
         {
-            MV;
-            gl_Position = MVP * vec4(vertIn.xy, 0, 1);
+            vec4 vert = vec4(vertIn.xy, 0, 1);
+
+            position_in_view_space = MV * vert;
+
+            gl_Position = MVP * vert;
 
             vertexColor = colorIn;
         }
@@ -64,9 +69,23 @@ void ColorDistanceShader::ensureShader()
         out vec4 outColor;
         in vec4 vertexColor;
 
+        in vec4 position_in_view_space;
+
         void main()
         {
-            outColor = vertexColor;
+            //outColor = vertexColor;
+
+            // computes the distance between the fragment position 
+            // and the origin (4th coordinate should always be 1 
+            // for points). The origin in view space is actually 
+            // the camera position.
+            float dist = distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0));
+            
+            float farDist = 10.0f;
+
+            dist = min(farDist, dist) / farDist;
+
+            outColor = vec4(1.0, 0, 0, 1) * (1 - dist) + vec4(0,1.0,0,1) * dist;
         }
     )glsl";
 
@@ -79,9 +98,9 @@ void ColorDistanceShader::ensureShader()
 
 void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV)
 {
-    //instance->bind();
+    instance->Shader::bind(MVP, MV);
 
-    //instance->setMVP(camera->get
+    instance->setUniform(MV_Uniform, MV);
 }
 
 
