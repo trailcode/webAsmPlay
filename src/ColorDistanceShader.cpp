@@ -25,6 +25,7 @@
   \copyright 2018
 */
 
+#include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Shader.h>
@@ -36,7 +37,12 @@ namespace
 {
     Shader * instance = NULL;
 
-    GLint MV_Uniform = -1;
+    GLint MV_Uniform            = -1;
+    GLint minVertexColorUniform = -1;
+    GLint maxVertexColorUniform = -1;
+
+    vec4 minColor(1,1,0,1);
+    vec4 maxColor(0,0.4,0.4,0.4);
 }
 
 void ColorDistanceShader::ensureShader()
@@ -46,11 +52,14 @@ void ColorDistanceShader::ensureShader()
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
         in vec2 vertIn;
-        out vec4 vertexColor;
+        
         uniform mat4 MVP;
         uniform mat4 MV;
-        uniform vec4 colorIn;
+        uniform vec4 minVertexColorIn;
+        uniform vec4 maxVertexColorIn;
 
+        out vec4 minVertexColor;
+        out vec4 maxVertexColor;
         out vec4 position_in_view_space;
 
         void main()
@@ -61,20 +70,21 @@ void ColorDistanceShader::ensureShader()
 
             gl_Position = MVP * vert;
 
-            vertexColor = colorIn;
+            minVertexColor = minVertexColorIn;
+            maxVertexColor = maxVertexColorIn;
         }
     )glsl";
 
     const GLchar* fragmentSource = R"glsl(#version 330 core
-        out vec4 outColor;
-        in vec4 vertexColor;
-
+        
+        in vec4 minVertexColor;
+        in vec4 maxVertexColor;
         in vec4 position_in_view_space;
+
+        out vec4 outColor;
 
         void main()
         {
-            //outColor = vertexColor;
-
             // computes the distance between the fragment position 
             // and the origin (4th coordinate should always be 1 
             // for points). The origin in view space is actually 
@@ -85,15 +95,20 @@ void ColorDistanceShader::ensureShader()
 
             dist = min(farDist, dist) / farDist;
 
-            outColor = vec4(1.0, 0, 0, 1) * (1 - dist) + vec4(0,1.0,0,1) * dist;
+            outColor = minVertexColor * (1 - dist) + maxVertexColor * dist;
         }
     )glsl";
 
-    instance = Shader::create(vertexSource, fragmentSource, StrVec({"MV"}));
+    instance = Shader::create(  vertexSource,
+                                fragmentSource,
+                                StrVec({"MV",
+                                        "minVertexColorIn",
+                                        "maxVertexColorIn"}));
 
-    MV_Uniform = instance->getUniformLoc("MV");
-
-    dmess("MV_Uniform " << MV_Uniform);
+    MV_Uniform            = instance->getUniformLoc("MV");
+    minVertexColorUniform = instance->getUniformLoc("minVertexColorIn");
+    maxVertexColorUniform = instance->getUniformLoc("maxVertexColorIn");
+    
 }
 
 void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV)
@@ -101,6 +116,12 @@ void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV)
     instance->Shader::bind(MVP, MV);
 
     instance->setUniform(MV_Uniform, MV);
+    instance->setUniform(minVertexColorUniform, minColor);
+    instance->setUniform(maxVertexColorUniform, maxColor);
 }
 
+vec4 ColorDistanceShader::setMinColor(const vec4 & _minColor) { return minColor = _minColor ;}
+vec4 ColorDistanceShader::setMaxColor(const vec4 & _maxColor) { return maxColor = _maxColor ;}
 
+vec4 ColorDistanceShader::getMinColor() { return minColor ;}
+vec4 ColorDistanceShader::getMaxColor() { return maxColor ;}

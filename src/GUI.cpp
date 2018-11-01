@@ -370,69 +370,6 @@ void GUI::MVP_MatrixPanel()
     ImGui::End();
 }
 
-void GUI::renderSettingsPanel()
-{
-    if(!showRenderSettingsPanel) { return ;}
-
-    ImGui::Begin("Render Settings", &showRenderSettingsPanel);
-
-        static bool fillPolygons            = true;
-        static bool renderPolygonOutlines   = true;
-        static bool renderSkyBox            = true;
-
-        static bool _fillPolygons           = true;
-        static bool _renderPolygonOutlines  = true;
-        static bool _renderSkyBox           = true;
-
-        ImGui::Checkbox("Fill Polygons",    &_fillPolygons);
-        ImGui::Checkbox("Polygon Outlines", &_renderPolygonOutlines);
-        ImGui::Checkbox("SkyBox",           &_renderSkyBox);
-
-        if(fillPolygons != _fillPolygons)
-        {
-            fillPolygons = _fillPolygons;
-
-            for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
-
-            for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
-
-            Renderable::setDefaultRenderFill(fillPolygons);
-        }
-
-        if(renderPolygonOutlines != _renderPolygonOutlines)
-        {
-            renderPolygonOutlines = _renderPolygonOutlines;
-
-            for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
-
-            for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
-
-            Renderable::setDefaultRenderOutline(renderPolygonOutlines);
-        }
-
-        if(renderSkyBox != _renderSkyBox)
-        {
-            renderSkyBox = _renderSkyBox;
-
-            if(renderSkyBox) { canvas->setSkyBox(skyBox) ;}
-            else             { canvas->setSkyBox(NULL)   ;}
-        }
-
-        static vec4 fillColor(Renderable::getDefaultFillColor());
-        static vec4 outlineColor(Renderable::getDefaultOutlineColor());
-        
-        //ImGui::ColorEdit4("Fill", (float*)&fillColor, true);
-        //ImGui::ColorEdit4("Outline", (float*)&outlineColor, true);
-
-        
-        ImGui::ColorPicker4("##picker",
-                            (float*)&fillColor,
-                            //ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview);
-                            0);
-
-    ImGui::End();
-}
-
 void GUI::attributePanel(const string & attrsStr)
 {
     if(!showAttributePanel) { return ;}

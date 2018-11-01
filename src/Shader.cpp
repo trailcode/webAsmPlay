@@ -263,7 +263,5 @@ GLint Shader::getAttributeLoc(const string & name) const
     return i->second;
 }
 
-void Shader::setUniform(const GLint location, const mat4 & value) const
-{
-    glUniformMatrix4fv(location, 1, false, value_ptr(value));
-}
+void Shader::setUniform(const GLint location, const mat4 & value) const { glUniformMatrix4fv(location, 1, false, value_ptr(value)) ;}
+void Shader::setUniform(const GLint location, const vec4 & value) const { glUniform4fv(location, 1, value_ptr(value)) ;}

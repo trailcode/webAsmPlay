@@ -89,6 +89,7 @@ public:
     GLint getAttributeLoc(const std::string & name) const;
 
     void setUniform(const GLint location, const glm::mat4 & value) const;
+    void setUniform(const GLint location, const glm::vec4 & value) const;
 
 protected:
 

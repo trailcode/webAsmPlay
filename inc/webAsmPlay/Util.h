@@ -36,4 +36,8 @@ std::string mat4ToStr(const glm::mat4 & m);
 
 static glm::ivec2 __(const ImVec2 & v) { return glm::ivec2(v.x, v.y) ;}
 
+static ImVec4 __(const glm::vec4 & v) { return ImVec4(v.x, v.y, v.z, v.q) ;}
+
+static glm::vec4 __(const ImVec4 & v) { return glm::vec4(v.x, v.y, v.z, v.w) ;}
+
 #endif // __WEB_ASM_PLAY_UTIL_H__

@@ -35,6 +35,12 @@ public:
 
     static void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
 
+    static glm::vec4 setMinColor(const glm::vec4 & minColor);
+    static glm::vec4 setMaxColor(const glm::vec4 & maxColor);
+
+    static glm::vec4 getMinColor();
+    static glm::vec4 getMaxColor();
+
 private:
 };
 
