@@ -27,6 +27,7 @@
 #ifndef __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
 #define __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
 
+#include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 
 class ColorDistanceShader

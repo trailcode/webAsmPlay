@@ -30,9 +30,11 @@
 #include <codecvt>
 #include <JSON.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/ColorDistanceShader.h>
 #include <webAsmPlay/GUI.h>
 
 using namespace std;
+using namespace glm;
 
 void GUI::loadState()
 {
@@ -46,34 +48,66 @@ void GUI::loadState()
 
     JSONObject root = value->AsObject();
 
-    auto set = [&root](const wstring & key, bool & value)->void
+    // Booleans
+    auto setBool = [&root](const wstring & key, bool & value)->void
     {
         if(root.find(key) != root.end()) { value = root[key]->AsBool() ;}
     };
 
-    set(L"showViewMatrixPanel",     showViewMatrixPanel);
-    set(L"showMVP_MatrixPanel",     showMVP_MatrixPanel);
-    set(L"showSceneViewPanel",      showSceneViewPanel);
-    set(L"showPerformancePanel",    showPerformancePanel);
-    set(L"showPerformancePanel",    showPerformancePanel);
-    set(L"showRenderSettingsPanel", showRenderSettingsPanel);
-    set(L"showLogPanel",            showLogPanel);
-    set(L"showAttributePanel",      showAttributePanel);
-    set(L"showGUI_Settings_Panel",  showGUI_Settings_Panel);
+    setBool(L"showViewMatrixPanel",     showViewMatrixPanel);
+    setBool(L"showMVP_MatrixPanel",     showMVP_MatrixPanel);
+    setBool(L"showSceneViewPanel",      showSceneViewPanel);
+    setBool(L"showPerformancePanel",    showPerformancePanel);
+    setBool(L"showPerformancePanel",    showPerformancePanel);
+    setBool(L"showRenderSettingsPanel", showRenderSettingsPanel);
+    setBool(L"showLogPanel",            showLogPanel);
+    setBool(L"showAttributePanel",      showAttributePanel);
+    setBool(L"showGUI_Settings_Panel",  showGUI_Settings_Panel);
+
+    // Floats
+
+    typedef float (*_setFloat)(const float & value);
+
+    auto setFloat = [&root](const wstring & key, _setFloat setFunc)->void
+    {
+        if(root.find(key) != root.end()) { setFunc(root[key]->AsNumber()) ;}
+    };
+
+    setFloat(L"ColorDistanceShader::minDist", &ColorDistanceShader::setMinDist);
+    setFloat(L"ColorDistanceShader::maxDist", &ColorDistanceShader::setMaxDist);
+
+    typedef vec4 (*_setVec4)(const vec4 & value);
+
+    auto setVec4 = [&root](const wstring & key, _setVec4 setFunc)->void
+    {
+        if(root.find(key) != root.end()) { setFunc(root[key]->AsVec4()) ;}
+    };
+
+    setVec4(L"ColorDistanceShader::minColor", &ColorDistanceShader::setMinColor);
+    setVec4(L"ColorDistanceShader::maxColor", &ColorDistanceShader::setMaxColor);
 }
 
 void GUI::saveState()
 {
     JSONObject root;
 
-    root[L"showViewMatrixPanel"]        = new JSONValue(showViewMatrixPanel);
-    root[L"showMVP_MatrixPanel"]        = new JSONValue(showMVP_MatrixPanel);
-    root[L"showSceneViewPanel"]         = new JSONValue(showSceneViewPanel);
-    root[L"showPerformancePanel"]       = new JSONValue(showPerformancePanel);
-    root[L"showRenderSettingsPanel"]    = new JSONValue(showRenderSettingsPanel);
-    root[L"showLogPanel"]               = new JSONValue(showLogPanel);
-    root[L"showAttributePanel"]         = new JSONValue(showAttributePanel);
-    root[L"showGUI_Settings_Panel"] = new JSONValue(showGUI_Settings_Panel);
+    // Booleans
+    root[L"showViewMatrixPanel"]      = new JSONValue(showViewMatrixPanel);
+    root[L"showMVP_MatrixPanel"]      = new JSONValue(showMVP_MatrixPanel);
+    root[L"showSceneViewPanel"]       = new JSONValue(showSceneViewPanel);
+    root[L"showPerformancePanel"]     = new JSONValue(showPerformancePanel);
+    root[L"showRenderSettingsPanel"]  = new JSONValue(showRenderSettingsPanel);
+    root[L"showLogPanel"]             = new JSONValue(showLogPanel);
+    root[L"showAttributePanel"]       = new JSONValue(showAttributePanel);
+    root[L"showGUI_Settings_Panel"]   = new JSONValue(showGUI_Settings_Panel);
+
+    // Floats
+    root[L"ColorDistanceShader::minDist"]  = new JSONValue(ColorDistanceShader::getMinDist());
+    root[L"ColorDistanceShader::maxDist"]  = new JSONValue(ColorDistanceShader::getMaxDist());
+
+    // Vec4s
+    root[L"ColorDistanceShader::minColor"] = new JSONValue(ColorDistanceShader::getMinColor());
+    root[L"ColorDistanceShader::maxColor"] = new JSONValue(ColorDistanceShader::getMaxColor());
 
     wstring_convert<codecvt_utf8<wchar_t>, wchar_t> converter;
 
