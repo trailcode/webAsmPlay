@@ -108,7 +108,7 @@ void ColorDistanceShader::ensureShader()
             
             dist = min(maxDist, dist) / maxDist;
 
-            outColor = minVertexColor * (1 - dist) + maxVertexColor * dist;
+            outColor = minVertexColor * (1.0f - dist) + maxVertexColor * dist;
         }
     )glsl";
 
