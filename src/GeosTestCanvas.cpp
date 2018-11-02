@@ -100,7 +100,8 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
         {   
             Renderable * geom = Renderable::create(ring, trans);
 
-            geom->setOutlineColor(vec4(0,1,0,1));
+            //geom->setOutlineColor(vec4(0,1,0,1));
+            geom->setOutlineColor(1);
 
             addRenderiable(geom);
 

@@ -65,19 +65,19 @@ Renderable * RenderablePoint::create(const vec3 & pos)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    return new RenderablePoint(vao, ebo, vbo,
-    false,
-                        getDefaultFillColor(),
-                        getDefaultOutlineColor(),
-                        true,
-                        true);
+    return new RenderablePoint( vao, ebo, vbo,
+                                false,
+                                getDefaultFillColor(),
+                                getDefaultOutlineColor(),
+                                true,
+                                true);
 }
 
 void RenderablePoint::render(const mat4 & MVP, const mat4 & MV) const
 {
     getDefaultShader()->bind(MVP, MV);
 
-    getDefaultShader()->setColor(outlineColor);
+    //getDefaultShader()->setColor(outlineColor);
     
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -92,8 +92,8 @@ RenderablePoint::RenderablePoint(   const GLuint      vao,
                                     const GLuint      ebo,
                                     const GLuint      vbo,
                                     const bool        isMulti,
-                                    const vec4      & fillColor,
-                                    const vec4      & outlineColor,
+                                    const GLuint fillColor,
+                                    const GLuint outlineColor,
                                     const bool        renderOutline,
                                     const bool        renderFill) : Renderable(isMulti,
                                                                                 fillColor,

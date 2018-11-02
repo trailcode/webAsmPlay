@@ -97,6 +97,7 @@ protected:
     Shader( const GLuint                                   shaderProgram,
             const GLint                                    vertInAttrib,
             const GLint                                    colorInAttrib,
+            const GLint  colorsInUniform,
             const GLint                                    MVP_In_Uniform,
             const GLint                                    colorUniform,
             const GLint                                    textureCoordsUniform,
@@ -108,6 +109,7 @@ private:
     GLuint shaderProgram;
     GLint  vertInAttrib;
     GLint  colorInAttrib;
+    GLint  colorsInUniform;
     GLint  MVP_In_Uniform;
     GLint  colorUniform;
     GLint  textureCoordsUniform;

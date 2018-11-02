@@ -1,10 +1,10 @@
 /**
-╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
-┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
-╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
-╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
-╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
-╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+ ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+ ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+ ╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+ ╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+ ╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
  // This software is provided 'as-is', without any express or implied
  // warranty.  In no event will the authors be held liable for any damages
  // arising from the use of this software.
@@ -53,8 +53,8 @@ RenderablePolygon::RenderablePolygon(   const GLuint      vao,
                                         const Uint32Vec & counterVertIndices,
                                         const size_t      numContourLines,
                                         const bool        isMulti,
-                                        const vec4      & fillColor,
-                                        const vec4      & outlineColor,
+                                        const GLuint fillColor,
+                                        const GLuint outlineColor,
                                         const bool        renderOutline,
                                         const bool        renderFill,
                                         const bool        seperateFillColors) : Renderable( isMulti,
@@ -82,7 +82,7 @@ RenderablePolygon::~RenderablePolygon()
 
 RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  const Polygon * poly,
                                                                             const dmat4   & trans,
-                                                                            const vec4    & fillColor)
+                                                                            const GLuint    fillColor)
 {
     TesselationResult ret;
 
@@ -209,6 +209,8 @@ void RenderablePolygon::tesselateMultiPolygon(  const MultiPolygon              
                                                 const dmat4                     & trans,
                                                 vector<const TesselationResult> & tesselationResults)
 {
+    dmess("2");
+
     for(size_t i = 0; i < multiPoly->getNumGeometries(); ++i)
     {
         const Polygon * poly = dynamic_cast<const Polygon *>(multiPoly->getGeometryN(i));
@@ -217,7 +219,7 @@ void RenderablePolygon::tesselateMultiPolygon(  const MultiPolygon              
             
         if(!tesselationResults.rbegin()->vertsOut)
         {
-            dmess("Warning tesselation failed!");
+            dmess("Warning tessellation failed!");
 
             tesselationResults.pop_back();
         }
@@ -226,15 +228,25 @@ void RenderablePolygon::tesselateMultiPolygon(  const MultiPolygon              
 
 Renderable * RenderablePolygon::create( const Polygon * poly,
                                         const dmat4   & trans,
-                                        const vec4    & fillColor,
-                                        const vec4    & outlineColor,
+                                        const GLuint fillColor,
+                                        const GLuint outlineColor,
                                         const bool      renderOutline,
                                         const bool      renderFill)
 {
+    dmess("1");
+
     const TesselationResult tess = tessellatePolygon(poly, trans);
 
     if(!tess.vertsOut) { return NULL ;}
 
+    return createFromTesselations(  vector<const TesselationResult>({tess}),
+                                    fillColor,
+                                    outlineColor,
+                                    renderOutline, 
+                                    renderFill,
+                                    false);
+
+    /*
     FloatVec verts(tess.numVerts * 2);
 
     for(size_t i = 0; i < tess.numVerts * 2; ++i) { verts[i] = tess.vertsOut[i] ;}
@@ -244,10 +256,10 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
     GLuint ebo2 = 0;
     GLuint vbo  = 0;
 
-    glGenVertexArrays   (1, &vao);
-    glGenBuffers        (1, &vbo);
-    glGenBuffers        (1, &ebo);
-    glGenBuffers        (1, &ebo2);
+    glGenVertexArrays (1, &vao);
+    glGenBuffers      (1, &vbo);
+    glGenBuffers      (1, &ebo);
+    glGenBuffers      (1, &ebo2);
 
     glBindVertexArray(vao);
 
@@ -279,15 +291,18 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
                                     renderOutline,
                                     renderFill,
                                     false);
+                                    */
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
                                         const dmat4         & trans,
-                                        const vec4          & fillColor,
-                                        const vec4          & outlineColor,
+                                        const GLuint fillColor,
+                                        const GLuint outlineColor,
                                         const bool            renderOutline,
                                         const bool            renderFill)
 {
+    dmess("3");
+
     vector<const TesselationResult> tesselationResults;
 
     tesselateMultiPolygon(multiPoly, trans, tesselationResults);
@@ -302,8 +317,8 @@ Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
 
 Renderable * RenderablePolygon::create( const ConstGeosGeomVec & polygons,
                                         const dmat4            & trans,
-                                        const vec4             & fillColor,
-                                        const vec4             & outlineColor,
+                                        const GLuint fillColor,
+                                        const GLuint outlineColor,
                                         const bool               renderOutline,
                                         const bool               renderFill)
 {
@@ -348,20 +363,20 @@ Renderable * RenderablePolygon::create( const ConstGeosGeomVec & polygons,
                                     false);
 }
 
-Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, const vec4, const vec4> >  & polygons,
+Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, const GLuint, const GLuint> >  & polygons,
                                         const dmat4                     & trans,
-                                        const vec4                      & fillColor,
-                                        const vec4                      & outlineColor,
+                                        const GLuint fillColor,
+                                        const GLuint outlineColor,
                                         const bool                        renderOutline,
                                         const bool                        renderFill)
 {
     vector<const TesselationResult> tesselationResults;
 
-    for(const tuple<const Geometry *, const vec4, const vec4> & polyAndColors : polygons)
+    for(const tuple<const Geometry *, const GLuint, const GLuint> & polyAndColors : polygons)
     {
         const Geometry  * geom          = get<0>(polyAndColors);
-        const vec4      & fillColor     = get<1>(polyAndColors);
-        const vec4      & outlineColor  = get<2>(polyAndColors);
+        const GLuint fillColor     = get<1>(polyAndColors);
+        const GLuint outlineColor  = get<2>(polyAndColors);
 
         const Polygon      * poly;
         const MultiPolygon * multiPoly;
@@ -400,12 +415,16 @@ Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, con
 }
 
 Renderable * RenderablePolygon::createFromTesselations( const vector<const TesselationResult>   & tesselations,
-                                                        const vec4                              & fillColor,
-                                                        const vec4                              & outlineColor,
+                                                        const GLuint fillColor,
+                                                        const GLuint outlineColor,
                                                         const bool                                renderOutline,
                                                         const bool                                renderFill,
-                                                        const bool                                seperateFillColors)
+                                                        const bool                                _seperateFillColors)
 {
+    dmess("4");
+
+    const bool seperateFillColors = true;
+
     if(!tesselations.size()) { return NULL ;}
 
     size_t numVerts                 = 0;
@@ -423,8 +442,12 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
 
     FloatVec verts;
     
+    /*
     if(seperateFillColors)  { verts.resize(numVerts * (2 + 4)) ;}
     else                    { verts.resize(numVerts * 2 + 4) ;}
+    */
+
+    verts.resize(numVerts * (2 + 1));
 
     Uint32Vec triangleIndices      (numTriangles * 3);
     Uint32Vec counterVertIndices   (numCounterVertIndices);
@@ -448,10 +471,14 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
                 *vertsPtr = tess.vertsOut[j * 2 + 0]; ++vertsPtr;
                 *vertsPtr = tess.vertsOut[j * 2 + 1]; ++vertsPtr;
 
+                /*
                 *vertsPtr = tesselations[i].fillColor.x; ++vertsPtr;
                 *vertsPtr = tesselations[i].fillColor.y; ++vertsPtr;
                 *vertsPtr = tesselations[i].fillColor.z; ++vertsPtr;
                 *vertsPtr = tesselations[i].fillColor.w; ++vertsPtr;
+                */
+                
+                memcpy(vertsPtr, &tesselations[i].fillColor, sizeof(GLuint)); ++vertsPtr;
             }
         }
         else
@@ -485,8 +512,12 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    if(!seperateFillColors) { glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2, &verts[0], GL_STATIC_DRAW) ;}
+    /*
+    if(!seperateFillColors) { glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2,       &verts[0], GL_STATIC_DRAW) ;}
     else                    { glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * (2 + 4), &verts[0], GL_STATIC_DRAW) ;}
+    */
+
+    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, &triangleIndices[0], GL_STATIC_DRAW);
@@ -516,19 +547,26 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
     glBindBuffer(GL_ARRAY_BUFFER,         vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    if(seperateFillColors)
+    //if(seperateFillColors)
+    if(true)
     {
         colorPolygonShader->bind(MVP, MV);
 
+        /*
         colorPolygonShader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
 
-        colorPolygonShader->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)(2*sizeof(GLfloat)));
+        colorPolygonShader->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+        */
+
+        colorPolygonShader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+
+        colorPolygonShader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
     }
     else
     {
         getDefaultShader()->bind(MVP, MV);
 
-        if(getRenderFill()) { getDefaultShader()->setColor(fillColor) ;}
+        //if(getRenderFill()) { getDefaultShader()->setColor(fillColor) ;}
 
         getDefaultShader()->enableVertexAttribArray();
     }
@@ -552,10 +590,11 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
         {
             getDefaultShader()->bind(MVP, MV);
 
-            getDefaultShader()->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+            //getDefaultShader()->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+            getDefaultShader()->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
         } 
         
-        getDefaultShader()->setColor(outlineColor);
+        getDefaultShader()->setColor(vec4(0,1,0,1));
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
         
@@ -634,16 +673,19 @@ void RenderablePolygon::ensureColorPolygonShader()
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
         in vec2 vertIn;
-        in vec4 vertColorIn;
+        //in vec4 vertColorIn;
+        in int vertColorIn;
         out vec4 vertexColor;
 
         uniform mat4 MVP;
+        uniform vec4 colorsIn[32];
 
         void main()
         {
             gl_Position = MVP * vec4(vertIn.xy, 0, 1);
-            vertexColor = vertColorIn;
+            //vertexColor = vertColorIn;
             //vertexColor = vec4(0,1,1,1);
+            vertexColor = colorsIn[vertColorIn];
         }
     )glsl";
 
@@ -658,4 +700,19 @@ void RenderablePolygon::ensureColorPolygonShader()
     )glsl";
 
     colorPolygonShader = Shader::create(vertexSource, fragmentSource);
+
+    const GLint colorsInLoc = colorPolygonShader->getUniformLoc("colorsIn");
+
+    dmess("colorsInLoc " << colorsInLoc);
+
+    const float colors[] = {0,0,1,0.3,
+                            1,1,0,0.3,
+                            1,0,0,0.3,
+                            0,1,0,0.3,
+                            1,0,1,0.3,
+                            0,1,1,0.3,
+                            1,1,1,0.3};
+
+    glUniform4fv(colorsInLoc, 7, colors);
+
 }

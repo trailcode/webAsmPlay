@@ -47,8 +47,8 @@ private:
                     const GLuint      ebo,
                     const GLuint      vbo,
                     const bool        isMulti,
-                    const glm::vec4 & fillColor,
-                    const glm::vec4 & outlineColor,
+                    const GLuint fillColor,
+                    const GLuint outlineColor,
                     const bool        renderOutline,
                     const bool        renderFill);
 

@@ -53,15 +53,15 @@ public:
 
     static Renderable * create( const geos::geom::LineString    * lineString,
                                 const glm::mat4                 & trans         = glm::mat4(1.0),
-                                const glm::vec4                 & fillColor     = getDefaultFillColor(),
-                                const glm::vec4                 & outlineColor  = getDefaultOutlineColor(),
+                                const GLuint fillColor     = 1,
+                                const GLuint outlineColor  = 1,
                                 const bool                        renderOutline = getDefaultRenderOutline(),
                                 const bool                        renderFill    = getDefaultRenderFill());
 
     static Renderable * create( const ConstGeosGeomVec & lineStrings,
                                 const glm::mat4        & trans         = glm::mat4(1.0),
-                                const glm::vec4        & fillColor     = getDefaultFillColor(),
-                                const glm::vec4        & outlineColor  = getDefaultOutlineColor(),
+                                const GLuint fillColor     = 1,
+                                const GLuint outlineColor  = 1,
                                 const bool               renderOutline = getDefaultRenderOutline(),
                                 const bool               renderFill    = getDefaultRenderFill());
 
@@ -76,15 +76,15 @@ private:
                             const GLuint      vbo,
                             const GLuint      numElements,
                             const bool        isMulti,
-                            const glm::vec4 & fillColor,
-                            const glm::vec4 & outlineColor,
+                            const GLuint fillColor,
+                            const GLuint outlineColor,
                             const bool        renderOutline,
                             const bool        renderFill);
 
     static Renderable * create( const FloatVec   & verts,
                                 const Uint32Vec  & indices,
-                                const glm::vec4  & fillColor,
-                                const glm::vec4  & outlineColor,
+                                const GLuint fillColor,
+                                const GLuint outlineColor,
                                 const bool         renderOutline,
                                 const bool         renderFill,
                                 const bool         isMulti);

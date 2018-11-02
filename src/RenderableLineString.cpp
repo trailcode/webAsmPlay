@@ -40,8 +40,8 @@ RenderableLineString::RenderableLineString( const GLuint   vao,
                                             const GLuint   vbo,
                                             const GLuint   numElements,
                                             const bool     isMulti,
-                                            const vec4   & fillColor,
-                                            const vec4   & outlineColor,
+                                            const GLuint fillColor,
+                                            const GLuint outlineColor,
                                             const bool     renderOutline,
                                             const bool     renderFill) :    Renderable( isMulti,
                                                                                         fillColor,
@@ -64,8 +64,8 @@ RenderableLineString::~RenderableLineString()
 
 Renderable * RenderableLineString::create(  const LineString    * lineString,
                                             const mat4          & trans,
-                                            const vec4          & fillColor,
-                                            const vec4          & outlineColor,
+                                            const GLuint fillColor,
+                                            const GLuint outlineColor,
                                             const bool            renderOutline,
                                             const bool            renderFill)
 {
@@ -125,8 +125,8 @@ Renderable * RenderableLineString::create(  const LineString    * lineString,
 
 Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineStrings,
                                             const mat4              & trans,
-                                            const vec4              & fillColor,
-                                            const vec4              & outlineColor,
+                                            const GLuint fillColor,
+                                            const GLuint outlineColor,
                                             const bool                renderOutline,
                                             const bool                renderFill)
 {
@@ -194,8 +194,8 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
 
 Renderable * RenderableLineString::create(  const FloatVec  & verts,
                                             const Uint32Vec & indices,
-                                            const vec4      & fillColor,
-                                            const vec4      & outlineColor,
+                                            const GLuint fillColor,
+                                            const GLuint outlineColor,
                                             const bool        renderOutline,
                                             const bool        renderFill,
                                             const bool        isMulti)

@@ -80,8 +80,8 @@ Shader * Renderable::getDefaultShader() { return defaultShader ;}
 
 Renderable * Renderable::create(const Geometry::Ptr & geom,
                                 const mat4          & trans,
-                                const vec4          & fillColor,
-                                const vec4          & outlineColor,
+                                const GLuint fillColor,
+                                const GLuint outlineColor,
                                 const bool            renderOutline,
                                 const bool            renderFill)
 {
@@ -95,8 +95,8 @@ Renderable * Renderable::create(const Geometry::Ptr & geom,
 
 Renderable * Renderable::create(const Geometry  * geom,
                                 const mat4      & trans,
-                                const vec4      & fillColor,
-                                const vec4      & outlineColor,
+                                const GLuint fillColor,
+                                const GLuint outlineColor,
                                 const bool        renderOutline,
                                 const bool        renderFill)
 {
@@ -137,8 +137,8 @@ Renderable * Renderable::create(const Geometry  * geom,
 }
 
 Renderable::Renderable( const bool   isMulti,
-                        const vec4 & fillColor,
-                        const vec4 & outlineColor,
+                        const GLuint fillColor,
+                        const GLuint outlineColor,
                         const bool   renderOutline,
                         const bool   renderFill) :  fillColor       (fillColor),
                                                     outlineColor    (outlineColor),
@@ -155,13 +155,13 @@ Renderable::~Renderable()
 
 void Renderable::render(const Canvas * canvas) const { render(canvas->getMVP_Ref(), canvas->getMV_Ref()) ;}
 
-vec4 Renderable::setFillColor(const vec4 & fillColor) { return this->fillColor = fillColor ;}
+GLuint Renderable::setFillColor(const GLuint fillColor) { return this->fillColor = fillColor ;}
 
-vec4 Renderable::getFillColor() const { return fillColor ;}
+GLuint Renderable::getFillColor() const { return fillColor ;}
 
-vec4 Renderable::setOutlineColor(const vec4 & outlineColor) { return this->outlineColor = outlineColor ;}
+GLuint Renderable::setOutlineColor(const GLuint outlineColor) { return this->outlineColor = outlineColor ;}
 
-vec4 Renderable::getOutlineColor() const { return outlineColor ;}
+GLuint Renderable::getOutlineColor() const { return outlineColor ;}
 
 bool Renderable::setRenderOutline(const bool renderOutline) { return this->renderOutline = renderOutline ;}
 
@@ -175,16 +175,16 @@ void Renderable::addOnDeleteCallback(const OnDelete & callback) { onDeleteCallba
 
 namespace
 {
-    vec4 defaultFillColor(0.7, 0.5, 0, 0.5);
-    vec4 defaultOutlineColor(1,0,0,1);
+    GLuint defaultFillColor = 1;
+    GLuint defaultOutlineColor = 1;
     bool defaultDoFill = true;
     bool defaultDoOutline = true;
 }
 
-vec4 Renderable::setDefaultFillColor(const vec4 & fillColor) { return defaultFillColor = fillColor ;}
-vec4 Renderable::getDefaultFillColor() { return defaultFillColor ;}
-vec4 Renderable::setDefaultOutlineColor(const vec4 & outlineColor) { return defaultOutlineColor = outlineColor ;}
-vec4 Renderable::getDefaultOutlineColor() { return defaultOutlineColor ;}
+GLuint Renderable::setDefaultFillColor(const GLuint fillColor) { return defaultFillColor = fillColor ;}
+GLuint Renderable::getDefaultFillColor() { return defaultFillColor ;}
+GLuint Renderable::setDefaultOutlineColor(const GLuint outlineColor) { return defaultOutlineColor = outlineColor ;}
+GLuint Renderable::getDefaultOutlineColor() { return defaultOutlineColor ;}
 bool Renderable::setDefaultRenderFill(const bool renderFill) { return defaultDoFill = renderFill ;}
 bool Renderable::getDefaultRenderFill() { return defaultDoFill ;}
 bool Renderable::setDefaultRenderOutline(const bool renderOutline) { return defaultDoOutline = renderOutline ;}

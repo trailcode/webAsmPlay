@@ -52,15 +52,15 @@ public:
 
     static Renderable * create( const geos::geom::Geometry::Ptr & geom,
                                 const glm::mat4                 & trans         = glm::mat4(1.0),
-                                const glm::vec4                 & fillColor     = getDefaultFillColor(),
-                                const glm::vec4                 & outlineColor  = getDefaultOutlineColor(),
+                                const GLuint fillColor     = 0,
+                                const GLuint outlineColor  = 0,
                                 const bool                        renderOutline = getDefaultRenderOutline(),
                                 const bool                        renderFill    = getDefaultRenderFill());
 
     static Renderable * create( const geos::geom::Geometry  * geom,
                                 const glm::mat4             & trans         = glm::mat4(1.0),
-                                const glm::vec4             & fillColor     = getDefaultFillColor(),
-                                const glm::vec4             & outlineColor  = getDefaultOutlineColor(),
+                                const GLuint fillColor     = 0,
+                                const GLuint outlineColor  = 0,
                                 const bool                    renderOutline = getDefaultRenderOutline(),
                                 const bool                    renderFill    = getDefaultRenderFill());
 
@@ -68,11 +68,11 @@ public:
 
     static Shader * getDefaultShader();
 
-    glm::vec4 setFillColor(const glm::vec4 & fillColor);
-    glm::vec4 getFillColor() const;
+    GLuint setFillColor(const GLuint fillColor);
+    GLuint getFillColor() const;
 
-    glm::vec4 setOutlineColor(const glm::vec4 & outlineColor);
-    glm::vec4 getOutlineColor() const;
+    GLuint setOutlineColor(const GLuint outlineColor);
+    GLuint getOutlineColor() const;
 
     bool setRenderOutline(const bool renderOutline);
     bool getRenderOutline() const;
@@ -82,11 +82,11 @@ public:
 
     void addOnDeleteCallback(const OnDelete & callback);
 
-    static glm::vec4 setDefaultFillColor(const glm::vec4 & fillColor);
-    static glm::vec4 getDefaultFillColor();
+    static GLuint setDefaultFillColor(const GLuint fillColor);
+    static GLuint getDefaultFillColor();
 
-    static glm::vec4 setDefaultOutlineColor(const glm::vec4 & outlineColor);
-    static glm::vec4 getDefaultOutlineColor();
+    static GLuint setDefaultOutlineColor(const GLuint outlineColor);
+    static GLuint getDefaultOutlineColor();
 
     static bool setDefaultRenderFill(const bool renderFill);
     static bool getDefaultRenderFill();
@@ -97,16 +97,16 @@ public:
 protected:
 
     Renderable( const bool        isMulti,
-                const glm::vec4 & fillColor,
-                const glm::vec4 & outlineColor,
+                const GLuint fillColor,
+                const GLuint outlineColor,
                 const bool        renderOutline,
                 const bool        renderFill);
 
     std::vector<OnDelete> onDeleteCallbacks;
 
     bool        isMulti;
-    glm::vec4   fillColor;
-    glm::vec4   outlineColor;
+    GLuint   fillColor;
+    GLuint   outlineColor;
     bool        renderOutline;
     bool        renderFill;
 };
