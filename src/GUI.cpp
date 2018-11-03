@@ -48,6 +48,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/ColorDistanceShader.h>
+#include <webAsmPlay/ColorDistanceShader2.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
@@ -104,7 +105,8 @@ bool GUI::showPerformancePanel       = false;
 bool GUI::showRenderSettingsPanel    = false;
 bool GUI::showLogPanel               = false;
 bool GUI::showAttributePanel         = false;
-bool GUI::showGUI_Settings_Panel = false;
+bool GUI::showAttributionPanel       = false;
+bool GUI::showGUI_Settings_Panel     = false;
 
 bool isFirst = true;
 
@@ -312,14 +314,15 @@ void GUI::showMainMenuBar(GLFWwindow * window)
 
     if(ImGui::BeginMenu("View"))
     {
-        if(ImGui::MenuItem("View Matrix"))     { showViewMatrixPanel        = !showViewMatrixPanel        ;}
-        if(ImGui::MenuItem("MVP Matrix"))      { showMVP_MatrixPanel        = !showMVP_MatrixPanel        ;}
-        if(ImGui::MenuItem("Geos Tests"))      { showSceneViewPanel         = !showSceneViewPanel         ;}
-        if(ImGui::MenuItem("Performance"))     { showPerformancePanel       = !showPerformancePanel       ;}
-        if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel    = !showRenderSettingsPanel    ;}
-        if(ImGui::MenuItem("Log"))             { showLogPanel               = !showLogPanel               ;}
-        if(ImGui::MenuItem("Attributes"))      { showAttributePanel         = !showAttributePanel         ;}
-        if(ImGui::MenuItem("GUI Settings"))    { showGUI_Settings_Panel = !showGUI_Settings_Panel ;}
+        if(ImGui::MenuItem("View Matrix"))     { showViewMatrixPanel     = !showViewMatrixPanel        ;}
+        if(ImGui::MenuItem("MVP Matrix"))      { showMVP_MatrixPanel     = !showMVP_MatrixPanel        ;}
+        if(ImGui::MenuItem("Geos Tests"))      { showSceneViewPanel      = !showSceneViewPanel         ;}
+        if(ImGui::MenuItem("Performance"))     { showPerformancePanel    = !showPerformancePanel       ;}
+        if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel = !showRenderSettingsPanel    ;}
+        if(ImGui::MenuItem("Log"))             { showLogPanel            = !showLogPanel               ;}
+        if(ImGui::MenuItem("Attributes"))      { showAttributePanel      = !showAttributePanel         ;}
+        if(ImGui::MenuItem("GUI Settings"))    { showGUI_Settings_Panel  = !showGUI_Settings_Panel     ;}
+        if(ImGui::MenuItem("Attribution"))     { showAttributionPanel    = !showAttributionPanel       ;}
 
         ImGui::EndMenu();
     }
@@ -455,6 +458,8 @@ void GUI::mainLoop(GLFWwindow * window)
 
     renderSettingsPanel();
 
+    attributionPanel();
+
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
 
     canvas->render();
@@ -512,6 +517,7 @@ void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
     //GridPlane  ::ensureShader();
     RenderablePolygon::ensureShaders();
     ColorDistanceShader::ensureShader();
+    ColorDistanceShader2::ensureShader();
 
     canvas = new Canvas(false);
 

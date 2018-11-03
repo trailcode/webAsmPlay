@@ -35,23 +35,23 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-RenderableLineString::RenderableLineString( const GLuint   vao,
-                                            const GLuint   ebo,
-                                            const GLuint   vbo,
-                                            const GLuint   numElements,
-                                            const bool     isMulti,
-                                            const GLuint fillColor,
-                                            const GLuint outlineColor,
-                                            const bool     renderOutline,
-                                            const bool     renderFill) :    Renderable( isMulti,
-                                                                                        fillColor,
-                                                                                        outlineColor,
-                                                                                        renderOutline,
-                                                                                        renderFill),
-                                                                            vao         (vao),
-                                                                            ebo         (ebo),
-                                                                            vbo         (vbo),
-                                                                            numElements (numElements)
+RenderableLineString::RenderableLineString( const GLuint  vao,
+                                            const GLuint  ebo,
+                                            const GLuint  vbo,
+                                            const GLuint  numElements,
+                                            const bool    isMulti,
+                                            const GLuint  fillColor,
+                                            const GLuint  outlineColor,
+                                            const bool    renderOutline,
+                                            const bool    renderFill) :    Renderable( isMulti,
+                                                                                       fillColor,
+                                                                                       outlineColor,
+                                                                                       renderOutline,
+                                                                                       renderFill),
+                                                                           vao         (vao),
+                                                                           ebo         (ebo),
+                                                                           vbo         (vbo),
+                                                                           numElements (numElements)
 {
 }
 
@@ -62,12 +62,12 @@ RenderableLineString::~RenderableLineString()
     glDeleteBuffers     (1, &vbo);
 }
 
-Renderable * RenderableLineString::create(  const LineString    * lineString,
-                                            const mat4          & trans,
-                                            const GLuint fillColor,
-                                            const GLuint outlineColor,
-                                            const bool            renderOutline,
-                                            const bool            renderFill)
+Renderable * RenderableLineString::create(  const LineString * lineString,
+                                            const mat4       & trans,
+                                            const GLuint       fillColor,
+                                            const GLuint       outlineColor,
+                                            const bool         renderOutline,
+                                            const bool         renderFill)
 {
     if(!lineString)
     {
@@ -194,8 +194,8 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
 
 Renderable * RenderableLineString::create(  const FloatVec  & verts,
                                             const Uint32Vec & indices,
-                                            const GLuint fillColor,
-                                            const GLuint outlineColor,
+                                            const GLuint      fillColor,
+                                            const GLuint      outlineColor,
                                             const bool        renderOutline,
                                             const bool        renderFill,
                                             const bool        isMulti)

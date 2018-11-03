@@ -63,6 +63,7 @@ void GUI::loadState()
     setBool(L"showLogPanel",            showLogPanel);
     setBool(L"showAttributePanel",      showAttributePanel);
     setBool(L"showGUI_Settings_Panel",  showGUI_Settings_Panel);
+    setBool(L"showAttributionPanel",    showAttributionPanel);
 
     // Floats
 
@@ -100,6 +101,7 @@ void GUI::saveState()
     root[L"showLogPanel"]             = new JSONValue(showLogPanel);
     root[L"showAttributePanel"]       = new JSONValue(showAttributePanel);
     root[L"showGUI_Settings_Panel"]   = new JSONValue(showGUI_Settings_Panel);
+    root[L"showAttributionPanel"]     = new JSONValue(showAttributionPanel);
 
     // Floats
     root[L"ColorDistanceShader::minDist"]  = new JSONValue(ColorDistanceShader::getMinDist());

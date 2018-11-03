@@ -480,9 +480,12 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
         GLuint fc = 0;
 
-        if(attrs->hasStringKey("addr_house"))
+        if( attrs->hasStringKey("addr_house") ||
+            attrs->hasStringKey("addr::housenumber") ||
+            attrs->hasStringKey("addr::housename"))
         {
             fillColor = vec4(0.7,0.5,0,0.5);
+            
             fc = 1;
         }
         else if(attrs->hasStringKey("building"))

@@ -24,13 +24,13 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
-#define __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
+#ifndef __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER2_H__
+#define __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER2_H__
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 
-class ColorDistanceShader
+class ColorDistanceShader2
 {
 public:
 
@@ -38,22 +38,13 @@ public:
 
     static void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
 
-    static glm::vec4 setMinColor(const glm::vec4 & minColor);
-    static glm::vec4 setMaxColor(const glm::vec4 & maxColor);
-
-    static glm::vec4 getMinColor();
-    static glm::vec4 getMaxColor();
-
-    static float setMinDist(const float & value);
-    static float setMaxDist(const float & value);
-
-    static float getMinDist();
-    static float getMaxDist();
+    static glm::vec4 setColor(const size_t index, const glm::vec4 & color);
+    static glm::vec4 getColor(const size_t index);
 
 private:
 
-    ColorDistanceShader() {}
-    ~ColorDistanceShader() {}
+    ColorDistanceShader2() {}
+    ~ColorDistanceShader2() {}   
 };
 
-#endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
+#endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER2_H__
