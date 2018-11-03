@@ -173,7 +173,7 @@ GLuint Textures::loadCube(const vector<string> & files)
     return texCube;
 }
 
-GLuint Textures::create(const vector<vec4> & values)
+GLuint Textures::create(const vec4 * values, const size_t num)
 {
     GLuint texture;
 
@@ -183,11 +183,11 @@ GLuint Textures::create(const vector<vec4> & values)
     glBindTexture( GL_TEXTURE_2D, texture );
 
     /* Generate The Texture */
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, values.size(), 1, 0, GL_RGBA, GL_FLOAT, &values[0] );
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, num, 1, 0, GL_RGBA, GL_FLOAT, values );
 
     /* Linear Filtering */
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
     dmess("texture " << texture);
 

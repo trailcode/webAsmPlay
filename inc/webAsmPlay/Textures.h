@@ -49,7 +49,7 @@ public:
 
     static GLuint loadCube(const std::vector<std::string> & files);
 
-    static GLuint create(const std::vector<glm::vec4> & values);
+    static GLuint create(const glm::vec4 * values, const size_t num);
 
 private:
 

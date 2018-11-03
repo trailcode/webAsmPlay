@@ -450,6 +450,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
+        /*
         Attributes * attrs;
 
         const Geometry * g;
@@ -463,6 +464,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
 
         quadTreePolygons->insert(g->getEnvelopeInternal(), data);
+        */
     }
 
     dmess("quadTree " << quadTreePolygons->depth() << " " << geoms.size());
@@ -485,7 +487,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
             attrs->hasStringKey("addr::housename"))
         {
             fillColor = vec4(0.7,0.5,0,0.5);
-            
+
             fc = 1;
         }
         else if(attrs->hasStringKey("building"))
@@ -517,6 +519,8 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
 void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & geoms, Canvas * canvas)
 {
+    return;
+    
     dmess("Start create linestrings " << geoms.size());
 
     vector<const Geometry *> polylines;
