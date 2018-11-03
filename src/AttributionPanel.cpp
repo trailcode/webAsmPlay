@@ -51,7 +51,7 @@ namespace
 
         if(ImGui::ColorEdit4((name + " fill far").c_str(), value_ptr(colors[1]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-            ColorDistanceShader2::setColor(colorIndex * 2 + 1, colors[0]);
+            ColorDistanceShader2::setColor(colorIndex * 2 + 1, colors[1]);
         }
 
         if(ImGui::ColorEdit4((name + " outline near").c_str(), value_ptr(colors[2]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))

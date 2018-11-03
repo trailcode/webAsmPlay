@@ -532,7 +532,7 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
     glDisable(GL_DEPTH_TEST);
 
-    if(getRenderOutline())
+    if(false && getRenderOutline())
     {
         if(seperateFillColors)
         {

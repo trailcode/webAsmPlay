@@ -39,6 +39,8 @@ namespace
 
     GLint colorsInLoc = -1;
 
+    GLint MV_Uniform = -1;
+
     glm::vec4 colors[32];
 }
 
@@ -48,29 +50,59 @@ void ColorDistanceShader2::ensureShader()
     const GLchar* vertexSource = R"glsl(#version 330 core
         in vec2 vertIn;
         in int vertColorIn;
-        out vec4 vertexColor;
-
+        
         uniform mat4 MVP;
+        uniform mat4 MV;
         uniform vec4 colorsIn[32];
+
+        out vec4 vertexColorNear;
+        out vec4 vertexColorFar;
+        out vec4 position_in_view_space;
 
         void main()
         {
-            gl_Position = MVP * vec4(vertIn.xy, 0, 1);
-            vertexColor = colorsIn[vertColorIn * 2];
+            vec4 vert = vec4(vertIn.xy, 0, 1);
+
+            position_in_view_space = MV * vert;
+
+            gl_Position = MVP * vert;
+
+            vertexColorNear = colorsIn[vertColorIn * 2];
+            vertexColorFar  = colorsIn[vertColorIn * 2 + 1];
         }
     )glsl";
 
     const GLchar* fragmentSource = R"glsl(#version 330 core
+        
+        in vec4 vertexColorNear;
+        in vec4 vertexColorFar;
+        in vec4 position_in_view_space;
+
         out vec4 outColor;
-        in vec4 vertexColor;
 
         void main()
         {
-            outColor = vertexColor;
+            float minDist = 0.0;
+            float maxDist = 5.0;
+
+            // computes the distance between the fragment position 
+            // and the origin (4th coordinate should always be 1 
+            // for points). The origin in view space is actually 
+            // the camera position.
+            float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
+            
+            dist = min(maxDist, dist) / maxDist;
+
+            outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
+            //outColor = vertexColorFar;
         }
     )glsl";
 
-    instance = Shader::create(vertexSource, fragmentSource);
+    instance = Shader::create(  vertexSource,
+                                fragmentSource,
+                                StrVec({"MV", "colorsIn"}));
+
+    MV_Uniform  = instance->getUniformLoc("MV");
 
     colorsInLoc = instance->getUniformLoc("colorsIn");
 
@@ -88,11 +120,15 @@ void ColorDistanceShader2::ensureShader()
 
 void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV)
 {
+    //dmess("MV " << mat4ToStr(MV));
+
     instance->bind(MVP, MV);
+
+    instance->setUniform(MV_Uniform,            MV);
 
     instance->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-    instance->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
+    instance->enableColorAttribArray(1, GL_UNSIGNED_INT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
 
     glUniform4fv(colorsInLoc, 32, (const GLfloat *)colors);
 }
