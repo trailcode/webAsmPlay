@@ -26,9 +26,11 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/Shader.h>
 #include <webAsmPlay/ColorDistanceShader2.h>
 
+using namespace std;
 using namespace glm;
 
 namespace
@@ -104,3 +106,37 @@ vec4 ColorDistanceShader2::getColor(const size_t index)
 {
     return colors[index];
 }
+
+void ColorDistanceShader2::loadState(const JSONObject & dataStore)
+{
+    dmess("ColorDistanceShader2::loadState");
+
+    auto setVec4 = [&dataStore](const wstring & key, vec4 & color)->void
+    {
+        JSONObject::const_iterator i = dataStore.find(key);
+
+        if(i != dataStore.end()) { color = i->second->AsVec4() ;}
+    };
+
+    char buf[1024];
+
+    for(size_t i = 0; i < 32; ++i)
+    {
+        sprintf(buf, "attributeColor_%i", i);
+
+        setVec4(stringToWstring(buf), colors[i]);
+    }
+}
+
+void ColorDistanceShader2::saveState(JSONObject & dataStore)
+{
+    char buf[1024];
+
+    for(size_t i = 0; i < 32; ++i)
+    {
+        sprintf(buf, "attributeColor_%i", i);
+
+        dataStore[stringToWstring(buf)] = new JSONValue(colors[i]);
+    }
+}
+

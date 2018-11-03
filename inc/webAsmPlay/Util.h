@@ -40,4 +40,6 @@ static ImVec4 __(const glm::vec4 & v) { return ImVec4(v.x, v.y, v.z, v.q) ;}
 
 static glm::vec4 __(const ImVec4 & v) { return glm::vec4(v.x, v.y, v.z, v.w) ;}
 
+std::wstring stringToWstring(const std::string& t_str);
+
 #endif // __WEB_ASM_PLAY_UTIL_H__

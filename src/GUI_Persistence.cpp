@@ -31,6 +31,7 @@
 #include <JSON.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/ColorDistanceShader.h>
+#include <webAsmPlay/ColorDistanceShader2.h>
 #include <webAsmPlay/GUI.h>
 
 using namespace std;
@@ -38,6 +39,8 @@ using namespace glm;
 
 void GUI::loadState()
 {
+    dmess("GUI::loadState");
+
     ifstream configFile("config.json");
     
     const string config((istreambuf_iterator<char>(configFile)), istreambuf_iterator<char>());
@@ -86,6 +89,8 @@ void GUI::loadState()
 
     setVec4(L"ColorDistanceShader::minColor", &ColorDistanceShader::setMinColor);
     setVec4(L"ColorDistanceShader::maxColor", &ColorDistanceShader::setMaxColor);
+
+    ColorDistanceShader2::loadState(root);
 }
 
 void GUI::saveState()
@@ -110,6 +115,8 @@ void GUI::saveState()
     // Vec4s
     root[L"ColorDistanceShader::minColor"] = new JSONValue(ColorDistanceShader::getMinColor());
     root[L"ColorDistanceShader::maxColor"] = new JSONValue(ColorDistanceShader::getMaxColor());
+
+    ColorDistanceShader2::saveState(root);
 
     wstring_convert<codecvt_utf8<wchar_t>, wchar_t> converter;
 

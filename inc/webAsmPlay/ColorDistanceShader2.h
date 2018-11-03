@@ -29,6 +29,7 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
+#include <JSON.h>
 
 class ColorDistanceShader2
 {
@@ -40,6 +41,10 @@ public:
 
     static glm::vec4 setColor(const size_t index, const glm::vec4 & color);
     static glm::vec4 getColor(const size_t index);
+
+    static void loadState(const JSONObject & dataStore);
+
+    static void saveState(JSONObject & dataStore);
 
 private:
 

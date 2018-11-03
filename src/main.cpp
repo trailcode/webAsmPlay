@@ -127,9 +127,9 @@ int main(int, char**)
 
     GUI::setupCallbacks(window);
 
-    GUI::loadState();
-
     GUI::initOpenGL(window);
+
+    GUI::loadState();
 
     #ifdef __EMSCRIPTEN__
         

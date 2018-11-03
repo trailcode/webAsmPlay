@@ -25,6 +25,7 @@
   \copyright 2018
 */
 
+#include <codecvt>
 #include <webAsmPlay/Util.h>
 
 using namespace std;
@@ -45,4 +46,15 @@ string mat4ToStr(const mat4 & m)
             static_cast<double>(m[3][0]), static_cast<double>(m[3][1]), static_cast<double>(m[3][2]), static_cast<double>(m[3][3]));
 
     return buf;
+}
+
+wstring stringToWstring(const string& t_str)
+{
+    //setup converter
+    typedef codecvt_utf8<wchar_t> convert_type;
+
+    wstring_convert<convert_type, wchar_t> converter;
+
+    //use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
+    return converter.from_bytes(t_str);
 }
