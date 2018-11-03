@@ -333,7 +333,7 @@ Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, con
             
             if(!tesselationResults.rbegin()->vertsOut)
             {
-                dmess("Warning tesselation failed!");
+                dmess("Warning tessellation failed!");
 
                 tesselationResults.pop_back();
             }
@@ -422,7 +422,9 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
                 *vertsPtr = tesselations[i].fillColor.w; ++vertsPtr;
                 */
                 
-                memcpy(vertsPtr, &tesselations[i].fillColor, sizeof(GLuint)); ++vertsPtr;
+                //memcpy(vertsPtr, &tesselations[i].fillColor, sizeof(GLuint)); ++vertsPtr;
+                *vertsPtr = (float(tesselations[i].fillColor * 2) + 0.5) / 32.0; ++vertsPtr;
+                //*vertsPtr = 0.5; ++vertsPtr;
             }
         }
         else

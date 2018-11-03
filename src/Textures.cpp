@@ -179,7 +179,11 @@ GLuint Textures::create(const vec4 * values, const size_t num)
 
     glGenTextures( 1, &texture );
 
-    /* Typical Texture Generation Using Data From The Bitmap */
+    return set1D(texture, values, num);
+};
+
+GLuint Textures::set1D(const GLuint texture, const glm::vec4 * values, const size_t num)
+{
     glBindTexture( GL_TEXTURE_2D, texture );
 
     /* Generate The Texture */
@@ -189,7 +193,5 @@ GLuint Textures::create(const vec4 * values, const size_t num)
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-    dmess("texture " << texture);
-
     return texture;
-};
+}

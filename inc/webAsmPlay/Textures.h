@@ -50,6 +50,8 @@ public:
     static GLuint loadCube(const std::vector<std::string> & files);
 
     static GLuint create(const glm::vec4 * values, const size_t num);
+    
+    static GLuint set1D(const GLuint texture, const glm::vec4 * values, const size_t num);
 
 private:
 

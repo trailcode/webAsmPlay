@@ -45,6 +45,8 @@ namespace
     glm::vec4 colors[32];
 
     GLuint colorTexture = 0;
+
+    bool colorTextureDirty = true;
 }
 
 void ColorDistanceShader2::ensureShader()
@@ -54,7 +56,7 @@ void ColorDistanceShader2::ensureShader()
         uniform sampler2D tex;
 
         in vec2 vertIn;
-        in int vertColorIn;
+        in float vertColorIn;
         
         uniform mat4 MVP;
         uniform mat4 MV;
@@ -63,6 +65,7 @@ void ColorDistanceShader2::ensureShader()
         out vec4 vertexColorNear;
         out vec4 vertexColorFar;
         out vec4 position_in_view_space;
+        out float colorNearIndex;
 
         void main()
         {
@@ -78,9 +81,13 @@ void ColorDistanceShader2::ensureShader()
             vertexColorNear = vec4(0,1,0,0.3);
             vertexColorFar = vec4(0,1,0,0.3);
             
-            vec4 color = texture(tex, vec2((float(vertColorIn) + 0.5) / 32.0, 0.5)).rgba;
-            vertexColorNear = color;
-
+            //vec4 color = texture(tex, vec2((float(vertColorIn * 2) + 0.5) / 32.0, 0.5)).rgba;
+            //vertexColorNear = color;
+            //colorNearIndex = vec2((float(vertColorIn) + 0.5) / 32.0, 0.5);
+            //colorNearIndex = vec2(0,0.5);
+            //colorNearIndex = vertColorIn;
+            vertexColorNear = texture(tex, vec2(vertColorIn, 0.5));
+            vertexColorFar = texture(tex, vec2(vertColorIn + 1.0 / 32.0, 0.5));
         }
     )glsl";
 
@@ -89,6 +96,7 @@ void ColorDistanceShader2::ensureShader()
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
+        in float colorNearIndex;
 
         out vec4 outColor;
 
@@ -105,12 +113,13 @@ void ColorDistanceShader2::ensureShader()
             
             dist = min(maxDist, dist) / maxDist;
 
-            //outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
+            outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
             //outColor = vertexColorFar;
             //outColor = vec4(0,1,0,0.5);
-            outColor = vertexColorNear;
-            //vec4 color = texture(tex, vec2(0, 0)).rgba;
+            //outColor = vertexColorNear;
+            //outColor = texture(tex, vec2(colorNearIndex, 0.5));
             //outColor = color;
+            //outColor = vertexColorNear;
         }
     )glsl";
 
@@ -142,13 +151,24 @@ void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV)
 
     instance->bind(MVP, MV);
 
-    instance->setUniform(MV_Uniform,            MV);
+    instance->setUniform(MV_Uniform, MV);
 
     instance->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-    instance->enableColorAttribArray(1, GL_UNSIGNED_INT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
+    //instance->enableColorAttribArray(1, GL_UNSIGNED_INT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
+    instance->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
 
     //glUniform4fv(colorsInLoc, 32, (const GLfloat *)colors);
+
+    //dmess("colorTextureDirty " << colorTextureDirty);
+
+    if(colorTextureDirty)
+    {
+        Textures::set1D(colorTexture, colors, 32);
+
+        colorTextureDirty =false;
+    }
+
     glEnable(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, colorTexture);
@@ -156,6 +176,10 @@ void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV)
 
 vec4 ColorDistanceShader2::setColor(const size_t index, const vec4 & color)
 {
+    dmess("ColorDistanceShader2::setColor");
+
+    colorTextureDirty = true;
+
     return colors[index] = color;
 }
 
