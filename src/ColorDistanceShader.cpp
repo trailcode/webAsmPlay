@@ -28,14 +28,14 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Camera.h>
-#include <webAsmPlay/Shader.h>
+#include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/ColorDistanceShader.h>
 
 using namespace glm;
 
 namespace
 {
-    Shader * instance = NULL;
+    ShaderProgram * instance = NULL;
 
     GLint MV_Uniform            = -1;
     GLint minVertexColorUniform = -1;
@@ -112,7 +112,7 @@ void ColorDistanceShader::ensureShader()
         }
     )glsl";
 
-    instance = Shader::create(  vertexSource,
+    instance = ShaderProgram::create(  vertexSource,
                                 fragmentSource,
                                 StrVec({"MV",
                                         "minVertexColorIn",
@@ -129,7 +129,7 @@ void ColorDistanceShader::ensureShader()
 
 void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV)
 {
-    instance->Shader::bind(MVP, MV);
+    instance->ShaderProgram::bind(MVP, MV);
 
     instance->setUniform(MV_Uniform,            MV);
     instance->setUniform(minVertexColorUniform, minColor);

@@ -26,12 +26,12 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Shader.h>
+#include <webAsmPlay/ShaderProgram.h>
 
 using namespace std;
 using namespace glm;
 
-Shader * Shader::create(const GLchar * vertexSource,
+ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
                         const GLchar * fragmentSource,
                         const StrVec & uniforms,
                         const StrVec & attributes)
@@ -39,7 +39,7 @@ Shader * Shader::create(const GLchar * vertexSource,
     return create(vertexSource, fragmentSource, NULL, uniforms, attributes);
 }
 
-Shader * Shader::create(const GLchar * vertexSource,
+ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
                         const GLchar * fragmentSource,
                         const GLchar * geometrySource,
                         const StrVec & uniforms,
@@ -153,7 +153,7 @@ Shader * Shader::create(const GLchar * vertexSource,
 
     glVertexAttribPointer(colorInAttrib, 4, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
     
-    return new Shader(  shaderProgram,
+    return new ShaderProgram(  shaderProgram,
                         vertInAttrib,
                         colorInAttrib,
                         colorsInUniform,
@@ -164,7 +164,7 @@ Shader * Shader::create(const GLchar * vertexSource,
                         attributeMap);
 }
 
-Shader::Shader( const GLuint                         shaderProgram,
+ShaderProgram::ShaderProgram( const GLuint                         shaderProgram,
                 const GLint                          vertInAttrib,
                 const GLint                          colorInAttrib,
                 const GLint                          colorsInUniform,
@@ -184,33 +184,28 @@ Shader::Shader( const GLuint                         shaderProgram,
 {
 } 
 
-Shader::~Shader()
+ShaderProgram::~ShaderProgram()
 {
     // TODO Cleanup!
 }
 
-void Shader::bind(const mat4 & MVP, const mat4 & MV)
+void ShaderProgram::bind(const mat4 & MVP, const mat4 & MV)
 {
     glUseProgram(shaderProgram);
 
     setUniform(MVP_In_Uniform, MVP);
 }
 
-void Shader::unbind()
-{
-    glUseProgram(0);
-}
+GLuint ShaderProgram::getProgramHandle() const { return shaderProgram ;}
 
-GLuint Shader::getProgramHandle() const { return shaderProgram ;}
-
-vec4 Shader::setColor(const vec4 & color)
+vec4 ShaderProgram::setColor(const vec4 & color)
 {
     glUniform4f(colorUniform, color.x, color.y, color.z, color.w);
 
     return color;
 }
 
-void Shader::enableVertexAttribArray(   const GLint       size,
+void ShaderProgram::enableVertexAttribArray(   const GLint       size,
                                         const GLenum      type,
                                         const GLboolean   normalized,
                                         const GLsizei     stride,
@@ -222,7 +217,7 @@ void Shader::enableVertexAttribArray(   const GLint       size,
     glVertexAttribPointer(vertInAttrib, size, type, normalized, stride, pointer);
 }
 
-void Shader::enableColorAttribArray(    const GLint       size,
+void ShaderProgram::enableColorAttribArray(    const GLint       size,
                                         const GLenum      type,
                                         const GLboolean   normalized,
                                         const GLsizei     stride,
@@ -234,14 +229,14 @@ void Shader::enableColorAttribArray(    const GLint       size,
     glVertexAttribPointer(colorInAttrib, size, type, normalized, stride, pointer);
 }
 
-GLuint Shader::setTexture1Slot(const GLuint slot) const
+GLuint ShaderProgram::setTexture1Slot(const GLuint slot) const
 {
     glUniform1i(textureCoordsUniform, slot);
 
     return slot;
 }
 
-GLint Shader::getUniformLoc(const string & name) const
+GLint ShaderProgram::getUniformLoc(const string & name) const
 {
     const auto i = uniforms.find(name);
 
@@ -255,7 +250,7 @@ GLint Shader::getUniformLoc(const string & name) const
     return i->second;
 }
 
-GLint Shader::getAttributeLoc(const string & name) const
+GLint ShaderProgram::getAttributeLoc(const string & name) const
 {
     const auto i = attributes.find(name);
 
@@ -269,7 +264,7 @@ GLint Shader::getAttributeLoc(const string & name) const
     return i->second;
 }
 
-void Shader::setUniform (const GLint location, const mat4   & value) const { glUniformMatrix4fv(location, 1, false, value_ptr(value)) ;}
-void Shader::setUniform (const GLint location, const vec4   & value) const { glUniform4fv      (location, 1,        value_ptr(value)) ;}
-void Shader::setUniform (const GLint location, const float  & value) const { glUniform1f       (location,                     value)  ;}
-void Shader::setUniformi(const GLint location, const GLuint & value) const { glUniform1i       (location,                     value)  ;}
+void ShaderProgram::setUniform (const GLint location, const mat4   & value) const { glUniformMatrix4fv(location, 1, false, value_ptr(value)) ;}
+void ShaderProgram::setUniform (const GLint location, const vec4   & value) const { glUniform4fv      (location, 1,        value_ptr(value)) ;}
+void ShaderProgram::setUniform (const GLint location, const float  & value) const { glUniform1f       (location,                     value)  ;}
+void ShaderProgram::setUniformi(const GLint location, const GLuint & value) const { glUniform1i       (location,                     value)  ;}

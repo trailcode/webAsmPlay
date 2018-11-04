@@ -30,7 +30,7 @@
 #include <geos/geom/LineString.h>
 #include "../GLUTesselator/include/GLU/tessellate.h"
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Shader.h>
+#include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/ColorDistanceShader2.h>
 #include <webAsmPlay/RenderablePolygon.h>
 
@@ -40,8 +40,8 @@ using namespace geos::geom;
 
 namespace
 {
-    Shader * outlineShader      = NULL;
-    Shader * colorPolygonShader = NULL;
+    ShaderProgram * outlineShader      = NULL;
+    ShaderProgram * colorPolygonShader = NULL;
 }
 
 // TODO Create better variable names. Try to simplify this class.
@@ -542,7 +542,7 @@ void RenderablePolygon::ensureOutlineShader()
 
     )glsl";
 
-    outlineShader = Shader::create(vertexSource, fragmentSource, geometrySource);
+    outlineShader = ShaderProgram::create(vertexSource, fragmentSource, geometrySource);
 }
 
 void RenderablePolygon::ensureColorPolygonShader()
@@ -580,7 +580,7 @@ void RenderablePolygon::ensureColorPolygonShader()
         }
     )glsl";
 
-    colorPolygonShader = Shader::create(vertexSource, fragmentSource);
+    colorPolygonShader = ShaderProgram::create(vertexSource, fragmentSource);
 
     const GLint colorsInLoc = colorPolygonShader->getUniformLoc("colorsIn");
 

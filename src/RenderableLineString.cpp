@@ -229,13 +229,13 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
 
 void RenderableLineString::render(const mat4 & MVP, const mat4 & MV) const
 {
-    ColorDistanceShader::bind(MVP, MV);
+    //ColorDistanceShader::bind(MVP, MV);
     
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    getDefaultShader()->enableVertexAttribArray();
+    //getDefaultShader()->enableVertexAttribArray();
 
     if(!isMulti) { glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL) ;}
     else         { glDrawElements(GL_LINES,      numElements, GL_UNSIGNED_INT, NULL) ;}

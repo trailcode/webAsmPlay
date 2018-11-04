@@ -27,7 +27,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Shader.h>
+#include <webAsmPlay/Types.h>
+#include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/ColorDistanceShader2.h>
 
@@ -36,7 +37,7 @@ using namespace glm;
 
 namespace
 {
-    Shader * instance = NULL;
+    ShaderProgram * instance = NULL;
 
     GLint colorsInLoc = -1;
 
@@ -118,7 +119,7 @@ void ColorDistanceShader2::ensureShader()
 
     colorTexture = Textures::create(colors, 32);
 
-    instance = Shader::create(  vertexSource,
+    instance = ShaderProgram::create(  vertexSource,
                                 fragmentSource,
                                 StrVec({"MV", "colorsIn", "tex", "colorLookupOffset"}));
 

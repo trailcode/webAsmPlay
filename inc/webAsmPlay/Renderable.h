@@ -34,7 +34,7 @@
 #include <geos/geom/Geometry.h>
 #include <webAsmPlay/Types.h>
 
-class Shader;
+class ShaderProgram;
 
 class Canvas;
 
@@ -66,7 +66,7 @@ public:
 
     static void ensureShader();
 
-    static Shader * getDefaultShader();
+    static ShaderProgram * getDefaultShader();
 
     GLuint setFillColor(const GLuint fillColor);
     GLuint getFillColor() const;

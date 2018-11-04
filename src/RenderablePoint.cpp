@@ -25,7 +25,7 @@
 */
 
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Shader.h>
+#include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/RenderablePoint.h>
 
 using namespace std;
@@ -33,7 +33,7 @@ using namespace glm;
 
 namespace
 {
-    Shader * defaultShader = NULL;
+    ShaderProgram * defaultShader = NULL;
 }
 
 Renderable * RenderablePoint::create(const vec3 & pos)
@@ -113,4 +113,4 @@ RenderablePoint::~RenderablePoint()
     glDeleteBuffers     (1, &vbo);
 }
 
-Shader * getDefaultShader() { return defaultShader ;}
+//Shader * getDefaultShader() { return defaultShader ;}

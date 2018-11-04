@@ -29,14 +29,15 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
+#include <webAsmPlay/Shader.h>
 
-class ColorDistanceShader
+class ColorDistanceShader : public Shader
 {
 public:
 
     static void ensureShader();
 
-    static void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
+    void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
 
     static glm::vec4 setMinColor(const glm::vec4 & minColor);
     static glm::vec4 setMaxColor(const glm::vec4 & maxColor);

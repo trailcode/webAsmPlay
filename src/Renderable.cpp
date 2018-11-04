@@ -29,7 +29,7 @@
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/Shader.h>
+#include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/RenderableLineString.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/Renderable.h>
@@ -40,7 +40,7 @@ using namespace geos::geom;
 
 namespace
 {
-    Shader * defaultShader = NULL;
+    ShaderProgram * defaultShader = NULL;
 }
 
 void Renderable::ensureShader()
@@ -73,10 +73,10 @@ void Renderable::ensureShader()
         }
     )glsl";
 
-    defaultShader = Shader::create(vertexSource, fragmentSource);
+    defaultShader = ShaderProgram::create(vertexSource, fragmentSource);
 }
 
-Shader * Renderable::getDefaultShader() { return defaultShader ;}
+ShaderProgram * Renderable::getDefaultShader() { return defaultShader ;}
 
 Renderable * Renderable::create(const Geometry::Ptr & geom,
                                 const mat4          & trans,
