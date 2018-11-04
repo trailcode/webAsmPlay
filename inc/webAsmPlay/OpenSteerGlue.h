@@ -24,43 +24,16 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/GUI/ImguiInclude.h>
-#include <webAsmPlay/GeosTestCanvas.h>
-#include <webAsmPlay/Util.h>
-#include <webAsmPlay/GUI/GUI.h>
+#ifndef __WEB_ASM_PLAY_OPEN_STEER_H__
+#define __WEB_ASM_PLAY_OPEN_STEER_H__
 
-void GUI::geosTestPanel()
+class OpenSteerGlue
 {
-    geosTestCanvas->setEnabled(showSceneViewPanel);
+public:
 
-    if(!showSceneViewPanel) { return ;}
-    
-    ImGui::Begin("Geos Tests", &showSceneViewPanel);
+  static void init();
 
-        const ImVec2 pos = ImGui::GetCursorScreenPos();
+private:
+};
 
-        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
-
-        geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
-
-        geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
-
-        ImGui::GetWindowDrawList()->AddImage(   (void *)geosTestCanvas->render(),
-                                                pos,
-                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-                                                ImVec2(0, 1),
-                                                ImVec2(1, 0));
-        
-        static float buffer1 = 0.1;
-        static float buffer2 = 0.02;
-        static float buffer3 = 0.22;
-
-        ImGui::SliderFloat("buffer1", &buffer1, 0.0f, 0.3f, "buffer1 = %.3f");
-        ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");
-        ImGui::SliderFloat("buffer3", &buffer3, 0.0f, 0.3f, "buffer3 = %.3f");
-
-        geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
-
-    ImGui::End();
-}
-
+#endif // __WEB_ASM_PLAY_OPEN_STEER_H__

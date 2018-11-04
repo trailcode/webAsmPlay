@@ -70,9 +70,10 @@ private:
     static void MVP_MatrixPanel();
     static void renderSettingsPanel();
     static void attributePanel(const std::string & attrsStr);
-    static void sceneViewPanel();
+    static void geosTestPanel();
     static void GUI_Settings_Panel();
     static void attributionPanel();
+    static void openSteerTestPanel();
 
     static void showHelpMarker(const char* desc);
 

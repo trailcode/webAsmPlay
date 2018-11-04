@@ -460,6 +460,7 @@ void GUI::mainLoop(GLFWwindow * window)
     renderSettingsPanel();
 
     attributionPanel();
+    openSteerTestPanel();
 
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
 
@@ -482,7 +483,7 @@ void GUI::mainLoop(GLFWwindow * window)
 
     attributePanel(attrsStr);
 
-    sceneViewPanel();
+    geosTestPanel();
 
     ImGui::End();
 

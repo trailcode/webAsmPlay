@@ -40,7 +40,7 @@
 //
 // ----------------------------------------------------------------------------
 
-
+#include <webAsmPlay/Debug.h>
 #include "OpenSteer/OpenSteerDemo.h"
 #include "OpenSteer/Annotation.h"
 #include "OpenSteer/Color.h"
@@ -51,19 +51,15 @@
 #include <sstream>
 #include <iomanip>
 
-// Include headers for OpenGL (gl.h), OpenGL Utility Library (glu.h) and
-// OpenGL Utility Toolkit (glut.h).
-//
-// XXX In Mac OS X these headers are located in a different directory.
-// XXX Need to revisit conditionalization on operating system.
-#if __APPLE__ && __MACH__
-#include <GLUT/glut.h>   // for Mac OS X
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
 #else
-    #include <GL/glu.h>     // for Linux and Windows
-    #ifndef HAVE_NO_GLUT
-        #include <GL/glut.h>   // for Mac OS X
-    #endif
-#endif
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+    #include <GLFW/glfw3.h>
+    
+#endif // __EMSCRIPTEN__
 
 // ----------------------------------------------------------------------------
 // keeps track of both "real time" and "simulation time"
@@ -454,6 +450,8 @@ OpenSteer::OpenSteerDemo::vehicleNearestToMouse (void)
 OpenSteer::AbstractVehicle* 
 OpenSteer::OpenSteerDemo::findVehicleNearestScreenPosition (int x, int y)
 {
+    dmess("Implement me!");
+    /*
     // find the direction from the camera position to the given pixel
     const Vec3 direction = directionFromCameraToScreenPosition (x, y, glutGet (GLUT_WINDOW_HEIGHT));
 
@@ -479,6 +477,9 @@ OpenSteer::OpenSteerDemo::findVehicleNearestScreenPosition (int x, int y)
     }
 
     return nearest;
+    */
+
+   return NULL;
 }
 
 
@@ -846,6 +847,8 @@ namespace {
     void 
     initGL (void)
     {
+        dmess("Implement me!");
+        /*
         // background = dark gray
         // @todo bknafla Changed the background color to make some screenshots.
         glClearColor (0.3f, 0.3f, 0.3f, 0);
@@ -872,6 +875,7 @@ namespace {
         // reset projection matrix
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
+        */
     }
 
 
@@ -885,6 +889,8 @@ namespace {
     void 
     reshapeFunc (int width, int height)
     {
+        dmess("Implement me!");
+        /*
         // set viewport to full window
         glViewport(0, 0, width, height);
 
@@ -901,6 +907,7 @@ namespace {
 
         // leave in modelview mode
         glMatrixMode(GL_MODELVIEW);
+        */
     }
 
 
@@ -911,6 +918,8 @@ namespace {
     void 
     mouseButtonFunc (int button, int state, int x, int y)
     {
+        dmess("Implement me!");
+        /*
         // if the mouse button has just been released
         if (state == GLUT_UP)
         {
@@ -922,15 +931,17 @@ namespace {
         // if the mouse button has just been pushed down
         if (state == GLUT_DOWN)
         {
+            dmess("Fix!!");
             // names for relevant values of "button" and "state"
-            const int  mods       = glutGetModifiers ();
-            const bool modNone    = (mods == 0);
-            const bool modCtrl    = (mods == GLUT_ACTIVE_CTRL);
-            const bool modAlt     = (mods == GLUT_ACTIVE_ALT);
-            const bool modCtrlAlt = (mods == (GLUT_ACTIVE_CTRL | GLUT_ACTIVE_ALT));
-            const bool mouseL     = (button == GLUT_LEFT_BUTTON);
-            const bool mouseM     = (button == GLUT_MIDDLE_BUTTON);
-            const bool mouseR     = (button == GLUT_RIGHT_BUTTON);
+            //const int  mods       = glutGetModifiers ();
+            const int  mods       = 0;
+            const bool modNone    = 0; //(mods == 0);
+            const bool modCtrl    = 0; //(mods == GLUT_ACTIVE_CTRL);
+            const bool modAlt     = 0; //(mods == GLUT_ACTIVE_ALT);
+            const bool modCtrlAlt = 0; //(mods == (GLUT_ACTIVE_CTRL | GLUT_ACTIVE_ALT));
+            const bool mouseL     = 0; //(button == GLUT_LEFT_BUTTON);
+            const bool mouseM     = 0; //(button == GLUT_MIDDLE_BUTTON);
+            const bool mouseR     = 0; //(button == GLUT_RIGHT_BUTTON);
 
     #if __APPLE__ && __MACH__
             const bool macosx = true;
@@ -969,6 +980,7 @@ namespace {
                 gMouseAdjustingCameraRadius = true;
             }
         }
+        */
     }
 
 
@@ -1032,8 +1044,11 @@ namespace {
     void 
     mouseEnterExitWindowFunc (int state)
     {
+        dmess("Implement me!");
+        /*
         if (state == GLUT_ENTERED) OpenSteer::OpenSteerDemo::mouseInWindow = true;
         if (state == GLUT_LEFT)    OpenSteer::OpenSteerDemo::mouseInWindow = false;
+        */
     }
 
 
@@ -1044,11 +1059,14 @@ namespace {
     void 
     drawDisplayPlugInName (void)
     {
+        dmess("Implement me!");
+        /*
         const float h = glutGet (GLUT_WINDOW_HEIGHT);
         const OpenSteer::Vec3 screenLocation (10, h-20, 0);
         draw2dTextAt2dLocation (*OpenSteer::OpenSteerDemo::nameOfSelectedPlugIn (),
                                 screenLocation,
                                 OpenSteer::gWhite, OpenSteer::drawGetWindowWidth(), OpenSteer::drawGetWindowHeight());
+                                */
     }
 
 
@@ -1344,9 +1362,7 @@ namespace {
 
         // exit application with normal status 
         case esc:
-            glutDestroyWindow (windowID);
-            OpenSteer::OpenSteerDemo::printMessage ("exit.");
-            OpenSteer::OpenSteerDemo::exit (0);
+            break;
 
         default:
             message << "unrecognized single key command: " << key;
@@ -1369,7 +1385,9 @@ namespace {
     specialFunc (int key, int /*x*/, int /*y*/)
     {
         std::ostringstream message;
+        dmess("Implement me!");
 
+        /*
         switch (key)
         {
         case GLUT_KEY_F1:  OpenSteer::OpenSteerDemo::functionKeyForPlugIn (1);  break;
@@ -1394,6 +1412,7 @@ namespace {
             OpenSteer::OpenSteerDemo::printMessage (message);
             break;
         }
+        */
     }
 
 
@@ -1428,7 +1447,7 @@ namespace {
 
         // double buffering, swap back and front buffers
         glFlush ();
-        glutSwapBuffers();
+        //glutSwapBuffers();
     }
 
 
@@ -1443,6 +1462,7 @@ namespace {
 void 
 OpenSteer::initializeGraphics (int argc, char **argv)
 {
+#ifdef WORKING
     // initialize GLUT state based on command line arguments
     glutInit (&argc, argv);  
 
@@ -1485,6 +1505,7 @@ OpenSteer::initializeGraphics (int argc, char **argv)
 
     // register handler for when mouse enters or exists the window
     glutEntryFunc (mouseEnterExitWindowFunc);
+    #endif
 }
 
 
@@ -1495,7 +1516,7 @@ OpenSteer::initializeGraphics (int argc, char **argv)
 void 
 OpenSteer::runGraphics (void)
 {
-    glutMainLoop ();  
+    //glutMainLoop ();  
 }
 
 
@@ -1507,13 +1528,17 @@ OpenSteer::runGraphics (void)
 float 
 OpenSteer::drawGetWindowHeight (void) 
 {
-    return glutGet (GLUT_WINDOW_HEIGHT);
+    dmess("Fix!");
+    //return glutGet (GLUT_WINDOW_HEIGHT);
+    return 0;
 }
 
 
 float 
 OpenSteer::drawGetWindowWidth  (void) 
 {
-    return glutGet (GLUT_WINDOW_WIDTH);
+    //return glutGet (GLUT_WINDOW_WIDTH);
+    dmess("Fix!");
+    return 0;
 }
 

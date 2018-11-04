@@ -165,7 +165,7 @@ No notes.
 * ~~Bring Emscripten ImGUI up to date with native version~~.
 * Present error if cannot connect to server
 * Move to a newer geos. 3.8.0Dev seems to have more functions.
-* Make a third party directory.
+* ~~Make a third party directory.~~
 * Make a project Talent Stack Document/Panel.
 * Remove fill and outline color arguments in Renderable, RenderablePolygon, etc
 
