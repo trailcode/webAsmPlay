@@ -482,11 +482,14 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
         if( attrs->hasStringKey("addr_house") ||
             attrs->hasStringKey("addr::housenumber") ||
-            attrs->hasStringKey("addr::housename"))
+            attrs->hasStringKey("addr::housename") ||
+            attrs->hasStringKeyValue("building", "house")) // TODO Are the ones above even doing anything?
         {
             fillColor = vec4(0.7,0.5,0,0.5);
 
             fc = 1;
+
+            //dmess("House!");
         }
         else if(attrs->hasStringKey("building"))
         {

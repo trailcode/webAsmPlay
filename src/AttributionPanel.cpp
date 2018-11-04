@@ -76,7 +76,30 @@ void GUI::attributionPanel()
 
     if (ImGui::CollapsingHeader("Linear Features", ImGuiTreeNodeFlags_DefaultOpen))
     {
+        static float minDist = ColorDistanceShader::getMinDist();
+        static float maxDist = ColorDistanceShader::getMaxDist();
         
+        if (ImGui::SliderFloat("Min", &minDist, -10.0f, 30.0f, "%.0f")) { ColorDistanceShader::setMinDist(minDist) ;}
+        if (ImGui::SliderFloat("Max", &maxDist, 0.0f,   50.0f, "%.0f")) { ColorDistanceShader::setMaxDist(maxDist) ;}
+        
+        static ImGuiColorEditFlags alpha_flags = 0;
+
+        ImGui::RadioButton("Opaque", &alpha_flags, 0);                                  ImGui::SameLine();
+        ImGui::RadioButton("Alpha",  &alpha_flags, ImGuiColorEditFlags_AlphaPreview);   ImGui::SameLine();
+        ImGui::RadioButton("Both",   &alpha_flags, ImGuiColorEditFlags_AlphaPreviewHalf);
+
+        static ImVec4 minColor = __(ColorDistanceShader::getMinColor());
+        static ImVec4 maxColor = __(ColorDistanceShader::getMaxColor());
+
+        if(ImGui::ColorEdit4("Min", (float*)&minColor, ImGuiColorEditFlags_AlphaBar | alpha_flags))
+        {
+            ColorDistanceShader::setMinColor(__(minColor));
+        }
+
+        if(ImGui::ColorEdit4("Max", (float*)&maxColor, ImGuiColorEditFlags_AlphaBar | alpha_flags))
+        {
+            ColorDistanceShader::setMaxColor(__(maxColor));
+        }
     }
 
     if (ImGui::CollapsingHeader("Polygonal features", ImGuiTreeNodeFlags_DefaultOpen))

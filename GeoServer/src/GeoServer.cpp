@@ -64,7 +64,8 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
     vector<AttributedGeometry> geometry = OSM_Reader::import(  
                                                                 //"/Users/trailcode/osm.osm"
                                                                 //"/Users/trailcode/osm1.osm"
-                                                                "/Users/trailcode/osmDenver.osm"
+                                                                //"/Users/trailcode/osmDenver.osm"
+                                                                "/Users/trailcode/osmDenver2.osm"
                                                                 );
 
     dmess("geometry " << geometry.size());

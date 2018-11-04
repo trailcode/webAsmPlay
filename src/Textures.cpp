@@ -193,12 +193,8 @@ void CheckOpenGLError(const char* stmt, const char* fname, int line)
 }
 
 
-    #define GL_CHECK(stmt) do { \
-            stmt; \
-            CheckOpenGLError(#stmt, __FILE__, __LINE__); \
-        } while (0)
-
-    //#define GL_CHECK(stmt) stmt
+    //#define GL_CHECK(stmt) do { stmt; CheckOpenGLError(#stmt, __FILE__, __LINE__); } while (0)
+    #define GL_CHECK(stmt) stmt
 
 
 GLuint Textures::set1D(const GLuint texture, const glm::vec4 * values, const size_t num)
