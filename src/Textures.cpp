@@ -182,16 +182,53 @@ GLuint Textures::create(const vec4 * values, const size_t num)
     return set1D(texture, values, num);
 };
 
+void CheckOpenGLError(const char* stmt, const char* fname, int line)
+{
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR)
+    {
+        printf("OpenGL error %08x, at %s:%i - for %s\n", err, fname, line, stmt);
+        //abort();
+    }
+}
+
+
+    #define GL_CHECK(stmt) do { \
+            stmt; \
+            CheckOpenGLError(#stmt, __FILE__, __LINE__); \
+        } while (0)
+
+    //#define GL_CHECK(stmt) stmt
+
+
 GLuint Textures::set1D(const GLuint texture, const glm::vec4 * values, const size_t num)
 {
-    glBindTexture( GL_TEXTURE_2D, texture );
+    //GL_CHECK(glEnable(GL_TEXTURE_2D));
+
+    GL_CHECK(glBindTexture( GL_TEXTURE_2D, texture ));
+
+    //GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    //GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+
+    // NEED EXT_color_buffer_float
 
     /* Generate The Texture */
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, num, 1, 0, GL_RGBA, GL_FLOAT, values );
+    GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, num, 1, 0, GL_RGBA, GL_FLOAT, values ));
+    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, num, 1, 0, GL_RGBA, GL_FLOAT, values ));
+    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 32, 1, 0, GL_RGBA, GL_FLOAT, buf));
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, num, 1, 0, GL_RGBA, GL_BYTE, buf );
+    
+    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_SHORT, buf ));
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, values );
+
+    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 
     /* Linear Filtering */
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    dmess("texture " << texture);
 
     return texture;
 }

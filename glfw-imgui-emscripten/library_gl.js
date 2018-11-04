@@ -646,13 +646,16 @@ var LibraryGL = {
       }
 
       var exts = GLctx.getSupportedExtensions();
+      console.log(exts);
       if (exts && exts.length > 0) {
         GLctx.getSupportedExtensions().forEach(function(ext) {
           if (automaticallyEnabledExtensions.indexOf(ext) != -1) {
-            GLctx.getExtension(ext); // Calling .getExtension enables that extension permanently, no need to store the return value to be enabled.
+            var r = GLctx.getExtension(ext); // Calling .getExtension enables that extension permanently, no need to store the return value to be enabled.
+            console.log('Enabeling: ', ext, r);
           }
         });
       }
+      
     },
 
     // In WebGL, uniforms in a shader program are accessed through an opaque object type 'WebGLUniformLocation'.

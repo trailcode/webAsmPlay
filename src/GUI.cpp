@@ -513,12 +513,12 @@ void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
 
     glViewport(0, 0, width, height);
 
+    ColorDistanceShader2::ensureShader();
     Renderable::ensureShader();
     //GridPlane  ::ensureShader();
     RenderablePolygon::ensureShaders();
     ColorDistanceShader::ensureShader();
-    ColorDistanceShader2::ensureShader();
-
+    
     canvas = new Canvas(false);
 
     canvas->setArea(ivec2(0,0), ivec2(width, height));

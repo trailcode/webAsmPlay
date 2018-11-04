@@ -523,13 +523,13 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
     if(getRenderFill())
     {
-        glEnable(GL_BLEND);
+        //glEnable(GL_BLEND);
 
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, NULL);
         
-        glDisable(GL_BLEND);
+        //glDisable(GL_BLEND);
     }
 
     glDisable(GL_DEPTH_TEST);
