@@ -25,10 +25,10 @@
 */
 
 #include <glm/gtc/type_ptr.hpp>
+#include <GLU/tessellate.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
-#include "../GLUTesselator/include/GLU/tessellate.h"
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>

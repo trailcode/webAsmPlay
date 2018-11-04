@@ -57,18 +57,7 @@ file(GLOB geosSrc   "geos/src/util/*.cpp"
                     "geos/src/linearref/*.cpp"
                     "geos/src/simplify/*.cpp")
 
-file(GLOB GLUTesselatorSrc  "GLUTesselator/src/dict.cpp"
-                            "GLUTesselator/src/mesh.cpp"
-                            "GLUTesselator/src/render.cpp"
-                            "GLUTesselator/src/tess.cpp"
-                            "GLUTesselator/src/geom.cpp"
-                            "GLUTesselator/src/memalloc.cpp"
-                            "GLUTesselator/src/normal.cpp"
-                            "GLUTesselator/src/priorityq.cpp"
-                            "GLUTesselator/src/sweep.cpp"
-                            "GLUTesselator/src/tessmono.cpp"
-                            "GLUTesselator/src/tessellate.cpp" 
-                            )
+file(GLOB GLUTesselatorSrc  "ThirdParty/GLUTesselator/src/*.cpp")
 
 file(GLOB opensteerSrc  "opensteer/src/Clock.cpp"
                             "opensteer/src/Color.cpp"
@@ -156,12 +145,9 @@ if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     include_directories(imgui/gl3w)
 endif()
 
-include_directories(GLUTesselator/include)
+include_directories(ThirdParty/GLUTesselator/include)
 include_directories(geos/include)
 include_directories(glm)
-include_directories(glbinding/include)
-include_directories(glbinding-aux/include)
-include_directories(globjects/include)
 include_directories(opensteer/include)
 include_directories(GeoServer/inc)
 include_directories(imgui)

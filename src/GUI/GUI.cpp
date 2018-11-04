@@ -36,7 +36,7 @@
 #include <geos/geom/Point.h>
 #include <geos/simplify/TopologyPreservingSimplifier.h>
 #include <geos/simplify/DouglasPeuckerSimplifier.h>
-#include "../GLUTesselator/include/GLU/tessellate.h"
+#include <GLU/tessellate.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
