@@ -19,43 +19,43 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "")
       append_compiler_flag("-O3")
 endif()
 
-file(GLOB geosSrc   "geos/src/util/*.cpp"
-                    "geos/src/geom/*.cpp"
-                    "geos/src/index/bintree/*.cpp"
-                    "geos/src/index/chain/*.cpp"
-                    "geos/src/index/intervalrtree/*.cpp"
-                    "geos/src/index/quadtree/*.cpp"
-                    "geos/src/index/strtree/*.cpp"
-                    "geos/src/index/sweepline/*.cpp"
-                    "geos/src/geom/prep/*.cpp"
-                    "geos/src/geom/util/*.cpp"
-                    "geos/src/io/*.cpp"
-                    "geos/src/algorithm/*.cpp"
-                    "geos/src/algorithm/distance/*.cpp"
-                    "geos/src/algorithm/locate/*.cpp"
-                    "geos/src/geomgraph/*.cpp"
-                    "geos/src/geomgraph/index/*.cpp"
-                    "geos/src/noding/*.cpp"
-                    "geos/src/noding/snapround/*.cpp"
-                    "geos/src/operation/*.cpp"
-                    "geos/src/operation/buffer/*.cpp"
-                    "geos/src/operation/distance/*.cpp"
-                    "geos/src/operation/intersection/*.cpp"
-                    "geos/src/operation/linemerge/*.cpp"
-                    "geos/src/operation/overlay/*.cpp"
-                    "geos/src/operation/overlay/validate/*.cpp"
-                    "geos/src/operation/overlay/snap/*.cpp"
-                    "geos/src/operation/polygonize/*.cpp"
-                    "geos/src/operation/predicate/*.cpp"
-                    "geos/src/operation/relate/*.cpp"
-                    "geos/src/operation/sharedpaths/*.cpp"
-                    "geos/src/operation/union/*.cpp"
-                    "geos/src/operation/valid/*.cpp"
-                    "geos/src/planargraph/*.cpp"
-                    "geos/src/planargraph/algorithm/*.cpp"
-                    "geos/src/precision/*.cpp"
-                    "geos/src/linearref/*.cpp"
-                    "geos/src/simplify/*.cpp")
+file(GLOB geosSrc   "ThirdParty/geos/src/util/*.cpp"
+                    "ThirdParty/geos/src/geom/*.cpp"
+                    "ThirdParty/geos/src/index/bintree/*.cpp"
+                    "ThirdParty/geos/src/index/chain/*.cpp"
+                    "ThirdParty/geos/src/index/intervalrtree/*.cpp"
+                    "ThirdParty/geos/src/index/quadtree/*.cpp"
+                    "ThirdParty/geos/src/index/strtree/*.cpp"
+                    "ThirdParty/geos/src/index/sweepline/*.cpp"
+                    "ThirdParty/geos/src/geom/prep/*.cpp"
+                    "ThirdParty/geos/src/geom/util/*.cpp"
+                    "ThirdParty/geos/src/io/*.cpp"
+                    "ThirdParty/geos/src/algorithm/*.cpp"
+                    "ThirdParty/geos/src/algorithm/distance/*.cpp"
+                    "ThirdParty/geos/src/algorithm/locate/*.cpp"
+                    "ThirdParty/geos/src/geomgraph/*.cpp"
+                    "ThirdParty/geos/src/geomgraph/index/*.cpp"
+                    "ThirdParty/geos/src/noding/*.cpp"
+                    "ThirdParty/geos/src/noding/snapround/*.cpp"
+                    "ThirdParty/geos/src/operation/*.cpp"
+                    "ThirdParty/geos/src/operation/buffer/*.cpp"
+                    "ThirdParty/geos/src/operation/distance/*.cpp"
+                    "ThirdParty/geos/src/operation/intersection/*.cpp"
+                    "ThirdParty/geos/src/operation/linemerge/*.cpp"
+                    "ThirdParty/geos/src/operation/overlay/*.cpp"
+                    "ThirdParty/geos/src/operation/overlay/validate/*.cpp"
+                    "ThirdParty/geos/src/operation/overlay/snap/*.cpp"
+                    "ThirdParty/geos/src/operation/polygonize/*.cpp"
+                    "ThirdParty/geos/src/operation/predicate/*.cpp"
+                    "ThirdParty/geos/src/operation/relate/*.cpp"
+                    "ThirdParty/geos/src/operation/sharedpaths/*.cpp"
+                    "ThirdParty/geos/src/operation/union/*.cpp"
+                    "ThirdParty/geos/src/operation/valid/*.cpp"
+                    "ThirdParty/geos/src/planargraph/*.cpp"
+                    "ThirdParty/geos/src/planargraph/algorithm/*.cpp"
+                    "ThirdParty/geos/src/precision/*.cpp"
+                    "ThirdParty/geos/src/linearref/*.cpp"
+                    "ThirdParty/geos/src/simplify/*.cpp")
 
 file(GLOB GLUTesselatorSrc  "ThirdParty/GLUTesselator/src/*.cpp")
 
@@ -145,9 +145,10 @@ if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     include_directories(imgui/gl3w)
 endif()
 
+include_directories(ThirdParty)
 include_directories(ThirdParty/GLUTesselator/include)
-include_directories(geos/include)
-include_directories(glm)
+include_directories(ThirdParty/geos/include)
+include_directories(ThirdParty/glm)
 include_directories(opensteer/include)
 include_directories(GeoServer/inc)
 include_directories(imgui)
