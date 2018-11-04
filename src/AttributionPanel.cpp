@@ -76,21 +76,15 @@ void GUI::attributionPanel()
 
     if (ImGui::CollapsingHeader("Linear Features", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        for (int i = 0; i < 10; i++)
-            ImGui::Text("Scrolling Text %d", i);
+        
     }
 
     if (ImGui::CollapsingHeader("Polygonal features", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        static vec4 defaultColors[]  = {ColorDistanceShader2::getColor(0 * 2 + 0), ColorDistanceShader2::getColor(0 * 2 + 1), vec4(0,1,0,1), vec4(0,1,0,1) };
-        static vec4 houseColors[]    = {ColorDistanceShader2::getColor(1 * 2 + 0), ColorDistanceShader2::getColor(1 * 2 + 1), vec4(0,1,0,1), vec4(0,1,0,1) };
-        static vec4 buildingColors[] = {ColorDistanceShader2::getColor(2 * 2 + 0), ColorDistanceShader2::getColor(2 * 2 + 1), vec4(0,1,0,1), vec4(0,1,0,1) };
-        static vec4 grassColors[]    = {ColorDistanceShader2::getColor(3 * 2 + 0), ColorDistanceShader2::getColor(3 * 2 + 1), vec4(0,1,0,1), vec4(0,1,0,1) };
-
-        addSymbologyColorControls(0, "Default",  defaultColors);
-        addSymbologyColorControls(1, "House",    houseColors);
-        addSymbologyColorControls(2, "Building", buildingColors);
-        addSymbologyColorControls(3, "Grass",    grassColors);
+        addSymbologyColorControls(0, "Default",  &ColorDistanceShader2::getColorRef(0 * 4 + 0));
+        addSymbologyColorControls(1, "House",    &ColorDistanceShader2::getColorRef(1 * 4 + 0));
+        addSymbologyColorControls(2, "Building", &ColorDistanceShader2::getColorRef(2 * 4 + 0));
+        addSymbologyColorControls(3, "Grass",    &ColorDistanceShader2::getColorRef(3 * 4 + 0));
     }
 
     ImGui::End();

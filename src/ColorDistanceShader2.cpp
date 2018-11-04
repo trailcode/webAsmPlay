@@ -164,10 +164,9 @@ vec4 ColorDistanceShader2::setColor(const size_t index, const vec4 & color)
     return colors[index] = color;
 }
 
-vec4 ColorDistanceShader2::getColor(const size_t index)
-{
-    return colors[index];
-}
+vec4 ColorDistanceShader2::getColor(const size_t index) { return colors[index] ;}
+
+vec4 & ColorDistanceShader2::getColorRef(const size_t index) { return colors[index] ;}
 
 void ColorDistanceShader2::loadState(const JSONObject & dataStore)
 {

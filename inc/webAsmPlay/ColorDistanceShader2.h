@@ -41,6 +41,7 @@ public:
 
     static glm::vec4 setColor(const size_t index, const glm::vec4 & color);
     static glm::vec4 getColor(const size_t index);
+    static glm::vec4 & getColorRef(const size_t index);
 
     static void loadState(const JSONObject & dataStore);
 
