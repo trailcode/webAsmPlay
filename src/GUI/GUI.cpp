@@ -49,6 +49,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/ColorDistanceShader.h>
 #include <webAsmPlay/ColorDistanceShader2.h>
+#include <webAsmPlay/ColorShader.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
@@ -514,10 +515,10 @@ void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
     glViewport(0, 0, width, height);
 
     ColorDistanceShader2::ensureShader();
-    Renderable::ensureShader();
     //GridPlane  ::ensureShader();
     RenderablePolygon::ensureShaders();
     ColorDistanceShader::ensureShader();
+    ColorShader::ensureShader();
     
     canvas = new Canvas(false);
 

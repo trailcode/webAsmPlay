@@ -24,37 +24,42 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
-#define __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
-
-#include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
+#include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/Shader.h>
 
-class ColorDistanceShader : public Shader
+using namespace glm;
+
+Shader::Shader(ShaderProgram * program) :   renderFill   (true),
+                                            renderOutline(true),
+                                            program      (program) {}
+
+bool Shader::getRenderFill() const { return renderFill ;}
+bool Shader::getRenderOutline() const { return renderOutline ;}
+
+void Shader::enableVertexAttribArray(const GLint       size,
+                                     const GLenum      type,
+                                     const GLboolean   normalized,
+                                     const GLsizei     stride,
+                                     const GLvoid    * pointer)
 {
-public:
+    program->enableVertexAttribArray(size,
+                                     type,
+                                     normalized,
+                                     stride,
+                                     pointer);
+}
 
-    static void ensureShader();
+void Shader::enableColorAttribArray(const GLint       size,
+                                    const GLenum      type,
+                                    const GLboolean   normalized,
+                                    const GLsizei     stride,
+                                    const GLvoid    * pointer)
+{
+    program->enableColorAttribArray(size,
+                                    type,
+                                    normalized,
+                                    stride,
+                                    pointer);
+}
 
-    void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
-
-    static glm::vec4 setMinColor(const glm::vec4 & minColor);
-    static glm::vec4 setMaxColor(const glm::vec4 & maxColor);
-
-    static glm::vec4 getMinColor();
-    static glm::vec4 getMaxColor();
-
-    static float setMinDist(const float & value);
-    static float setMaxDist(const float & value);
-
-    static float getMinDist();
-    static float getMaxDist();
-
-private:
-
-    ColorDistanceShader();
-    ~ColorDistanceShader() {}
-};
-
-#endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
+void Shader::bind(const mat4 & MVP, const mat4 & MV) { program->bind(MVP, MV) ;}

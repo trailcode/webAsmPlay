@@ -39,19 +39,11 @@ RenderableLineString::RenderableLineString( const GLuint  vao,
                                             const GLuint  ebo,
                                             const GLuint  vbo,
                                             const GLuint  numElements,
-                                            const bool    isMulti,
-                                            const GLuint  fillColor,
-                                            const GLuint  outlineColor,
-                                            const bool    renderOutline,
-                                            const bool    renderFill) :    Renderable( isMulti,
-                                                                                       fillColor,
-                                                                                       outlineColor,
-                                                                                       renderOutline,
-                                                                                       renderFill),
-                                                                           vao         (vao),
-                                                                           ebo         (ebo),
-                                                                           vbo         (vbo),
-                                                                           numElements (numElements)
+                                            const bool    isMulti) :    Renderable(isMulti),
+                                                                        vao         (vao),
+                                                                        ebo         (ebo),
+                                                                        vbo         (vbo),
+                                                                        numElements (numElements)
 {
 }
 
@@ -63,11 +55,7 @@ RenderableLineString::~RenderableLineString()
 }
 
 Renderable * RenderableLineString::create(  const LineString * lineString,
-                                            const mat4       & trans,
-                                            const GLuint       fillColor,
-                                            const GLuint       outlineColor,
-                                            const bool         renderOutline,
-                                            const bool         renderFill)
+                                            const mat4       & trans)
 {
     if(!lineString)
     {
@@ -115,20 +103,12 @@ Renderable * RenderableLineString::create(  const LineString * lineString,
 
     return create(  verts,
                     indices,
-                    fillColor,
-                    outlineColor,
-                    renderOutline,
-                    renderFill,
                     false // isMulti
                 );
 }
 
 Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineStrings,
-                                            const mat4              & trans,
-                                            const GLuint fillColor,
-                                            const GLuint outlineColor,
-                                            const bool                renderOutline,
-                                            const bool                renderFill)
+                                            const mat4              & trans)
 {
     size_t numVerts = 0;
 
@@ -184,20 +164,12 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
 
     return create(  verts,
                     indices,
-                    fillColor,
-                    outlineColor,
-                    renderOutline,
-                    renderFill,
                     true // isMulti
                 );
 }
 
 Renderable * RenderableLineString::create(  const FloatVec  & verts,
                                             const Uint32Vec & indices,
-                                            const GLuint      fillColor,
-                                            const GLuint      outlineColor,
-                                            const bool        renderOutline,
-                                            const bool        renderFill,
                                             const bool        isMulti)
 {
     GLuint vao = 0;
@@ -220,11 +192,7 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
                                     ebo,
                                     vbo,
                                     indices.size(),
-                                    isMulti,
-                                    fillColor,
-                                    outlineColor,
-                                    renderOutline,
-                                    renderFill);
+                                    isMulti);
 }
 
 void RenderableLineString::render(const mat4 & MVP, const mat4 & MV) const

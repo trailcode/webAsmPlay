@@ -34,7 +34,7 @@
 #include <geos/geom/Geometry.h>
 #include <webAsmPlay/Types.h>
 
-class ShaderProgram;
+class Shader;
 
 class Canvas;
 
@@ -51,64 +51,25 @@ public:
     virtual void render(const glm::mat4 & MVP, const glm::mat4 & MV) const = 0;
 
     static Renderable * create( const geos::geom::Geometry::Ptr & geom,
-                                const glm::mat4                 & trans         = glm::mat4(1.0),
-                                const GLuint fillColor     = 0,
-                                const GLuint outlineColor  = 0,
-                                const bool                        renderOutline = getDefaultRenderOutline(),
-                                const bool                        renderFill    = getDefaultRenderFill());
+                                const glm::mat4                 & trans = glm::mat4(1.0));
 
     static Renderable * create( const geos::geom::Geometry  * geom,
-                                const glm::mat4             & trans         = glm::mat4(1.0),
-                                const GLuint fillColor     = 0,
-                                const GLuint outlineColor  = 0,
-                                const bool                    renderOutline = getDefaultRenderOutline(),
-                                const bool                    renderFill    = getDefaultRenderFill());
-
-    static void ensureShader();
-
-    static ShaderProgram * getDefaultShader();
-
-    GLuint setFillColor(const GLuint fillColor);
-    GLuint getFillColor() const;
-
-    GLuint setOutlineColor(const GLuint outlineColor);
-    GLuint getOutlineColor() const;
-
-    bool setRenderOutline(const bool renderOutline);
-    bool getRenderOutline() const;
-
-    bool setRenderFill(const bool renderFill);
-    bool getRenderFill() const;
+                                const glm::mat4             & trans = glm::mat4(1.0));
 
     void addOnDeleteCallback(const OnDelete & callback);
 
-    static GLuint setDefaultFillColor(const GLuint fillColor);
-    static GLuint getDefaultFillColor();
-
-    static GLuint setDefaultOutlineColor(const GLuint outlineColor);
-    static GLuint getDefaultOutlineColor();
-
-    static bool setDefaultRenderFill(const bool renderFill);
-    static bool getDefaultRenderFill();
-
-    static bool setDefaultRenderOutline(const bool renderOutline);
-    static bool getDefaultRenderOutline();
+    Shader * getShader() const;
+    Shader * setShader(Shader * shader);
 
 protected:
 
-    Renderable( const bool    isMulti,
-                const GLuint  fillColor,
-                const GLuint  outlineColor,
-                const bool    renderOutline,
-                const bool    renderFill);
+    Renderable(const bool isMulti);
 
     std::vector<OnDelete> onDeleteCallbacks;
 
-    bool    isMulti;
-    GLuint  fillColor;
-    GLuint  outlineColor;
-    bool    renderOutline;
-    bool    renderFill;
+    bool isMulti;
+
+    Shader * shader;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__

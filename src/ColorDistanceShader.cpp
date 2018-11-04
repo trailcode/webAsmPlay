@@ -35,7 +35,7 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram * instance = NULL;
+    ShaderProgram * programInstance = NULL;
 
     GLint MV_Uniform            = -1;
     GLint minVertexColorUniform = -1;
@@ -112,7 +112,7 @@ void ColorDistanceShader::ensureShader()
         }
     )glsl";
 
-    instance = ShaderProgram::create(  vertexSource,
+    programInstance = ShaderProgram::create(  vertexSource,
                                 fragmentSource,
                                 StrVec({"MV",
                                         "minVertexColorIn",
@@ -120,22 +120,27 @@ void ColorDistanceShader::ensureShader()
                                         "minDistIn",
                                         "maxDistIn"}));
 
-    MV_Uniform            = instance->getUniformLoc("MV");
-    minVertexColorUniform = instance->getUniformLoc("minVertexColorIn");
-    maxVertexColorUniform = instance->getUniformLoc("maxVertexColorIn");
-    minDistUniform = instance->getUniformLoc("minDistIn");
-    maxDistUniform = instance->getUniformLoc("maxDistIn");
+    MV_Uniform            = programInstance->getUniformLoc("MV");
+    minVertexColorUniform = programInstance->getUniformLoc("minVertexColorIn");
+    maxVertexColorUniform = programInstance->getUniformLoc("maxVertexColorIn");
+    minDistUniform = programInstance->getUniformLoc("minDistIn");
+    maxDistUniform = programInstance->getUniformLoc("maxDistIn");
+}
+
+ColorDistanceShader::ColorDistanceShader() : Shader(programInstance)
+{
+
 }
 
 void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV)
 {
-    instance->ShaderProgram::bind(MVP, MV);
+    programInstance->ShaderProgram::bind(MVP, MV);
 
-    instance->setUniform(MV_Uniform,            MV);
-    instance->setUniform(minVertexColorUniform, minColor);
-    instance->setUniform(maxVertexColorUniform, maxColor);
-    instance->setUniform(minDistUniform,        minDist);
-    instance->setUniform(maxDistUniform,        maxDist);
+    programInstance->setUniform(MV_Uniform,            MV);
+    programInstance->setUniform(minVertexColorUniform, minColor);
+    programInstance->setUniform(maxVertexColorUniform, maxColor);
+    programInstance->setUniform(minDistUniform,        minDist);
+    programInstance->setUniform(maxDistUniform,        maxDist);
 
     glEnable   (GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

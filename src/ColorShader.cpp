@@ -24,53 +24,57 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_SHADER_H__
-#define __WEB_ASM_PLAY_SHADER_H__
+#include <webAsmPlay/ShaderProgram.h>
+#include <webAsmPlay/ColorShader.h>
 
-#ifdef __EMSCRIPTEN__
-    // GLEW
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-#else
-    #include <GL/gl3w.h>
-#endif
-
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-
-class ShaderProgram;
-
-class Shader
+namespace
 {
-public:
+    ShaderProgram * shaderProgram = NULL;
 
-    bool getRenderFill() const;
-    bool getRenderOutline() const;
+    ColorShader * defaultInstance = NULL;
+}
 
-    virtual void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
+void ColorShader::ensureShader()
+{
+    if(shaderProgram) { return ;}
 
-    void enableVertexAttribArray(   const GLint       size          = 2,
-                                    const GLenum      type          = GL_FLOAT,
-                                    const GLboolean   normalized    = GL_FALSE,
-                                    const GLsizei     stride        = 0,
-                                    const GLvoid    * pointer       = NULL);
+    // Shader sources
+    const GLchar* vertexSource = R"glsl(#version 330 core
+        in vec2 vertIn;
+        out vec4 vertexColor;
+        uniform mat4 MVP;
+        uniform vec4 colorIn;
 
-    void enableColorAttribArray(    const GLint       size          = 4,
-                                    const GLenum      type          = GL_FLOAT,
-                                    const GLboolean   normalized    = GL_FALSE,
-                                    const GLsizei     stride        = 0,
-                                    const GLvoid    * pointer       = NULL);
+        void main()
+        {
+            gl_Position = MVP * vec4(vertIn.xy, 0, 1);
+            vertexColor = colorIn;
+        }
+    )glsl";
 
-protected:
+    const GLchar* fragmentSource = R"glsl(#version 330 core
+        out vec4 outColor;
+        in vec4 vertexColor;
 
-    Shader(ShaderProgram * program);
+        void main()
+        {
+            outColor = vertexColor;
+        }
+    )glsl";
 
-    virtual ~Shader() {}
+    shaderProgram = ShaderProgram::create(vertexSource, fragmentSource);
 
-    bool renderFill;
-    bool renderOutline;
+    defaultInstance = new ColorShader();
+}
 
-    ShaderProgram * program;
-};
+ColorShader * ColorShader::getDefaultInstance() { return defaultInstance ;}
 
-#endif // __WEB_ASM_PLAY_SHADER_H__
+ColorShader::ColorShader() : Shader(shaderProgram)
+{
+
+}
+
+ColorShader::~ColorShader()
+{
+
+}

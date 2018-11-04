@@ -43,14 +43,10 @@ public:
 
 private:
 
-    RenderablePoint(const GLuint      vao,
-                    const GLuint      ebo,
-                    const GLuint      vbo,
-                    const bool        isMulti,
-                    const GLuint fillColor,
-                    const GLuint outlineColor,
-                    const bool        renderOutline,
-                    const bool        renderFill);
+    RenderablePoint(const GLuint vao,
+                    const GLuint ebo,
+                    const GLuint vbo,
+                    const bool   isMulti);
 
     const GLuint vao;
     const GLuint ebo;

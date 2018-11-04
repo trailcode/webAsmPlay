@@ -469,10 +469,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     
     dmess("Start base geom...");
 
-
-    //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors;
-
-    vector<tuple<const Geometry *, const GLuint, const GLuint> > polysAndColors;
+    vector<pair<const Geometry *, const size_t> > polysAndColors; // TODO rename this
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
@@ -500,9 +497,8 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
             fc = 4;
         }
 
-        polysAndColors.push_back(make_tuple(geoms[i].second, fc, 1));
+        polysAndColors.push_back(make_pair(geoms[i].second, fc));
     }
-    
 
     dmess("polysAndColors " << polysAndColors.size());
 
@@ -510,7 +506,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     Renderable * r = RenderablePolygon::create(polysAndColors, trans);
 
     //r->setOutlineColor(vec4(0.3,1,0,1));
-    r->setOutlineColor(1);
+    //r->setOutlineColor(1);
     
     canvas->addRenderiable(r);
     
@@ -554,7 +550,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
     
     //r->setOutlineColor(vec4(0.6,0.4,0,1));
-    r->setOutlineColor(1);
+    //r->setOutlineColor(1);
     //r->setOutlineColor(vec4(0,1,1,0.4));
     
     canvas->addRenderiable(r);

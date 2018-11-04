@@ -24,53 +24,23 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_SHADER_H__
-#define __WEB_ASM_PLAY_SHADER_H__
+#ifndef __WEB_ASM_PLAY_COLOR_SHADER_H__
+#define __WEB_ASM_PLAY_COLOR_SHADER_H__
 
-#ifdef __EMSCRIPTEN__
-    // GLEW
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-#else
-    #include <GL/gl3w.h>
-#endif
+#include <webAsmPlay/Shader.h>
 
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-
-class ShaderProgram;
-
-class Shader
+class ColorShader : public Shader
 {
-public:
+    public:
 
-    bool getRenderFill() const;
-    bool getRenderOutline() const;
+    ColorShader();
+    ~ColorShader();
 
-    virtual void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
+    static void ensureShader();
 
-    void enableVertexAttribArray(   const GLint       size          = 2,
-                                    const GLenum      type          = GL_FLOAT,
-                                    const GLboolean   normalized    = GL_FALSE,
-                                    const GLsizei     stride        = 0,
-                                    const GLvoid    * pointer       = NULL);
+    static ColorShader * getDefaultInstance();
 
-    void enableColorAttribArray(    const GLint       size          = 4,
-                                    const GLenum      type          = GL_FLOAT,
-                                    const GLboolean   normalized    = GL_FALSE,
-                                    const GLsizei     stride        = 0,
-                                    const GLvoid    * pointer       = NULL);
-
-protected:
-
-    Shader(ShaderProgram * program);
-
-    virtual ~Shader() {}
-
-    bool renderFill;
-    bool renderOutline;
-
-    ShaderProgram * program;
+    private:
 };
 
-#endif // __WEB_ASM_PLAY_SHADER_H__
+#endif // __WEB_ASM_PLAY_COLOR_SHADER_H__
