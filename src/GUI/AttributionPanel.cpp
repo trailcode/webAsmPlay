@@ -78,27 +78,29 @@ void GUI::attributionPanel()
 
     if (ImGui::CollapsingHeader("Linear Features", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        static float minDist = ColorDistanceShader::getMinDist();
-        static float maxDist = ColorDistanceShader::getMaxDist();
+        ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
+
+        static float minDist = shader->getMinDist();
+        static float maxDist = shader->getMaxDist();
         
-        static ImVec4 minColor = __(ColorDistanceShader::getMinColor());
-        static ImVec4 maxColor = __(ColorDistanceShader::getMaxColor());
+        static ImVec4 minColor = __(shader->getMinColor());
+        static ImVec4 maxColor = __(shader->getMaxColor());
 
         if(ImGui::ColorEdit4("Min", (float*)&minColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-            ColorDistanceShader::setMinColor(__(minColor));
+            shader->setMinColor(__(minColor));
         }
 
         if(ImGui::ColorEdit4("Max", (float*)&maxColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-            ColorDistanceShader::setMaxColor(__(maxColor));
+            shader->setMaxColor(__(maxColor));
         }
     }
 
-    ColorDistanceShader2 * shader = ColorDistanceShader2::getDefaultInstance();
-
     if (ImGui::CollapsingHeader("Polygonal features", ImGuiTreeNodeFlags_DefaultOpen))
     {
+        ColorDistanceShader2 * shader = ColorDistanceShader2::getDefaultInstance();
+
         addSymbologyColorControls(0, "Default",  &shader->getColorRef(0 * 4 + 0));
         addSymbologyColorControls(1, "House",    &shader->getColorRef(1 * 4 + 0));
         addSymbologyColorControls(2, "Building", &shader->getColorRef(2 * 4 + 0));

@@ -72,13 +72,15 @@ void GUI::loadState()
 
     typedef float (*_setFloat)(const float & value);
 
-    auto setFloat = [&root](const wstring & key, _setFloat setFunc)->void
+    ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
+
+    auto setFloat = [&root, shader](const wstring & key, _setFloat setFunc)->void
     {
-        if(root.find(key) != root.end()) { setFunc(root[key]->AsNumber()) ;}
+        //if(root.find(key) != root.end()) { shader->setFunc(root[key]->AsNumber()) ;}
     };
 
-    setFloat(L"ColorDistanceShader::minDist", &ColorDistanceShader::setMinDist);
-    setFloat(L"ColorDistanceShader::maxDist", &ColorDistanceShader::setMaxDist);
+    //setFloat(L"ColorDistanceShader::minDist", &ColorDistanceShader::setMinDist);
+    //setFloat(L"ColorDistanceShader::maxDist", &ColorDistanceShader::setMaxDist);
 
     typedef vec4 (*_setVec4)(const vec4 & value);
 
@@ -87,8 +89,8 @@ void GUI::loadState()
         if(root.find(key) != root.end()) { setFunc(root[key]->AsVec4()) ;}
     };
 
-    setVec4(L"ColorDistanceShader::minColor", &ColorDistanceShader::setMinColor);
-    setVec4(L"ColorDistanceShader::maxColor", &ColorDistanceShader::setMaxColor);
+    //setVec4(L"ColorDistanceShader::minColor", &ColorDistanceShader::setMinColor);
+    //setVec4(L"ColorDistanceShader::maxColor", &ColorDistanceShader::setMaxColor);
 
     ColorDistanceShader2::getDefaultInstance()->loadState(root);
 }
@@ -108,13 +110,15 @@ void GUI::saveState()
     root[L"showGUI_Settings_Panel"]   = new JSONValue(showGUI_Settings_Panel);
     root[L"showAttributionPanel"]     = new JSONValue(showAttributionPanel);
 
+    ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
+
     // Floats
-    root[L"ColorDistanceShader::minDist"]  = new JSONValue(ColorDistanceShader::getMinDist());
-    root[L"ColorDistanceShader::maxDist"]  = new JSONValue(ColorDistanceShader::getMaxDist());
+    root[L"ColorDistanceShader::minDist"]  = new JSONValue(shader->getMinDist());
+    root[L"ColorDistanceShader::maxDist"]  = new JSONValue(shader->getMaxDist());
 
     // Vec4s
-    root[L"ColorDistanceShader::minColor"] = new JSONValue(ColorDistanceShader::getMinColor());
-    root[L"ColorDistanceShader::maxColor"] = new JSONValue(ColorDistanceShader::getMaxColor());
+    root[L"ColorDistanceShader::minColor"] = new JSONValue(shader->getMinColor());
+    root[L"ColorDistanceShader::maxColor"] = new JSONValue(shader->getMaxColor());
 
     ColorDistanceShader2::getDefaultInstance()->saveState(root);
 
