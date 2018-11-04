@@ -42,18 +42,22 @@ public:
 
     void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
 
-    static glm::vec4 setColor(const size_t index, const glm::vec4 & color);
-    static glm::vec4 getColor(const size_t index);
-    static glm::vec4 & getColorRef(const size_t index);
+    glm::vec4 setColor(const size_t index, const glm::vec4 & color);
+    glm::vec4 getColor(const size_t index);
+    glm::vec4 & getColorRef(const size_t index);
 
-    static void loadState(const JSONObject & dataStore);
+    void loadState(const JSONObject & dataStore);
 
-    static void saveState(JSONObject & dataStore);
+    void saveState(JSONObject & dataStore);
 
     ColorDistanceShader2();
     ~ColorDistanceShader2();
 
 private:
+
+    glm::vec4 colors[32];
+
+    bool colorTextureDirty;
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER2_H__

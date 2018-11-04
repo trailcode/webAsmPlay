@@ -44,24 +44,26 @@ namespace
     // 3 - grass
     void addSymbologyColorControls(const size_t colorIndex, const string & name, vec4 * colors)
     {
+        ColorDistanceShader2 * shader = ColorDistanceShader2::getDefaultInstance();
+
         if(ImGui::ColorEdit4((name + " fill near").c_str(), value_ptr(colors[0]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-            ColorDistanceShader2::setColor(colorIndex * 4 + 0, colors[0]);
+            shader->setColor(colorIndex * 4 + 0, colors[0]);
         }
 
         if(ImGui::ColorEdit4((name + " fill far").c_str(), value_ptr(colors[1]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-            ColorDistanceShader2::setColor(colorIndex * 4 + 1, colors[1]);
+            shader->setColor(colorIndex * 4 + 1, colors[1]);
         }
 
         if(ImGui::ColorEdit4((name + " outline near").c_str(), value_ptr(colors[2]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-            ColorDistanceShader2::setColor(colorIndex * 4 + 2, colors[2]);
+            shader->setColor(colorIndex * 4 + 2, colors[2]);
         }
 
         if(ImGui::ColorEdit4((name + " outline far").c_str(), value_ptr(colors[3]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-            ColorDistanceShader2::setColor(colorIndex * 4 + 3, colors[3]);
+            shader->setColor(colorIndex * 4 + 3, colors[3]);
         }
 
         ImGui::Separator();
@@ -93,13 +95,15 @@ void GUI::attributionPanel()
         }
     }
 
+    ColorDistanceShader2 * shader = ColorDistanceShader2::getDefaultInstance();
+
     if (ImGui::CollapsingHeader("Polygonal features", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        addSymbologyColorControls(0, "Default",  &ColorDistanceShader2::getColorRef(0 * 4 + 0));
-        addSymbologyColorControls(1, "House",    &ColorDistanceShader2::getColorRef(1 * 4 + 0));
-        addSymbologyColorControls(2, "Building", &ColorDistanceShader2::getColorRef(2 * 4 + 0));
-        addSymbologyColorControls(3, "Grass",    &ColorDistanceShader2::getColorRef(3 * 4 + 0));
-        addSymbologyColorControls(3, "water",    &ColorDistanceShader2::getColorRef(4 * 4 + 0));
+        addSymbologyColorControls(0, "Default",  &shader->getColorRef(0 * 4 + 0));
+        addSymbologyColorControls(1, "House",    &shader->getColorRef(1 * 4 + 0));
+        addSymbologyColorControls(2, "Building", &shader->getColorRef(2 * 4 + 0));
+        addSymbologyColorControls(3, "Grass",    &shader->getColorRef(3 * 4 + 0));
+        addSymbologyColorControls(3, "water",    &shader->getColorRef(4 * 4 + 0));
     }
 
     ImGui::End();

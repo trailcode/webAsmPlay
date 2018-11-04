@@ -90,7 +90,7 @@ void GUI::loadState()
     setVec4(L"ColorDistanceShader::minColor", &ColorDistanceShader::setMinColor);
     setVec4(L"ColorDistanceShader::maxColor", &ColorDistanceShader::setMaxColor);
 
-    ColorDistanceShader2::loadState(root);
+    ColorDistanceShader2::getDefaultInstance()->loadState(root);
 }
 
 void GUI::saveState()
@@ -116,7 +116,7 @@ void GUI::saveState()
     root[L"ColorDistanceShader::minColor"] = new JSONValue(ColorDistanceShader::getMinColor());
     root[L"ColorDistanceShader::maxColor"] = new JSONValue(ColorDistanceShader::getMaxColor());
 
-    ColorDistanceShader2::saveState(root);
+    ColorDistanceShader2::getDefaultInstance()->saveState(root);
 
     wstring_convert<codecvt_utf8<wchar_t>, wchar_t> converter;
 

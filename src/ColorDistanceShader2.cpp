@@ -49,11 +49,9 @@ namespace
 
     GLuint texUniform = -1;
 
-    glm::vec4 colors[32];
-
     GLuint colorTexture = 0;
 
-    bool colorTextureDirty = true;
+    glm::vec4 initalColors[32];
 }
 
 void ColorDistanceShader2::ensureShader()
@@ -110,16 +108,7 @@ void ColorDistanceShader2::ensureShader()
         }
     )glsl";
 
-    colors[0] = vec4(1,0,0,1);
-    colors[1] = vec4(1,1,0,1);
-    colors[2] = vec4(1,0,1,1);
-    colors[3] = vec4(0,1,0,1);
-    colors[4] = vec4(0,1,1,1);
-    colors[5] = vec4(0,0,1,1);
-    colors[6] = vec4(1,0,0,1);
-    colors[7] = vec4(1,0,0,1);
-
-    colorTexture = Textures::create(colors, 32);
+    colorTexture = Textures::create(initalColors, 32);
 
     shaderProgram = ShaderProgram::create(  vertexSource,
                                 fragmentSource,
@@ -138,7 +127,14 @@ void ColorDistanceShader2::ensureShader()
 
 ColorDistanceShader2::ColorDistanceShader2() : Shader(shaderProgram)
 {
-
+    colors[0] = vec4(1,0,0,1);
+    colors[1] = vec4(1,1,0,1);
+    colors[2] = vec4(1,0,1,1);
+    colors[3] = vec4(0,1,0,1);
+    colors[4] = vec4(0,1,1,1);
+    colors[5] = vec4(0,0,1,1);
+    colors[6] = vec4(1,0,0,1);
+    colors[7] = vec4(1,0,0,1);
 }
 
 ColorDistanceShader2::~ColorDistanceShader2()
