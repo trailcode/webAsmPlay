@@ -37,7 +37,7 @@
     #include <GL/glew.h>
     #define IMGUI_API
     
-    #include </Users/trailcode/emscripten/webAsmPlay/glfw-imgui-emscripten/GLFW/glfw3.h>
+    #include <glfw-imgui-emscripten/GLFW/glfw3.h>
     #include <emscripten/emscripten.h>
     #include <emscripten/bind.h>
 #else
