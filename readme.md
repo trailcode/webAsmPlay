@@ -10,7 +10,7 @@ is developed and debugged both as a web application and a native application.
 Another goal is to discover the limitations and capabilities of Emscripten web application development.
 Cross platform development is achieved using cmake.
 
-![alt text](https://raw.githubusercontent.com/trailcode/trailcode.github.io/master/webAsmPlay.jpg)
+![Screenshot](docs/webAsmPlay.jpg)
 
 After initial evaluation the next goal of this project is to create a Real-Time Strategy game using
 OpenSteer (http://opensteer.sourceforge.net/)  and OpenStreetMap (https://www.openstreetmap.org)
