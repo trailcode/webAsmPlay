@@ -46,22 +46,22 @@ namespace
     {
         if(ImGui::ColorEdit4((name + " fill near").c_str(), value_ptr(colors[0]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-            ColorDistanceShader2::setColor(colorIndex * 2 + 0, colors[0]);
+            ColorDistanceShader2::setColor(colorIndex * 4 + 0, colors[0]);
         }
 
         if(ImGui::ColorEdit4((name + " fill far").c_str(), value_ptr(colors[1]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-            ColorDistanceShader2::setColor(colorIndex * 2 + 1, colors[1]);
+            ColorDistanceShader2::setColor(colorIndex * 4 + 1, colors[1]);
         }
 
         if(ImGui::ColorEdit4((name + " outline near").c_str(), value_ptr(colors[2]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-
+            ColorDistanceShader2::setColor(colorIndex * 4 + 2, colors[2]);
         }
 
         if(ImGui::ColorEdit4((name + " outline far").c_str(), value_ptr(colors[3]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
-
+            ColorDistanceShader2::setColor(colorIndex * 4 + 3, colors[3]);
         }
 
         ImGui::Separator();

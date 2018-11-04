@@ -37,7 +37,7 @@ public:
 
     static void ensureShader();
 
-    static void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
+    static void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const float offset);
 
     static glm::vec4 setColor(const size_t index, const glm::vec4 & color);
     static glm::vec4 getColor(const size_t index);

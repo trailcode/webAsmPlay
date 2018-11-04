@@ -40,6 +40,8 @@ namespace
 
     GLint colorsInLoc = -1;
 
+    GLint colorLookupOffsetLoc = -1;
+
     GLint MV_Uniform = -1;
 
     GLuint texUniform = -1;
@@ -62,11 +64,11 @@ void ColorDistanceShader2::ensureShader()
         
         uniform mat4 MVP;
         uniform mat4 MV;
+        uniform float colorLookupOffset;
         
         out vec4 vertexColorNear;
         out vec4 vertexColorFar;
         out vec4 position_in_view_space;
-        //out vec2 vertColor;
 
         void main()
         {
@@ -76,19 +78,15 @@ void ColorDistanceShader2::ensureShader()
 
             gl_Position = MVP * vert;
 
-            vertexColorNear = texture(tex, vec2(vertColorIn, 0.5));
-            //vertexColorNear = vec4(0,1,0,0.4);
-            //vertexColorFar = texture(tex, vec2(vertColorIn + 1.0 / 32.0, 0.5));
-            //vertColor = vertColorIn;
+            vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
+            vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
         }
     )glsl";
 
     const GLchar* fragmentSource = R"glsl(#version 150 core
-        //uniform sampler2D tex;
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
-        //in vec2 vertColor;
 
         out vec4 outColor;
 
@@ -105,12 +103,7 @@ void ColorDistanceShader2::ensureShader()
             
             dist = min(maxDist, dist) / maxDist;
 
-            //outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
-            outColor = vertexColorNear;
-            //vec3 t = texture(tex, vec2(0, 0.5)).rgb;
-            //outColor = vec4(t.xyz, 1.0);
-            //outColor = texture(tex, vertColor);
-            //outColor = vec4(0,1,0,0.5);
+            outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
         }
     )glsl";
 
@@ -123,34 +116,32 @@ void ColorDistanceShader2::ensureShader()
     colors[6] = vec4(1,0,0,1);
     colors[7] = vec4(1,0,0,1);
 
-    //glUniform4fv(colorsInLoc, 32, (const GLfloat *)colors);
-
     colorTexture = Textures::create(colors, 32);
 
     instance = Shader::create(  vertexSource,
                                 fragmentSource,
-                                StrVec({"MV", "colorsIn", "tex"}));
+                                StrVec({"MV", "colorsIn", "tex", "colorLookupOffset"}));
+
+    colorLookupOffsetLoc = instance->getUniformLoc("colorLookupOffset");
 
     MV_Uniform  = instance->getUniformLoc("MV");
 
     colorsInLoc = instance->getUniformLoc("colorsIn");
 
     texUniform = instance->getUniformLoc("tex");
-    glUniform1i       (texUniform,                     0);
-
-    //dmess("texUniform " << texUniform);
-
-    
 }
 
-void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV)
+void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV, const float offset)
 {
-    //dmess("MV " << mat4ToStr(MV));
+    if(colorTextureDirty)
+    {
+        Textures::set1D(colorTexture, colors, 32);
+
+        colorTextureDirty =false;
+    }
 
     glActiveTexture(GL_TEXTURE0);
     glEnable(GL_TEXTURE_2D);
-    //glBindSampler(0, linearFiltering);
-    //dmess("colorTexture " << colorTexture);
     glBindTexture(GL_TEXTURE_2D, colorTexture);
 
     instance->bind(MVP, MV);
@@ -159,35 +150,15 @@ void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV)
 
     instance->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-    //instance->enableColorAttribArray(1, GL_UNSIGNED_INT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
     instance->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
 
-    //uniform1i(programInfo.uniformLocations.uSampler, 0);
+    instance->setUniformi(texUniform, 0);
 
-    //instance->setUniformi(texUniform, 0);
-
-    glUniform1i     (texUniform,                     0);
-
-    
-
-    //glUniform4fv(colorsInLoc, 32, (const GLfloat *)colors);
-
-    //dmess("colorTextureDirty " << colorTextureDirty);
-
-    if(colorTextureDirty)
-    {
-        Textures::set1D(colorTexture, colors, 32);
-
-        colorTextureDirty =false;
-    }
-    
-    
+    instance->setUniform(colorLookupOffsetLoc, offset);
 }
 
 vec4 ColorDistanceShader2::setColor(const size_t index, const vec4 & color)
 {
-    dmess("ColorDistanceShader2::setColor");
-
     colorTextureDirty = true;
 
     return colors[index] = color;

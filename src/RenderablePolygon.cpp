@@ -415,16 +415,7 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
                 *vertsPtr = tess.vertsOut[j * 2 + 0]; ++vertsPtr;
                 *vertsPtr = tess.vertsOut[j * 2 + 1]; ++vertsPtr;
 
-                /*
-                *vertsPtr = tesselations[i].fillColor.x; ++vertsPtr;
-                *vertsPtr = tesselations[i].fillColor.y; ++vertsPtr;
-                *vertsPtr = tesselations[i].fillColor.z; ++vertsPtr;
-                *vertsPtr = tesselations[i].fillColor.w; ++vertsPtr;
-                */
-                
-                //memcpy(vertsPtr, &tesselations[i].fillColor, sizeof(GLuint)); ++vertsPtr;
-                *vertsPtr = (float(tesselations[i].fillColor * 2) + 0.5) / 32.0; ++vertsPtr;
-                //*vertsPtr = 0.5; ++vertsPtr;
+                *vertsPtr = (float(tesselations[i].fillColor * 4) + 0.5) / 32.0; ++vertsPtr;
             }
         }
         else
@@ -458,11 +449,6 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    /*
-    if(!seperateFillColors) { glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 2,       &verts[0], GL_STATIC_DRAW) ;}
-    else                    { glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * (2 + 4), &verts[0], GL_STATIC_DRAW) ;}
-    */
-
     glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -493,63 +479,43 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
     glBindBuffer(GL_ARRAY_BUFFER,         vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    //if(seperateFillColors)
-    if(true)
-    {
-        #ifdef WORKING
-        colorPolygonShader->bind(MVP, MV);
+    glEnable(GL_BLEND);
 
-        /*
-        colorPolygonShader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
-
-        colorPolygonShader->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-        */
-
-        colorPolygonShader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
-
-        colorPolygonShader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
-        #endif
-
-        ColorDistanceShader2::bind(MVP, MV);
-    }
-    else
-    {
-        getDefaultShader()->bind(MVP, MV);
-
-        //if(getRenderFill()) { getDefaultShader()->setColor(fillColor) ;}
-
-        getDefaultShader()->enableVertexAttribArray();
-    }
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if(getRenderFill())
     {
-        //glEnable(GL_BLEND);
-
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        ColorDistanceShader2::bind(MVP, MV, 0);
 
         glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, NULL);
-        
-        //glDisable(GL_BLEND);
     }
 
     glDisable(GL_DEPTH_TEST);
 
-    if(false && getRenderOutline())
+    if(getRenderOutline())
     {
-        if(seperateFillColors)
+        //if(seperateFillColors)
         {
+            /*
             getDefaultShader()->bind(MVP, MV);
 
             //getDefaultShader()->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
             getDefaultShader()->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+            */
         } 
         
-        getDefaultShader()->setColor(vec4(0,1,0,1));
+        ColorDistanceShader2::bind(MVP, MV, 2.0);
+
+        //getDefaultShader()->setColor(vec4(0,1,0,1));
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
         
         glDrawElements(GL_LINES, numContourLines, GL_UNSIGNED_INT, NULL);
     }
+
+    glDisable(GL_BLEND);
+
+    glUseProgram(0);
 }
 
 void RenderablePolygon::ensureShaders()

@@ -203,32 +203,14 @@ void CheckOpenGLError(const char* stmt, const char* fname, int line)
 
 GLuint Textures::set1D(const GLuint texture, const glm::vec4 * values, const size_t num)
 {
-    //GL_CHECK(glEnable(GL_TEXTURE_2D));
+    //GL_CHECK(glBindTexture( GL_TEXTURE_2D, texture ));
+    glBindTexture( GL_TEXTURE_2D, texture ); // TODO Why the OpenGL error?
 
-    GL_CHECK(glBindTexture( GL_TEXTURE_2D, texture ));
-
-    //GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    //GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-
-    // NEED EXT_color_buffer_float
-
-    /* Generate The Texture */
+    // Generate The Texture
     GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, num, 1, 0, GL_RGBA, GL_FLOAT, values ));
-    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, num, 1, 0, GL_RGBA, GL_FLOAT, values ));
-    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 32, 1, 0, GL_RGBA, GL_FLOAT, buf));
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, num, 1, 0, GL_RGBA, GL_BYTE, buf );
     
-    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_SHORT, buf ));
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, values );
-
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-
-    /* Linear Filtering */
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-    dmess("texture " << texture);
 
     return texture;
 }
