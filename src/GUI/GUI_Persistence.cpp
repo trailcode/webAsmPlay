@@ -32,7 +32,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/ColorDistanceShader.h>
 #include <webAsmPlay/ColorDistanceShader2.h>
-#include <webAsmPlay/GUI.h>
+#include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
 using namespace glm;

@@ -28,7 +28,7 @@
 #include <glm/gtc/type_ptr.hpp> // value_ptr
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
-#include <webAsmPlay/ImguiInclude.h>
+#include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/FrameBuffer.h>

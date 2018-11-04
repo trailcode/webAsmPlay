@@ -38,7 +38,6 @@
 #include <geos/io/WKBReader.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
-#include <webAsmPlay/ImguiInclude.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GeosUtil.h>
@@ -48,7 +47,8 @@
 #include <webAsmPlay/RenderableLineString.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeoClientRequest.h>
-#include <webAsmPlay/GUI.h>
+#include <webAsmPlay/GUI/GUI.h>
+#include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GeoClient.h>
 
 using namespace std;

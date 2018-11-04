@@ -41,6 +41,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <imguitoolbar.h>
+#include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Attributes.h>
@@ -57,7 +58,6 @@
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/GeosUtil.h>
-#include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 // .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.

@@ -24,10 +24,10 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/ImguiInclude.h>
+#include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/GUI.h>
+#include <webAsmPlay/GUI/GUI.h>
 
 void GUI::sceneViewPanel()
 {

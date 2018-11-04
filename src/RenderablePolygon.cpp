@@ -57,20 +57,18 @@ RenderablePolygon::RenderablePolygon(   const GLuint      vao,
                                         const GLuint      fillColor,
                                         const GLuint      outlineColor,
                                         const bool        renderOutline,
-                                        const bool        renderFill,
-                                        const bool        seperateFillColors) : Renderable( isMulti,
-                                                                                            fillColor,
-                                                                                            outlineColor,
-                                                                                            renderOutline,
-                                                                                            renderFill),
-                                                                                vao                 (vao),
-                                                                                ebo                 (ebo),
-                                                                                ebo2                (ebo2),
-                                                                                vbo                 (vbo),
-                                                                                numTriangles        (numTriangles),
-                                                                                counterVertIndices  (counterVertIndices),
-                                                                                numContourLines     (numContourLines),
-                                                                                seperateFillColors  (seperateFillColors)
+                                        const bool        renderFill) : Renderable( isMulti,
+                                                                                    fillColor,
+                                                                                    outlineColor,
+                                                                                    renderOutline,
+                                                                                    renderFill),
+                                                                        vao                 (vao),
+                                                                        ebo                 (ebo),
+                                                                        ebo2                (ebo2),
+                                                                        vbo                 (vbo),
+                                                                        numTriangles        (numTriangles),
+                                                                        counterVertIndices  (counterVertIndices),
+                                                                        numContourLines     (numContourLines)
 {
 }
 
@@ -240,8 +238,7 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
                                     fillColor,
                                     outlineColor,
                                     renderOutline, 
-                                    renderFill,
-                                    false);
+                                    renderFill);
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
@@ -259,8 +256,7 @@ Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
                                     fillColor,
                                     outlineColor,
                                     renderOutline, 
-                                    renderFill,
-                                    false);
+                                    renderFill);
 }
 
 Renderable * RenderablePolygon::create( const ConstGeosGeomVec & polygons,
@@ -305,8 +301,7 @@ Renderable * RenderablePolygon::create( const ConstGeosGeomVec & polygons,
                                     fillColor,
                                     outlineColor,
                                     renderOutline,
-                                    renderFill,
-                                    false);
+                                    renderFill);
 }
 
 Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, const GLuint, const GLuint> >  & polygons,
@@ -356,8 +351,7 @@ Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, con
                                     fillColor,
                                     outlineColor,
                                     renderOutline,
-                                    renderFill,
-                                    true);
+                                    renderFill);
 }
 
 Renderable * RenderablePolygon::createFromTesselations( const Tesselations & tesselations,
@@ -400,19 +394,12 @@ Renderable * RenderablePolygon::createFromTesselations( const Tesselations & tes
     {
         const TesselationResult & tess = tesselations[i];
 
-        if(seperateFillColors) // TODO template or make two loops to avoid so many if checks
+        for(size_t j = 0; j < tess.numVerts; ++j)
         {
-            for(size_t j = 0; j < tess.numVerts; ++j)
-            {
-                *vertsPtr = tess.vertsOut[j * 2 + 0]; ++vertsPtr;
-                *vertsPtr = tess.vertsOut[j * 2 + 1]; ++vertsPtr;
+            *vertsPtr = tess.vertsOut[j * 2 + 0]; ++vertsPtr;
+            *vertsPtr = tess.vertsOut[j * 2 + 1]; ++vertsPtr;
 
-                *vertsPtr = (float(tesselations[i].fillColor * 4) + 0.5) / 32.0; ++vertsPtr;
-            }
-        }
-        else
-        {
-            for(size_t j = 0; j < tess.numVerts * 2; ++j, ++vertsPtr) { *vertsPtr = tess.vertsOut[j] ;}
+            *vertsPtr = (float(tesselations[i].fillColor * 4) + 0.5) / 32.0; ++vertsPtr;
         }
 
         for(size_t j = 0; j < tess.numTriangles * 3; ++j, ++triangleIndicesPtr) { *triangleIndicesPtr = tess.triangleIndices[j] + offset ;}
@@ -460,8 +447,7 @@ Renderable * RenderablePolygon::createFromTesselations( const Tesselations & tes
                                     fillColor,
                                     outlineColor,
                                     renderOutline,
-                                    renderFill,
-                                    seperateFillColors);
+                                    renderFill);
 }
 
 void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const

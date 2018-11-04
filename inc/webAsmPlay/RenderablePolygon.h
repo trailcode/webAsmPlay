@@ -111,10 +111,9 @@ private:
                         const GLuint      fillColor,
                         const GLuint      outlineColor,
                         const bool        renderOutline,
-                        const bool        renderFill,
-                        const bool        seperateFillColors);
+                        const bool        renderFill);
 
-    typedef std::vector<const TesselationResult> Tesselations
+    typedef std::vector<const TesselationResult> Tesselations;
 
     static Renderable * createFromTesselations( const Tesselations & tesselations,
                                                 const GLuint         fillColor,
