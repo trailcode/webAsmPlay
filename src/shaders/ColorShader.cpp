@@ -24,8 +24,8 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/ShaderProgram.h>
-#include <webAsmPlay/ColorShader.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/shaders/ColorShader.h>
 
 using namespace glm;
 

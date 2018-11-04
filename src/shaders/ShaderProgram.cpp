@@ -26,7 +26,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/ShaderProgram.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
 
 using namespace std;
 using namespace glm;

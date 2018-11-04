@@ -45,8 +45,8 @@
 #include <webAsmPlay/GeometryConverter.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/RenderableLineString.h>
-#include <webAsmPlay/ColorDistanceShader.h>
-#include <webAsmPlay/ColorDistanceShader2.h>
+#include <webAsmPlay/shaders/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/ColorDistanceShader2.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GUI/GUI.h>

@@ -28,9 +28,9 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
-#include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/Textures.h>
-#include <webAsmPlay/ColorDistanceShader2.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/shaders/ColorDistanceShader2.h>
 
 using namespace std;
 using namespace glm;

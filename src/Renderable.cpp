@@ -29,7 +29,7 @@
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/ColorShader.h>
+#include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/RenderableLineString.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/Renderable.h>
