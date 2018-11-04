@@ -469,14 +469,14 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     
     dmess("Start base geom...");
 
+
     //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors;
+
     vector<tuple<const Geometry *, const GLuint, const GLuint> > polysAndColors;
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
         Attributes * attrs = geoms[i].first;
-
-        vec4 fillColor = vec4(0,0,1,0.5);
 
         GLuint fc = 0;
 
@@ -485,28 +485,27 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
             attrs->hasStringKey("addr::housename") ||
             attrs->hasStringKeyValue("building", "house")) // TODO Are the ones above even doing anything?
         {
-            fillColor = vec4(0.7,0.5,0,0.5);
-
             fc = 1;
-
-            //dmess("House!");
         }
         else if(attrs->hasStringKey("building"))
         {
-            fillColor = vec4(1,0.5,0,0.5);
             fc = 2;
         }
         else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
         {
-            fillColor = vec4(0,0.7,0,0.5);
             fc = 3;
         }
-        
-        //polysAndColors.push_back(make_tuple(geoms[i].second, fillColor, vec4(0,1,0,1)));
+        else if(attrs->hasStringKeyValue("landuse", "reservor"))
+        {
+            fc = 4;
+        }
+
         polysAndColors.push_back(make_tuple(geoms[i].second, fc, 1));
     }
     
+
     dmess("polysAndColors " << polysAndColors.size());
+
 
     Renderable * r = RenderablePolygon::create(polysAndColors, trans);
 

@@ -108,26 +108,27 @@ private:
                         const Uint32Vec & counterVertIndices,
                         const size_t      numContourLines,
                         const bool        isMulti,
-                        const GLuint fillColor,
-                        const GLuint outlineColor,
+                        const GLuint      fillColor,
+                        const GLuint      outlineColor,
                         const bool        renderOutline,
                         const bool        renderFill,
                         const bool        seperateFillColors);
 
-    static Renderable * createFromTesselations( const std::vector<const TesselationResult>  & tesselations,
-                                                const GLuint fillColor,
-                                                const GLuint outlineColor,
-                                                const bool                                    renderOutline,
-                                                const bool                                    renderFill,
-                                                const bool                                    seperateFillColors);
+    typedef std::vector<const TesselationResult> Tesselations
+
+    static Renderable * createFromTesselations( const Tesselations & tesselations,
+                                                const GLuint         fillColor,
+                                                const GLuint         outlineColor,
+                                                const bool           renderOutline,
+                                                const bool           renderFill);
 
     static TesselationResult tessellatePolygon( const geos::geom::Polygon * poly,
                                                 const glm::dmat4          & trans,
-                                                const GLuint fillColor = 0);
+                                                const GLuint                fillColor = 0);
 
-    static void tesselateMultiPolygon(  const geos::geom::MultiPolygon       * multiPoly,
-                                        const glm::dmat4                     & trans,
-                                        std::vector<const TesselationResult> & tesselationResults);
+    static void tesselateMultiPolygon(  const geos::geom::MultiPolygon  * multiPoly,
+                                        const glm::dmat4                & trans,
+                                        Tesselations                    & tesselationResults);
 
     static void ensureOutlineShader();
 
@@ -140,7 +141,6 @@ private:
     const int       numTriangles;
     const Uint32Vec counterVertIndices;
     const size_t    numContourLines;
-    const bool      seperateFillColors;
 }; 
 
 #endif // __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__

@@ -6,11 +6,11 @@ WebAsmPlay was initially developed to evaluate web application development using
 
 Currently a handful of C++ libraries have been compiled with Emscripten in this project to run in the browser
 and run natively. The idea is to test a cross platform development environment where an application
-is developed and debugged both as a web application and a browser application.
+is developed and debugged both as a web application and a native application.
 Another goal is to discover the limitations and capabilities of Emscripten web application development.
 Cross platform development is achieved using cmake.
 
-After initial evaluation the next goal of this project is to create a Real-TIme Strategy game using
+After initial evaluation the next goal of this project is to create a Real-Time Strategy game using
 OpenSteer (http://opensteer.sourceforge.net/)  and OpenStreetMap (https://www.openstreetmap.org)
 To provide a starting point for non player character(NPC) zombie bots who roam Open Street Map cities.
 NPC positions will be calculated on a server and the client application running in the browser or natively
@@ -165,6 +165,7 @@ No notes.
 * Move to a newer geos. 3.8.0Dev seems to have more functions.
 * Make a third party directory.
 * Make a project Talent Stack Document/Panel.
+* Remove fill and outline color arguments in Renderable, RenderablePolygon, etc
 
 ### Bugs
 

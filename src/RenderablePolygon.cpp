@@ -206,9 +206,9 @@ RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  cons
     return ret;
 }
 
-void RenderablePolygon::tesselateMultiPolygon(  const MultiPolygon              * multiPoly,
-                                                const dmat4                     & trans,
-                                                vector<const TesselationResult> & tesselationResults)
+void RenderablePolygon::tesselateMultiPolygon(  const MultiPolygon  * multiPoly,
+                                                const dmat4         & trans,
+                                                Tesselations        & tesselationResults)
 {
     for(size_t i = 0; i < multiPoly->getNumGeometries(); ++i)
     {
@@ -360,15 +360,12 @@ Renderable * RenderablePolygon::create( const vector<tuple<const Geometry *, con
                                     true);
 }
 
-Renderable * RenderablePolygon::createFromTesselations( const vector<const TesselationResult> & tesselations,
-                                                        const GLuint                            fillColor,
-                                                        const GLuint                            outlineColor,
-                                                        const bool                              renderOutline,
-                                                        const bool                              renderFill,
-                                                        const bool                              _seperateFillColors)
+Renderable * RenderablePolygon::createFromTesselations( const Tesselations & tesselations,
+                                                        const GLuint         fillColor,
+                                                        const GLuint         outlineColor,
+                                                        const bool           renderOutline,
+                                                        const bool           renderFill)
 {
-    const bool seperateFillColors = true;
-
     if(!tesselations.size()) { return NULL ;}
 
     size_t numVerts                 = 0;
@@ -385,11 +382,6 @@ Renderable * RenderablePolygon::createFromTesselations( const vector<const Tesse
     }
 
     FloatVec verts;
-    
-    /*
-    if(seperateFillColors)  { verts.resize(numVerts * (2 + 4)) ;}
-    else                    { verts.resize(numVerts * 2 + 4) ;}
-    */
 
     verts.resize(numVerts * (2 + 1));
 
@@ -494,20 +486,8 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
     if(getRenderOutline())
     {
-        //if(seperateFillColors)
-        {
-            /*
-            getDefaultShader()->bind(MVP, MV);
-
-            //getDefaultShader()->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
-            getDefaultShader()->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
-            */
-        } 
-        
         ColorDistanceShader2::bind(MVP, MV, 2.0);
 
-        //getDefaultShader()->setColor(vec4(0,1,0,1));
-        
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
         
         glDrawElements(GL_LINES, numContourLines, GL_UNSIGNED_INT, NULL);

@@ -40,22 +40,13 @@ void GUI::renderSettingsPanel()
 
     ImGui::Begin("Render Settings", &showRenderSettingsPanel);
 
-        static bool fillPolygons            = true;
-        static bool renderPolygonOutlines   = true;
-        static bool renderSkyBox            = true;
+        static bool fillPolygons           = true;
+        static bool renderPolygonOutlines  = true;
+        static bool renderLinearFeatures   = true;
+        static bool renderSkyBox           = true;
 
-        static bool _fillPolygons           = true;
-        static bool _renderPolygonOutlines  = true;
-        static bool _renderSkyBox           = true;
-
-        ImGui::Checkbox("Fill Polygons",    &_fillPolygons);
-        ImGui::Checkbox("Polygon Outlines", &_renderPolygonOutlines);
-        ImGui::Checkbox("SkyBox",           &_renderSkyBox);
-
-        if(fillPolygons != _fillPolygons)
+        if(ImGui::Checkbox("Fill Polygons", &fillPolygons))
         {
-            fillPolygons = _fillPolygons;
-
             for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
 
             for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
@@ -63,10 +54,8 @@ void GUI::renderSettingsPanel()
             Renderable::setDefaultRenderFill(fillPolygons);
         }
 
-        if(renderPolygonOutlines != _renderPolygonOutlines)
+        if(ImGui::Checkbox("Polygon Outlines", &renderPolygonOutlines))
         {
-            renderPolygonOutlines = _renderPolygonOutlines;
-
             for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
 
             for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
@@ -74,10 +63,13 @@ void GUI::renderSettingsPanel()
             Renderable::setDefaultRenderOutline(renderPolygonOutlines);
         }
 
-        if(renderSkyBox != _renderSkyBox)
+        if(ImGui::Checkbox("Linear Features", &renderLinearFeatures))
         {
-            renderSkyBox = _renderSkyBox;
+            dmess("Linear Features");
+        }
 
+        if(ImGui::Checkbox("SkyBox", &renderSkyBox))
+        {
             if(renderSkyBox) { canvas->setSkyBox(skyBox) ;}
             else             { canvas->setSkyBox(NULL)   ;}
         }

@@ -79,24 +79,15 @@ void GUI::attributionPanel()
         static float minDist = ColorDistanceShader::getMinDist();
         static float maxDist = ColorDistanceShader::getMaxDist();
         
-        if (ImGui::SliderFloat("Min", &minDist, -10.0f, 30.0f, "%.0f")) { ColorDistanceShader::setMinDist(minDist) ;}
-        if (ImGui::SliderFloat("Max", &maxDist, 0.0f,   50.0f, "%.0f")) { ColorDistanceShader::setMaxDist(maxDist) ;}
-        
-        static ImGuiColorEditFlags alpha_flags = 0;
-
-        ImGui::RadioButton("Opaque", &alpha_flags, 0);                                  ImGui::SameLine();
-        ImGui::RadioButton("Alpha",  &alpha_flags, ImGuiColorEditFlags_AlphaPreview);   ImGui::SameLine();
-        ImGui::RadioButton("Both",   &alpha_flags, ImGuiColorEditFlags_AlphaPreviewHalf);
-
         static ImVec4 minColor = __(ColorDistanceShader::getMinColor());
         static ImVec4 maxColor = __(ColorDistanceShader::getMaxColor());
 
-        if(ImGui::ColorEdit4("Min", (float*)&minColor, ImGuiColorEditFlags_AlphaBar | alpha_flags))
+        if(ImGui::ColorEdit4("Min", (float*)&minColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
             ColorDistanceShader::setMinColor(__(minColor));
         }
 
-        if(ImGui::ColorEdit4("Max", (float*)&maxColor, ImGuiColorEditFlags_AlphaBar | alpha_flags))
+        if(ImGui::ColorEdit4("Max", (float*)&maxColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
         {
             ColorDistanceShader::setMaxColor(__(maxColor));
         }
@@ -108,6 +99,7 @@ void GUI::attributionPanel()
         addSymbologyColorControls(1, "House",    &ColorDistanceShader2::getColorRef(1 * 4 + 0));
         addSymbologyColorControls(2, "Building", &ColorDistanceShader2::getColorRef(2 * 4 + 0));
         addSymbologyColorControls(3, "Grass",    &ColorDistanceShader2::getColorRef(3 * 4 + 0));
+        addSymbologyColorControls(3, "water",    &ColorDistanceShader2::getColorRef(4 * 4 + 0));
     }
 
     ImGui::End();

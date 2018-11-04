@@ -96,19 +96,19 @@ public:
 
 protected:
 
-    Renderable( const bool        isMulti,
-                const GLuint fillColor,
-                const GLuint outlineColor,
-                const bool        renderOutline,
-                const bool        renderFill);
+    Renderable( const bool    isMulti,
+                const GLuint  fillColor,
+                const GLuint  outlineColor,
+                const bool    renderOutline,
+                const bool    renderFill);
 
     std::vector<OnDelete> onDeleteCallbacks;
 
-    bool        isMulti;
-    GLuint   fillColor;
-    GLuint   outlineColor;
-    bool        renderOutline;
-    bool        renderFill;
+    bool    isMulti;
+    GLuint  fillColor;
+    GLuint  outlineColor;
+    bool    renderOutline;
+    bool    renderFill;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__
