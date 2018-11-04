@@ -36,7 +36,7 @@
 #include <geos/geom/Point.h>
 #include <geos/simplify/TopologyPreservingSimplifier.h>
 #include <geos/simplify/DouglasPeuckerSimplifier.h>
-#include "../GLUTesselator/include/GLU/tessellate.h"
+#include <GLU/tessellate.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -47,9 +47,9 @@
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/ColorDistanceShader.h>
-#include <webAsmPlay/ColorDistanceShader2.h>
-#include <webAsmPlay/ColorShader.h>
+#include <webAsmPlay/shaders/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/ColorDistanceShader2.h>
+#include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>

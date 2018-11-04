@@ -25,8 +25,8 @@
 */
 
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Shader.h>
-#include <webAsmPlay/ShaderProgram.h>
+#include <webAsmPlay/shaders/Shader.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/RenderablePoint.h>
 
 using namespace std;

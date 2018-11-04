@@ -28,8 +28,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Camera.h>
-#include <webAsmPlay/ShaderProgram.h>
-#include <webAsmPlay/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/shaders/ColorDistanceShader.h>
 
 using namespace glm;
 

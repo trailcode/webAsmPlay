@@ -30,8 +30,8 @@
 #include <codecvt>
 #include <JSON.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/ColorDistanceShader.h>
-#include <webAsmPlay/ColorDistanceShader2.h>
+#include <webAsmPlay/shaders/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/ColorDistanceShader2.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;

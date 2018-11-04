@@ -33,7 +33,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/ShaderProgram.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/SkyBox.h>
 

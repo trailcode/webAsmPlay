@@ -19,58 +19,47 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "")
       append_compiler_flag("-O3")
 endif()
 
-file(GLOB geosSrc   "geos/src/util/*.cpp"
-                    "geos/src/geom/*.cpp"
-                    "geos/src/index/bintree/*.cpp"
-                    "geos/src/index/chain/*.cpp"
-                    "geos/src/index/intervalrtree/*.cpp"
-                    "geos/src/index/quadtree/*.cpp"
-                    "geos/src/index/strtree/*.cpp"
-                    "geos/src/index/sweepline/*.cpp"
-                    "geos/src/geom/prep/*.cpp"
-                    "geos/src/geom/util/*.cpp"
-                    "geos/src/io/*.cpp"
-                    "geos/src/algorithm/*.cpp"
-                    "geos/src/algorithm/distance/*.cpp"
-                    "geos/src/algorithm/locate/*.cpp"
-                    "geos/src/geomgraph/*.cpp"
-                    "geos/src/geomgraph/index/*.cpp"
-                    "geos/src/noding/*.cpp"
-                    "geos/src/noding/snapround/*.cpp"
-                    "geos/src/operation/*.cpp"
-                    "geos/src/operation/buffer/*.cpp"
-                    "geos/src/operation/distance/*.cpp"
-                    "geos/src/operation/intersection/*.cpp"
-                    "geos/src/operation/linemerge/*.cpp"
-                    "geos/src/operation/overlay/*.cpp"
-                    "geos/src/operation/overlay/validate/*.cpp"
-                    "geos/src/operation/overlay/snap/*.cpp"
-                    "geos/src/operation/polygonize/*.cpp"
-                    "geos/src/operation/predicate/*.cpp"
-                    "geos/src/operation/relate/*.cpp"
-                    "geos/src/operation/sharedpaths/*.cpp"
-                    "geos/src/operation/union/*.cpp"
-                    "geos/src/operation/valid/*.cpp"
-                    "geos/src/planargraph/*.cpp"
-                    "geos/src/planargraph/algorithm/*.cpp"
-                    "geos/src/precision/*.cpp"
-                    "geos/src/linearref/*.cpp"
-                    "geos/src/simplify/*.cpp")
+file(GLOB geosSrc   "ThirdParty/geos/src/util/*.cpp"
+                    "ThirdParty/geos/src/geom/*.cpp"
+                    "ThirdParty/geos/src/index/bintree/*.cpp"
+                    "ThirdParty/geos/src/index/chain/*.cpp"
+                    "ThirdParty/geos/src/index/intervalrtree/*.cpp"
+                    "ThirdParty/geos/src/index/quadtree/*.cpp"
+                    "ThirdParty/geos/src/index/strtree/*.cpp"
+                    "ThirdParty/geos/src/index/sweepline/*.cpp"
+                    "ThirdParty/geos/src/geom/prep/*.cpp"
+                    "ThirdParty/geos/src/geom/util/*.cpp"
+                    "ThirdParty/geos/src/io/*.cpp"
+                    "ThirdParty/geos/src/algorithm/*.cpp"
+                    "ThirdParty/geos/src/algorithm/distance/*.cpp"
+                    "ThirdParty/geos/src/algorithm/locate/*.cpp"
+                    "ThirdParty/geos/src/geomgraph/*.cpp"
+                    "ThirdParty/geos/src/geomgraph/index/*.cpp"
+                    "ThirdParty/geos/src/noding/*.cpp"
+                    "ThirdParty/geos/src/noding/snapround/*.cpp"
+                    "ThirdParty/geos/src/operation/*.cpp"
+                    "ThirdParty/geos/src/operation/buffer/*.cpp"
+                    "ThirdParty/geos/src/operation/distance/*.cpp"
+                    "ThirdParty/geos/src/operation/intersection/*.cpp"
+                    "ThirdParty/geos/src/operation/linemerge/*.cpp"
+                    "ThirdParty/geos/src/operation/overlay/*.cpp"
+                    "ThirdParty/geos/src/operation/overlay/validate/*.cpp"
+                    "ThirdParty/geos/src/operation/overlay/snap/*.cpp"
+                    "ThirdParty/geos/src/operation/polygonize/*.cpp"
+                    "ThirdParty/geos/src/operation/predicate/*.cpp"
+                    "ThirdParty/geos/src/operation/relate/*.cpp"
+                    "ThirdParty/geos/src/operation/sharedpaths/*.cpp"
+                    "ThirdParty/geos/src/operation/union/*.cpp"
+                    "ThirdParty/geos/src/operation/valid/*.cpp"
+                    "ThirdParty/geos/src/planargraph/*.cpp"
+                    "ThirdParty/geos/src/planargraph/algorithm/*.cpp"
+                    "ThirdParty/geos/src/precision/*.cpp"
+                    "ThirdParty/geos/src/linearref/*.cpp"
+                    "ThirdParty/geos/src/simplify/*.cpp")
 
-file(GLOB GLUTesselatorSrc  "GLUTesselator/src/dict.cpp"
-                            "GLUTesselator/src/mesh.cpp"
-                            "GLUTesselator/src/render.cpp"
-                            "GLUTesselator/src/tess.cpp"
-                            "GLUTesselator/src/geom.cpp"
-                            "GLUTesselator/src/memalloc.cpp"
-                            "GLUTesselator/src/normal.cpp"
-                            "GLUTesselator/src/priorityq.cpp"
-                            "GLUTesselator/src/sweep.cpp"
-                            "GLUTesselator/src/tessmono.cpp"
-                            "GLUTesselator/src/tessellate.cpp" 
-                            )
+file(GLOB GLUTesselatorSrc  "ThirdParty/GLUTesselator/src/*.cpp")
 
-file(GLOB opensteerSrc  "opensteer/src/Clock.cpp"
+file(GLOB opensteerSrc  "ThirdParty/opensteer/src/Clock.cpp"
                             "opensteer/src/Color.cpp"
                             "opensteer/src/Obstacle.cpp"
                             "opensteer/src/OldPathway.cpp"
@@ -106,9 +95,9 @@ file(GLOB tceOpenSteer_SRC  "./tceOpenSteer/src/*.cpp")
 file(GLOB tceCore_SRC       "./tceCore/inc/tceCore/*.cpp")
 file(GLOB tceRender_SRC     "./tceRender/src/*.cpp")
 
-file(GLOB simpleJSON_SRC "SimpleJSON/src/*.cpp")
+file(GLOB simpleJSON_SRC "ThirdParty/SimpleJSON/src/*.cpp")
 
-file(GLOB imguiSrc  "imgui/*.cpp")
+file(GLOB imguiSrc  "ThirdParty/imgui/*.cpp")
 
 file(GLOB webAsmPlay_SRC        "src/GUI/GUI.cpp"
                                 "src/GUI/GeosTestPanel.cpp"
@@ -117,6 +106,11 @@ file(GLOB webAsmPlay_SRC        "src/GUI/GUI.cpp"
                                 "src/GUI/GUI_Persistence.cpp"
                                 "src/GUI/AttributionPanel.cpp"
                                 "src/GUI/InputEvents.cpp"
+                                "src/shaders/Shader.cpp"
+                                "src/shaders/ShaderProgram.cpp"
+                                "src/shaders/ColorShader.cpp"
+                                "src/shaders/ColorDistanceShader.cpp"
+                                "src/shaders/ColorDistanceShader2.cpp"
                                 "src/Camera.cpp"
                                 "src/Debug.cpp"
                                 "src/TrackBallInteractor.cpp"
@@ -133,18 +127,12 @@ file(GLOB webAsmPlay_SRC        "src/GUI/GUI.cpp"
                                 "src/GeoClientRequest.cpp"
                                 "src/GeosTestCanvas.cpp"
                                 "src/SkyBox.cpp"
-                                "src/Shader.cpp"
-                                "src/ShaderProgram.cpp"
-                                "src/ColorShader.cpp"
                                 "src/Textures.cpp"
                                 "src/GridPlane.cpp"
-                                "src/AppLog.cpp"
                                 "src/K2DTree.cpp"
                                 "src/GeometryConverter.cpp"
                                 "src/Attributes.cpp"
                                 "src/Relation.cpp"
-                                "src/ColorDistanceShader.cpp"
-                                "src/ColorDistanceShader2.cpp"
                                 "src/main.cpp"
                                 ${tceGeom_SRC}
                                 ${tceCore_SRC}
@@ -153,21 +141,20 @@ file(GLOB webAsmPlay_SRC        "src/GUI/GUI.cpp"
 
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
-    include_directories(imgui/glfw/include)
-    include_directories(imgui/gl3w)
+    include_directories(ThirdParty/imgui/glfw/include)
+    include_directories(ThirdParty/imgui/gl3w)
+
 endif()
 
-include_directories(GLUTesselator/include)
-include_directories(geos/include)
-include_directories(glm)
-include_directories(glbinding/include)
-include_directories(glbinding-aux/include)
-include_directories(globjects/include)
-include_directories(opensteer/include)
+include_directories(ThirdParty)
+include_directories(ThirdParty/GLUTesselator/include)
+include_directories(ThirdParty/geos/include)
+include_directories(ThirdParty/glm)
+include_directories(ThirdParty/imgui)
+include_directories(ThirdParty/imguiAddons/imguitoolbar)
+include_directories(ThirdParty/opensteer/include)
+include_directories(ThirdParty/SimpleJSON/inc)
 include_directories(GeoServer/inc)
-include_directories(imgui)
-include_directories(imguiAddons/imguitoolbar)
-include_directories(SimpleJSON/inc)
 include_directories(tceGeom/inc)
 include_directories(tceCore/inc)
 include_directories(tceOpenSteer/inc)
@@ -188,8 +175,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
                                 -s WASM=1 \
                                 -s USE_WEBGL2=1 \
                                 -s USE_GLFW=3 \
-                                --js-library ${CMAKE_CURRENT_SOURCE_DIR}/glfw-imgui-emscripten/library_glfw.js \
-                                --js-library ${CMAKE_CURRENT_SOURCE_DIR}/glfw-imgui-emscripten/library_gl.js \
+                                --js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_glfw.js \
+                                --js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_gl.js \
                                 -s USE_SDL_IMAGE=2 \
                                 -s SDL2_IMAGE_FORMATS='[\"png\"]' \
                                 -s DISABLE_EXCEPTION_CATCHING=0 \
@@ -229,7 +216,7 @@ else()
     include_directories(${Boost_INCLUDE_DIRS})
     include_directories(${SDL2_INCLUDE_DIRS})
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
-    include_directories(./ctpl)
+    include_directories(ThirdParty/ctpl)
     include_directories(./)
     
     link_libraries(${GLEW_LIBRARIES})
@@ -302,7 +289,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
 else()
 
-    add_executable(webAsmPlay ${sources} ${imguiSrc} "imgui/gl3w/GL/gl3w.c")
+    add_executable(webAsmPlay ${sources} ${imguiSrc} "ThirdParty/imgui/gl3w/GL/gl3w.c")
 endif()
 
 

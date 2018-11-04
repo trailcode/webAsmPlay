@@ -30,7 +30,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 #include <JSON.h>
-#include <webAsmPlay/Shader.h>
+#include <webAsmPlay/shaders/Shader.h>
 
 class ColorDistanceShader2 : public Shader
 {

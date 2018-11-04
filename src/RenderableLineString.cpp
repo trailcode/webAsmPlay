@@ -27,8 +27,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Shader.h>
-#include <webAsmPlay/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/Shader.h>
+#include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/RenderableLineString.h>
 
 using namespace std;
