@@ -30,14 +30,17 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 #include <JSON.h>
+#include <webAsmPlay/Shader.h>
 
-class ColorDistanceShader2
+class ColorDistanceShader2 : public Shader
 {
 public:
 
+    static ColorDistanceShader2 * getDefaultInstance();
+
     static void ensureShader();
 
-    static void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const float offset);
+    void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
 
     static glm::vec4 setColor(const size_t index, const glm::vec4 & color);
     static glm::vec4 getColor(const size_t index);
@@ -47,10 +50,10 @@ public:
 
     static void saveState(JSONObject & dataStore);
 
-private:
+    ColorDistanceShader2();
+    ~ColorDistanceShader2();
 
-    ColorDistanceShader2() {}
-    ~ColorDistanceShader2() {}   
+private:
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER2_H__

@@ -37,7 +37,9 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram * instance = NULL;
+    ShaderProgram * shaderProgram = NULL;
+
+    ColorDistanceShader2 * defaultInstance = NULL;
 
     GLint colorsInLoc = -1;
 
@@ -119,20 +121,34 @@ void ColorDistanceShader2::ensureShader()
 
     colorTexture = Textures::create(colors, 32);
 
-    instance = ShaderProgram::create(  vertexSource,
+    shaderProgram = ShaderProgram::create(  vertexSource,
                                 fragmentSource,
                                 StrVec({"MV", "colorsIn", "tex", "colorLookupOffset"}));
 
-    colorLookupOffsetLoc = instance->getUniformLoc("colorLookupOffset");
+    colorLookupOffsetLoc = shaderProgram->getUniformLoc("colorLookupOffset");
 
-    MV_Uniform  = instance->getUniformLoc("MV");
+    MV_Uniform  = shaderProgram->getUniformLoc("MV");
 
-    colorsInLoc = instance->getUniformLoc("colorsIn");
+    colorsInLoc = shaderProgram->getUniformLoc("colorsIn");
 
-    texUniform = instance->getUniformLoc("tex");
+    texUniform = shaderProgram->getUniformLoc("tex");
+
+    defaultInstance = new ColorDistanceShader2();
 }
 
-void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV, const float offset)
+ColorDistanceShader2::ColorDistanceShader2() : Shader(shaderProgram)
+{
+
+}
+
+ColorDistanceShader2::~ColorDistanceShader2()
+{
+
+}
+
+ColorDistanceShader2 * ColorDistanceShader2::getDefaultInstance() { return defaultInstance ;}
+
+void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
 {
     if(colorTextureDirty)
     {
@@ -145,17 +161,18 @@ void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV, const float o
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, colorTexture);
 
-    instance->bind(MVP, MV);
+    shaderProgram->bind(MVP, MV);
 
-    instance->setUniform(MV_Uniform, MV);
+    shaderProgram->setUniform(MV_Uniform, MV);
 
-    instance->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    shaderProgram->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-    instance->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
+    shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
 
-    instance->setUniformi(texUniform, 0);
+    shaderProgram->setUniformi(texUniform, 0);
 
-    instance->setUniform(colorLookupOffsetLoc, offset);
+    if(isOutline) { shaderProgram->setUniform(colorLookupOffsetLoc, 2.0f) ;}
+    else          { shaderProgram->setUniform(colorLookupOffsetLoc, 0.0f) ;}
 }
 
 vec4 ColorDistanceShader2::setColor(const size_t index, const vec4 & color)

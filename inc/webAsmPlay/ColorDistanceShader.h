@@ -37,7 +37,7 @@ public:
 
     static void ensureShader();
 
-    void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
+    void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
 
     static glm::vec4 setMinColor(const glm::vec4 & minColor);
     static glm::vec4 setMaxColor(const glm::vec4 & maxColor);

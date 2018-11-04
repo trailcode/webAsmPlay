@@ -132,7 +132,7 @@ ColorDistanceShader::ColorDistanceShader() : Shader(programInstance)
 
 }
 
-void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV)
+void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
 {
     programInstance->ShaderProgram::bind(MVP, MV);
 

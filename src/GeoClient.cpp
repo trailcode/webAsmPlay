@@ -45,6 +45,7 @@
 #include <webAsmPlay/GeometryConverter.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/RenderableLineString.h>
+#include <webAsmPlay/ColorDistanceShader2.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -502,8 +503,9 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     dmess("polysAndColors " << polysAndColors.size());
 
-
     Renderable * r = RenderablePolygon::create(polysAndColors, trans);
+
+    r->setShader(ColorDistanceShader2::getDefaultInstance());
 
     //r->setOutlineColor(vec4(0.3,1,0,1));
     //r->setOutlineColor(1);

@@ -35,7 +35,6 @@
     #include <GL/gl3w.h>
 #endif
 
-#include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
 class ShaderProgram;
@@ -47,7 +46,7 @@ public:
     bool getRenderFill() const;
     bool getRenderOutline() const;
 
-    virtual void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
+    virtual void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
 
     void enableVertexAttribArray(   const GLint       size          = 2,
                                     const GLenum      type          = GL_FLOAT,

@@ -32,7 +32,6 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Shader.h>
 #include <webAsmPlay/ShaderProgram.h>
-#include <webAsmPlay/ColorDistanceShader2.h>
 #include <webAsmPlay/RenderablePolygon.h>
 
 using namespace std;
@@ -117,11 +116,6 @@ RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  cons
             const Coordinate & C = coords[i];
 
             const dvec4 v = trans * dvec4(C.x, C.y, 0, 1);
-
-            if(i < 2)
-            {
-                //dmess(" " << C.x << " " << C.y << " " << v.x << " " << v.y);
-            }
 
             verts.push_back(v.x);
             verts.push_back(v.y);
@@ -417,18 +411,24 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glDisable(GL_DEPTH_TEST);
+
+    //dmess("numTriangles " << numTriangles);
+
     if(shader->getRenderFill())
     {
-        ColorDistanceShader2::bind(MVP, MV, 0);
+        shader->bind(MVP, MV, false);
+
+        shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+
+        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
 
         glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, NULL);
     }
 
-    glDisable(GL_DEPTH_TEST);
-
     if(shader->getRenderOutline())
     {
-        ColorDistanceShader2::bind(MVP, MV, 2.0);
+        shader->bind(MVP, MV, true);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
         

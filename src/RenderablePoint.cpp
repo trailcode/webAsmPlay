@@ -69,7 +69,7 @@ Renderable * RenderablePoint::create(const vec3 & pos)
 
 void RenderablePoint::render(const mat4 & MVP, const mat4 & MV) const
 {
-    shader->bind(MVP, MV);
+    shader->bind(MVP, MV, false);
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);

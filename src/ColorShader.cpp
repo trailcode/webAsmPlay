@@ -27,6 +27,8 @@
 #include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/ColorShader.h>
 
+using namespace glm;
+
 namespace
 {
     ShaderProgram * shaderProgram = NULL;
@@ -69,7 +71,7 @@ void ColorShader::ensureShader()
 
 ColorShader * ColorShader::getDefaultInstance() { return defaultInstance ;}
 
-ColorShader::ColorShader() : Shader(shaderProgram)
+ColorShader::ColorShader() : Shader(shaderProgram), fillColor(0,1,0,0.5), outlineColor(1,1,0,1)
 {
 
 }
@@ -77,4 +79,12 @@ ColorShader::ColorShader() : Shader(shaderProgram)
 ColorShader::~ColorShader()
 {
 
+}
+
+void ColorShader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
+{
+    shaderProgram->bind(MVP, MV);
+
+    if(isOutline) { shaderProgram->setColor(outlineColor) ;}
+    else          { shaderProgram->setColor(fillColor)    ;}
 }

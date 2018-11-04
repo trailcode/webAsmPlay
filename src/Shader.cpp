@@ -62,4 +62,4 @@ void Shader::enableColorAttribArray(const GLint       size,
                                     pointer);
 }
 
-void Shader::bind(const mat4 & MVP, const mat4 & MV) { program->bind(MVP, MV) ;}
+void Shader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline) { program->bind(MVP, MV) ;}

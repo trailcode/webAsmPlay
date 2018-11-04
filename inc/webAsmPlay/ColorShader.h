@@ -27,11 +27,12 @@
 #ifndef __WEB_ASM_PLAY_COLOR_SHADER_H__
 #define __WEB_ASM_PLAY_COLOR_SHADER_H__
 
+#include <glm/vec4.hpp>
 #include <webAsmPlay/Shader.h>
 
 class ColorShader : public Shader
 {
-    public:
+public:
 
     ColorShader();
     ~ColorShader();
@@ -40,7 +41,13 @@ class ColorShader : public Shader
 
     static ColorShader * getDefaultInstance();
 
-    private:
+    void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
+
+private:
+
+    glm::vec4 fillColor;
+    glm::vec4 outlineColor;
+
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_SHADER_H__
