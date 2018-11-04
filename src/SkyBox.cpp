@@ -33,7 +33,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Shader.h>
+#include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/SkyBox.h>
 
@@ -46,7 +46,7 @@ using namespace glm;
 
 namespace
 {
-    Shader * skyboxShader = NULL;
+    ShaderProgram * skyboxShader = NULL;
 
     vector<SkyBox *> instances;
 }
@@ -80,7 +80,7 @@ void SkyBox::ensureShader()
         }
     )glsl";
 
-    skyboxShader = Shader::create(vertexSource, fragmentSource);
+    skyboxShader = ShaderProgram::create(vertexSource, fragmentSource);
 }
 
 SkyBox::SkyBox()

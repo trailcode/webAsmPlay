@@ -45,6 +45,8 @@
 #include <webAsmPlay/GeometryConverter.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/RenderableLineString.h>
+#include <webAsmPlay/ColorDistanceShader.h>
+#include <webAsmPlay/ColorDistanceShader2.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -469,10 +471,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     
     dmess("Start base geom...");
 
-
-    //vector<tuple<const Geometry *, const vec4, const vec4> > polysAndColors;
-
-    vector<tuple<const Geometry *, const GLuint, const GLuint> > polysAndColors;
+    vector<pair<const Geometry *, const size_t> > polysAndColors; // TODO rename this
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
@@ -500,17 +499,17 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
             fc = 4;
         }
 
-        polysAndColors.push_back(make_tuple(geoms[i].second, fc, 1));
+        polysAndColors.push_back(make_pair(geoms[i].second, fc));
     }
-    
 
     dmess("polysAndColors " << polysAndColors.size());
 
-
     Renderable * r = RenderablePolygon::create(polysAndColors, trans);
 
+    r->setShader(ColorDistanceShader2::getDefaultInstance());
+
     //r->setOutlineColor(vec4(0.3,1,0,1));
-    r->setOutlineColor(1);
+    //r->setOutlineColor(1);
     
     canvas->addRenderiable(r);
     
@@ -551,12 +550,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     Renderable * r = RenderableLineString::create(polylines, trans);
 
-    //r->setFillColor(vec4(0.3,0.0,0.3,0.3));
-    
-    //r->setOutlineColor(vec4(0.6,0.4,0,1));
-    r->setOutlineColor(1);
-    //r->setOutlineColor(vec4(0,1,1,0.4));
-    
+    r->setShader(ColorDistanceShader::getDefaultInstance());
+
     canvas->addRenderiable(r);
     
     dmess("Done creating renderiable.");

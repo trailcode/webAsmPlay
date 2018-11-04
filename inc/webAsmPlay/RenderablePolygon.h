@@ -53,33 +53,20 @@ public:
 
     ~RenderablePolygon();
 
-    static Renderable * create( const geos::geom::Polygon   * poly,
-                                const glm::dmat4            & trans             = glm::dmat4(1.0),
-                                const GLuint fillColor         = 0,
-                                const GLuint outlineColor      = 0,
-                                const bool                    renderOutline     = getDefaultRenderOutline(),
-                                const bool                    renderFill        = getDefaultRenderFill());
+    static Renderable * create( const geos::geom::Polygon * poly,
+                                const glm::dmat4          & trans       = glm::dmat4(1.0),
+                                const size_t                symbologyID = 0);
 
     static Renderable * create( const geos::geom::MultiPolygon  * multyPoly,
                                 const glm::dmat4                & trans         = glm::dmat4(1.0),
-                                const GLuint fillColor     = 0,
-                                const GLuint outlineColor  = 0,
-                                const bool                        renderOutline = getDefaultRenderOutline(),
-                                const bool                        renderFill    = getDefaultRenderFill());
+                                const size_t                      symbologyID   = 0);
 
     static Renderable * create( const ConstGeosGeomVec & polygons,
-                                const glm::dmat4       & trans         = glm::dmat4(1.0),
-                                const GLuint fillColor     = 0,
-                                const GLuint outlineColor  = 0,
-                                const bool               renderOutline = getDefaultRenderOutline(),
-                                const bool               renderFill    = getDefaultRenderFill());
+                                const glm::dmat4       & trans          = glm::dmat4(1.0),
+                                const size_t             symbologyID    = 0);
 
-    static Renderable * create( const std::vector<std::tuple<const geos::geom::Geometry *, const GLuint, const GLuint> > & polygons,
-                                const glm::dmat4                                & trans         = glm::mat4(1.0),
-                                const GLuint fillColor     = 0,
-                                const GLuint outlineColor  = 0,
-                                const bool                                        renderOutline = getDefaultRenderOutline(),
-                                const bool                                        renderFill    = getDefaultRenderFill());
+    static Renderable * create( const std::vector<std::pair<const geos::geom::Geometry *, const size_t> > & polygons,
+                                const glm::dmat4                                & trans         = glm::mat4(1.0));
 
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
@@ -97,7 +84,7 @@ private:
         Uint32Vec counterVertIndices;
         Uint32Vec counterVertIndices2;
 
-        GLuint fillColor;
+        GLuint symbologyID;
     };
 
     RenderablePolygon(  const GLuint      vao,
@@ -107,27 +94,20 @@ private:
                         const int         numTriangles,
                         const Uint32Vec & counterVertIndices,
                         const size_t      numContourLines,
-                        const bool        isMulti,
-                        const GLuint      fillColor,
-                        const GLuint      outlineColor,
-                        const bool        renderOutline,
-                        const bool        renderFill);
+                        const bool        isMulti);
 
     typedef std::vector<const TesselationResult> Tesselations;
 
-    static Renderable * createFromTesselations( const Tesselations & tesselations,
-                                                const GLuint         fillColor,
-                                                const GLuint         outlineColor,
-                                                const bool           renderOutline,
-                                                const bool           renderFill);
+    static Renderable * createFromTesselations(const Tesselations & tesselations);
 
     static TesselationResult tessellatePolygon( const geos::geom::Polygon * poly,
                                                 const glm::dmat4          & trans,
-                                                const GLuint                fillColor = 0);
+                                                const size_t                symbologyID);
 
     static void tesselateMultiPolygon(  const geos::geom::MultiPolygon  * multiPoly,
                                         const glm::dmat4                & trans,
-                                        Tesselations                    & tesselationResults);
+                                        Tesselations                    & tesselationResults,
+                                        const size_t                      symbologyID);
 
     static void ensureOutlineShader();
 

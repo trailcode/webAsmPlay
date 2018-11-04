@@ -29,31 +29,40 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
+#include <webAsmPlay/Shader.h>
 
-class ColorDistanceShader
+class ColorDistanceShader : public Shader
 {
 public:
 
+    ColorDistanceShader();
+    ~ColorDistanceShader() {}
+
     static void ensureShader();
 
-    static void bind(const glm::mat4 & MVP, const glm::mat4 & MV);
+    static ColorDistanceShader * getDefaultInstance();
 
-    static glm::vec4 setMinColor(const glm::vec4 & minColor);
-    static glm::vec4 setMaxColor(const glm::vec4 & maxColor);
+    void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
 
-    static glm::vec4 getMinColor();
-    static glm::vec4 getMaxColor();
+    glm::vec4 setMinColor(const glm::vec4 & minColor);
+    glm::vec4 setMaxColor(const glm::vec4 & maxColor);
 
-    static float setMinDist(const float & value);
-    static float setMaxDist(const float & value);
+    glm::vec4 getMinColor();
+    glm::vec4 getMaxColor();
 
-    static float getMinDist();
-    static float getMaxDist();
+    float setMinDist(const float & value);
+    float setMaxDist(const float & value);
+
+    float getMinDist();
+    float getMaxDist();
 
 private:
 
-    ColorDistanceShader() {}
-    ~ColorDistanceShader() {}
+    glm::vec4 minColor;
+    glm::vec4 maxColor;
+
+    float minDist;
+    float maxDist;
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__

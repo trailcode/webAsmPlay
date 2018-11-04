@@ -51,19 +51,11 @@ public:
 
     ~RenderableLineString();
 
-    static Renderable * create( const geos::geom::LineString    * lineString,
-                                const glm::mat4                 & trans         = glm::mat4(1.0),
-                                const GLuint fillColor     = 1,
-                                const GLuint outlineColor  = 1,
-                                const bool                        renderOutline = getDefaultRenderOutline(),
-                                const bool                        renderFill    = getDefaultRenderFill());
+    static Renderable * create( const geos::geom::LineString * lineString,
+                                const glm::mat4              & trans = glm::mat4(1.0));
 
     static Renderable * create( const ConstGeosGeomVec & lineStrings,
-                                const glm::mat4        & trans         = glm::mat4(1.0),
-                                const GLuint fillColor     = 1,
-                                const GLuint outlineColor  = 1,
-                                const bool               renderOutline = getDefaultRenderOutline(),
-                                const bool               renderFill    = getDefaultRenderFill());
+                                const glm::mat4        & trans = glm::mat4(1.0));
 
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
@@ -75,18 +67,10 @@ private:
                             const GLuint      ebo,
                             const GLuint      vbo,
                             const GLuint      numElements,
-                            const bool        isMulti,
-                            const GLuint fillColor,
-                            const GLuint outlineColor,
-                            const bool        renderOutline,
-                            const bool        renderFill);
+                            const bool        isMulti);
 
     static Renderable * create( const FloatVec   & verts,
                                 const Uint32Vec  & indices,
-                                const GLuint fillColor,
-                                const GLuint outlineColor,
-                                const bool         renderOutline,
-                                const bool         renderFill,
                                 const bool         isMulti);
 
     const GLuint vao;

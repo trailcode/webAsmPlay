@@ -28,26 +28,22 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Camera.h>
-#include <webAsmPlay/Shader.h>
+#include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/ColorDistanceShader.h>
 
 using namespace glm;
 
 namespace
 {
-    Shader * instance = NULL;
+    ShaderProgram * programInstance = NULL;
+
+    ColorDistanceShader * defaultInstance = NULL;
 
     GLint MV_Uniform            = -1;
     GLint minVertexColorUniform = -1;
     GLint maxVertexColorUniform = -1;
     GLint minDistUniform        = -1;
     GLint maxDistUniform        = -1;
-
-    vec4 minColor(1,0,0,1);
-    vec4 maxColor(0,1,0,1);
-
-    float minDist = 0;
-    float maxDist = 30;
 }
 
 void ColorDistanceShader::ensureShader()
@@ -112,30 +108,42 @@ void ColorDistanceShader::ensureShader()
         }
     )glsl";
 
-    instance = Shader::create(  vertexSource,
-                                fragmentSource,
-                                StrVec({"MV",
-                                        "minVertexColorIn",
-                                        "maxVertexColorIn",
-                                        "minDistIn",
-                                        "maxDistIn"}));
+    programInstance = ShaderProgram::create(vertexSource,
+                                            fragmentSource,
+                                            StrVec({"MV",
+                                                    "minVertexColorIn",
+                                                    "maxVertexColorIn",
+                                                    "minDistIn",
+                                                    "maxDistIn"}));
 
-    MV_Uniform            = instance->getUniformLoc("MV");
-    minVertexColorUniform = instance->getUniformLoc("minVertexColorIn");
-    maxVertexColorUniform = instance->getUniformLoc("maxVertexColorIn");
-    minDistUniform = instance->getUniformLoc("minDistIn");
-    maxDistUniform = instance->getUniformLoc("maxDistIn");
+    MV_Uniform            = programInstance->getUniformLoc("MV");
+    minVertexColorUniform = programInstance->getUniformLoc("minVertexColorIn");
+    maxVertexColorUniform = programInstance->getUniformLoc("maxVertexColorIn");
+    minDistUniform        = programInstance->getUniformLoc("minDistIn");
+    maxDistUniform        = programInstance->getUniformLoc("maxDistIn");
+
+    defaultInstance = new ColorDistanceShader();
 }
 
-void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV)
-{
-    instance->Shader::bind(MVP, MV);
+ColorDistanceShader * ColorDistanceShader::getDefaultInstance() { return defaultInstance ;}
 
-    instance->setUniform(MV_Uniform,            MV);
-    instance->setUniform(minVertexColorUniform, minColor);
-    instance->setUniform(maxVertexColorUniform, maxColor);
-    instance->setUniform(minDistUniform,        minDist);
-    instance->setUniform(maxDistUniform,        maxDist);
+ColorDistanceShader::ColorDistanceShader() : Shader  (programInstance),
+                                             minColor(1,0,0,1),
+                                             maxColor(0,1,0,1),
+                                             minDist (0),
+                                             maxDist (30)
+{
+}
+
+void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
+{
+    programInstance->ShaderProgram::bind(MVP, MV);
+
+    programInstance->setUniform(MV_Uniform,            MV);
+    programInstance->setUniform(minVertexColorUniform, minColor);
+    programInstance->setUniform(maxVertexColorUniform, maxColor);
+    programInstance->setUniform(minDistUniform,        minDist);
+    programInstance->setUniform(maxDistUniform,        maxDist);
 
     glEnable   (GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

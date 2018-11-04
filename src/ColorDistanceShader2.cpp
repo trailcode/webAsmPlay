@@ -27,7 +27,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Shader.h>
+#include <webAsmPlay/Types.h>
+#include <webAsmPlay/ShaderProgram.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/ColorDistanceShader2.h>
 
@@ -36,7 +37,9 @@ using namespace glm;
 
 namespace
 {
-    Shader * instance = NULL;
+    ShaderProgram * shaderProgram = NULL;
+
+    ColorDistanceShader2 * defaultInstance = NULL;
 
     GLint colorsInLoc = -1;
 
@@ -46,11 +49,9 @@ namespace
 
     GLuint texUniform = -1;
 
-    glm::vec4 colors[32];
-
     GLuint colorTexture = 0;
 
-    bool colorTextureDirty = true;
+    glm::vec4 initalColors[32];
 }
 
 void ColorDistanceShader2::ensureShader()
@@ -107,6 +108,25 @@ void ColorDistanceShader2::ensureShader()
         }
     )glsl";
 
+    colorTexture = Textures::create(initalColors, 32);
+
+    shaderProgram = ShaderProgram::create(  vertexSource,
+                                fragmentSource,
+                                StrVec({"MV", "colorsIn", "tex", "colorLookupOffset"}));
+
+    colorLookupOffsetLoc = shaderProgram->getUniformLoc("colorLookupOffset");
+
+    MV_Uniform  = shaderProgram->getUniformLoc("MV");
+
+    colorsInLoc = shaderProgram->getUniformLoc("colorsIn");
+
+    texUniform = shaderProgram->getUniformLoc("tex");
+
+    defaultInstance = new ColorDistanceShader2();
+}
+
+ColorDistanceShader2::ColorDistanceShader2() : Shader(shaderProgram)
+{
     colors[0] = vec4(1,0,0,1);
     colors[1] = vec4(1,1,0,1);
     colors[2] = vec4(1,0,1,1);
@@ -115,23 +135,16 @@ void ColorDistanceShader2::ensureShader()
     colors[5] = vec4(0,0,1,1);
     colors[6] = vec4(1,0,0,1);
     colors[7] = vec4(1,0,0,1);
-
-    colorTexture = Textures::create(colors, 32);
-
-    instance = Shader::create(  vertexSource,
-                                fragmentSource,
-                                StrVec({"MV", "colorsIn", "tex", "colorLookupOffset"}));
-
-    colorLookupOffsetLoc = instance->getUniformLoc("colorLookupOffset");
-
-    MV_Uniform  = instance->getUniformLoc("MV");
-
-    colorsInLoc = instance->getUniformLoc("colorsIn");
-
-    texUniform = instance->getUniformLoc("tex");
 }
 
-void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV, const float offset)
+ColorDistanceShader2::~ColorDistanceShader2()
+{
+
+}
+
+ColorDistanceShader2 * ColorDistanceShader2::getDefaultInstance() { return defaultInstance ;}
+
+void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
 {
     if(colorTextureDirty)
     {
@@ -144,17 +157,18 @@ void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV, const float o
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, colorTexture);
 
-    instance->bind(MVP, MV);
+    shaderProgram->bind(MVP, MV);
 
-    instance->setUniform(MV_Uniform, MV);
+    shaderProgram->setUniform(MV_Uniform, MV);
 
-    instance->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    shaderProgram->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-    instance->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
+    shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
 
-    instance->setUniformi(texUniform, 0);
+    shaderProgram->setUniformi(texUniform, 0);
 
-    instance->setUniform(colorLookupOffsetLoc, offset);
+    if(isOutline) { shaderProgram->setUniform(colorLookupOffsetLoc, 2.0f) ;}
+    else          { shaderProgram->setUniform(colorLookupOffsetLoc, 0.0f) ;}
 }
 
 vec4 ColorDistanceShader2::setColor(const size_t index, const vec4 & color)
