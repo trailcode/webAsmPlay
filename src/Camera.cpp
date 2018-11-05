@@ -2,7 +2,6 @@
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Debug.h>
 #include <tceGeom/vec3.h>
-#define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp> // lookAt
 #include <glm/gtc/type_ptr.hpp> // value_ptr
 

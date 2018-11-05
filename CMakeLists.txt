@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 #set(EMCC_DEBUG 1)
  
 #set (CMAKE_CXX_STANDARD 17)
@@ -168,6 +168,9 @@ include_directories(tceRender/inc)
 include_directories(inc)
 
 add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
+
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+add_definitions(-DGLM_FORCE_RADIANS)
 
 set(sourcePath ${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")

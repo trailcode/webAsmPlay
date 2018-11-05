@@ -1,4 +1,3 @@
-#define GLM_ENABLE_EXPERIMENTAL
 #include <iostream>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/TrackBallInteractor.h>

@@ -2,8 +2,6 @@
 #define RSMZ_TRACKBALLINTERACTOR_H
 
 #include "Camera.h"
-#define GLM_ENABLE_EXPERIMENTAL
-#define GLM_FORCE_RADIANS
 #include <glm/gtc/quaternion.hpp>
 
 namespace rsmz

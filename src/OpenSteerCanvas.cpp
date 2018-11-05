@@ -25,8 +25,11 @@
 */
 
 #include <memory>
+#include <glm/gtx/transform.hpp>
 #include <OpenSteer/OpenSteerDemo.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/Camera.h>
 #include <webAsmPlay/DeferredRenderable.h>
 #include <webAsmPlay/OpenSteerCanvas.h>
 
@@ -48,6 +51,20 @@ void openSteerDisplayFunc();
 
 GLuint OpenSteerCanvas::render()
 {
+    const vec3 scale(0.1, 0.1, 0.1);
+
+    const vec3 lookat = __(OpenSteer::OpenSteerDemo::camera.target)     * scale;
+    const vec3 pos    = __(OpenSteer::OpenSteerDemo::camera.position()) * scale;
+    const vec3 up     = __(OpenSteer::OpenSteerDemo::camera.up());
+
+    const mat4 rotate = glm::rotate(radians(90.0f), vec3(1, 0, 0));
+
+    getCamera()->setCenter(rotate * vec4(lookat, 1));
+    getCamera()->setEye   (rotate * vec4(pos,    1));
+    getCamera()->setUp    (rotate * vec4(up,     1));
+
+    getCamera()->update();
+
     if(!preRender()) { return 0 ;}
 
     openSteerDisplayFunc();

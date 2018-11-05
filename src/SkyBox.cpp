@@ -28,7 +28,6 @@
     #include <emscripten/emscripten.h>
     #include <emscripten/bind.h>
 #endif
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Debug.h>

@@ -39,7 +39,7 @@
 //
 // ----------------------------------------------------------------------------
 
-
+#include <webAsmPlay/Debug.h>
 #include "OpenSteer/Camera.h"
 #include "OpenSteer/Draw.h"
 

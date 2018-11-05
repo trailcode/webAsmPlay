@@ -23,7 +23,6 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-#define GLM_ENABLE_EXPERIMENTAL
 #include <vector>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp> // value_ptr
