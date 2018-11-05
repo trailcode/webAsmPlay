@@ -214,7 +214,7 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
     */
 
 
-    //dmess("acurrIndex " << currIndex);
+    //dmess("currIndex " << currIndex);
 }
 
 void DeferredRenderable::render(const mat4 & MVP, const mat4 & MV) const

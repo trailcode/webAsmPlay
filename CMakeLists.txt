@@ -272,7 +272,7 @@ else()
                 )
         list(APPEND configFileDest "${CMAKE_CURRENT_BINARY_DIR}/${configFile}")
 
-    endforeach(assetFile)
+    endforeach(configFile)
 
     ADD_CUSTOM_TARGET(configs ALL DEPENDS ${configFileDest})
 

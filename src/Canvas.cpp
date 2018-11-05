@@ -66,8 +66,6 @@ Canvas::Canvas( const bool   useFrameBuffer,
 
     //cursor = RenderablePoint::create(vec3(0,0,0));
     cursor = NULL;
-
-    //addRenderiable(cursor);
 }
 
 Canvas::~Canvas()

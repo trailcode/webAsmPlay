@@ -24,7 +24,7 @@
   \copyright 2018
 */
 
-#include <stdio.h>
+#include <cstdio>
 #include <algorithm>
 #include <limits>
 #include <ctpl.h>
@@ -78,11 +78,11 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
 
     for(const AttributedGeometry & i : geometry)
     {
-        if(polygon = dynamic_cast<Polygon *>(i.second))
+        if((polygon = dynamic_cast<Polygon *>(i.second)))
         {
             serializedPolygons.push_back(GeometryConverter::convert(polygon, i.first));
         }
-        else if(lineString = dynamic_cast<LineString *>(i.second))
+        else if((lineString = dynamic_cast<LineString *>(i.second)))
         {
             serializedLineStrings.push_back(GeometryConverter::convert(AttributedLineString(i.first, lineString)));
         }
@@ -142,6 +142,8 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
     */
 
     //*/
+
+    saveData("data.geo");
 }
 
 GeoServer::~GeoServer()
@@ -460,12 +462,23 @@ void GeoServer::start()
     dmess("Exit");
 }
 
-void saveData(FILE * fp, vector<string> & data)
+void _saveData(FILE * fp, vector<string> & data)
 {
+    const uint32_t num = data.size();
 
+    fwrite(&num, sizeof(uint32_t), 1, fp);
+
+    for(const auto & i : data) { fwrite(i.data(), sizeof(char), i.length(), fp) ;}
 }
 
 void GeoServer::saveData(const string & fileName)
 {
-    
+    FILE * fp = fopen(fileName.c_str(), "wb");
+
+    _saveData(fp, serializedPolygons);
+    _saveData(fp, serializedLineStrings);
+    _saveData(fp, serializedPoints);
+    _saveData(fp, serializedRelations);
+
+    fclose(fp);
 }
