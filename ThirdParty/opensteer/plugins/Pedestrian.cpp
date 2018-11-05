@@ -512,6 +512,7 @@ namespace {
         void redraw (const float currentTime, const float elapsedTime)
         {
             // selected Pedestrian (user can mouse click to select another)
+
             AbstractVehicle& selected = *OpenSteerDemo::selectedVehicle;
 
             // Pedestrian nearest mouse (to be highlighted)
@@ -531,10 +532,10 @@ namespace {
             drawPathAndObstacles ();
 
             // highlight Pedestrian nearest mouse
-            OpenSteerDemo::highlightVehicleUtility (nearMouse);
+            //OpenSteerDemo::highlightVehicleUtility (nearMouse); // Crashing in release mode!
 
             // textual annotation (at the vehicle's screen position)
-            serialNumberAnnotationUtility (selected, nearMouse);
+            //serialNumberAnnotationUtility (selected, nearMouse); // Crashing in release mode!
 
             // textual annotation for selected Pedestrian
             if (OpenSteerDemo::selectedVehicle && OpenSteer::annotationIsOn())

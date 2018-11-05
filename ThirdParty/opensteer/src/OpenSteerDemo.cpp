@@ -272,6 +272,7 @@ OpenSteer::OpenSteerDemo::updateSelectedPlugIn (const float currentTime,
     doDelayedResetPlugInXXX ();
 
     // if no vehicle is selected, and some exist, select the first one
+
     if (selectedVehicle == NULL)
     {
         const AVGroup& vehicles = allVehiclesOfSelectedPlugIn();
@@ -384,6 +385,7 @@ OpenSteer::OpenSteerDemo::allVehiclesOfSelectedPlugIn (void)
 void 
 OpenSteer::OpenSteerDemo::selectNextVehicle (void)
 {
+    dmess("selectedVehicle " << selectedVehicle);
     if (selectedVehicle != NULL)
     {
         // get a container of all vehicles
@@ -403,6 +405,7 @@ OpenSteer::OpenSteerDemo::selectNextVehicle (void)
         // if the search failed, use NULL
         if (s == last) selectedVehicle = NULL;
     }
+    dmess("selectedVehicle " << selectedVehicle);
 }
 
 

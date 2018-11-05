@@ -506,6 +506,12 @@ void GUI::mainLoop(GLFWwindow * window)
     glfwMakeContextCurrent(window);
 
     glfwSwapBuffers(window);
+
+#ifdef __EMSCRIPTEN__
+
+    refresh(window);
+
+#endif
 }
 
 void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
