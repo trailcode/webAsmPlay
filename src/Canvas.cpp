@@ -184,14 +184,12 @@ void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
 
     const vec2 pos = mousePos - vec2(upperLeft);
 
-    //dmess("mousePos " << pos);
-
     trackBallInteractor->setClickPoint(pos.x, pos.y);
     trackBallInteractor->update();
 
     // From: http://antongerdelan.net/opengl/raycasting.html
-    const vec4 rayClip = vec4(  (2.0f * mousePos.x) / size.x - 1.0f,
-                                1.0f - (2.0f * mousePos.y) / size.y, -1.0, 1.0);
+    const vec4 rayClip = vec4(  (2.0f * pos.x) / size.x - 1.0f,
+                                1.0f - (2.0f * pos.y) / size.y, -1.0, 1.0);
 
     dvec4 rayEye = inverse(projection) * rayClip;
     
