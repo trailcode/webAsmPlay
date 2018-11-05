@@ -77,7 +77,7 @@ namespace
     GetAllGeometriesRequests    getAllGeometriesRequests;
 }
 
-GeoClient::GeoClient(GLFWwindow * window)
+GeoClient::GeoClient(GLFWwindow * window, Canvas * canvas) : canvas(canvas)
 {
 #ifndef __EMSCRIPTEN__
 
@@ -386,11 +386,11 @@ void GeoClient::onMessage(const string & data)
     }
 }
 
-void GeoClient::loadAllGeometry(Canvas * canvas)
+void GeoClient::loadGeoServerGeometry()
 {
-    dmess("GeoClient::loadAllGeometry");
+    dmess("GeoClient::loadGeoServerGeometry");
 
-    getLayerBounds([this, canvas](const AABB2D & bounds)
+    getLayerBounds([this](const AABB2D & bounds)
     {
         const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
 
@@ -401,7 +401,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
         
         inverseTrans = inverse(trans);
 
-        getNumPolygons([this, canvas](const size_t numPolys)
+        getNumPolygons([this](const size_t numPolys)
         {
             if(!numPolys) { return ;}
 
@@ -416,16 +416,16 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
                 const bool isLast = i + 1 >= numPolys / blockSize;
 
                 getPolygons(startIndex, std::min(blockSize, numPolys - startIndex - blockSize),
-                                [this, geoms, canvas, isLast, startIndex, numPolys](vector<AttributedGeometry> geomsIn)
+                                [this, geoms, isLast, startIndex, numPolys](vector<AttributedGeometry> geomsIn)
                 {
                     geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
 
-                    if(isLast) { createPolygonRenderiables(*geoms.get(), canvas) ;}
+                    if(isLast) { createPolygonRenderiables(*geoms.get()) ;}
                 });
             }
         });
 
-        getNumPolylines([this, canvas](const size_t numPolylines)
+        getNumPolylines([this](const size_t numPolylines)
         {
             if(!numPolylines) { return ;}
 
@@ -440,12 +440,12 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
                 const bool isLast = i + 1 >= numPolylines / blockSize;
 
                 getPolylines(startIndex, std::min(blockSize, numPolylines - startIndex - blockSize),
-                             [this, canvas, isLast, geoms, startIndex]
+                             [this, isLast, geoms, startIndex]
                              (vector<AttributedGeometry> geomsIn)
                 {
                     geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
 
-                    if(isLast) { createLineStringRenderiables(*geoms.get(), canvas) ;}
+                    if(isLast) { createLineStringRenderiables(*geoms.get()) ;}
                 });
             }
         });
@@ -459,6 +459,9 @@ namespace
     void downloadSucceeded(emscripten_fetch_t *fetch)
     {
         printf("Finished downloading %llu bytes from URL %s.\n", fetch->numBytes, fetch->url);
+
+        ((GeoClient *)fetch->userData)->addGeometry(fetch->data);
+
         // The data is now available at fetch->data[0] through fetch->data[fetch->numBytes-1];
         emscripten_fetch_close(fetch); // Free data associated with the fetch.
     }
@@ -485,7 +488,7 @@ namespace
 
 void GeoClient::loadGeometry(const string fileName)
 {
-    dmess("GeoClient::loadGeometry");
+    dmess("GeoClient::loadGeometry " << this);
 
 #ifdef __EMSCRIPTEN__
 
@@ -496,13 +499,42 @@ void GeoClient::loadGeometry(const string fileName)
     attr.onsuccess = downloadSucceeded;
     attr.onerror = downloadFailed;
     attr.onprogress = downloadProgress;
+    attr.userData = this;
     emscripten_fetch(&attr, fileName.c_str());
 
 #endif
 }
 
-void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms, Canvas * canvas)
+void GeoClient::addGeometry(const char * data)
 {
+    dmess("GeoClient::addGeometry");
+
+    AABB2D bounds;
+    
+    bounds = *(AABB2D *)data; data += sizeof(double) * 4;
+
+    const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
+
+    trans = translate(  s,
+                        dvec3((get<2>(bounds) + get<0>(bounds)) * -0.5,
+                                (get<3>(bounds) + get<1>(bounds)) * -0.5,
+                                0.0));
+    
+    dmess("trans " << mat4ToStr(trans));
+
+    inverseTrans = inverse(trans);
+
+    createPolygonRenderiables(GeometryConverter::getGeosPolygons(data));
+
+    uint32_t numLineStrings;
+    uint32_t numPoints;
+    uint32_t numRelations;
+}
+
+void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms)
+{
+    dmess("GeoClient::createPolygonRenderiables " << geoms.size());
+
     dmess("Start polygon quadTree...");
 
     for(size_t i = 0; i < geoms.size(); ++i)
@@ -571,7 +603,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     dmess("End base geom");
 }
 
-void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & geoms, Canvas * canvas)
+void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & geoms)
 {
     dmess("Start create linestrings " << geoms.size());
 
@@ -729,7 +761,7 @@ dmat4 GeoClient::getTrans() const { return trans ;}
 
 dmat4 GeoClient::getInverseTrans() const { return inverseTrans ;}
 
-string GeoClient::doPicking(const char mode, const dvec4 & pos, Canvas * canvas) const
+string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 {
     Renderable * renderiable;
     Attributes * attrs;

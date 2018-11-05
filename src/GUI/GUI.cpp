@@ -306,12 +306,7 @@ void GUI::showMainMenuBar(GLFWwindow * window)
              #endif
         }
 
-        if(ImGui::MenuItem("Load Geometry"))
-        {
-            //GeoClient::getInstance()->loadGeometry(canvas);
-
-            client->loadAllGeometry(canvas);
-        }
+        if(ImGui::MenuItem("Load Geometry")) { client->loadGeoServerGeometry() ;}
 
         ImGui::EndMenu();
     }
@@ -461,18 +456,14 @@ void GUI::mainLoop(GLFWwindow * window)
 
     const double scale = canvas->getTrackBallInteractor()->mZoomScale = dist * 0.02;
 
-    string attrsStr;
+    const dvec4 pos(canvas->getCursorPosWC(), 1.0);
 
-    if(client)
-    {
-        const dvec4 pos(canvas->getCursorPosWC(), 1.0);
+    showCursorPositionOverlay(NULL, client->getInverseTrans() * pos);
 
-        showCursorPositionOverlay(NULL, client->getInverseTrans() * pos);
-
-        attrsStr = client->doPicking(mode, pos, canvas);
-    }
+    string attrsStr = client->doPicking(mode, pos);
 
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
+    
     showMainToolBar();
     showMainMenuBar(window);
     GUI_Settings_Panel();
@@ -541,7 +532,7 @@ void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
 
     canvas->setSkyBox(skyBox);
 
-    client = new GeoClient(window);
+    client = new GeoClient(window, canvas);
 
     client->loadGeometry("data.geo");
 

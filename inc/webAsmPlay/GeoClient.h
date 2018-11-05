@@ -59,7 +59,7 @@ class GeoClient
 {
 public:
 
-    GeoClient(GLFWwindow * window);
+    GeoClient(GLFWwindow * window, Canvas * canvas);
 
     virtual ~GeoClient();
 
@@ -75,7 +75,7 @@ public:
 
     void getPolylines(const size_t startIndex, const size_t numPolylines, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
-    void loadAllGeometry(Canvas * canvas);
+    void loadGeoServerGeometry();
 
     void loadGeometry(const std::string fileName);
 
@@ -88,19 +88,23 @@ public:
     glm::dmat4 getTrans() const;
     glm::dmat4 getInverseTrans() const;
 
-    std::string doPicking(const char mode, const glm::dvec4 & pos, Canvas * canvas) const;
+    std::string doPicking(const char mode, const glm::dvec4 & pos) const;
+
+    void addGeometry(const char * data);
 
 private:
     
-    void createPolygonRenderiables(const std::vector<AttributedGeometry> & geoms, Canvas * canvas);
+    void createPolygonRenderiables(const std::vector<AttributedGeometry> & geoms);
 
-    void createLineStringRenderiables(const std::vector<AttributedGeometry> & geoms, Canvas * canvas);
-    
+    void createLineStringRenderiables(const std::vector<AttributedGeometry> & geoms);
+
     geos::index::quadtree::Quadtree * quadTreePolygons;
     geos::index::quadtree::Quadtree * quadTreeLineStrings;
     
     glm::dmat4 trans;
     glm::dmat4 inverseTrans;
+
+    Canvas * canvas;
 
 #ifndef __EMSCRIPTEN__
 

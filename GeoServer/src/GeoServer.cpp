@@ -259,10 +259,12 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     //*/
 
+    saveGeoFile("data.geo");
+
     return osmFile;
 }
 
-void _saveData(FILE * fp, vector<string> & data)
+void _saveData(FILE * fp, const vector<string> & data)
 {
     const uint32_t num = data.size();
 
