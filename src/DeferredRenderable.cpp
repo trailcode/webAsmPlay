@@ -23,8 +23,9 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
+#define GLM_ENABLE_EXPERIMENTAL
 #include <vector>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp> // value_ptr
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
@@ -35,22 +36,23 @@ using namespace glm;
 
 namespace
 {
-    vector<GLfloat> triangleVertsAndColors;
+    vector<GLfloat> vertsAndColor;
     vector<GLuint>  triangleIndices;
+    vector<GLuint>  lineIndices;
 
     inline void addTriangle(const vec3    & A,
                             const vec3    & B,
                             const vec3    & C,
                             const vec4    & color,
                             size_t        & startIndex,
-                            GLfloat      *& triangleVertsAndColorsPtr,
+                            GLfloat      *& vertsAndColorPtr,
                             GLuint       *& triangleIndicesPtr)
     {
-        memcpy(triangleVertsAndColorsPtr, value_ptr(A), sizeof(GLfloat) * 3); triangleVertsAndColorsPtr += 3;
-        memcpy(triangleVertsAndColorsPtr, value_ptr(B), sizeof(GLfloat) * 3); triangleVertsAndColorsPtr += 3;
-        memcpy(triangleVertsAndColorsPtr, value_ptr(C), sizeof(GLfloat) * 3); triangleVertsAndColorsPtr += 3;
+        memcpy(vertsAndColorPtr, value_ptr(A), sizeof(GLfloat) * 3); vertsAndColorPtr += 3;
+        memcpy(vertsAndColorPtr, value_ptr(B), sizeof(GLfloat) * 3); vertsAndColorPtr += 3;
+        memcpy(vertsAndColorPtr, value_ptr(C), sizeof(GLfloat) * 3); vertsAndColorPtr += 3;
 
-        memcpy(triangleVertsAndColorsPtr, value_ptr(color), sizeof(GLfloat) * 4); triangleVertsAndColorsPtr += 4;
+        memcpy(vertsAndColorPtr, value_ptr(color), sizeof(GLfloat) * 4); vertsAndColorPtr += 4;
 
         *triangleIndicesPtr = startIndex++; ++triangleIndicesPtr;
         *triangleIndicesPtr = startIndex++; ++triangleIndicesPtr;
@@ -60,11 +62,9 @@ namespace
 
 DeferredRenderable * DeferredRenderable::createFromQueued()
 {
-    dmess("triangleVertsAndColors " << triangleVertsAndColors.size());
-    dmess("triangleIndices " << triangleIndices.size());
-
     GLuint vao  = 0;
     GLuint ebo  = 0;
+    GLuint ebo2 = 0;
     GLuint vbo  = 0;
     
     glGenVertexArrays(1, &vao);
@@ -72,30 +72,39 @@ DeferredRenderable * DeferredRenderable::createFromQueued()
 
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
+    glGenBuffers(1, &ebo2);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    glBufferData(GL_ARRAY_BUFFER, triangleVertsAndColors.size() * sizeof(GLfloat), &triangleVertsAndColors[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertsAndColor.size() * sizeof(GLfloat), &vertsAndColor[0], GL_STATIC_DRAW);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * triangleIndices.size(), &triangleIndices[0], GL_STATIC_DRAW);
     
-    DeferredRenderable * ret = new DeferredRenderable(vao, ebo, vbo, triangleIndices.size());
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW);
 
-    triangleVertsAndColors.clear();
+    DeferredRenderable * ret = new DeferredRenderable(vao, ebo, ebo2, vbo, triangleIndices.size(), lineIndices.size());
+
+    vertsAndColor.clear();
     triangleIndices.clear();
+    lineIndices.clear();
 
     return ret;
 }
 
 DeferredRenderable::DeferredRenderable( const GLuint & vao,
                                         const GLuint & ebo,
+                                        const GLuint & ebo2,
                                         const GLuint & vbo,
-                                        const GLuint & numTriIndices) : Renderable   (false),
-                                                                        vao          (vao),
-                                                                        ebo          (ebo),
-                                                                        vbo          (vbo),
-                                                                        numTriIndices(numTriIndices)
+                                        const GLuint & numTriIndices,
+                                        const GLuint & numLineIndices) : Renderable    (false),
+                                                                         vao           (vao),
+                                                                         ebo           (ebo),
+                                                                         ebo2          (ebo2),
+                                                                         vbo           (vbo),
+                                                                         numTriIndices (numTriIndices),
+                                                                         numLineIndices(numLineIndices)
 {
 
 }
@@ -105,20 +114,35 @@ DeferredRenderable::~DeferredRenderable()
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers     (1, &vbo);
     glDeleteBuffers     (1, &ebo);
+    glDeleteBuffers     (1, &ebo2);
 }
 
 namespace
 {
     inline void addVert(const vec3 & v, const vec4 & color)
     {
-        triangleVertsAndColors.push_back(v.x * 0.1);
-        triangleVertsAndColors.push_back(v.y * 0.1);
-        triangleVertsAndColors.push_back(v.z * 0.1);
-        triangleVertsAndColors.push_back(color.x);
-        triangleVertsAndColors.push_back(color.y);
-        triangleVertsAndColors.push_back(color.z);
-        triangleVertsAndColors.push_back(color.w);
+        vertsAndColor.push_back(v.x * 0.1);
+        vertsAndColor.push_back(v.y * 0.1);
+        vertsAndColor.push_back(v.z * 0.1);
+        vertsAndColor.push_back(color.x);
+        vertsAndColor.push_back(color.y);
+        vertsAndColor.push_back(color.z);
+        vertsAndColor.push_back(color.w);
     }
+}
+
+void DeferredRenderable::addLine(const vec3 & A,
+                                 const vec3 & B,
+                                 const vec4 & color)
+{
+    const size_t index = vertsAndColor.size() / 7;
+
+    addVert(A, color);
+    addVert(B, color);
+    addVert(B, color);
+
+    lineIndices.push_back(index + 0);
+    lineIndices.push_back(index + 1);
 }
 
 void DeferredRenderable::addTriangle(const vec3 & A,
@@ -126,11 +150,11 @@ void DeferredRenderable::addTriangle(const vec3 & A,
                                      const vec3 & C,
                                      const vec4 & color)
 {
+    const size_t index = vertsAndColor.size() / 7;
+
     addVert(A, color);
     addVert(B, color);
     addVert(C, color);
-
-    const size_t index = triangleVertsAndColors.size() / 7;
 
     triangleIndices.push_back(index + 0);
     triangleIndices.push_back(index + 1);
@@ -143,14 +167,14 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
                                         const vec3 & D,
                                         const vec4 & color)
 {
+    const size_t index = vertsAndColor.size() / 7;
+
     addVert(A, color);
     addVert(B, color);
     addVert(C, color);
     addVert(A, color);
     addVert(C, color);
     addVert(D, color);
-
-    const size_t index = triangleVertsAndColors.size() / 7;
 
     triangleIndices.push_back(index + 0);
     triangleIndices.push_back(index + 1);
@@ -160,15 +184,15 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
     triangleIndices.push_back(index + 5);
 
     /*
-    size_t curr = triangleVertsAndColors.size();
+    size_t curr = vertsAndColor.size();
 
-    triangleVertsAndColors.resize(curr + ((3 + 4) * 6));
+    vertsAndColor.resize(curr + ((3 + 4) * 6));
 
     size_t currIndex = curr / 7;
 
     triangleIndices.resize(triangleIndices.size() + 6);
 
-    GLfloat * triangleVertsAndColorsPtr = &triangleVertsAndColors[curr];
+    GLfloat * vertsAndColorPtr = &vertsAndColor[curr];
     GLuint  * triangleIndicesPtr        = &triangleIndices[currIndex];
 
     //dmess("currIndex " << currIndex);
@@ -178,7 +202,7 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
                 C,
                 color,
                 currIndex,
-                triangleVertsAndColorsPtr,
+                vertsAndColorPtr,
                 triangleIndicesPtr);
     
     addTriangle(A,
@@ -186,7 +210,7 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
                 D,
                 color,
                 currIndex,
-                triangleVertsAndColorsPtr,
+                vertsAndColorPtr,
                 triangleIndicesPtr);
     */
 
@@ -196,18 +220,23 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
 
 void DeferredRenderable::render(const mat4 & MVP, const mat4 & MV) const
 {
-    dmess("DeferredRenderable::render");
-
     glBindVertexArray(vao);
     
     glBindBuffer(GL_ARRAY_BUFFER,         vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    ColorVertexShader::getInstance()->bind(MVP, MV, false);
+    const mat4 _MVP = glm::rotate(MVP, radians(90.0f), vec3(1, 0, 0)); // TODO might not be correct, might need to define model first!
+
+    //ColorVertexShader::getInstance()->bind(MVP, MV, false);
+    ColorVertexShader::getInstance()->bind(_MVP, MV, false);
 
     ColorVertexShader::getInstance()->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
 
     ColorVertexShader::getInstance()->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
 
     glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+
+    glDrawElements(GL_LINES, numLineIndices, GL_UNSIGNED_INT, NULL);
 }

@@ -111,21 +111,15 @@ namespace {
     // ----------------------------------------------------------------------------
     // draw 3d "graphical annotation" lines, used for debugging
     
+    bool in2D_Drawing = false; // TODO Hack!
+
     inline void iDrawLine (const OpenSteer::Vec3& startPoint,
                            const OpenSteer::Vec3& endPoint,
                            const OpenSteer::Color& color)
     {
         OpenSteer::warnIfInUpdatePhase ("iDrawLine");
 
-        //dmess("Implement me!");
-
-        /*
-        glColor3f (color.r(), color.g(), color.b());
-        glBegin (GL_LINES);
-        glVertexVec3 (startPoint);
-        glVertexVec3 (endPoint);
-        glEnd ();
-        */
+        DeferredRenderable::addLine(__(startPoint), __(endPoint), __(color));
     }
 
     // ----------------------------------------------------------------------------
@@ -142,19 +136,6 @@ namespace {
                                         __(b),
                                         __(c),
                                         __(color));
-
-        //dmess("Implement me!");
-
-        /*
-        glColor3f (color.r(), color.g(), color.b());
-        glBegin (GL_TRIANGLES);
-        {
-            OpenSteer::glVertexVec3 (a);
-            OpenSteer::glVertexVec3 (b);
-            OpenSteer::glVertexVec3 (c);
-        }
-        glEnd ();
-        */
     }
 
 
@@ -174,18 +155,6 @@ namespace {
                                             __(c),
                                             __(d),
                                             __(color));
-
-        /*
-        glColor3f (color.r(), color.g(), color.b());
-        glBegin (GL_QUADS);
-        {
-            OpenSteer::glVertexVec3 (a);
-            OpenSteer::glVertexVec3 (b);
-            OpenSteer::glVertexVec3 (c);
-            OpenSteer::glVertexVec3 (d);
-        }
-        glEnd ();
-        */
     }
 
     // ------------------------------------------------------------------------
@@ -205,6 +174,7 @@ namespace {
 
     inline GLint begin2dDrawing (float w, float h)
     {
+        in2D_Drawing = true;
         //dmess("Implement me!");
 
         /*
@@ -235,6 +205,7 @@ namespace {
 
     inline void end2dDrawing (GLint originalMatrixMode)
     {
+        in2D_Drawing = false;
         //dmess("Implement me!");
         /*
         // restore previous model/projection transformation state
@@ -291,15 +262,10 @@ OpenSteer::drawLineAlpha (const Vec3& startPoint,
                           const Color& color,
                           const float alpha)
 {
-    //dmess("Implement me!");
-    /*
-    warnIfInUpdatePhase ("drawLineAlpha");
-    glColor4f (color.r(), color.g(), color.b(), alpha);
-    glBegin (GL_LINES);
-    OpenSteer::glVertexVec3 (startPoint);
-    OpenSteer::glVertexVec3 (endPoint);
-    glEnd ();
-    */
+
+    const glm::vec4 c(color.r(), color.g(), color.b(), alpha);
+
+    DeferredRenderable::addLine(__(startPoint), __(endPoint), c);
 }
 
 void 
@@ -310,11 +276,6 @@ OpenSteer::drawTriangle (const Vec3& a,
 {
     iDrawTriangle (a, b, c, color);
 }
-
-
-
-
-    
     
 void 
 OpenSteer::drawQuadrangle (const Vec3& a,
@@ -354,10 +315,6 @@ OpenSteer::drawXZWideLine (const Vec3& startPoint,
 }
 
 
-
-
-
-
 // ------------------------------------------------------------------------
 // General purpose circle/disk drawing routine.  Draws circles or disks (as
 // specified by "filled" argument) and handles both special case 2d circles
@@ -376,8 +333,8 @@ OpenSteer::drawCircleOrDisk (const float radius,
 {
     //dmess("Implement me!");
 
-    /*
     LocalSpace ls;
+    //dmess("in3d " << in3d);
     if (in3d)
     {
         // define a local space with "axis" as the Y/up direction
@@ -398,33 +355,46 @@ OpenSteer::drawCircleOrDisk (const float radius,
     const float step = (2 * OPENSTEER_M_PI) / segments;
 
     // set drawing color
-    glColor3f (color.r(), color.g(), color.b());
+    //glColor3f (color.r(), color.g(), color.b());
 
     // begin drawing a triangle fan (for disk) or line loop (for circle)
-    glBegin (filled ? GL_TRIANGLE_FAN : GL_LINE_LOOP);
+    //glBegin (filled ? GL_TRIANGLE_FAN : GL_LINE_LOOP);
 
     // for the filled case, first emit the center point
-    if (filled) iglVertexVec3 (in3d ? ls.position() : center);
+    //if (filled) iglVertexVec3 (in3d ? ls.position() : center);
 
     // rotate p around the circle in "segments" steps
     float sin=0, cos=0;
     const int vertexCount = filled ? segments+1 : segments;
+
+    std::vector<Vec3> points;
+
     for (int i = 0; i < vertexCount; i++)
     {
         // emit next point on circle, either in 3d (globalized out
         // of the local space), or in 2d (offset from the center)
+        /*
         iglVertexVec3 (in3d ?
                            ls.globalizePosition (pointOnCircle) :
                            (Vec3) (pointOnCircle + center));
+                           */
 
         // rotate point one more step around circle
         pointOnCircle = pointOnCircle.rotateAboutGlobalY (step, sin, cos);
+
+        points.push_back(pointOnCircle + center);
+    }
+
+    points.push_back(*points.begin());
+
+    for(size_t i = 0; i < points.size() - 1; ++i)
+    {
+        DeferredRenderable::addLine(__(points[i]), __(points[i + 1]), __(color));
     }
 
     // close drawing operation
-    glEnd ();
+    //glEnd ();
     if (filled) endDoubleSidedDrawing ();
-    */
 }
 
 

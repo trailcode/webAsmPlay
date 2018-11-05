@@ -58,19 +58,27 @@ public:
                             const glm::vec3 & C,
                             const glm::vec4 & color);
 
+    static void addLine(const glm::vec3 & A,
+                        const glm::vec3 & B,
+                        const glm::vec4 & color);
+
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
 private:
 
     DeferredRenderable( const GLuint & vao,
                         const GLuint & ebo,
+                        const GLuint & ebo2,
                         const GLuint & vbo,
-                        const GLuint & numTriIndices);
+                        const GLuint & numTriIndices,
+                        const GLuint & numLineIndices);
 
     const GLuint vao;
     const GLuint ebo;
+    const GLuint ebo2;
     const GLuint vbo;
     const GLuint numTriIndices;
+    const GLuint numLineIndices;
 };
 
 #endif // __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
