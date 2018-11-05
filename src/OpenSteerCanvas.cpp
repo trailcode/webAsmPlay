@@ -89,3 +89,13 @@ void OpenSteerCanvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
 
     Canvas::setArea(upperLeft, size);
 }
+
+void openSteerKeyboardFunc (unsigned char key);
+
+void OpenSteerCanvas::onChar(GLFWwindow * window, const size_t c)
+{
+    dmess("OpenSteerCanvas::onChar " << (char)c);
+
+    //openSteerKeyboardFunc((char)c);
+}
+

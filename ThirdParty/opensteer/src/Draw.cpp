@@ -1003,7 +1003,7 @@ OpenSteer::deferredDrawLine (const Vec3& startPoint,
                              const Color& color)
 {
     dmess("Implement me!");
-    
+
     DeferredLine::addToBuffer (startPoint, endPoint, color);
 }
 

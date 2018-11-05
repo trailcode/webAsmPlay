@@ -26,6 +26,7 @@
 */
 
 #include <glm/vec2.hpp>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeosTestCanvas.h>

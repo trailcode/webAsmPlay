@@ -436,12 +436,6 @@ void GUI::mainLoop(GLFWwindow * window)
     ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), opt_flags);
     
-    showMainToolBar();
-
-    showMainMenuBar(window);
-
-    GUI_Settings_Panel();
-
     // Rendering
     int screenWidth, screenHeight;
     glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
@@ -453,23 +447,7 @@ void GUI::mainLoop(GLFWwindow * window)
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
-
-    performacePanel();
-
-    viewMatrixPanel();
-
-    //if(isFirst) { ImGui::SetNextWindowPos(ImVec2(0,0)) ;}
-
-    MVP_MatrixPanel();
-
-    isFirst = false;
-
-    renderSettingsPanel();
-
-    attributionPanel();
-    
-    if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
-
+ 
     canvas->render();
 
     const double dist = distance(canvas->getCamera()->getCenter(), canvas->getCamera()->getEye());
@@ -487,10 +465,17 @@ void GUI::mainLoop(GLFWwindow * window)
         attrsStr = client->doPicking(mode, pos, canvas);
     }
 
+    if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
+    showMainToolBar();
+    showMainMenuBar(window);
+    GUI_Settings_Panel();
+    performacePanel();
+    viewMatrixPanel();
+    MVP_MatrixPanel();
+    renderSettingsPanel();
+    attributionPanel();
     attributePanel(attrsStr);
-
     geosTestPanel();
-
     openSteerTestPanel();
 
     ImGui::End();

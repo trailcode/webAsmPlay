@@ -106,6 +106,9 @@ void geosUtil::getExternalRings(vector<const LineString *> & rings, const Geomet
 
             break;
         }
+
+        default:
+            break;
     }
 }
 

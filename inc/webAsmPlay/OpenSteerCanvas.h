@@ -42,6 +42,8 @@ public:
 
     void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size);
 
+    void onChar(GLFWwindow * window, const size_t c);
+
 private:
 };
 

@@ -1282,102 +1282,6 @@ namespace {
     // parameter names commented out to prevent compiler warning from "-W"
 
 
-    void 
-    keyboardFunc (unsigned char key, int /*x*/, int /*y*/) 
-    {
-        std::ostringstream message;
-
-        // ascii codes
-        const int tab = 9;
-        const int space = 32;
-        const int esc = 27; // escape key
-
-        switch (key)
-        {
-        // reset selected PlugIn
-        case 'r':
-            OpenSteer::OpenSteerDemo::resetSelectedPlugIn ();
-            message << "reset PlugIn "
-                    << '"' << OpenSteer::OpenSteerDemo::nameOfSelectedPlugIn () << '"'
-                    << std::ends;
-            OpenSteer::OpenSteerDemo::printMessage (message);
-            break;
-
-        // cycle selection to next vehicle
-        case 's':
-            OpenSteer::OpenSteerDemo::printMessage ("select next vehicle/agent");
-            OpenSteer::OpenSteerDemo::selectNextVehicle ();
-            break;
-
-        // camera mode cycle
-        case 'c':
-            OpenSteer::OpenSteerDemo::camera.selectNextMode ();
-            message << "select camera mode "
-                    << '"' << OpenSteer::OpenSteerDemo::camera.modeName () << '"' << std::ends;
-            OpenSteer::OpenSteerDemo::printMessage (message);
-            break;
-
-        // select next PlugIn
-        case tab:
-            OpenSteer::OpenSteerDemo::selectNextPlugIn ();
-            message << "select next PlugIn: "
-                    << '"' << OpenSteer::OpenSteerDemo::nameOfSelectedPlugIn () << '"'
-                    << std::ends;
-            OpenSteer::OpenSteerDemo::printMessage (message);
-            break;
-
-        // toggle annotation state
-        case 'a':
-            OpenSteer::OpenSteerDemo::printMessage (OpenSteer::toggleAnnotationState () ?
-                                                    "annotation ON" : "annotation OFF");
-            break;
-
-        // toggle run/pause state
-        case space:
-            OpenSteer::OpenSteerDemo::printMessage (OpenSteer::OpenSteerDemo::clock.togglePausedState () ?
-                                                    "pause" : "run");
-            break;
-
-        // cycle through frame rate (clock mode) presets
-        case 'f':
-            selectNextPresetFrameRate ();
-            message << "set clock to ";
-            if (OpenSteer::OpenSteerDemo::clock.getAnimationMode ())
-                message << "animation mode, fixed frame rate ("
-                        << OpenSteer::OpenSteerDemo::clock.getFixedFrameRate () << " fps)";
-            else
-            {
-                message << "real-time mode, ";
-                if (OpenSteer::OpenSteerDemo::clock.getVariableFrameRateMode ())
-                    message << "variable frame rate";
-                else
-                    message << "fixed frame rate ("
-                            << OpenSteer::OpenSteerDemo::clock.getFixedFrameRate () << " fps)";
-            }
-            message << std::ends;
-            OpenSteer::OpenSteerDemo::printMessage (message);
-            break;
-
-        // print minimal help for single key commands
-        case '?':
-            OpenSteer::OpenSteerDemo::keyboardMiniHelp ();
-            break;
-
-        // exit application with normal status 
-        case esc:
-            break;
-
-        default:
-            message << "unrecognized single key command: " << key;
-            message << " (" << (int)key << ")";//xxx perhaps only for debugging?
-            message << std::ends;
-            OpenSteer::OpenSteerDemo::printMessage ("");
-            OpenSteer::OpenSteerDemo::printMessage (message);
-            OpenSteer::OpenSteerDemo::keyboardMiniHelp ();
-        }
-    }
-
-
     // ------------------------------------------------------------------------
     // handles "special" keys,
     // function keys are handled by the PlugIn
@@ -1423,6 +1327,101 @@ namespace {
     // Main drawing function for OpenSteerDemo application,
     // drives simulation as a side effect
 } // annonymous namespace
+
+void openSteerKeyboardFunc (unsigned char key) 
+{
+    std::ostringstream message;
+
+    // ascii codes
+    const int tab = 9;
+    const int space = 32;
+    const int esc = 27; // escape key
+
+    switch (key)
+    {
+    // reset selected PlugIn
+    case 'r':
+        OpenSteer::OpenSteerDemo::resetSelectedPlugIn ();
+        message << "reset PlugIn "
+                << '"' << OpenSteer::OpenSteerDemo::nameOfSelectedPlugIn () << '"'
+                << std::ends;
+        OpenSteer::OpenSteerDemo::printMessage (message);
+        break;
+
+    // cycle selection to next vehicle
+    case 's':
+        OpenSteer::OpenSteerDemo::printMessage ("select next vehicle/agent");
+        OpenSteer::OpenSteerDemo::selectNextVehicle ();
+        break;
+
+    // camera mode cycle
+    case 'c':
+        OpenSteer::OpenSteerDemo::camera.selectNextMode ();
+        message << "select camera mode "
+                << '"' << OpenSteer::OpenSteerDemo::camera.modeName () << '"' << std::ends;
+        OpenSteer::OpenSteerDemo::printMessage (message);
+        break;
+
+    // select next PlugIn
+    case tab:
+        OpenSteer::OpenSteerDemo::selectNextPlugIn ();
+        message << "select next PlugIn: "
+                << '"' << OpenSteer::OpenSteerDemo::nameOfSelectedPlugIn () << '"'
+                << std::ends;
+        OpenSteer::OpenSteerDemo::printMessage (message);
+        break;
+
+    // toggle annotation state
+    case 'a':
+        OpenSteer::OpenSteerDemo::printMessage (OpenSteer::toggleAnnotationState () ?
+                                                "annotation ON" : "annotation OFF");
+        break;
+
+    // toggle run/pause state
+    case space:
+        OpenSteer::OpenSteerDemo::printMessage (OpenSteer::OpenSteerDemo::clock.togglePausedState () ?
+                                                "pause" : "run");
+        break;
+
+    // cycle through frame rate (clock mode) presets
+    case 'f':
+        selectNextPresetFrameRate ();
+        message << "set clock to ";
+        if (OpenSteer::OpenSteerDemo::clock.getAnimationMode ())
+            message << "animation mode, fixed frame rate ("
+                    << OpenSteer::OpenSteerDemo::clock.getFixedFrameRate () << " fps)";
+        else
+        {
+            message << "real-time mode, ";
+            if (OpenSteer::OpenSteerDemo::clock.getVariableFrameRateMode ())
+                message << "variable frame rate";
+            else
+                message << "fixed frame rate ("
+                        << OpenSteer::OpenSteerDemo::clock.getFixedFrameRate () << " fps)";
+        }
+        message << std::ends;
+        OpenSteer::OpenSteerDemo::printMessage (message);
+        break;
+
+    // print minimal help for single key commands
+    case '?':
+        OpenSteer::OpenSteerDemo::keyboardMiniHelp ();
+        break;
+
+    // exit application with normal status 
+    case esc:
+        break;
+
+    default:
+        message << "unrecognized single key command: " << key;
+        message << " (" << (int)key << ")";//xxx perhaps only for debugging?
+        message << std::ends;
+        OpenSteer::OpenSteerDemo::printMessage ("");
+        OpenSteer::OpenSteerDemo::printMessage (message);
+        OpenSteer::OpenSteerDemo::keyboardMiniHelp ();
+    }
+}
+
 
 void openSteerDisplayFunc()
 {

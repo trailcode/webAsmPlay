@@ -74,7 +74,7 @@ void GUI::attributionPanel()
 {
     if(!showAttributionPanel) { return ;}
 
-    ImGui::Begin("GUI Configuration", &showAttributionPanel);
+    ImGui::Begin("Attribution", &showAttributionPanel);
 
     if (ImGui::CollapsingHeader("Linear Features", ImGuiTreeNodeFlags_DefaultOpen))
     {

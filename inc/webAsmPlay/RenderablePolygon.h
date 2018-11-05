@@ -72,7 +72,7 @@ public:
 
 private:
 
-    struct TesselationResult
+    struct TessellationResult
     {
         double  * vertsOut          = NULL;
         int     * triangleIndices   = NULL;
@@ -94,17 +94,17 @@ private:
                         const size_t      numContourLines,
                         const bool        isMulti);
 
-    typedef std::vector<const TesselationResult> Tesselations;
+    typedef std::vector<const TessellationResult> Tessellations;
 
-    static Renderable * createFromTesselations(const Tesselations & tesselations);
+    static Renderable * createFromTessellations(const Tessellations & tessellations);
 
-    static TesselationResult tessellatePolygon( const geos::geom::Polygon * poly,
+    static TessellationResult tessellatePolygon(const geos::geom::Polygon * poly,
                                                 const glm::dmat4          & trans,
                                                 const size_t                symbologyID);
 
-    static void tesselateMultiPolygon(  const geos::geom::MultiPolygon  * multiPoly,
+    static void tessellateMultiPolygon( const geos::geom::MultiPolygon  * multiPoly,
                                         const glm::dmat4                & trans,
-                                        Tesselations                    & tesselationResults,
+                                        Tessellations                   & tessellationResults,
                                         const size_t                      symbologyID);
 
     const GLuint    vao;
