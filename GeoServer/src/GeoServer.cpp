@@ -30,6 +30,7 @@
 #include <ctpl.h>
 #include <glm/vec2.hpp>
 #include <boost/histogram.hpp>
+#include <boost/filesystem.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/io/WKTWriter.h>
@@ -46,7 +47,7 @@ using namespace glm;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
-
+using namespace boost;
 using namespace boost::histogram;
 using namespace geos::io;
 using namespace geos::geom;
@@ -61,89 +62,6 @@ GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
                             boundsMaxX(-numeric_limits<double>::max()),
                             boundsMaxY(-numeric_limits<double>::max())
 {
-    //*
-    vector<AttributedGeometry> geometry = OSM_Reader::import(  
-                                                                //"/Users/trailcode/osm.osm"
-                                                                //"/Users/trailcode/osm1.osm"
-                                                                //"/Users/trailcode/osmDenver.osm"
-                                                                "/Users/trailcode/osmDenver2.osm"
-                                                                );
-
-    dmess("geometry " << geometry.size());
-
-    dvec2 center;
-
-    Polygon * polygon;
-    LineString * lineString;
-
-    for(const AttributedGeometry & i : geometry)
-    {
-        if((polygon = dynamic_cast<Polygon *>(i.second)))
-        {
-            serializedPolygons.push_back(GeometryConverter::convert(polygon, i.first));
-        }
-        else if((lineString = dynamic_cast<LineString *>(i.second)))
-        {
-            serializedLineStrings.push_back(GeometryConverter::convert(AttributedLineString(i.first, lineString)));
-        }
-
-        const Envelope * extent = i.second->getEnvelopeInternal();
-
-        /*
-        if(boundsMinX > extent->getMinX()) { boundsMinX = extent->getMinX() ;}
-        if(boundsMinY > extent->getMinY()) { boundsMinY = extent->getMinY() ;}
-        if(boundsMaxX < extent->getMaxX()) { boundsMaxX = extent->getMaxX() ;}
-        if(boundsMaxY < extent->getMaxY()) { boundsMaxY = extent->getMaxY() ;}
-        //*/
-
-        center += dvec2((extent->getMinX() + extent->getMaxX()) * 0.5,
-                        (extent->getMinY() + extent->getMaxY()) * 0.5);
-    }
-
-    center /= double(geometry.size());
-
-    boundsMinX = center.x;
-    boundsMaxX = center.x;
-    boundsMinY = center.y;
-    boundsMaxY = center.y;
-
-    /*
-    boundsMinX = -104.979;
-    boundsMinY = 39.75;
-    boundsMaxX = -104.961;
-    boundsMaxY = 39.7685;
-    */
-
-    //dmess("shift x " << boundsMaxX + boundsMinX);
-    //dmess("shift y " << boundsMinY + boundsMaxY);
-    //dmess("here " << int(boundsMinY < boundsMaxX) << " boundsMinY " << boundsMinY << " boundsMaxX " << boundsMaxX);
-
-    /*
-    auto histX = make_static_histogram(axis::regular<>(1024, boundsMinX, boundsMaxX, "x"));
-    auto histY = make_static_histogram(axis::regular<>(1024, boundsMinY, boundsMaxY, "y"));
-
-    for(const AttributedGeometry & i : polygons)
-    {
-        CoordinateSequence * coords = i.second->getCoordinates(); // TODO memory leak.
-
-        for(size_t i = 0; i < coords->getSize(); ++i)
-        {
-            histX(coords->getX(i));
-            histY(coords->getY(i));
-        }
-    }
-
-    //histX.sum
-
-    for(size_t i = 0; i < 1024; ++i)
-    {
-        dmess(i << " " << histX.at(i).value());
-    }
-    */
-
-    //*/
-
-    saveData("data.geo");
 }
 
 GeoServer::~GeoServer()
@@ -152,11 +70,27 @@ GeoServer::~GeoServer()
 
 string GeoServer::addGeoFile(const string & geomFile)
 {
+    const string ext = filesystem::path(geomFile).extension().string();
+
+         if(ext == ".osm") { addOsmFile          (geomFile) ;}
+    else if(ext == ".shp") { addGdalSupportedFile(geomFile) ;}
+    else
+    {
+        cout << "Error! Unsupported file: " << geomFile << endl;
+
+        exit(-1);
+    }
+
+    return geomFile;
+}
+
+string GeoServer::addGdalSupportedFile(const string & gdalFile)
+{
     GDALAllRegister();
 
-    GDALDataset * poDS = (GDALDataset *)GDALOpenEx(geomFile.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+    GDALDataset * poDS = (GDALDataset *)GDALOpenEx(gdalFile.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 
-    if(!poDS) { dmess("Error opening: " << geomFile) ;}
+    if(!poDS) { dmess("Error opening: " << gdalFile) ;}
 
     OGRLayer * poLayer = poDS->GetLayer(0);
 
@@ -239,7 +173,93 @@ string GeoServer::addGeoFile(const string & geomFile)
 
     GDALClose(poDS);
 
-    return geomFile;
+    return gdalFile;
+}
+
+string GeoServer::addOsmFile(const string & osmFile)
+{
+    vector<AttributedGeometry> geometry = OSM_Reader::import(  
+                                                                //"/Users/trailcode/osm.osm"
+                                                                //"/Users/trailcode/osm1.osm"
+                                                                //"/Users/trailcode/osmDenver.osm"
+                                                                "/Users/trailcode/osmDenver2.osm"
+                                                                );
+
+    dmess("geometry " << geometry.size());
+
+    dvec2 center;
+
+    Polygon * polygon;
+    LineString * lineString;
+
+    for(const AttributedGeometry & i : geometry)
+    {
+        if((polygon = dynamic_cast<Polygon *>(i.second)))
+        {
+            serializedPolygons.push_back(GeometryConverter::convert(polygon, i.first));
+        }
+        else if((lineString = dynamic_cast<LineString *>(i.second)))
+        {
+            serializedLineStrings.push_back(GeometryConverter::convert(AttributedLineString(i.first, lineString)));
+        }
+
+        const Envelope * extent = i.second->getEnvelopeInternal();
+
+        /*
+        if(boundsMinX > extent->getMinX()) { boundsMinX = extent->getMinX() ;}
+        if(boundsMinY > extent->getMinY()) { boundsMinY = extent->getMinY() ;}
+        if(boundsMaxX < extent->getMaxX()) { boundsMaxX = extent->getMaxX() ;}
+        if(boundsMaxY < extent->getMaxY()) { boundsMaxY = extent->getMaxY() ;}
+        //*/
+
+        center += dvec2((extent->getMinX() + extent->getMaxX()) * 0.5,
+                        (extent->getMinY() + extent->getMaxY()) * 0.5);
+    }
+
+    center /= double(geometry.size());
+
+    boundsMinX = center.x;
+    boundsMaxX = center.x;
+    boundsMinY = center.y;
+    boundsMaxY = center.y;
+
+    /*
+    boundsMinX = -104.979;
+    boundsMinY = 39.75;
+    boundsMaxX = -104.961;
+    boundsMaxY = 39.7685;
+    */
+
+    //dmess("shift x " << boundsMaxX + boundsMinX);
+    //dmess("shift y " << boundsMinY + boundsMaxY);
+    //dmess("here " << int(boundsMinY < boundsMaxX) << " boundsMinY " << boundsMinY << " boundsMaxX " << boundsMaxX);
+
+    /*
+    auto histX = make_static_histogram(axis::regular<>(1024, boundsMinX, boundsMaxX, "x"));
+    auto histY = make_static_histogram(axis::regular<>(1024, boundsMinY, boundsMaxY, "y"));
+
+    for(const AttributedGeometry & i : polygons)
+    {
+        CoordinateSequence * coords = i.second->getCoordinates(); // TODO memory leak.
+
+        for(size_t i = 0; i < coords->getSize(); ++i)
+        {
+            histX(coords->getX(i));
+            histY(coords->getY(i));
+        }
+    }
+
+    //histX.sum
+
+    for(size_t i = 0; i < 1024; ++i)
+    {
+        dmess(i << " " << histX.at(i).value());
+    }
+    */
+
+    //*/
+
+    return osmFile;
 }
 
 // Define a callback to handle incoming messages
@@ -417,6 +437,17 @@ void GeoServer::start()
     dmess("boundsMinY " << boundsMinY);
     dmess("boundsMaxX " << boundsMaxX);
     dmess("boundsMaxY " << boundsMaxY);
+
+cout << "  .-----------------------------------------------------------------." << endl;
+cout << " /  .-.                                                         .-.  \\" << endl;
+cout << "|  /   \\   .oOo.oOo.oOo.  G E O  S E R V E R   .oOo.oOo.oOo.   /   \\  |" << endl;
+cout << "| |\\_.  |                                                     |    /| |" << endl;
+cout << "|\\|  | /|      .oOo.oOo.    S T A R T E D    .oOo.oOo.        |\\  | |/|" << endl;
+cout << "| `---' |                                                     | `---' |" << endl;
+cout << "|       |-----------------------------------------------------|       |" << endl;
+cout << "\\       |                                                     |       /" << endl;
+cout << " \\     /                                                       \\     /" << endl;
+cout << "  `---'                                                         `---'" << endl;
 
     try
     {

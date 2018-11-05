@@ -399,7 +399,7 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
         getNumPolygons([this, canvas](const size_t numPolys)
         {
-            dmess("numPolys " << numPolys);
+            if(!numPolys) { return ;}
 
             const size_t blockSize = std::min((size_t)4096, numPolys);
 
@@ -423,6 +423,8 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
 
         getNumPolylines([this, canvas](const size_t numPolylines)
         {
+            if(!numPolylines) { return ;}
+
             const size_t blockSize = std::min((size_t)4096, numPolylines);
 
             shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());

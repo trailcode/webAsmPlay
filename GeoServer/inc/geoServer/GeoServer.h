@@ -56,6 +56,10 @@ private:
 
     static void onMessage(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
 
+    std::string addGdalSupportedFile(const std::string & gdalFile);
+
+    std::string addOsmFile(const std::string & osmFile);
+
     std::vector<std::string> serializedPolygons;
     std::vector<std::string> serializedLineStrings;
     std::vector<std::string> serializedPoints;

@@ -20,9 +20,9 @@
  //    misrepresented as being the original software.
  // 3. This notice may not be removed or altered from any source distribution.
 
-  \author Matthew Tang
-  \email trailcode@gmail.com
-  \copyright 2018
+  \\author Matthew Tang
+  \\email trailcode@gmail.com
+  \\copyright 2018
 */
 
 #include <webAsmPlay/Debug.h>
@@ -37,14 +37,74 @@ void dmessCallback(const string & file, const size_t line, const string & messag
     cout << file << " " << line << " " << message;
 }
 
+void showHelp()
+{
+const char* helpMessage = R"help(
+                          __                    __
+          __       __     \_\  __          __   \_\  __   __       __
+          \_\     /_/        \/_/         /_/      \/_/   \_\     /_/
+        .-.  \.-./  .-.   .-./  .-.   .-./  .-.   .-\   .-.  \.-./  .-.
+       //-\\_//-\\_//-\\_//-\\_//-\\_//-\\_// \\_//-\\_//-\\_//-\\_//-\\
+     __(   '-'   '-'\  '-'   '-'  /'-'   '-'\__'-'   '-'__/'-'   '-'\__
+    /_/))            \__       __/\          \_\       /_/           \_\
+ ___\_//              \_\     /_/  \__
+/_/  ((                             \_\
+      )) __
+__   // /_/
+\_\_((_/___     ╭━━━╮╱╱╱╱╱╱╱╱╭━━━╮
+     ))  \_\    ┃╭━╮┃╱╱╱╱╱╱╱╱┃╭━╮┃
+     \\         ┃┃╱╰╯╭━━╮╭━━╮┃╰━━╮╭━━╮╭━╮╭╮╭╮╭━━╮╭━╮
+      )) _      ┃┃╭━╮┃┃━┫┃╭╮┃╰━━╮┃┃┃━┫┃╭╯┃╰╯┃┃┃━┫┃╭╯
+__   // /_/     ┃╰┻━┃┃┃━┫┃╰╯┃┃╰━╯┃┃┃━┫┃┃╱╰╮╭╯┃┃━┫┃┃
+\_\_((          ╰━━━╯╰━━╯╰━━╯╰━━━╯╰━━╯╰╯╱╱╰╯╱╰━━╯╰╯
+     \\         
+      )) __     Usage:
+__   // /_/     
+\_\_((_/___         geoServer <path to vector file>
+     ))  \_\    
+     \\         Supported file types:
+      )) _          
+__   // /_/         .shp
+\_\_((_/            .osm (OpenStreetMap xml file format)
+     \\
+      )) __
+__   // /_/     Help (This message):
+\_\_((_/___     
+     ))  \_\        geoServer --help
+     \\             geoServer -h
+      )) _
+__   // /_/
+\_\_((_/___
+     ))  \_\                __                    __
+     \\     __       __     \_\  __          __   \_\  __   __       __
+  __  ))    \_\     /_/        \/_/         /_/      \/_/   \_\     /_/
+  \_\_((   .-.  \.-./  .-.   .-./  .-.   .-./  .-.   .-\   .-.  \.-./  .-.
+       \\_//-\\_//-\\_//-\\_//-\\_//-\\_//-\\_// \\_//-\\_//-\\_//-\\_//-\\
+        'dc\__'-'   '-'\  '-'   '-'  /'-'   '-'\__'-'   '-'__/'-'   '-'\__
+            \_\         \__       __/\          \_\       /_/           \_\
+                         \_\     /_/  \__
+                                       \_\
+)help";
+
+    cout << helpMessage << endl;
+
+    exit(0);
+}
+
 int main(const int argc, char ** argv)
 {
+    if(argc == 1) { showHelp() ;}
+
+    if(argc > 1 && (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h"))) { showHelp() ;}
+
     debugLoggerFunc = &dmessCallback;
 
     //GeoServer s("/Users/trailcode/Downloads/cb_2017_08_tract_500k/cb_2017_08_tract_500k.shp");
     //GeoServer s("/Users/trailcode/osmPolygons.shp");
     GeoServer s;
     
+    s.addGeoFile(argv[1]);
+
     //s.addGeoFile("/Users/trailcode/osmPolygon2.shp");
     //s.addGeoFile("/Users/trailcode/osmPolygons.shp");
     //s.addGeoFile("/Users/trailcode/osmPolylines2.shp");
