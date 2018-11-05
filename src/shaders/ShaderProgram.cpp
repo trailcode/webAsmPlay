@@ -164,23 +164,23 @@ ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
                         attributeMap);
 }
 
-ShaderProgram::ShaderProgram( const GLuint                         shaderProgram,
-                const GLint                          vertInAttrib,
-                const GLint                          colorInAttrib,
-                const GLint                          colorsInUniform,
-                const GLint                          MVP_In_Uniform,
-                const GLint                          colorUniform,
-                const GLint                          textureCoordsUniform,
-                const unordered_map<string, GLint> & uniforms,
-                const unordered_map<string, GLint> & attributes) :  shaderProgram        (shaderProgram),
-                                                                    vertInAttrib         (vertInAttrib),
-                                                                    colorInAttrib        (colorInAttrib),
-                                                                    colorsInUniform      (colorsInUniform),
-                                                                    MVP_In_Uniform       (MVP_In_Uniform),
-                                                                    colorUniform         (colorUniform),
-                                                                    textureCoordsUniform (textureCoordsUniform),
-                                                                    uniforms             (uniforms),
-                                                                    attributes           (attributes)
+ShaderProgram::ShaderProgram(   const GLuint                         shaderProgram,
+                                const GLint                          vertInAttrib,
+                                const GLint                          colorInAttrib,
+                                const GLint                          colorsInUniform,
+                                const GLint                          MVP_In_Uniform,
+                                const GLint                          colorUniform,
+                                const GLint                          textureCoordsUniform,
+                                const unordered_map<string, GLint> & uniforms,
+                                const unordered_map<string, GLint> & attributes) :  shaderProgram        (shaderProgram),
+                                                                                    vertInAttrib         (vertInAttrib),
+                                                                                    colorInAttrib        (colorInAttrib),
+                                                                                    colorsInUniform      (colorsInUniform),
+                                                                                    MVP_In_Uniform       (MVP_In_Uniform),
+                                                                                    colorUniform         (colorUniform),
+                                                                                    textureCoordsUniform (textureCoordsUniform),
+                                                                                    uniforms             (uniforms),
+                                                                                    attributes           (attributes)
 {
 } 
 

@@ -27,14 +27,45 @@
 #ifndef __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
 #define __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
 
-class DeferredRenderable
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+#else
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+#endif
+
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <webAsmPlay/Renderable.h>
+
+class DeferredRenderable : public Renderable
 {
 public:
 
-    DeferredRenderable();
-    ~DeferredRenderable();
+    virtual ~DeferredRenderable();
+
+    static DeferredRenderable * createFromQueued(); 
+
+    static void addQuadrangle(  const glm::vec3 & A,
+                                const glm::vec3 & B,
+                                const glm::vec3 & C,
+                                const glm::vec3 & D,
+                                const glm::vec4 & color);
+
+    void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
 private:
+
+    DeferredRenderable( const GLuint & vao,
+                        const GLuint & ebo,
+                        const GLuint & vbo,
+                        const GLuint & numTriIndices);
+
+    const GLuint vao;
+    const GLuint ebo;
+    const GLuint vbo;
+    const GLuint numTriIndices;
 };
 
 #endif // __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__

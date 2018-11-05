@@ -24,10 +24,13 @@
   \copyright 2018
 */
 
+#include <memory>
 #include <OpenSteer/OpenSteerDemo.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/DeferredRenderable.h>
 #include <webAsmPlay/OpenSteerCanvas.h>
 
+using namespace std;
 using namespace glm;
 
 OpenSteerCanvas::OpenSteerCanvas(const bool   useFrameBuffer,
@@ -48,6 +51,8 @@ GLuint OpenSteerCanvas::render()
     if(!preRender()) { return 0 ;}
 
     openSteerDisplayFunc();
+
+    unique_ptr<Renderable>(DeferredRenderable::createFromQueued())->render(this);
 
     return postRender();
 }

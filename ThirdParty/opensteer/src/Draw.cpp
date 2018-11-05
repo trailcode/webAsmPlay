@@ -63,6 +63,8 @@
     
 #endif // __EMSCRIPTEN__
 
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/DeferredRenderable.h>
 #include "OpenSteer/Vec3.h"
 
 // To include OpenSteer::round.
@@ -162,7 +164,11 @@ namespace {
     {
         OpenSteer::warnIfInUpdatePhase ("iDrawQuadrangle");
 
-        //dmess("Implement me!");
+        DeferredRenderable::addQuadrangle(  __(a),
+                                            __(b),
+                                            __(c),
+                                            __(d),
+                                            __(color));
 
         /*
         glColor3f (color.r(), color.g(), color.b());

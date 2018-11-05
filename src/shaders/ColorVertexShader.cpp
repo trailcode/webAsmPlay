@@ -32,6 +32,8 @@ using namespace glm;
 namespace
 {
     ShaderProgram * shaderProgram = NULL;
+
+    ColorVertexShader * defaultInstance = NULL;
 }
 
 ColorVertexShader::ColorVertexShader() : Shader(shaderProgram) {}
@@ -39,15 +41,40 @@ ColorVertexShader::~ColorVertexShader() {}
 
 void ColorVertexShader::ensureShader()
 {
+    if(shaderProgram) { return ;}
 
+    // Shader sources
+    const GLchar* vertexSource = R"glsl(#version 330 core
+        in vec3 vertIn;
+        in vec4 vertColorIn;
+        out vec4 vertexColor;
+        uniform mat4 MVP;
+        
+        void main()
+        {
+            gl_Position = MVP * vec4(vertIn.xyz, 1);
+            vertexColor = vertColorIn;
+        }
+    )glsl";
+
+    const GLchar* fragmentSource = R"glsl(#version 330 core
+        out vec4 outColor;
+        in vec4 vertexColor;
+
+        void main()
+        {
+            outColor = vertexColor;
+        }
+    )glsl";
+
+    shaderProgram = ShaderProgram::create(vertexSource, fragmentSource);
+
+    defaultInstance = new ColorVertexShader();
 }
 
-ColorVertexShader * ColorVertexShader::getInstance()
-{
-    return NULL;
-}
+ColorVertexShader * ColorVertexShader::getInstance() { return defaultInstance ;}
 
 void ColorVertexShader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
 {
-
+    shaderProgram->bind(MVP, MV);
 }
