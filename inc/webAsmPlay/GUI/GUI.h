@@ -33,6 +33,7 @@ class GLFWwindow;
 
 class Canvas;
 class GeosTestCanvas;
+class OpenSteerCanvas;
 class SkyBox;
 
 class GUI
@@ -95,8 +96,10 @@ private:
     static bool showAttributePanel;
     static bool showGUI_Settings_Panel;
     static bool showAttributionPanel;
+    static bool showOpenSteerPanel;
 
     static GeosTestCanvas  * geosTestCanvas;
+    static OpenSteerCanvas * openSteerCanvas;
     static Canvas          * canvas;
     static SkyBox          * skyBox;
 };

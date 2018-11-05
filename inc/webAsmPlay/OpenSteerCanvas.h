@@ -24,38 +24,23 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Util.h>
-#include <webAsmPlay/OpenSteerCanvas.h>
-#include <webAsmPlay/GUI/ImguiInclude.h>
-#include <webAsmPlay/GUI/GUI.h>
+#ifndef __WEB_ASM_PLAY_OPEN_STEER_CANVAS_H__
+#define __WEB_ASM_PLAY_OPEN_STEER_CANVAS_H__
 
-void GUI::openSteerTestPanel()
+#include <webAsmPlay/Canvas.h>
+
+class OpenSteerCanvas : public Canvas
 {
-    openSteerCanvas->setEnabled(showOpenSteerPanel);
+public:
 
-    if (!showOpenSteerPanel)
-    {
-        return;
-    }
+    OpenSteerCanvas(const bool        useFrameBuffer = true,
+                    const glm::vec4 & clearColor     = glm::vec4(0.5, 0.5, 1, 1));
 
-    ImGui::Begin("OpenSteer", &showOpenSteerPanel);
+    ~OpenSteerCanvas();
 
-        const ImVec2 pos = ImGui::GetCursorScreenPos();
+    GLuint render();
 
-        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+private:
+};
 
-        openSteerCanvas->setArea(__(pos), __(sceneWindowSize));
-
-        openSteerCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
-
-        ImGui::GetWindowDrawList()->AddImage((void *)openSteerCanvas->render(),
-                                            pos,
-                                            ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-                                            ImVec2(0, 1),
-                                            ImVec2(1, 0));
-
-    ImGui::End();
-
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
+#endif // __WEB_ASM_PLAY_OPEN_STEER_CANVAS_H__

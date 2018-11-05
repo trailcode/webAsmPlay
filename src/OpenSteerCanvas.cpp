@@ -25,37 +25,24 @@
 */
 
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Util.h>
 #include <webAsmPlay/OpenSteerCanvas.h>
-#include <webAsmPlay/GUI/ImguiInclude.h>
-#include <webAsmPlay/GUI/GUI.h>
 
-void GUI::openSteerTestPanel()
+using namespace glm;
+
+OpenSteerCanvas::OpenSteerCanvas(const bool   useFrameBuffer,
+                                 const vec4 & clearColor) : Canvas(useFrameBuffer, clearColor)
 {
-    openSteerCanvas->setEnabled(showOpenSteerPanel);
 
-    if (!showOpenSteerPanel)
-    {
-        return;
-    }
+}
 
-    ImGui::Begin("OpenSteer", &showOpenSteerPanel);
+OpenSteerCanvas::~OpenSteerCanvas()
+{
 
-        const ImVec2 pos = ImGui::GetCursorScreenPos();
+}
 
-        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+GLuint OpenSteerCanvas::render()
+{
+    if(!preRender()) { return 0 ;}
 
-        openSteerCanvas->setArea(__(pos), __(sceneWindowSize));
-
-        openSteerCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
-
-        ImGui::GetWindowDrawList()->AddImage((void *)openSteerCanvas->render(),
-                                            pos,
-                                            ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-                                            ImVec2(0, 1),
-                                            ImVec2(1, 0));
-
-    ImGui::End();
-
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return postRender();
 }

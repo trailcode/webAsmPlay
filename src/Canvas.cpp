@@ -88,15 +88,15 @@ void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
     trackBallInteractor->setScreenSize(size.x, size.y);
 }
 
-GLuint Canvas::render()
+bool Canvas::preRender()
 {
-    if(!enabled) { return 0 ;}
+    if(!enabled) { return false ;}
 
     if(!size.x || !size.y)
     {
         dmess("Error canvas size is not valid!");
 
-        return 0;
+        return false;
     }
 
     Camera * camera = trackBallInteractor->getCamera();
@@ -123,10 +123,22 @@ GLuint Canvas::render()
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
+    return true;
+}
+
+GLuint Canvas::render()
+{
+    if(!preRender()) { return 0 ;}
+
     lock_guard<mutex> _(renderiablesMutex);
 
     for(Renderable * r : renderiables) { r->render(this) ;}
 
+    return postRender();
+}
+
+GLuint Canvas::postRender()
+{
     if(!cursor) { cursor = RenderablePoint::create(vec3(0,0,0)) ;}
 
     {
@@ -142,6 +154,7 @@ GLuint Canvas::render()
 
     return 0;
 }
+
 
 GLuint Canvas::getTextureID() const
 {

@@ -1,10 +1,10 @@
-/**
-╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
-┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
-╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
-╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
-╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
-╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ /**
+ ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+ ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+ ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+ ╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+ ╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+ ╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
  // This software is provided 'as-is', without any express or implied
  // warranty.  In no event will the authors be held liable for any damages
  // arising from the use of this software.
@@ -69,15 +69,15 @@ public:
 
     bool setWantMouseCapture(const bool wantMouseCapture);
 
-    void onMouseButton(GLFWwindow * window, const int button, const int action, const int mods);
+    virtual void onMouseButton(GLFWwindow * window, const int button, const int action, const int mods);
 
-    void onMousePosition(GLFWwindow * window, const glm::vec2 & mousePos);
+    virtual void onMousePosition(GLFWwindow * window, const glm::vec2 & mousePos);
 
-    void onMouseScroll(GLFWwindow * window, const glm::vec2 & mouseScroll);
+    virtual void onMouseScroll(GLFWwindow * window, const glm::vec2 & mouseScroll);
 
-    void onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods);
+    virtual void onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods);
 
-    void onChar(GLFWwindow * window, const size_t c);
+    virtual void onChar(GLFWwindow * window, const size_t c);
 
     rsmz::Camera * getCamera() const;
 
@@ -112,6 +112,12 @@ public:
     bool getEnabled() const;
     
     glm::dvec3 getCursorPosWC() const;
+
+protected:
+
+    bool preRender();
+
+    GLuint postRender();
 
 private:
 

@@ -67,6 +67,7 @@ void GUI::loadState()
     setBool(L"showAttributePanel",      showAttributePanel);
     setBool(L"showGUI_Settings_Panel",  showGUI_Settings_Panel);
     setBool(L"showAttributionPanel",    showAttributionPanel);
+    setBool(L"showOpenSteerPanel",      showOpenSteerPanel);
 
     // Floats
 
@@ -109,6 +110,7 @@ void GUI::saveState()
     root[L"showAttributePanel"]       = new JSONValue(showAttributePanel);
     root[L"showGUI_Settings_Panel"]   = new JSONValue(showGUI_Settings_Panel);
     root[L"showAttributionPanel"]     = new JSONValue(showAttributionPanel);
+    root[L"showOpenSteerPanel"]       = new JSONValue(showOpenSteerPanel);
 
     ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
 

@@ -136,6 +136,7 @@ file(GLOB webAsmPlay_SRC        "src/GUI/GUI.cpp"
                                 "src/Attributes.cpp"
                                 "src/Relation.cpp"
                                 "src/OpenSteerGlue.cpp"
+                                "src/OpenSteerCanvas.cpp"
                                 "src/main.cpp"
                                 ${tceGeom_SRC}
                                 ${tceCore_SRC}

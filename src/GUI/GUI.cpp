@@ -58,6 +58,7 @@
 #include <webAsmPlay/GridPlane.h>
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GeosTestCanvas.h>
+#include <webAsmPlay/OpenSteerCanvas.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -95,19 +96,21 @@ static int mouse_buttons_down = 0;
 
 static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
 
-GeosTestCanvas  * GUI::geosTestCanvas = NULL;
-Canvas          * GUI::canvas         = NULL;
-SkyBox          * GUI::skyBox         = NULL;
+GeosTestCanvas  * GUI::geosTestCanvas  = NULL;
+OpenSteerCanvas * GUI::openSteerCanvas = NULL;
+Canvas          * GUI::canvas          = NULL;
+SkyBox          * GUI::skyBox          = NULL;
 
-bool GUI::showViewMatrixPanel        = false;
-bool GUI::showMVP_MatrixPanel        = false;
-bool GUI::showSceneViewPanel         = false;
-bool GUI::showPerformancePanel       = false;
-bool GUI::showRenderSettingsPanel    = false;
-bool GUI::showLogPanel               = false;
-bool GUI::showAttributePanel         = false;
-bool GUI::showAttributionPanel       = false;
-bool GUI::showGUI_Settings_Panel     = false;
+bool GUI::showViewMatrixPanel          = false;
+bool GUI::showMVP_MatrixPanel          = false;
+bool GUI::showSceneViewPanel           = false;
+bool GUI::showPerformancePanel         = false;
+bool GUI::showRenderSettingsPanel      = false;
+bool GUI::showLogPanel                 = false;
+bool GUI::showAttributePanel           = false;
+bool GUI::showAttributionPanel         = false;
+bool GUI::showGUI_Settings_Panel       = false;
+bool GUI::showOpenSteerPanel           = false;
 
 bool isFirst = true;
 
@@ -324,6 +327,7 @@ void GUI::showMainMenuBar(GLFWwindow * window)
         if(ImGui::MenuItem("Attributes"))      { showAttributePanel      = !showAttributePanel         ;}
         if(ImGui::MenuItem("GUI Settings"))    { showGUI_Settings_Panel  = !showGUI_Settings_Panel     ;}
         if(ImGui::MenuItem("Attribution"))     { showAttributionPanel    = !showAttributionPanel       ;}
+        if(ImGui::MenuItem("OpenSteer"))       { showOpenSteerPanel      = !showOpenSteerPanel         ;}
 
         ImGui::EndMenu();
     }
@@ -460,8 +464,7 @@ void GUI::mainLoop(GLFWwindow * window)
     renderSettingsPanel();
 
     attributionPanel();
-    openSteerTestPanel();
-
+    
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
 
     canvas->render();
@@ -484,6 +487,8 @@ void GUI::mainLoop(GLFWwindow * window)
     attributePanel(attrsStr);
 
     geosTestPanel();
+
+    openSteerTestPanel();
 
     ImGui::End();
 
@@ -526,6 +531,8 @@ void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
     canvas->setArea(ivec2(0,0), ivec2(width, height));
 
     geosTestCanvas = new GeosTestCanvas();
+
+    openSteerCanvas = new OpenSteerCanvas();
 
     skyBox = new SkyBox();
 
