@@ -531,7 +531,6 @@ void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
 
     ColorDistanceShader2::ensureShader();
     //GridPlane  ::ensureShader();
-    RenderablePolygon::ensureShaders();
     ColorDistanceShader::ensureShader();
     ColorShader::ensureShader();
     ColorVertexShader::ensureShader();

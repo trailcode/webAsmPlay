@@ -38,12 +38,6 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-namespace
-{
-    ShaderProgram * outlineShader      = NULL;
-    ShaderProgram * colorPolygonShader = NULL;
-}
-
 // TODO Create better variable names. Try to simplify this class.
 
 RenderablePolygon::RenderablePolygon(   const GLuint      vao,
@@ -83,8 +77,6 @@ RenderablePolygon::TesselationResult RenderablePolygon::tessellatePolygon(  cons
     const LineString * ring = poly->getExteriorRing();
 
     const vector<Coordinate> & coords = *ring->getCoordinatesRO()->toVector();
-
-    //dmess("coords " << coords.size());
 
     if(coords.size() < 4)
     {
@@ -414,8 +406,6 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
     glDisable(GL_DEPTH_TEST);
 
-    //dmess("numTriangles " << numTriangles);
-
     if(shader->getRenderFill())
     {
         shader->bind(MVP, MV, false);
@@ -438,119 +428,5 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
     glDisable(GL_BLEND);
 
-    glUseProgram(0);
-}
-
-void RenderablePolygon::ensureShaders()
-{
-    ensureOutlineShader();
-    ensureColorPolygonShader();
-}
-
-void RenderablePolygon::ensureOutlineShader()
-{
-#ifdef __EMSCRIPTEN__
-
-    return; // WebGL does not support geometry shaders.
-
-#endif
-
-    if(outlineShader) { return ;}
-
-    const GLchar* vertexSource = R"glsl(#version 330 core
-        in vec2 vertIn;
-        out vec4 vertexColor;
-        uniform mat4 MVP;
-        uniform vec4 colorIn;
-
-        void main()
-        {
-            gl_Position = MVP * vec4(vertIn.xy, 0, 1);
-
-            vertexColor = colorIn;
-        }
-    )glsl";
-
-    const GLchar* fragmentSource = R"glsl(#version 330 core
-        out vec4 outColor;
-        in vec4 vertexColor;
-
-        void main()
-        {
-            outColor = vec4(1,0,0,1);
-        }
-    )glsl";
-
-    const GLchar* geometrySource = R"glsl(#version 330 core
-        
-        layout(points) in;
-        layout(line_strip, max_vertices = 2) out;
-
-        void main()
-        {
-            gl_Position = gl_in[0].gl_Position + vec4(-0.1, 0.0, 0.0, 0.0);
-            EmitVertex();
-
-            gl_Position = gl_in[0].gl_Position + vec4(0.1, 0.0, 0.0, 0.0);
-            EmitVertex();
-
-            EndPrimitive();
-        }
-
-    )glsl";
-
-    outlineShader = ShaderProgram::create(vertexSource, fragmentSource, geometrySource);
-}
-
-void RenderablePolygon::ensureColorPolygonShader()
-{
-    if(colorPolygonShader) { return ;}
-
-    dmess("RenderablePolygon::ensureColorPolygonShader");
-
-    // Shader sources
-    const GLchar* vertexSource = R"glsl(#version 330 core
-        in vec2 vertIn;
-        //in vec4 vertColorIn;
-        in int vertColorIn;
-        out vec4 vertexColor;
-
-        uniform mat4 MVP;
-        uniform vec4 colorsIn[32];
-
-        void main()
-        {
-            gl_Position = MVP * vec4(vertIn.xy, 0, 1);
-            //vertexColor = vertColorIn;
-            //vertexColor = vec4(0,1,1,1);
-            vertexColor = colorsIn[vertColorIn];
-        }
-    )glsl";
-
-    const GLchar* fragmentSource = R"glsl(#version 330 core
-        out vec4 outColor;
-        in vec4 vertexColor;
-
-        void main()
-        {
-            outColor = vertexColor;
-        }
-    )glsl";
-
-    colorPolygonShader = ShaderProgram::create(vertexSource, fragmentSource);
-
-    const GLint colorsInLoc = colorPolygonShader->getUniformLoc("colorsIn");
-
-    dmess("colorsInLoc " << colorsInLoc);
-
-    const float colors[] = {0,0,1,0.3,
-                            1,1,0,0.3,
-                            1,0,0,0.3,
-                            0,1,0,0.3,
-                            1,0,1,0.3,
-                            0,1,1,0.3,
-                            1,1,1,0.3};
-
-    glUniform4fv(colorsInLoc, 7, colors);
-
+    //glUseProgram(0);
 }

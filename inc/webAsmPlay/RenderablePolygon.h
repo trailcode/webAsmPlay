@@ -70,8 +70,6 @@ public:
 
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
-    static void ensureShaders();
-
 private:
 
     struct TesselationResult
@@ -108,10 +106,6 @@ private:
                                         const glm::dmat4                & trans,
                                         Tesselations                    & tesselationResults,
                                         const size_t                      symbologyID);
-
-    static void ensureOutlineShader();
-
-    static void ensureColorPolygonShader();
 
     const GLuint    vao;
     const GLuint    ebo;
