@@ -44,7 +44,7 @@ public:
 
     void start();
 
-    void saveData(const std::string & fileName);
+    std::string saveGeoFile(const std::string & fileName);
 
 private:
     
@@ -59,6 +59,8 @@ private:
     std::string addGdalSupportedFile(const std::string & gdalFile);
 
     std::string addOsmFile(const std::string & osmFile);
+
+    std::string _addGeoFile(const std::string & geoFile);
 
     std::vector<std::string> serializedPolygons;
     std::vector<std::string> serializedLineStrings;

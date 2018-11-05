@@ -60,21 +60,21 @@ __   // /_/     ┃╰┻━┃┃┃━┫┃╰╯┃┃╰━╯┃┃┃━�
      \\         
       )) __     Usage:
 __   // /_/     
-\_\_((_/___         geoServer <path to vector file>
-     ))  \_\    
-     \\         Supported file types:
-      )) _          
-__   // /_/         .shp
-\_\_((_/            .osm (OpenStreetMap xml file format)
-     \\
+\_\_((_/___             geoServer <path to vector file>
+     ))  \_\        
+     \\             Supported file types:
+      )) _              
+__   // /_/             .shp
+\_\_((_/                .osm (OpenStreetMap xml file format)
+     \\                 .geo (GeoServer file format)
       )) __
-__   // /_/     Help (This message):
+__   // /_/         Create .geo: 
 \_\_((_/___     
-     ))  \_\        geoServer --help
-     \\             geoServer -h
-      )) _
-__   // /_/
-\_\_((_/___
+     ))  \_\            geoServer --convert <vector file> <.geo file>
+     \\         
+      )) _          Help (This message):    
+__   // /_/         
+\_\_((_/___             geoServer --help
      ))  \_\                __                    __
      \\     __       __     \_\  __          __   \_\  __   __       __
   __  ))    \_\     /_/        \/_/         /_/      \/_/   \_\     /_/
@@ -99,17 +99,9 @@ int main(const int argc, char ** argv)
 
     debugLoggerFunc = &dmessCallback;
 
-    //GeoServer s("/Users/trailcode/Downloads/cb_2017_08_tract_500k/cb_2017_08_tract_500k.shp");
-    //GeoServer s("/Users/trailcode/osmPolygons.shp");
     GeoServer s;
     
     s.addGeoFile(argv[1]);
-
-    //s.addGeoFile("/Users/trailcode/osmPolygon2.shp");
-    //s.addGeoFile("/Users/trailcode/osmPolygons.shp");
-    //s.addGeoFile("/Users/trailcode/osmPolylines2.shp");
-    //s.addGeoFile("/Users/trailcode/osmPolys.geojson");
-    //s.addGeoFile("/Users/trailcode/osm1.osm");
 
     s.start();
 

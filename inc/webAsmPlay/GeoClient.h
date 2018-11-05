@@ -77,6 +77,8 @@ public:
 
     void loadAllGeometry(Canvas * canvas);
 
+    void loadGeometry(const std::string fileName);
+
     std::pair<Renderable *, Attributes *> pickLineStringRenderable(const glm::vec3 & pos) const;
 
     std::pair<Renderable *, Attributes *> pickPolygonRenderable(const glm::vec3 & pos) const;

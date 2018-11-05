@@ -74,6 +74,7 @@ string GeoServer::addGeoFile(const string & geomFile)
 
          if(ext == ".osm") { addOsmFile          (geomFile) ;}
     else if(ext == ".shp") { addGdalSupportedFile(geomFile) ;}
+    else if(ext == ".geo") { _addGeoFile         (geomFile) ;}
     else
     {
         cout << "Error! Unsupported file: " << geomFile << endl;
@@ -86,6 +87,8 @@ string GeoServer::addGeoFile(const string & geomFile)
 
 string GeoServer::addGdalSupportedFile(const string & gdalFile)
 {
+    cout << "Loading: " << gdalFile << endl;
+
     GDALAllRegister();
 
     GDALDataset * poDS = (GDALDataset *)GDALOpenEx(gdalFile.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
@@ -178,18 +181,15 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
 
 string GeoServer::addOsmFile(const string & osmFile)
 {
-    vector<AttributedGeometry> geometry = OSM_Reader::import(  
-                                                                //"/Users/trailcode/osm.osm"
-                                                                //"/Users/trailcode/osm1.osm"
-                                                                //"/Users/trailcode/osmDenver.osm"
-                                                                "/Users/trailcode/osmDenver2.osm"
-                                                                );
+    cout << "Loading: " << osmFile << endl;
+
+    vector<AttributedGeometry> geometry = OSM_Reader::import(osmFile);
 
     dmess("geometry " << geometry.size());
 
     dvec2 center;
 
-    Polygon * polygon;
+    Polygon    * polygon;
     LineString * lineString;
 
     for(const AttributedGeometry & i : geometry)
@@ -260,6 +260,41 @@ string GeoServer::addOsmFile(const string & osmFile)
     //*/
 
     return osmFile;
+}
+
+void _saveData(FILE * fp, vector<string> & data)
+{
+    const uint32_t num = data.size();
+
+    fwrite(&num, sizeof(uint32_t), 1, fp);
+
+    for(const auto & i : data) { fwrite(i.data(), sizeof(char), i.length(), fp) ;}
+}
+
+string GeoServer::saveGeoFile(const string & fileName)
+{
+    FILE * fp = fopen(fileName.c_str(), "wb");
+
+    fwrite(&boundsMinX, sizeof(double), 1, fp);
+    fwrite(&boundsMinY, sizeof(double), 1, fp);
+    fwrite(&boundsMaxX, sizeof(double), 1, fp);
+    fwrite(&boundsMaxY, sizeof(double), 1, fp);
+
+    _saveData(fp, serializedPolygons);
+    _saveData(fp, serializedLineStrings);
+    _saveData(fp, serializedPoints);
+    _saveData(fp, serializedRelations);
+
+    fclose(fp);
+
+    return fileName;
+}
+
+string GeoServer::_addGeoFile(const string & geoFile)
+{
+    cout << "Loading: " << geoFile << endl;
+
+    return geoFile;
 }
 
 // Define a callback to handle incoming messages
@@ -438,16 +473,16 @@ void GeoServer::start()
     dmess("boundsMaxX " << boundsMaxX);
     dmess("boundsMaxY " << boundsMaxY);
 
-cout << "  .-----------------------------------------------------------------." << endl;
-cout << " /  .-.                                                         .-.  \\" << endl;
-cout << "|  /   \\   .oOo.oOo.oOo.  G E O  S E R V E R   .oOo.oOo.oOo.   /   \\  |" << endl;
-cout << "| |\\_.  |                                                     |    /| |" << endl;
-cout << "|\\|  | /|      .oOo.oOo.    S T A R T E D    .oOo.oOo.        |\\  | |/|" << endl;
-cout << "| `---' |                                                     | `---' |" << endl;
-cout << "|       |-----------------------------------------------------|       |" << endl;
-cout << "\\       |                                                     |       /" << endl;
-cout << " \\     /                                                       \\     /" << endl;
-cout << "  `---'                                                         `---'" << endl;
+    cout << "  .-----------------------------------------------------------------." << endl;
+    cout << " /  .-.                                                         .-.  \\" << endl;
+    cout << "|  /   \\   .oOo.oOo.oOo.  G E O  S E R V E R   .oOo.oOo.oOo.   /   \\  |" << endl;
+    cout << "| |\\_.  |                                                     |    /| |" << endl;
+    cout << "|\\|  | /|      .oOo.oOo.    S T A R T E D    .oOo.oOo.        |\\  | |/|" << endl;
+    cout << "| `---' |                                                     | `---' |" << endl;
+    cout << "|       |-----------------------------------------------------|       |" << endl;
+    cout << "\\       |                                                     |       /" << endl;
+    cout << " \\     /                                                       \\     /" << endl;
+    cout << "  `---'                                                         `---'" << endl;
 
     try
     {
@@ -491,25 +526,4 @@ cout << "  `---'                                                         `---'" 
     }
 
     dmess("Exit");
-}
-
-void _saveData(FILE * fp, vector<string> & data)
-{
-    const uint32_t num = data.size();
-
-    fwrite(&num, sizeof(uint32_t), 1, fp);
-
-    for(const auto & i : data) { fwrite(i.data(), sizeof(char), i.length(), fp) ;}
-}
-
-void GeoServer::saveData(const string & fileName)
-{
-    FILE * fp = fopen(fileName.c_str(), "wb");
-
-    _saveData(fp, serializedPolygons);
-    _saveData(fp, serializedLineStrings);
-    _saveData(fp, serializedPoints);
-    _saveData(fp, serializedRelations);
-
-    fclose(fp);
 }

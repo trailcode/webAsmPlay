@@ -25,6 +25,10 @@
   \copyright 2018
 */
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/fetch.h>
+#endif
+
 #include <utility>
 #include <memory>
 #include <glm/gtc/matrix_transform.hpp>
@@ -448,6 +452,55 @@ void GeoClient::loadAllGeometry(Canvas * canvas)
     });
 }
 
+namespace
+{
+#ifdef __EMSCRIPTEN__
+
+    void downloadSucceeded(emscripten_fetch_t *fetch)
+    {
+        printf("Finished downloading %llu bytes from URL %s.\n", fetch->numBytes, fetch->url);
+        // The data is now available at fetch->data[0] through fetch->data[fetch->numBytes-1];
+        emscripten_fetch_close(fetch); // Free data associated with the fetch.
+    }
+
+    void downloadFailed(emscripten_fetch_t *fetch)
+    {
+        printf("Downloading %s failed, HTTP failure status code: %d.\n", fetch->url, fetch->status);
+        emscripten_fetch_close(fetch); // Also free data on failure.
+    }
+
+    void downloadProgress(emscripten_fetch_t *fetch)
+    {
+        if (fetch->totalBytes)
+        {
+            printf("Downloading %s.. %.2f%% complete.\n", fetch->url, fetch->dataOffset * 100.0 / fetch->totalBytes);
+        } else
+        {
+            printf("Downloading %s.. %lld bytes complete.\n", fetch->url, fetch->dataOffset + fetch->numBytes);
+        }
+    }
+
+#endif
+}
+
+void GeoClient::loadGeometry(const string fileName)
+{
+    dmess("GeoClient::loadGeometry");
+
+#ifdef __EMSCRIPTEN__
+
+    emscripten_fetch_attr_t attr;
+    emscripten_fetch_attr_init(&attr);
+    strcpy(attr.requestMethod, "GET");
+    attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+    attr.onsuccess = downloadSucceeded;
+    attr.onerror = downloadFailed;
+    attr.onprogress = downloadProgress;
+    emscripten_fetch(&attr, fileName.c_str());
+
+#endif
+}
+
 void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms, Canvas * canvas)
 {
     dmess("Start polygon quadTree...");
@@ -556,7 +609,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     canvas->addRenderiable(r);
     
-    dmess("Done creating renderiable.");
+    dmess("Done creating renderable.");
 }
 
 pair<Renderable *, Attributes *> GeoClient::pickLineStringRenderable(const vec3 & _pos) const

@@ -24,6 +24,10 @@
   \copyright 2018
 */
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/fetch.h>
+#endif
+
 #include <cmath>
 #include <memory>
 #include <iostream>
@@ -160,8 +164,6 @@ struct AppLog
     {
         va_list args;
         va_start(args, fmt);
-        //Buf.appendv(fmt, args);
-        //Buf.appendf("%s", "fdasdfasd");
         va_end(args);
         ScrollToBottom = true;
     }
@@ -297,11 +299,16 @@ void GUI::showMainMenuBar(GLFWwindow * window)
             #endif
         }
 
+        if(ImGui::MenuItem("Test Emscripten Fetch"))
+        {
+             #ifdef __EMSCRIPTEN__
+
+             #endif
+        }
+
         if(ImGui::MenuItem("Load Geometry"))
         {
             //GeoClient::getInstance()->loadGeometry(canvas);
-
-            if(!client) { client = new GeoClient(window) ;}
 
             client->loadAllGeometry(canvas);
         }
@@ -395,7 +402,7 @@ void GUI::mainLoop(GLFWwindow * window)
     //dmess("mainLoop");
 
 #ifdef __EMSCRIPTEN__
-    // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
+    // Check if any events have been activated (key pressed, mouse moved etc.) and call corresponding response functions
     glfwPollEvents();
 
     ImGui_ImplOpenGL3_NewFrame();
@@ -533,6 +540,10 @@ void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
     skyBox = new SkyBox();
 
     canvas->setSkyBox(skyBox);
+
+    client = new GeoClient(window);
+
+    client->loadGeometry("data.geo");
 
     //GridPlane * gridPlane = new GridPlane();
 

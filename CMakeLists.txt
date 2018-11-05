@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
+set(default_build_type "Release")
 #set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_BUILD_TYPE Debug)
 #set(EMCC_DEBUG 1)
@@ -16,7 +17,7 @@ endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
       # Default to -O3 when no build type is specified.
-      append_compiler_flag("-O3")
+      # append_compiler_flag("-O3")
 endif()
 
 file(GLOB geosSrc   "ThirdParty/geos/src/util/*.cpp"
@@ -189,6 +190,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
                                 -s USE_SDL_IMAGE=2 \
                                 -s SDL2_IMAGE_FORMATS='[\"png\"]' \
                                 -s DISABLE_EXCEPTION_CATCHING=0 \
+                                -s FETCH=1 \
                                 --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/ \
                                 --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/config@/")
 
