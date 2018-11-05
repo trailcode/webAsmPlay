@@ -121,6 +121,22 @@ namespace
     }
 }
 
+void DeferredRenderable::addTriangle(const vec3 & A,
+                                     const vec3 & B,
+                                     const vec3 & C,
+                                     const vec4 & color)
+{
+    addVert(A, color);
+    addVert(B, color);
+    addVert(C, color);
+
+    const size_t index = triangleVertsAndColors.size() / 7;
+
+    triangleIndices.push_back(index + 0);
+    triangleIndices.push_back(index + 1);
+    triangleIndices.push_back(index + 2);
+}
+
 void DeferredRenderable::addQuadrangle( const vec3 & A,
                                         const vec3 & B,
                                         const vec3 & C,

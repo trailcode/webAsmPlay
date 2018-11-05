@@ -53,6 +53,11 @@ public:
                                 const glm::vec3 & D,
                                 const glm::vec4 & color);
 
+    static void addTriangle(const glm::vec3 & A,
+                            const glm::vec3 & B,
+                            const glm::vec3 & C,
+                            const glm::vec4 & color);
+
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
 private:

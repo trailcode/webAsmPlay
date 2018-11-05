@@ -138,6 +138,11 @@ namespace {
     {
         OpenSteer::warnIfInUpdatePhase ("iDrawTriangle");
 
+        DeferredRenderable::addTriangle(__(a),
+                                        __(b),
+                                        __(c),
+                                        __(color));
+
         //dmess("Implement me!");
 
         /*
