@@ -101,6 +101,8 @@ OpenSteerCanvas * GUI::openSteerCanvas = NULL;
 Canvas          * GUI::canvas          = NULL;
 SkyBox          * GUI::skyBox          = NULL;
 
+vector<Canvas *> GUI::auxCanvases;
+
 bool GUI::showViewMatrixPanel          = false;
 bool GUI::showMVP_MatrixPanel          = false;
 bool GUI::showSceneViewPanel           = false;
@@ -530,9 +532,11 @@ void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
 
     canvas->setArea(ivec2(0,0), ivec2(width, height));
 
-    geosTestCanvas = new GeosTestCanvas();
-
-    openSteerCanvas = new OpenSteerCanvas();
+    auxCanvases = vector<Canvas *>(
+    {
+        geosTestCanvas  = new GeosTestCanvas(),
+        openSteerCanvas = new OpenSteerCanvas()
+    });
 
     skyBox = new SkyBox();
 

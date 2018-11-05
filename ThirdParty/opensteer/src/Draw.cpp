@@ -115,7 +115,7 @@ namespace {
     {
         OpenSteer::warnIfInUpdatePhase ("iDrawLine");
 
-        dmess("Implement me!");
+        //dmess("Implement me!");
 
         /*
         glColor3f (color.r(), color.g(), color.b());
@@ -136,7 +136,7 @@ namespace {
     {
         OpenSteer::warnIfInUpdatePhase ("iDrawTriangle");
 
-        dmess("Implement me!");
+        //dmess("Implement me!");
 
         /*
         glColor3f (color.r(), color.g(), color.b());
@@ -162,7 +162,7 @@ namespace {
     {
         OpenSteer::warnIfInUpdatePhase ("iDrawQuadrangle");
 
-        dmess("Implement me!");
+        //dmess("Implement me!");
 
         /*
         glColor3f (color.r(), color.g(), color.b());
@@ -194,7 +194,7 @@ namespace {
 
     inline GLint begin2dDrawing (float w, float h)
     {
-        dmess("Implement me!");
+        //dmess("Implement me!");
 
         /*
         // store OpenGL matrix mode
@@ -224,7 +224,7 @@ namespace {
 
     inline void end2dDrawing (GLint originalMatrixMode)
     {
-        dmess("Implement me!");
+        //dmess("Implement me!");
         /*
         // restore previous model/projection transformation state
         glPopMatrix ();
@@ -280,7 +280,7 @@ OpenSteer::drawLineAlpha (const Vec3& startPoint,
                           const Color& color,
                           const float alpha)
 {
-    dmess("Implement me!");
+    //dmess("Implement me!");
     /*
     warnIfInUpdatePhase ("drawLineAlpha");
     glColor4f (color.r(), color.g(), color.b(), alpha);
@@ -363,7 +363,7 @@ OpenSteer::drawCircleOrDisk (const float radius,
                              const bool filled,
                              const bool in3d)
 {
-    dmess("Implement me!");
+    //dmess("Implement me!");
 
     /*
     LocalSpace ls;
@@ -841,7 +841,7 @@ OpenSteer::drawCameraLookAt (const Vec3& cameraPosition,
                              const Vec3& pointToLookAt,
                              const Vec3& up)
 {
-    dmess("Implement me!");
+    //dmess("Implement me!");
 
     /*
     // check for valid "look at" parameters
@@ -1128,7 +1128,7 @@ OpenSteer::draw2dTextAt3dLocation (const char& text,
                                    const Vec3& location,
                                    const Color& color, float w, float h)
 {
-    dmess("Implement me!")
+    //dmess("Implement me!")
     
 #ifdef WORKING
     // XXX NOTE: "it would be nice if" this had a 2d screenspace offset for

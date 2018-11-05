@@ -24,25 +24,17 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_OPEN_STEER_CANVAS_H__
-#define __WEB_ASM_PLAY_OPEN_STEER_CANVAS_H__
+#ifndef __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
+#define __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
 
-#include <webAsmPlay/Canvas.h>
-
-class OpenSteerCanvas : public Canvas
+class DeferredRenderable
 {
 public:
 
-    OpenSteerCanvas(const bool        useFrameBuffer = true,
-                    const glm::vec4 & clearColor     = glm::vec4(0.5, 0.5, 1, 1));
-
-    ~OpenSteerCanvas();
-
-    GLuint render();
-
-    void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size);
+    DeferredRenderable();
+    ~DeferredRenderable();
 
 private:
 };
 
-#endif // __WEB_ASM_PLAY_OPEN_STEER_CANVAS_H__
+#endif // __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__

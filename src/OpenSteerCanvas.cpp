@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <OpenSteer/OpenSteerDemo.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/OpenSteerCanvas.h>
 
@@ -40,9 +41,29 @@ OpenSteerCanvas::~OpenSteerCanvas()
 
 }
 
+void openSteerDisplayFunc();
+
 GLuint OpenSteerCanvas::render()
 {
     if(!preRender()) { return 0 ;}
 
+    openSteerDisplayFunc();
+
     return postRender();
+}
+
+extern float openSteerWindowHeight;
+extern float openSteerWindowWidth;
+
+void OpenSteerCanvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
+{
+    openSteerWindowWidth  = size.x;
+    openSteerWindowHeight = size.y;
+
+    if(size != this->size)
+    {
+        dmess("Resize!");
+    }
+
+    Canvas::setArea(upperLeft, size);
 }

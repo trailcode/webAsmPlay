@@ -1059,7 +1059,7 @@ namespace {
     void 
     drawDisplayPlugInName (void)
     {
-        dmess("Implement me!");
+        //dmess("Implement me!");
         /*
         const float h = glutGet (GLUT_WINDOW_HEIGHT);
         const OpenSteer::Vec3 screenLocation (10, h-20, 0);
@@ -1419,40 +1419,35 @@ namespace {
     // ------------------------------------------------------------------------
     // Main drawing function for OpenSteerDemo application,
     // drives simulation as a side effect
-
-
-    void 
-    displayFunc (void)
-    {
-        // clear color and depth buffers
-        glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // run simulation and draw associated graphics
-        OpenSteer::OpenSteerDemo::updateSimulationAndRedraw ();
-
-        // draw text showing (smoothed, rounded) "frames per second" rate
-        drawDisplayFPS ();
-
-        // draw the name of the selected PlugIn
-        drawDisplayPlugInName ();
-
-        // draw the name of the camera's current mode
-        drawDisplayCameraModeName ();
-
-        // draw crosshairs to indicate aimpoint (xxx for debugging only?)
-        // drawReticle ();
-
-        // check for errors in drawing module, if so report and exit
-        OpenSteer::checkForDrawError ("OpenSteerDemo::updateSimulationAndRedraw");
-
-        // double buffering, swap back and front buffers
-        glFlush ();
-        //glutSwapBuffers();
-    }
-
-
 } // annonymous namespace
 
+void openSteerDisplayFunc()
+{
+    // clear color and depth buffers
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // run simulation and draw associated graphics
+    OpenSteer::OpenSteerDemo::updateSimulationAndRedraw ();
+
+    // draw text showing (smoothed, rounded) "frames per second" rate
+    drawDisplayFPS ();
+
+    // draw the name of the selected PlugIn
+    drawDisplayPlugInName ();
+
+    // draw the name of the camera's current mode
+    drawDisplayCameraModeName ();
+
+    // draw crosshairs to indicate aimpoint (xxx for debugging only?)
+    // drawReticle ();
+
+    // check for errors in drawing module, if so report and exit
+    OpenSteer::checkForDrawError ("OpenSteerDemo::updateSimulationAndRedraw");
+
+    // double buffering, swap back and front buffers
+    glFlush ();
+    //glutSwapBuffers();
+}
 
 
 // ----------------------------------------------------------------------------
@@ -1524,21 +1519,19 @@ OpenSteer::runGraphics (void)
 // ----------------------------------------------------------------------------
 // accessors for GLUT's window dimensions
 
+float openSteerWindowHeight = 0;
+float openSteerWindowWidth  = 0;
 
 float 
 OpenSteer::drawGetWindowHeight (void) 
 {
-    dmess("Fix!");
-    //return glutGet (GLUT_WINDOW_HEIGHT);
-    return 0;
+    return openSteerWindowHeight;
 }
 
 
 float 
 OpenSteer::drawGetWindowWidth  (void) 
 {
-    //return glutGet (GLUT_WINDOW_WIDTH);
-    dmess("Fix!");
-    return 0;
+    return openSteerWindowWidth;
 }
 

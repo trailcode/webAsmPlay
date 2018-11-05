@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 #set(EMCC_DEBUG 1)
  
 #set (CMAKE_CXX_STANDARD 17)
@@ -121,6 +121,7 @@ file(GLOB webAsmPlay_SRC        "src/GUI/GUI.cpp"
                                 "src/RenderablePolygon.cpp"
                                 "src/RenderableCollection.cpp"
                                 "src/RenderablePoint.cpp"
+                                "src/DeferredRenderable.cpp"
                                 "src/GeosUtil.cpp"
                                 "src/Util.cpp"
                                 "src/FrameBuffer.cpp"

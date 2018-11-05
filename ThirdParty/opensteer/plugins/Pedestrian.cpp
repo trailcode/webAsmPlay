@@ -39,6 +39,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <webAsmPlay/Debug.h>
 #include "OpenSteer/PolylineSegmentedPathwaySingleRadius.h"
 #include "OpenSteer/SimpleVehicle.h"
 #include "OpenSteer/OpenSteerDemo.h"
@@ -498,6 +499,9 @@ namespace {
 
         void update (const float currentTime, const float elapsedTime)
         {
+            Vec3 p = crowd[0]->position();
+            //dmess("crowd " << crowd.size() << p.x << " " << p.z);
+
             // update each Pedestrian
             for (iterator i = crowd.begin(); i != crowd.end(); i++)
             {

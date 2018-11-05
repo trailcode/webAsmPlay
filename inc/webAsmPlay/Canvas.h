@@ -61,7 +61,7 @@ public:
     
     virtual ~Canvas();
 
-    void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size);
+    virtual void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size);
 
     virtual GLuint render();
 
@@ -119,14 +119,14 @@ protected:
 
     GLuint postRender();
 
+    glm::ivec2 upperLeft;
+    glm::ivec2 size;
+
 private:
 
     rsmz::TrackBallInteractor * trackBallInteractor;
 
     FrameBuffer * frameBuffer;
-
-    glm::ivec2 upperLeft;
-    glm::ivec2 size;
 
     bool wantMouseCapture;
 

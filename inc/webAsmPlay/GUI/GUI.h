@@ -102,6 +102,8 @@ private:
     static OpenSteerCanvas * openSteerCanvas;
     static Canvas          * canvas;
     static SkyBox          * skyBox;
+
+    static std::vector<Canvas *> auxCanvases;
 };
 
 #endif // __WEB_ASM_PLAY_GUI_H__

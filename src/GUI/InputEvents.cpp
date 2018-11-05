@@ -40,8 +40,8 @@ namespace
 
 void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
 {
-    geosTestCanvas->onMouseButton(window, button, action, mods);
-
+    for(auto c : auxCanvases) { c->onMouseButton(window, button, action, mods) ;}
+    
     if(!GImGui->IO.WantCaptureMouse) { canvas->onMouseButton(window, button, action, mods) ;}
 
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
@@ -51,9 +51,7 @@ void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int m
 
 void GUI::cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 {
-    //dmess("x " << xpos << " y " << ypos);
-
-    geosTestCanvas->onMousePosition(window, vec2(xpos, ypos));
+    for(auto c : auxCanvases) { c->onMousePosition(window, vec2(xpos, ypos)) ;}
 
     canvas->onMousePosition(window, vec2(xpos, ypos));
 
@@ -62,9 +60,7 @@ void GUI::cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 
 void GUI::scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 {
-    //dmess("ScrollCallback " << xoffset << " " << yoffset);
-
-    geosTestCanvas->onMouseScroll(window, vec2(xoffset, yoffset));
+    for(auto c : auxCanvases) { c->onMouseScroll(window, vec2(xoffset, yoffset)) ;}
 
     if(!GImGui->IO.WantCaptureMouse) { canvas->onMouseScroll(window, vec2(xoffset, yoffset)) ;}
 
@@ -75,7 +71,7 @@ void GUI::scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 
 void GUI::keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods)
 {
-    geosTestCanvas->onKey(window, key, scancode, action, mods);
+    for(auto c : auxCanvases) { c->onKey(window, key, scancode, action, mods) ;}
 
     if(!GImGui->IO.WantCaptureKeyboard) { canvas->onKey(window, key, scancode, action, mods) ;}
  
@@ -86,7 +82,7 @@ void GUI::keyCallback(GLFWwindow * window, int key, int scancode, int action, in
 
 void GUI::charCallback(GLFWwindow * window, unsigned int c)
 {
-    geosTestCanvas->onChar(window, c);
+    for(auto ac : auxCanvases) { ac->onChar(window, c) ;}
 
     canvas->onChar(window, c);
 
