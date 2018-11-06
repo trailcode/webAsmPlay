@@ -28,13 +28,17 @@
 #define __WEB_ASM_PLAY_UTIL_H__
 
 #include <string>
+#include <chrono>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <OpenSteer/Vec3.h>
 #include <OpenSteer/Color.h>
+#include <webAsmPlay/GUI/GUI.h>
 #include <imgui.h>
+
+// TODO add util namespace
 
 std::string mat4ToStr(const glm::mat4 & m);
 
@@ -49,5 +53,25 @@ static glm::vec3 __(const OpenSteer::Vec3 & v) { return glm::vec3(v.x, v.y, v.z)
 static glm::vec4 __(const OpenSteer::Color & v) { return glm::vec4(v.r(), v.g(), v.b(), v.a()) ;}
 
 std::wstring stringToWstring(const std::string& t_str);
+
+inline void doProgress( const std::string                                    & message,
+                        const size_t                                         i,
+                        const size_t                                         num,
+                        std::chrono::time_point<std::chrono::system_clock> & startTime,
+                        const size_t                                         sampleRate = 1000)
+{
+    if(i % sampleRate) { return ;}
+
+    const auto now = std::chrono::system_clock::now();
+
+    if((now - startTime).count() > 20000)
+    {
+        GUI::progress(message, float(i) / float(num));
+
+        startTime = now;
+
+        //GUI::refresh();
+    }
+}
 
 #endif // __WEB_ASM_PLAY_UTIL_H__

@@ -24,17 +24,20 @@
   \copyright 2018
 */
 
+#include <chrono>
 #include <glm/gtc/type_ptr.hpp>
 #include <GLU/tessellate.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/RenderablePolygon.h>
 
 using namespace std;
+using namespace std::chrono;
 using namespace glm;
 using namespace geos::geom;
 
@@ -264,15 +267,22 @@ Renderable * RenderablePolygon::create( const ConstGeosGeomVec & polygons,
     return createFromTessellations(tessellationResults);
 }
 
-Renderable * RenderablePolygon::create( const vector<pair<const Geometry *, const size_t> >  & polygons,
-                                        const dmat4   & trans)
+Renderable * RenderablePolygon::create( const vector<pair<const Geometry *, const size_t> >  & polygons, // TODO create a typedef
+                                        const dmat4   & trans,
+                                        const bool    showProgress)
 {
+    time_point<system_clock> startTime;
+    
+    if(showProgress) { startTime = system_clock::now() ;}
+
     vector<const TessellationResult> tessellationResults;
 
-    for(const pair<const Geometry *, const size_t> & polyAndColors : polygons)
+    for(size_t i = 0; i < polygons.size(); ++i)
     {
-        const Geometry  * geom        = get<0>(polyAndColors);
-        const GLuint      symbologyID = get<1>(polyAndColors);
+        if(showProgress) { doProgress("(6/6) Creating geometry:", i, polygons.size(), startTime) ;}
+
+        const Geometry  * geom        = get<0>(polygons[i]);
+        const GLuint      symbologyID = get<1>(polygons[i]);
         
         const Polygon      * poly;
         const MultiPolygon * multiPoly;
@@ -302,7 +312,11 @@ Renderable * RenderablePolygon::create( const vector<pair<const Geometry *, cons
         }
     }
 
-    return createFromTessellations(tessellationResults);
+    Renderable * ret = createFromTessellations(tessellationResults);
+
+    if(showProgress) { GUI::progress("", 1.0) ;}
+
+    return ret;
 }
 
 Renderable * RenderablePolygon::createFromTessellations(const Tessellations & tessellations)

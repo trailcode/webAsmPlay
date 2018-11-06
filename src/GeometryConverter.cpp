@@ -144,8 +144,6 @@ vector<AttributedGeometry> GeometryConverter::getGeosPolygons(const char *& poly
 {
     const uint32_t numPolygons = *(uint32_t *)polys; polys += sizeof(uint32_t);
 
-    dmess("numPolygons " << numPolygons);
-
     vector<AttributedGeometry> ret(numPolygons);
 
     for(size_t i = 0; i < numPolygons; ++i) { ret[i] = getGeosPolygon(polys) ;}

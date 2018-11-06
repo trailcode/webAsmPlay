@@ -66,7 +66,8 @@ public:
                                 const size_t             symbologyID    = 0);
 
     static Renderable * create( const std::vector<std::pair<const geos::geom::Geometry *, const size_t> > & polygons,
-                                const glm::dmat4                                & trans         = glm::mat4(1.0));
+                                const glm::dmat4                                & trans         = glm::mat4(1.0),
+                                const bool                                        showProgress = false);
 
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 

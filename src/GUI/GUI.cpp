@@ -123,6 +123,8 @@ bool isFirst = true;
 
 FrameBuffer * frameBuffer = NULL;
 
+GLFWwindow * mainWindow = NULL;
+
 void errorCallback(int error, const char* description)
 {
     fprintf(stderr, "Error %d: %s\n", error, description);
@@ -134,7 +136,9 @@ void GUI::refresh(GLFWwindow* window)
     glfwPollEvents();
 
     //dmess("Fix!");
-    glfwMarkWindowForRefresh(window);
+    if(window) { glfwMarkWindowForRefresh(window)     ;}
+    else       { glfwMarkWindowForRefresh(mainWindow) ;}
+
 #else
 
     glfwPostEmptyEvent();
@@ -248,11 +252,11 @@ void GUI::showProgressBar()
 {
     if(!doShowProgressBar) { return ;}
 
-    static float progressBarLength = 250.0f;
+    static float progressBarLength = 350.0f;
     ImVec2 window_pos(ImGui::GetIO().DisplaySize.x / 2 - progressBarLength,  ImGui::GetIO().DisplaySize.y / 2);
     ImVec2 window_pos_pivot(0,0);
     ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
-    ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
+    ImGui::SetNextWindowBgAlpha(0.6f); // Transparent background
     if (ImGui::Begin(progressText.c_str(),
                      &doShowProgressBar,    ImGuiWindowFlags_NoTitleBar |
                                             ImGuiWindowFlags_NoResize |
@@ -547,8 +551,10 @@ void GUI::progress(const string & message, const float percent)
     progressBarValue = percent;
 }
 
-void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
+void GUI::initOpenGL(GLFWwindow * window) // TODO, need some code refactor here
 {
+    mainWindow = window;
+    
     debugLoggerFunc = &dmessCallback;
 
     infoIcon = Textures::load("if_Info_131908.png");

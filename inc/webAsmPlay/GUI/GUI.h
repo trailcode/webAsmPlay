@@ -54,7 +54,7 @@ public:
 
     static void mainLoop(GLFWwindow * window);
 
-    static void refresh(GLFWwindow * window);
+    static void refresh(GLFWwindow * window = NULL);
 
     static void loadState();
     static void saveState();

@@ -58,6 +58,7 @@
 #include <webAsmPlay/GeoClient.h>
 
 using namespace std;
+using namespace std::chrono;
 using namespace glm;
 using namespace geos::io;
 using namespace geos::geom;
@@ -401,33 +402,11 @@ void GeoClient::loadGeoServerGeometry()
         
         inverseTrans = inverse(trans);
 
-        getNumPolygons([this](const size_t numPolys)
-        {
-            if(!numPolys) { return ;}
-
-            const size_t blockSize = std::min((size_t)4096, numPolys);
-
-            shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());
-
-            for(size_t i = 0; i < numPolys / blockSize; ++i)
-            {
-                const size_t startIndex = i * blockSize;
-
-                const bool isLast = i + 1 >= numPolys / blockSize;
-
-                getPolygons(startIndex, std::min(blockSize, numPolys - startIndex - blockSize),
-                                [this, geoms, isLast, startIndex, numPolys](vector<AttributedGeometry> geomsIn)
-                {
-                    geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
-
-                    if(isLast) { createPolygonRenderiables(*geoms.get()) ;}
-                });
-            }
-        });
-
         getNumPolylines([this](const size_t numPolylines)
         {
             if(!numPolylines) { return ;}
+
+            auto startTime = system_clock::now();
 
             const size_t blockSize = std::min((size_t)4096, numPolylines);
 
@@ -440,12 +419,42 @@ void GeoClient::loadGeoServerGeometry()
                 const bool isLast = i + 1 >= numPolylines / blockSize;
 
                 getPolylines(startIndex, std::min(blockSize, numPolylines - startIndex - blockSize),
-                             [this, isLast, geoms, startIndex]
+                             [this, isLast, geoms, startIndex, &startTime, numPolylines]
                              (vector<AttributedGeometry> geomsIn)
                 {
+                    doProgress("(1/6) Loading linestrings:", geoms->size(), numPolylines, startTime, 1);
+
                     geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
 
                     if(isLast) { createLineStringRenderiables(*geoms.get()) ;}
+                });
+            }
+        });
+
+        getNumPolygons([this](const size_t numPolys)
+        {
+            if(!numPolys) { return ;}
+
+            auto startTime = system_clock::now();
+
+            const size_t blockSize = std::min((size_t)4096, numPolys);
+
+            shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());
+
+            for(size_t i = 0; i < numPolys / blockSize; ++i)
+            {
+                const size_t startIndex = i * blockSize;
+
+                const bool isLast = i + 1 >= numPolys / blockSize;
+
+                getPolygons(startIndex, std::min(blockSize, numPolys - startIndex - blockSize),
+                                [this, geoms, isLast, startIndex, numPolys, &startTime](vector<AttributedGeometry> geomsIn)
+                {
+                    doProgress("(4/6) Loading polygons:", geoms->size(), numPolys, startTime, 1);
+
+                    geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
+
+                    if(isLast) { createPolygonRenderiables(*geoms.get()) ;}
                 });
             }
         });
@@ -458,8 +467,6 @@ namespace
 
     void downloadSucceeded(emscripten_fetch_t *fetch)
     {
-        GUI::progress("Done Downloading:", 1.0);
-        
         ((GeoClient *)fetch->userData)->addGeometry(fetch->data);
 
         // The data is now available at fetch->data[0] through fetch->data[fetch->numBytes-1];
@@ -474,21 +481,8 @@ namespace
 
     void downloadProgress(emscripten_fetch_t *fetch)
     {
-        //dmess("Downloading: " << float(fetch->dataOffset) / float(fetch->numBytes));
-
-        if (fetch->totalBytes)
-        {
-            float percent = fetch->dataOffset * 100.0 / fetch->totalBytes;
-
-            dmess("percent " << percent);
-
-            GUI::progress("Downloading:", percent / 100.0);
-            
-        }
-        else           
-        {
-            GUI::progress("Done Downloading:", 1.0);
-        }
+        if (fetch->totalBytes) { GUI::progress("Downloading:", float(fetch->dataOffset) / (fetch->totalBytes)) ;}
+        else                   { GUI::progress("Done Downloading:", 1.0) ;}
     }
 
 #endif
@@ -517,6 +511,8 @@ void GeoClient::addGeometry(const char * data)
 {
     dmess("GeoClient::addGeometry");
 
+    GUI::progress("Polygon index:", 0.0f);
+
     AABB2D bounds;
     
     bounds = *(AABB2D *)data; data += sizeof(double) * 4;
@@ -540,8 +536,12 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     dmess("Start polygon quadTree...");
 
+    auto startTime = system_clock::now();
+
     for(size_t i = 0; i < geoms.size(); ++i)
     {
+        doProgress("(5/6) Indexing polygons:", i, geoms.size(), startTime);
+
         Attributes * attrs;
 
         const Geometry * g;
@@ -556,6 +556,8 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
         quadTreePolygons->insert(g->getEnvelopeInternal(), data);
     }
+
+    GUI::progress("", 1.0f);
 
     dmess("quadTree " << quadTreePolygons->depth() << " " << geoms.size());
     
@@ -594,13 +596,10 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     dmess("polysAndColors " << polysAndColors.size());
 
-    Renderable * r = RenderablePolygon::create(polysAndColors, trans);
+    Renderable * r = RenderablePolygon::create(polysAndColors, trans, true);
 
     r->setShader(ColorDistanceShader2::getDefaultInstance());
 
-    //r->setOutlineColor(vec4(0.3,1,0,1));
-    //r->setOutlineColor(1);
-    
     canvas->addRenderiable(r);
     
     dmess("End base geom");
@@ -610,10 +609,14 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 {
     dmess("Start create linestrings " << geoms.size());
 
+    auto startTime = system_clock::now();
+
     vector<const Geometry *> polylines;
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
+        doProgress("(2/6) Indexing linestrings:", i, geoms.size(), startTime);
+
         Attributes * attrs = geoms[i].first;
 
         const Geometry * geom = geoms[i].second;
@@ -636,15 +639,23 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
         polylines.push_back(geom);
     }
     
+    GUI::progress("Linestring index:", 1.0);
+
     dmess("linestring quadTree " << quadTreeLineStrings->depth() << " " << geoms.size());
 
-    Renderable * r = RenderableLineString::create(polylines, trans);
+    Renderable * r = RenderableLineString::create(polylines, trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 
     canvas->addRenderiable(r);
     
     dmess("Done creating renderable.");
+
+#ifndef __EMSCRIPTEN__
+
+    GUI::progress("Waiting for server:", 0.0);
+
+#endif
 }
 
 pair<Renderable *, Attributes *> GeoClient::pickLineStringRenderable(const vec3 & _pos) const

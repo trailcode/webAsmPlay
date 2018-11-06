@@ -24,14 +24,17 @@
   \copyright 2018
 */
 
+#include <chrono>
 #include <glm/gtc/type_ptr.hpp>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/RenderableLineString.h>
 
 using namespace std;
+using namespace std::chrono;
 using namespace glm;
 using namespace geos::geom;
 
@@ -108,8 +111,13 @@ Renderable * RenderableLineString::create(  const LineString * lineString,
 }
 
 Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineStrings,
-                                            const mat4              & trans)
+                                            const mat4              & trans,
+                                            const bool                showProgress)
 {
+    time_point<system_clock> startTime;
+    
+    if(showProgress) { startTime = system_clock::now() ;}
+
     size_t numVerts = 0;
 
     for(const Geometry * ls : lineStrings) { numVerts += dynamic_cast<const LineString *>(ls)->getNumPoints() ;}
@@ -121,9 +129,12 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
 
     size_t index = 0;
 
-    for(const Geometry * ls : lineStrings)
+    //for(const Geometry * ls : lineStrings)
+    for(size_t i = 0; i < lineStrings.size(); ++i)
     {
-        const vector<Coordinate> & coords = *dynamic_cast<const LineString *>(ls)->getCoordinatesRO()->toVector();
+        if(showProgress) { doProgress("(3/6) Creating geometry:", i, lineStrings.size(), startTime) ;}
+
+        const vector<Coordinate> & coords = *dynamic_cast<const LineString *>(lineStrings[i])->getCoordinatesRO()->toVector();
 
         if(trans == mat4(1.0))
         {
@@ -162,10 +173,11 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
         }
     }
 
-    return create(  verts,
-                    indices,
-                    true // isMulti
-                );
+    Renderable * ret = create(verts, indices, true);
+
+    if(showProgress) { GUI::progress("", 1.0) ;}
+
+    return ret;
 }
 
 Renderable * RenderableLineString::create(  const FloatVec  & verts,
