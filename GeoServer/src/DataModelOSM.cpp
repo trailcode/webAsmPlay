@@ -38,6 +38,7 @@ namespace
         { "osm",        OSM_KEY_OSM },
         { "generator",  OSM_KEY_GENERATOR },
         { "note",       OSM_KEY_NOTE },
+        { "remark",     OSM_KEY_REMARK },
 
         { "member",     OSM_KEY_MEMBER },
         { "tag",        OSM_KEY_TAG },

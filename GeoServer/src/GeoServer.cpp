@@ -33,6 +33,7 @@
 #include <boost/filesystem.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
+#include <geos/geom/Point.h>
 #include <geos/io/WKTWriter.h>
 #include "ogrsf_frmts.h"
 #include <webAsmPlay/Debug.h>
@@ -191,8 +192,11 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     Polygon    * polygon;
     LineString * lineString;
+    Point      * point;
 
-    size_t numPoints = 0;
+    size_t numVertices = 0;
+
+    size_t numEmptyPoints = 0;
 
     for(const AttributedGeometry & i : geometry)
     {
@@ -206,12 +210,17 @@ string GeoServer::addOsmFile(const string & osmFile)
             {
                 center += dvec2(c.x, c.y);
 
-                ++numPoints;
+                ++numVertices;
             }
         }
         else if((lineString = dynamic_cast<LineString *>(i.second)))
         {
             serializedLineStrings.push_back(GeometryConverter::convert(AttributedLineString(i.first, lineString)));
+        }
+        else if((point = dynamic_cast<Point *>(i.second)))
+        {
+            if(i.first) { serializedPoints.push_back(GeometryConverter::convert(AttributedPoint(i.first, point))) ;}
+            else        { ++numEmptyPoints ;}
         }
 
         /*
@@ -229,9 +238,11 @@ string GeoServer::addOsmFile(const string & osmFile)
         //unique_ptr<CoordinateSequence>(i.second->getCoordinates())->toVector();
     }
 
-    dmess("numPoints " << numPoints);
+    dmess("numEmptyPoints " << numEmptyPoints);
 
-    center /= double(numPoints);
+    dmess("numVertices " << numVertices);
+
+    center /= double(numVertices);
 
     boundsMinX = center.x;
     boundsMaxX = center.x;
@@ -484,6 +495,8 @@ void GeoServer::start()
 
     dmess("   serializedPolygons: " << serializedPolygons.size());
     dmess("serializedLineStrings: " << serializedLineStrings.size());
+    dmess("     serializedPoints: " << serializedPoints.size());
+    dmess("  serializedRelations: " << serializedRelations.size());
 
     dmess("boundsMinX " << boundsMinX);
     dmess("boundsMinY " << boundsMinY);

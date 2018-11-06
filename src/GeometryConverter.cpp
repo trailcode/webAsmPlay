@@ -28,6 +28,7 @@
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LinearRing.h>
 #include <geos/geom/LineString.h>
+#include <geos/geom/Point.h>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/GeometryFactory.h>
 #include <webAsmPlay/Debug.h>
@@ -52,6 +53,15 @@ string GeometryConverter::convert(const AttributedLineString & lineString)
     stringstream ret;
 
     convert(lineString, ret);
+
+    return ret.str();
+}
+
+string GeometryConverter::convert(const AttributedPoint & point)
+{
+    stringstream ret;
+
+    convert(point, ret);
 
     return ret.str();
 }
@@ -87,11 +97,27 @@ void GeometryConverter::convert(const LineString * lineString, stringstream & da
     }
 }
 
+void GeometryConverter::convert(const Point * point, stringstream & data)
+{
+    const double x = point->getX();
+    const double y = point->getY();
+
+    data.write((const char *)&x, sizeof(double));
+    data.write((const char *)&y, sizeof(double));
+}
+
 void GeometryConverter::convert(const AttributedLineString & lineString, stringstream & data)
 {
     get<0>(lineString)->write(data);
 
     convert(get<1>(lineString), data);
+}
+
+void GeometryConverter::convert(const AttributedPoint & point, stringstream & data)
+{
+    get<0>(point)->write(data);
+
+    convert(get<1>(point), data);
 }
 
 CoordinateSequence * GeometryConverter::getGeosCoordinateSequence(const char *& lineString)
@@ -109,6 +135,14 @@ CoordinateSequence * GeometryConverter::getGeosCoordinateSequence(const char *& 
     }
 
     return new CoordinateArraySequence(coords, 2);
+}
+
+Point * GeometryConverter::getGeosPoint(const char *& point)
+{
+    const double x = *(double *)point; point += sizeof(double);
+    const double y = *(double *)point; point += sizeof(double);
+    
+    return GeometryFactory::getDefaultInstance()->createPoint(Coordinate(x, y));
 }
 
 AttributedGeometry GeometryConverter::getGeosPolygon(const char *& poly)

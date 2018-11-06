@@ -30,6 +30,7 @@
 #include <vector>
 #include <memory>
 #include <initializer_list>
+#include <glm/vec2.hpp>
 #include <geos/geom/Geometry.h>
 
 namespace geos
@@ -38,6 +39,7 @@ namespace geos
     {
         class Geometry;
         class Polygon;
+        class Point;
     }
 }
 
@@ -72,6 +74,8 @@ namespace geosUtil
     void getExternalRings(std::vector<const geos::geom::LineString *> & rings, const geos::geom::Geometry * geom);
 
     std::vector<geos::geom::Geometry::Ptr> __(const std::vector<const geos::geom::LineString *> & lineStrings);
+
+    geos::geom::Point * __(const glm::dvec2 & pos);
 
     bool contains(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
 

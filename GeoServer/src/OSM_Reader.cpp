@@ -32,6 +32,7 @@
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
+#include <geos/geom/Point.h>
 #include <geos/geom/GeometryFactory.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Debug.h>
@@ -72,12 +73,41 @@ namespace
     OSM_Node     * currNode     = NULL;
     OSM_Way      * currWay      = NULL;
     OSM_Relation * currRelation = NULL;
+
+    inline OSM_Node * getNode(const uint64_t ID)
+    {
+        const auto i = nodes.find(ID);
+
+        if(i == nodes.end()) { return NULL ;}
+
+        return i->second;
+    }
+
+    inline OSM_Way * getWay(const uint64_t ID)
+    {
+        const auto i = ways.find(ID);
+
+        if(i == ways.end()) { return NULL ;}
+
+        return i->second;
+    }
+
+    inline OSM_Relation * getRelation(const uint64_t ID)
+    {
+        const auto i = relations.find(ID);
+
+        if(i == relations.end()) { return NULL ;}
+
+        return i->second;
+    }
 }
 
 vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
 {
     char buf[BUFSIZ];
+
     XML_Parser parser = XML_ParserCreate(NULL);
+    
     int done;
     int depth = 0;
 
@@ -151,6 +181,7 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
     }
 
     size_t numInvalidWays      = 0;
+    size_t numInvalidPoints    = 0;
     size_t geomOperationErrors = 0;
 
     for(const OSM_Relations::value_type & i : relations)
@@ -164,15 +195,22 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
             {
                 case OSM_TYPE_NODE:
                 {
-                    OSM_Node * node = nodes[member->ref];
+                    OSM_Node * node = getNode(member->ref);
 
-                    //dmess("node " << node->attrs->strings.size());
+                    if(!node)
+                    {
+                        ++numInvalidPoints;
+
+                        break;
+                    }
+
+                    ret.push_back(AttributedGeometry(node->attrs.release(), __(node->pos)));
 
                     break;
                 }
                 case OSM_TYPE_WAY:
                 {  
-                    OSM_Way * way = ways[member->ref];
+                    OSM_Way * way = getWay(member->ref);
 
                     if(!way)
                     {
@@ -257,6 +295,7 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
     }
 
     dmess("numInvalidWays " << numInvalidWays);
+    dmess("numInvalidPoints " << numInvalidPoints);
     dmess("geomOperationErrors " << geomOperationErrors);
 
     return ret;
@@ -274,9 +313,10 @@ void OSM_Reader::startElement(void *userData, const char *name, const char **att
         case OSM_KEY_ND:        handleND       (atts); break;
 
         // Unused
-        case OSM_KEY_META: break;
-        case OSM_KEY_OSM:  break;
-        case OSM_KEY_NOTE: break;
+        case OSM_KEY_META: 
+        case OSM_KEY_OSM:  
+        case OSM_KEY_NOTE: 
+        case OSM_KEY_REMARK: break;
 
         default: dmess("Unknown tag: " << name);
     }
@@ -426,16 +466,9 @@ void OSM_Reader::handleND(const char **atts)
         {
             case OSM_KEY_REF:
             {
-                OSM_Nodes::const_iterator n = nodes.find(stoull(atts[i + 1]));
+                OSM_Node * node = getNode(stoull(atts[i + 1]));
 
-                if(n == nodes.end()) // TODO assume data is correct? No there are duplicates!
-                {
-                    //dmess("Parse error!");
-
-                    break;
-                }
-
-                currWay->nodes.push_back(n->second);
+                if(node) { currWay->nodes.push_back(node) ;}
 
                 break;
             }

@@ -46,9 +46,11 @@ class GeometryConverter
 {
 public:
 
-    static std::string convert(const geos::geom::Polygon * poly, const Attributes * attrs);
+    static std::string convert(const geos::geom::Polygon * poly, const Attributes * attrs); // TODO code refactor, create AttributedPolygon
 
     static std::string convert(const AttributedLineString & lineString);
+
+    static std::string convert(const AttributedPoint & point);
 
     static AttributedGeometry getGeosPolygon(const char *& poly);
 
@@ -60,11 +62,17 @@ public:
 
     static geos::geom::CoordinateSequence * getGeosCoordinateSequence(const char *& lineString);
 
+    static geos::geom::Point * getGeosPoint(const char *& point);
+
     static void convert(const geos::geom::Polygon * poly, const Attributes * attrs, std::stringstream & data);
 
     static void convert(const geos::geom::LineString * lineString, std::stringstream & data);
 
+    static void convert(const geos::geom::Point * point, std::stringstream & data);
+
     static void convert(const AttributedLineString & lineString, std::stringstream & data);
+
+    static void convert(const AttributedPoint & point, std::stringstream & data);
 
 private:
 

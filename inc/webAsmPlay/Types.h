@@ -39,14 +39,15 @@ namespace geos
     {
         class Geometry;
         class LineString;
+        class Point;
     }
 }
 
 typedef std::tuple<double, double, double, double> AABB2D;
 
-typedef std::pair<Attributes *, geos::geom::Geometry *> AttributedGeometry;
-
-typedef std::tuple<Attributes *, geos::geom::LineString *> AttributedLineString;
+typedef std::pair<Attributes *, geos::geom::Geometry   *> AttributedGeometry;
+typedef std::pair<Attributes *, geos::geom::LineString *> AttributedLineString;
+typedef std::pair<Attributes *, geos::geom::Point      *> AttributedPoint;
 
 typedef std::vector<const geos::geom::Geometry *> ConstGeosGeomVec;
 

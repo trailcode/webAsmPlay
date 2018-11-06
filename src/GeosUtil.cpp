@@ -1,10 +1,10 @@
 /**
-╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
-┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
-╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
-╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
-╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
-╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+ ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+ ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+ ╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+ ╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+ ╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
  // This software is provided 'as-is', without any express or implied
  // warranty.  In no event will the authors be held liable for any damages
  // arising from the use of this software.
@@ -34,6 +34,7 @@
 #include <webAsmPlay/GeosUtil.h>
 
 using namespace std;
+using namespace glm;
 using namespace geos::geom;
 using namespace geos::operation::geounion;
 
@@ -155,6 +156,11 @@ vector<Geometry::Ptr> __(const vector<const LineString *> & lineStrings)
     for(size_t i = 0; i < lineStrings.size(); ++i) { ret.push_back(Geometry::Ptr(lineStrings[i]->clone())) ;}
 
     return ret;
+}
+
+Point * geosUtil::__(const dvec2 & pos)
+{
+    return GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y));
 }
 
 _ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : geom(geom) {}

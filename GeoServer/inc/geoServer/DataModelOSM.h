@@ -50,6 +50,7 @@ namespace dataModelOSM
         OSM_KEY_ND,
         OSM_KEY_OSM,
         OSM_KEY_NOTE,
+        OSM_KEY_REMARK,
 
         OSM_KEY_ROLE,
         OSM_KEY_REF,
