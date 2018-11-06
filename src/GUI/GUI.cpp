@@ -235,6 +235,39 @@ GeoClient * client = NULL;
 
 static char mode = GUI::NORMAL_MODE;
 
+namespace
+{
+    bool doShowProgressBar = false;
+
+    string progressText = "progress";
+
+    float progressBarValue = 0.0f;
+}
+
+void GUI::showProgressBar()
+{
+    if(!doShowProgressBar) { return ;}
+
+    static float progressBarLength = 250.0f;
+    ImVec2 window_pos(ImGui::GetIO().DisplaySize.x / 2 - progressBarLength,  ImGui::GetIO().DisplaySize.y / 2);
+    ImVec2 window_pos_pivot(0,0);
+    ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+    ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
+    if (ImGui::Begin(progressText.c_str(),
+                     &doShowProgressBar,    ImGuiWindowFlags_NoTitleBar |
+                                            ImGuiWindowFlags_NoResize |
+                                            ImGuiWindowFlags_AlwaysAutoResize |
+                                            ImGuiWindowFlags_NoSavedSettings |
+                                            ImGuiWindowFlags_NoFocusOnAppearing |
+                                            ImGuiWindowFlags_NoNav))
+    {
+        ImGui::Text(progressText.c_str());
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        ImGui::ProgressBar(progressBarValue, ImVec2(progressBarLength,0.0f));
+    }
+    ImGui::End();
+}
+
 // Helper to display a little (?) mark which shows a tooltip when hovered.
 void GUI::showHelpMarker(const char* desc)
 {
@@ -463,9 +496,10 @@ void GUI::mainLoop(GLFWwindow * window)
     string attrsStr = client->doPicking(mode, pos);
 
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
-    
+
     showMainToolBar();
     showMainMenuBar(window);
+    showProgressBar();
     GUI_Settings_Panel();
     performacePanel();
     viewMatrixPanel();
@@ -497,14 +531,28 @@ void GUI::mainLoop(GLFWwindow * window)
 #endif
 }
 
+void GUI::progress(const string & message, const float percent)
+{
+    if(percent >= 1.0)
+    {
+        doShowProgressBar = false;
+
+        return;
+    }
+
+    doShowProgressBar = true;
+
+    progressText = message;
+
+    progressBarValue = percent;
+}
+
 void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
 {
     debugLoggerFunc = &dmessCallback;
 
     infoIcon = Textures::load("if_Info_131908.png");
-    //if(!infoIcon) { infoIcon = Textures::load("if_Info_131908.png") ;}
-    //if(!infoIcon) { infoIcon = Textures::load("xpos.png") ;}
-
+    
     // Define the viewport dimensions
     static int width, height;
     
@@ -534,7 +582,7 @@ void GUI::initOpenGL(GLFWwindow* window) // TODO, need some code refactor here
 
     client = new GeoClient(window, canvas);
 
-    client->loadGeometry("data.geo");
+    client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
 
     //GridPlane * gridPlane = new GridPlane();
 

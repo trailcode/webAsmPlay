@@ -458,8 +458,8 @@ namespace
 
     void downloadSucceeded(emscripten_fetch_t *fetch)
     {
-        printf("Finished downloading %llu bytes from URL %s.\n", fetch->numBytes, fetch->url);
-
+        GUI::progress("Done Downloading:", 1.0);
+        
         ((GeoClient *)fetch->userData)->addGeometry(fetch->data);
 
         // The data is now available at fetch->data[0] through fetch->data[fetch->numBytes-1];
@@ -474,12 +474,20 @@ namespace
 
     void downloadProgress(emscripten_fetch_t *fetch)
     {
+        //dmess("Downloading: " << float(fetch->dataOffset) / float(fetch->numBytes));
+
         if (fetch->totalBytes)
         {
-            printf("Downloading %s.. %.2f%% complete.\n", fetch->url, fetch->dataOffset * 100.0 / fetch->totalBytes);
-        } else
+            float percent = fetch->dataOffset * 100.0 / fetch->totalBytes;
+
+            dmess("percent " << percent);
+
+            GUI::progress("Downloading:", percent / 100.0);
+            
+        }
+        else           
         {
-            printf("Downloading %s.. %lld bytes complete.\n", fetch->url, fetch->dataOffset + fetch->numBytes);
+            GUI::progress("Done Downloading:", 1.0);
         }
     }
 

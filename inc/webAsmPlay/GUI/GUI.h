@@ -59,6 +59,8 @@ public:
     static void loadState();
     static void saveState();
 
+    static void progress(const std::string & message, const float percent);
+
 private:
 
     GUI() {}
@@ -66,6 +68,7 @@ private:
 
     static void showMainToolBar();
     static void showMainMenuBar(GLFWwindow * window);
+    static void showProgressBar();
     static void performacePanel();
     static void viewMatrixPanel();
     static void MVP_MatrixPanel();
