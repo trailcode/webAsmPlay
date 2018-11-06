@@ -385,7 +385,7 @@ void GUI::performacePanel()
 
         static float f = 0.0f;
         static float frameTimes[100] = {0.f};
-        memcpy(&frameTimes[0], &frameTimes[1], sizeof(frameTimes) - sizeof(frameTimes[0]));
+        memmove(&frameTimes[0], &frameTimes[1], sizeof(frameTimes) - sizeof(frameTimes[0]));
         frameTimes[ARRAYSIZE(frameTimes) - 1] = ImGui::GetIO().Framerate;
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::PlotLines("Frame History", frameTimes, ARRAYSIZE(frameTimes), 0, "", 0.0f, 100.0f, ImVec2(0, 50));

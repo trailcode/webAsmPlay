@@ -74,9 +74,6 @@ namespace
     OSM_Relation * currRelation = NULL;
 }
 
-unordered_set<string> _types;
-unordered_set<string> _rolls;
-
 vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
 {
     char buf[BUFSIZ];
@@ -138,12 +135,8 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
         }
         else
         {
-            if(coords->getSize() < 3)
-            {
-                //dmess("coords->getSize() < 3 " << coords->getSize() << " " << id); // TODO Why is is happening? Clipping?
+            if(coords->getSize() < 3) { continue ;}
 
-                continue;
-            }
             else if(coords->getSize() == 3) 
             {
                 coords->add(Coordinate(coords->getAt(0)));
@@ -157,6 +150,9 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
         }
     }
 
+    size_t numInvalidWays      = 0;
+    size_t geomOperationErrors = 0;
+
     for(const OSM_Relations::value_type & i : relations)
     {
         vector<OSM_Way *> outers;
@@ -164,21 +160,23 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
 
         for(const OSM_Member * member : i.second->members)
         {
-            _types.insert(member->type);
-            _rolls.insert(member->role);
-
             switch(getRelationKey(member->type))
             {
                 case OSM_TYPE_NODE:
-                    break;
+                {
+                    OSM_Node * node = nodes[member->ref];
 
+                    //dmess("node " << node->attrs->strings.size());
+
+                    break;
+                }
                 case OSM_TYPE_WAY:
                 {  
                     OSM_Way * way = ways[member->ref];
 
                     if(!way)
                     {
-                        dmess("Could not get way!");
+                        ++numInvalidWays;
 
                         continue;
                     }
@@ -207,7 +205,6 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
                     break;
                 }
                     
-
                 default:
 
                     dmess("Implement me! [" << member->type << "]");
@@ -216,37 +213,21 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
             }
         }
 
-        //dmess("outers " << outers.size());
-        //dmess("inners " << inners.size());
-
         for(auto inner : inners)
         {
-            if(!inner->geom)
-            {
-                //dmess("!inner");
-
-                continue;
-            }
+            if(!inner->geom) { continue ;}
 
             for(auto outer : outers)
             {
-                if(!outer->geom)
-                {
-                    //dmess("!outer");
-
-                    continue;
-                }
+                if(!outer->geom) { continue ;}
 
                 try
                 {
                     if(!contains(outer->geom, inner->geom)) { continue ;}
 
-                    if(!subtract(outer->geom, inner->geom)) { dmess("Diff error!") ;}
+                    if(!subtract(outer->geom, inner->geom)) { ++geomOperationErrors ;}
                 }
-                catch(...)
-                {
-                    dmess("Geometry operation error!");
-                }
+                catch(...) { ++geomOperationErrors ;}
             }
         }
     }
@@ -258,8 +239,6 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
         Relation * _realtion = new Relation();
     }
 
-    size_t unusedWays = 0;
-
     for(const auto & i : ways)
     {
         const uint64_t   id  = i.first;
@@ -270,8 +249,6 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
             Attributes * attrs = way->attrs.release();
 
             ret.push_back(AttributedGeometry(attrs, way->geom.get())); // TODO not safe!
-
-            if(way->relations.size() > 1) { dmess("way->relations.size() " << way->relations.size()) ;}
         }
         else
         {
@@ -279,17 +256,8 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
         }
     }
 
-    dmess("unusedWays " << unusedWays);
-
-
-    dmess("points " << numPoints);
-    dmess("lineStrings " << numLineStrings);
-    dmess("polygons " << numPolygons);
-
-    /*
-    dmess("types: "); for(const string & i : _types) { dmess("   " << i) ;}
-    dmess("Rolls"); for(const string & i : _rolls) { dmess("   " << i) ;}
-    //*/
+    dmess("numInvalidWays " << numInvalidWays);
+    dmess("geomOperationErrors " << geomOperationErrors);
 
     return ret;
 }
@@ -308,6 +276,7 @@ void OSM_Reader::startElement(void *userData, const char *name, const char **att
         // Unused
         case OSM_KEY_META: break;
         case OSM_KEY_OSM:  break;
+        case OSM_KEY_NOTE: break;
 
         default: dmess("Unknown tag: " << name);
     }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
 set(default_build_type "Release")
-set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_BUILD_TYPE Debug)
 #set(EMCC_DEBUG 1)
  
@@ -300,6 +300,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     set_target_properties(worker PROPERTIES LINK_FLAGS "-s EXPORTED_FUNCTIONS=\"['_one']\" -s BUILD_AS_WORKER=1")
 
 else()
+
+    #set(CMAKE_CXX_FLAGS "-fsanitize=address -O1 -fno-omit-frame-pointer -g")
 
     add_executable(webAsmPlay ${sources} ${imguiSrc} "ThirdParty/imgui/gl3w/GL/gl3w.c")
 endif()
