@@ -520,15 +520,10 @@ void GeoClient::addGeometry(const char * data)
                                 (get<3>(bounds) + get<1>(bounds)) * -0.5,
                                 0.0));
     
-    dmess("trans " << mat4ToStr(trans));
-
     inverseTrans = inverse(trans);
 
-    createPolygonRenderiables(GeometryConverter::getGeosPolygons(data));
-
-    uint32_t numLineStrings;
-    uint32_t numPoints;
-    uint32_t numRelations;
+    createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
+    createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
 }
 
 void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms)

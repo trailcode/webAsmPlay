@@ -192,31 +192,46 @@ string GeoServer::addOsmFile(const string & osmFile)
     Polygon    * polygon;
     LineString * lineString;
 
+    size_t numPoints = 0;
+
     for(const AttributedGeometry & i : geometry)
     {
         if((polygon = dynamic_cast<Polygon *>(i.second)))
         {
             serializedPolygons.push_back(GeometryConverter::convert(polygon, i.first));
+
+            unique_ptr<CoordinateSequence> coords(i.second->getCoordinates());
+
+            for(auto & c : *coords->toVector())
+            {
+                center += dvec2(c.x, c.y);
+
+                ++numPoints;
+            }
         }
         else if((lineString = dynamic_cast<LineString *>(i.second)))
         {
             serializedLineStrings.push_back(GeometryConverter::convert(AttributedLineString(i.first, lineString)));
         }
 
+        /*
         const Envelope * extent = i.second->getEnvelopeInternal();
 
-        /*
         if(boundsMinX > extent->getMinX()) { boundsMinX = extent->getMinX() ;}
         if(boundsMinY > extent->getMinY()) { boundsMinY = extent->getMinY() ;}
         if(boundsMaxX < extent->getMaxX()) { boundsMaxX = extent->getMaxX() ;}
         if(boundsMaxY < extent->getMaxY()) { boundsMaxY = extent->getMaxY() ;}
-        //*/
 
         center += dvec2((extent->getMinX() + extent->getMaxX()) * 0.5,
                         (extent->getMinY() + extent->getMaxY()) * 0.5);
+                        */
+
+        //unique_ptr<CoordinateSequence>(i.second->getCoordinates())->toVector();
     }
 
-    center /= double(geometry.size());
+    dmess("numPoints " << numPoints);
+
+    center /= double(numPoints);
 
     boundsMinX = center.x;
     boundsMaxX = center.x;
