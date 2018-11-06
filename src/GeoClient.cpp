@@ -391,6 +391,8 @@ void GeoClient::loadGeoServerGeometry()
 {
     dmess("GeoClient::loadGeoServerGeometry");
 
+    for(auto renderiable : canvas->getRenderiables()) { delete renderiable ;}
+
     getLayerBounds([this](const AABB2D & bounds)
     {
         const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
