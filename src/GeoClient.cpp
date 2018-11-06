@@ -49,6 +49,7 @@
 #include <webAsmPlay/GeometryConverter.h>
 #include <webAsmPlay/RenderablePolygon.h>
 #include <webAsmPlay/RenderableLineString.h>
+#include <webAsmPlay/RenderablePoint.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader2.h>
 #include <webAsmPlay/Attributes.h>
@@ -196,6 +197,37 @@ void GeoClient::getNumPolylines(const function<void (const size_t)> & callback)
 #endif
 }
 
+void GeoClient::getNumPoints(const function<void (const size_t)> & callback)
+{
+    GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
+
+    numGeomsRequests[request->ID] = request;
+
+#ifdef __EMSCRIPTEN__
+
+    char buf[2048];
+
+    sprintf(buf,    "var buffer = new ArrayBuffer(5); \r\n"
+                    "var dv = new DataView(buffer); \r\n"
+                    "dv.setUint8(0,%i); \r\n"
+                    "dv.setUint32(1, Module.swap32(%i)); \r\n"
+                    "Module.connection.send(buffer); \r\n", GeoServerBase::GET_NUM_POINTS_REQUEST, request->ID);
+                
+    emscripten_run_script(buf);
+
+#else
+
+    vector<char> data(5);
+
+    data[0] = GeoServerBase::GET_NUM_POINTS_REQUEST;
+
+    *(uint32_t *)&data[1] = request->ID;
+
+    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+
+#endif
+}
+
 void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 {
     GeoRequestLayerBounds * request = new GeoRequestLayerBounds(callback);
@@ -314,6 +346,49 @@ void GeoClient::getPolylines(const size_t startIndex, const size_t numPolylines,
 #endif
 }
 
+void GeoClient::getPoints(const size_t startIndex, const size_t numPoints, function<void (vector<AttributedGeometry> geoms)> callback)
+{
+    GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
+
+    getAllGeometriesRequests[request->ID] = request;
+
+#ifdef __EMSCRIPTEN__
+
+    char buf[2048];
+
+    sprintf(buf,    "var buffer = new ArrayBuffer(13); \r\n"
+                    "var dv = new DataView(buffer); \r\n"
+                    "dv.setUint8(0,%i); \r\n"
+                    "dv.setUint32(1, Module.swap32(%i)); \r\n"
+                    "dv.setUint32(5, Module.swap32(%i)); \r\n"
+                    "dv.setUint32(9, Module.swap32(%i)); \r\n"
+                    "Module.connection.send(buffer); \r\n",
+                        GeoServerBase::GET_POINTS_REQUEST,
+                        request->ID,
+                        startIndex,
+                        numPoints);
+                
+    emscripten_run_script(buf);
+
+#else
+
+    vector<char> data(1 + sizeof(uint32_t) * 3);
+
+    data[0] = GeoServerBase::GET_POINTS_REQUEST;
+
+    char * ptr = &data[1];
+
+    *(uint32_t *)ptr = request->ID; ptr += sizeof(uint32_t);
+
+    *(uint32_t *)ptr = startIndex; ptr += sizeof(uint32_t);
+
+    *(uint32_t *)ptr = numPoints; ptr += sizeof(uint32_t);
+
+    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+
+#endif
+}
+
 void GeoClient::onMessage(const string & data)
 {
     const char * ptr = (const char *)data.data();
@@ -322,6 +397,7 @@ void GeoClient::onMessage(const string & data)
     {
         case GeoServerBase::GET_NUM_POLYGONS_RESPONCE:
         case GeoServerBase::GET_NUM_POLYLINES_RESPONCE:
+        case GeoServerBase::GET_NUM_POINTS_RESPONCE:
         {
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
 
@@ -368,6 +444,21 @@ void GeoClient::onMessage(const string & data)
             break;
         }
 
+        case GeoServerBase::GET_POINTS_RESPONCE:
+        {
+            const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
+
+            GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
+
+            unique_ptr<GetRequestGetAllGeometries> request(i->second);
+
+            request->callback(GeometryConverter::getGeosPoints(ptr));
+
+            getAllGeometriesRequests.erase(i);
+
+            break;
+        }
+
         case GeoServerBase::GET_LAYER_BOUNDS_RESPONCE:
         {
             const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
@@ -403,6 +494,37 @@ void GeoClient::loadGeoServerGeometry()
                                   0.0));
         
         inverseTrans = inverse(trans);
+
+        getNumPoints([this](const size_t numPoints)
+        {
+            dmess("numPoints " << numPoints);
+
+            if(!numPoints) { return ;}
+
+            auto startTime = system_clock::now();
+
+            const size_t blockSize = std::min((size_t)4096, numPoints);
+
+            shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());
+
+            for(size_t i = 0; i < numPoints / blockSize; ++i)
+            {
+                const size_t startIndex = i * blockSize;
+
+                const bool isLast = i + 1 >= numPoints / blockSize;
+
+                getPoints(startIndex, std::min(blockSize, numPoints - startIndex - blockSize),
+                             [this, isLast, geoms, startIndex, &startTime, numPoints]
+                             (vector<AttributedGeometry> geomsIn)
+                {
+                    doProgress("(1/6) Loading points:", geoms->size(), numPoints, startTime, 1);
+
+                    geoms->insert(geoms->end(), geomsIn.begin(), geomsIn.end());
+
+                    if(isLast) { createPointRenderiables(*geoms.get()) ;}
+                });
+            }
+        });
 
         getNumPolylines([this](const size_t numPolylines)
         {
@@ -648,6 +770,59 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     Renderable * r = RenderableLineString::create(polylines, trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
+
+    canvas->addRenderiable(r);
+    
+    dmess("Done creating renderable.");
+
+#ifndef __EMSCRIPTEN__
+
+    GUI::progress("Waiting for server:", 0.0);
+
+#endif
+}
+
+void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms)
+{
+    dmess("Start create points " << geoms.size());
+
+    auto startTime = system_clock::now();
+
+    vector<const Geometry *> points;
+
+    for(size_t i = 0; i < geoms.size(); ++i)
+    {
+        doProgress("(2/6) Indexing points:", i, geoms.size(), startTime);
+
+        Attributes * attrs = geoms[i].first;
+
+        const Geometry * geom = geoms[i].second;
+        
+        if(!geom)
+        {
+            dmess("!geom");
+
+            continue;
+        }
+
+        Renderable * r = Renderable::create(geom, trans);
+        
+        if(!r) { dmess("!r"); continue ;}
+        
+        tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, geom, attrs);
+
+        quadTreePoints->insert(geom->getEnvelopeInternal(), data);
+
+        points.push_back(geom);
+    }
+    
+    GUI::progress("", 1.0);
+
+    dmess("Points quadTree " << quadTreePoints->depth() << " " << geoms.size());
+
+    Renderable * r = RenderablePoint::create(points, trans, true);
+
+    //r->setShader(ColorDistanceShader::getDefaultInstance());
 
     canvas->addRenderiable(r);
     

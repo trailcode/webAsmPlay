@@ -380,6 +380,25 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                 break;
 
+            case GET_NUM_POINTS_REQUEST:
+
+                pool.push([hdl, s, server, requestID](int ID)
+                {
+                    vector<char> data(sizeof(char) + sizeof(uint32_t) * 2);
+
+                    data[0] = GET_NUM_POINTS_RESPONCE;
+
+                    char * ptr = &data[1];
+
+                    *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
+
+                    *(uint32_t *)ptr = server->serializedPoints.size();
+
+                    s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
+                });
+
+                break;
+
             case GET_POLYGONS_REQUEST:
             {
                 const uint32_t startIndex = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
@@ -452,6 +471,19 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
                     }
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
+                });
+
+                break;
+            }
+            case GET_POINTS_REQUEST:
+            {
+                const uint32_t startIndex = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
+
+                const uint32_t numGeoms = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
+
+                pool.push([hdl, s, server, requestID, startIndex, numGeoms](int ID)
+                {
+
                 });
 
                 break;

@@ -37,7 +37,8 @@ namespace
     ShaderProgram * defaultShader = NULL;
 }
 
-Renderable * RenderablePoint::create(const vec3 & pos)
+Renderable * RenderablePoint::create(const vec3 & pos,
+                                     const mat4 & trans)
 {
     const float size = 0.05;
 
@@ -67,6 +68,13 @@ Renderable * RenderablePoint::create(const vec3 & pos)
     return new RenderablePoint(vao, ebo, vbo, false);
 }
 
+Renderable * RenderablePoint::create(const ConstGeosGeomVec & points,
+                                     const mat4             & trans,
+                                     const bool               showProgress)
+{
+    return NULL;
+}
+
 void RenderablePoint::render(const mat4 & MVP, const mat4 & MV) const
 {
     shader->bind(MVP, MV, false);
@@ -93,6 +101,6 @@ RenderablePoint::RenderablePoint(   const GLuint      vao,
 
 RenderablePoint::~RenderablePoint()
 {
-    //glDeleteVertexArrays(1, &vao);
+    glDeleteVertexArrays(1, &vao);
     glDeleteBuffers     (1, &vbo);
 }

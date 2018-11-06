@@ -69,11 +69,15 @@ public:
 
     void getNumPolylines(const std::function<void (const size_t)> & callback);
 
+    void getNumPoints(const std::function<void (const size_t)> & callback);
+
     void getLayerBounds(const std::function<void (const AABB2D &)> & callback);
 
     void getPolygons(const size_t startIndex, const size_t numPolys, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
     void getPolylines(const size_t startIndex, const size_t numPolylines, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
+
+    void getPoints(const size_t startIndex, const size_t numPoints, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
 
     void loadGeoServerGeometry();
 
@@ -94,12 +98,13 @@ public:
 
 private:
     
-    void createPolygonRenderiables(const std::vector<AttributedGeometry> & geoms);
-
+    void createPolygonRenderiables   (const std::vector<AttributedGeometry> & geoms);
     void createLineStringRenderiables(const std::vector<AttributedGeometry> & geoms);
+    void createPointRenderiables     (const std::vector<AttributedGeometry> & geoms);
 
     geos::index::quadtree::Quadtree * quadTreePolygons;
     geos::index::quadtree::Quadtree * quadTreeLineStrings;
+    geos::index::quadtree::Quadtree * quadTreePoints;
     
     glm::dmat4 trans;
     glm::dmat4 inverseTrans;

@@ -56,13 +56,15 @@ public:
 
     static AttributedGeometry getGeosLineString(const char *& lineString);
 
+    static AttributedGeometry getGeosPoint(const char *& point);
+
     static std::vector<AttributedGeometry> getGeosPolygons(const char *& polys);
 
     static std::vector<AttributedGeometry> getGeosLineStrings(const char *& lineStrings);
 
-    static geos::geom::CoordinateSequence * getGeosCoordinateSequence(const char *& lineString);
+    static std::vector<AttributedGeometry> getGeosPoints(const char *& points);
 
-    static geos::geom::Point * getGeosPoint(const char *& point);
+    static geos::geom::CoordinateSequence * getGeosCoordinateSequence(const char *& lineString);
 
     static void convert(const geos::geom::Polygon * poly, const Attributes * attrs, std::stringstream & data);
 

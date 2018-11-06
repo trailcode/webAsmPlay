@@ -137,14 +137,6 @@ CoordinateSequence * GeometryConverter::getGeosCoordinateSequence(const char *& 
     return new CoordinateArraySequence(coords, 2);
 }
 
-Point * GeometryConverter::getGeosPoint(const char *& point)
-{
-    const double x = *(double *)point; point += sizeof(double);
-    const double y = *(double *)point; point += sizeof(double);
-    
-    return GeometryFactory::getDefaultInstance()->createPoint(Coordinate(x, y));
-}
-
 AttributedGeometry GeometryConverter::getGeosPolygon(const char *& poly)
 {
     Attributes * attrs = new Attributes(poly);
@@ -174,6 +166,18 @@ AttributedGeometry GeometryConverter::getGeosLineString(const char *& lineString
     return AttributedGeometry(attrs, factory->createLineString(getGeosCoordinateSequence(lineString)));
 }
 
+AttributedGeometry GeometryConverter::getGeosPoint(const char *& point)
+{
+    const GeometryFactory * factory = GeometryFactory::getDefaultInstance();
+
+    Attributes * attrs = new Attributes(point);
+
+    const double x = *(double *)point; point += sizeof(double);
+    const double y = *(double *)point; point += sizeof(double);
+    
+    return AttributedGeometry(attrs, factory->createPoint(Coordinate(x, y)));
+}
+
 vector<AttributedGeometry> GeometryConverter::getGeosPolygons(const char *& polys)
 {
     const uint32_t numPolygons = *(uint32_t *)polys; polys += sizeof(uint32_t);
@@ -192,6 +196,17 @@ vector<AttributedGeometry> GeometryConverter::getGeosLineStrings(const char *& l
     vector<AttributedGeometry> ret(numLineStrings);
 
     for(size_t i = 0; i < numLineStrings; ++i) { ret[i] = getGeosLineString(lineStrings) ;}
+
+    return ret;
+}
+
+vector<AttributedGeometry> GeometryConverter::getGeosPoints(const char *& points)
+{
+    const uint32_t numPoints = *(uint32_t *)points; points += sizeof(uint32_t);
+
+    vector<AttributedGeometry> ret(numPoints);
+
+    for(size_t i = 0; i < numPoints; ++i) { ret[i] = getGeosPoint(points) ;}
 
     return ret;
 }
