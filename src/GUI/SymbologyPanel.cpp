@@ -46,22 +46,35 @@ namespace
     {
         ColorDistanceShader2 * shader = ColorDistanceShader2::getDefaultInstance();
 
-        if(ImGui::ColorEdit4((name + " fill near").c_str(), value_ptr(colors[0]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
+        const ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoInputs;
+
+        //ImGui::ColorPicker4((name + " fill neara").c_str(), value_ptr(colors[0]), flags);
+
+        /*
+        ImVec4 c(colors[0].x, colors[0].y, colors[0].z, colors[0].w);
+
+        if(ImGui::ColorButton((name + " fill neara").c_str(), c, flags, ImVec2(20,20)))
+        {
+            ImGui::ColorPicker4((name + " fill neara").c_str(), value_ptr(colors[0]), flags);
+        }
+        */
+
+        if(ImGui::ColorEdit4((name + " fill near").c_str(), value_ptr(colors[0]), flags))
         {
             shader->setColor(colorIndex * 4 + 0, colors[0]);
         }
 
-        if(ImGui::ColorEdit4((name + " fill far").c_str(), value_ptr(colors[1]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
+        if(ImGui::ColorEdit4((name + " fill far").c_str(), value_ptr(colors[1]), flags))
         {
             shader->setColor(colorIndex * 4 + 1, colors[1]);
         }
 
-        if(ImGui::ColorEdit4((name + " outline near").c_str(), value_ptr(colors[2]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
+        if(ImGui::ColorEdit4((name + " outline near").c_str(), value_ptr(colors[2]), flags))
         {
             shader->setColor(colorIndex * 4 + 2, colors[2]);
         }
 
-        if(ImGui::ColorEdit4((name + " outline far").c_str(), value_ptr(colors[3]), ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
+        if(ImGui::ColorEdit4((name + " outline far").c_str(), value_ptr(colors[3]), flags))
         {
             shader->setColor(colorIndex * 4 + 3, colors[3]);
         }
@@ -70,11 +83,11 @@ namespace
     }
 }
 
-void GUI::attributionPanel()
+void GUI::symbologyPanel()
 {
-    if(!showAttributionPanel) { return ;}
+    if(!showSymbologyPanel) { return ;}
 
-    ImGui::Begin("Attribution", &showAttributionPanel);
+    ImGui::Begin("Symbology", &showSymbologyPanel);
 
     if (ImGui::CollapsingHeader("Linear Features", ImGuiTreeNodeFlags_DefaultOpen))
     {

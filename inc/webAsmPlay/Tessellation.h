@@ -24,36 +24,13 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_RENDERIABLE_POINT_H__
-#define __WEB_ASM_PLAY_RENDERIABLE_POINT_H__
+#ifndef __WEB_ASM_PLAY_TESSELLATION_H__
+#define __WEB_ASM_PLAY_TESSELLATION_H__
 
-#include <webAsmPlay/Renderable.h>
-
-class RenderablePoint : public Renderable
+class Tessellation
 {
 public:
 
-    ~RenderablePoint();
-
-    static Renderable * create( const glm::vec3 & pos,
-                                const glm::mat4 & trans = glm::mat4(1.0));
-
-    static Renderable * create( const ConstGeosGeomVec & points,
-                                const glm::mat4        & trans        = glm::mat4(1.0),
-                                const bool               showProgress = false);
-
-    void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
-
-private:
-
-    RenderablePoint(const GLuint vao,
-                    const GLuint ebo,
-                    const GLuint vbo,
-                    const bool   isMulti);
-
-    const GLuint vao;
-    const GLuint ebo;
-    const GLuint vbo;
 };
 
-#endif // __WEB_ASM_PLAY_RENDERIABLE_POINT_H__
+#endif // __WEB_ASM_PLAY_TESSELLATION_H__

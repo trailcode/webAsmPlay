@@ -129,7 +129,6 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
 
     size_t index = 0;
 
-    //for(const Geometry * ls : lineStrings)
     for(size_t i = 0; i < lineStrings.size(); ++i)
     {
         if(showProgress) { doProgress("(3/6) Creating geometry:", i, lineStrings.size(), startTime) ;}

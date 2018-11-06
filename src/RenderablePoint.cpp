@@ -32,11 +32,6 @@
 using namespace std;
 using namespace glm;
 
-namespace
-{
-    ShaderProgram * defaultShader = NULL;
-}
-
 Renderable * RenderablePoint::create(const vec3 & pos,
                                      const mat4 & trans)
 {
