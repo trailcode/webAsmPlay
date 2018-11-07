@@ -156,18 +156,6 @@ ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
     for(const auto & variable : uniforms)   { uniformMap  [variable] = glGetUniformLocation(shaderProgram, variable.c_str()) ;}
     for(const auto & variable : attributes) { attributeMap[variable] = glGetAttribLocation(shaderProgram,  variable.c_str()) ;}
 
-    /*
-    dmess("vertInAttrib " << vertInAttrib);
-
-    GL_CHECK(glEnableVertexAttribArray(vertInAttrib));
-
-    GL_CHECK(glVertexAttribPointer(vertInAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0));
-
-    GL_CHECK(glEnableVertexAttribArray(colorInAttrib));
-
-    GL_CHECK(glVertexAttribPointer(colorInAttrib, 4, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0));
-    */
-    
     return new ShaderProgram(shaderProgram,
                              vertInAttrib,
                              colorInAttrib,

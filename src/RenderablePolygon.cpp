@@ -30,7 +30,6 @@
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
-#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
@@ -63,10 +62,10 @@ RenderablePolygon::RenderablePolygon(   const GLuint      vao,
 
 RenderablePolygon::~RenderablePolygon()
 {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers     (1, &vbo);
-    glDeleteBuffers     (1, &ebo);
-    glDeleteBuffers     (1, &ebo2);
+    GL_CHECK(glDeleteVertexArrays(1, &vao));
+    GL_CHECK(glDeleteBuffers     (1, &vbo));
+    GL_CHECK(glDeleteBuffers     (1, &ebo));
+    GL_CHECK(glDeleteBuffers     (1, &ebo2));
 }
 
 RenderablePolygon::TessellationResult RenderablePolygon::tessellatePolygon( const Polygon * poly,
@@ -342,22 +341,22 @@ Renderable * RenderablePolygon::createFromTessellations(const Tessellations & te
     GLuint ebo2 = 0;
     GLuint vbo  = 0;
     
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    GL_CHECK(glGenVertexArrays(1, &vao));
+    GL_CHECK(glBindVertexArray(vao));
 
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
-    glGenBuffers(1, &ebo2);
+    GL_CHECK(glGenBuffers(1, &vbo));
+    GL_CHECK(glGenBuffers(1, &ebo));
+    GL_CHECK(glGenBuffers(1, &ebo2));
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
 
-    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW);
+    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW));
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, &triangleIndices[0], GL_STATIC_DRAW);
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, &triangleIndices[0], GL_STATIC_DRAW));
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * counterVertIndices2.size(), &counterVertIndices2[0], GL_STATIC_DRAW);
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * counterVertIndices2.size(), &counterVertIndices2[0], GL_STATIC_DRAW));
 
     return new RenderablePolygon(   vao,
                                     ebo,
@@ -371,16 +370,16 @@ Renderable * RenderablePolygon::createFromTessellations(const Tessellations & te
 
 void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 {
-    glBindVertexArray(vao);
+    GL_CHECK(glBindVertexArray(vao));
     
-    glBindBuffer(GL_ARRAY_BUFFER,         vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
 
-    glEnable(GL_BLEND);
+    GL_CHECK(glEnable(GL_BLEND));
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-    glDisable(GL_DEPTH_TEST);
+    GL_CHECK(glDisable(GL_DEPTH_TEST));
 
     if(shader->getRenderFill())
     {
@@ -390,19 +389,19 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
         shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
-        glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, NULL);
+        GL_CHECK(glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, NULL));
     }
 
     if(shader->getRenderOutline())
     {
         shader->bind(MVP, MV, true);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+        GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
         
-        glDrawElements(GL_LINES, numContourLines, GL_UNSIGNED_INT, NULL);
+        GL_CHECK(glDrawElements(GL_LINES, numContourLines, GL_UNSIGNED_INT, NULL));
     }
 
-    glDisable(GL_BLEND);
+    glDisable(GL_BLEND); // TODO Remove!
 
     //glUseProgram(0);
 }

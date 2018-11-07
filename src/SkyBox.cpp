@@ -178,16 +178,19 @@ void SkyBox::render(const mat4 & _view, const mat4 & projection)
 
     const mat4 MVP = projection * centeredView * model;
 
+    GL_CHECK(glBindVertexArray(vao));
+
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    
     skyboxShader->bind(MVP, mat4(1.0));
 
-    skyboxShader->setTexture1Slot(1);
+    skyboxShader->setTexture1Slot(0);
 
-    skyboxShader->enableVertexAttribArray(3); // TODO Why is this not required here?
+    skyboxShader->enableVertexAttribArray(3); // TODO Why is this not required here? Perhaps the point of vertex array objects?
 
     GL_CHECK(glDepthMask(GL_FALSE));
-    GL_CHECK(glActiveTexture(GL_TEXTURE1));
+    GL_CHECK(glActiveTexture(GL_TEXTURE0));
     GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, texID));
-    GL_CHECK(glBindVertexArray(vao));
     GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 36));
     GL_CHECK(glDepthMask(GL_TRUE));
     GL_CHECK(glFlush());

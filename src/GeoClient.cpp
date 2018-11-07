@@ -771,7 +771,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     Renderable * r = RenderableLineString::create(polylines, trans, true);
 
-    //r->setShader(ColorDistanceShader2::getDefaultInstance());
+    r->setShader(ColorDistanceShader2::getDefaultInstance());
 
     canvas->addRenderiable(r);
     
