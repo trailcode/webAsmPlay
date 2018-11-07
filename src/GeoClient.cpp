@@ -744,13 +744,6 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
         Attributes * attrs = geoms[i].first;
 
         const Geometry * geom = geoms[i].second;
-        
-        if(!geom)
-        {
-            dmess("!geom");
-
-            continue;
-        }
 
         GLuint colorID = 0;
 
@@ -790,7 +783,6 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
         {
             colorID = 9;
         }
-
 
         Renderable * r = Renderable::create(geom, trans);
         
@@ -838,13 +830,6 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
         const Geometry * geom = geoms[i].second;
         
-        if(!geom)
-        {
-            dmess("!geom");
-
-            continue;
-        }
-
         Renderable * r = Renderable::create(geom, trans);
         
         if(!r) { dmess("!r"); continue ;}

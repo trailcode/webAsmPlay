@@ -86,6 +86,8 @@ string GeoServer::addGeoFile(const string & geomFile)
     return geomFile;
 }
 
+typedef tuple<Geometry *, double, Attributes *> PolyAndArea; // TODO better name.
+
 string GeoServer::addGdalSupportedFile(const string & gdalFile)
 {
     cout << "Loading: " << gdalFile << endl;
@@ -102,13 +104,9 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
 
     poLayer->ResetReading();
 
-    size_t c = 0;
-
     const GEOSContextHandle_t gctx = OGRGeometry::createGEOSContext();
 
-    typedef tuple<Geometry *, double, Attributes *> PolyAndArea; // TODO better name.
-    
-    vector<PolyAndArea>          polys;
+    vector<PolyAndArea>          polygons;
     vector<AttributedLineString> lineStrings;
 
     for(const auto & poFeature : *poLayer)
@@ -135,23 +133,21 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
         
         switch(geom->getGeometryTypeId())
         {
-            case GEOS_POLYGON:    polys      .push_back(PolyAndArea(geom, geom->getArea(), attrs)); break;
+            case GEOS_POLYGON:    polygons   .push_back(PolyAndArea(geom, geom->getArea(), attrs)); break;
             case GEOS_LINESTRING: lineStrings.push_back(AttributedLineString(attrs, dynamic_cast<LineString *>(geom))); break;
             default:
                 dmess("Implement for " << geom->getGeometryType());
         }
-
-        if(++c > 100000) { break ;}
     }
     
-    sort(polys.begin(), polys.end(), [](const PolyAndArea & lhs, const PolyAndArea & rhs) { return get<1>(lhs) < get<1>(rhs) ;});
+    sort(polygons.begin(), polygons.end(), [](const PolyAndArea & lhs, const PolyAndArea & rhs) { return get<1>(lhs) < get<1>(rhs) ;});
 
-    for(const PolyAndArea & g : polys)
+    for(const PolyAndArea & g : polygons)
     {
         //dmess("g " << get<1>(g) << " " << get<0>(g)->getGeometryType());
     }
 
-    for(const PolyAndArea & g : polys)
+    for(const PolyAndArea & g : polygons)
     {
         serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g)));
     }
@@ -198,11 +194,15 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     size_t numEmptyPoints = 0;
 
+    vector<PolyAndArea> polygons;
+
     for(const AttributedGeometry & i : geometry)
     {
         if((polygon = dynamic_cast<Polygon *>(i.second)))
         {
-            serializedPolygons.push_back(GeometryConverter::convert(polygon, i.first));
+            polygons.push_back(PolyAndArea(polygon, polygon->getArea(), i.first));
+
+            //serializedPolygons.push_back(GeometryConverter::convert(polygon, i.first));
 
             unique_ptr<CoordinateSequence> coords(i.second->getCoordinates());
 
@@ -236,6 +236,18 @@ string GeoServer::addOsmFile(const string & osmFile)
                         */
 
         //unique_ptr<CoordinateSequence>(i.second->getCoordinates())->toVector();
+    }
+
+    sort(polygons.begin(), polygons.end(), [](const PolyAndArea & lhs, const PolyAndArea & rhs) { return get<1>(lhs) > get<1>(rhs) ;});
+
+    for(const PolyAndArea & g : polygons)
+    {
+        //dmess("g " << get<1>(g) << " " << get<0>(g)->getGeometryType());
+    }
+
+    for(const PolyAndArea & g : polygons)
+    {
+        serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g)));
     }
 
     dmess("numEmptyPoints " << numEmptyPoints);
