@@ -200,9 +200,11 @@ string GeoServer::addOsmFile(const string & osmFile)
     {
         if((polygon = dynamic_cast<Polygon *>(i.second)))
         {
-            polygons.push_back(PolyAndArea(polygon, polygon->getArea(), i.first));
+            const double area = polygon->getArea();
 
-            //serializedPolygons.push_back(GeometryConverter::convert(polygon, i.first));
+            i.first->doubles["area"] = area;
+
+            polygons.push_back(PolyAndArea(polygon, area, i.first));
 
             unique_ptr<CoordinateSequence> coords(i.second->getCoordinates());
 
