@@ -36,7 +36,7 @@
 #include <geos/geom/Point.h>
 #include <geos/io/WKTWriter.h>
 #include "ogrsf_frmts.h"
-#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/GeometryConverter.h>
@@ -384,7 +384,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
         const char * dataPtr = &data[1];
 
-        const uint32_t requestID = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
+        const uint32_t requestID = getUint32(dataPtr);
 
         switch(data[0])
         {
@@ -487,9 +487,8 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
             }
             case GET_POLYLINES_REQUEST:
             {
-                const uint32_t startIndex = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
-
-                const uint32_t numGeoms = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
+                const uint32_t startIndex = getUint32(dataPtr);
+                const uint32_t numGeoms   = getUint32(dataPtr);
 
                 pool.push([hdl, s, server, requestID, startIndex, numGeoms](int ID)
                 {
@@ -527,9 +526,8 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
             }
             case GET_POINTS_REQUEST:
             {
-                const uint32_t startIndex = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
-
-                const uint32_t numGeoms = *(const uint32_t *)dataPtr; dataPtr += sizeof(uint32_t);
+                const uint32_t startIndex = getUint32(dataPtr);
+                const uint32_t numGeoms   = getUint32(dataPtr);
 
                 pool.push([hdl, s, server, requestID, startIndex, numGeoms](int ID)
                 {

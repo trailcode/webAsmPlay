@@ -42,7 +42,6 @@
 #include <geos/io/WKBReader.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
-#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Canvas.h>
@@ -400,9 +399,9 @@ void GeoClient::onMessage(const string & data)
         case GeoServerBase::GET_NUM_POLYLINES_RESPONCE:
         case GeoServerBase::GET_NUM_POINTS_RESPONCE:
         {
-            const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
+            const uint32_t requestID = getUint32(++ptr);
 
-            const uint32_t numGeoms = *(uint32_t *)ptr;
+            const uint32_t numGeoms = getUint32(ptr);
 
             NumGeomsRequests::const_iterator i = numGeomsRequests.find(requestID);
 
@@ -417,7 +416,7 @@ void GeoClient::onMessage(const string & data)
 
         case GeoServerBase::GET_POLYGONS_RESPONCE:
         {
-            const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
+            const uint32_t requestID = getUint32(++ptr);
 
             GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
 
@@ -432,7 +431,7 @@ void GeoClient::onMessage(const string & data)
 
         case GeoServerBase::GET_POLYLINES_RESPONCE:
         {
-            const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
+            const uint32_t requestID = getUint32(++ptr);;
 
             GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
 
@@ -447,7 +446,7 @@ void GeoClient::onMessage(const string & data)
 
         case GeoServerBase::GET_POINTS_RESPONCE:
         {
-            const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
+            const uint32_t requestID = getUint32(++ptr);;
 
             GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
 
@@ -462,7 +461,7 @@ void GeoClient::onMessage(const string & data)
 
         case GeoServerBase::GET_LAYER_BOUNDS_RESPONCE:
         {
-            const uint32_t requestID = *(uint32_t *)(++ptr); ptr += sizeof(uint32_t);
+            const uint32_t requestID = getUint32(++ptr);
 
             const AABB2D & bounds = *(AABB2D *)ptr;
 

@@ -1,10 +1,10 @@
 /**
-╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
-┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
-╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
-╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
-╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
-╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+ ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+ ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+ ╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+ ╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+ ╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
  // This software is provided 'as-is', without any express or implied
  // warranty.  In no event will the authors be held liable for any damages
  // arising from the use of this software.
@@ -27,12 +27,16 @@
 #ifndef __WEB_ASM_PLAY_UTIL_H__
 #define __WEB_ASM_PLAY_UTIL_H__
 
-#ifdef __EMSCRIPTEN__
-    // GLEW
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-#else
-    #include <GL/gl3w.h>
+#ifdef OPENGL_CALL_CHECKING
+
+    #ifdef __EMSCRIPTEN__
+        // GLEW
+        #define GLEW_STATIC
+        #include <GL/glew.h>
+    #else
+        #include <GL/gl3w.h>
+    #endif
+
 #endif
 
 #include <string>
@@ -83,16 +87,30 @@ inline void doProgress( const std::string                                    & m
     }
 }
 
-void checkOpenGLError(const char * stmt, const char* fname, int line);
+#ifdef OPENGL_CALL_CHECKING
+    #define GL_CHECK(stmt) do { stmt; \
+            const GLenum err = glGetError(); \
+            if (err != GL_NO_ERROR) { \
+            dmess("OpenGL error " << err << " call " << #stmt); \
+            abort(); \
+            } \
+        } while (0)
+#else
+    #define GL_CHECK(stmt) stmt
+#endif
 
-#define GL_CHECK(stmt) do { stmt; \
-        const GLenum err = glGetError(); \
-        if (err != GL_NO_ERROR) { \
-        dmess("OpenGL error " << err << " call " << #stmt); \
-        abort(); \
-        } \
-    } while (0) \
+inline uint32_t getUint32(const char *& dataStream)
+{
+    const uint32_t ret = *(uint32_t *)dataStream; dataStream += sizeof(uint32_t);
 
-//#define GL_CHECK(stmt) stmt
+    return ret;
+}
+
+inline double getDouble(const char *& dataStream)
+{
+    const double ret = *(double *)dataStream; dataStream += sizeof(double);
+
+    return ret;
+}
 
 #endif // __WEB_ASM_PLAY_UTIL_H__

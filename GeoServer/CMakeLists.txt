@@ -18,6 +18,8 @@ include_directories(./inc)
 include_directories(../inc)
 include_directories(../ThirdParty/ctpl)
 include_directories(../ThirdParty/histogram/include)
+include_directories(../ThirdParty/opensteer/include)
+include_directories(../ThirdParty/imgui) # TODO try to remove
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GDAL_INCLUDE_DIR})
 include_directories(${EXPAT_INCLUDE_DIRS})

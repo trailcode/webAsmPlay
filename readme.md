@@ -168,7 +168,7 @@ No notes.
 * Move to a newer geos. 3.8.0Dev seems to have more functions.
 * ~~Make a third party directory.~~
 * Make a project Talent Stack Document/Panel.
-* Remove fill and outline color arguments in Renderable, RenderablePolygon, etc.
+* ~~Remove fill and outline color arguments in Renderable, RenderablePolygon, etc.~~
 * Make tessellation templated. 
 
 ### Bugs
