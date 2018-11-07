@@ -27,7 +27,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/RenderablePoint.h>
+#include <webAsmPlay/renderables/RenderablePoint.h>
 
 using namespace std;
 using namespace glm;

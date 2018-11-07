@@ -24,61 +24,60 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
-#define __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
+#ifndef __WEB_ASM_PLAY_RENDERABLE_LINE_STRING_2D_H__
+#define __WEB_ASM_PLAY_RENDERABLE_LINE_STRING_2D_H__
 
 #ifdef __EMSCRIPTEN__
-    // GLEW
+
     #define GLEW_STATIC
     #include <GL/glew.h>
 #else
-    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+    #include <GL/gl3w.h>
 #endif
 
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <webAsmPlay/Renderable.h>
+#include <webAsmPlay/renderables/Renderable.h>
 
-class DeferredRenderable : public Renderable
+namespace geos
+{
+    namespace geom
+    {
+        class LineString;
+    }
+}
+
+class RenderableLineString : public Renderable
 {
 public:
 
-    virtual ~DeferredRenderable();
+    ~RenderableLineString();
 
-    static DeferredRenderable * createFromQueued(); 
-
-    static void addQuadrangle(  const glm::vec3 & A,
-                                const glm::vec3 & B,
-                                const glm::vec3 & C,
-                                const glm::vec3 & D,
-                                const glm::vec4 & color);
-
-    static void addTriangle(const glm::vec3 & A,
-                            const glm::vec3 & B,
-                            const glm::vec3 & C,
-                            const glm::vec4 & color);
-
-    static void addLine(const glm::vec3 & A,
-                        const glm::vec3 & B,
-                        const glm::vec4 & color);
+    static Renderable * create( const geos::geom::LineString * lineString,
+                                const glm::mat4              & trans    = glm::mat4(1.0));
+    
+    static Renderable * create( const ColoredGemetryVec & lineStrings,
+                                const glm::mat4         & trans          = glm::mat4(1.0),
+                                const bool                showProgress   = false);
 
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
+    static void ensureShaders();
+
 private:
 
-    DeferredRenderable( const GLuint & vao,
-                        const GLuint & ebo,
-                        const GLuint & ebo2,
-                        const GLuint & vbo,
-                        const GLuint & numTriIndices,
-                        const GLuint & numLineIndices);
+    RenderableLineString(   const GLuint      vao,
+                            const GLuint      ebo,
+                            const GLuint      vbo,
+                            const GLuint      numElements,
+                            const bool        isMulti);
+
+    static Renderable * create( const FloatVec   & verts,
+                                const Uint32Vec  & indices,
+                                const bool         isMulti);
 
     const GLuint vao;
     const GLuint ebo;
-    const GLuint ebo2;
     const GLuint vbo;
-    const GLuint numTriIndices;
-    const GLuint numLineIndices;
+    const GLuint numElements;
 };
 
-#endif // __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
+#endif // __WEB_ASM_PLAY_RENDERABLE_LINE_STRING_2D_H__

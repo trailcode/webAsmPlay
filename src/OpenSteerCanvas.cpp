@@ -30,7 +30,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Camera.h>
-#include <webAsmPlay/DeferredRenderable.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/OpenSteerCanvas.h>
 
 using namespace std;

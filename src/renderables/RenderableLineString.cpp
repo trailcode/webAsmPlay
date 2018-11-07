@@ -27,11 +27,10 @@
 #include <chrono>
 #include <glm/gtc/type_ptr.hpp>
 #include <geos/geom/LineString.h>
-#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/RenderableLineString.h>
+#include <webAsmPlay/renderables/RenderableLineString.h>
 
 using namespace std;
 using namespace std::chrono;

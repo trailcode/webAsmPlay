@@ -24,4 +24,4 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/RenderableMesh.h>
+#include <webAsmPlay/renderables/RenderableMesh.h>

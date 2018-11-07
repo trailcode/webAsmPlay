@@ -24,52 +24,36 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__
-#define __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__
+#ifndef __WEB_ASM_PLAY_RENDERABLE_POINT_H__
+#define __WEB_ASM_PLAY_RENDERABLE_POINT_H__
 
-#include <vector>
-#include <functional>
-#include <glm/glm.hpp>
-#include <glm/mat4x4.hpp>
-#include <geos/geom/Geometry.h>
-#include <webAsmPlay/Types.h>
+#include <webAsmPlay/renderables/Renderable.h>
 
-class Shader;
-
-class Canvas;
-
-class Renderable
+class RenderablePoint : public Renderable
 {
 public:
 
-    typedef std::function<void (Renderable *)> OnDelete;
+    ~RenderablePoint();
 
-    virtual ~Renderable();
+    static Renderable * create( const glm::vec3 & pos,
+                                const glm::mat4 & trans = glm::mat4(1.0));
 
-    void render(const Canvas * canvas) const;
+    static Renderable * create( const ConstGeosGeomVec & points,
+                                const glm::mat4        & trans        = glm::mat4(1.0),
+                                const bool               showProgress = false);
 
-    virtual void render(const glm::mat4 & MVP, const glm::mat4 & MV) const = 0;
+    void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
-    static Renderable * create( const geos::geom::Geometry::Ptr & geom,
-                                const glm::mat4                 & trans = glm::mat4(1.0));
+private:
 
-    static Renderable * create( const geos::geom::Geometry  * geom,
-                                const glm::mat4             & trans = glm::mat4(1.0));
+    RenderablePoint(const GLuint vao,
+                    const GLuint ebo,
+                    const GLuint vbo,
+                    const bool   isMulti);
 
-    void addOnDeleteCallback(const OnDelete & callback);
-
-    Shader * getShader() const;
-    Shader * setShader(Shader * shader);
-
-protected:
-
-    Renderable(const bool isMulti);
-
-    std::vector<OnDelete> onDeleteCallbacks;
-
-    bool isMulti;
-
-    Shader * shader;
+    const GLuint vao;
+    const GLuint ebo;
+    const GLuint vbo;
 };
 
-#endif // __WEB_ASM_PLAY__GEOS_RENDERIABLE_H__
+#endif // __WEB_ASM_PLAY_RENDERABLE_POINT_H__

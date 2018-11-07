@@ -27,7 +27,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GeosTestCanvas.h>
-#include <webAsmPlay/Renderable.h>
+#include <webAsmPlay/renderables/Renderable.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;

@@ -24,15 +24,52 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_RENDERIABLE_MESH_H__
-#define __WEB_ASM_PLAY_RENDERIABLE_MESH_H__
+#ifndef __WEB_ASM_PLAY__GEOS_RENDERABLE_H__
+#define __WEB_ASM_PLAY__GEOS_RENDERABLE_H__
 
-#include <webAsmPlay/Renderable.h>
+#include <vector>
+#include <functional>
+#include <glm/glm.hpp>
+#include <glm/mat4x4.hpp>
+#include <geos/geom/Geometry.h>
+#include <webAsmPlay/Types.h>
 
-class RenderableMesh : public Renderable
+class Shader;
+
+class Canvas;
+
+class Renderable
 {
 public:
-private:
+
+    typedef std::function<void (Renderable *)> OnDelete;
+
+    virtual ~Renderable();
+
+    void render(const Canvas * canvas) const;
+
+    virtual void render(const glm::mat4 & MVP, const glm::mat4 & MV) const = 0;
+
+    static Renderable * create( const geos::geom::Geometry::Ptr & geom,
+                                const glm::mat4                 & trans = glm::mat4(1.0));
+
+    static Renderable * create( const geos::geom::Geometry  * geom,
+                                const glm::mat4             & trans = glm::mat4(1.0));
+
+    void addOnDeleteCallback(const OnDelete & callback);
+
+    Shader * getShader() const;
+    Shader * setShader(Shader * shader);
+
+protected:
+
+    Renderable(const bool isMulti);
+
+    std::vector<OnDelete> onDeleteCallbacks;
+
+    bool isMulti;
+
+    Shader * shader;
 };
 
-#endif // __WEB_ASM_PLAY_RENDERIABLE_MESH_H__
+#endif // __WEB_ASM_PLAY__GEOS_RENDERABLE_H__

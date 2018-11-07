@@ -33,7 +33,7 @@
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/TrackBallInteractor.h>
-#include <webAsmPlay/RenderablePoint.h>
+#include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/Canvas.h>
 

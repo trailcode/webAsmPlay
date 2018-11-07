@@ -28,7 +28,7 @@
 #include <glm/gtc/type_ptr.hpp> // value_ptr
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
-#include <webAsmPlay/DeferredRenderable.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
 
 using namespace std;
 using namespace glm;

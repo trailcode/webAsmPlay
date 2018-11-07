@@ -33,7 +33,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/RenderablePolygon.h>
+#include <webAsmPlay/renderables/RenderablePolygon.h>
 
 using namespace std;
 using namespace std::chrono;

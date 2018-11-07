@@ -24,8 +24,8 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__
-#define __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__
+#ifndef __WEB_ASM_PLAY_RENDERABLE_POLYGON2D_H__
+#define __WEB_ASM_PLAY_RENDERABLE_POLYGON2D_H__
 
 #ifdef __EMSCRIPTEN__
 
@@ -36,7 +36,7 @@
 #endif
 
 #include <vector>
-#include <webAsmPlay/Renderable.h>
+#include <webAsmPlay/renderables/Renderable.h>
 
 namespace geos
 {
@@ -113,4 +113,4 @@ private:
     const size_t    numContourLines;
 }; 
 
-#endif // __WEB_ASM_PLAY_RENDERIABLE_POLYGON2D_H__
+#endif // __WEB_ASM_PLAY_RENDERABLE_POLYGON2D_H__

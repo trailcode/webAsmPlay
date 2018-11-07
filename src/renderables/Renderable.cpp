@@ -30,9 +30,9 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ColorShader.h>
-#include <webAsmPlay/RenderableLineString.h>
-#include <webAsmPlay/RenderablePolygon.h>
-#include <webAsmPlay/Renderable.h>
+#include <webAsmPlay/renderables/RenderableLineString.h>
+#include <webAsmPlay/renderables/RenderablePolygon.h>
+#include <webAsmPlay/renderables/Renderable.h>
 
 using namespace std;
 using namespace glm;

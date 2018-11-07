@@ -64,7 +64,7 @@
 #endif // __EMSCRIPTEN__
 
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/DeferredRenderable.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
 #include "OpenSteer/Vec3.h"
 
 // To include OpenSteer::round.

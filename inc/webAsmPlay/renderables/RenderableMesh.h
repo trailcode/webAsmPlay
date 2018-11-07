@@ -24,60 +24,15 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_RENDERIABLE_LINE_STRING_2D_H__
-#define __WEB_ASM_PLAY_RENDERIABLE_LINE_STRING_2D_H__
+#ifndef __WEB_ASM_PLAY_RENDERABLE_MESH_H__
+#define __WEB_ASM_PLAY_RENDERABLE_MESH_H__
 
-#ifdef __EMSCRIPTEN__
+#include <webAsmPlay/renderables/Renderable.h>
 
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-#else
-    #include <GL/gl3w.h>
-#endif
-
-#include <webAsmPlay/Renderable.h>
-
-namespace geos
-{
-    namespace geom
-    {
-        class LineString;
-    }
-}
-
-class RenderableLineString : public Renderable
+class RenderableMesh : public Renderable
 {
 public:
-
-    ~RenderableLineString();
-
-    static Renderable * create( const geos::geom::LineString * lineString,
-                                const glm::mat4              & trans    = glm::mat4(1.0));
-    
-    static Renderable * create( const ColoredGemetryVec & lineStrings,
-                                const glm::mat4         & trans          = glm::mat4(1.0),
-                                const bool                showProgress   = false);
-
-    void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
-
-    static void ensureShaders();
-
 private:
-
-    RenderableLineString(   const GLuint      vao,
-                            const GLuint      ebo,
-                            const GLuint      vbo,
-                            const GLuint      numElements,
-                            const bool        isMulti);
-
-    static Renderable * create( const FloatVec   & verts,
-                                const Uint32Vec  & indices,
-                                const bool         isMulti);
-
-    const GLuint vao;
-    const GLuint ebo;
-    const GLuint vbo;
-    const GLuint numElements;
 };
 
-#endif // __WEB_ASM_PLAY_RENDERIABLE_LINE_STRING_2D_H__
+#endif // __WEB_ASM_PLAY_RENDERABLE_MESH_H__

@@ -27,7 +27,7 @@
 #ifndef __WEB_ASM_PLAY_GRID_PLANE_H__
 #define __WEB_ASM_PLAY_GRID_PLANE_H__
 
-#include <webAsmPlay/Renderable.h>
+#include <webAsmPlay/renderables/Renderable.h>
 
 #ifdef WORKING
 

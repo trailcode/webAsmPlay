@@ -24,36 +24,61 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_RENDERIABLE_POINT_H__
-#define __WEB_ASM_PLAY_RENDERIABLE_POINT_H__
+#ifndef __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
+#define __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
 
-#include <webAsmPlay/Renderable.h>
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+#else
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+#endif
 
-class RenderablePoint : public Renderable
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <webAsmPlay/renderables/Renderable.h>
+
+class DeferredRenderable : public Renderable
 {
 public:
 
-    ~RenderablePoint();
+    virtual ~DeferredRenderable();
 
-    static Renderable * create( const glm::vec3 & pos,
-                                const glm::mat4 & trans = glm::mat4(1.0));
+    static DeferredRenderable * createFromQueued(); 
 
-    static Renderable * create( const ConstGeosGeomVec & points,
-                                const glm::mat4        & trans        = glm::mat4(1.0),
-                                const bool               showProgress = false);
+    static void addQuadrangle(  const glm::vec3 & A,
+                                const glm::vec3 & B,
+                                const glm::vec3 & C,
+                                const glm::vec3 & D,
+                                const glm::vec4 & color);
+
+    static void addTriangle(const glm::vec3 & A,
+                            const glm::vec3 & B,
+                            const glm::vec3 & C,
+                            const glm::vec4 & color);
+
+    static void addLine(const glm::vec3 & A,
+                        const glm::vec3 & B,
+                        const glm::vec4 & color);
 
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
 private:
 
-    RenderablePoint(const GLuint vao,
-                    const GLuint ebo,
-                    const GLuint vbo,
-                    const bool   isMulti);
+    DeferredRenderable( const GLuint & vao,
+                        const GLuint & ebo,
+                        const GLuint & ebo2,
+                        const GLuint & vbo,
+                        const GLuint & numTriIndices,
+                        const GLuint & numLineIndices);
 
     const GLuint vao;
     const GLuint ebo;
+    const GLuint ebo2;
     const GLuint vbo;
+    const GLuint numTriIndices;
+    const GLuint numLineIndices;
 };
 
-#endif // __WEB_ASM_PLAY_RENDERIABLE_POINT_H__
+#endif // __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
