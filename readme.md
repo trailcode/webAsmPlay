@@ -149,9 +149,10 @@ No notes.
   is to separate linear features from features with area. The layers will be rendered to different offscreen buffers allowing for image
   processing.
   
-    * One filter to test would be setting the transparency depending on the distance from the camera.
+    * ~~One filter to test would be setting the transparency depending on the distance from the camera.~~
     * Another filter would be to set the transparency based on the density of the features of similar color local to the current screen pixel.
       This also might be a start at generalization.
+    * Transparency shader based on feature area or length.
       
 * Interpolate line string color in relation to the distance to the camera.
 
