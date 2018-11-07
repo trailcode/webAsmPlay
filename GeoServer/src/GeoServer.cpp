@@ -290,13 +290,45 @@ string GeoServer::addOsmFile(const string & osmFile)
     return osmFile;
 }
 
-void _saveData(FILE * fp, const vector<string> & data)
+namespace
 {
-    const uint32_t num = data.size();
+    void _saveData(FILE * fp, const vector<string> & data)
+    {
+        const uint32_t num = data.size();
 
-    fwrite(&num, sizeof(uint32_t), 1, fp);
+        fwrite(&num, sizeof(uint32_t), 1, fp);
 
-    for(const auto & i : data) { fwrite(i.data(), sizeof(char), i.length(), fp) ;}
+        for(const auto & i : data)
+        {
+            const uint32_t numBytes = i.length();
+
+            fwrite(&numBytes, sizeof(uint32_t), 1, fp);
+
+            fwrite(i.data(), sizeof(char), numBytes, fp);
+        }
+    }
+
+    void loadData(FILE * fp, vector<string> & data)
+    {
+        uint32_t num;
+
+        fread(&num, sizeof(uint32_t), 1, fp);
+
+        for(size_t i = 0; i < num; ++i)
+        {
+            uint32_t numBytes;
+
+            fread(&numBytes, sizeof(uint32_t), 1, fp);
+
+            data.push_back(string());
+
+            string & str = *data.rbegin();
+
+            str.resize(numBytes);
+
+            fread((char *)str.data(), sizeof(char), numBytes, fp);
+        }
+    }
 }
 
 string GeoServer::saveGeoFile(const string & fileName)
@@ -321,6 +353,20 @@ string GeoServer::saveGeoFile(const string & fileName)
 string GeoServer::_addGeoFile(const string & geoFile)
 {
     cout << "Loading: " << geoFile << endl;
+
+    FILE * fp = fopen(geoFile.c_str(), "rb");
+
+    fread(&boundsMinX, sizeof(double), 1, fp);
+    fread(&boundsMinY, sizeof(double), 1, fp);
+    fread(&boundsMaxX, sizeof(double), 1, fp);
+    fread(&boundsMaxY, sizeof(double), 1, fp);
+
+    loadData(fp, serializedPolygons);
+    loadData(fp, serializedLineStrings);
+    loadData(fp, serializedPoints);
+    loadData(fp, serializedRelations);
+
+    fclose(fp);
 
     return geoFile;
 }
@@ -411,7 +457,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
-                    for(size_t i = 0; i < numGeoms; ++i) { bufferSize += serializedPolygons[startIndex + i].length() ;}
+                    for(size_t i = 0; i < numGeoms; ++i) { bufferSize += serializedPolygons[startIndex + i].length() + sizeof(uint32_t) ;}
 
                     vector<char> data(bufferSize);
 
@@ -426,6 +472,8 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
                     for(size_t i = 0; i < numGeoms; ++i)
                     {
                         const string & geom = serializedPolygons[startIndex + i];
+
+                        *(uint32_t *)ptr = geom.length(); ptr += sizeof(uint32_t);
 
                         memcpy(ptr, geom.data(), geom.length()); 
 
@@ -449,7 +497,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
-                    for(uint i = 0; i < numGeoms; ++i) { bufferSize += serializedLineStrings[startIndex + i].length() ;}
+                    for(uint i = 0; i < numGeoms; ++i) { bufferSize += serializedLineStrings[startIndex + i].length() + sizeof(uint32_t) ;}
 
                     vector<char> data(bufferSize);
 
@@ -464,6 +512,8 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
                     for(size_t i = 0; i < numGeoms; ++i)
                     {
                         const string & geom = serializedLineStrings[startIndex + i];
+
+                        *(uint32_t *)ptr = geom.length(); ptr += sizeof(uint32_t);
 
                         memcpy(ptr, geom.data(), geom.length()); 
 

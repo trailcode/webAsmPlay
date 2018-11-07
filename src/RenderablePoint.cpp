@@ -67,6 +67,7 @@ Renderable * RenderablePoint::create(const ConstGeosGeomVec & points,
                                      const mat4             & trans,
                                      const bool               showProgress)
 {
+    abort();
     return NULL;
 }
 

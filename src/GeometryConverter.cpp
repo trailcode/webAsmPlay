@@ -184,7 +184,12 @@ vector<AttributedGeometry> GeometryConverter::getGeosPolygons(const char *& poly
 
     vector<AttributedGeometry> ret(numPolygons);
 
-    for(size_t i = 0; i < numPolygons; ++i) { ret[i] = getGeosPolygon(polys) ;}
+    for(size_t i = 0; i < numPolygons; ++i)
+    {
+        polys += sizeof(uint32_t); // Skip num bytes;
+
+        ret[i] = getGeosPolygon(polys);
+    }
 
     return ret;
 }
@@ -195,7 +200,12 @@ vector<AttributedGeometry> GeometryConverter::getGeosLineStrings(const char *& l
 
     vector<AttributedGeometry> ret(numLineStrings);
 
-    for(size_t i = 0; i < numLineStrings; ++i) { ret[i] = getGeosLineString(lineStrings) ;}
+    for(size_t i = 0; i < numLineStrings; ++i)
+    {
+        lineStrings += sizeof(uint32_t); // Skip num bytes;
+
+        ret[i] = getGeosLineString(lineStrings);
+    }
 
     return ret;
 }

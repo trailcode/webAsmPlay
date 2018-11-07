@@ -128,6 +128,7 @@ GeoClient::GeoClient(GLFWwindow * window, Canvas * canvas) : canvas(canvas)
 
     quadTreePolygons    = new Quadtree();
     quadTreeLineStrings = new Quadtree();
+    quadTreePoints      = new Quadtree();
 }
 
 GeoClient::~GeoClient()

@@ -88,8 +88,6 @@ Attributes::Attributes(const char *& attrs)
             attrs += value.length() + 1;
         }
     }
-
-    //dmess("done");
 }
 
 Attributes::Attributes(const unordered_map<string, unordered_set<string> > & multiStrsIn)
