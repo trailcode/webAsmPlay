@@ -754,6 +754,44 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
         GLuint colorID = 0;
 
+        if(attrs->hasStringKeyValue("highway", "motorway"))
+        {
+            colorID = 1;
+        }
+        else if(attrs->hasStringKeyValue("highway", "trunk"))
+        {
+            colorID = 2;
+        }
+        else if(attrs->hasStringKeyValue("highway", "primary"))
+        {
+            colorID = 3;
+        }
+        else if(attrs->hasStringKeyValue("highway", "secondary"))
+        {
+            colorID = 4;
+        }
+        else if(attrs->hasStringKeyValue("highway", "tertiary"))
+        {
+            colorID = 5;
+        }
+        else if(attrs->hasStringKeyValue("highway", "unclassified"))
+        {
+            colorID = 6;
+        }
+        else if(attrs->hasStringKeyValue("highway", "residential"))
+        {
+            colorID = 7;
+        }
+        else if(attrs->hasStringKeyValue("highway", "service"))
+        {
+            colorID = 8;
+        }
+        else if(attrs->hasStringKey("highway"))
+        {
+            colorID = 9;
+        }
+
+
         Renderable * r = Renderable::create(geom, trans);
         
         if(!r) { continue ;}
