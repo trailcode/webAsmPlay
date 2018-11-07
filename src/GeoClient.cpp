@@ -503,7 +503,7 @@ void GeoClient::loadGeoServerGeometry()
 
             auto startTime = system_clock::now();
 
-            const size_t blockSize = std::min((size_t)4096, numPoints);
+            const size_t blockSize = std::min((size_t)1024, numPoints);
 
             shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());
 
@@ -532,7 +532,7 @@ void GeoClient::loadGeoServerGeometry()
 
             auto startTime = system_clock::now();
 
-            const size_t blockSize = std::min((size_t)4096, numPolylines);
+            const size_t blockSize = std::min((size_t)1024, numPolylines);
 
             shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());
 
@@ -561,7 +561,7 @@ void GeoClient::loadGeoServerGeometry()
 
             auto startTime = system_clock::now();
 
-            const size_t blockSize = std::min((size_t)4096, numPolys);
+            const size_t blockSize = std::min((size_t)1024, numPolys);
 
             shared_ptr<vector<AttributedGeometry> > geoms(new vector<AttributedGeometry>());
 
@@ -687,40 +687,40 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     
     dmess("Start base geom...");
 
-    vector<pair<const Geometry *, const size_t> > polysAndColors; // TODO rename this
+    ColoredGemetryVec polygons;
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
         Attributes * attrs = geoms[i].first;
 
-        GLuint fc = 0;
+        GLuint colorID = 0;
 
         if( attrs->hasStringKey("addr_house") ||
             attrs->hasStringKey("addr::housenumber") ||
             attrs->hasStringKey("addr::housename") ||
             attrs->hasStringKeyValue("building", "house")) // TODO Are the ones above even doing anything?
         {
-            fc = 1;
+            colorID = 1;
         }
         else if(attrs->hasStringKey("building"))
         {
-            fc = 2;
+            colorID = 2;
         }
         else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
         {
-            fc = 3;
+            colorID = 3;
         }
         else if(attrs->hasStringKeyValue("landuse", "reservor"))
         {
-            fc = 4;
+            colorID = 4;
         }
 
-        polysAndColors.push_back(make_pair(geoms[i].second, fc));
+        polygons.push_back(make_pair(geoms[i].second, colorID));
     }
 
-    dmess("polysAndColors " << polysAndColors.size());
+    dmess("polygons " << polygons.size());
 
-    Renderable * r = RenderablePolygon::create(polysAndColors, trans, true);
+    Renderable * r = RenderablePolygon::create(polygons, trans, true);
 
     r->setShader(ColorDistanceShader2::getDefaultInstance());
 
@@ -735,7 +735,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     auto startTime = system_clock::now();
 
-    vector<const Geometry *> polylines;
+    ColoredGemetryVec polylines;
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
@@ -752,15 +752,17 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
             continue;
         }
 
+        GLuint colorID = 0;
+
         Renderable * r = Renderable::create(geom, trans);
         
-        if(!r) { dmess("!r"); continue ;}
+        if(!r) { continue ;}
         
         tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, geom, attrs);
 
         quadTreeLineStrings->insert(geom->getEnvelopeInternal(), data);
 
-        polylines.push_back(geom);
+        polylines.push_back(make_pair(geom, colorID));
     }
     
     GUI::progress("Linestring index:", 1.0);
@@ -769,7 +771,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     Renderable * r = RenderableLineString::create(polylines, trans, true);
 
-    r->setShader(ColorDistanceShader::getDefaultInstance());
+    //r->setShader(ColorDistanceShader2::getDefaultInstance());
 
     canvas->addRenderiable(r);
     

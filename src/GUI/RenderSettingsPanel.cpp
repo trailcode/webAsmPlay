@@ -24,7 +24,6 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GeosTestCanvas.h>

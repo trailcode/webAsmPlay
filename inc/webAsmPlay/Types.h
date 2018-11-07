@@ -49,6 +49,10 @@ typedef std::pair<Attributes *, geos::geom::Geometry   *> AttributedGeometry;
 typedef std::pair<Attributes *, geos::geom::LineString *> AttributedLineString;
 typedef std::pair<Attributes *, geos::geom::Point      *> AttributedPoint;
 
+typedef std::pair<const geos::geom::Geometry *, const size_t> ColoredGemetry;
+
+typedef std::vector<ColoredGemetry> ColoredGemetryVec;
+
 typedef std::vector<const geos::geom::Geometry *> ConstGeosGeomVec;
 
 typedef std::vector<float> FloatVec;

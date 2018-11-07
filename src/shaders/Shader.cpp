@@ -33,7 +33,7 @@ Shader::Shader(ShaderProgram * program) :   renderFill   (true),
                                             renderOutline(true),
                                             program      (program) {}
 
-bool Shader::getRenderFill() const { return renderFill ;}
+bool Shader::getRenderFill()    const { return renderFill    ;}
 bool Shader::getRenderOutline() const { return renderOutline ;}
 
 void Shader::enableVertexAttribArray(const GLint       size,

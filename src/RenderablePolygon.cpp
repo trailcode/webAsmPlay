@@ -229,47 +229,9 @@ Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
     return createFromTessellations(tessellationResults);
 }
 
-Renderable * RenderablePolygon::create( const ConstGeosGeomVec & polygons,
-                                        const dmat4            & trans,
-                                        const size_t             symbologyID)
-{
-    vector<const TessellationResult> tessellationResults;
-
-    for(const Geometry * geom : polygons)
-    {
-        const Polygon      * poly;
-        const MultiPolygon * multiPoly;
-
-        if((poly = dynamic_cast<const Polygon *>(geom)))
-        {
-            tessellationResults.push_back(tessellatePolygon(poly, trans, symbologyID));
-            
-            if(!tessellationResults.rbegin()->vertsOut)
-            {
-                dmess("Warning tessellation failed!");
-
-                tessellationResults.pop_back();
-            }
-
-        }
-        else if((multiPoly = dynamic_cast<const MultiPolygon *>(geom)))
-        {
-            dmess("Have a multiPoly!");
-
-            tessellateMultiPolygon(multiPoly, trans, tessellationResults, 0);
-        }
-        else
-        {
-            dmess("Warning not a polygon or multi-polygon.");
-        }
-    }
-
-    return createFromTessellations(tessellationResults);
-}
-
-Renderable * RenderablePolygon::create( const vector<pair<const Geometry *, const size_t> >  & polygons, // TODO create a typedef
-                                        const dmat4   & trans,
-                                        const bool    showProgress)
+Renderable * RenderablePolygon::create( const ColoredGemetryVec & polygons,
+                                        const dmat4             & trans,
+                                        const bool                showProgress)
 {
     time_point<system_clock> startTime;
     
@@ -426,7 +388,7 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
         shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
+        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
         glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, NULL);
     }

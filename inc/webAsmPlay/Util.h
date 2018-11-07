@@ -27,6 +27,14 @@
 #ifndef __WEB_ASM_PLAY_UTIL_H__
 #define __WEB_ASM_PLAY_UTIL_H__
 
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+#else
+    #include <GL/gl3w.h>
+#endif
+
 #include <string>
 #include <chrono>
 #include <glm/vec2.hpp>
@@ -35,6 +43,7 @@
 #include <glm/mat4x4.hpp>
 #include <OpenSteer/Vec3.h>
 #include <OpenSteer/Color.h>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <imgui.h>
 
@@ -73,5 +82,17 @@ inline void doProgress( const std::string                                    & m
         //GUI::refresh();
     }
 }
+
+void checkOpenGLError(const char * stmt, const char* fname, int line);
+
+#define GL_CHECK(stmt) do { stmt; \
+        const GLenum err = glGetError(); \
+        if (err != GL_NO_ERROR) { \
+        dmess("OpenGL error " << err << " call " << #stmt); \
+        abort(); \
+        } \
+    } while (0) \
+
+//#define GL_CHECK(stmt) stmt
 
 #endif // __WEB_ASM_PLAY_UTIL_H__

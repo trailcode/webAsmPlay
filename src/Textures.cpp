@@ -27,7 +27,7 @@
 #include <fstream>
 #include <vector>
 #include <SDL_image.h>
-#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/Textures.h>
 
 using namespace std;
@@ -98,19 +98,19 @@ GLuint Textures::load(const string & filename)
 
     GLuint texture;
 
-    glGenTextures( 1, &texture );
+    GL_CHECK(glGenTextures(1, &texture));
 
     /* Typical Texture Generation Using Data From The Bitmap */
-    glBindTexture( GL_TEXTURE_2D, texture );
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, texture));
 
     /* Generate The Texture */
-    glTexImage2D(   GL_TEXTURE_2D, 0, GL_RGBA, img->w,
-                    img->h, 0, GL_RGBA,
-                    GL_UNSIGNED_BYTE, img->pixels );
+    GL_CHECK(glTexImage2D(  GL_TEXTURE_2D, 0, GL_RGBA, img->w,
+                            img->h, 0, GL_RGBA,
+                            GL_UNSIGNED_BYTE, img->pixels));
 
     /* Linear Filtering */
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
     //SDL_FreeSurface(img);
 
@@ -149,17 +149,18 @@ GLuint Textures::loadCube(const vector<string> & files)
 
     GLuint texCube;
     
-    glGenTextures(1, &texCube);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, texCube);
+    GL_CHECK(glGenTextures(1, &texCube));
+    GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, texCube));
 
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, xpos->w, xpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, xpos->pixels);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, xneg->w, xneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, xneg->pixels);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, ypos->w, ypos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, ypos->pixels);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, yneg->w, yneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, yneg->pixels);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, zpos->w, zpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zpos->pixels);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, zneg->w, zneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zneg->pixels);
+    GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+
+    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, xpos->w, xpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, xpos->pixels));
+    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, xneg->w, xneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, xneg->pixels));
+    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, ypos->w, ypos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, ypos->pixels));
+    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, yneg->w, yneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, yneg->pixels));
+    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, zpos->w, zpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zpos->pixels));
+    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, zneg->w, zneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zneg->pixels));
     
     /*
     SDL_FreeSurface(xpos); // TODO Causes crashing. MUst not be the correct way to free memory.
@@ -177,33 +178,17 @@ GLuint Textures::create(const vec4 * values, const size_t num)
 {
     GLuint texture;
 
-    glGenTextures( 1, &texture );
+    GL_CHECK(glGenTextures(1, &texture));
 
     return set1D(texture, values, num);
 };
 
-void CheckOpenGLError(const char* stmt, const char* fname, int line)
-{
-    GLenum err = glGetError();
-    if (err != GL_NO_ERROR)
-    {
-        printf("OpenGL error %08x, at %s:%i - for %s\n", err, fname, line, stmt);
-        //abort();
-    }
-}
-
-
-    //#define GL_CHECK(stmt) do { stmt; CheckOpenGLError(#stmt, __FILE__, __LINE__); } while (0)
-    #define GL_CHECK(stmt) stmt
-
-
 GLuint Textures::set1D(const GLuint texture, const glm::vec4 * values, const size_t num)
 {
-    //GL_CHECK(glBindTexture( GL_TEXTURE_2D, texture ));
-    glBindTexture( GL_TEXTURE_2D, texture ); // TODO Why the OpenGL error?
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, texture)); // TODO Why the OpenGL error?
 
     // Generate The Texture
-    GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, num, 1, 0, GL_RGBA, GL_FLOAT, values ));
+    GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, num, 1, 0, GL_RGBA, GL_FLOAT, values));
     
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));

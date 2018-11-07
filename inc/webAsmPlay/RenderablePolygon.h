@@ -61,13 +61,9 @@ public:
                                 const glm::dmat4                & trans         = glm::dmat4(1.0),
                                 const size_t                      symbologyID   = 0);
 
-    static Renderable * create( const ConstGeosGeomVec & polygons,
-                                const glm::dmat4       & trans          = glm::dmat4(1.0),
-                                const size_t             symbologyID    = 0);
-
-    static Renderable * create( const std::vector<std::pair<const geos::geom::Geometry *, const size_t> > & polygons,
-                                const glm::dmat4                                & trans         = glm::mat4(1.0),
-                                const bool                                        showProgress = false);
+    static Renderable * create( const ColoredGemetryVec & polygons,
+                                const glm::dmat4        & trans        = glm::mat4(1.0),
+                                const bool                showProgress = false);
 
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 

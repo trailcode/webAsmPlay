@@ -58,3 +58,5 @@ wstring stringToWstring(const string& t_str)
     //use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
     return converter.from_bytes(t_str);
 }
+
+void checkOpenGLError(const char * stmt, const char* fname, int line);

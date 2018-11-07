@@ -110,9 +110,9 @@ Renderable * RenderableLineString::create(  const LineString * lineString,
                 );
 }
 
-Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineStrings,
-                                            const mat4              & trans,
-                                            const bool                showProgress)
+Renderable * RenderableLineString::create(const ColoredGemetryVec & lineStrings,
+                                          const mat4              & trans,
+                                          const bool                showProgress)
 {
     time_point<system_clock> startTime;
     
@@ -120,9 +120,10 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
 
     size_t numVerts = 0;
 
-    for(const Geometry * ls : lineStrings) { numVerts += dynamic_cast<const LineString *>(ls)->getNumPoints() ;}
+    for(const auto & ls : lineStrings) { numVerts += dynamic_cast<const LineString *>(get<0>(ls))->getNumPoints() ;}
 
-    FloatVec  verts(numVerts * 2);
+    FloatVec  verts(numVerts * 3);
+
     Uint32Vec indices; // TODO try not to push_back
 
     GLfloat * vertsPtr = &verts[0];
@@ -133,7 +134,10 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
     {
         if(showProgress) { doProgress("(3/6) Creating geometry:", i, lineStrings.size(), startTime) ;}
 
-        const vector<Coordinate> & coords = *dynamic_cast<const LineString *>(lineStrings[i])->getCoordinatesRO()->toVector();
+        const Geometry  * geom        = get<0>(lineStrings[i]);
+        const GLuint      symbologyID = get<1>(lineStrings[i]);
+
+        const vector<Coordinate> & coords = *dynamic_cast<const LineString *>(geom)->getCoordinatesRO()->toVector();
 
         if(trans == mat4(1.0))
         {
@@ -147,7 +151,9 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
 
             *vertsPtr = v.x; ++vertsPtr;
             *vertsPtr = v.y; ++vertsPtr;
-
+            
+            *vertsPtr = (float(symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
+            
             indices.push_back(index++);
 
             for(size_t i = 1; i < coords.size() - 1; ++i)
@@ -156,6 +162,8 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
 
                 *vertsPtr = v.x; ++vertsPtr;
                 *vertsPtr = v.y; ++vertsPtr;
+
+                *vertsPtr = (float(symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
 
                 indices.push_back(index);
                 indices.push_back(index);
@@ -167,6 +175,8 @@ Renderable * RenderableLineString::create(  const ConstGeosGeomVec  & lineString
 
             *vertsPtr = v.x; ++vertsPtr;
             *vertsPtr = v.y; ++vertsPtr;
+
+            *vertsPtr = (float(symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
 
             indices.push_back(index++);
         }
@@ -214,9 +224,21 @@ void RenderableLineString::render(const mat4 & MVP, const mat4 & MV) const
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    shader->enableVertexAttribArray();
+    if(!isMulti)
+    {
+        shader->enableVertexAttribArray();
 
-    if(!isMulti) { glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL) ;}
-    else         { glDrawElements(GL_LINES,      numElements, GL_UNSIGNED_INT, NULL) ;}
+        glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL);
+    }
+    else
+    {
+        shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+
+        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+
+        glDrawElements(GL_LINES,      numElements, GL_UNSIGNED_INT, NULL);
+    }
+
+    glBindVertexArray(0);
 }
 

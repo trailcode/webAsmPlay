@@ -1,10 +1,10 @@
 /**
-╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
-┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
-╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
-╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
-╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
-╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+ ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+ ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+ ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+ ╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+ ╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+ ╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
  // This software is provided 'as-is', without any express or implied
  // warranty.  In no event will the authors be held liable for any damages
  // arising from the use of this software.
@@ -29,7 +29,7 @@
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
-#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/TrackBallInteractor.h>
@@ -109,16 +109,20 @@ bool Canvas::preRender()
     {
         frameBuffer->bind();
     
-        glViewport(0,0,size.x,size.y);
+        GL_CHECK(glViewport(0, 0, size.x, size.y));
     }
+
+    //GL_CHECK(glActiveTexture(GL_TEXTURE0));
+
+    //GL_CHECK(glDisable(GL_TEXTURE_2D));
 
     if(skyBox) { skyBox->render(getCamera()->getMatrix(), getProjectionRef()) ;}
 
     else
     {
-        glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+        GL_CHECK(glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w));
 
-        glClear(GL_COLOR_BUFFER_BIT);
+        GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
     }
 
     return true;

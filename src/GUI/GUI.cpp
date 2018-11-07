@@ -50,7 +50,6 @@
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader2.h>
 #include <webAsmPlay/shaders/ColorShader.h>
@@ -478,14 +477,15 @@ void GUI::mainLoop(GLFWwindow * window)
     // Rendering
     int screenWidth, screenHeight;
     glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
-    glViewport(0, 0, screenWidth, screenHeight);
+    
+    GL_CHECK(glViewport(0, 0, screenWidth, screenHeight));
     
     static float time = 0.f;
     
     time += ImGui::GetIO().DeltaTime;
 
-    glDisable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
+    GL_CHECK(glDisable(GL_BLEND));
+    GL_CHECK(glDisable(GL_DEPTH_TEST));
  
     canvas->render();
 
@@ -516,7 +516,7 @@ void GUI::mainLoop(GLFWwindow * window)
 
     ImGui::End();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
     ImGui::Render();
 
@@ -564,7 +564,7 @@ void GUI::initOpenGL(GLFWwindow * window) // TODO, need some code refactor here
     
     glfwGetWindowSize(window, &width, &height);
 
-    glViewport(0, 0, width, height);
+    GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
 
     ColorDistanceShader2::ensureShader();
     //GridPlane  ::ensureShader();
@@ -588,7 +588,7 @@ void GUI::initOpenGL(GLFWwindow * window) // TODO, need some code refactor here
 
     client = new GeoClient(window, canvas);
 
-    client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
+    //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
 
     //GridPlane * gridPlane = new GridPlane();
 

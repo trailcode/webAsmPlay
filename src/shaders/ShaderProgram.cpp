@@ -25,25 +25,25 @@
 */
 
 #include <glm/gtc/type_ptr.hpp>
-#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 
 using namespace std;
 using namespace glm;
 
 ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
-                        const GLchar * fragmentSource,
-                        const StrVec & uniforms,
-                        const StrVec & attributes)
+                                      const GLchar * fragmentSource,
+                                      const StrVec & uniforms,
+                                      const StrVec & attributes)
 {
     return create(vertexSource, fragmentSource, NULL, uniforms, attributes);
 }
 
 ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
-                        const GLchar * fragmentSource,
-                        const GLchar * geometrySource,
-                        const StrVec & uniforms,
-                        const StrVec & attributes)
+                                      const GLchar * fragmentSource,
+                                      const GLchar * geometrySource,
+                                      const StrVec & uniforms,
+                                      const StrVec & attributes)
 {
     GLuint shaderProgram        = 0;
     GLint  vertInAttrib         = 0;
@@ -56,16 +56,18 @@ ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
 
     // Create and compile the vertex shader
     const GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexSource, NULL);
-    glCompileShader(vertexShader);
+
+    GL_CHECK(glShaderSource(vertexShader, 1, &vertexSource, NULL));
+
+    GL_CHECK(glCompileShader(vertexShader));
     
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    GL_CHECK(glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success));
 
     GLchar infoLog[512];
 
     if (!success)
     {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        GL_CHECK(glGetShaderInfoLog(vertexShader, 512, NULL, infoLog));
 
         dmess("ERROR::SHADER::VERTEX::COMPILATION_FAILED: " << infoLog);
 
@@ -74,13 +76,16 @@ ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
 
     // Create and compile the fragment shader
     const GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+
+    GL_CHECK(glShaderSource(fragmentShader, 1, &fragmentSource, NULL));
+
+    GL_CHECK(glCompileShader(fragmentShader));
+
+    GL_CHECK(glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success));
 
     if (!success)
     {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        GL_CHECK(glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog));
 
         dmess("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED: " << infoLog);
 
@@ -102,13 +107,16 @@ ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
         // WebGL does not support geometry shaders :(
 
         geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-        glShaderSource(geometryShader, 1, &geometrySource, NULL);
-        glCompileShader(geometryShader);
-        glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
+
+        GL_CHECK(glShaderSource(geometryShader, 1, &geometrySource, NULL));
+
+        GL_CHECK(glCompileShader(geometryShader));
+
+        GL_CHECK(glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success));
 
         if (!success)
         {
-            glGetShaderInfoLog(geometryShader, 512, NULL, infoLog);
+            GL_CHECK(glGetShaderInfoLog(geometryShader, 512, NULL, infoLog));
 
             dmess("ERROR::SHADER::GEOMETRY::COMPILATION_FAILED: " << infoLog);
 
@@ -120,12 +128,14 @@ ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
     // Link the vertex and fragment shader into a shader program
     shaderProgram = glCreateProgram();
 
-    glAttachShader(shaderProgram, vertexShader);
-    if(geometrySource) { glAttachShader(shaderProgram, geometryShader) ;}
-    glAttachShader(shaderProgram, fragmentShader);
+    GL_CHECK(glAttachShader(shaderProgram, vertexShader));
 
-    glLinkProgram (shaderProgram);
-    glUseProgram  (shaderProgram);
+    if(geometrySource) { GL_CHECK(glAttachShader(shaderProgram, geometryShader)) ;}
+
+    GL_CHECK(glAttachShader(shaderProgram, fragmentShader));
+
+    GL_CHECK(glLinkProgram (shaderProgram));
+    GL_CHECK(glUseProgram  (shaderProgram));
 
     // Specify the layout of the vertex data
     vertInAttrib         = glGetAttribLocation (shaderProgram, "vertIn");
@@ -146,22 +156,27 @@ ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
     for(const auto & variable : uniforms)   { uniformMap  [variable] = glGetUniformLocation(shaderProgram, variable.c_str()) ;}
     for(const auto & variable : attributes) { attributeMap[variable] = glGetAttribLocation(shaderProgram,  variable.c_str()) ;}
 
-    glEnableVertexAttribArray(vertInAttrib);
-    glVertexAttribPointer(vertInAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+    /*
+    dmess("vertInAttrib " << vertInAttrib);
 
-    glEnableVertexAttribArray(colorInAttrib);
+    GL_CHECK(glEnableVertexAttribArray(vertInAttrib));
 
-    glVertexAttribPointer(colorInAttrib, 4, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+    GL_CHECK(glVertexAttribPointer(vertInAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0));
+
+    GL_CHECK(glEnableVertexAttribArray(colorInAttrib));
+
+    GL_CHECK(glVertexAttribPointer(colorInAttrib, 4, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0));
+    */
     
-    return new ShaderProgram(  shaderProgram,
-                        vertInAttrib,
-                        colorInAttrib,
-                        colorsInUniform,
-                        MVP_In_Uniform,
-                        colorUniform,
-                        textureCoordsUniform,
-                        uniformMap,
-                        attributeMap);
+    return new ShaderProgram(shaderProgram,
+                             vertInAttrib,
+                             colorInAttrib,
+                             colorsInUniform,
+                             MVP_In_Uniform,
+                             colorUniform,
+                             textureCoordsUniform,
+                             uniformMap,
+                             attributeMap);
 }
 
 ShaderProgram::ShaderProgram(   const GLuint                         shaderProgram,
@@ -191,7 +206,7 @@ ShaderProgram::~ShaderProgram()
 
 void ShaderProgram::bind(const mat4 & MVP, const mat4 & MV)
 {
-    glUseProgram(shaderProgram);
+    GL_CHECK(glUseProgram(shaderProgram));
 
     setUniform(MVP_In_Uniform, MVP);
 }
@@ -200,38 +215,40 @@ GLuint ShaderProgram::getProgramHandle() const { return shaderProgram ;}
 
 vec4 ShaderProgram::setColor(const vec4 & color)
 {
-    glUniform4f(colorUniform, color.x, color.y, color.z, color.w);
+    GL_CHECK(glUniform4f(colorUniform, color.x, color.y, color.z, color.w));
 
     return color;
 }
 
-void ShaderProgram::enableVertexAttribArray(   const GLint       size,
-                                        const GLenum      type,
-                                        const GLboolean   normalized,
-                                        const GLsizei     stride,
-                                        const GLvoid    * pointer)
+void ShaderProgram::enableVertexAttribArray(const GLint       size,
+                                            const GLenum      type,
+                                            const GLboolean   normalized,
+                                            const GLsizei     stride,
+                                            const GLvoid    * pointer)
 {
     // Specify the layout of the vertex data
-    glEnableVertexAttribArray(vertInAttrib);
+    GL_CHECK(glEnableVertexAttribArray(vertInAttrib));
 
-    glVertexAttribPointer(vertInAttrib, size, type, normalized, stride, pointer);
+    GL_CHECK(glVertexAttribPointer(vertInAttrib, size, type, normalized, stride, pointer));
 }
 
-void ShaderProgram::enableColorAttribArray(    const GLint       size,
-                                        const GLenum      type,
-                                        const GLboolean   normalized,
-                                        const GLsizei     stride,
-                                        const GLvoid    * pointer)
+void ShaderProgram::enableColorAttribArray( const GLint       size,
+                                            const GLenum      type,
+                                            const GLboolean   normalized,
+                                            const GLsizei     stride,
+                                            const GLvoid    * pointer)
 {
-    // Specify the layout of the vertex data
-    glEnableVertexAttribArray(colorInAttrib);
+    if(colorInAttrib == -1) { return ;}
 
-    glVertexAttribPointer(colorInAttrib, size, type, normalized, stride, pointer);
+    // Specify the layout of the vertex data
+    GL_CHECK(glEnableVertexAttribArray(colorInAttrib));
+
+    GL_CHECK(glVertexAttribPointer(colorInAttrib, size, type, normalized, stride, pointer));
 }
 
 GLuint ShaderProgram::setTexture1Slot(const GLuint slot) const
 {
-    glUniform1i(textureCoordsUniform, slot);
+    GL_CHECK(glUniform1i(textureCoordsUniform, slot));
 
     return slot;
 }
@@ -264,7 +281,7 @@ GLint ShaderProgram::getAttributeLoc(const string & name) const
     return i->second;
 }
 
-void ShaderProgram::setUniform (const GLint location, const mat4   & value) const { glUniformMatrix4fv(location, 1, false, value_ptr(value)) ;}
-void ShaderProgram::setUniform (const GLint location, const vec4   & value) const { glUniform4fv      (location, 1,        value_ptr(value)) ;}
-void ShaderProgram::setUniform (const GLint location, const float  & value) const { glUniform1f       (location,                     value)  ;}
-void ShaderProgram::setUniformi(const GLint location, const GLuint & value) const { glUniform1i       (location,                     value)  ;}
+void ShaderProgram::setUniform (const GLint location, const mat4   & value) const { GL_CHECK(glUniformMatrix4fv(location, 1, false, value_ptr(value))) ;}
+void ShaderProgram::setUniform (const GLint location, const vec4   & value) const { GL_CHECK(glUniform4fv      (location, 1,        value_ptr(value))) ;}
+void ShaderProgram::setUniform (const GLint location, const float  & value) const { GL_CHECK(glUniform1f       (location,                     value))  ;}
+void ShaderProgram::setUniformi(const GLint location, const GLuint & value) const { GL_CHECK(glUniform1i       (location,                     value))  ;}

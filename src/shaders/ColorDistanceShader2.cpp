@@ -150,12 +150,12 @@ void ColorDistanceShader2::bind(const mat4 & MVP, const mat4 & MV, const bool is
     {
         Textures::set1D(colorTexture, colors, 32);
 
-        colorTextureDirty =false;
+        colorTextureDirty = false;
     }
 
-    glActiveTexture(GL_TEXTURE0);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, colorTexture);
+    GL_CHECK(glActiveTexture(GL_TEXTURE0));
+
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorTexture));
 
     shaderProgram->bind(MVP, MV);
 
@@ -201,6 +201,8 @@ void ColorDistanceShader2::loadState(const JSONObject & dataStore)
 
         setVec4(stringToWstring(buf), colors[i]);
     }
+
+    colorTextureDirty = true;
 }
 
 void ColorDistanceShader2::saveState(JSONObject & dataStore)

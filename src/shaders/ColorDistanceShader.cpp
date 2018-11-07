@@ -26,7 +26,7 @@
 */
 
 #include <glm/gtc/type_ptr.hpp>
-#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
@@ -145,8 +145,8 @@ void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV, const bool isO
     programInstance->setUniform(minDistUniform,        minDist);
     programInstance->setUniform(maxDistUniform,        maxDist);
 
-    glEnable   (GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    GL_CHECK(glEnable   (GL_BLEND)); // TODO remove these calls
+    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 }
 
 vec4 ColorDistanceShader::setMinColor(const vec4 & _minColor) { return minColor = _minColor ;}

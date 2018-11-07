@@ -26,7 +26,7 @@
 #include <vector>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp> // value_ptr
-#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/DeferredRenderable.h>
 
@@ -39,13 +39,13 @@ namespace
     vector<GLuint>  triangleIndices;
     vector<GLuint>  lineIndices;
 
-    inline void addTriangle(const vec3    & A,
-                            const vec3    & B,
-                            const vec3    & C,
-                            const vec4    & color,
-                            size_t        & startIndex,
-                            GLfloat      *& vertsAndColorPtr,
-                            GLuint       *& triangleIndicesPtr)
+    inline void addTriangle(const vec3  & A,
+                            const vec3  & B,
+                            const vec3  & C,
+                            const vec4  & color,
+                            size_t      & startIndex,
+                            GLfloat    *& vertsAndColorPtr,
+                            GLuint     *& triangleIndicesPtr)
     {
         memcpy(vertsAndColorPtr, value_ptr(A), sizeof(GLfloat) * 3); vertsAndColorPtr += 3;
         memcpy(vertsAndColorPtr, value_ptr(B), sizeof(GLfloat) * 3); vertsAndColorPtr += 3;
@@ -66,22 +66,22 @@ DeferredRenderable * DeferredRenderable::createFromQueued()
     GLuint ebo2 = 0;
     GLuint vbo  = 0;
     
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    GL_CHECK(glGenVertexArrays(1, &vao));
+    GL_CHECK(glBindVertexArray(vao));
 
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
-    glGenBuffers(1, &ebo2);
+    GL_CHECK(glGenBuffers(1, &vbo));
+    GL_CHECK(glGenBuffers(1, &ebo));
+    GL_CHECK(glGenBuffers(1, &ebo2));
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
 
-    glBufferData(GL_ARRAY_BUFFER, vertsAndColor.size() * sizeof(GLfloat), &vertsAndColor[0], GL_STATIC_DRAW);
+    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, vertsAndColor.size() * sizeof(GLfloat), &vertsAndColor[0], GL_STATIC_DRAW));
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * triangleIndices.size(), &triangleIndices[0], GL_STATIC_DRAW);
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * triangleIndices.size(), &triangleIndices[0], GL_STATIC_DRAW));
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW);
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
 
     DeferredRenderable * ret = new DeferredRenderable(vao, ebo, ebo2, vbo, triangleIndices.size(), lineIndices.size());
 
@@ -110,10 +110,10 @@ DeferredRenderable::DeferredRenderable( const GLuint & vao,
 
 DeferredRenderable::~DeferredRenderable()
 {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers     (1, &vbo);
-    glDeleteBuffers     (1, &ebo);
-    glDeleteBuffers     (1, &ebo2);
+    GL_CHECK(glDeleteVertexArrays(1, &vao));
+    GL_CHECK(glDeleteBuffers     (1, &vbo));
+    GL_CHECK(glDeleteBuffers     (1, &ebo));
+    GL_CHECK(glDeleteBuffers     (1, &ebo2));
 }
 
 namespace
@@ -219,10 +219,10 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
 
 void DeferredRenderable::render(const mat4 & MVP, const mat4 & MV) const
 {
-    glBindVertexArray(vao);
+    GL_CHECK(glBindVertexArray(vao));
     
-    glBindBuffer(GL_ARRAY_BUFFER,         vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
 
     const mat4 _MVP = glm::rotate(MVP, radians(90.0f), vec3(1, 0, 0)); // TODO might not be correct, might need to define model first!
 
@@ -233,9 +233,9 @@ void DeferredRenderable::render(const mat4 & MVP, const mat4 & MV) const
 
     ColorVertexShader::getInstance()->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
 
-    glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL);
+    GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
 
-    glDrawElements(GL_LINES, numLineIndices, GL_UNSIGNED_INT, NULL);
+    GL_CHECK(glDrawElements(GL_LINES, numLineIndices, GL_UNSIGNED_INT, NULL));
 }
