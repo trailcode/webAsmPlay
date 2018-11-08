@@ -51,22 +51,30 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
         numVerts               += tess->numVerts;
         numTriangles           += tess->numTriangles;
         numCounterVertIndices  += tess->counterVertIndices.size();
-        numlineIndices         += tess->lineIndices.size();
+
+        if(IS_3D)
+        {
+            numlineIndices         += tess->lineIndices.size() * 3;
+        }
+        else
+        {
+            numlineIndices         += tess->lineIndices.size();
+        }
     }
 
     FloatVec verts;
 
-    if(IS_3D) { verts.resize(numVerts * (3 + 1)) ;}
+    if(IS_3D) { verts.resize(numVerts * 3 * (3 + 1)) ;}
     else      { verts.resize(numVerts * (2 + 1)) ;}
 
     Uint32Vec triangleIndices      (numTriangles * 3);
     Uint32Vec counterVertIndices   (numCounterVertIndices);
-    Uint32Vec lineIndices  (numlineIndices);
+    Uint32Vec lineIndices          (numlineIndices);
 
     GLfloat * vertsPtr               = &verts[0];
     GLuint  * triangleIndicesPtr     = &triangleIndices[0];
     GLuint  * counterVertIndicesPtr  = &counterVertIndices[0];
-    GLuint  * counterVertIndicesPtr2 = &lineIndices[0];
+    GLuint  * lineIndicesPtr         = &lineIndices[0];
 
     size_t offset = 0;
 
@@ -75,6 +83,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
         const auto & tess = tessellations[i];
 
         const float symbologyID_value = (float(tess->symbologyID * 4) + 0.5) / 32.0;
+
+        const size_t startIndex = *counterVertIndicesPtr;
 
         for(size_t j = 0; j < tess->numVerts; ++j)
         {
@@ -90,9 +100,35 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         for(size_t j = 0; j < tess->counterVertIndices.size(); ++j, ++counterVertIndicesPtr) { *counterVertIndicesPtr = tess->counterVertIndices[j] + offset ;}
 
-        for(size_t j = 0; j < tess->lineIndices.size(); ++j, ++counterVertIndicesPtr2) { *counterVertIndicesPtr2 = tess->lineIndices[j] + offset ;}
+        for(size_t j = 0; j < tess->lineIndices.size(); ++j, ++lineIndicesPtr) { *lineIndicesPtr = tess->lineIndices[j] + offset ;}
 
         offset += tess->numVerts;
+
+        if(IS_3D)
+        {
+            for(size_t j = 0; j < tess->numVerts; ++j)
+            {
+                //*lineIndicesPtr = startIndex + j; ++lineIndicesPtr;
+                //*lineIndicesPtr = startIndex + j + 1; ++lineIndicesPtr;
+
+                *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+                //*lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+
+                append(vertsPtr, tess->vertsOut[j * 2 + 0]);
+                append(vertsPtr, tess->vertsOut[j * 2 + 1]);
+                append(vertsPtr, 0);
+                append(vertsPtr, symbologyID_value);
+
+                *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+
+                append(vertsPtr, tess->vertsOut[j * 2 + 0]);
+                append(vertsPtr, tess->vertsOut[j * 2 + 1]);
+                append(vertsPtr, tess->height);
+                append(vertsPtr, symbologyID_value);
+            }
+
+            offset += tess->numVerts * 2;
+        }
     }
 
     GLuint vao  = 0;
