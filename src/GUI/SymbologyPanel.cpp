@@ -28,7 +28,6 @@
 #include <glm/gtc/type_ptr.hpp> // value_ptr
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorDistanceShader2.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -43,7 +42,7 @@ namespace
     // 3 - grass
     void addSymbologyColorControls(const size_t colorIndex, const string & name, vec4 * colors)
     {
-        ColorDistanceShader2 * shader = ColorDistanceShader2::getDefaultInstance();
+        ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
 
         const ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoInputs;
 
@@ -90,28 +89,12 @@ void GUI::symbologyPanel()
 
     if (ImGui::CollapsingHeader("Linear Features", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
-
-        static float minDist = shader->getMinDist();
-        static float maxDist = shader->getMaxDist();
         
-        static ImVec4 minColor = __(shader->getMinColor());
-        static ImVec4 maxColor = __(shader->getMaxColor());
-
-        if(ImGui::ColorEdit4("Min", (float*)&minColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
-        {
-            shader->setMinColor(__(minColor));
-        }
-
-        if(ImGui::ColorEdit4("Max", (float*)&maxColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
-        {
-            shader->setMaxColor(__(maxColor));
-        }
     }
 
     if (ImGui::CollapsingHeader("Polygonal features", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ColorDistanceShader2 * shader = ColorDistanceShader2::getDefaultInstance();
+        ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
 
         addSymbologyColorControls(0, "Default",  &shader->getColorRef(0 * 4 + 0));
         addSymbologyColorControls(1, "House",    &shader->getColorRef(1 * 4 + 0));

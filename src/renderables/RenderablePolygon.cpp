@@ -68,11 +68,11 @@ RenderablePolygon::~RenderablePolygon()
     GL_CHECK(glDeleteBuffers     (1, &ebo2));
 }
 
-RenderablePolygon::TessellationResult RenderablePolygon::tessellatePolygon( const Polygon * poly,
-                                                                            const dmat4   & trans,
-                                                                            const size_t    symbologyID)
+Tessellation RenderablePolygon::tessellatePolygon(  const Polygon * poly,
+                                                    const dmat4   & trans,
+                                                    const size_t    symbologyID)
 {
-    TessellationResult ret;
+    Tessellation ret;
 
     ret.symbologyID = symbologyID;
 
@@ -188,20 +188,20 @@ RenderablePolygon::TessellationResult RenderablePolygon::tessellatePolygon( cons
 
 void RenderablePolygon::tessellateMultiPolygon( const MultiPolygon  * multiPoly,
                                                 const dmat4         & trans,
-                                                Tessellations       & tessellationResults,
+                                                Tessellations       & tessellations,
                                                 const size_t          symbologyID)
 {
     for(size_t i = 0; i < multiPoly->getNumGeometries(); ++i)
     {
         const Polygon * poly = dynamic_cast<const Polygon *>(multiPoly->getGeometryN(i));
 
-        tessellationResults.push_back(tessellatePolygon(poly, trans, symbologyID));
+        tessellations.push_back(tessellatePolygon(poly, trans, symbologyID));
             
-        if(!tessellationResults.rbegin()->vertsOut)
+        if(!tessellations.rbegin()->vertsOut)
         {
             dmess("Warning tessellation failed!");
 
-            tessellationResults.pop_back();
+            tessellations.pop_back();
         }
     }
 }
@@ -210,25 +210,25 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
                                         const dmat4   & trans,
                                         const size_t    symbologyID)
 {
-    const TessellationResult tess = tessellatePolygon(poly, trans, symbologyID);
+    const Tessellation tess = tessellatePolygon(poly, trans, symbologyID);
 
     if(!tess.vertsOut) { return NULL ;}
 
-    return createFromTessellations(vector<const TessellationResult>({tess}));
+    return createFromTessellations(vector<const Tessellation>({tess}));
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
                                         const dmat4         & trans,
                                         const size_t          symbologyID)
 {
-    vector<const TessellationResult> tessellationResults;
+    vector<const Tessellation> tessellations;
 
-    tessellateMultiPolygon(multiPoly, trans, tessellationResults, symbologyID);
+    tessellateMultiPolygon(multiPoly, trans, tessellations, symbologyID);
 
-    return createFromTessellations(tessellationResults);
+    return createFromTessellations(tessellations);
 }
 
-Renderable * RenderablePolygon::create( const ColoredGemetryVec & polygons,
+Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
                                         const dmat4             & trans,
                                         const bool                showProgress)
 {
@@ -236,7 +236,7 @@ Renderable * RenderablePolygon::create( const ColoredGemetryVec & polygons,
     
     if(showProgress) { startTime = system_clock::now() ;}
 
-    vector<const TessellationResult> tessellationResults;
+    vector<const Tessellation> tessellations;
 
     for(size_t i = 0; i < polygons.size(); ++i)
     {
@@ -250,20 +250,20 @@ Renderable * RenderablePolygon::create( const ColoredGemetryVec & polygons,
 
         if((poly = dynamic_cast<const Polygon *>(geom)))
         {
-            tessellationResults.push_back(tessellatePolygon(poly, trans, symbologyID));
+            tessellations.push_back(tessellatePolygon(poly, trans, symbologyID));
             
-            if(!tessellationResults.rbegin()->vertsOut)
+            if(!tessellations.rbegin()->vertsOut)
             {
                 dmess("Warning tessellation failed!");
 
-                tessellationResults.pop_back();
+                tessellations.pop_back();
             }
         }
         else if((multiPoly = dynamic_cast<const MultiPolygon *>(geom)))
         {
             dmess("Have a multiPoly!");
 
-            //tesselateMultiPolygon(multiPoly, trans, tessellationResults);
+            //tesselateMultiPolygon(multiPoly, trans, tessellations);
             abort();
         }
         else
@@ -273,7 +273,7 @@ Renderable * RenderablePolygon::create( const ColoredGemetryVec & polygons,
         }
     }
 
-    Renderable * ret = createFromTessellations(tessellationResults);
+    Renderable * ret = createFromTessellations(tessellations);
 
     if(showProgress) { GUI::progress("", 1.0) ;}
 
@@ -289,7 +289,7 @@ Renderable * RenderablePolygon::createFromTessellations(const Tessellations & te
     size_t numCounterVertIndices    = 0;
     size_t numCounterVertIndices2   = 0;
 
-    for(const TessellationResult & tess : tessellations)
+    for(const Tessellation & tess : tessellations)
     {
         numVerts                += tess.numVerts;
         numTriangles            += tess.numTriangles;
@@ -314,7 +314,7 @@ Renderable * RenderablePolygon::createFromTessellations(const Tessellations & te
 
     for(size_t i = 0; i < tessellations.size(); ++i)
     {
-        const TessellationResult & tess = tessellations[i];
+        const Tessellation & tess = tessellations[i];
 
         for(size_t j = 0; j < tess.numVerts; ++j)
         {

@@ -27,12 +27,30 @@
 #ifndef __WEB_ASM_PLAY_RENDERABLE_MESH_H__
 #define __WEB_ASM_PLAY_RENDERABLE_MESH_H__
 
+#include <webAsmPlay/Tessellation.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
 class RenderableMesh : public Renderable
 {
 public:
+
+    ~RenderableMesh();
+
+    static Renderable * create( const ColoredExtrudedGeometryVec & geoms,
+                                const glm::dmat4                 & trans        = glm::mat4(1.0),
+                                const bool                         showProgress = false);
+
+    void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
+
 private:
+
+    RenderableMesh( const GLuint      vao,
+                    const GLuint      ebo,
+                    const GLuint      ebo2,
+                    const GLuint      vbo,
+                    const int         numTriangles,
+                    const Uint32Vec & counterVertIndices,
+                    const size_t      numContourLines);
 };
 
 #endif // __WEB_ASM_PLAY_RENDERABLE_MESH_H__

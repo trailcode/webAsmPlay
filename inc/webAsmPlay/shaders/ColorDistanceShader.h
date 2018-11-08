@@ -29,40 +29,35 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
+#include <JSON.h>
 #include <webAsmPlay/shaders/Shader.h>
 
 class ColorDistanceShader : public Shader
 {
 public:
 
-    ColorDistanceShader();
-    ~ColorDistanceShader() {}
+    static ColorDistanceShader * getDefaultInstance();
 
     static void ensureShader();
 
-    static ColorDistanceShader * getDefaultInstance();
-
     void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
 
-    glm::vec4 setMinColor(const glm::vec4 & minColor);
-    glm::vec4 setMaxColor(const glm::vec4 & maxColor);
+    glm::vec4 setColor(const size_t index, const glm::vec4 & color);
+    glm::vec4 getColor(const size_t index);
+    glm::vec4 & getColorRef(const size_t index);
 
-    glm::vec4 getMinColor();
-    glm::vec4 getMaxColor();
+    void loadState(const JSONObject & dataStore);
 
-    float setMinDist(const float & value);
-    float setMaxDist(const float & value);
+    void saveState(JSONObject & dataStore);
 
-    float getMinDist();
-    float getMaxDist();
+    ColorDistanceShader();
+    ~ColorDistanceShader();
 
 private:
 
-    glm::vec4 minColor;
-    glm::vec4 maxColor;
+    glm::vec4 colors[32];
 
-    float minDist;
-    float maxDist;
+    bool colorTextureDirty;
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__

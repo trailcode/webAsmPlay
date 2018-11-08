@@ -27,9 +27,29 @@
 #ifndef __WEB_ASM_PLAY_TESSELLATION_H__
 #define __WEB_ASM_PLAY_TESSELLATION_H__
 
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+#else
+    #include <GL/gl3w.h>
+#endif
+
+#include <webAsmPlay/Types.h>
+
 class Tessellation
 {
 public:
+
+    double  * vertsOut          = NULL;
+    int     * triangleIndices   = NULL;
+    int       numVerts          = 0;
+    int       numTriangles      = 0;
+
+    Uint32Vec counterVertIndices;
+    Uint32Vec counterVertIndices2;
+
+    GLuint symbologyID;
 
 };
 

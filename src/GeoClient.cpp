@@ -50,7 +50,6 @@
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorDistanceShader2.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -687,7 +686,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     
     dmess("Start base geom...");
 
-    ColoredGemetryVec polygons;
+    ColoredGeometryVec polygons;
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
@@ -722,7 +721,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     Renderable * r = RenderablePolygon::create(polygons, trans, true);
 
-    r->setShader(ColorDistanceShader2::getDefaultInstance());
+    r->setShader(ColorDistanceShader::getDefaultInstance());
 
     canvas->addRenderiable(r);
     
@@ -735,7 +734,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     auto startTime = system_clock::now();
 
-    ColoredGemetryVec polylines;
+    ColoredGeometryVec polylines;
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
@@ -801,7 +800,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     Renderable * r = RenderableLineString::create(polylines, trans, true);
 
-    r->setShader(ColorDistanceShader2::getDefaultInstance());
+    r->setShader(ColorDistanceShader::getDefaultInstance());
 
     canvas->addRenderiable(r);
     

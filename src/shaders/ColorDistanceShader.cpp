@@ -1,4 +1,3 @@
-
 /**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
@@ -27,46 +26,49 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/Types.h>
+#include <webAsmPlay/Textures.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 
+using namespace std;
 using namespace glm;
 
 namespace
 {
-    ShaderProgram * programInstance = NULL;
+    ShaderProgram * shaderProgram = NULL;
 
     ColorDistanceShader * defaultInstance = NULL;
 
-    GLint MV_Uniform            = -1;
-    GLint minVertexColorUniform = -1;
-    GLint maxVertexColorUniform = -1;
-    GLint minDistUniform        = -1;
-    GLint maxDistUniform        = -1;
+    GLint colorsInLoc = -1;
+
+    GLint colorLookupOffsetLoc = -1;
+
+    GLint MV_Uniform = -1;
+
+    GLuint texUniform = -1;
+
+    GLuint colorTexture = 0;
+
+    glm::vec4 initalColors[32];
 }
 
 void ColorDistanceShader::ensureShader()
 {
-    dmess("ColorDistanceShader::ensureShader");
-
     // Shader sources
-    const GLchar* vertexSource = R"glsl(#version 330 core
-        
-        in vec2 vertIn;
-        
-        uniform mat4  MVP;
-        uniform mat4  MV;
-        uniform vec4  minVertexColorIn;
-        uniform vec4  maxVertexColorIn;
-        uniform float minDistIn;
-        uniform float maxDistIn;
+    const GLchar* vertexSource = R"glsl(#version 150 core
+        uniform sampler2D tex;
 
-        out vec4  minVertexColor;
-        out vec4  maxVertexColor;
-        out float minDist;
-        out float maxDist;
-        out vec4  position_in_view_space;
+        in vec2 vertIn;
+        in float vertColorIn;
+        
+        uniform mat4 MVP;
+        uniform mat4 MV;
+        uniform float colorLookupOffset;
+        
+        out vec4 vertexColorNear;
+        out vec4 vertexColorFar;
+        out vec4 position_in_view_space;
 
         void main()
         {
@@ -76,26 +78,23 @@ void ColorDistanceShader::ensureShader()
 
             gl_Position = MVP * vert;
 
-            minVertexColor = minVertexColorIn;
-            maxVertexColor = maxVertexColorIn;
-
-            minDist = minDistIn;
-            maxDist = maxDistIn;
+            vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
+            vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
         }
     )glsl";
 
-    const GLchar* fragmentSource = R"glsl(#version 330 core
-        
-        in vec4  minVertexColor;
-        in vec4  maxVertexColor;
-        in float minDist;
-        in float maxDist;
-        in vec4  position_in_view_space;
+    const GLchar* fragmentSource = R"glsl(#version 150 core
+        in vec4 vertexColorNear;
+        in vec4 vertexColorFar;
+        in vec4 position_in_view_space;
 
         out vec4 outColor;
 
         void main()
         {
+            float minDist = 0.0;
+            float maxDist = 5.0;
+
             // computes the distance between the fragment position 
             // and the origin (4th coordinate should always be 1 
             // for points). The origin in view space is actually 
@@ -104,59 +103,114 @@ void ColorDistanceShader::ensureShader()
             
             dist = min(maxDist, dist) / maxDist;
 
-            outColor = minVertexColor * (1.0f - dist) + maxVertexColor * dist;
+            outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
         }
     )glsl";
 
-    programInstance = ShaderProgram::create(vertexSource,
-                                            fragmentSource,
-                                            StrVec({"MV",
-                                                    "minVertexColorIn",
-                                                    "maxVertexColorIn",
-                                                    "minDistIn",
-                                                    "maxDistIn"}));
+    colorTexture = Textures::create(initalColors, 32);
 
-    MV_Uniform            = programInstance->getUniformLoc("MV");
-    minVertexColorUniform = programInstance->getUniformLoc("minVertexColorIn");
-    maxVertexColorUniform = programInstance->getUniformLoc("maxVertexColorIn");
-    minDistUniform        = programInstance->getUniformLoc("minDistIn");
-    maxDistUniform        = programInstance->getUniformLoc("maxDistIn");
+    shaderProgram = ShaderProgram::create(  vertexSource,
+                                            fragmentSource,
+                                            StrVec({"MV", "colorsIn", "tex", "colorLookupOffset"}));
+
+    colorLookupOffsetLoc = shaderProgram->getUniformLoc("colorLookupOffset");
+
+    MV_Uniform  = shaderProgram->getUniformLoc("MV");
+
+    colorsInLoc = shaderProgram->getUniformLoc("colorsIn");
+
+    texUniform = shaderProgram->getUniformLoc("tex");
 
     defaultInstance = new ColorDistanceShader();
 }
 
-ColorDistanceShader * ColorDistanceShader::getDefaultInstance() { return defaultInstance ;}
-
-ColorDistanceShader::ColorDistanceShader() : Shader  (programInstance),
-                                             minColor(1,0,0,1),
-                                             maxColor(0,1,0,1),
-                                             minDist (0),
-                                             maxDist (30)
+ColorDistanceShader::ColorDistanceShader() : Shader(shaderProgram)
 {
+    colors[0] = vec4(1,0,0,1);
+    colors[1] = vec4(1,1,0,1);
+    colors[2] = vec4(1,0,1,1);
+    colors[3] = vec4(0,1,0,1);
+    colors[4] = vec4(0,1,1,1);
+    colors[5] = vec4(0,0,1,1);
+    colors[6] = vec4(1,0,0,1);
+    colors[7] = vec4(1,0,0,1);
 }
+
+ColorDistanceShader::~ColorDistanceShader()
+{
+
+}
+
+ColorDistanceShader * ColorDistanceShader::getDefaultInstance() { return defaultInstance ;}
 
 void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
 {
-    programInstance->ShaderProgram::bind(MVP, MV);
+    if(colorTextureDirty)
+    {
+        Textures::set1D(colorTexture, colors, 32);
 
-    programInstance->setUniform(MV_Uniform,            MV);
-    programInstance->setUniform(minVertexColorUniform, minColor);
-    programInstance->setUniform(maxVertexColorUniform, maxColor);
-    programInstance->setUniform(minDistUniform,        minDist);
-    programInstance->setUniform(maxDistUniform,        maxDist);
+        colorTextureDirty = false;
+    }
 
-    GL_CHECK(glEnable   (GL_BLEND)); // TODO remove these calls
-    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    GL_CHECK(glActiveTexture(GL_TEXTURE0));
+
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorTexture));
+
+    shaderProgram->bind(MVP, MV);
+
+    shaderProgram->setUniform(MV_Uniform, MV);
+
+    shaderProgram->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+
+    shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
+
+    shaderProgram->setUniformi(texUniform, 0);
+
+    if(isOutline) { shaderProgram->setUniform(colorLookupOffsetLoc, 2.0f) ;}
+    else          { shaderProgram->setUniform(colorLookupOffsetLoc, 0.0f) ;}
 }
 
-vec4 ColorDistanceShader::setMinColor(const vec4 & _minColor) { return minColor = _minColor ;}
-vec4 ColorDistanceShader::setMaxColor(const vec4 & _maxColor) { return maxColor = _maxColor ;}
+vec4 ColorDistanceShader::setColor(const size_t index, const vec4 & color)
+{
+    colorTextureDirty = true;
 
-vec4 ColorDistanceShader::getMinColor() { return minColor ;}
-vec4 ColorDistanceShader::getMaxColor() { return maxColor ;}
+    return colors[index] = color;
+}
 
-float ColorDistanceShader::setMinDist(const float & value) { return minDist = value ;}
-float ColorDistanceShader::setMaxDist(const float & value) { return maxDist = value ;}
+vec4 ColorDistanceShader::getColor(const size_t index) { return colors[index] ;}
 
-float ColorDistanceShader::getMinDist() { return minDist ;}
-float ColorDistanceShader::getMaxDist() { return maxDist ;}
+vec4 & ColorDistanceShader::getColorRef(const size_t index) { return colors[index] ;}
+
+void ColorDistanceShader::loadState(const JSONObject & dataStore)
+{
+    auto setVec4 = [&dataStore](const wstring & key, vec4 & color)->void
+    {
+        JSONObject::const_iterator i = dataStore.find(key);
+
+        if(i != dataStore.end()) { color = i->second->AsVec4() ;}
+    };
+
+    char buf[1024];
+
+    for(size_t i = 0; i < 32; ++i)
+    {
+        sprintf(buf, "attributeColor_%i", (int)i);
+
+        setVec4(stringToWstring(buf), colors[i]);
+    }
+
+    colorTextureDirty = true;
+}
+
+void ColorDistanceShader::saveState(JSONObject & dataStore)
+{
+    char buf[1024];
+
+    for(size_t i = 0; i < 32; ++i)
+    {
+        sprintf(buf, "attributeColor_%i", (int)i);
+
+        dataStore[stringToWstring(buf)] = new JSONValue(colors[i]);
+    }
+}
+

@@ -109,7 +109,7 @@ Renderable * RenderableLineString::create(  const LineString * lineString,
                 );
 }
 
-Renderable * RenderableLineString::create(const ColoredGemetryVec & lineStrings,
+Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings,
                                           const mat4              & trans,
                                           const bool                showProgress)
 {

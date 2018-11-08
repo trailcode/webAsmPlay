@@ -27,16 +27,12 @@
 #ifndef __WEB_ASM_PLAY_UTIL_H__
 #define __WEB_ASM_PLAY_UTIL_H__
 
-#ifdef OPENGL_CALL_CHECKING
-
-    #ifdef __EMSCRIPTEN__
-        // GLEW
-        #define GLEW_STATIC
-        #include <GL/glew.h>
-    #else
-        #include <GL/gl3w.h>
-    #endif
-
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+#else
+    #include <GL/gl3w.h>
 #endif
 
 #include <string>

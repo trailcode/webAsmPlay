@@ -36,6 +36,7 @@
 #endif
 
 #include <vector>
+#include <webAsmPlay/Tessellation.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
 namespace geos
@@ -61,26 +62,13 @@ public:
                                 const glm::dmat4                & trans         = glm::dmat4(1.0),
                                 const size_t                      symbologyID   = 0);
 
-    static Renderable * create( const ColoredGemetryVec & polygons,
+    static Renderable * create( const ColoredGeometryVec & polygons,
                                 const glm::dmat4        & trans        = glm::mat4(1.0),
                                 const bool                showProgress = false);
 
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
 private:
-
-    struct TessellationResult
-    {
-        double  * vertsOut          = NULL;
-        int     * triangleIndices   = NULL;
-        int       numVerts          = 0;
-        int       numTriangles      = 0;
-
-        Uint32Vec counterVertIndices;
-        Uint32Vec counterVertIndices2;
-
-        GLuint symbologyID;
-    };
 
     RenderablePolygon(  const GLuint      vao,
                         const GLuint      ebo,
@@ -91,17 +79,17 @@ private:
                         const size_t      numContourLines,
                         const bool        isMulti);
 
-    typedef std::vector<const TessellationResult> Tessellations;
+    typedef std::vector<const Tessellation> Tessellations;
 
     static Renderable * createFromTessellations(const Tessellations & tessellations);
 
-    static TessellationResult tessellatePolygon(const geos::geom::Polygon * poly,
-                                                const glm::dmat4          & trans,
-                                                const size_t                symbologyID);
+    static Tessellation tessellatePolygon(  const geos::geom::Polygon * poly,
+                                            const glm::dmat4          & trans,
+                                            const size_t                symbologyID);
 
     static void tessellateMultiPolygon( const geos::geom::MultiPolygon  * multiPoly,
                                         const glm::dmat4                & trans,
-                                        Tessellations                   & tessellationResults,
+                                        Tessellations                   & tessellations,
                                         const size_t                      symbologyID);
 
     const GLuint    vao;
