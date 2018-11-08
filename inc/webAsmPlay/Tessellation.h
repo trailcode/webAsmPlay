@@ -35,6 +35,7 @@
     #include <GL/gl3w.h>
 #endif
 
+#include <memory>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
 
@@ -42,14 +43,20 @@ class Tessellation
 {
 public:
 
-    static Tessellation tessellatePolygon(  const geos::geom::Polygon * poly,
-                                            const glm::dmat4          & trans,
-                                            const size_t                symbologyID = 0,
-                                            const double                height      = 0.0);
+    typedef std::vector<std::unique_ptr<const Tessellation> > Tessellations;
 
-    // TODO add de-constructor, and getters. 
+    static std::unique_ptr<const Tessellation> tessellatePolygon(const geos::geom::Polygon * poly,
+                                                                 const glm::dmat4          & trans,
+                                                                 const size_t                symbologyID = 0,
+                                                                 const double                height      = 0.0);
 
-    double  * vertsOut          = NULL;
+    static void tessellateMultiPolygon( const geos::geom::MultiPolygon  * multiPoly,
+                                        const glm::dmat4                & trans,
+                                        Tessellations                   & tessellations,
+                                        const size_t                      symbologyID);
+    ~Tessellation();
+
+    double  * vertsOut          = NULL; // TODO make object oriented 
     int     * triangleIndices   = NULL;
     int       numVerts          = 0;
     int       numTriangles      = 0;
@@ -60,8 +67,16 @@ public:
     GLuint symbologyID;
 
     double height;
+
+private:
+
+    Tessellation();
+
+    Tessellation(const Tessellation&);             // Prevent copy-construction
+    Tessellation& operator=(const Tessellation&);  // Prevent assignment
+    
 };
 
-typedef std::vector<const Tessellation> Tessellations;
+typedef Tessellation::Tessellations Tessellations;
 
 #endif // __WEB_ASM_PLAY_TESSELLATION_H__

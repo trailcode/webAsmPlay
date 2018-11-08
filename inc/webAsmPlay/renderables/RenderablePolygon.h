@@ -74,11 +74,6 @@ private:
 
     RenderablePolygon(VertexArrayObject * vertexArrayObject);
 
-    static void tessellateMultiPolygon( const geos::geom::MultiPolygon  * multiPoly,
-                                        const glm::dmat4                & trans,
-                                        Tessellations                   & tessellations,
-                                        const size_t                      symbologyID);
-
     VertexArrayObject * vertexArrayObject;
 }; 
 

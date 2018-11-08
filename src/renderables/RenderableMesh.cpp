@@ -44,7 +44,7 @@ Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons
     
     if(showProgress) { startTime = system_clock::now() ;}
 
-    vector<const Tessellation> tessellations;
+    Tessellations tessellations;
 
     for(size_t i = 0; i < polygons.size(); ++i)
     {
@@ -61,7 +61,7 @@ Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons
         {
             tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID, height));
             
-            if(!tessellations.rbegin()->vertsOut)
+            if(!(*tessellations.rbegin())->vertsOut)
             {
                 dmess("Warning tessellation failed!");
 
@@ -91,6 +91,7 @@ Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons
 
 Renderable * RenderableMesh::createFromTessellations(const Tessellations & tessellations)
 {
+
     return NULL;
 }
 

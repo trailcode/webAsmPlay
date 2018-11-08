@@ -41,6 +41,7 @@ namespace geos
         class Polygon;
         class LineString;
         class Point;
+        class MultiPolygon;
     }
 }
 

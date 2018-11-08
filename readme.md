@@ -171,6 +171,7 @@ No notes.
 * ~~Remove fill and outline color arguments in Renderable, RenderablePolygon, etc.~~
 * Make tessellation templated.
 * Generate OpenGL vertex buffers in the GeoServer.
+* Assign default values of class member variables in header file. Must be a C++ 11 or C++ 14 feature.
 
 ### Bugs
 

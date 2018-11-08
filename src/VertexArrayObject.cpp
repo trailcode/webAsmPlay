@@ -42,12 +42,12 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     size_t numCounterVertIndices    = 0;
     size_t numCounterVertIndices2   = 0;
 
-    for(const Tessellation & tess : tessellations)
+    for(const auto & tess : tessellations)
     {
-        numVerts                += tess.numVerts;
-        numTriangles            += tess.numTriangles;
-        numCounterVertIndices   += tess.counterVertIndices.size();
-        numCounterVertIndices2  += tess.counterVertIndices2.size();
+        numVerts                += tess->numVerts;
+        numTriangles            += tess->numTriangles;
+        numCounterVertIndices   += tess->counterVertIndices.size();
+        numCounterVertIndices2  += tess->counterVertIndices2.size();
     }
 
     FloatVec verts;
@@ -67,26 +67,25 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
     for(size_t i = 0; i < tessellations.size(); ++i)
     {
-        const Tessellation & tess = tessellations[i];
+        const auto & tess = tessellations[i];
 
-        for(size_t j = 0; j < tess.numVerts; ++j)
+        const float symbologyID_value = (float(tess->symbologyID * 4) + 0.5) / 32.0;
+
+        for(size_t j = 0; j < tess->numVerts; ++j)
         {
-            *vertsPtr = tess.vertsOut[j * 2 + 0]; ++vertsPtr;
-            *vertsPtr = tess.vertsOut[j * 2 + 1]; ++vertsPtr;
+            *vertsPtr = tess->vertsOut[j * 2 + 0]; ++vertsPtr; // TODO create a helper function to do this.
+            *vertsPtr = tess->vertsOut[j * 2 + 1]; ++vertsPtr;
 
-            *vertsPtr = (float(tessellations[i].symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
+            *vertsPtr = symbologyID_value; ++vertsPtr;
         }
 
-        for(size_t j = 0; j < tess.numTriangles * 3; ++j, ++triangleIndicesPtr) { *triangleIndicesPtr = tess.triangleIndices[j] + offset ;}
+        for(size_t j = 0; j < tess->numTriangles * 3; ++j, ++triangleIndicesPtr) { *triangleIndicesPtr = tess->triangleIndices[j] + offset ;}
 
-        for(size_t j = 0; j < tess.counterVertIndices.size(); ++j, ++counterVertIndicesPtr) { *counterVertIndicesPtr = tess.counterVertIndices[j] + offset ;}
+        for(size_t j = 0; j < tess->counterVertIndices.size(); ++j, ++counterVertIndicesPtr) { *counterVertIndicesPtr = tess->counterVertIndices[j] + offset ;}
 
-        for(size_t j = 0; j < tess.counterVertIndices2.size(); ++j, ++counterVertIndicesPtr2) { *counterVertIndicesPtr2 = tess.counterVertIndices2[j] + offset ;}
+        for(size_t j = 0; j < tess->counterVertIndices2.size(); ++j, ++counterVertIndicesPtr2) { *counterVertIndicesPtr2 = tess->counterVertIndices2[j] + offset ;}
 
-        offset += tess.numVerts;
-
-        free(tess.vertsOut);
-        free(tess.triangleIndices);
+        offset += tess->numVerts;
     }
 
     GLuint vao  = 0;

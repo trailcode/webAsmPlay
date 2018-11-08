@@ -52,44 +52,26 @@ RenderablePolygon::~RenderablePolygon()
     delete vertexArrayObject;
 }
 
-void RenderablePolygon::tessellateMultiPolygon( const MultiPolygon  * multiPoly,
-                                                const dmat4         & trans,
-                                                Tessellations       & tessellations,
-                                                const size_t          symbologyID)
-{
-    for(size_t i = 0; i < multiPoly->getNumGeometries(); ++i)
-    {
-        const Polygon * poly = dynamic_cast<const Polygon *>(multiPoly->getGeometryN(i));
-
-        tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
-            
-        if(!tessellations.rbegin()->vertsOut)
-        {
-            dmess("Warning tessellation failed!");
-
-            tessellations.pop_back();
-        }
-    }
-}
-
 Renderable * RenderablePolygon::create( const Polygon * poly,
                                         const dmat4   & trans,
                                         const size_t    symbologyID)
 {
-    const Tessellation tess = Tessellation::tessellatePolygon(poly, trans, symbologyID);
+    Tessellations tesselations;
 
-    if(!tess.vertsOut) { return NULL ;}
+    tesselations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
 
-    return new RenderablePolygon(VertexArrayObject::create(vector<const Tessellation>({tess})));
+    if(!(*tesselations.begin())->vertsOut) { return NULL ;}
+
+    return new RenderablePolygon(VertexArrayObject::create(tesselations));
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
                                         const dmat4         & trans,
                                         const size_t          symbologyID)
 {
-    vector<const Tessellation> tessellations;
+    Tessellations tessellations;
 
-    tessellateMultiPolygon(multiPoly, trans, tessellations, symbologyID);
+    Tessellation::tessellateMultiPolygon(multiPoly, trans, tessellations, symbologyID);
 
     return new RenderablePolygon(VertexArrayObject::create(tessellations));
 }
@@ -102,7 +84,7 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
     
     if(showProgress) { startTime = system_clock::now() ;}
 
-    vector<const Tessellation> tessellations;
+    Tessellations tessellations;
 
     for(size_t i = 0; i < polygons.size(); ++i)
     {
@@ -118,7 +100,7 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
         {
             tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
             
-            if(!tessellations.rbegin()->vertsOut)
+            if(!(*tessellations.rbegin())->vertsOut)
             {
                 dmess("Warning tessellation failed!");
 
