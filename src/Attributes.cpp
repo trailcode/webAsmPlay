@@ -69,8 +69,6 @@ Attributes::Attributes(const char *& attrs)
         strings[key] = value;
     }
 
-    //dmess("nums[4] " << nums[4]);
-
     for(size_t i = 0; i < nums[4]; ++i)
     {
         const string key(attrs); attrs += key.length() + 1;
@@ -158,9 +156,9 @@ string Attributes::toString() const
 {
     stringstream attrsStrStream;
 
-    for(const Attributes::Ints32 ::value_type & i : ints32)  { attrsStrStream << i.first << ": " << i.second << endl ;}
-    for(const Attributes::Ints64 ::value_type & i : ints64)  { attrsStrStream << i.first << ": " << i.second << endl ;}
-    for(const Attributes::Doubles::value_type & i : doubles) { attrsStrStream << i.first << ": " << i.second << endl ;}
+    for(const Attributes::Ints32 ::value_type & i : ints32)  { attrsStrStream << "int32 " << i.first << ": " << i.second << endl ;}
+    for(const Attributes::Ints64 ::value_type & i : ints64)  { attrsStrStream << "int64 " << i.first << ": " << i.second << endl ;}
+    for(const Attributes::Doubles::value_type & i : doubles) { attrsStrStream << "dbl " << i.first << ": " << i.second << endl ;}
     for(const Attributes::Strings::value_type & i : strings) { attrsStrStream << "[" << i.first << "]: " << i.second << endl ;}
 
     //dmess("multiStrs " << multiStrs.size());

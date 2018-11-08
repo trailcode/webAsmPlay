@@ -29,6 +29,8 @@
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations)
 {
+    if(tessellations[0]->height != 0.0) { return _create<false>(tessellations) ;}
+
     return _create<false>(tessellations);
 }
 
@@ -52,7 +54,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
     FloatVec verts;
 
-    verts.resize(numVerts * (2 + 1));
+    verts.resize(numVerts * (3 + 1));
 
     Uint32Vec triangleIndices      (numTriangles * 3);
     Uint32Vec counterVertIndices   (numCounterVertIndices);
@@ -73,10 +75,12 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         for(size_t j = 0; j < tess->numVerts; ++j)
         {
-            *vertsPtr = tess->vertsOut[j * 2 + 0]; ++vertsPtr; // TODO create a helper function to do this.
-            *vertsPtr = tess->vertsOut[j * 2 + 1]; ++vertsPtr;
+            append(vertsPtr, tess->vertsOut[j * 2 + 0]);
+            append(vertsPtr, tess->vertsOut[j * 2 + 1]);
 
-            *vertsPtr = symbologyID_value; ++vertsPtr;
+            if(IS_3D) { append(vertsPtr, tess->height) ;}
+
+            append(vertsPtr, symbologyID_value);
         }
 
         for(size_t j = 0; j < tess->numTriangles * 3; ++j, ++triangleIndicesPtr) { *triangleIndicesPtr = tess->triangleIndices[j] + offset ;}

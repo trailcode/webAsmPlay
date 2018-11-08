@@ -27,12 +27,16 @@
 #ifndef __WEB_ASM_PLAY_UTIL_H__
 #define __WEB_ASM_PLAY_UTIL_H__
 
-#ifdef __EMSCRIPTEN__
-    // GLEW
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-#else
-    #include <GL/gl3w.h>
+#ifdef OPENGL_CALL_CHECKING
+
+    #ifdef __EMSCRIPTEN__
+        // GLEW
+        #define GLEW_STATIC
+        #include <GL/glew.h>
+    #else
+        #include <GL/gl3w.h>
+    #endif
+
 #endif
 
 #include <string>
@@ -107,6 +111,15 @@ inline double getDouble(const char *& dataStream)
     const double ret = *(double *)dataStream; dataStream += sizeof(double);
 
     return ret;
+}
+
+inline float append(float *& dataStream, const float value)
+{
+    *dataStream = value; 
+
+    ++dataStream;
+
+    return value;
 }
 
 #endif // __WEB_ASM_PLAY_UTIL_H__

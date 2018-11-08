@@ -47,6 +47,7 @@
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeometryConverter.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
+#include <webAsmPlay/renderables/RenderableMesh.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
@@ -653,6 +654,14 @@ void GeoClient::addGeometry(const char * data)
     createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
 }
 
+namespace
+{
+    double getHeight(Attributes * attrs)
+    {
+        return 0.001;
+    }
+}
+
 void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms)
 {
     dmess("GeoClient::createPolygonRenderiables " << geoms.size());
@@ -688,11 +697,15 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     ColoredGeometryVec polygons;
 
+    ColoredExtrudedGeometryVec polygons3D;
+
     for(size_t i = 0; i < geoms.size(); ++i)
     {
         Attributes * attrs = geoms[i].first;
 
         GLuint colorID = 0;
+
+        double height = 0.0;
 
         if( attrs->hasStringKey("addr_house") ||
             attrs->hasStringKey("addr::housenumber") ||
@@ -700,10 +713,14 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
             attrs->hasStringKeyValue("building", "house")) // TODO Are the ones above even doing anything?
         {
             colorID = 1;
+
+            height = getHeight(attrs);
         }
         else if(attrs->hasStringKey("building"))
         {
             colorID = 2;
+
+            height = getHeight(attrs);
         }
         else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
         {
@@ -714,16 +731,30 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
             colorID = 4;
         }
 
-        polygons.push_back(make_pair(geoms[i].second, colorID));
+        if(height == 0.0) { polygons.push_back(ColoredGeometry(geoms[i].second, colorID)) ;}
+
+        else { polygons3D.push_back(ColoredExtrudedGeometry(geoms[i].second, colorID)) ;}
     }
 
-    dmess("polygons " << polygons.size());
+    dmess("polygons " << polygons.size() << " polygons3D " << polygons3D.size());
 
     Renderable * r = RenderablePolygon::create(polygons, trans, true);
 
-    r->setShader(ColorDistanceShader::getDefaultInstance());
+    if(r)
+    {
+        r->setShader(ColorDistanceShader::getDefaultInstance());
 
-    canvas->addRenderiable(r);
+        canvas->addRenderiable(r);
+    }
+
+    r = RenderableMesh::create(polygons3D, trans, true);
+
+    if(r)
+    {
+        r->setShader(ColorDistanceShader::getDefaultInstance());
+
+        canvas->addRenderiable(r);
+    }
     
     dmess("End base geom");
 }

@@ -51,6 +51,7 @@
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
@@ -566,6 +567,7 @@ void GUI::initOpenGL(GLFWwindow * window) // TODO, need some code refactor here
     GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
 
     ColorDistanceShader::ensureShader();
+    ColorDistanceShader3D::ensureShader();
     ColorShader::ensureShader();
     ColorVertexShader::ensureShader();
     
