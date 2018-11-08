@@ -44,14 +44,14 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     size_t numVerts                 = 0;
     size_t numTriangles             = 0;
     size_t numCounterVertIndices    = 0;
-    size_t numCounterVertIndices2   = 0;
+    size_t numlineIndices   = 0;
 
     for(const auto & tess : tessellations)
     {
-        numVerts                += tess->numVerts;
-        numTriangles            += tess->numTriangles;
-        numCounterVertIndices   += tess->counterVertIndices.size();
-        numCounterVertIndices2  += tess->counterVertIndices2.size();
+        numVerts               += tess->numVerts;
+        numTriangles           += tess->numTriangles;
+        numCounterVertIndices  += tess->counterVertIndices.size();
+        numlineIndices         += tess->lineIndices.size();
     }
 
     FloatVec verts;
@@ -61,12 +61,12 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
     Uint32Vec triangleIndices      (numTriangles * 3);
     Uint32Vec counterVertIndices   (numCounterVertIndices);
-    Uint32Vec counterVertIndices2  (numCounterVertIndices2);
+    Uint32Vec lineIndices  (numlineIndices);
 
     GLfloat * vertsPtr               = &verts[0];
     GLuint  * triangleIndicesPtr     = &triangleIndices[0];
     GLuint  * counterVertIndicesPtr  = &counterVertIndices[0];
-    GLuint  * counterVertIndicesPtr2 = &counterVertIndices2[0];
+    GLuint  * counterVertIndicesPtr2 = &lineIndices[0];
 
     size_t offset = 0;
 
@@ -90,7 +90,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         for(size_t j = 0; j < tess->counterVertIndices.size(); ++j, ++counterVertIndicesPtr) { *counterVertIndicesPtr = tess->counterVertIndices[j] + offset ;}
 
-        for(size_t j = 0; j < tess->counterVertIndices2.size(); ++j, ++counterVertIndicesPtr2) { *counterVertIndicesPtr2 = tess->counterVertIndices2[j] + offset ;}
+        for(size_t j = 0; j < tess->lineIndices.size(); ++j, ++counterVertIndicesPtr2) { *counterVertIndicesPtr2 = tess->lineIndices[j] + offset ;}
 
         offset += tess->numVerts;
     }
@@ -115,7 +115,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, &triangleIndices[0], GL_STATIC_DRAW));
     
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * counterVertIndices2.size(), &counterVertIndices2[0], GL_STATIC_DRAW));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
 
     return new VertexArrayObject(vao,
                                  ebo,
@@ -123,7 +123,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                                  vbo,
                                  numTriangles,
                                  counterVertIndices,
-                                 counterVertIndices2.size(),
+                                 lineIndices.size(),
                                  tessellations.size() > 1);
 }
 

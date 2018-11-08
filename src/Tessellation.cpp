@@ -88,8 +88,8 @@ unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * 
             verts.push_back(C.x);
             verts.push_back(C.y);
 
-            ret->counterVertIndices2.push_back(i);
-            ret->counterVertIndices2.push_back((i + 1) % num);
+            ret->lineIndices.push_back(i);
+            ret->lineIndices.push_back((i + 1) % num);
         }
     }
     else
@@ -103,8 +103,8 @@ unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * 
             verts.push_back(v.x);
             verts.push_back(v.y);
 
-            ret->counterVertIndices2.push_back(i);
-            ret->counterVertIndices2.push_back((i + 1) % num);
+            ret->lineIndices.push_back(i);
+            ret->lineIndices.push_back((i + 1) % num);
         }
     }
 
@@ -135,8 +135,8 @@ unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * 
                 verts.push_back(C.x);
                 verts.push_back(C.y);
 
-                ret->counterVertIndices2.push_back(i + offset);
-                ret->counterVertIndices2.push_back(((i + 1) % num) + offset);
+                ret->lineIndices.push_back(i + offset);
+                ret->lineIndices.push_back(((i + 1) % num) + offset);
             }
         }
         else
@@ -150,8 +150,8 @@ unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * 
                 verts.push_back(v.x);
                 verts.push_back(v.y);
 
-                ret->counterVertIndices2.push_back(i + offset);
-                ret->counterVertIndices2.push_back(((i + 1) % num) + offset);
+                ret->lineIndices.push_back(i + offset);
+                ret->lineIndices.push_back(((i + 1) % num) + offset);
             }
         }
 

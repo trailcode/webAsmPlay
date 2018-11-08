@@ -62,7 +62,7 @@ public:
     int       numTriangles      = 0;
 
     Uint32Vec counterVertIndices;
-    Uint32Vec counterVertIndices2;
+    Uint32Vec lineIndices;
 
     GLuint symbologyID;
 
