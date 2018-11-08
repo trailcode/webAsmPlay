@@ -51,6 +51,7 @@
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -658,6 +659,11 @@ namespace
 {
     double getHeight(Attributes * attrs)
     {
+        // See: https://wiki.openstreetmap.org/wiki/OSM-3D.org
+        if(attrs->hasStringKey("height")) { return atof(attrs->strings["height"].c_str()) * 0.001 * 0.3;}
+
+        if(attrs->hasStringKey("building:levels")) { return atof(attrs->strings["building:levels"].c_str()) * 0.001 ;}
+
         return 0.001;
     }
 }
@@ -733,7 +739,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
         if(height == 0.0) { polygons.push_back(ColoredGeometry(geoms[i].second, colorID)) ;}
 
-        else { polygons3D.push_back(ColoredExtrudedGeometry(geoms[i].second, colorID)) ;}
+        else { polygons3D.push_back(ColoredExtrudedGeometry(geoms[i].second, colorID, height)) ;}
     }
 
     dmess("polygons " << polygons.size() << " polygons3D " << polygons3D.size());
@@ -743,18 +749,22 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     if(r)
     {
         r->setShader(ColorDistanceShader::getDefaultInstance());
+        //r->setShader(ColorDistanceShader3D::getDefaultInstance());
 
         canvas->addRenderiable(r);
     }
 
+    //*
     r = RenderableMesh::create(polygons3D, trans, true);
 
     if(r)
     {
+        //r->setShader(ColorDistanceShader3D::getDefaultInstance());
         r->setShader(ColorDistanceShader::getDefaultInstance());
 
         canvas->addRenderiable(r);
     }
+    //*/
     
     dmess("End base geom");
 }

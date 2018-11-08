@@ -29,6 +29,8 @@
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations)
 {
+    return _create<true>(tessellations);
+
     if(tessellations[0]->height != 0.0) { return _create<false>(tessellations) ;}
 
     return _create<false>(tessellations);
@@ -54,7 +56,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
     FloatVec verts;
 
-    verts.resize(numVerts * (3 + 1));
+    if(IS_3D) { verts.resize(numVerts * (3 + 1)) ;}
+    else      { verts.resize(numVerts * (2 + 1)) ;}
 
     Uint32Vec triangleIndices      (numTriangles * 3);
     Uint32Vec counterVertIndices   (numCounterVertIndices);

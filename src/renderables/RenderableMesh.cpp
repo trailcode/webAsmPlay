@@ -29,6 +29,8 @@
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/VertexArrayObject.h>
+#include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/renderables/RenderableMesh.h>
 
 using namespace std;
@@ -91,37 +93,64 @@ Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons
 
 Renderable * RenderableMesh::createFromTessellations(const Tessellations & tessellations)
 {
+    VertexArrayObject * vao = VertexArrayObject::create(tessellations);
 
-    return NULL;
+    if(!vao)
+    {
+        dmess("Error! Could not create VertexArrayObject!");
+
+        return NULL;
+    };
+
+    return new RenderableMesh(vao);
 }
 
 RenderableMesh::~RenderableMesh()
 {
-    GL_CHECK(glDeleteVertexArrays(1, &vao));
-    GL_CHECK(glDeleteBuffers     (1, &vbo));
-    GL_CHECK(glDeleteBuffers     (1, &ebo));
-    GL_CHECK(glDeleteBuffers     (1, &ebo2));
+    delete vertexArrayObject;
 }
 
-RenderableMesh::RenderableMesh( const GLuint      vao,
-                                const GLuint      ebo,
-                                const GLuint      ebo2,
-                                const GLuint      vbo,
-                                const int         numTriangles,
-                                const Uint32Vec & counterVertIndices,
-                                const size_t      numContourLines) : Renderable          (true),
-                                                                     vao                 (vao),
-                                                                     ebo                 (ebo),
-                                                                     ebo2                (ebo2),
-                                                                     vbo                 (vbo),
-                                                                     numTriangles        (numTriangles),
-                                                                     counterVertIndices  (counterVertIndices),
-                                                                     numContourLines     (numContourLines)
+RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderable       (true),
+                                                                        vertexArrayObject(vertexArrayObject)
 {
 
 }
 
 void RenderableMesh::render(const mat4 & MVP, const mat4 & MV) const
 {
+    vertexArrayObject->bind();
 
+    vertexArrayObject->bindTriangles();
+
+    GL_CHECK(glEnable(GL_BLEND));
+
+    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+    GL_CHECK(glDisable(GL_DEPTH_TEST));
+
+    if(shader->getRenderFill())
+    {
+        shader->bind(MVP, MV, false);
+
+        shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+
+        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+
+        vertexArrayObject->drawTriangles();
+    }
+
+    if(shader->getRenderOutline())
+    {
+        shader->bind(MVP, MV, true);
+
+        shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+
+        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+
+        vertexArrayObject->bindLines();
+        
+        vertexArrayObject->drawLines();
+    }
+
+    glDisable(GL_BLEND); // TODO Remove!
 }

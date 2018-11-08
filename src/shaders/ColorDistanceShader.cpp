@@ -59,7 +59,7 @@ void ColorDistanceShader::ensureShader()
     const GLchar* vertexSource = R"glsl(#version 150 core
         uniform sampler2D tex;
 
-        in vec2 vertIn;
+        in vec3 vertIn;
         in float vertColorIn;
         
         uniform mat4 MVP;
@@ -72,7 +72,8 @@ void ColorDistanceShader::ensureShader()
 
         void main()
         {
-            vec4 vert = vec4(vertIn.xy, 0, 1);
+            //vec4 vert = vec4(vertIn.xy, 0, 1);
+            vec4 vert = vec4(vertIn.xyz, 1);
 
             position_in_view_space = MV * vert;
 
@@ -160,9 +161,9 @@ void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV, const bool isO
 
     shaderProgram->setUniform(MV_Uniform, MV);
 
-    shaderProgram->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    shaderProgram->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-    shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
+    shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLuint)));
 
     shaderProgram->setUniformi(texUniform, 0);
 

@@ -30,6 +30,8 @@
 #include <webAsmPlay/Tessellation.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
+class VertexArrayObject;
+
 class RenderableMesh : public Renderable
 {
 public:
@@ -46,21 +48,9 @@ private:
 
     static Renderable * createFromTessellations(const Tessellations & tessellations);
 
-    RenderableMesh( const GLuint      vao,
-                    const GLuint      ebo,
-                    const GLuint      ebo2,
-                    const GLuint      vbo,
-                    const int         numTriangles,
-                    const Uint32Vec & counterVertIndices,
-                    const size_t      numContourLines);
+    RenderableMesh(VertexArrayObject * vertexArrayObject);
 
-    const GLuint    vao;
-    const GLuint    ebo;
-    const GLuint    ebo2;
-    const GLuint    vbo;
-    const int       numTriangles;
-    const Uint32Vec counterVertIndices;
-    const size_t    numContourLines;
+    VertexArrayObject * vertexArrayObject;
 };
 
 #endif // __WEB_ASM_PLAY_RENDERABLE_MESH_H__
