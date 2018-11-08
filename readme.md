@@ -175,6 +175,9 @@ No notes.
 
 * Holding down shift and moving outside the Geos test panel keeps it as if the shift key is still held down when the mouse is brought back in the panel.
 * Camera still has a bug with window resizing and trackball. Seems to only happen in emscripten build.
+* Upgraded OSX, glfw is having problems now :( Happened after upgrading to xcode 10
+    * https://github.com/glfw/glfw/issues/1337
+    * https://www.syntaxbomb.com/index.php?topic=4927.0
 
 
 
