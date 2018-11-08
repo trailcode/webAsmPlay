@@ -169,7 +169,8 @@ No notes.
 * ~~Make a third party directory.~~
 * Make a project Talent Stack Document/Panel.
 * ~~Remove fill and outline color arguments in Renderable, RenderablePolygon, etc.~~
-* Make tessellation templated. 
+* Make tessellation templated.
+* Generate OpenGL vertex buffers in the GeoServer.
 
 ### Bugs
 

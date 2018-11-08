@@ -26,11 +26,11 @@
 
 #include <chrono>
 #include <glm/gtc/type_ptr.hpp>
-#include <GLU/tessellate.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/VertexArrayObject.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
@@ -42,148 +42,14 @@ using namespace geos::geom;
 
 // TODO Create better variable names. Try to simplify this class.
 
-RenderablePolygon::RenderablePolygon(   const GLuint      vao,
-                                        const GLuint      ebo,
-                                        const GLuint      ebo2,
-                                        const GLuint      vbo,
-                                        const int         numTriangles,
-                                        const Uint32Vec & counterVertIndices,
-                                        const size_t      numContourLines,
-                                        const bool        isMulti) : Renderable          (isMulti),
-                                                                     vao                 (vao),
-                                                                     ebo                 (ebo),
-                                                                     ebo2                (ebo2),
-                                                                     vbo                 (vbo),
-                                                                     numTriangles        (numTriangles),
-                                                                     counterVertIndices  (counterVertIndices),
-                                                                     numContourLines     (numContourLines)
+RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable       (vertexArrayObject->isMulti()),
+                                                                                vertexArrayObject(vertexArrayObject)
 {
 }
 
 RenderablePolygon::~RenderablePolygon()
 {
-    GL_CHECK(glDeleteVertexArrays(1, &vao));
-    GL_CHECK(glDeleteBuffers     (1, &vbo));
-    GL_CHECK(glDeleteBuffers     (1, &ebo));
-    GL_CHECK(glDeleteBuffers     (1, &ebo2));
-}
-
-Tessellation RenderablePolygon::tessellatePolygon(  const Polygon * poly,
-                                                    const dmat4   & trans,
-                                                    const size_t    symbologyID)
-{
-    Tessellation ret;
-
-    ret.symbologyID = symbologyID;
-
-    const LineString * ring = poly->getExteriorRing();
-
-    const vector<Coordinate> & coords = *ring->getCoordinatesRO()->toVector();
-
-    if(coords.size() < 4)
-    {
-        dmess("Bad geometry!");
-
-        return ret;
-    }
-
-    vector<double> verts;
-    
-    const size_t num = coords.size() - 1;
-
-    if(trans == dmat4(1.0))
-    {
-        for(size_t i = 0; i < num; ++i)
-        {
-            const Coordinate & C = coords[i];
-
-            verts.push_back(C.x);
-            verts.push_back(C.y);
-
-            ret.counterVertIndices2.push_back(i);
-            ret.counterVertIndices2.push_back((i + 1) % num);
-        }
-    }
-    else
-    {
-        for(size_t i = 0; i < num; ++i)
-        {
-            const Coordinate & C = coords[i];
-
-            const dvec4 v = trans * dvec4(C.x, C.y, 0, 1);
-
-            verts.push_back(v.x);
-            verts.push_back(v.y);
-
-            ret.counterVertIndices2.push_back(i);
-            ret.counterVertIndices2.push_back((i + 1) % num);
-        }
-    }
-
-    ret.counterVertIndices.push_back(0);
-    ret.counterVertIndices.push_back(verts.size());
-
-    for(size_t i = 0; i < poly->getNumInteriorRing(); ++i)
-    {
-        const vector<Coordinate> & coords = *poly->getInteriorRingN(i)->getCoordinates()->toVector();
-
-        if(coords.size() < 4)
-        {
-            dmess("Bad geometry!");
-
-            return ret;
-        }
-
-        const size_t num = coords.size() - 1;
-
-        const size_t offset = verts.size() / 2;
-
-        if(trans == dmat4(1.0))
-        {
-            for(size_t i = 0; i < num; ++i)
-            {
-                const Coordinate & C = coords[i];
-
-                verts.push_back(C.x);
-                verts.push_back(C.y);
-
-                ret.counterVertIndices2.push_back(i + offset);
-                ret.counterVertIndices2.push_back(((i + 1) % num) + offset);
-            }
-        }
-        else
-        {
-            for(size_t i = 0; i < num; ++i)
-            {
-                const Coordinate & C = coords[i];
-
-                const vec4 v = trans * vec4(C.x, C.y, 0, 1);
-
-                verts.push_back(v.x);
-                verts.push_back(v.y);
-
-                ret.counterVertIndices2.push_back(i + offset);
-                ret.counterVertIndices2.push_back(((i + 1) % num) + offset);
-            }
-        }
-
-        ret.counterVertIndices.push_back(verts.size());
-    }
-
-    vector<const double *> counterVertPtrs;
-
-    for(size_t i = 0; i < ret.counterVertIndices.size(); ++i) { counterVertPtrs.push_back(&verts[0] + ret.counterVertIndices[i]) ;}
-
-    tessellate( &ret.vertsOut,
-                &ret.numVerts,
-                &ret.triangleIndices,
-                &ret.numTriangles,
-                &counterVertPtrs[0],
-                &counterVertPtrs[0] + counterVertPtrs.size());
-
-    for(size_t i = 0; i < ret.counterVertIndices.size(); ++i) { ret.counterVertIndices[i] /= 2 ;}
-
-    return ret;
+    delete vertexArrayObject;
 }
 
 void RenderablePolygon::tessellateMultiPolygon( const MultiPolygon  * multiPoly,
@@ -195,7 +61,7 @@ void RenderablePolygon::tessellateMultiPolygon( const MultiPolygon  * multiPoly,
     {
         const Polygon * poly = dynamic_cast<const Polygon *>(multiPoly->getGeometryN(i));
 
-        tessellations.push_back(tessellatePolygon(poly, trans, symbologyID));
+        tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
             
         if(!tessellations.rbegin()->vertsOut)
         {
@@ -210,11 +76,11 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
                                         const dmat4   & trans,
                                         const size_t    symbologyID)
 {
-    const Tessellation tess = tessellatePolygon(poly, trans, symbologyID);
+    const Tessellation tess = Tessellation::tessellatePolygon(poly, trans, symbologyID);
 
     if(!tess.vertsOut) { return NULL ;}
 
-    return createFromTessellations(vector<const Tessellation>({tess}));
+    return new RenderablePolygon(VertexArrayObject::create(vector<const Tessellation>({tess})));
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
@@ -225,12 +91,12 @@ Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
 
     tessellateMultiPolygon(multiPoly, trans, tessellations, symbologyID);
 
-    return createFromTessellations(tessellations);
+    return new RenderablePolygon(VertexArrayObject::create(tessellations));
 }
 
 Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
-                                        const dmat4             & trans,
-                                        const bool                showProgress)
+                                        const dmat4              & trans,
+                                        const bool                 showProgress)
 {
     time_point<system_clock> startTime;
     
@@ -250,7 +116,7 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
 
         if((poly = dynamic_cast<const Polygon *>(geom)))
         {
-            tessellations.push_back(tessellatePolygon(poly, trans, symbologyID));
+            tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
             
             if(!tessellations.rbegin()->vertsOut)
             {
@@ -273,107 +139,18 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
         }
     }
 
-    Renderable * ret = createFromTessellations(tessellations);
+    Renderable * ret = new RenderablePolygon(VertexArrayObject::create(tessellations));
 
     if(showProgress) { GUI::progress("", 1.0) ;}
 
     return ret;
 }
 
-Renderable * RenderablePolygon::createFromTessellations(const Tessellations & tessellations)
-{
-    if(!tessellations.size()) { return NULL ;}
-
-    size_t numVerts                 = 0;
-    size_t numTriangles             = 0;
-    size_t numCounterVertIndices    = 0;
-    size_t numCounterVertIndices2   = 0;
-
-    for(const Tessellation & tess : tessellations)
-    {
-        numVerts                += tess.numVerts;
-        numTriangles            += tess.numTriangles;
-        numCounterVertIndices   += tess.counterVertIndices.size();
-        numCounterVertIndices2  += tess.counterVertIndices2.size();
-    }
-
-    FloatVec verts;
-
-    verts.resize(numVerts * (2 + 1));
-
-    Uint32Vec triangleIndices      (numTriangles * 3);
-    Uint32Vec counterVertIndices   (numCounterVertIndices);
-    Uint32Vec counterVertIndices2  (numCounterVertIndices2);
-
-    GLfloat * vertsPtr               = &verts[0];
-    GLuint  * triangleIndicesPtr     = &triangleIndices[0];
-    GLuint  * counterVertIndicesPtr  = &counterVertIndices[0];
-    GLuint  * counterVertIndicesPtr2 = &counterVertIndices2[0];
-
-    size_t offset = 0;
-
-    for(size_t i = 0; i < tessellations.size(); ++i)
-    {
-        const Tessellation & tess = tessellations[i];
-
-        for(size_t j = 0; j < tess.numVerts; ++j)
-        {
-            *vertsPtr = tess.vertsOut[j * 2 + 0]; ++vertsPtr;
-            *vertsPtr = tess.vertsOut[j * 2 + 1]; ++vertsPtr;
-
-            *vertsPtr = (float(tessellations[i].symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
-        }
-
-        for(size_t j = 0; j < tess.numTriangles * 3; ++j, ++triangleIndicesPtr) { *triangleIndicesPtr = tess.triangleIndices[j] + offset ;}
-
-        for(size_t j = 0; j < tess.counterVertIndices.size(); ++j, ++counterVertIndicesPtr) { *counterVertIndicesPtr = tess.counterVertIndices[j] + offset ;}
-
-        for(size_t j = 0; j < tess.counterVertIndices2.size(); ++j, ++counterVertIndicesPtr2) { *counterVertIndicesPtr2 = tess.counterVertIndices2[j] + offset ;}
-
-        offset += tess.numVerts;
-
-        free(tess.vertsOut);
-        free(tess.triangleIndices);
-    }
-
-    GLuint vao  = 0;
-    GLuint ebo  = 0;
-    GLuint ebo2 = 0;
-    GLuint vbo  = 0;
-    
-    GL_CHECK(glGenVertexArrays(1, &vao));
-    GL_CHECK(glBindVertexArray(vao));
-
-    GL_CHECK(glGenBuffers(1, &vbo));
-    GL_CHECK(glGenBuffers(1, &ebo));
-    GL_CHECK(glGenBuffers(1, &ebo2));
-
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
-
-    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW));
-    
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, &triangleIndices[0], GL_STATIC_DRAW));
-    
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * counterVertIndices2.size(), &counterVertIndices2[0], GL_STATIC_DRAW));
-
-    return new RenderablePolygon(   vao,
-                                    ebo,
-                                    ebo2,
-                                    vbo,
-                                    numTriangles,
-                                    counterVertIndices,
-                                    counterVertIndices2.size(),
-                                    tessellations.size() > 1);
-}
-
 void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 {
-    GL_CHECK(glBindVertexArray(vao));
-    
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
+    vertexArrayObject->bind();
+
+    vertexArrayObject->bindTriangles();
 
     GL_CHECK(glEnable(GL_BLEND));
 
@@ -389,16 +166,16 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
         shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
-        GL_CHECK(glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, NULL));
+        vertexArrayObject->drawTriangles();
     }
 
     if(shader->getRenderOutline())
     {
         shader->bind(MVP, MV, true);
 
-        GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
+        vertexArrayObject->bindLines();
         
-        GL_CHECK(glDrawElements(GL_LINES, numContourLines, GL_UNSIGNED_INT, NULL));
+        vertexArrayObject->drawLines();
     }
 
     glDisable(GL_BLEND); // TODO Remove!

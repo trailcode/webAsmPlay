@@ -36,13 +36,15 @@ public:
 
     ~RenderableMesh();
 
-    static Renderable * create( const ColoredExtrudedGeometryVec & geoms,
+    static Renderable * create( const ColoredExtrudedGeometryVec & polygons,
                                 const glm::dmat4                 & trans        = glm::mat4(1.0),
                                 const bool                         showProgress = false);
 
     void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
 
 private:
+
+    static Renderable * createFromTessellations(const Tessellations & tessellations);
 
     RenderableMesh( const GLuint      vao,
                     const GLuint      ebo,
@@ -51,6 +53,14 @@ private:
                     const int         numTriangles,
                     const Uint32Vec & counterVertIndices,
                     const size_t      numContourLines);
+
+    const GLuint    vao;
+    const GLuint    ebo;
+    const GLuint    ebo2;
+    const GLuint    vbo;
+    const int       numTriangles;
+    const Uint32Vec counterVertIndices;
+    const size_t    numContourLines;
 };
 
 #endif // __WEB_ASM_PLAY_RENDERABLE_MESH_H__

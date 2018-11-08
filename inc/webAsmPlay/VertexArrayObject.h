@@ -1,3 +1,6 @@
+#ifndef __WEB_ASM_PLAY_VERTEX_ARRAY_OBJECT_H__
+#define __WEB_ASM_PLAY_VERTEX_ARRAY_OBJECT_H__
+
 /**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
@@ -24,62 +27,58 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_RENDERABLE_POLYGON2D_H__
-#define __WEB_ASM_PLAY_RENDERABLE_POLYGON2D_H__
-
 #ifdef __EMSCRIPTEN__
-
+    // GLEW
     #define GLEW_STATIC
     #include <GL/glew.h>
 #else
     #include <GL/gl3w.h>
 #endif
 
-#include <vector>
 #include <webAsmPlay/Tessellation.h>
-#include <webAsmPlay/renderables/Renderable.h>
 
-namespace geos
-{
-    namespace geom
-    {
-        class Polygon;
-        class MultiPolygon;
-    }
-}
-
-class VertexArrayObject;
-
-class RenderablePolygon : public Renderable
+class VertexArrayObject
 {
 public:
 
-    ~RenderablePolygon();
+    static VertexArrayObject * create(const Tessellations & tessellations);
 
-    static Renderable * create( const geos::geom::Polygon       * poly,
-                                const glm::dmat4                & trans         = glm::dmat4(1.0),
-                                const size_t                      symbologyID   = 0);
+    ~VertexArrayObject();
 
-    static Renderable * create( const geos::geom::MultiPolygon  * multyPoly,
-                                const glm::dmat4                & trans         = glm::dmat4(1.0),
-                                const size_t                      symbologyID   = 0);
+    void bind() const;
 
-    static Renderable * create( const ColoredGeometryVec        & polygons,
-                                const glm::dmat4                & trans         = glm::mat4(1.0),
-                                const bool                        showProgress  = false);
+    void bindTriangles() const;
 
-    void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
+    void bindLines() const;
+
+    void drawTriangles() const;
+
+    void drawLines() const;
+
+    bool isMulti() const;
 
 private:
 
-    RenderablePolygon(VertexArrayObject * vertexArrayObject);
+    template<bool IS_3D>
+    static VertexArrayObject * _create(const Tessellations & tessellations);
 
-    static void tessellateMultiPolygon( const geos::geom::MultiPolygon  * multiPoly,
-                                        const glm::dmat4                & trans,
-                                        Tessellations                   & tessellations,
-                                        const size_t                      symbologyID);
+    VertexArrayObject(  const GLuint      vao,
+                        const GLuint      ebo,
+                        const GLuint      ebo2,
+                        const GLuint      vbo,
+                        const int         numTriangles,
+                        const Uint32Vec & counterVertIndices,
+                        const size_t      numContourLines,
+                        const bool        isMulti);
 
-    VertexArrayObject * vertexArrayObject;
-}; 
+    const GLuint    vao;
+    const GLuint    ebo;
+    const GLuint    ebo2;
+    const GLuint    vbo;
+    const int       numTriangles;
+    const Uint32Vec counterVertIndices;
+    const size_t    numContourLines;
+    const bool      _isMulti;
+};
 
-#endif // __WEB_ASM_PLAY_RENDERABLE_POLYGON2D_H__
+#endif // __WEB_ASM_PLAY_VERTEX_ARRAY_OBJECT_H__

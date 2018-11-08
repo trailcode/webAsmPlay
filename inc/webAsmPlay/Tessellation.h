@@ -35,11 +35,19 @@
     #include <GL/gl3w.h>
 #endif
 
+#include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
 
 class Tessellation
 {
 public:
+
+    static Tessellation tessellatePolygon(  const geos::geom::Polygon * poly,
+                                            const glm::dmat4          & trans,
+                                            const size_t                symbologyID = 0,
+                                            const double                height      = 0.0);
+
+    // TODO add de-constructor, and getters. 
 
     double  * vertsOut          = NULL;
     int     * triangleIndices   = NULL;
@@ -51,6 +59,9 @@ public:
 
     GLuint symbologyID;
 
+    double height;
 };
+
+typedef std::vector<const Tessellation> Tessellations;
 
 #endif // __WEB_ASM_PLAY_TESSELLATION_H__

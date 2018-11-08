@@ -38,6 +38,7 @@ namespace geos
     namespace geom
     {
         class Geometry;
+        class Polygon;
         class LineString;
         class Point;
     }
