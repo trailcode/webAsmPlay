@@ -719,23 +719,23 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
             attrs->hasStringKey("addr::housename") ||
             attrs->hasStringKeyValue("building", "house")) // TODO Are the ones above even doing anything?
         {
-            colorID = 1;
+            colorID = 0;
 
             height = getHeight(attrs);
         }
         else if(attrs->hasStringKey("building"))
         {
-            colorID = 2;
+            colorID = 1;
 
             height = getHeight(attrs);
         }
         else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
         {
-            colorID = 3;
+            colorID = 1;
         }
         else if(attrs->hasStringKeyValue("landuse", "reservor"))
         {
-            colorID = 4;
+            colorID = 2;
         }
 
         if(height == 0.0) { polygons.push_back(ColoredGeometry(geoms[i].second, colorID)) ;}
@@ -745,21 +745,18 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     dmess("polygons " << polygons.size() << " polygons3D " << polygons3D.size());
 
-    Renderable * r = RenderablePolygon::create(polygons, trans, true);
+    Renderable * r;
 
-    if(r)
+    if((r = RenderablePolygon::create(polygons, trans, true)))
     {
         r->setShader(ColorDistanceShader::getDefaultInstance());
 
         canvas->addRenderiable(r);
     }
 
-    r = RenderableMesh::create(polygons3D, trans, true);
-
-    if(r)
+    if((r = RenderableMesh::create(polygons3D, trans, true)))
     {
         r->setShader(ColorDistanceShader3D::getDefaultInstance());
-        //r->setShader(ColorDistanceShader::getDefaultInstance());
 
         canvas->addRenderiable(r);
     }

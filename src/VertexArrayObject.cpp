@@ -31,9 +31,7 @@ using namespace std;
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations)
 {
-    //return _create<true>(tessellations);
-
-    if(tessellations[0]->height != 0.0) { dmess("Here " << tessellations[0]->height); return _create<true>(tessellations) ;}
+    if(tessellations[0]->height != 0.0) { return _create<true>(tessellations) ;}
 
     return _create<false>(tessellations);
 }
@@ -43,10 +41,10 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 {
     if(!tessellations.size()) { return NULL ;}
 
-    size_t numVerts                 = 0;
-    size_t numTriangles             = 0;
-    size_t numCounterVertIndices    = 0;
-    size_t numlineIndices   = 0;
+    size_t numVerts               = 0;
+    size_t numTriangles           = 0;
+    size_t numCounterVertIndices  = 0;
+    size_t numlineIndices         = 0;
 
     for(const auto & tess : tessellations)
     {
@@ -54,14 +52,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
         numTriangles           += tess->numTriangles;
         numCounterVertIndices  += tess->counterVertIndices.size();
 
-        if(IS_3D)
-        {
-            numlineIndices         += tess->lineIndices.size() * 3;
-        }
-        else
-        {
-            numlineIndices         += tess->lineIndices.size();
-        }
+        if(IS_3D) { numlineIndices += tess->lineIndices.size() * 3 ;}
+        else      { numlineIndices += tess->lineIndices.size()     ;}
     }
 
     FloatVec verts;
@@ -86,7 +78,9 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     {
         const auto & tess = tessellations[i];
 
-        const float symbologyID_value = (float(tess->symbologyID * 4) + 0.5) / 32.0;
+        const float symbologyID_value = (float(tess->symbologyID * 6) + 0.5) / 32.0;
+
+        const float symbologyWallID_value = (float(tess->symbologyID * 6) + 0.5) / 32.0 + 4.0 / 32.0;
 
         const size_t startIndex = *counterVertIndicesPtr;
 
@@ -116,7 +110,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             append(vertsPtr, tess->vertsOut[0]);
             append(vertsPtr, tess->vertsOut[1]);
             append(vertsPtr, 0);
-            append(vertsPtr, symbologyID_value);
+            append(vertsPtr, symbologyWallID_value);
 
             size_t prevB = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
 
@@ -126,7 +120,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             append(vertsPtr, tess->vertsOut[0]);
             append(vertsPtr, tess->vertsOut[1]);
             append(vertsPtr, tess->height);
-            append(vertsPtr, symbologyID_value);
+            append(vertsPtr, symbologyWallID_value);
 
             for(size_t j = 1; j < tess->numVerts; ++j)
             {
@@ -135,14 +129,14 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                 append(vertsPtr, tess->vertsOut[j * 2 + 0]);
                 append(vertsPtr, tess->vertsOut[j * 2 + 1]);
                 append(vertsPtr, 0);
-                append(vertsPtr, symbologyID_value);
+                append(vertsPtr, symbologyWallID_value);
 
                 size_t B = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
 
                 append(vertsPtr, tess->vertsOut[j * 2 + 0]);
                 append(vertsPtr, tess->vertsOut[j * 2 + 1]);
                 append(vertsPtr, tess->height);
-                append(vertsPtr, symbologyID_value);
+                append(vertsPtr, symbologyWallID_value);
 
                 wallTris.push_back(prevA);
                 wallTris.push_back(prevB);
