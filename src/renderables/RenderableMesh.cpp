@@ -63,7 +63,7 @@ Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons
         {
             tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID, height));
             
-            if(!(*tessellations.rbegin())->vertsOut)
+            if((*tessellations.rbegin())->isEmpty())
             {
                 dmess("Warning tessellation failed!");
 

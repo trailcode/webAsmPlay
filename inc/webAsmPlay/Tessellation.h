@@ -27,14 +27,6 @@
 #ifndef __WEB_ASM_PLAY_TESSELLATION_H__
 #define __WEB_ASM_PLAY_TESSELLATION_H__
 
-#ifdef __EMSCRIPTEN__
-    // GLEW
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-#else
-    #include <GL/gl3w.h>
-#endif
-
 #include <memory>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
@@ -56,15 +48,23 @@ public:
                                         const size_t                      symbologyID);
     ~Tessellation();
 
-    double  * vertsOut          = NULL; // TODO make object oriented 
-    int     * triangleIndices   = NULL;
-    int       numVerts          = 0;
-    int       numTriangles      = 0;
+    bool     isEmpty() const;
+    uint32_t getSymbologyID() const;
+    double   getHeight() const;
+
+private:
+
+    friend class VertexArrayObject;
+
+    double    * verts           = NULL; // TODO make object oriented 
+    uint32_t  * triangleIndices = NULL;
+    uint32_t    numVerts        = 0;
+    uint32_t    numTriangles    = 0;
 
     Uint32Vec counterVertIndices;
     Uint32Vec lineIndices;
 
-    GLuint symbologyID;
+    uint32_t symbologyID;
 
     double height;
 

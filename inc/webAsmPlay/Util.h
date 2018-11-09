@@ -122,4 +122,14 @@ inline float append(float *& dataStream, const float value)
     return value;
 }
 
+inline uint32_t append(uint32_t *& dataStream, const uint32_t value)
+{
+    *dataStream = value; 
+
+    ++dataStream;
+
+    return value;
+}
+
+
 #endif // __WEB_ASM_PLAY_UTIL_H__

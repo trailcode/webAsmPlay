@@ -31,7 +31,7 @@ using namespace std;
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations)
 {
-    if(tessellations[0]->height != 0.0) { return _create<true>(tessellations) ;}
+    if(tessellations[0]->getHeight() != 0.0) { return _create<true>(tessellations) ;}
 
     return _create<false>(tessellations);
 }
@@ -86,8 +86,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         for(size_t j = 0; j < tess->numVerts; ++j)
         {
-            append(vertsPtr, tess->vertsOut[j * 2 + 0]);
-            append(vertsPtr, tess->vertsOut[j * 2 + 1]);
+            append(vertsPtr, tess->verts[j * 2 + 0]);
+            append(vertsPtr, tess->verts[j * 2 + 1]);
 
             if(IS_3D) { append(vertsPtr, tess->height) ;}
 
@@ -102,39 +102,39 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         offset += tess->numVerts;
 
-        if(IS_3D && tess->numVerts)
+        if(IS_3D && tess->verts)
         {
-            size_t prevA = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
-            //*lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
-
-            append(vertsPtr, tess->vertsOut[0]);
-            append(vertsPtr, tess->vertsOut[1]);
+            //size_t prevA = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+            size_t prevA = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
+            
+            append(vertsPtr, tess->verts[0]);
+            append(vertsPtr, tess->verts[1]);
             append(vertsPtr, 0);
             append(vertsPtr, symbologyWallID_value);
 
-            size_t prevB = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+            size_t prevB = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
 
             const size_t startA = prevA;
             const size_t startB = prevB;
 
-            append(vertsPtr, tess->vertsOut[0]);
-            append(vertsPtr, tess->vertsOut[1]);
+            append(vertsPtr, tess->verts[0]);
+            append(vertsPtr, tess->verts[1]);
             append(vertsPtr, tess->height);
             append(vertsPtr, symbologyWallID_value);
 
             for(size_t j = 1; j < tess->numVerts; ++j)
             {
-                size_t A = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+                const size_t A = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
 
-                append(vertsPtr, tess->vertsOut[j * 2 + 0]);
-                append(vertsPtr, tess->vertsOut[j * 2 + 1]);
+                append(vertsPtr, tess->verts[j * 2 + 0]);
+                append(vertsPtr, tess->verts[j * 2 + 1]);
                 append(vertsPtr, 0);
                 append(vertsPtr, symbologyWallID_value);
 
-                size_t B = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+                const size_t B = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
 
-                append(vertsPtr, tess->vertsOut[j * 2 + 0]);
-                append(vertsPtr, tess->vertsOut[j * 2 + 1]);
+                append(vertsPtr, tess->verts[j * 2 + 0]);
+                append(vertsPtr, tess->verts[j * 2 + 1]);
                 append(vertsPtr, tess->height);
                 append(vertsPtr, symbologyWallID_value);
 
@@ -192,7 +192,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                                  ebo,
                                  ebo2,
                                  vbo,
-                                 triangleIndices.size() / 3, // TODO use number of indices.
+                                 triangleIndices.size(),
                                  counterVertIndices,
                                  lineIndices.size(),
                                  tessellations.size() > 1);
@@ -202,16 +202,16 @@ VertexArrayObject::VertexArrayObject(   const GLuint      vao,
                                         const GLuint      ebo,
                                         const GLuint      ebo2,
                                         const GLuint      vbo,
-                                        const int         numTriangles,
+                                        const GLuint      numTrianglesIndices,
                                         const Uint32Vec & counterVertIndices,
                                         const size_t      numContourLines,
                                         const bool        isMulti) : vao                (vao),
                                                                      ebo                (ebo),
                                                                      ebo2               (ebo2),
                                                                      vbo                (vbo),
-                                                                     numTriangles       (numTriangles),
+                                                                     numTrianglesIndices(numTrianglesIndices),
                                                                      counterVertIndices (counterVertIndices),
-                                                                    numContourLines     (numContourLines),
+                                                                     numContourLines    (numContourLines),
                                                                      _isMulti           (isMulti)
 {
 
@@ -244,7 +244,7 @@ void VertexArrayObject::bindLines() const
 
 void VertexArrayObject::drawTriangles() const
 {
-    GL_CHECK(glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, NULL));
+    GL_CHECK(glDrawElements(GL_TRIANGLES, numTrianglesIndices, GL_UNSIGNED_INT, NULL));
 }
 
 void VertexArrayObject::drawLines() const

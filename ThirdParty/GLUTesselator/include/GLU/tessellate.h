@@ -6,10 +6,9 @@ typedef struct Vertex {
     struct Vertex *prev;
 } Vertex;
 
-void tessellate
-    (double **verts,
-     int *nverts,
-     int **tris,
-     int *ntris,
-     const double **contoursbegin, 
-     const double **contoursend);
+void tessellate(double **verts,
+                uint32_t *nverts,
+                uint32_t **tris,
+                uint32_t *ntris,
+                const double **contoursbegin, 
+                const double **contoursend);

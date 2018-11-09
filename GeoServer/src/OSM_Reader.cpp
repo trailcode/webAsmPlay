@@ -235,9 +235,7 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
 
                             way->relations.push_back(i.second);
 
-                            //if(way->keyValues.size()) { dmess("way->keyValues.size() " << way->keyValues.size()) ;}
-
-                            break; // TODO handle the others
+                            break;
                     }
                     
                     break;

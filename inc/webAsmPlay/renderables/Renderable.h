@@ -71,14 +71,17 @@ protected:
 
     Renderable(const bool isMulti);
 
+    Renderable(const Renderable&) {}                            // Prevent copy-construction
+    Renderable& operator=(const Renderable&) { return *this ;}  // Prevent assignment
+
     std::vector<OnDelete> onDeleteCallbacks;
 
-    bool isMulti;
+    bool isMulti = false;
 
-    Shader * shader;
+    Shader * shader = NULL;
 
-    bool renderFill;
-    bool renderOutline;
+    bool renderFill = true;
+    bool renderOutline = true;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERABLE_H__

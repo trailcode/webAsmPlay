@@ -66,19 +66,23 @@ private:
                         const GLuint      ebo,
                         const GLuint      ebo2,
                         const GLuint      vbo,
-                        const int         numTriangles,
+                        const GLuint      numTrianglesIndices,
                         const Uint32Vec & counterVertIndices,
                         const size_t      numContourLines,
                         const bool        isMulti);
 
-    const GLuint    vao;
-    const GLuint    ebo;
-    const GLuint    ebo2;
-    const GLuint    vbo;
-    const int       numTriangles;
+    VertexArrayObject(const VertexArrayObject&) {}                            // Prevent copy-construction
+    VertexArrayObject& operator=(const VertexArrayObject&) { return *this ;}  // Prevent assignment
+
+    const GLuint    vao                 = 0;
+    const GLuint    ebo                 = 0;
+    const GLuint    ebo2                = 0;
+    const GLuint    vbo                 = 0;
+    const GLuint    numTrianglesIndices = 0;
+    const size_t    numContourLines     = 0;
+    const bool      _isMulti            = false;
+
     const Uint32Vec counterVertIndices;
-    const size_t    numContourLines;
-    const bool      _isMulti;
 };
 
 #endif // __WEB_ASM_PLAY_VERTEX_ARRAY_OBJECT_H__

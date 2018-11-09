@@ -69,9 +69,7 @@ Renderable * Renderable::create(const Geometry * geom,
 }
 
 Renderable::Renderable(const bool isMulti) : isMulti        (isMulti),
-                                             shader         (ColorShader::getDefaultInstance()),
-                                             renderFill     (true),
-                                             renderOutline  (true)
+                                             shader         (ColorShader::getDefaultInstance())
 {
 }
 

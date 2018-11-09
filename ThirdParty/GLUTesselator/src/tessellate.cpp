@@ -163,14 +163,14 @@ void combine(const GLdouble newVertex[3],
     *outData = result;
 }
 
-void write_output(TessContext *ctx, double **coordinates_out, int **tris_out, int *vc, int *tc)
+void write_output(TessContext *ctx, double **coordinates_out, uint32_t **tris_out, uint32_t *vc, uint32_t *tc)
 {
     int n_verts = 1 + ctx->latest_v->index;
     *vc = n_verts;
     int n_tris_copy = ctx->n_tris;
     *tc = ctx->n_tris;
     *coordinates_out = (double *)malloc(n_verts * sizeof(double) * 2);
-    *tris_out = (int *)(ctx->n_tris ? malloc(ctx->n_tris * sizeof(int) * 3) : NULL);
+    *tris_out = (uint32_t *)(ctx->n_tris ? malloc(ctx->n_tris * sizeof(uint32_t) * 3) : NULL);
 
     while (ctx->latest_v) {
         (*coordinates_out)[2*ctx->latest_v->index]   = ctx->latest_v->pt[0];
@@ -193,9 +193,9 @@ void write_output(TessContext *ctx, double **coordinates_out, int **tris_out, in
 
 void tessellate
         (double **verts,
-         int *nverts,
-         int **tris,
-         int *ntris,
+         uint32_t *nverts,
+         uint32_t **tris,
+         uint32_t *ntris,
          const double **contoursbegin,
          const double **contoursend) {
     const double *contourbegin, *contourend;

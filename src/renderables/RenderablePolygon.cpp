@@ -60,7 +60,7 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
 
     tesselations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
 
-    if(!(*tesselations.begin())->vertsOut) { return NULL ;}
+    if((*tesselations.begin())->isEmpty()) { return NULL ;}
 
     return new RenderablePolygon(VertexArrayObject::create(tesselations));
 }
@@ -100,7 +100,7 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
         {
             tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
             
-            if(!(*tessellations.rbegin())->vertsOut)
+            if((*tessellations.rbegin())->isEmpty())
             {
                 dmess("Warning tessellation failed!");
 

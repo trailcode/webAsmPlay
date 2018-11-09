@@ -43,7 +43,7 @@ Tessellation::Tessellation(const Tessellation&) { abort() ;}
     
 Tessellation::~Tessellation()
 {
-    free(vertsOut);
+    free(verts);
     free(triangleIndices);
 }
 
@@ -162,7 +162,7 @@ unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * 
 
     for(size_t i = 0; i < ret->counterVertIndices.size(); ++i) { counterVertPtrs.push_back(&verts[0] + ret->counterVertIndices[i]) ;}
 
-    tessellate( &ret->vertsOut,
+    tessellate( &ret->verts,
                 &ret->numVerts,
                 &ret->triangleIndices,
                 &ret->numTriangles,
@@ -185,7 +185,7 @@ void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
 
         tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
             
-        if(!(*tessellations.rbegin())->vertsOut)
+        if(!(*tessellations.rbegin())->verts)
         {
             dmess("Warning tessellation failed!");
 
@@ -193,3 +193,15 @@ void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
         }
     }
 }
+
+bool Tessellation::isEmpty() const { return verts == NULL ;}
+
+/*
+const uint32_t * Tessellation::getTriangleIndices() const { return triangleIndices ;}
+uint32_t Tessellation::getNumVerts() const { return numVerts ;}
+uint32_t Tessellation::getNumTriangles() const { return numTriangles ;}
+const Uint32Vec & Tessellation::getCounterVertIndices() const { 
+const Uint32Vec & Tessellation::getLineIndices() const;
+*/
+uint32_t Tessellation::getSymbologyID() const { return symbologyID ;}
+double Tessellation::getHeight() const { return height ;}
