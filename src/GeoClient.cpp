@@ -750,22 +750,19 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     if(r)
     {
         r->setShader(ColorDistanceShader::getDefaultInstance());
-        //r->setShader(ColorDistanceShader3D::getDefaultInstance());
 
         canvas->addRenderiable(r);
     }
 
-    //*
     r = RenderableMesh::create(polygons3D, trans, true);
 
     if(r)
     {
-        //r->setShader(ColorDistanceShader3D::getDefaultInstance());
-        r->setShader(ColorDistanceShader::getDefaultInstance());
+        r->setShader(ColorDistanceShader3D::getDefaultInstance());
+        //r->setShader(ColorDistanceShader::getDefaultInstance());
 
         canvas->addRenderiable(r);
     }
-    //*/
     
     dmess("End base geom");
 }

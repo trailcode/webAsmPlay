@@ -38,6 +38,9 @@ public:
 
     static ColorDistanceShader3D * getDefaultInstance();
 
+    ColorDistanceShader3D();
+    ~ColorDistanceShader3D();
+
     static void ensureShader();
 
     void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
@@ -50,14 +53,15 @@ public:
 
     void saveState(JSONObject & dataStore);
 
-    ColorDistanceShader3D();
-    ~ColorDistanceShader3D();
+    float setHeightMultiplier(const float multiplier);
 
 private:
 
     glm::vec4 colors[32];
 
     bool colorTextureDirty;
+
+    float heightMultiplier = 1.0f;
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_3D_H__

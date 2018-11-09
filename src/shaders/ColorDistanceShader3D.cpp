@@ -46,6 +46,8 @@ namespace
 
     GLint colorLookupOffsetLoc = -1;
 
+    GLint heightMultiplierLoc = -1;
+
     GLint MV_Uniform = -1;
 
     GLuint texUniform = -1;
@@ -59,14 +61,16 @@ void ColorDistanceShader3D::ensureShader()
 {
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 150 core
-        uniform sampler2D tex;
+
+        uniform sampler2D tex; // TODO why does the ordering matter here? Something must not be correct.
 
         in vec3 vertIn;
         in float vertColorIn;
         
-        uniform mat4 MVP;
-        uniform mat4 MV;
-        uniform float colorLookupOffset;
+        uniform mat4      MVP;
+        uniform mat4      MV;
+        uniform float     colorLookupOffset;
+        uniform float     heightMultiplier;
         
         out vec4 vertexColorNear;
         out vec4 vertexColorFar;
@@ -74,7 +78,7 @@ void ColorDistanceShader3D::ensureShader()
 
         void main()
         {
-            vec4 vert = vec4(vertIn.xyz, 1);
+            vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
 
             position_in_view_space = MV * vert;
 
@@ -86,6 +90,7 @@ void ColorDistanceShader3D::ensureShader()
     )glsl";
 
     const GLchar* fragmentSource = R"glsl(#version 150 core
+        
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
@@ -113,7 +118,11 @@ void ColorDistanceShader3D::ensureShader()
 
     shaderProgram = ShaderProgram::create(  vertexSource,
                                             fragmentSource,
-                                            StrVec({"MV", "colorsIn", "tex", "colorLookupOffset"}));
+                                            StrVec({"MV",
+                                                    "colorsIn",
+                                                    "tex",
+                                                    "colorLookupOffset",
+                                                    "heightMultiplier"}));
 
     colorLookupOffsetLoc = shaderProgram->getUniformLoc("colorLookupOffset");
 
@@ -122,6 +131,8 @@ void ColorDistanceShader3D::ensureShader()
     colorsInLoc = shaderProgram->getUniformLoc("colorsIn");
 
     texUniform = shaderProgram->getUniformLoc("tex");
+
+    heightMultiplierLoc = shaderProgram->getUniformLoc("heightMultiplier");
 
     defaultInstance = new ColorDistanceShader3D();
 }
@@ -162,14 +173,16 @@ void ColorDistanceShader3D::bind(const mat4 & MVP, const mat4 & MV, const bool i
 
     shaderProgram->setUniform(MV_Uniform, MV);
 
+    shaderProgram->setUniformi(texUniform, 0);
+
+    shaderProgram->setUniformf(heightMultiplierLoc, heightMultiplier);
+
     shaderProgram->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
 
     shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLuint)));
 
-    shaderProgram->setUniformi(texUniform, 0);
-
-    if(isOutline) { shaderProgram->setUniform(colorLookupOffsetLoc, 2.0f) ;}
-    else          { shaderProgram->setUniform(colorLookupOffsetLoc, 0.0f) ;}
+    if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 2.0f) ;}
+    else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}
 }
 
 vec4 ColorDistanceShader3D::setColor(const size_t index, const vec4 & color)
@@ -216,3 +229,4 @@ void ColorDistanceShader3D::saveState(JSONObject & dataStore)
     }
 }
 
+float ColorDistanceShader3D::setHeightMultiplier(const float multiplier) { return heightMultiplier = multiplier ;}

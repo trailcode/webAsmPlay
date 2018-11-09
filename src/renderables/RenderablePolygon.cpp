@@ -144,9 +144,9 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
     {
         shader->bind(MVP, MV, false);
 
-        shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0); // TODO shader->bind should be doing this
+        shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO shader->bind should be doing this
 
-        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
         vertexArrayObject->drawTriangles();
     }
@@ -156,9 +156,9 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
         shader->bind(MVP, MV, true);
 
         // TODO this is here as a hack
-        shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0); // TODO shader->bind should be doing this
+        shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO shader->bind should be doing this
 
-        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
         vertexArrayObject->bindLines();
         

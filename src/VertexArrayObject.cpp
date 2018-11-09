@@ -31,9 +31,9 @@ using namespace std;
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations)
 {
-    return _create<true>(tessellations);
+    //return _create<true>(tessellations);
 
-    if(tessellations[0]->height != 0.0) { return _create<false>(tessellations) ;}
+    if(tessellations[0]->height != 0.0) { dmess("Here " << tessellations[0]->height); return _create<true>(tessellations) ;}
 
     return _create<false>(tessellations);
 }

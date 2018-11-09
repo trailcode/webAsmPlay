@@ -61,6 +61,8 @@ public:
 
     static void progress(const std::string & message, const float percent);
 
+    static float getHeightMultiplier();
+
 private:
 
     GUI() {}
@@ -107,6 +109,8 @@ private:
     static SkyBox          * skyBox;
 
     static std::vector<Canvas *> auxCanvases;
+
+    static float heightMultiplier;
 };
 
 #endif // __WEB_ASM_PLAY_GUI_H__

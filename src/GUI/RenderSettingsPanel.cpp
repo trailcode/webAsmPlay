@@ -28,10 +28,13 @@
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/renderables/Renderable.h>
+#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
 using namespace glm;
+
+float GUI::heightMultiplier = 1.0f;
 
 void GUI::renderSettingsPanel()
 {
@@ -68,12 +71,19 @@ void GUI::renderSettingsPanel()
         }
 
         if(ImGui::Checkbox("SkyBox", &renderSkyBox))
-        {
+        {   
             if(renderSkyBox) { canvas->setSkyBox(skyBox) ;}
             else             { canvas->setSkyBox(NULL)   ;}
         }
         
-        ImGui::Spacing();
+        //ImGui::Spacing();
+
+        if(ImGui::SliderFloat("", &heightMultiplier, 0.0f, 5.0f, "Height mult: %.3f"))
+        {
+            ColorDistanceShader3D::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
+        }
 
     ImGui::End();
 }
+
+float GUI::getHeightMultiplier() { return heightMultiplier ;}

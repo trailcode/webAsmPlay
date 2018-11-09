@@ -79,9 +79,9 @@ public:
     GLint getUniformLoc  (const std::string & name) const;
     GLint getAttributeLoc(const std::string & name) const;
 
-    void setUniform(const GLint location, const glm::mat4 & value) const;
-    void setUniform(const GLint location, const glm::vec4 & value) const;
-    void setUniform(const GLint location, const float     & value) const;
+    void setUniform (const GLint location, const glm::mat4 & value) const;
+    void setUniform (const GLint location, const glm::vec4 & value) const;
+    void setUniformf(const GLint location, const float     & value) const;
     void setUniformi(const GLint location, const GLuint    & value) const;
 
 protected:
