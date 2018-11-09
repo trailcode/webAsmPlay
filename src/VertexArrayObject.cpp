@@ -120,8 +120,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             size_t prevB = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
 
-            size_t startA = prevA;
-            size_t startB = prevB;
+            const size_t startA = prevA;
+            const size_t startB = prevB;
 
             append(vertsPtr, tess->vertsOut[0]);
             append(vertsPtr, tess->vertsOut[1]);
@@ -130,11 +130,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             for(size_t j = 1; j < tess->numVerts; ++j)
             {
-                //*lineIndicesPtr = startIndex + j; ++lineIndicesPtr;
-                //*lineIndicesPtr = startIndex + j + 1; ++lineIndicesPtr;
-
                 size_t A = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
-                //*lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
 
                 append(vertsPtr, tess->vertsOut[j * 2 + 0]);
                 append(vertsPtr, tess->vertsOut[j * 2 + 1]);

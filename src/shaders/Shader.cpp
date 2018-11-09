@@ -29,12 +29,7 @@
 
 using namespace glm;
 
-Shader::Shader(ShaderProgram * program) :   renderFill   (true),
-                                            renderOutline(true),
-                                            program      (program) {}
-
-bool Shader::getRenderFill()    const { return renderFill    ;}
-bool Shader::getRenderOutline() const { return renderOutline ;}
+Shader::Shader(ShaderProgram * program) : program(program) {}
 
 void Shader::enableVertexAttribArray(const GLint       size,
                                      const GLenum      type,

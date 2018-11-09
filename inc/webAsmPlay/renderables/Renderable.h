@@ -61,6 +61,12 @@ public:
     Shader * getShader() const;
     Shader * setShader(Shader * shader);
 
+    bool getRenderFill() const;
+    bool getRenderOutline() const;
+
+    bool setRenderFill(const bool render);
+    bool setRenderOutline(const bool render);
+
 protected:
 
     Renderable(const bool isMulti);
@@ -70,6 +76,9 @@ protected:
     bool isMulti;
 
     Shader * shader;
+
+    bool renderFill;
+    bool renderOutline;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERABLE_H__

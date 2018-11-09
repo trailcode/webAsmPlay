@@ -46,27 +46,20 @@ void GUI::renderSettingsPanel()
 
         if(ImGui::Checkbox("Fill Polygons", &fillPolygons))
         {
-            dmess("Fix!");
-            /*
             for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
 
             for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
 
-            Renderable::setDefaultRenderFill(fillPolygons);
-            */
+            //Renderable::setDefaultRenderFill(fillPolygons);
         }
 
         if(ImGui::Checkbox("Polygon Outlines", &renderPolygonOutlines))
         {
-            dmess("Fix!");
-
-            /*
             for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
 
             for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
 
-            Renderable::setDefaultRenderOutline(renderPolygonOutlines);
-            */
+            //Renderable::setDefaultRenderOutline(renderPolygonOutlines);
         }
 
         if(ImGui::Checkbox("Linear Features", &renderLinearFeatures))

@@ -68,7 +68,10 @@ Renderable * Renderable::create(const Geometry * geom,
     return NULL;
 }
 
-Renderable::Renderable(const bool isMulti) : isMulti(isMulti), shader(ColorShader::getDefaultInstance())
+Renderable::Renderable(const bool isMulti) : isMulti        (isMulti),
+                                             shader         (ColorShader::getDefaultInstance()),
+                                             renderFill     (true),
+                                             renderOutline  (true)
 {
 }
 
@@ -83,3 +86,9 @@ void Renderable::addOnDeleteCallback(const OnDelete & callback) { onDeleteCallba
 
 Shader * Renderable::getShader() const { return shader ;}
 Shader * Renderable::setShader(Shader * shader) { return this->shader = shader ;}
+
+bool Renderable::getRenderFill()    const { return renderFill ;}
+bool Renderable::getRenderOutline() const { return renderOutline ;}
+
+bool Renderable::setRenderFill   (const bool render) { return renderFill = render ;}
+bool Renderable::setRenderOutline(const bool render) { return renderOutline = render ;}

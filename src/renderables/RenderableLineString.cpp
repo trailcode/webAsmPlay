@@ -235,7 +235,7 @@ void RenderableLineString::render(const mat4 & MVP, const mat4 & MV) const
 
         shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
-        glDrawElements(GL_LINES,      numElements, GL_UNSIGNED_INT, NULL);
+        glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, NULL);
     }
 
     glBindVertexArray(0);

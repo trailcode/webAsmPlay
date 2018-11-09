@@ -43,9 +43,6 @@ class Shader
 {
 public:
 
-    bool getRenderFill() const;
-    bool getRenderOutline() const;
-
     virtual void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
 
     void enableVertexAttribArray(   const GLint       size          = 2,
@@ -65,9 +62,6 @@ protected:
     Shader(ShaderProgram * program);
 
     virtual ~Shader() {}
-
-    bool renderFill;
-    bool renderOutline;
 
     ShaderProgram * program;
 };

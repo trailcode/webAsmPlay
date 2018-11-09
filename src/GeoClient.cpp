@@ -659,7 +659,7 @@ namespace
 {
     double getHeight(Attributes * attrs)
     {
-        const double scale = 0.01;
+        const double scale = 0.005;
         // See: https://wiki.openstreetmap.org/wiki/OSM-3D.org
         if(attrs->hasStringKey("height")) { return atof(attrs->strings["height"].c_str()) * scale * 0.3;}
 

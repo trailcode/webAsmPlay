@@ -140,7 +140,7 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
     GL_CHECK(glDisable(GL_DEPTH_TEST));
 
-    if(shader->getRenderFill())
+    if(getRenderFill())
     {
         shader->bind(MVP, MV, false);
 
@@ -151,7 +151,7 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
         vertexArrayObject->drawTriangles();
     }
 
-    if(shader->getRenderOutline())
+    if(getRenderOutline())
     {
         shader->bind(MVP, MV, true);
 
