@@ -45,6 +45,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <OpenSteer/Vec3.h>
 #include <OpenSteer/Color.h>
 #include <webAsmPlay/Debug.h>
@@ -131,5 +132,31 @@ inline uint32_t append(uint32_t *& dataStream, const uint32_t value)
     return value;
 }
 
+inline void append( uint32_t       *& dataStream,
+                    const uint32_t    valueA,
+                    const uint32_t    valueB)
+{
+    *dataStream = valueA; ++dataStream;
+    *dataStream = valueB; ++dataStream;
+}
+
+inline void append( float       *& dataStream,
+                    const float    valueA,
+                    const float    valueB,
+                    const float    valueC)
+{
+    *dataStream = valueA; ++dataStream;
+    *dataStream = valueB; ++dataStream;
+    *dataStream = valueC; ++dataStream;
+}
+
+inline glm::vec3 append(float *& dataStream, const glm::vec3 & value)
+{
+    memcpy(dataStream, value_ptr(value), sizeof(glm::vec3));
+
+    dataStream += 3;
+
+    return value;
+}
 
 #endif // __WEB_ASM_PLAY_UTIL_H__

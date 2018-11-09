@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <glm/gtx/normal.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/VertexArrayObject.h>
 
@@ -114,80 +115,72 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         if(IS_3D && tess->verts)
         {
-            size_t prevA = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
+            size_t prevIndexA = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
             
-            append(vertsPtr, tess->verts[0]);
-            append(vertsPtr, tess->verts[1]);
-            append(vertsPtr, 0);
+            const vec3 A(tess->verts[0], tess->verts[1], 0);
+            const vec3 B(tess->verts[0], tess->verts[1], tess->height);
+            const vec3 C(tess->verts[2], tess->verts[3], 0);
 
-            append(vertsPtr, 0);
-            append(vertsPtr, 0);
-            append(vertsPtr, 0);
+            const vec3 normal = triangleNormal(A, B, C);
 
+            append(vertsPtr, A);
+            append(vertsPtr, normal);
             append(vertsPtr, symbologyWallID_value);
 
-            size_t prevB = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
+            size_t prevIndexB = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
 
-            const size_t startA = prevA;
-            const size_t startB = prevB;
+            const size_t startIndexA = prevIndexA;
+            const size_t startIndexB = prevIndexB;
 
-            append(vertsPtr, tess->verts[0]);
-            append(vertsPtr, tess->verts[1]);
-            append(vertsPtr, tess->height);
-
-            append(vertsPtr, 0);
-            append(vertsPtr, 0);
-            append(vertsPtr, 0);
-
+            append(vertsPtr, B);
+            append(vertsPtr, normal);
             append(vertsPtr, symbologyWallID_value);
 
             for(size_t j = 1; j < tess->numVerts; ++j)
             {
-                //const size_t A = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
-                const size_t A = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
+                const size_t indexA = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
 
-                append(vertsPtr, tess->verts[j * 2 + 0]);
-                append(vertsPtr, tess->verts[j * 2 + 1]);
-                append(vertsPtr, 0);
+                const size_t k = (j + 1) % tess->numVerts;
 
-                append(vertsPtr, 0);
-                append(vertsPtr, 0);
-                append(vertsPtr, 0);
+                const vec3 A(tess->verts[j * 2 + 0], tess->verts[j * 2 + 1], 0);
+                const vec3 B(tess->verts[j * 2 + 0], tess->verts[j * 2 + 1], tess->height);
+                const vec3 C(tess->verts[k * 2 + 0], tess->verts[k * 2 + 1], 0);
 
-                append(vertsPtr, symbologyWallID_value);
+                const vec3 normal = triangleNormal(A, B, C);
 
-                //const size_t B = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
-                const size_t B = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
-
-                append(vertsPtr, tess->verts[j * 2 + 0]);
-                append(vertsPtr, tess->verts[j * 2 + 1]);
-                append(vertsPtr, tess->height);
-
-                append(vertsPtr, 0);
-                append(vertsPtr, 0);
-                append(vertsPtr, 0);
-
-                append(vertsPtr, symbologyWallID_value);
-
-                wallTris.push_back(prevA);
-                wallTris.push_back(prevB);
-                wallTris.push_back(A);
-
-                wallTris.push_back(A);
-                wallTris.push_back(prevB);
-                wallTris.push_back(B);
+                append(vertsPtr, A);
                 
-                prevA = A;
-                prevB = B;
+                append(vertsPtr, normal);
+                
+                append(vertsPtr, symbologyWallID_value);
+
+                const size_t indexB = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
+
+                append(vertsPtr, B);
+
+                append(vertsPtr, normal);
+
+                append(vertsPtr, symbologyWallID_value);
+
+                wallTris.push_back(prevIndexA);
+                wallTris.push_back(prevIndexB);
+                wallTris.push_back(indexA);
+
+                wallTris.push_back(indexA);
+                wallTris.push_back(prevIndexB);
+                wallTris.push_back(indexB);
+                
+                prevIndexA = indexA;
+                prevIndexB = indexB;
             }
 
-            wallTris.push_back(startA);
-            wallTris.push_back(startB);
-            wallTris.push_back(prevA);
+            wallTris.push_back(startIndexA);
+            wallTris.push_back(startIndexB);
+            wallTris.push_back(prevIndexA);
 
-            wallTris.push_back(prevA);
-            wallTris.push_back(startB);
-            wallTris.push_back(prevB);
+            wallTris.push_back(prevIndexA);
+            wallTris.push_back(startIndexB);
+            wallTris.push_back(prevIndexB);
 
             //dmess("tess->numVerts " << tess->numVerts << " wallTris " << wallTris.size());
 

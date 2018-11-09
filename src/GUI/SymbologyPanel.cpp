@@ -42,7 +42,7 @@ namespace
     // 2 - building
     // 3 - grass
 
-    const const ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoInputs;
+    const ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoInputs;
 
     void addSymbologyColorControls(const size_t colorIndex, const string & name, vec4 * colors)
     {

@@ -177,9 +177,15 @@ void ColorDistanceShader3D::bind(const mat4 & MVP, const mat4 & MV, const bool i
 
     shaderProgram->setUniformf(heightMultiplierLoc, heightMultiplier);
 
-    shaderProgram->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+    //shaderProgram->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+    shaderProgram->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
 
-    shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLuint)));
+    //shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLuint)));
+    shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+
+    //GL_CHECK(glEnableVertexAttribArray(colorInAttrib));
+
+    //GL_CHECK(glVertexAttribPointer(colorInAttrib, 3, GL_FLOAT, GL_FALSE, stride, pointer));
 
     if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 2.0f) ;}
     else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}

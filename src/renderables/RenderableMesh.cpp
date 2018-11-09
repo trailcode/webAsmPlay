@@ -126,29 +126,31 @@ void RenderableMesh::render(const mat4 & MVP, const mat4 & MV) const
 
     GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-    //GL_CHECK(glDisable(GL_DEPTH_TEST));
-    GL_CHECK(glEnable(GL_DEPTH_TEST));
+    GL_CHECK(glDisable(GL_DEPTH_TEST));
+    //GL_CHECK(glEnable(GL_DEPTH_TEST));
 
-    if(getRenderFill())
+    if(false && getRenderFill())
     {
         shader->bind(MVP, MV, false);
+
+        //shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+        //shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+
+        //shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+        //shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+
+        vertexArrayObject->drawTriangles();
+    }
+
+    if(getRenderOutline())
+    {
+        shader->bind(MVP, MV, true);
 
         //shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
         shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
 
         //shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
         shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
-
-        vertexArrayObject->drawTriangles();
-    }
-
-    if(false && getRenderOutline())
-    {
-        shader->bind(MVP, MV, true);
-
-        shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
-
-        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 
         vertexArrayObject->bindLines();
         
