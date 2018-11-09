@@ -28,6 +28,7 @@
 #include <webAsmPlay/VertexArrayObject.h>
 
 using namespace std;
+using namespace glm;
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations)
 {
@@ -58,7 +59,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
     FloatVec verts;
 
-    if(IS_3D) { verts.resize(numVerts * 3 * (3 + 1)) ;}
+    if(IS_3D) { verts.resize(numVerts * (3 + 3 + 1 + 1) * 2) ;}
     else      { verts.resize(numVerts * (2 + 1)) ;}
 
     Uint32Vec triangleIndices      (numTriangles * 3);
@@ -84,12 +85,21 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         const size_t startIndex = *counterVertIndicesPtr;
 
+        //const vec3 normal;
+
         for(size_t j = 0; j < tess->numVerts; ++j)
         {
             append(vertsPtr, tess->verts[j * 2 + 0]);
             append(vertsPtr, tess->verts[j * 2 + 1]);
 
-            if(IS_3D) { append(vertsPtr, tess->height) ;}
+            if(IS_3D)
+            {
+                append(vertsPtr, tess->height);
+
+                append(vertsPtr, 0);
+                append(vertsPtr, 0);
+                append(vertsPtr, 1);
+            }
 
             append(vertsPtr, symbologyID_value);
         }
@@ -104,15 +114,19 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         if(IS_3D && tess->verts)
         {
-            //size_t prevA = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
-            size_t prevA = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
+            size_t prevA = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
             
             append(vertsPtr, tess->verts[0]);
             append(vertsPtr, tess->verts[1]);
             append(vertsPtr, 0);
+
+            append(vertsPtr, 0);
+            append(vertsPtr, 0);
+            append(vertsPtr, 0);
+
             append(vertsPtr, symbologyWallID_value);
 
-            size_t prevB = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
+            size_t prevB = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
 
             const size_t startA = prevA;
             const size_t startB = prevB;
@@ -120,22 +134,39 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             append(vertsPtr, tess->verts[0]);
             append(vertsPtr, tess->verts[1]);
             append(vertsPtr, tess->height);
+
+            append(vertsPtr, 0);
+            append(vertsPtr, 0);
+            append(vertsPtr, 0);
+
             append(vertsPtr, symbologyWallID_value);
 
             for(size_t j = 1; j < tess->numVerts; ++j)
             {
-                const size_t A = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
+                //const size_t A = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
+                const size_t A = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
 
                 append(vertsPtr, tess->verts[j * 2 + 0]);
                 append(vertsPtr, tess->verts[j * 2 + 1]);
                 append(vertsPtr, 0);
+
+                append(vertsPtr, 0);
+                append(vertsPtr, 0);
+                append(vertsPtr, 0);
+
                 append(vertsPtr, symbologyWallID_value);
 
-                const size_t B = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
+                //const size_t B = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
+                const size_t B = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
 
                 append(vertsPtr, tess->verts[j * 2 + 0]);
                 append(vertsPtr, tess->verts[j * 2 + 1]);
                 append(vertsPtr, tess->height);
+
+                append(vertsPtr, 0);
+                append(vertsPtr, 0);
+                append(vertsPtr, 0);
+
                 append(vertsPtr, symbologyWallID_value);
 
                 wallTris.push_back(prevA);
