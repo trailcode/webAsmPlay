@@ -27,6 +27,8 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/VertexArrayObject.h>
 
+using namespace std;
+
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations)
 {
     return _create<true>(tessellations);
@@ -78,6 +80,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
     size_t offset = 0;
 
+    vector<size_t> wallTris;
+
     for(size_t i = 0; i < tessellations.size(); ++i)
     {
         const auto & tess = tessellations[i];
@@ -104,14 +108,32 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         offset += tess->numVerts;
 
-        if(IS_3D)
+        if(IS_3D && tess->numVerts)
         {
-            for(size_t j = 0; j < tess->numVerts; ++j)
+            size_t prevA = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+            //*lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+
+            append(vertsPtr, tess->vertsOut[0]);
+            append(vertsPtr, tess->vertsOut[1]);
+            append(vertsPtr, 0);
+            append(vertsPtr, symbologyID_value);
+
+            size_t prevB = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+
+            size_t startA = prevA;
+            size_t startB = prevB;
+
+            append(vertsPtr, tess->vertsOut[0]);
+            append(vertsPtr, tess->vertsOut[1]);
+            append(vertsPtr, tess->height);
+            append(vertsPtr, symbologyID_value);
+
+            for(size_t j = 1; j < tess->numVerts; ++j)
             {
                 //*lineIndicesPtr = startIndex + j; ++lineIndicesPtr;
                 //*lineIndicesPtr = startIndex + j + 1; ++lineIndicesPtr;
 
-                *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+                size_t A = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
                 //*lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
 
                 append(vertsPtr, tess->vertsOut[j * 2 + 0]);
@@ -119,17 +141,40 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                 append(vertsPtr, 0);
                 append(vertsPtr, symbologyID_value);
 
-                *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
+                size_t B = *lineIndicesPtr = (vertsPtr - &verts[0]) / 4; ++lineIndicesPtr;
 
                 append(vertsPtr, tess->vertsOut[j * 2 + 0]);
                 append(vertsPtr, tess->vertsOut[j * 2 + 1]);
                 append(vertsPtr, tess->height);
                 append(vertsPtr, symbologyID_value);
+
+                wallTris.push_back(prevA);
+                wallTris.push_back(prevB);
+                wallTris.push_back(A);
+
+                wallTris.push_back(A);
+                wallTris.push_back(prevB);
+                wallTris.push_back(B);
+                
+                prevA = A;
+                prevB = B;
             }
+
+            wallTris.push_back(startA);
+            wallTris.push_back(startB);
+            wallTris.push_back(prevA);
+
+            wallTris.push_back(prevA);
+            wallTris.push_back(startB);
+            wallTris.push_back(prevB);
+
+            //dmess("tess->numVerts " << tess->numVerts << " wallTris " << wallTris.size());
 
             offset += tess->numVerts * 2;
         }
     }
+
+    triangleIndices.insert(triangleIndices.begin(), wallTris.begin(), wallTris.end()); // TODO try not to do this.
 
     GLuint vao  = 0;
     GLuint ebo  = 0;
@@ -148,7 +193,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     GL_CHECK(glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW));
     
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * numTriangles * 3, &triangleIndices[0], GL_STATIC_DRAW));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * triangleIndices.size(), &triangleIndices[0], GL_STATIC_DRAW));
     
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
     GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
@@ -157,7 +202,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                                  ebo,
                                  ebo2,
                                  vbo,
-                                 numTriangles,
+                                 triangleIndices.size() / 3, // TODO use number of indices.
                                  counterVertIndices,
                                  lineIndices.size(),
                                  tessellations.size() > 1);

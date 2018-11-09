@@ -659,12 +659,13 @@ namespace
 {
     double getHeight(Attributes * attrs)
     {
+        const double scale = 0.01;
         // See: https://wiki.openstreetmap.org/wiki/OSM-3D.org
-        if(attrs->hasStringKey("height")) { return atof(attrs->strings["height"].c_str()) * 0.001 * 0.3;}
+        if(attrs->hasStringKey("height")) { return atof(attrs->strings["height"].c_str()) * scale * 0.3;}
 
-        if(attrs->hasStringKey("building:levels")) { return atof(attrs->strings["building:levels"].c_str()) * 0.001 ;}
+        if(attrs->hasStringKey("building:levels")) { return atof(attrs->strings["building:levels"].c_str()) * scale ;}
 
-        return 0.001;
+        return scale;
     }
 }
 

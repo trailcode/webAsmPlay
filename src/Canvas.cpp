@@ -125,6 +125,8 @@ bool Canvas::preRender()
         GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
     }
 
+    GL_CHECK(glClear(GL_DEPTH_BUFFER_BIT));
+
     return true;
 }
 
