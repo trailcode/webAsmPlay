@@ -30,7 +30,7 @@
 class ArrayDescriptor
 {
 public:
-
+    
 };
 
 #endif // __WEB_ASM_PLAY_ARRAY_DESCRIPTOR_H__

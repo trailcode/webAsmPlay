@@ -64,14 +64,19 @@ public:
                             const GLsizei     stride      = 0,
                             const GLvoid    * pointer     = NULL);
 
+    std::string getName() const;
+
 protected:
 
-    Shader( ShaderProgram * program,
-            const GLint     vertexInLoc = -1,
-            const GLint     colorInLoc  = -1,
-            const GLint     normalInLoc = -1);
+    Shader( const std::string & shaderName,
+            ShaderProgram     * program,
+            const GLint         vertexInLoc = -1,
+            const GLint         colorInLoc  = -1,
+            const GLint         normalInLoc = -1);
 
     virtual ~Shader() {}
+
+    const std::string shaderName;
 
     ShaderProgram * program;
 

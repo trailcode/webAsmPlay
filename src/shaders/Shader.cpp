@@ -27,12 +27,15 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/Shader.h>
 
+using namespace std;
 using namespace glm;
 
-Shader::Shader( ShaderProgram * program,
+Shader::Shader( const string  & shaderName,
+                ShaderProgram * program,
                 const GLint     vertexInLoc,
                 const GLint     colorInLoc,
-                const GLint     normalInLoc) :  program(program),
+                const GLint     normalInLoc) :  shaderName  (shaderName),
+                                                program     (program),
                                                 vertexInLoc (vertexInLoc),
                                                 colorInLoc  (colorInLoc),
                                                 normalInLoc (normalInLoc){}
@@ -78,3 +81,5 @@ void Shader::enableNormalArray( const GLint       size,
                                            stride,
                                            pointer);
 }
+
+string Shader::getName() const { return shaderName ;}

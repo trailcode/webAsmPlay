@@ -175,7 +175,8 @@ void ColorDistanceShader3D::ensureShader()
     defaultInstance = new ColorDistanceShader3D();
 }
 
-ColorDistanceShader3D::ColorDistanceShader3D() : Shader(shaderProgram,
+ColorDistanceShader3D::ColorDistanceShader3D() : Shader("ColorDistanceShader3D",
+                                                        shaderProgram,
                                                         vertInAttrLoc,
                                                         vertColorInAttrLoc,
                                                         normalInAttrLoc)

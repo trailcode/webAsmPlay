@@ -81,7 +81,8 @@ void ColorShader::ensureShader()
 
 ColorShader * ColorShader::getDefaultInstance() { return defaultInstance ;}
 
-ColorShader::ColorShader() :    Shader      (shaderProgram,
+ColorShader::ColorShader() :    Shader      ("ColorShader",
+                                             shaderProgram,
                                              vertInAttrLoc,
                                              colorInAttrLoc),
                                 fillColor   (0,1,0,0.5),
@@ -100,8 +101,6 @@ void ColorShader::bind(Canvas * canvas, const bool isOutline)
     shaderProgram->bind();
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
-
-    shaderProgram->enableVertexAttribArray(vertexInLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
     if(isOutline) { shaderProgram->setUniform(colorInLoc, outlineColor) ;}
     else          { shaderProgram->setUniform(colorInLoc, fillColor)    ;}

@@ -79,7 +79,7 @@ void RenderablePoint::render(Canvas * canvas) const
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    //shader->enableVertexAttribArray(3);
+    shader->enableVertexArray(3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
     glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL);
 }

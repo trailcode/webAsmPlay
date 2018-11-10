@@ -127,7 +127,8 @@ void ColorDistanceShader::ensureShader()
     dmess("Done ColorDistanceShader::ensureShader");
 }
 
-ColorDistanceShader::ColorDistanceShader() : Shader(shaderProgram,
+ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader",
+                                                    shaderProgram,
                                                     vertInAttrLoc,
                                                     vertColorInAttrLoc)
 {
@@ -168,10 +169,8 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 
-    //*
     shaderProgram->enableVertexAttribArray(vertexInLoc, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
     shaderProgram->enableVertexAttribArray(colorInLoc, 1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
-    //*/
 
     shaderProgram->setUniformi(texUniformLoc, 0);
 
