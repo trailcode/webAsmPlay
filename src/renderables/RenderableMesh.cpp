@@ -126,10 +126,10 @@ void RenderableMesh::render(const mat4 & MVP, const mat4 & MV) const
 
     GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-    GL_CHECK(glDisable(GL_DEPTH_TEST));
-    //GL_CHECK(glEnable(GL_DEPTH_TEST));
+    //GL_CHECK(glDisable(GL_DEPTH_TEST));
+    GL_CHECK(glEnable(GL_DEPTH_TEST));
 
-    if(false && getRenderFill())
+    if(getRenderFill())
     {
         shader->bind(MVP, MV, false);
 
