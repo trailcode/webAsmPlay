@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <GLU/glu.h>
 #include <GLU/tess.h>
 #include <stdio.h>
