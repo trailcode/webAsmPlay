@@ -102,9 +102,7 @@ public:
     SkyBox * setSkyBox(SkyBox * skyBox);
     SkyBox * getSkyBox() const;
 
-    const std::list<Renderable *> & getRenderiablesRef() const;
-
-    std::list<Renderable *> getRenderiables() const;
+    std::vector<Renderable *> getRenderiables() const;
 
     static std::vector<Canvas *> getInstances();
 
@@ -124,6 +122,8 @@ protected:
 
 private:
 
+    Renderable * addRenderiable(std::list<Renderable *> & container, Renderable * renderiable);
+
     rsmz::TrackBallInteractor * trackBallInteractor;
 
     FrameBuffer * frameBuffer;
@@ -132,7 +132,11 @@ private:
 
     glm::ivec2 lastShiftKeyDownMousePos;
 
-    std::list<Renderable *> renderiables;
+    std::list<Renderable *> points;
+    std::list<Renderable *> lineStrings;
+    std::list<Renderable *> polygons;
+    std::list<Renderable *> meshes;
+    std::list<Renderable *> deferredRenderables;
 
     const bool useFrameBuffer;
 

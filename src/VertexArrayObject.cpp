@@ -50,11 +50,16 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
     size_t offset = 0;
 
+    size_t symbologyID_Ofset;
+
+    if(IS_3D) { symbologyID_Ofset = 6 ;}
+    else      { symbologyID_Ofset = 4 ;}
+
     for(const auto & tess : tessellations)
     {
-        const float symbologyID_value = (float(tess->symbologyID * 6) + 0.5) / 32.0;
+        const float symbologyID_value = (float(tess->symbologyID * symbologyID_Ofset) + 0.5) / 32.0;
 
-        const float symbologyWallID_value = (float(tess->symbologyID * 6) + 0.5) / 32.0 + 4.0 / 32.0;
+        const float symbologyWallID_value = (float(tess->symbologyID * symbologyID_Ofset) + 0.5) / 32.0 + 4.0 / 32.0;
 
         for(size_t i = 0; i < tess->numVerts; ++i)
         {

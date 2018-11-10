@@ -33,7 +33,11 @@
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/TrackBallInteractor.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
+#include <webAsmPlay/renderables/RenderableLineString.h>
+#include <webAsmPlay/renderables/RenderableMesh.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
+#include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/Canvas.h>
 
@@ -131,8 +135,11 @@ GLuint Canvas::render()
     if(!preRender()) { return 0 ;}
 
     lock_guard<mutex> _(renderiablesMutex);
-
-    for(Renderable * r : renderiables) { r->render(this) ;}
+    
+    for(const auto r : polygons)    { r->render(this) ;}
+    for(const auto r : lineStrings) { r->render(this) ;}
+    for(const auto r : points)      { r->render(this) ;}
+    for(const auto r : meshes)      { r->render(this) ;}
 
     return postRender();
 }
@@ -273,18 +280,45 @@ void Canvas::onChar(GLFWwindow * window, const size_t c)
 
 Renderable * Canvas::addRenderiable(Renderable * renderiable)
 {
+    if(dynamic_cast<DeferredRenderable   *>(renderiable)) { return addRenderiable(deferredRenderables, renderiable) ;}
+    if(dynamic_cast<RenderableLineString *>(renderiable)) { return addRenderiable(lineStrings,         renderiable) ;}
+    if(dynamic_cast<RenderablePolygon    *>(renderiable)) { return addRenderiable(polygons,            renderiable) ;}
+    if(dynamic_cast<RenderablePoint      *>(renderiable)) { return addRenderiable(points,              renderiable) ;}
+    if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderiable(meshes,              renderiable) ;}
+
+    dmess("Error! Implement!");
+    
+    abort();
+
+    return renderiable;
+}
+
+Renderable * Canvas::addRenderiable(list<Renderable *> & container, Renderable * renderiable)
+{   
     lock_guard<mutex> _(renderiablesMutex);
 
-    renderiables.push_back(renderiable);
+    container.push_back(renderiable);
 
-    renderiable->addOnDeleteCallback([this](Renderable * r)
+    renderiable->addOnDeleteCallback([this, &container](Renderable * r)
     {
         lock_guard<mutex> _(renderiablesMutex);
 
-        renderiables.remove(r);
+        container.remove(r);
     });
-    
+
     return renderiable;
+}
+
+vector<Renderable *> Canvas::getRenderiables() const
+{
+    vector<Renderable *> ret;
+
+    ret.insert(ret.end(), points.begin(),       points.end());
+    ret.insert(ret.end(), lineStrings.begin(),  lineStrings.end());
+    ret.insert(ret.end(), polygons.begin(),     polygons.end());
+    ret.insert(ret.end(), meshes.begin(),       meshes.end());
+
+    return ret;
 }
 
 vec4 Canvas::setClearColor(const vec4 & clearColor) { return this->clearColor = clearColor ;}
@@ -307,10 +341,6 @@ const dmat4 & Canvas::getMV_Ref()        const { return MV         ;}
 
 SkyBox * Canvas::setSkyBox(SkyBox * skyBox) { return this->skyBox = skyBox ;}
 SkyBox * Canvas::getSkyBox() const          { return skyBox ;}
-
-const list<Renderable *> & Canvas::getRenderiablesRef() const { return renderiables ;}
-
-list<Renderable *> Canvas::getRenderiables() const { return renderiables ;}
 
 vector<Canvas *> Canvas::getInstances() { return instances ;}
 
