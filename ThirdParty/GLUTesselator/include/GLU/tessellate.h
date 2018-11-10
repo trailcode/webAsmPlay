@@ -1,5 +1,6 @@
 
-	
+#include <cstdint>
+
 typedef struct Vertex {
     double pt[3];
     int index;

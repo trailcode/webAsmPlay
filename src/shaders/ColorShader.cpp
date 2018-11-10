@@ -37,7 +37,7 @@ namespace
     ColorShader * defaultInstance = NULL;
 
     GLint vertInAttrLoc;
-    GLint colorInAttrLoc;
+    GLint colorInUniformLoc;
 
     GLint MVP_Loc;
 }
@@ -74,7 +74,7 @@ void ColorShader::ensureShader()
                                             fragmentSource,
                                             Variables({{"vertIn",   vertInAttrLoc}}),
                                             Variables({{"MVP",      MVP_Loc},
-                                                       {"colorIn",  colorInAttrLoc}}));
+                                                       {"colorIn",  colorInUniformLoc}}));
 
     defaultInstance = new ColorShader();
 }
@@ -83,8 +83,7 @@ ColorShader * ColorShader::getDefaultInstance() { return defaultInstance ;}
 
 ColorShader::ColorShader() :    Shader      ("ColorShader",
                                              shaderProgram,
-                                             vertInAttrLoc,
-                                             colorInAttrLoc),
+                                             vertInAttrLoc),
                                 fillColor   (0,1,0,0.5),
                                 outlineColor(1,1,0,1)
 {
@@ -102,6 +101,6 @@ void ColorShader::bind(Canvas * canvas, const bool isOutline)
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 
-    if(isOutline) { shaderProgram->setUniform(colorInLoc, outlineColor) ;}
-    else          { shaderProgram->setUniform(colorInLoc, fillColor)    ;}
+    if(isOutline) { shaderProgram->setUniform(colorInUniformLoc, outlineColor) ;}
+    else          { shaderProgram->setUniform(colorInUniformLoc, fillColor)    ;}
 }
