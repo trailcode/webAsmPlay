@@ -169,9 +169,6 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 
-    shaderProgram->enableVertexAttribArray(vertexInLoc, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
-    shaderProgram->enableVertexAttribArray(colorInLoc, 1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
-
     shaderProgram->setUniformi(texUniformLoc, 0);
 
     if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 2.0f) ;}

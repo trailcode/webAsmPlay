@@ -140,12 +140,12 @@ void RenderablePolygon::render(Canvas * canvas) const
 
     GL_CHECK(glDisable(GL_DEPTH_TEST));
 
+    shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    shader->enableColorArray (1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+
     if(getRenderFill())
     {
         shader->bind(canvas, false);
-
-        //shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
-        //shader->enableColorArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
         vertexArrayObject->drawTriangles();
     }
@@ -154,15 +154,10 @@ void RenderablePolygon::render(Canvas * canvas) const
     {
         shader->bind(canvas, true);
 
-        //shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
-        //shader->enableColorArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-
         vertexArrayObject->bindLines();
         
         vertexArrayObject->drawLines();
     }
 
     glDisable(GL_BLEND); // TODO Remove!
-
-    //glUseProgram(0);
 }
