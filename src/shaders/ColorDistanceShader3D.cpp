@@ -250,7 +250,7 @@ void ColorDistanceShader3D::loadState(const JSONObject & dataStore)
 
     for(size_t i = 0; i < 32; ++i)
     {
-        sprintf(buf, "attributeColor_%i", (int)i);
+        sprintf(buf, "ColorDistanceShader3D_attributeColor_%i", (int)i);
 
         setVec4(stringToWstring(buf), colors[i]);
     }
@@ -264,7 +264,7 @@ void ColorDistanceShader3D::saveState(JSONObject & dataStore)
 
     for(size_t i = 0; i < 32; ++i)
     {
-        sprintf(buf, "attributeColor_%i", (int)i);
+        sprintf(buf, "ColorDistanceShader3D_attributeColor_%i", (int)i);
 
         dataStore[stringToWstring(buf)] = new JSONValue(colors[i]);
     }

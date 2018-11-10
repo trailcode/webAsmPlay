@@ -31,6 +31,7 @@
 #include <JSON.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
@@ -92,7 +93,8 @@ void GUI::loadState()
     //setVec4(L"ColorDistanceShader::minColor", &ColorDistanceShader::setMinColor);
     //setVec4(L"ColorDistanceShader::maxColor", &ColorDistanceShader::setMaxColor);
 
-    ColorDistanceShader::getDefaultInstance()->loadState(root);
+    ColorDistanceShader  ::getDefaultInstance()->loadState(root);
+    ColorDistanceShader3D::getDefaultInstance()->loadState(root);
 }
 
 void GUI::saveState()
@@ -111,7 +113,8 @@ void GUI::saveState()
     root[L"showSymbologyPanel"]       = new JSONValue(showSymbologyPanel);
     root[L"showOpenSteerPanel"]       = new JSONValue(showOpenSteerPanel);
 
-    ColorDistanceShader::getDefaultInstance()->saveState(root);
+    ColorDistanceShader  ::getDefaultInstance()->saveState(root);
+    ColorDistanceShader3D::getDefaultInstance()->saveState(root);
 
     wstring_convert<codecvt_utf8<wchar_t>, wchar_t> converter;
 
