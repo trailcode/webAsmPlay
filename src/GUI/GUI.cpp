@@ -298,6 +298,8 @@ void GUI::showMainToolBar()
         toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",(void*)infoIcon,uv0,uv1,size));
         toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",(void*)infoIcon,uv0,uv1,size));
         toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Find Path",(void*)infoIcon,uv0,uv1,size));
 
         toolbar.setProperties(false,false,true,ImVec2(0.5f,0.f));
 
@@ -312,6 +314,8 @@ void GUI::showMainToolBar()
         case 1: mode = PICK_MODE_LINESTRING; break;
         case 2: mode = PICK_MODE_POLYGON_SINGLE; break;
         case 3: mode = PICK_MODE_POLYGON_MULTIPLE; break;
+        case 4: mode = SET_PATH_START_POINT; break;
+        case 5: mode = FIND_PATH; break;
     }
 }
 
@@ -498,6 +502,8 @@ void GUI::mainLoop(GLFWwindow * window)
     showCursorPositionOverlay(NULL, client->getInverseTrans() * pos);
 
     string attrsStr = client->doPicking(mode, pos);
+
+    client->doPathFinding(mode, pos);
 
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
 

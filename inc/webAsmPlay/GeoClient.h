@@ -94,6 +94,8 @@ public:
 
     std::string doPicking(const char mode, const glm::dvec4 & pos) const;
 
+    void doPathFinding(const char mode, const glm::dvec4 & pos) const;
+
     void addGeometry(const char * data);
 
 private:

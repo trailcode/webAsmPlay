@@ -1005,55 +1005,62 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
     string attrsStr;
 
-    if(mode == GUI::PICK_MODE_LINESTRING)
+    switch(mode)
     {
-        tie(renderiable, attrs) = pickLineStringRenderable(canvas->getCursorPosWC());
-
-        if(renderiable)
+        case GUI::PICK_MODE_LINESTRING:
         {
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_BLEND);
+            tie(renderiable, attrs) = pickLineStringRenderable(canvas->getCursorPosWC());
 
-            renderiable->render(canvas);
-
-            attrsStr = attrs->toString();
-        }
-    }
-    if(mode == GUI::PICK_MODE_POLYGON_SINGLE)
-    {
-        tie(renderiable, attrs) = pickPolygonRenderable(canvas->getCursorPosWC());
-
-        if(renderiable)
-        {
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_BLEND);
-
-            renderiable->render(canvas);
-
-            attrsStr = attrs->toString();
-        }
-    }
-    else if(mode == GUI::PICK_MODE_POLYGON_MULTIPLE)
-    {
-        vector<pair<Renderable *, Attributes *> > picked = pickPolygonRenderables(canvas->getCursorPosWC());
-
-        if(picked.size())
-        {
-            tie(renderiable, attrs) = picked[0];
-
-            renderiable->render(canvas);
-
-            attrsStr = attrs->toString();
-
-            for(size_t i = 1; i < picked.size(); ++i)
+            if(renderiable)
             {
-                attrsStr += "\n";
+                glDisable(GL_DEPTH_TEST);
+                glDisable(GL_BLEND);
 
-                attrsStr += get<1>(picked[i])->toString();
+                renderiable->render(canvas);
+
+                attrsStr = attrs->toString();
             }
+            break;
+        }
+        case GUI::PICK_MODE_POLYGON_SINGLE:
+        {
+            tie(renderiable, attrs) = pickPolygonRenderable(canvas->getCursorPosWC());
+
+            if(renderiable)
+            {
+                glDisable(GL_DEPTH_TEST);
+                glDisable(GL_BLEND);
+
+                renderiable->render(canvas);
+
+                attrsStr = attrs->toString();
+            }
+
+            break;
+        }
+        case GUI::PICK_MODE_POLYGON_MULTIPLE:
+        {
+            vector<pair<Renderable *, Attributes *> > picked = pickPolygonRenderables(canvas->getCursorPosWC());
+
+            if(picked.size())
+            {
+                tie(renderiable, attrs) = picked[0];
+
+                renderiable->render(canvas);
+
+                attrsStr = attrs->toString();
+
+                for(size_t i = 1; i < picked.size(); ++i)
+                {
+                    attrsStr += "\n";
+
+                    attrsStr += get<1>(picked[i])->toString();
+                }
+            }
+
+            break;
         }
     }
-
     return attrsStr;
 }
 

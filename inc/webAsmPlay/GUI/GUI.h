@@ -46,6 +46,8 @@ public:
         PICK_MODE_LINESTRING,
         PICK_MODE_POLYGON_SINGLE,
         PICK_MODE_POLYGON_MULTIPLE,
+        SET_PATH_START_POINT,
+        FIND_PATH,
     };
 
     static void setupCallbacks(GLFWwindow* window);
