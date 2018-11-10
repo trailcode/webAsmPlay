@@ -36,6 +36,7 @@
 #endif
 
 #include <list>
+#include <stack>
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
@@ -99,6 +100,9 @@ public:
     const glm::dmat4 & getMVP_Ref() const;
     const glm::dmat4 & getMV_Ref() const;
 
+    void pushModel(const glm::dmat4 & model);
+    void popMVP();
+
     SkyBox * setSkyBox(SkyBox * skyBox);
     SkyBox * getSkyBox() const;
 
@@ -124,6 +128,8 @@ private:
 
     Renderable * addRenderiable(std::list<Renderable *> & container, Renderable * renderiable);
 
+    void updateMVP();
+
     rsmz::TrackBallInteractor * trackBallInteractor;
 
     FrameBuffer * frameBuffer;
@@ -142,11 +148,18 @@ private:
 
     glm::vec4 clearColor;
 
-    glm::dmat4 view;
-    glm::dmat4 model;
-    glm::dmat4 projection;
-    glm::dmat4 MV;
-    glm::dmat4 MVP;
+    struct MVP
+    {
+        glm::dmat4 view;
+        glm::dmat4 model         = glm::dmat4(1.0);
+        glm::dmat4 projection;
+        glm::dmat4 MV;
+        glm::dmat4 MVP;
+    };
+
+    MVP currMVP;
+
+    std::stack<MVP> stackMVP;
     
     glm::dvec3 cursorPosWC;
 

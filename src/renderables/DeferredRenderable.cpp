@@ -27,6 +27,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 
@@ -181,62 +182,30 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
     triangleIndices.push_back(index + 3);
     triangleIndices.push_back(index + 4);
     triangleIndices.push_back(index + 5);
-
-    /*
-    size_t curr = vertsAndColor.size();
-
-    vertsAndColor.resize(curr + ((3 + 4) * 6));
-
-    size_t currIndex = curr / 7;
-
-    triangleIndices.resize(triangleIndices.size() + 6);
-
-    GLfloat * vertsAndColorPtr = &vertsAndColor[curr];
-    GLuint  * triangleIndicesPtr        = &triangleIndices[currIndex];
-
-    //dmess("currIndex " << currIndex);
-
-    addTriangle(A,
-                B,
-                C,
-                color,
-                currIndex,
-                vertsAndColorPtr,
-                triangleIndicesPtr);
-    
-    addTriangle(A,
-                C,
-                D,
-                color,
-                currIndex,
-                vertsAndColorPtr,
-                triangleIndicesPtr);
-    */
-
-
-    //dmess("currIndex " << currIndex);
 }
 
 void DeferredRenderable::render(Canvas * canvas) const
 {
-    /*
+    //*
     GL_CHECK(glBindVertexArray(vao));
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
 
-    const mat4 _model = glm::rotate(model, radians(90.0f), vec3(1, 0, 0)); // TODO might not be correct, might need to define model first!
+    const dmat4 prevModel = canvas->getModelRef();
 
-    ColorVertexShader::getInstance()->bind(_model, view, projection, false);
+    const dmat4 model = glm::rotate(prevModel, radians(90.0), dvec3(1, 0, 0));
 
-    ColorVertexShader::getInstance()->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+    shader->bind(canvas, false);
 
-    ColorVertexShader::getInstance()->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
+    //ColorVertexShader::getInstance()->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+
+    //ColorVertexShader::getInstance()->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
 
     GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
 
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
 
     GL_CHECK(glDrawElements(GL_LINES, numLineIndices, GL_UNSIGNED_INT, NULL));
-    */
+    //*/
 }

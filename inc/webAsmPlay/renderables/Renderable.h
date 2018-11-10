@@ -67,14 +67,14 @@ public:
 
 protected:
 
-    Renderable(const bool isMulti);
+    Renderable( const bool isMulti);
 
     Renderable(const Renderable&) {}                            // Prevent copy-construction
     Renderable& operator=(const Renderable&) { return *this ;}  // Prevent assignment
 
     std::vector<OnDelete> onDeleteCallbacks;
 
-    bool isMulti = false;
+    bool isMulti;
 
     Shader * shader = NULL;
 

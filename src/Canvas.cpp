@@ -90,6 +90,30 @@ void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
     trackBallInteractor->setScreenSize(size.x, size.y);
 }
 
+void Canvas::updateMVP()
+{
+    currMVP.view        = trackBallInteractor->getCamera()->getMatrix();
+    currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.01, 300.0);
+    currMVP.MV          = currMVP.view * currMVP.model;
+    currMVP.MVP         = currMVP.projection * currMVP.MV;
+}
+
+void Canvas::pushModel(const dmat4 & model)
+{
+    stackMVP.push(currMVP);
+
+    currMVP.model = model;
+
+    updateMVP();
+}
+
+void Canvas::popMVP()
+{
+    currMVP = stackMVP.top();
+
+    stackMVP.pop();
+}
+
 bool Canvas::preRender()
 {
     if(!enabled) { return false ;}
@@ -103,11 +127,7 @@ bool Canvas::preRender()
 
     Camera * camera = trackBallInteractor->getCamera();
 
-    view         = camera->getMatrix();
-    model        = mat4(1.0);
-    projection   = perspective(45.0, double(size.x) / double(size.y), 0.01, 300.0);
-    MV           = view * model;
-    MVP          = projection * MV;
+    updateMVP();
 
     if(useFrameBuffer)
     {
@@ -136,10 +156,11 @@ GLuint Canvas::render()
 
     lock_guard<mutex> _(renderiablesMutex);
     
-    for(const auto r : polygons)    { r->render(this) ;}
-    for(const auto r : lineStrings) { r->render(this) ;}
-    for(const auto r : points)      { r->render(this) ;}
-    for(const auto r : meshes)      { r->render(this) ;}
+    for(const auto r : polygons)            { r->render(this) ;}
+    for(const auto r : lineStrings)         { r->render(this) ;}
+    for(const auto r : points)              { r->render(this) ;}
+    for(const auto r : deferredRenderables) { r->render(this) ;}
+    for(const auto r : meshes)              { r->render(this) ;}
 
     return postRender();
 }
@@ -148,22 +169,11 @@ GLuint Canvas::postRender()
 {
     if(!cursor) { cursor = RenderablePoint::create(vec3(0,0,0)) ;}
 
-    const mat4 _model = model;
-
-    model = translate(dmat4(1.0), cursorPosWC); // TODO make push model, pop model, etc
-
-    // TODO make this nicer
-    projection   = perspective(45.0, double(size.x) / double(size.y), 0.01, 300.0);
-    MV           = view * model;
-    MVP          = projection * MV;
+    pushModel(translate(dmat4(1.0), cursorPosWC));
 
     cursor->render(this);
 
-    model = _model;
-
-    projection   = perspective(45.0, double(size.x) / double(size.y), 0.01, 300.0);
-    MV           = view * model;
-    MVP          = projection * MV;
+    popMVP();
 
     if(useFrameBuffer) { return frameBuffer->getTextureID() ;}
 
@@ -206,7 +216,7 @@ void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
     const vec4 rayClip = vec4(  (2.0f * pos.x) / size.x - 1.0f,
                                 1.0f - (2.0f * pos.y) / size.y, -1.0, 1.0);
 
-    dvec4 rayEye = inverse(projection) * rayClip;
+    dvec4 rayEye = inverse(currMVP.projection) * rayClip;
     
     rayEye = dvec4(rayEye.x, rayEye.y, -1.0, 0.0);
     
@@ -327,17 +337,17 @@ Camera * Canvas::getCamera() const { return trackBallInteractor->getCamera() ;}
 
 TrackBallInteractor * Canvas::getTrackBallInteractor() const { return trackBallInteractor ;}
 
-dmat4 Canvas::getView()       const { return view       ;}
-dmat4 Canvas::getModel()      const { return model      ;}
-dmat4 Canvas::getProjection() const { return projection ;}
-dmat4 Canvas::getMVP()        const { return MVP        ;}
-dmat4 Canvas::getMV()         const { return MV         ;}
+dmat4 Canvas::getView()       const { return currMVP.view       ;}
+dmat4 Canvas::getModel()      const { return currMVP.model      ;}
+dmat4 Canvas::getProjection() const { return currMVP.projection ;}
+dmat4 Canvas::getMVP()        const { return currMVP.MVP        ;}
+dmat4 Canvas::getMV()         const { return currMVP.MV         ;}
 
-const dmat4 & Canvas::getViewRef()       const { return view       ;}
-const dmat4 & Canvas::getModelRef()      const { return model      ;}
-const dmat4 & Canvas::getProjectionRef() const { return projection ;}
-const dmat4 & Canvas::getMVP_Ref()       const { return MVP        ;}
-const dmat4 & Canvas::getMV_Ref()        const { return MV         ;}
+const dmat4 & Canvas::getViewRef()       const { return currMVP.view       ;}
+const dmat4 & Canvas::getModelRef()      const { return currMVP.model      ;}
+const dmat4 & Canvas::getProjectionRef() const { return currMVP.projection ;}
+const dmat4 & Canvas::getMVP_Ref()       const { return currMVP.MVP        ;}
+const dmat4 & Canvas::getMV_Ref()        const { return currMVP.MV         ;}
 
 SkyBox * Canvas::setSkyBox(SkyBox * skyBox) { return this->skyBox = skyBox ;}
 SkyBox * Canvas::getSkyBox() const          { return skyBox ;}
