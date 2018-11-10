@@ -145,14 +145,7 @@ GLuint Canvas::postRender()
 {
     if(!cursor) { cursor = RenderablePoint::create(vec3(0,0,0)) ;}
 
-    {
-        const dmat4 m = translate(dmat4(1.0), cursorPosWC);
-        
-        const dmat4 MV  = view * m;
-        const dmat4 MVP = projection * MV;
-
-        cursor->render(MVP, MV);
-    }
+    cursor->render(translate(dmat4(1.0), cursorPosWC), view, projection);
 
     if(useFrameBuffer) { return frameBuffer->getTextureID() ;}
 

@@ -116,7 +116,9 @@ RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderab
 
 }
 
-void RenderableMesh::render(const mat4 & MVP, const mat4 & MV) const
+void RenderableMesh::render(const mat4 & model,
+                            const mat4 & view,
+                            const mat4 & projection) const
 {
     vertexArrayObject->bind();
 
@@ -131,26 +133,14 @@ void RenderableMesh::render(const mat4 & MVP, const mat4 & MV) const
 
     if(getRenderFill())
     {
-        shader->bind(MVP, MV, false);
-
-        //shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
-        //shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
-
-        //shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-        //shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+        shader->bind(model, view, projection, false);
 
         vertexArrayObject->drawTriangles();
     }
 
     if(getRenderOutline())
     {
-        shader->bind(MVP, MV, true);
-
-        //shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
-        shader->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
-
-        //shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+        shader->bind(model, view, projection, true);
 
         vertexArrayObject->bindLines();
         

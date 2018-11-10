@@ -192,11 +192,13 @@ ShaderProgram::~ShaderProgram()
     // TODO Cleanup!
 }
 
-void ShaderProgram::bind(const mat4 & MVP, const mat4 & MV)
+void ShaderProgram::bind(const mat4 & model,
+                         const mat4 & view,
+                         const mat4 & projection)
 {
     GL_CHECK(glUseProgram(shaderProgram));
 
-    setUniform(MVP_In_Uniform, MVP);
+    setUniform(MVP_In_Uniform, projection * view * model); // TODO remove this, should be in Shader implementing class
 }
 
 GLuint ShaderProgram::getProgramHandle() const { return shaderProgram ;}

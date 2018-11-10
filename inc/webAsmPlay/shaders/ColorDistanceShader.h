@@ -40,7 +40,10 @@ public:
 
     static void ensureShader();
 
-    void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
+    void bind(const glm::mat4 & model,
+              const glm::mat4 & view,
+              const glm::mat4 & projection,
+              const bool        isOutline);
 
     glm::vec4 setColor(const size_t index, const glm::vec4 & color);
     glm::vec4 getColor(const size_t index);

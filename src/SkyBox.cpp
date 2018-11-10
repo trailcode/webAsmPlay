@@ -176,13 +176,11 @@ void SkyBox::render(const mat4 & _view, const mat4 & projection)
     value_ptr(centeredView)[13] = 0;
     value_ptr(centeredView)[14] = 0;
 
-    const mat4 MVP = projection * centeredView * model;
-
     GL_CHECK(glBindVertexArray(vao));
 
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
     
-    skyboxShader->bind(MVP, mat4(1.0));
+    skyboxShader->bind(model, centeredView, projection);
 
     skyboxShader->setTexture1Slot(0);
 

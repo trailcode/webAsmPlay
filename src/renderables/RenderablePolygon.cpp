@@ -128,7 +128,9 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
     return ret;
 }
 
-void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
+void RenderablePolygon::render(const mat4 & model,
+                               const mat4 & view,
+                               const mat4 & projection) const
 {
     vertexArrayObject->bind();
 
@@ -142,7 +144,7 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
     if(getRenderFill())
     {
-        shader->bind(MVP, MV, false);
+        shader->bind(model, view, projection, false);
 
         shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO shader->bind should be doing this
 
@@ -153,7 +155,7 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
     if(getRenderOutline())
     {
-        shader->bind(MVP, MV, true);
+        shader->bind(model, view, projection, true);
 
         // TODO this is here as a hack
         shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO shader->bind should be doing this

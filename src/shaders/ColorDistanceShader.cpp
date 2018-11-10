@@ -144,7 +144,10 @@ ColorDistanceShader::~ColorDistanceShader()
 
 ColorDistanceShader * ColorDistanceShader::getDefaultInstance() { return defaultInstance ;}
 
-void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
+void ColorDistanceShader::bind(const mat4 & model,
+                               const mat4 & view,
+                               const mat4 & projection,
+                               const bool   isOutline)
 {
     if(colorTextureDirty)
     {
@@ -157,9 +160,9 @@ void ColorDistanceShader::bind(const mat4 & MVP, const mat4 & MV, const bool isO
 
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorTexture));
 
-    shaderProgram->bind(MVP, MV);
+    shaderProgram->bind(model, view, projection);
 
-    shaderProgram->setUniform(MV_Uniform, MV);
+    shaderProgram->setUniform(MV_Uniform, model * view);
 
     shaderProgram->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 

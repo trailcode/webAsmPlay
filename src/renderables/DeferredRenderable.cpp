@@ -25,7 +25,7 @@
 */
 #include <vector>
 #include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp> // value_ptr
+#include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
@@ -217,17 +217,18 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
     //dmess("currIndex " << currIndex);
 }
 
-void DeferredRenderable::render(const mat4 & MVP, const mat4 & MV) const
+void DeferredRenderable::render(const mat4 & model,
+                                const mat4 & view,
+                                const mat4 & projection) const
 {
     GL_CHECK(glBindVertexArray(vao));
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
 
-    const mat4 _MVP = glm::rotate(MVP, radians(90.0f), vec3(1, 0, 0)); // TODO might not be correct, might need to define model first!
+    const mat4 _model = glm::rotate(model, radians(90.0f), vec3(1, 0, 0)); // TODO might not be correct, might need to define model first!
 
-    //ColorVertexShader::getInstance()->bind(MVP, MV, false);
-    ColorVertexShader::getInstance()->bind(_MVP, MV, false);
+    ColorVertexShader::getInstance()->bind(_model, view, projection, false);
 
     ColorVertexShader::getInstance()->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
 

@@ -215,9 +215,11 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
                                     isMulti);
 }
 
-void RenderableLineString::render(const mat4 & MVP, const mat4 & MV) const
+void RenderableLineString::render(const mat4 & model,
+                                  const mat4 & view,
+                                  const mat4 & projection) const
 {
-    shader->bind(MVP, MV, true);
+    shader->bind(model, view, projection, true);
     
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -231,7 +233,7 @@ void RenderableLineString::render(const mat4 & MVP, const mat4 & MV) const
     }
     else
     {
-        shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+        shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO try to remove!
 
         shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 

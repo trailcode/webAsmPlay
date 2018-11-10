@@ -81,9 +81,12 @@ ColorShader::~ColorShader()
 
 }
 
-void ColorShader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
+void ColorShader::bind(const mat4 & model,
+                       const mat4 & view,
+                       const mat4 & projection,
+                       const bool   isOutline)
 {
-    shaderProgram->bind(MVP, MV);
+    shaderProgram->bind(model, view, projection);
 
     if(isOutline) { shaderProgram->setColor(outlineColor) ;}
     else          { shaderProgram->setColor(fillColor)    ;}

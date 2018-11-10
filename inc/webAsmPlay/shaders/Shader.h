@@ -43,7 +43,10 @@ class Shader
 {
 public:
 
-    virtual void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
+    virtual void bind(const glm::mat4 & model,
+                      const glm::mat4 & view,
+                      const glm::mat4 & projection,
+                      const bool        isOutline);
 
     void enableVertexAttribArray(   const GLint       size          = 2,
                                     const GLenum      type          = GL_FLOAT,
