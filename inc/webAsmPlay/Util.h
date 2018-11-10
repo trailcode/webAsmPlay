@@ -40,6 +40,7 @@
 #endif
 
 #include <string>
+#include <vector>
 #include <chrono>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -105,6 +106,31 @@ inline uint32_t getUint32(const char *& dataStream)
     const uint32_t ret = *(uint32_t *)dataStream; dataStream += sizeof(uint32_t);
 
     return ret;
+}
+
+inline uint32_t appendUint32(char *& dataStream, const uint32_t value)
+{
+    *(uint32_t *)dataStream = value;
+
+    dataStream += sizeof(uint32_t);
+
+    return value;
+}
+
+inline void appendUint32s(char *& dataStream, const uint32_t A, const uint32_t B, const uint32_t C)
+{
+    appendUint32(dataStream, A);
+    appendUint32(dataStream, B);
+    appendUint32(dataStream, C);
+}
+
+inline char * appendChar(std::vector<char> & data, const char value)
+{
+    char * ret = &data[0];
+
+    *ret = value;
+
+    return ret + 1;
 }
 
 inline double getDouble(const char *& dataStream)

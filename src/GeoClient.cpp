@@ -288,15 +288,9 @@ void GeoClient::getPolygons(const size_t startIndex, const size_t numPolys, func
 
     vector<char> data(1 + sizeof(uint32_t) * 3);
 
-    data[0] = GeoServerBase::GET_POLYGONS_REQUEST;
+    char * ptr = appendChar(data, GeoServerBase::GET_POLYGONS_REQUEST);
 
-    char * ptr = &data[1];
-
-    *(uint32_t *)ptr = request->ID; ptr += sizeof(uint32_t);
-
-    *(uint32_t *)ptr = startIndex; ptr += sizeof(uint32_t);
-
-    *(uint32_t *)ptr = numPolys; ptr += sizeof(uint32_t);
+    appendUint32s(ptr, request->ID, startIndex, numPolys);
 
     client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
@@ -332,15 +326,9 @@ void GeoClient::getPolylines(const size_t startIndex, const size_t numPolylines,
 
     vector<char> data(1 + sizeof(uint32_t) * 3);
 
-    data[0] = GeoServerBase::GET_POLYLINES_REQUEST;
+    char * ptr = appendChar(data, GeoServerBase::GET_POLYLINES_REQUEST);
 
-    char * ptr = &data[1];
-
-    *(uint32_t *)ptr = request->ID; ptr += sizeof(uint32_t);
-
-    *(uint32_t *)ptr = startIndex; ptr += sizeof(uint32_t);
-
-    *(uint32_t *)ptr = numPolylines; ptr += sizeof(uint32_t);
+    appendUint32s(ptr, request->ID, startIndex, numPolylines);
 
     client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
@@ -375,15 +363,9 @@ void GeoClient::getPoints(const size_t startIndex, const size_t numPoints, funct
 
     vector<char> data(1 + sizeof(uint32_t) * 3);
 
-    data[0] = GeoServerBase::GET_POINTS_REQUEST;
+    char * ptr = appendChar(data, GeoServerBase::GET_POINTS_REQUEST);
 
-    char * ptr = &data[1];
-
-    *(uint32_t *)ptr = request->ID; ptr += sizeof(uint32_t);
-
-    *(uint32_t *)ptr = startIndex; ptr += sizeof(uint32_t);
-
-    *(uint32_t *)ptr = numPoints; ptr += sizeof(uint32_t);
+    appendUint32s(ptr, request->ID, startIndex, numPoints);
 
     client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
@@ -819,7 +801,11 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
             colorID = 9;
         }
 
-        Renderable * r = Renderable::create(geom, trans);
+        //Renderable * r = Renderable::create(geom, trans);
+
+        unique_ptr<Geometry> buffered(geom->buffer(0.00001));
+
+        Renderable * r = Renderable::create(buffered.get(), trans);
         
         if(!r) { continue ;}
         
