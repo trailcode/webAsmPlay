@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 
@@ -87,6 +88,7 @@ ColorVertexShader * ColorVertexShader::getInstance() { return defaultInstance ;}
 
 void ColorVertexShader::bind(Canvas * canvas, const bool isOutline)
 {
-    //shaderProgram->bind(model, view, projection);
-    abort();
+    shaderProgram->bind();
+
+    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }

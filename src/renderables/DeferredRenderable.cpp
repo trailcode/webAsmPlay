@@ -106,7 +106,7 @@ DeferredRenderable::DeferredRenderable( const GLuint & vao,
                                                                          numTriIndices (numTriIndices),
                                                                          numLineIndices(numLineIndices)
 {
-
+    setShader(ColorVertexShader::getInstance());
 }
 
 DeferredRenderable::~DeferredRenderable()
@@ -192,15 +192,22 @@ void DeferredRenderable::render(Canvas * canvas) const
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
 
-    const dmat4 prevModel = canvas->getModelRef();
+    glDisable(GL_DEPTH_TEST);
 
-    const dmat4 model = glm::rotate(prevModel, radians(90.0), dvec3(1, 0, 0));
+    //canvas->pushModel(rotate(dmat4(1.0), radians(90.0), dvec3(1, 0, 0)));
+    canvas->pushModel(rotate(canvas->getModelRef(), radians(90.0), dvec3(1, 0, 0)));
 
     shader->bind(canvas, false);
+
+    shader->enableVertexArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+
+    shader->enableColorArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
 
     //ColorVertexShader::getInstance()->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
 
     //ColorVertexShader::getInstance()->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
+
+    //dmess("numTriIndices " << numTriIndices);
 
     GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
 
@@ -208,4 +215,6 @@ void DeferredRenderable::render(Canvas * canvas) const
 
     GL_CHECK(glDrawElements(GL_LINES, numLineIndices, GL_UNSIGNED_INT, NULL));
     //*/
+
+    canvas->popMVP();
 }
