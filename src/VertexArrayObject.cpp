@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <glm/gtx/normal.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/VertexArrayObject.h>
 
@@ -42,160 +43,157 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 {
     if(!tessellations.size()) { return NULL ;}
 
-    size_t numVerts               = 0;
-    size_t numTriangles           = 0;
-    size_t numCounterVertIndices  = 0;
-    size_t numlineIndices         = 0;
-
-    for(const auto & tess : tessellations)
-    {
-        numVerts               += tess->numVerts;
-        numTriangles           += tess->numTriangles;
-        numCounterVertIndices  += tess->counterVertIndices.size();
-
-        if(IS_3D) { numlineIndices += tess->lineIndices.size() * 3 ;}
-        else      { numlineIndices += tess->lineIndices.size()     ;}
-    }
-
-    FloatVec verts;
-
-    if(IS_3D) { verts.resize(numVerts * (3 + 3 + 1 + 1) * 2) ;}
-    else      { verts.resize(numVerts * (2 + 1)) ;}
-
-    Uint32Vec triangleIndices      (numTriangles * 3);
-    Uint32Vec counterVertIndices   (numCounterVertIndices);
-    Uint32Vec lineIndices          (numlineIndices);
-
-    GLfloat * vertsPtr               = &verts[0];
-    GLuint  * triangleIndicesPtr     = &triangleIndices[0];
-    GLuint  * counterVertIndicesPtr  = &counterVertIndices[0];
-    GLuint  * lineIndicesPtr         = &lineIndices[0];
+    FloatVec  verts;
+    Uint32Vec triangleIndices;
+    Uint32Vec counterVertIndices;
+    Uint32Vec lineIndices;
 
     size_t offset = 0;
 
-    vector<size_t> wallTris;
+    size_t symbologyID_Ofset;
 
-    for(size_t i = 0; i < tessellations.size(); ++i)
+    if(IS_3D) { symbologyID_Ofset = 6 ;}
+    else      { symbologyID_Ofset = 4 ;}
+
+    for(const auto & tess : tessellations)
     {
-        const auto & tess = tessellations[i];
+        const float symbologyID_value = (float(tess->symbologyID * symbologyID_Ofset) + 0.5) / 32.0;
 
-        const float symbologyID_value = (float(tess->symbologyID * 6) + 0.5) / 32.0;
+        const float symbologyWallID_value = (float(tess->symbologyID * symbologyID_Ofset) + 0.5) / 32.0 + 4.0 / 32.0;
 
-        const float symbologyWallID_value = (float(tess->symbologyID * 6) + 0.5) / 32.0 + 4.0 / 32.0;
-
-        const size_t startIndex = *counterVertIndicesPtr;
-
-        //const vec3 normal;
-
-        for(size_t j = 0; j < tess->numVerts; ++j)
+        for(size_t i = 0; i < tess->numVerts; ++i)
         {
-            append(vertsPtr, tess->verts[j * 2 + 0]);
-            append(vertsPtr, tess->verts[j * 2 + 1]);
+            verts.push_back(tess->verts[i * 2 + 0]);
+            verts.push_back(tess->verts[i * 2 + 1]);
 
             if(IS_3D)
             {
-                append(vertsPtr, tess->height);
+                verts.push_back(tess->height);
 
-                append(vertsPtr, 0);
-                append(vertsPtr, 0);
-                append(vertsPtr, 1);
+                verts.push_back(0);
+                verts.push_back(0);
+                verts.push_back(1);
             }
 
-            append(vertsPtr, symbologyID_value);
+            verts.push_back(symbologyID_value);
         }
 
-        for(size_t j = 0; j < tess->numTriangles * 3; ++j, ++triangleIndicesPtr) { *triangleIndicesPtr = tess->triangleIndices[j] + offset ;}
+        for(size_t i = 0; i < tess->numTriangles * 3; ++i)
+        {
+            triangleIndices.push_back(tess->triangleIndices[i] + offset);
+        }
 
-        for(size_t j = 0; j < tess->counterVertIndices.size(); ++j, ++counterVertIndicesPtr) { *counterVertIndicesPtr = tess->counterVertIndices[j] + offset ;}
+        for(size_t i = 0; i < tess->numVerts; ++i)
+        {
+            lineIndices.push_back(i + offset);
+            lineIndices.push_back((i + 1) % tess->numVerts + offset);
+        }
 
-        for(size_t j = 0; j < tess->lineIndices.size(); ++j, ++lineIndicesPtr) { *lineIndicesPtr = tess->lineIndices[j] + offset ;}
-
+        //offset = verts.size() / 7;
         offset += tess->numVerts;
 
-        if(IS_3D && tess->verts)
+        if(offset != verts.size() / 7)
         {
-            size_t prevA = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
+            //dmess("offset " << offset << " verts " << verts.size() << " " << verts.size() / 7);
+        }
+
+        if(!IS_3D) { continue ;}
+
+        size_t prevIndexA;
+        size_t prevIndexB;
+
+        lineIndices.push_back(prevIndexA = offset++);
+        lineIndices.push_back(prevIndexB = offset++);
+
+        vec3 prevA(tess->verts[0], tess->verts[1], 0);
+        
+        const vec3 prevB(tess->verts[0], tess->verts[1], tess->height);
+
+        const vec3 C(tess->verts[2], tess->verts[3], 0);
+
+        //const vec3 normal = triangleNormal(prevA, prevB, C);
+        const vec3 normal(1,0,0);
+
+        verts.push_back(prevA.x);
+        verts.push_back(prevA.y);
+        verts.push_back(prevA.z);
+
+        verts.push_back(normal.x);
+        verts.push_back(normal.y);
+        verts.push_back(normal.z);
+
+        verts.push_back(symbologyWallID_value);
+
+        verts.push_back(prevB.x);
+        verts.push_back(prevB.y);
+        verts.push_back(prevB.z);
+
+        verts.push_back(normal.x);
+        verts.push_back(normal.y);
+        verts.push_back(normal.z);
+
+        verts.push_back(symbologyWallID_value);
+
+        for(size_t i = 1; i <= tess->numVerts; ++i)
+        {
+            const size_t vertIndex = i % tess->numVerts;
+
+            size_t indexA;
+            size_t indexB;
+
+            lineIndices.push_back(indexA = offset++);
+            lineIndices.push_back(indexB = offset++);
+
+            // pA   A
+            //
+            // pB   B
+
+            triangleIndices.push_back(indexA);
+            triangleIndices.push_back(indexB);
+            triangleIndices.push_back(prevIndexA);
             
-            append(vertsPtr, tess->verts[0]);
-            append(vertsPtr, tess->verts[1]);
-            append(vertsPtr, 0);
+            /*
+            triangleIndices.push_back(prevIndexA);
+            triangleIndices.push_back(indexB);
+            triangleIndices.push_back(prevIndexB);
+            */
+            triangleIndices.push_back(prevIndexB);
+            triangleIndices.push_back(indexB);
+            triangleIndices.push_back(prevIndexA);
+            
 
-            append(vertsPtr, 0);
-            append(vertsPtr, 0);
-            append(vertsPtr, 0);
+            prevIndexA = indexA;
+            prevIndexB = indexB;
 
-            append(vertsPtr, symbologyWallID_value);
+            const vec3 A(tess->verts[vertIndex * 2 + 0], tess->verts[vertIndex * 2 + 1], 0);
+            const vec3 B(tess->verts[vertIndex * 2 + 0], tess->verts[vertIndex * 2 + 1], tess->height);
 
-            size_t prevB = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
+            //const vec3 normal = triangleNormal(A, B, prevA);
+            const vec3 normal(1,0,0);
 
-            const size_t startA = prevA;
-            const size_t startB = prevB;
+            prevA = A;
 
-            append(vertsPtr, tess->verts[0]);
-            append(vertsPtr, tess->verts[1]);
-            append(vertsPtr, tess->height);
+            verts.push_back(A.x);
+            verts.push_back(A.y);
+            verts.push_back(A.z);
 
-            append(vertsPtr, 0);
-            append(vertsPtr, 0);
-            append(vertsPtr, 0);
+            verts.push_back(normal.x);
+            verts.push_back(normal.y);
+            verts.push_back(normal.z);
 
-            append(vertsPtr, symbologyWallID_value);
+            verts.push_back(symbologyWallID_value);
 
-            for(size_t j = 1; j < tess->numVerts; ++j)
-            {
-                //const size_t A = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
-                const size_t A = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
+            verts.push_back(B.x);
+            verts.push_back(B.y);
+            verts.push_back(B.z);
 
-                append(vertsPtr, tess->verts[j * 2 + 0]);
-                append(vertsPtr, tess->verts[j * 2 + 1]);
-                append(vertsPtr, 0);
+            verts.push_back(normal.x);
+            verts.push_back(normal.y);
+            verts.push_back(normal.z);
 
-                append(vertsPtr, 0);
-                append(vertsPtr, 0);
-                append(vertsPtr, 0);
-
-                append(vertsPtr, symbologyWallID_value);
-
-                //const size_t B = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 4);
-                const size_t B = append(lineIndicesPtr, (vertsPtr - &verts[0]) / 7);
-
-                append(vertsPtr, tess->verts[j * 2 + 0]);
-                append(vertsPtr, tess->verts[j * 2 + 1]);
-                append(vertsPtr, tess->height);
-
-                append(vertsPtr, 0);
-                append(vertsPtr, 0);
-                append(vertsPtr, 0);
-
-                append(vertsPtr, symbologyWallID_value);
-
-                wallTris.push_back(prevA);
-                wallTris.push_back(prevB);
-                wallTris.push_back(A);
-
-                wallTris.push_back(A);
-                wallTris.push_back(prevB);
-                wallTris.push_back(B);
-                
-                prevA = A;
-                prevB = B;
-            }
-
-            wallTris.push_back(startA);
-            wallTris.push_back(startB);
-            wallTris.push_back(prevA);
-
-            wallTris.push_back(prevA);
-            wallTris.push_back(startB);
-            wallTris.push_back(prevB);
-
-            //dmess("tess->numVerts " << tess->numVerts << " wallTris " << wallTris.size());
-
-            offset += tess->numVerts * 2;
+            verts.push_back(symbologyWallID_value);
         }
     }
-
-    triangleIndices.insert(triangleIndices.begin(), wallTris.begin(), wallTris.end()); // TODO try not to do this.
 
     GLuint vao  = 0;
     GLuint ebo  = 0;

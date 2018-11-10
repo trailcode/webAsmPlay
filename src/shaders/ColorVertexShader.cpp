@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 
@@ -34,10 +35,12 @@ namespace
     ShaderProgram * shaderProgram = NULL;
 
     ColorVertexShader * defaultInstance = NULL;
-}
 
-ColorVertexShader::ColorVertexShader() : Shader(shaderProgram) {}
-ColorVertexShader::~ColorVertexShader() {}
+    GLint vertInAttrLoc;
+    GLint vertColorInAttrLoc;
+
+    GLint MVP_Loc;
+}
 
 void ColorVertexShader::ensureShader()
 {
@@ -67,14 +70,26 @@ void ColorVertexShader::ensureShader()
         }
     )glsl";
 
-    shaderProgram = ShaderProgram::create(vertexSource, fragmentSource);
+    shaderProgram = ShaderProgram::create(  vertexSource,
+                                            fragmentSource,
+                                            Variables({{"vertIn",      vertInAttrLoc},
+                                                       {"vertColorIn", vertColorInAttrLoc}}),
+                                            Variables({{"MVP",         MVP_Loc}}));
 
     defaultInstance = new ColorVertexShader();
 }
 
+ColorVertexShader::ColorVertexShader() : Shader("ColorVertexShader",
+                                                shaderProgram,
+                                                vertInAttrLoc,
+                                                vertColorInAttrLoc) {}
+ColorVertexShader::~ColorVertexShader() {}
+
 ColorVertexShader * ColorVertexShader::getInstance() { return defaultInstance ;}
 
-void ColorVertexShader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
+void ColorVertexShader::bind(Canvas * canvas, const bool isOutline)
 {
-    shaderProgram->bind(MVP, MV);
+    shaderProgram->bind();
+
+    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }

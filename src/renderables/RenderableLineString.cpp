@@ -110,8 +110,8 @@ Renderable * RenderableLineString::create(  const LineString * lineString,
 }
 
 Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings,
-                                          const mat4              & trans,
-                                          const bool                showProgress)
+                                          const mat4               & trans,
+                                          const bool                 showProgress)
 {
     time_point<system_clock> startTime;
     
@@ -215,25 +215,32 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
                                     isMulti);
 }
 
-void RenderableLineString::render(const mat4 & MVP, const mat4 & MV) const
+void RenderableLineString::render(Canvas * canvas) const
 {
-    shader->bind(MVP, MV, true);
+    shader->bind(canvas, true);
     
     glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    glBindBuffer(GL_ARRAY_BUFFER,         vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    
+    glDisable(GL_DEPTH_TEST);
 
     if(!isMulti)
     {
-        shader->enableVertexAttribArray();
+        //shader->enableVertexAttribArray();
+        //shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO try to remove!
+        //shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+        shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0); // TODO try to remove!
 
         glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL);
     }
     else
     {
-        shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
-
-        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+        //shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO try to remove!
+        //shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+        shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO try to remove!
+        shader->enableColorArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
         glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, NULL);
     }

@@ -2,8 +2,8 @@
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Debug.h>
 #include <tceGeom/vec3.h>
-#include <glm/gtc/matrix_transform.hpp> // lookAt
-#include <glm/gtc/type_ptr.hpp> // value_ptr
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
 using namespace tce::geom;
@@ -20,32 +20,32 @@ namespace rsmz
     {
     }
 
-    const glm::vec3 & Camera::getCenterConstRef()
+    const glm::vec3 & Camera::getCenterConstRef() const
     {
         return mCenter;
     }
 
-    glm::vec3 Camera::getCenter()
+    glm::vec3 Camera::getCenter() const
     {
         return mCenter;
     }
 
-    const glm::vec3 & Camera::getEyeConstRef()
+    const glm::vec3 & Camera::getEyeConstRef() const
     {
         return mEye;
     }
 
-    glm::vec3 Camera::getEye()
+    glm::vec3 Camera::getEye() const
     {
         return mEye;
     }
 
-    const glm::mat4 & Camera::getMatrixConstRef()
+    const glm::mat4 & Camera::getMatrixConstRef() const
     {
         return mMatrix;
     }
 
-    glm::mat4 Camera::getMatrix()
+    glm::mat4 Camera::getMatrix() const
     {
         return mMatrix;
     }
@@ -57,12 +57,12 @@ namespace rsmz
         mMatrix = MVP;
     }
 
-    const float* Camera::getMatrixFlatPtr()
+    const float* Camera::getMatrixFlatPtr() const
     {
         return glm::value_ptr(mMatrix);
     }
 
-    vector<float> Camera::getMatrixFlat()
+    vector<float> Camera::getMatrixFlat() const
     {
         vector<float> ret(16);
 
@@ -71,12 +71,12 @@ namespace rsmz
         return ret;
     }
 
-    const glm::vec3 & Camera::getUpConstRef()
+    const glm::vec3 & Camera::getUpConstRef() const
     {
         return mUp;
     }
 
-    glm::vec3 Camera::getUp()
+    glm::vec3 Camera::getUp() const
     {
         return mUp;
     }

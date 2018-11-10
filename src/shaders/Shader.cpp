@@ -27,34 +27,59 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/Shader.h>
 
+using namespace std;
 using namespace glm;
 
-Shader::Shader(ShaderProgram * program) : program(program) {}
+Shader::Shader( const string  & shaderName,
+                ShaderProgram * program,
+                const GLint     vertexInLoc,
+                const GLint     colorInLoc,
+                const GLint     normalInLoc) :  shaderName  (shaderName),
+                                                program     (program),
+                                                vertexInLoc (vertexInLoc),
+                                                colorInLoc  (colorInLoc),
+                                                normalInLoc (normalInLoc){}
 
-void Shader::enableVertexAttribArray(const GLint       size,
-                                     const GLenum      type,
-                                     const GLboolean   normalized,
-                                     const GLsizei     stride,
-                                     const GLvoid    * pointer)
+void Shader::enableVertexArray(const GLint       size,
+                               const GLenum      type,
+                               const GLboolean   normalized,
+                               const GLsizei     stride,
+                               const GLvoid    * pointer)
 {
-    program->enableVertexAttribArray(size,
-                                     type,
-                                     normalized,
-                                     stride,
-                                     pointer);
+    ShaderProgram::enableVertexAttribArray(vertexInLoc,
+                                           size,
+                                           type,
+                                           normalized,
+                                           stride,
+                                           pointer);
 }
 
-void Shader::enableColorAttribArray(const GLint       size,
-                                    const GLenum      type,
-                                    const GLboolean   normalized,
-                                    const GLsizei     stride,
-                                    const GLvoid    * pointer)
+void Shader::enableColorArray( const GLint       size,
+                               const GLenum      type,
+                               const GLboolean   normalized,
+                               const GLsizei     stride,
+                               const GLvoid    * pointer)
 {
-    program->enableColorAttribArray(size,
-                                    type,
-                                    normalized,
-                                    stride,
-                                    pointer);
+    ShaderProgram::enableVertexAttribArray(colorInLoc,
+                                           size,
+                                           type,
+                                           normalized,
+                                           stride,
+                                           pointer);
 }
 
-void Shader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline) { program->bind(MVP, MV) ;}
+void Shader::enableNormalArray( const GLint       size,
+                                const GLenum      type,
+                                const GLboolean   normalized,
+                                const GLsizei     stride,
+                                const GLvoid    * pointer)
+{
+    ShaderProgram::enableVertexAttribArray(normalInLoc,
+                                           size,
+                                           type,
+                                           normalized,
+                                           stride,
+                                           pointer);
+}
+
+string Shader::getName() const { return shaderName ;}

@@ -41,7 +41,7 @@ public:
 
     static ColorShader * getDefaultInstance();
 
-    void bind(const glm::mat4 & MVP, const glm::mat4 & MV, const bool isOutline);
+    void bind(Canvas * canvas, const bool isOutline);
 
 private:
 

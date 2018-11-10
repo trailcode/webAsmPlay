@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 
@@ -34,6 +35,11 @@ namespace
     ShaderProgram * shaderProgram = NULL;
 
     ColorShader * defaultInstance = NULL;
+
+    GLint vertInAttrLoc;
+    GLint colorInAttrLoc;
+
+    GLint MVP_Loc;
 }
 
 void ColorShader::ensureShader()
@@ -42,14 +48,14 @@ void ColorShader::ensureShader()
 
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
-        in vec2 vertIn;
+        in vec3 vertIn;
         out vec4 vertexColor;
         uniform mat4 MVP;
         uniform vec4 colorIn;
 
         void main()
         {
-            gl_Position = MVP * vec4(vertIn.xy, 0, 1);
+            gl_Position = MVP * vec4(vertIn.xyz, 1);
             vertexColor = colorIn;
         }
     )glsl";
@@ -64,14 +70,23 @@ void ColorShader::ensureShader()
         }
     )glsl";
 
-    shaderProgram = ShaderProgram::create(vertexSource, fragmentSource);
+    shaderProgram = ShaderProgram::create(  vertexSource,
+                                            fragmentSource,
+                                            Variables({{"vertIn",   vertInAttrLoc}}),
+                                            Variables({{"MVP",      MVP_Loc},
+                                                       {"colorIn",  colorInAttrLoc}}));
 
     defaultInstance = new ColorShader();
 }
 
 ColorShader * ColorShader::getDefaultInstance() { return defaultInstance ;}
 
-ColorShader::ColorShader() : Shader(shaderProgram), fillColor(0,1,0,0.5), outlineColor(1,1,0,1)
+ColorShader::ColorShader() :    Shader      ("ColorShader",
+                                             shaderProgram,
+                                             vertInAttrLoc,
+                                             colorInAttrLoc),
+                                fillColor   (0,1,0,0.5),
+                                outlineColor(1,1,0,1)
 {
 
 }
@@ -81,10 +96,12 @@ ColorShader::~ColorShader()
 
 }
 
-void ColorShader::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
+void ColorShader::bind(Canvas * canvas, const bool isOutline)
 {
-    shaderProgram->bind(MVP, MV);
+    shaderProgram->bind();
 
-    if(isOutline) { shaderProgram->setColor(outlineColor) ;}
-    else          { shaderProgram->setColor(fillColor)    ;}
+    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+
+    if(isOutline) { shaderProgram->setUniform(colorInLoc, outlineColor) ;}
+    else          { shaderProgram->setUniform(colorInLoc, fillColor)    ;}
 }

@@ -28,6 +28,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Textures.h>
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 
@@ -42,15 +43,16 @@ namespace
 
     ColorDistanceShader3D * defaultInstance = NULL;
 
-    GLint colorsInLoc = -1;
+    GLint vertInAttrLoc;
+    GLint normalInAttrLoc;
+    GLint vertColorInAttrLoc;
 
-    GLint colorLookupOffsetLoc = -1;
-
-    GLint heightMultiplierLoc = -1;
-
-    GLint MV_Uniform = -1;
-
-    GLuint texUniform = -1;
+    GLint colorLookupOffsetLoc;
+    GLint heightMultiplierLoc;
+    GLint modelLoc;
+    GLint viewLoc;
+    GLint projectionLoc;
+    GLint texUniformLoc;
 
     GLuint colorTexture = 0;
 
@@ -64,28 +66,38 @@ void ColorDistanceShader3D::ensureShader()
 
         uniform sampler2D tex; // TODO why does the ordering matter here? Something must not be correct.
 
-        in vec3 vertIn;
+        in vec3  vertIn;
+        in vec3  normalIn;
         in float vertColorIn;
         
-        uniform mat4      MVP;
-        uniform mat4      MV;
-        uniform float     colorLookupOffset;
-        uniform float     heightMultiplier;
+        uniform mat4   model;
+        uniform mat4   view;
+        uniform mat4   projection;
+        uniform float  colorLookupOffset;
+        uniform float  heightMultiplier;
         
         out vec4 vertexColorNear;
         out vec4 vertexColorFar;
         out vec4 position_in_view_space;
+        out vec3 normal;
+        out vec3 fragPos;
 
         void main()
         {
             vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
 
+            fragPos = vec3(model * vert);
+
+            mat4 MV = view * model;
+
             position_in_view_space = MV * vert;
 
-            gl_Position = MVP * vert;
+            gl_Position = projection * MV * vert;
 
             vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
-            vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
+            vertexColorFar  = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
+
+            normal = mat3(transpose(inverse(model))) * normalIn;
         }
     )glsl";
 
@@ -94,6 +106,8 @@ void ColorDistanceShader3D::ensureShader()
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
+        in vec3 normal; 
+        in vec3 fragPos;
 
         out vec4 outColor;
 
@@ -101,6 +115,10 @@ void ColorDistanceShader3D::ensureShader()
         {
             float minDist = 0.0;
             float maxDist = 5.0;
+
+            vec3 lightPos = vec3(0.1,0.1,0.1);
+            vec3 lightColor = vec3(1,1,1);
+            vec3 viewPos = vec3(0,0,0);
 
             // computes the distance between the fragment position 
             // and the origin (4th coordinate should always be 1 
@@ -111,6 +129,32 @@ void ColorDistanceShader3D::ensureShader()
             dist = min(maxDist, dist) / maxDist;
 
             outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
+
+            /*
+            vec4 color = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
+            vec3 objectColor = vec3(color);
+
+            // ambient
+            float ambientStrength = 0.1;
+            vec3 ambient = ambientStrength * lightColor;
+                
+            // diffuse 
+            vec3 norm = normalize(normal);
+            vec3 lightDir = normalize(lightPos - fragPos);
+            float diff = max(dot(norm, lightDir), 0.0);
+            vec3 diffuse = diff * lightColor;
+            
+            // specular
+            float specularStrength = 0.5;
+            vec3 viewDir = normalize(viewPos - fragPos);
+            vec3 reflectDir = reflect(-lightDir, norm);  
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+            vec3 specular = specularStrength * spec * lightColor;  
+                
+            vec3 result = (ambient + diffuse + specular) * objectColor;
+            //outColor = vec4(result, color.w);
+            outColor = color;
+            */
         }
     )glsl";
 
@@ -118,26 +162,24 @@ void ColorDistanceShader3D::ensureShader()
 
     shaderProgram = ShaderProgram::create(  vertexSource,
                                             fragmentSource,
-                                            StrVec({"MV",
-                                                    "colorsIn",
-                                                    "tex",
-                                                    "colorLookupOffset",
-                                                    "heightMultiplier"}));
-
-    colorLookupOffsetLoc = shaderProgram->getUniformLoc("colorLookupOffset");
-
-    MV_Uniform  = shaderProgram->getUniformLoc("MV");
-
-    colorsInLoc = shaderProgram->getUniformLoc("colorsIn");
-
-    texUniform = shaderProgram->getUniformLoc("tex");
-
-    heightMultiplierLoc = shaderProgram->getUniformLoc("heightMultiplier");
+                                            Variables({{"vertIn",               vertInAttrLoc},
+                                                       {"vertColorIn",          vertColorInAttrLoc},
+                                                       {"normalIn",             normalInAttrLoc}}),
+                                            Variables({{"tex",                  texUniformLoc},
+                                                       {"model",                modelLoc},
+                                                       {"view",                 viewLoc},
+                                                       {"projection",           projectionLoc},
+                                                       {"colorLookupOffset",    colorLookupOffsetLoc},
+                                                       {"heightMultiplier",     heightMultiplierLoc}}));
 
     defaultInstance = new ColorDistanceShader3D();
 }
 
-ColorDistanceShader3D::ColorDistanceShader3D() : Shader(shaderProgram)
+ColorDistanceShader3D::ColorDistanceShader3D() : Shader("ColorDistanceShader3D",
+                                                        shaderProgram,
+                                                        vertInAttrLoc,
+                                                        vertColorInAttrLoc,
+                                                        normalInAttrLoc)
 {
     colors[0] = vec4(1,0,0,1);
     colors[1] = vec4(1,1,0,1);
@@ -156,7 +198,8 @@ ColorDistanceShader3D::~ColorDistanceShader3D()
 
 ColorDistanceShader3D * ColorDistanceShader3D::getDefaultInstance() { return defaultInstance ;}
 
-void ColorDistanceShader3D::bind(const mat4 & MVP, const mat4 & MV, const bool isOutline)
+void ColorDistanceShader3D::bind(Canvas     * canvas,
+                                 const bool   isOutline)
 {
     if(colorTextureDirty)
     {
@@ -169,17 +212,15 @@ void ColorDistanceShader3D::bind(const mat4 & MVP, const mat4 & MV, const bool i
 
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorTexture));
 
-    shaderProgram->bind(MVP, MV);
+    shaderProgram->bind();
 
-    shaderProgram->setUniform(MV_Uniform, MV);
-
-    shaderProgram->setUniformi(texUniform, 0);
+    shaderProgram->setUniformi(texUniformLoc, 0);
 
     shaderProgram->setUniformf(heightMultiplierLoc, heightMultiplier);
 
-    shaderProgram->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
-
-    shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLuint)));
+    shaderProgram->setUniform(modelLoc,      canvas->getModelRef());
+    shaderProgram->setUniform(viewLoc,       canvas->getViewRef());
+    shaderProgram->setUniform(projectionLoc, canvas->getProjectionRef());
 
     if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 2.0f) ;}
     else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}

@@ -128,7 +128,7 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
     return ret;
 }
 
-void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
+void RenderablePolygon::render(Canvas * canvas) const
 {
     vertexArrayObject->bind();
 
@@ -140,25 +140,19 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
 
     GL_CHECK(glDisable(GL_DEPTH_TEST));
 
+    shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    shader->enableColorArray (1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+
     if(getRenderFill())
     {
-        shader->bind(MVP, MV, false);
-
-        shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO shader->bind should be doing this
-
-        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+        shader->bind(canvas, false);
 
         vertexArrayObject->drawTriangles();
     }
 
     if(getRenderOutline())
     {
-        shader->bind(MVP, MV, true);
-
-        // TODO this is here as a hack
-        shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO shader->bind should be doing this
-
-        shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+        shader->bind(canvas, true);
 
         vertexArrayObject->bindLines();
         
@@ -166,6 +160,4 @@ void RenderablePolygon::render(const mat4 & MVP, const mat4 & MV) const
     }
 
     glDisable(GL_BLEND); // TODO Remove!
-
-    //glUseProgram(0);
 }

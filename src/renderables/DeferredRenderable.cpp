@@ -25,8 +25,9 @@
 */
 #include <vector>
 #include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp> // value_ptr
+#include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 
@@ -105,7 +106,7 @@ DeferredRenderable::DeferredRenderable( const GLuint & vao,
                                                                          numTriIndices (numTriIndices),
                                                                          numLineIndices(numLineIndices)
 {
-
+    setShader(ColorVertexShader::getInstance());
 }
 
 DeferredRenderable::~DeferredRenderable()
@@ -181,61 +182,39 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
     triangleIndices.push_back(index + 3);
     triangleIndices.push_back(index + 4);
     triangleIndices.push_back(index + 5);
-
-    /*
-    size_t curr = vertsAndColor.size();
-
-    vertsAndColor.resize(curr + ((3 + 4) * 6));
-
-    size_t currIndex = curr / 7;
-
-    triangleIndices.resize(triangleIndices.size() + 6);
-
-    GLfloat * vertsAndColorPtr = &vertsAndColor[curr];
-    GLuint  * triangleIndicesPtr        = &triangleIndices[currIndex];
-
-    //dmess("currIndex " << currIndex);
-
-    addTriangle(A,
-                B,
-                C,
-                color,
-                currIndex,
-                vertsAndColorPtr,
-                triangleIndicesPtr);
-    
-    addTriangle(A,
-                C,
-                D,
-                color,
-                currIndex,
-                vertsAndColorPtr,
-                triangleIndicesPtr);
-    */
-
-
-    //dmess("currIndex " << currIndex);
 }
 
-void DeferredRenderable::render(const mat4 & MVP, const mat4 & MV) const
+void DeferredRenderable::render(Canvas * canvas) const
 {
+    //*
     GL_CHECK(glBindVertexArray(vao));
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
 
-    const mat4 _MVP = glm::rotate(MVP, radians(90.0f), vec3(1, 0, 0)); // TODO might not be correct, might need to define model first!
+    glDisable(GL_DEPTH_TEST);
 
-    //ColorVertexShader::getInstance()->bind(MVP, MV, false);
-    ColorVertexShader::getInstance()->bind(_MVP, MV, false);
+    //canvas->pushModel(rotate(dmat4(1.0), radians(90.0), dvec3(1, 0, 0)));
+    canvas->pushModel(rotate(canvas->getModelRef(), radians(90.0), dvec3(1, 0, 0)));
 
-    ColorVertexShader::getInstance()->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+    shader->bind(canvas, false);
 
-    ColorVertexShader::getInstance()->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
+    shader->enableVertexArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+
+    shader->enableColorArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
+
+    //ColorVertexShader::getInstance()->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+
+    //ColorVertexShader::getInstance()->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
+
+    //dmess("numTriIndices " << numTriIndices);
 
     GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
 
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
 
     GL_CHECK(glDrawElements(GL_LINES, numLineIndices, GL_UNSIGNED_INT, NULL));
+    //*/
+
+    canvas->popMVP();
 }

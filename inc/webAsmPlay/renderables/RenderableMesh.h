@@ -42,7 +42,7 @@ public:
                                 const glm::dmat4                 & trans        = glm::mat4(1.0),
                                 const bool                         showProgress = false);
 
-    void render(const glm::mat4 & MVP, const glm::mat4 & MV) const;
+    void render(Canvas * canvas) const;
 
 private:
 

@@ -49,18 +49,18 @@ void GUI::renderSettingsPanel()
 
         if(ImGui::Checkbox("Fill Polygons", &fillPolygons))
         {
-            for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
+            for(Renderable * r : canvas->getRenderiables()) { r->setRenderFill(fillPolygons) ;}
 
-            for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderFill(fillPolygons) ;}
+            for(Renderable * r : geosTestCanvas->getRenderiables()) { r->setRenderFill(fillPolygons) ;}
 
             //Renderable::setDefaultRenderFill(fillPolygons);
         }
 
         if(ImGui::Checkbox("Polygon Outlines", &renderPolygonOutlines))
         {
-            for(Renderable * r : canvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
+            for(Renderable * r : canvas->getRenderiables()) { r->setRenderOutline(renderPolygonOutlines) ;}
 
-            for(Renderable * r : geosTestCanvas->getRenderiablesRef()) { r->setRenderOutline(renderPolygonOutlines) ;}
+            for(Renderable * r : geosTestCanvas->getRenderiables()) { r->setRenderOutline(renderPolygonOutlines) ;}
 
             //Renderable::setDefaultRenderOutline(renderPolygonOutlines);
         }
