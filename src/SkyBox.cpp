@@ -33,6 +33,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/Textures.h>
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/SkyBox.h>
 
 using namespace std;
@@ -45,6 +46,10 @@ using namespace glm;
 namespace
 {
     ShaderProgram * skyboxShader = NULL;
+
+    GLint vertInLoc      = -1;
+    GLint MVP_Loc        = -1;
+    GLint cubeTextureLoc = -1;
 
     vector<SkyBox *> instances;
 }
@@ -69,16 +74,24 @@ void SkyBox::ensureShader()
 
     const GLchar* fragmentSource = R"glsl(#version 330 core
         in vec3 texcoords;
-        uniform samplerCube cube_texture;
+        uniform samplerCube cubeTexture;
         out vec4 frag_colour;
         
         void main()
         {
-            frag_colour = texture(cube_texture, texcoords);
+            frag_colour = texture(cubeTexture, texcoords);
         }
     )glsl";
 
-    skyboxShader = ShaderProgram::create(vertexSource, fragmentSource);
+    skyboxShader = ShaderProgram::create(vertexSource,
+                                         fragmentSource,
+                                         Variables({{"vertIn",      vertInLoc}}),
+                                         Variables({{"MVP",         MVP_Loc},
+                                                    {"cubeTexture", cubeTextureLoc}}));
+
+    dmess("vertInLoc " << vertInLoc);
+    dmess("MVP_Loc " << MVP_Loc);
+    dmess("cubeTextureLoc " << cubeTextureLoc);
 }
 
 SkyBox::SkyBox()
@@ -168,9 +181,9 @@ SkyBox::~SkyBox()
     // TODO cleanup! Remove from instances
 }
 
-void SkyBox::render(const mat4 & _view, const mat4 & projection)
+void SkyBox::render(Canvas * canvas)
 {
-    mat4 centeredView = mat4(_view);
+    mat4 centeredView = mat4(canvas->getViewRef());
 
     value_ptr(centeredView)[12] = 0;
     value_ptr(centeredView)[13] = 0;
@@ -180,11 +193,15 @@ void SkyBox::render(const mat4 & _view, const mat4 & projection)
 
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
     
-    skyboxShader->bind(model, centeredView, projection);
+    skyboxShader->bind();
 
-    skyboxShader->setTexture1Slot(0);
+    const mat4 MVP = mat4(canvas->getProjectionRef()) * centeredView * model;
 
-    skyboxShader->enableVertexAttribArray(3); // TODO Why is this not required here? Perhaps the point of vertex array objects?
+    skyboxShader->setUniform(MVP_Loc, MVP);
+
+    skyboxShader->setUniformi(cubeTextureLoc, 0);
+
+    skyboxShader->enableVertexAttribArray(vertInLoc, 3);
 
     GL_CHECK(glDepthMask(GL_FALSE));
     GL_CHECK(glActiveTexture(GL_TEXTURE0));

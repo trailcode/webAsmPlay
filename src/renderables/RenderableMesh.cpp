@@ -116,9 +116,7 @@ RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderab
 
 }
 
-void RenderableMesh::render(const mat4 & model,
-                            const mat4 & view,
-                            const mat4 & projection) const
+void RenderableMesh::render(Canvas * canvas) const
 {
     vertexArrayObject->bind();
 
@@ -133,14 +131,24 @@ void RenderableMesh::render(const mat4 & model,
 
     if(getRenderFill())
     {
-        shader->bind(model, view, projection, false);
+        shader->bind(canvas, false);
+
+        // TODO should this be in the VertexArrayObject? Perhaps create a struct and pass into bind?
+        shader->enableVertexArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+        shader->enableColorArray (1, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+        shader->enableNormalArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 
         vertexArrayObject->drawTriangles();
     }
 
     if(getRenderOutline())
     {
-        shader->bind(model, view, projection, true);
+        shader->bind(canvas, true);
+
+        // TODO should this be in the VertexArrayObject?
+        shader->enableVertexArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+        shader->enableColorArray (1, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+        shader->enableNormalArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 
         vertexArrayObject->bindLines();
         

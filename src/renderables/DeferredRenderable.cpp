@@ -217,10 +217,9 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
     //dmess("currIndex " << currIndex);
 }
 
-void DeferredRenderable::render(const mat4 & model,
-                                const mat4 & view,
-                                const mat4 & projection) const
+void DeferredRenderable::render(Canvas * canvas) const
 {
+    /*
     GL_CHECK(glBindVertexArray(vao));
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
@@ -239,4 +238,5 @@ void DeferredRenderable::render(const mat4 & model,
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
 
     GL_CHECK(glDrawElements(GL_LINES, numLineIndices, GL_UNSIGNED_INT, NULL));
+    */
 }

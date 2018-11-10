@@ -34,10 +34,12 @@ namespace
     ShaderProgram * shaderProgram = NULL;
 
     ColorVertexShader * defaultInstance = NULL;
-}
 
-ColorVertexShader::ColorVertexShader() : Shader(shaderProgram) {}
-ColorVertexShader::~ColorVertexShader() {}
+    GLint vertInAttrLoc;
+    GLint vertColorInAttrLoc;
+
+    GLint MVP_Loc;
+}
 
 void ColorVertexShader::ensureShader()
 {
@@ -67,17 +69,24 @@ void ColorVertexShader::ensureShader()
         }
     )glsl";
 
-    shaderProgram = ShaderProgram::create(vertexSource, fragmentSource);
+    shaderProgram = ShaderProgram::create(  vertexSource,
+                                            fragmentSource,
+                                            Variables({{"vertIn",      vertInAttrLoc},
+                                                       {"vertColorIn", vertColorInAttrLoc}}),
+                                            Variables({{"MVP",         MVP_Loc}}));
 
     defaultInstance = new ColorVertexShader();
 }
 
+ColorVertexShader::ColorVertexShader() : Shader(shaderProgram,
+                                                vertInAttrLoc,
+                                                vertColorInAttrLoc) {}
+ColorVertexShader::~ColorVertexShader() {}
+
 ColorVertexShader * ColorVertexShader::getInstance() { return defaultInstance ;}
 
-void ColorVertexShader::bind(const mat4 & model,
-                             const mat4 & view,
-                             const mat4 & projection,
-                             const bool   isOutline)
+void ColorVertexShader::bind(Canvas * canvas, const bool isOutline)
 {
-    shaderProgram->bind(model, view, projection);
+    //shaderProgram->bind(model, view, projection);
+    abort();
 }

@@ -37,10 +37,7 @@ public:
 
     static ColorVertexShader * getInstance();
 
-    void bind(const glm::mat4 & model,
-              const glm::mat4 & view,
-              const glm::mat4 & projection,
-              const bool        isOutline);
+    void bind(Canvas * canvas, const bool isOutline);
 
 private:
 

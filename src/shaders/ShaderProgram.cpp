@@ -31,28 +31,22 @@
 using namespace std;
 using namespace glm;
 
-ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
-                                      const GLchar * fragmentSource,
-                                      const StrVec & uniforms,
-                                      const StrVec & attributes)
+ShaderProgram * ShaderProgram::create(const GLchar    * vertexSource,
+                                      const GLchar    * fragmentSource,
+                                      const Variables & attributes,
+                                      const Variables & uniforms)
 {
-    return create(vertexSource, fragmentSource, NULL, uniforms, attributes);
+    return create(vertexSource, fragmentSource, NULL, attributes, uniforms);
 }
 
-ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
-                                      const GLchar * fragmentSource,
-                                      const GLchar * geometrySource,
-                                      const StrVec & uniforms,
-                                      const StrVec & attributes)
+ShaderProgram * ShaderProgram::create(const GLchar    * vertexSource,
+                                      const GLchar    * fragmentSource,
+                                      const GLchar    * geometrySource,
+                                      const Variables & attributes,
+                                      const Variables & uniforms)
 {
-    GLuint shaderProgram        = 0;
-    GLint  vertInAttrib         = 0;
-    GLint  colorInAttrib        = 0;
-    GLint  colorsInUniform      = 0;
-    GLint  MVP_In_Uniform       = 0;
-    GLint  colorUniform         = 0;
-    GLint  textureCoordsUniform = 0;
-    GLint  success              = 0;
+    GLuint shaderProgram = 0;
+    GLint  success       = 0;
 
     // Create and compile the vertex shader
     const GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -137,51 +131,45 @@ ShaderProgram * ShaderProgram::create(const GLchar * vertexSource,
     GL_CHECK(glLinkProgram (shaderProgram));
     GL_CHECK(glUseProgram  (shaderProgram));
 
-    // Specify the layout of the vertex data
-    vertInAttrib         = glGetAttribLocation (shaderProgram, "vertIn");
-    colorInAttrib        = glGetAttribLocation (shaderProgram, "vertColorIn");
-    MVP_In_Uniform       = glGetUniformLocation(shaderProgram, "MVP");
-    colorUniform         = glGetUniformLocation(shaderProgram, "colorIn");
-    colorsInUniform      = glGetUniformLocation(shaderProgram, "colorsIn");
-    textureCoordsUniform = glGetUniformLocation(shaderProgram, "cube_texture");
+    unordered_map<string, GLint> uniformMap;
+    unordered_map<string, GLint> attributeMap;
 
-    unordered_map<string, GLint> uniformMap({   {"MVP",             MVP_In_Uniform},
-                                                {"colorIn",         colorUniform},
-                                                {"cube_texture",    textureCoordsUniform},
-                                                {"colorsIn",        colorsInUniform}});
+    for(const auto & variable : attributes)
+    {
+        variable.second = glGetAttribLocation(shaderProgram, variable.first.c_str());
 
-    unordered_map<string, GLint> attributeMap({ {"vertIn",          vertInAttrib},
-                                                {"vertColorIn",     colorInAttrib}});
+        if(variable.second == -1)
+        {
+            dmess("Warning could not find shader attribute: " << variable.first);
 
-    for(const auto & variable : uniforms)   { uniformMap  [variable] = glGetUniformLocation(shaderProgram, variable.c_str()) ;}
-    for(const auto & variable : attributes) { attributeMap[variable] = glGetAttribLocation(shaderProgram,  variable.c_str()) ;}
+            continue;
+        }
+
+        attributeMap[variable.first] = variable.second;
+    }
+
+    for(const auto & variable : uniforms)
+    {
+        variable.second = glGetUniformLocation(shaderProgram, variable.first.c_str());
+
+        if(variable.second == -1)
+        {
+            dmess("Warning could not find shader uniform: " << variable.first);
+
+            continue;
+        }
+
+        uniformMap[variable.first] = variable.second;
+    }
 
     return new ShaderProgram(shaderProgram,
-                             vertInAttrib,
-                             colorInAttrib,
-                             colorsInUniform,
-                             MVP_In_Uniform,
-                             colorUniform,
-                             textureCoordsUniform,
                              uniformMap,
                              attributeMap);
 }
 
 ShaderProgram::ShaderProgram(   const GLuint                         shaderProgram,
-                                const GLint                          vertInAttrib,
-                                const GLint                          colorInAttrib,
-                                const GLint                          colorsInUniform,
-                                const GLint                          MVP_In_Uniform,
-                                const GLint                          colorUniform,
-                                const GLint                          textureCoordsUniform,
                                 const unordered_map<string, GLint> & uniforms,
                                 const unordered_map<string, GLint> & attributes) :  shaderProgram        (shaderProgram),
-                                                                                    vertInAttrib         (vertInAttrib),
-                                                                                    colorInAttrib        (colorInAttrib),
-                                                                                    colorsInUniform      (colorsInUniform),
-                                                                                    MVP_In_Uniform       (MVP_In_Uniform),
-                                                                                    colorUniform         (colorUniform),
-                                                                                    textureCoordsUniform (textureCoordsUniform),
                                                                                     uniforms             (uniforms),
                                                                                     attributes           (attributes)
 {
@@ -192,56 +180,31 @@ ShaderProgram::~ShaderProgram()
     // TODO Cleanup!
 }
 
-void ShaderProgram::bind(const mat4 & model,
-                         const mat4 & view,
-                         const mat4 & projection)
-{
-    GL_CHECK(glUseProgram(shaderProgram));
-
-    setUniform(MVP_In_Uniform, projection * view * model); // TODO remove this, should be in Shader implementing class
-}
+void ShaderProgram::bind() { GL_CHECK(glUseProgram(shaderProgram)) ;}
 
 GLuint ShaderProgram::getProgramHandle() const { return shaderProgram ;}
 
-vec4 ShaderProgram::setColor(const vec4 & color)
-{
-    GL_CHECK(glUniform4f(colorUniform, color.x, color.y, color.z, color.w));
-
-    return color;
-}
-
-void ShaderProgram::enableVertexAttribArray(const GLint       size,
+void ShaderProgram::enableVertexAttribArray(const GLint       vertexLoc,
+                                            const GLint       size,
                                             const GLenum      type,
                                             const GLboolean   normalized,
                                             const GLsizei     stride,
                                             const GLvoid    * pointer)
 {
     // Specify the layout of the vertex data
-    GL_CHECK(glEnableVertexAttribArray(vertInAttrib));
+    GL_CHECK(glEnableVertexAttribArray(vertexLoc));
 
-    GL_CHECK(glVertexAttribPointer(vertInAttrib, size, type, normalized, stride, pointer));
+    GL_CHECK(glVertexAttribPointer(vertexLoc, size, type, normalized, stride, pointer));
 }
 
-void ShaderProgram::enableColorAttribArray( const GLint       size,
-                                            const GLenum      type,
-                                            const GLboolean   normalized,
-                                            const GLsizei     stride,
-                                            const GLvoid    * pointer)
-{
-    if(colorInAttrib == -1) { return ;}
-
-    // Specify the layout of the vertex data
-    GL_CHECK(glEnableVertexAttribArray(colorInAttrib));
-
-    GL_CHECK(glVertexAttribPointer(colorInAttrib, size, type, normalized, stride, pointer));
-}
-
+/*
 GLuint ShaderProgram::setTexture1Slot(const GLuint slot) const
 {
     GL_CHECK(glUniform1i(textureCoordsUniform, slot));
 
     return slot;
 }
+*/
 
 GLint ShaderProgram::getUniformLoc(const string & name) const
 {

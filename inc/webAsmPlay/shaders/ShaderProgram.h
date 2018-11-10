@@ -41,42 +41,34 @@
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
 
+typedef std::vector<std::pair<std::string, GLint &> > Variables;
+
 class ShaderProgram
 {
 public:
 
-    static ShaderProgram * create( const GLchar * vertexSource,
-                            const GLchar * fragmentSource,
-                            const GLchar * geometrySource   = NULL,
-                            const StrVec & uniforms         = StrVec(),
-                            const StrVec & attributes       = StrVec());
+    static ShaderProgram * create(const GLchar    * vertexSource,
+                                  const GLchar    * fragmentSource,
+                                  const GLchar    * geometrySource   = NULL,
+                                  const Variables & attributes       = Variables(),
+                                  const Variables & uniforms         = Variables());
 
-    static ShaderProgram * create( const GLchar * vertexSource,
-                            const GLchar * fragmentSource,
-                            const StrVec & uniforms,
-                            const StrVec & attributes       = StrVec());
+    static ShaderProgram * create(const GLchar    * vertexSource,
+                                  const GLchar    * fragmentSource,
+                                  const Variables & attributes,
+                                  const Variables & uniforms = Variables());
+                                  
 
-    virtual void bind(const glm::mat4 & model,
-                      const glm::mat4 & view,
-                      const glm::mat4 & projection);
+    void bind();
 
     GLuint getProgramHandle() const;
 
-    glm::vec4 setColor(const glm::vec4 & color);
-
-    void enableVertexAttribArray(   const GLint       size          = 2,
-                                    const GLenum      type          = GL_FLOAT,
-                                    const GLboolean   normalized    = GL_FALSE,
-                                    const GLsizei     stride        = 0,
-                                    const GLvoid    * pointer       = NULL);
-
-    void enableColorAttribArray(    const GLint       size          = 4,
-                                    const GLenum      type          = GL_FLOAT,
-                                    const GLboolean   normalized    = GL_FALSE,
-                                    const GLsizei     stride        = 0,
-                                    const GLvoid    * pointer       = NULL);
-
-    GLuint setTexture1Slot(const GLuint slot) const;
+    static void enableVertexAttribArray(const GLint       vertexLoc,
+                                        const GLint       size        = 2,
+                                        const GLenum      type        = GL_FLOAT,
+                                        const GLboolean   normalized  = GL_FALSE,
+                                        const GLsizei     stride      = 0,
+                                        const GLvoid    * pointer     = NULL);
 
     GLint getUniformLoc  (const std::string & name) const;
     GLint getAttributeLoc(const std::string & name) const;
@@ -86,30 +78,16 @@ public:
     void setUniformf(const GLint location, const float     & value) const;
     void setUniformi(const GLint location, const GLuint    & value) const;
 
-protected:
+private:
 
-    ShaderProgram( const GLuint                                   shaderProgram,
-            const GLint                                    vertInAttrib,
-            const GLint                                    colorInAttrib,
-            const GLint  colorsInUniform,
-            const GLint                                    MVP_In_Uniform,
-            const GLint                                    colorUniform,
-            const GLint                                    textureCoordsUniform,
-            const std::unordered_map<std::string, GLint> & uniforms,
-            const std::unordered_map<std::string, GLint> & attributes);
+    ShaderProgram(const GLuint                                   shaderProgram,
+                  const std::unordered_map<std::string, GLint> & uniforms,
+                  const std::unordered_map<std::string, GLint> & attributes);
 
     ~ShaderProgram();
 
-private:
-
     GLuint shaderProgram;
-    GLint  vertInAttrib;
-    GLint  colorInAttrib;
-    GLint  colorsInUniform;
-    GLint  MVP_In_Uniform;
-    GLint  colorUniform;
-    GLint  textureCoordsUniform;
-
+    
     std::unordered_map<std::string, GLint> uniforms;
     std::unordered_map<std::string, GLint> attributes;
 };

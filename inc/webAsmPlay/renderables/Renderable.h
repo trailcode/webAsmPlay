@@ -46,11 +46,7 @@ public:
 
     virtual ~Renderable();
 
-    void render(const Canvas * canvas) const;
-
-    virtual void render(const glm::mat4 & model,
-                        const glm::mat4 & view,
-                        const glm::mat4 & projection) const = 0;
+    virtual void render(Canvas * canvas) const = 0;
 
     static Renderable * create( const geos::geom::Geometry::Ptr & geom,
                                 const glm::mat4                 & trans = glm::mat4(1.0));

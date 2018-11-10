@@ -106,7 +106,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         const vec3 C(tess->verts[2], tess->verts[3], 0);
 
-        const vec3 normal = triangleNormal(prevA, prevB, C);
+        //const vec3 normal = triangleNormal(prevA, prevB, C);
+        const vec3 normal(1,0,0);
 
         verts.push_back(prevA.x);
         verts.push_back(prevA.y);
@@ -146,9 +147,14 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             triangleIndices.push_back(indexB);
             triangleIndices.push_back(prevIndexA);
             
+            /*
             triangleIndices.push_back(prevIndexA);
             triangleIndices.push_back(indexB);
             triangleIndices.push_back(prevIndexB);
+            */
+            triangleIndices.push_back(prevIndexB);
+            triangleIndices.push_back(indexB);
+            triangleIndices.push_back(prevIndexA);
             
 
             prevIndexA = indexA;
@@ -157,7 +163,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             const vec3 A(tess->verts[vertIndex * 2 + 0], tess->verts[vertIndex * 2 + 1], 0);
             const vec3 B(tess->verts[vertIndex * 2 + 0], tess->verts[vertIndex * 2 + 1], tess->height);
 
-            const vec3 normal = triangleNormal(A, B, prevA);
+            //const vec3 normal = triangleNormal(A, B, prevA);
+            const vec3 normal(1,0,0);
 
             prevA = A;
 

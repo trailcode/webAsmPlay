@@ -42,9 +42,7 @@ public:
                                 const glm::mat4        & trans        = glm::mat4(1.0),
                                 const bool               showProgress = false);
 
-    void render(const glm::mat4 & model,
-                const glm::mat4 & view,
-                const glm::mat4 & projection) const;
+    void render(Canvas * canvas) const;
 
 private:
 

@@ -78,13 +78,6 @@ Renderable::~Renderable()
     for(OnDelete & callback : onDeleteCallbacks) { callback(this) ;}
 }
 
-void Renderable::render(const Canvas * canvas) const
-{
-    render( canvas->getModelRef(),
-            canvas->getViewRef(),
-            canvas->getProjectionRef());
-}
-
 void Renderable::addOnDeleteCallback(const OnDelete & callback) { onDeleteCallbacks.push_back(callback) ;}
 
 Shader * Renderable::getShader() const { return shader ;}

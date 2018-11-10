@@ -29,35 +29,52 @@
 
 using namespace glm;
 
-Shader::Shader(ShaderProgram * program) : program(program) {}
+Shader::Shader( ShaderProgram * program,
+                const GLint     vertexInLoc,
+                const GLint     colorInLoc,
+                const GLint     normalInLoc) :  program(program),
+                                                vertexInLoc (vertexInLoc),
+                                                colorInLoc  (colorInLoc),
+                                                normalInLoc (normalInLoc){}
 
-void Shader::enableVertexAttribArray(const GLint       size,
-                                     const GLenum      type,
-                                     const GLboolean   normalized,
-                                     const GLsizei     stride,
-                                     const GLvoid    * pointer)
+void Shader::enableVertexArray(const GLint       size,
+                               const GLenum      type,
+                               const GLboolean   normalized,
+                               const GLsizei     stride,
+                               const GLvoid    * pointer)
 {
-    program->enableVertexAttribArray(size,
-                                     type,
-                                     normalized,
-                                     stride,
-                                     pointer);
+    ShaderProgram::enableVertexAttribArray(vertexInLoc,
+                                           size,
+                                           type,
+                                           normalized,
+                                           stride,
+                                           pointer);
 }
 
-void Shader::enableColorAttribArray(const GLint       size,
-                                    const GLenum      type,
-                                    const GLboolean   normalized,
-                                    const GLsizei     stride,
-                                    const GLvoid    * pointer)
+void Shader::enableColorArray( const GLint       size,
+                               const GLenum      type,
+                               const GLboolean   normalized,
+                               const GLsizei     stride,
+                               const GLvoid    * pointer)
 {
-    program->enableColorAttribArray(size,
-                                    type,
-                                    normalized,
-                                    stride,
-                                    pointer);
+    ShaderProgram::enableVertexAttribArray(colorInLoc,
+                                           size,
+                                           type,
+                                           normalized,
+                                           stride,
+                                           pointer);
 }
 
-void Shader::bind(const mat4 & model,
-                  const mat4 & view,
-                  const mat4 & projection,
-                  const bool   isOutline) { program->bind(model, view, projection) ;}
+void Shader::enableNormalArray( const GLint       size,
+                                const GLenum      type,
+                                const GLboolean   normalized,
+                                const GLsizei     stride,
+                                const GLvoid    * pointer)
+{
+    ShaderProgram::enableVertexAttribArray(normalInLoc,
+                                           size,
+                                           type,
+                                           normalized,
+                                           stride,
+                                           pointer);
+}

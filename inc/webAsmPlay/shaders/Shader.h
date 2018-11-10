@@ -38,35 +38,46 @@
 #include <glm/mat4x4.hpp>
 
 class ShaderProgram;
+class Canvas;
 
 class Shader
 {
 public:
 
-    virtual void bind(const glm::mat4 & model,
-                      const glm::mat4 & view,
-                      const glm::mat4 & projection,
-                      const bool        isOutline);
+    virtual void bind(Canvas * canvas, const bool isOutline) = 0;
 
-    void enableVertexAttribArray(   const GLint       size          = 2,
-                                    const GLenum      type          = GL_FLOAT,
-                                    const GLboolean   normalized    = GL_FALSE,
-                                    const GLsizei     stride        = 0,
-                                    const GLvoid    * pointer       = NULL);
+    void enableVertexArray(const GLint       size        = 2,
+                           const GLenum      type        = GL_FLOAT,
+                           const GLboolean   normalized  = GL_FALSE,
+                           const GLsizei     stride      = 0,
+                           const GLvoid    * pointer     = NULL);
 
-    void enableColorAttribArray(    const GLint       size          = 4,
-                                    const GLenum      type          = GL_FLOAT,
-                                    const GLboolean   normalized    = GL_FALSE,
-                                    const GLsizei     stride        = 0,
-                                    const GLvoid    * pointer       = NULL);
+    void enableColorArray( const GLint       size        = 2,
+                           const GLenum      type        = GL_FLOAT,
+                           const GLboolean   normalized  = GL_FALSE,
+                           const GLsizei     stride      = 0,
+                           const GLvoid    * pointer     = NULL);
+
+    void enableNormalArray( const GLint       size        = 2,
+                            const GLenum      type        = GL_FLOAT,
+                            const GLboolean   normalized  = GL_FALSE,
+                            const GLsizei     stride      = 0,
+                            const GLvoid    * pointer     = NULL);
 
 protected:
 
-    Shader(ShaderProgram * program);
+    Shader( ShaderProgram * program,
+            const GLint     vertexInLoc = -1,
+            const GLint     colorInLoc  = -1,
+            const GLint     normalInLoc = -1);
 
     virtual ~Shader() {}
 
     ShaderProgram * program;
+
+    const GLint vertexInLoc;
+    const GLint colorInLoc;
+    const GLint normalInLoc;
 };
 
 #endif // __WEB_ASM_PLAY_SHADER_H__

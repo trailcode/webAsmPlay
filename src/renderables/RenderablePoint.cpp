@@ -71,17 +71,15 @@ Renderable * RenderablePoint::create(const ConstGeosGeomVec & points,
     return NULL;
 }
 
-void RenderablePoint::render(const mat4 & model,
-                             const mat4 & view,
-                             const mat4 & projection) const
+void RenderablePoint::render(Canvas * canvas) const
 {
-    shader->bind(model, view, projection, false);
+    shader->bind(canvas, false);
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    shader->enableVertexAttribArray(3);
+    //shader->enableVertexAttribArray(3);
 
     glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL);
 }

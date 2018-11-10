@@ -38,6 +38,8 @@
 #include <vector>
 #include <glm/mat4x4.hpp>
 
+class Canvas;
+
 class SkyBox
 {
 public:
@@ -46,7 +48,7 @@ public:
 
     virtual ~SkyBox();
 
-    void render(const glm::mat4 & view, const glm::mat4 & projection);
+    void render(Canvas * canvas);
 
     static std::vector<SkyBox *> getInstances();
 

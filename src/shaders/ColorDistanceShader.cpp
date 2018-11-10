@@ -28,6 +28,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Textures.h>
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 
@@ -40,13 +41,13 @@ namespace
 
     ColorDistanceShader * defaultInstance = NULL;
 
-    GLint colorsInLoc = -1;
+    GLint vertInAttrLoc;
+    GLint vertColorInAttrLoc;
 
-    GLint colorLookupOffsetLoc = -1;
-
-    GLint MV_Uniform = -1;
-
-    GLuint texUniform = -1;
+    GLint colorLookupOffsetLoc;
+    GLint MV_Loc;
+    GLint MVP_Loc;
+    GLint texUniformLoc;
 
     GLuint colorTexture = 0;
 
@@ -55,11 +56,13 @@ namespace
 
 void ColorDistanceShader::ensureShader()
 {
+    dmess("ColorDistanceShader::ensureShader");
+
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 150 core
         uniform sampler2D tex;
 
-        in vec2 vertIn;
+        in vec2  vertIn;
         in float vertColorIn;
         
         uniform mat4 MVP;
@@ -112,20 +115,21 @@ void ColorDistanceShader::ensureShader()
 
     shaderProgram = ShaderProgram::create(  vertexSource,
                                             fragmentSource,
-                                            StrVec({"MV", "colorsIn", "tex", "colorLookupOffset"}));
-
-    colorLookupOffsetLoc = shaderProgram->getUniformLoc("colorLookupOffset");
-
-    MV_Uniform  = shaderProgram->getUniformLoc("MV");
-
-    colorsInLoc = shaderProgram->getUniformLoc("colorsIn");
-
-    texUniform = shaderProgram->getUniformLoc("tex");
+                                            Variables({{"vertIn",            vertInAttrLoc},
+                                                       {"vertColorIn",       vertColorInAttrLoc}}),
+                                            Variables({{"MV",                MV_Loc},
+                                                       {"MVP",               MVP_Loc},
+                                                       {"tex",               texUniformLoc},
+                                                       {"colorLookupOffset", colorLookupOffsetLoc}}));
 
     defaultInstance = new ColorDistanceShader();
+
+    dmess("Done ColorDistanceShader::ensureShader");
 }
 
-ColorDistanceShader::ColorDistanceShader() : Shader(shaderProgram)
+ColorDistanceShader::ColorDistanceShader() : Shader(shaderProgram,
+                                                    vertInAttrLoc,
+                                                    vertColorInAttrLoc)
 {
     colors[0] = vec4(1,0,0,1);
     colors[1] = vec4(1,1,0,1);
@@ -144,9 +148,7 @@ ColorDistanceShader::~ColorDistanceShader()
 
 ColorDistanceShader * ColorDistanceShader::getDefaultInstance() { return defaultInstance ;}
 
-void ColorDistanceShader::bind(const mat4 & model,
-                               const mat4 & view,
-                               const mat4 & projection,
+void ColorDistanceShader::bind(Canvas     * canvas,
                                const bool   isOutline)
 {
     if(colorTextureDirty)
@@ -160,15 +162,18 @@ void ColorDistanceShader::bind(const mat4 & model,
 
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorTexture));
 
-    shaderProgram->bind(model, view, projection);
+    shaderProgram->bind();
 
-    shaderProgram->setUniform(MV_Uniform, model * view);
+    shaderProgram->setUniform(MV_Loc, canvas->getMV_Ref());
 
-    shaderProgram->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 
-    shaderProgram->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
+    /*
+    shaderProgram->enableVertexAttribArray(vertexInLoc, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    shaderProgram->enableVertexAttribArray(colorInLoc, 1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLuint)));
+    */
 
-    shaderProgram->setUniformi(texUniform, 0);
+    shaderProgram->setUniformi(texUniformLoc, 0);
 
     if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 2.0f) ;}
     else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}

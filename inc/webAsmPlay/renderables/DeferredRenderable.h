@@ -62,9 +62,7 @@ public:
                         const glm::vec3 & B,
                         const glm::vec4 & color);
 
-    void render(const glm::mat4 & model,
-                const glm::mat4 & view,
-                const glm::mat4 & projection) const;
+    void render(Canvas * canvas) const;
 
 private:
 

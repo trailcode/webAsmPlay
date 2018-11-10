@@ -12,16 +12,17 @@ namespace rsmz
         Camera();
         ~Camera();
 
-        const glm::mat4 & getMatrixConstRef();
-        glm::mat4 getMatrix();
-        const float* getMatrixFlatPtr();
-        std::vector<float> getMatrixFlat();
-        const glm::vec3 & getCenterConstRef();
-        const glm::vec3 & getEyeConstRef();
-        const glm::vec3 & getUpConstRef();
-        glm::vec3 getCenter();
-        glm::vec3 getEye();
-        glm::vec3 getUp();
+        const glm::mat4 & getMatrixConstRef() const;
+        glm::mat4 getMatrix() const;
+        const float* getMatrixFlatPtr() const;
+        std::vector<float> getMatrixFlat() const;
+        const glm::vec3 & getCenterConstRef() const;
+        const glm::vec3 & getEyeConstRef() const;
+        const glm::vec3 & getUpConstRef() const;
+        glm::vec3 getCenter() const;
+        glm::vec3 getEye() const;
+        glm::vec3 getUp() const;
+        
         void reset();
         void setMatrix(const glm::mat4 & MVP);
         void setCenter(float x, float y, float z);

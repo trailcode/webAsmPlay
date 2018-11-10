@@ -112,11 +112,7 @@ bool Canvas::preRender()
         GL_CHECK(glViewport(0, 0, size.x, size.y));
     }
 
-    //GL_CHECK(glActiveTexture(GL_TEXTURE0));
-
-    //GL_CHECK(glDisable(GL_TEXTURE_2D));
-
-    if(skyBox) { skyBox->render(getCamera()->getMatrix(), getProjectionRef()) ;}
+    if(skyBox) { skyBox->render(this) ;}
 
     else
     {
@@ -145,7 +141,22 @@ GLuint Canvas::postRender()
 {
     if(!cursor) { cursor = RenderablePoint::create(vec3(0,0,0)) ;}
 
-    cursor->render(translate(dmat4(1.0), cursorPosWC), view, projection);
+    const mat4 _model = model;
+
+    model = translate(dmat4(1.0), cursorPosWC); // TODO make push model, pop model, etc
+
+    // TODO make this nicer
+    projection   = perspective(45.0, double(size.x) / double(size.y), 0.01, 300.0);
+    MV           = view * model;
+    MVP          = projection * MV;
+
+    cursor->render(this);
+
+    model = _model;
+
+    projection   = perspective(45.0, double(size.x) / double(size.y), 0.01, 300.0);
+    MV           = view * model;
+    MVP          = projection * MV;
 
     if(useFrameBuffer) { return frameBuffer->getTextureID() ;}
 
