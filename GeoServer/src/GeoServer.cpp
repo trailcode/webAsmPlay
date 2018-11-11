@@ -37,10 +37,11 @@
 #include <geos/io/WKTWriter.h>
 #include "ogrsf_frmts.h"
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Types.h>
+#include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeometryConverter.h>
 #include <geoServer/OSM_Reader.h>
+#include <geoServer/Topology.h>
 #include <geoServer/GeoServer.h>
 
 using namespace std;
@@ -52,6 +53,7 @@ using namespace boost;
 using namespace boost::histogram;
 using namespace geos::io;
 using namespace geos::geom;
+using namespace topology;
 
 namespace
 {
@@ -152,7 +154,7 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
         serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g)));
     }
 
-    for(const AttributedLineString & l : lineStrings)
+    for(const AttributedLineString & l : breakLineStrings(lineStrings))
     {
         serializedLineStrings.push_back(GeometryConverter::convert(l));
     }
@@ -194,7 +196,8 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     size_t numEmptyPoints = 0;
 
-    vector<PolyAndArea> polygons;
+    vector<PolyAndArea>          polygons;
+    vector<AttributedLineString> lineStrings;
 
     for(const AttributedGeometry & i : geometry)
     {
@@ -217,7 +220,9 @@ string GeoServer::addOsmFile(const string & osmFile)
         }
         else if((lineString = dynamic_cast<LineString *>(i.second)))
         {
-            serializedLineStrings.push_back(GeometryConverter::convert(AttributedLineString(i.first, lineString)));
+            //serializedLineStrings.push_back(GeometryConverter::convert(AttributedLineString(i.first, lineString)));
+
+            lineStrings.push_back(AttributedLineString(i.first, lineString));
         }
         else if((point = dynamic_cast<Point *>(i.second)))
         {
@@ -250,6 +255,11 @@ string GeoServer::addOsmFile(const string & osmFile)
     for(const PolyAndArea & g : polygons)
     {
         serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g)));
+    }
+
+    for(const AttributedLineString & l : breakLineStrings(lineStrings))
+    {
+        serializedLineStrings.push_back(GeometryConverter::convert(l));
     }
 
     dmess("numEmptyPoints " << numEmptyPoints);
