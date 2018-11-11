@@ -108,6 +108,8 @@ GeoClient::GeoClient(GLFWwindow * window, Canvas * canvas) : canvas(canvas)
 
     Client * _client = client;
 
+    dmess("_client " << _client);
+
     clientThread = new thread([_client, window]()
     {
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);

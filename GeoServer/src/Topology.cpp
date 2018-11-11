@@ -33,6 +33,7 @@
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/index/quadtree/Quadtree.h>
+#include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Util.h>
 #include <geoServer/Topology.h>
@@ -45,24 +46,64 @@ using namespace geosUtil;
 
 namespace
 {
+    size_t counterMyLineString = 0;
+
+    const double epsilon = 0.0000001;
+
     class MyLineString
     {
     public:
 
-        MyLineString(AttributedLineString * ls) : ls(ls) {}
+        MyLineString(AttributedLineString * ls) :   ls      (ls),
+                                                    noSplits(false),
+                                                    length  (get<1>(*ls)->getLength())
+        {
+            ++counterMyLineString;
+        }
+
+        ~MyLineString() { --counterMyLineString ;}
 
         const LineString * getLS() const { return get<1>(*ls) ;}
 
-        list<const LineString *> splits; // TODO try to put the below ls in splits initially. 
+        void save(vector<AttributedLineString> & out) const
+        {
+            if(splits.size())
+            {
+                for(auto i : splits)
+                {
+                    out.push_back(AttributedLineString(get<0>(*ls), i));
+                }
+            }
+            else if(!getLS())
+            {
+                dmess("This!");    
+            }
+            else
+            {
+                out.push_back(*ls);
+            }
+        }
+
+        void deleteOrigionalGeom()
+        {
+            //GeometryFactory::getDefaultInstance()->destroyGeometry(get<1>(*ls));
+            //delete get<1>(*ls);
+
+            //get<1>(*ls) = NULL;
+        }
+
+        list<LineString *> splits; // TODO try to put the below ls in splits initially. 
 
         AttributedLineString * ls;
+
+        bool noSplits;
+
+        float length;
     };
 
     size_t numSplits;
 
     size_t lastNumSplits = 0;
-
-    const double epsilon = 0.00001;
 
     inline LineString * extendEnds(const LineString * ls)
     {
@@ -89,13 +130,45 @@ namespace
         return GeometryFactory::getDefaultInstance()->createLineString(new CoordinateArraySequence(newCoords, 2));
     }
 
+    inline bool intersects(const Geometry * A, const Geometry * B)
+    {
+        try
+        {
+            if(A->intersects(B))
+            {
+                if(A->overlaps(B) || B->overlaps(A))
+                {
+                    dmess("jfskdfd");
+
+                    return false;
+                }
+
+                //dmess("jjjjjj");
+
+                return true;
+            }
+
+            return false;
+        }
+
+        catch(...)
+        {
+            dmess("Warning intersection check error!");
+
+            return false;
+        }
+    }
+
     // TODO Memory leaks!
 
-    inline void doSplitting(MyLineString * B, const LineString * ls, const unique_ptr<LineString> & curr)
+    inline bool doSplitting(MyLineString * B, const LineString * ls, const LineString * curr)
     {
-        Geometry * g = ls->difference(curr.get());
+        //unique_ptr<Geometry> g(ls->difference(curr));
+        Geometry * g = scopedGeosGeometry(ls->difference(curr));
 
         lastNumSplits = 0;
+
+        bool didSplit = false;
 
         switch(g->getGeometryTypeId())
         {
@@ -117,13 +190,15 @@ namespace
 
                     const LineString * splitLS = dynamic_cast<const LineString *>(g);
 
-                    if(splitLS->getLength() < epsilon) { continue ;}
+                    if(splitLS->getLength() < epsilon * 2.0) { continue ;}
 
                     ++numSplits;
 
                     ++lastNumSplits;
 
-                    B->splits.push_front(splitLS);
+                    didSplit = true;
+
+                    B->splits.push_front(dynamic_cast<LineString *>(splitLS->clone()));
                 }
 
                 break;
@@ -132,12 +207,19 @@ namespace
 
                 break;
         }
+
+        if(didSplit)
+        {
+            B->deleteOrigionalGeom();
+        }
+
+        return didSplit;
     }
 }
 
-vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & lineStrings)
+vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & lineStrings, vector<AttributedLineString> & nonSplitting)
 {
-    dmess("start topology::breakLineStrings " << lineStrings.size());
+    dmess("start topology::breakLineStrings " << lineStrings.size() << " MyLineString " << counterMyLineString);
 
     vector<AttributedLineString> ret;
 
@@ -154,35 +236,74 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
         myLineStrings.push_back(myLS);
     }
 
+    sort(myLineStrings.begin(), myLineStrings.end(), [](const MyLineString * lhs, const MyLineString * rhs)
+    {
+        return lhs->length < rhs->length;
+    });
+
     dmess("Tree depth " << tree.depth());
 
     numSplits = 0;
 
+    size_t maxNumSplits = 5;
+
+    size_t counter = 0;
+
     for(auto ls : myLineStrings)
     {
+        if(!(counter % 300)) { dmess("myLineStrings " << myLineStrings.size() << " " << counter) ;}
+
+        counter++;
+
+        //if(counter > 2500) { break ;}
+        //if(counter > 1000) { break ;}
+
+        if(!ls->getLS()) { continue ;}
+
+        /*
+        if(ls->splits.size()) { continue ;}
+
+        if(ls->splits.size() > maxNumSplits)
+        {
+            //dmess("skip here!");
+
+            continue;
+        }
+        //*/
+
         vector< void * > query;
 
         tree.query(ls->getLS()->getEnvelopeInternal(), query);
 
         //dmess("query " << query.size());
 
-        vector<MyLineString *> intersecting;
+        //vector<MyLineString *> intersecting;
 
         auto curr = ls->getLS();
 
-        unique_ptr<LineString> currExtended(extendEnds(curr));
+        //unique_ptr<LineString> currExtended(extendEnds(curr));
+
+        bool didSplit = false;
+        bool didSkip  = false;
 
         for(auto _B : query)
         {
             MyLineString * B = (MyLineString *)_B;
 
             if(B->getLS() == curr) { continue ;}
+            
+            if(false && B->splits.size() > maxNumSplits)
+            {
+                didSkip = true;
 
+                continue;
+            }
+            
             if(B->splits.size())
             {
                 auto it = B->splits.begin();
 
-                bool gotIntersect = false;
+                //bool gotIntersect = false;
 
                 while (it != B->splits.end())
                 {
@@ -193,33 +314,44 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
                         continue;
                     }
 
-                    if((*it)->intersects(currExtended.get()))
-                    //if((*it)->intersects(curr) || (*it)->touches(curr))
+                    //if(intersects(*it, currExtended.get()))
+                    if(intersects(*it, curr))
                     {
-                        doSplitting(B, *it, currExtended);
+                        //didSplit |= doSplitting(B, *it, currExtended);
+                        didSplit |= doSplitting(B, *it, curr);
 
-                        gotIntersect = true;
+                        //gotIntersect = true;
 
                         it = B->splits.erase(it);
                     }
                     else { ++it ;}
                 }
 
-                if(gotIntersect) { intersecting.push_back(B) ;}
+                //if(gotIntersect) { intersecting.push_back(B) ;}
 
                 continue;
             }
 
+            if(!B->getLS()) { continue ;}
+
             if(endPointsTouch(B->getLS(), curr)) { continue ;}
 
-            if(!B->getLS()->intersects(currExtended.get())) { continue ;}
-            //if(!B->getLS()->intersects(curr) && !B->getLS()->touches(curr)) { continue ;}
-            
-            intersecting.push_back(B);
+            //if(!intersects(B->getLS(), currExtended.get())) { continue ;}
+            if(!intersects(B->getLS(), curr)) { continue ;}
 
-            doSplitting(B, B->getLS(), currExtended);
+            //intersecting.push_back(B);
+
+            //didSplit |= doSplitting(B, B->getLS(), currExtended);
+            didSplit |= doSplitting(B, B->getLS(), curr);
         }
         
+        if(!didSplit && !didSkip)
+        {
+            //dmess("Done!");
+
+            ls->noSplits = true;
+        }
+
         /*
         for(auto B : intersecting)
         {
@@ -251,40 +383,63 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
 
     for(auto ls : myLineStrings)
     {
-        if(ls->splits.size())
-        {
-            for(auto i : ls->splits)
-            {
-                Attributes * a = ls->ls->first;
+        if(ls->noSplits) { ls->save(nonSplitting) ;}
 
-                ret.push_back(AttributedLineString(get<0>(*(ls->ls)), i));
-            }
-        }
-        else
-        {
-            ret.push_back(*(ls->ls));
-        }
+        else { ls->save(ret) ;}
+
+        delete ls;
     }
 
-    dmess("end topology::breakLineStrings " << ret.size() << " num splits: " << numSplits);
+    dmess("end topology::breakLineStrings " << ret.size() << " nonSplitting " << nonSplitting.size() << " num splits: " << numSplits);
 
     return ret;
 }
 
 vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
 {
-    vector<AttributedLineString> curr = lineStrings;
+    return lineStrings;
+    
+    vector<AttributedLineString> curr; // = lineStrings;
+
+    size_t counter = 0;
+
+    for(auto & i : lineStrings)
+    {
+        //if(get<0>(i)->hasStringKey("footway") || get<0>(i)->hasStringKeyValue("footway", "sidewalk") || get<0>(i)->hasStringKeyValue("highway", "footway")) { curr.push_back(i) ;}
+
+        //if( get<0>(i)->hasStringKeyValue("highway", "residential") || get<0>(i)->hasStringKeyValue("highway", "service")) { curr.push_back(i) ;}
+        //if(get<0>(i)->hasStringKeyValue("highway", "service")) { curr.push_back(i) ;}
+        //if(get<0>(i)->hasStringKeyValue("highway", "residential") || get<0>(i)->hasStringKeyValue("highway", "motorway"))
+        if(get<0>(i)->hasStringKeyValue("highway", "motorway"))
+        {
+            curr.push_back(i);
+
+            ++counter;
+
+            //if(counter > 20000) { break ;}
+        }
+
+
+    }
+
+    vector<AttributedLineString> nonSplitting;
 
     size_t i = 0;
 
     do
     {
-        curr = _breakLineStrings(curr);
+        curr = _breakLineStrings(curr, nonSplitting);
 
-        if(++i > 4) { break ;}
+        for(auto & j : nonSplitting)
+        {
+            //delete get<1>(j);
+        }
+
+        //if(++i > 4) { break ;}
     }
-
     while(numSplits);
 
-    return curr;
+    nonSplitting.insert(nonSplitting.end(), curr.begin(), curr.end());
+
+    return nonSplitting;
 }

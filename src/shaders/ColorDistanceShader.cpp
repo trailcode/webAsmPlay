@@ -132,6 +132,7 @@ ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader",
                                                     vertInAttrLoc,
                                                     vertColorInAttrLoc)
 {
+
     colors[0] = vec4(1,0,0,1);
     colors[1] = vec4(1,1,0,1);
     colors[2] = vec4(1,0,1,1);
@@ -140,6 +141,8 @@ ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader",
     colors[5] = vec4(0,0,1,1);
     colors[6] = vec4(1,0,0,1);
     colors[7] = vec4(1,0,0,1);
+
+    for(size_t i = 8; i < 32; ++i) { colors[i] = vec4(1,1,0,1) ;}
 }
 
 ColorDistanceShader::~ColorDistanceShader()
