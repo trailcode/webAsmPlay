@@ -40,5 +40,21 @@ namespace
 
 void AttributeStatistics::addLineStrings(const vector<AttributedLineString> & lineStrings)
 {
+    dmess("AttributeStatistics::addLineStrings " << lineStrings.size());
 
+    for(auto & ls : lineStrings)
+    {
+        Attributes * attrs = get<0>(ls);
+
+        for(const auto & i : attrs->strings) { lineStringAttrStats[i.first].insert(i.second) ;}
+    }
+
+    dmess("lineStringAttrStats " << lineStringAttrStats.size());
+
+    for(const auto & i : lineStringAttrStats)
+    {
+        cout << "key: " << i.first << endl;
+
+        for(const auto & j : i.second) { cout << "    " << j << endl ;}
+    }
 }

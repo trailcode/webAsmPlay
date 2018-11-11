@@ -38,6 +38,8 @@
 #include <webAsmPlay/Util.h>
 #include <geoServer/Topology.h>
 
+#include <geoServer/AttributeStatistics.h> // TODO does not belong here
+
 using namespace std;
 using namespace glm;
 using namespace geos::geom;
@@ -398,6 +400,8 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
 vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
 {
     //return lineStrings;
+
+    AttributeStatistics::addLineStrings(lineStrings);
 
     vector<AttributedLineString> curr; // = lineStrings;
 
