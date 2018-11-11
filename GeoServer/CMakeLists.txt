@@ -47,4 +47,5 @@ add_executable(geoServer    ../src/GeometryConverter.cpp
                             src/OSM_Reader.cpp
                             src/GeoServer.cpp
                             src/Topology.cpp
+                            src/AttributeStatistics.cpp
                             src/main.cpp)

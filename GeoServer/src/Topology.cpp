@@ -397,8 +397,8 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
 
 vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
 {
-    return lineStrings;
-    
+    //return lineStrings;
+
     vector<AttributedLineString> curr; // = lineStrings;
 
     size_t counter = 0;
@@ -411,6 +411,7 @@ vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineStr
         //if(get<0>(i)->hasStringKeyValue("highway", "service")) { curr.push_back(i) ;}
         //if(get<0>(i)->hasStringKeyValue("highway", "residential") || get<0>(i)->hasStringKeyValue("highway", "motorway"))
         if(get<0>(i)->hasStringKeyValue("highway", "motorway"))
+        //if(get<0>(i)->hasStringKeyValue("highway", "motorway"))
         {
             curr.push_back(i);
 
@@ -418,9 +419,9 @@ vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineStr
 
             //if(counter > 20000) { break ;}
         }
-
-
     }
+
+    return curr;
 
     vector<AttributedLineString> nonSplitting;
 
