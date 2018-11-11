@@ -24,5 +24,58 @@
   \copyright 2018
 */
 
+#include <unordered_map>
+#include <glm/gtx/hash.hpp>
+#include <GEOS/geom/LineString.h>
+#include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/Network.h>
 
+using namespace std;
+using namespace glm;
+using namespace geos::geom;
+using namespace geosUtil;
+
+Edge::Edge( Renderable       * renderable,
+            const LineString * geom,
+            Attributes       * attributes) : renderable(renderable),
+                                             geom      (geom),
+                                             attributes(attributes),
+                                             start     (getStartPoint(geom)),
+                                             end       (getEndPoint(geom))
+{
+
+}
+
+Renderable       * Edge::getRenderable() const { return renderable ;}
+const LineString * Edge::getGeometry()   const { return geom       ;}
+Attributes       * Edge::getAttributes() const { return attributes ;}
+
+namespace
+{
+    typedef vector<Edge *> Edges;
+
+    Edges edges;
+
+    unordered_map<dvec2, Edges> edgeMap;
+
+    Edge * start = NULL;
+}
+
+void Network::build(const Edges & _edges)
+{
+    edges = _edges;
+
+    dmess("Network::build " << edges.size());
+
+    for(const auto & edge : edges)
+    {
+        edgeMap[edge->start].push_back(edge);
+        edgeMap[edge->end  ].push_back(edge);
+    }
+}
+
+Edge * Network::setStartEdge(Edge * _start)
+{
+    return start = _start;
+}

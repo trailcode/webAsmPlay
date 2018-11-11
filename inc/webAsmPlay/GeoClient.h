@@ -43,6 +43,7 @@
 class GLFWwindow;
 class Canvas;
 class Renderable;
+class Edge;
 
 namespace geos
 {
@@ -83,7 +84,7 @@ public:
 
     void loadGeometry(const std::string fileName);
 
-    std::pair<Renderable *, Attributes *> pickLineStringRenderable(const glm::vec3 & pos) const;
+    Edge * pickLineStringRenderable(const glm::vec3 & pos) const;
 
     std::pair<Renderable *, Attributes *> pickPolygonRenderable(const glm::vec3 & pos) const;
 

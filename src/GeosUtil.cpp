@@ -163,25 +163,15 @@ Point * geosUtil::__(const dvec2 & pos)
     return GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y));
 }
 
+dvec2 geosUtil::__(const Coordinate & point) { return dvec2(point.x, point.y) ;}
+
+dvec2 geosUtil::getStartPoint(const LineString * ls) { return __(ls->getCoordinateN(0)) ;}
+dvec2 geosUtil::getEndPoint  (const LineString * ls) { return __(ls->getCoordinateN(ls->getNumPoints() - 1)) ;}
+
 _ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : geom(geom) {}
 
-_ScopedGeosGeometry::~_ScopedGeosGeometry()
-{
-    GeometryFactory::getDefaultInstance()->destroyGeometry(geom);
-}
+_ScopedGeosGeometry::~_ScopedGeosGeometry() { GeometryFactory::getDefaultInstance()->destroyGeometry(geom) ;}
 
-/*
-Geometry * unionGeoms(const initializer_list<const Geometry *> & geoms)
-{
-    for(const Geometry * g;
-    return NULL;
-}
-
-Geometry * unionGeomsOwned(const initializer_list<Geometry *> & geoms)
-{
-    return NULL;
-}
-*/
 
 
 

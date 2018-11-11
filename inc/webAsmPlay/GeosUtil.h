@@ -39,6 +39,7 @@ namespace geos
     {
         class Geometry;
         class Polygon;
+        class LineString;
         class Point;
     }
 }
@@ -77,6 +78,8 @@ namespace geosUtil
 
     geos::geom::Point * __(const glm::dvec2 & pos);
 
+    glm::dvec2 __(const geos::geom::Coordinate & point);
+
     bool contains(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
 
     bool contains(const geos::geom::Geometry * A, const geos::geom::Geometry * B);
@@ -92,6 +95,9 @@ namespace geosUtil
 
     bool subtract(  std::unique_ptr<geos::geom::Geometry>       & A,
                     const std::unique_ptr<geos::geom::Geometry> & B);
+
+    glm::dvec2 getStartPoint(const geos::geom::LineString * ls);
+    glm::dvec2 getEndPoint  (const geos::geom::LineString * ls);
 };
 
 #endif

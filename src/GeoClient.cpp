@@ -53,6 +53,7 @@
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/Attributes.h>
+#include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
@@ -754,6 +755,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     ColoredGeometryVec polylines;
 
+    vector<Edge *> edges;
+
     for(size_t i = 0; i < geoms.size(); ++i)
     {
         doProgress("(2/6) Indexing linestrings:", i, geoms.size(), startTime);
@@ -809,14 +812,18 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
         
         if(!r) { continue ;}
         
-        tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, geom, attrs);
+        Edge * edge = new Edge(r, dynamic_cast<const LineString *>(geom), attrs);
 
-        quadTreeLineStrings->insert(geom->getEnvelopeInternal(), data);
+        edges.push_back(edge);
+
+        quadTreeLineStrings->insert(geom->getEnvelopeInternal(), edge);
 
         polylines.push_back(make_pair(geom, colorID));
     }
     
     GUI::progress("Linestring index:", 1.0);
+
+    Network::build(edges);
 
     dmess("linestring quadTree " << quadTreeLineStrings->depth() << " " << geoms.size());
 
@@ -881,7 +888,7 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 #endif
 }
 
-pair<Renderable *, Attributes *> GeoClient::pickLineStringRenderable(const vec3 & _pos) const
+Edge * GeoClient::pickLineStringRenderable(const vec3 & _pos) const
 {
     const vec4 pos = inverseTrans * vec4(_pos, 1.0);
     
@@ -893,16 +900,15 @@ pair<Renderable *, Attributes *> GeoClient::pickLineStringRenderable(const vec3 
     
     double minDist = numeric_limits<double>::max();
 
-    Renderable * closest      = NULL;
-    Attributes * closestAttrs = NULL;
-
+    Edge * closest = NULL;
+    
     const Coordinate p(pos.x, pos.y);
 
     for(const void * _data : query)
     {
-        tuple<Renderable *, const Geometry *, Attributes *> * data = (tuple<Renderable *, const Geometry *, Attributes *> *)_data;
+        Edge * data = (Edge *)_data;
 
-        const LineString * geom = dynamic_cast<const LineString *>(get<1>(*data));
+        const LineString * geom = data->getGeometry();
 
         PointPairDistance ptDist;
 
@@ -911,12 +917,10 @@ pair<Renderable *, Attributes *> GeoClient::pickLineStringRenderable(const vec3 
         if(ptDist.getDistance() >= minDist) { continue ;}
 
         minDist = ptDist.getDistance();
-
-        closest      = get<0>(*data);
-        closestAttrs = get<2>(*data);
+        closest = data;
     }
 
-    return make_pair(closest, closestAttrs);
+    return closest;
 }
 
 pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _pos) const
@@ -1009,17 +1013,17 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
     {
         case GUI::PICK_MODE_LINESTRING:
         {
-            tie(renderiable, attrs) = pickLineStringRenderable(canvas->getCursorPosWC());
+            Edge * edge = pickLineStringRenderable(canvas->getCursorPosWC());
 
-            if(renderiable)
-            {
-                glDisable(GL_DEPTH_TEST);
-                glDisable(GL_BLEND);
+            if(!edge) { break ;}
 
-                renderiable->render(canvas);
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_BLEND);
 
-                attrsStr = attrs->toString();
-            }
+            edge->getRenderable()->render(canvas);
+
+            attrsStr = edge->getAttributes()->toString();
+
             break;
         }
         case GUI::PICK_MODE_POLYGON_SINGLE:

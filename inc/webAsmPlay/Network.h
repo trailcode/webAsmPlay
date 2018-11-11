@@ -27,9 +27,52 @@
 #ifndef __WEB_ASM_PLAY_NETWORK_H__
 #define __WEB_ASM_PLAY_NETWORK_H__
 
+#include <webAsmPlay/Types.h>
+
+namespace geos
+{
+    namespace geom
+    {
+        class LineString;
+    }
+}
+
+class Renderable;
+class Attributes;
+
+class Edge
+{
+public:
+
+    Edge(Renderable * renderable, const geos::geom::LineString * geom, Attributes * attributes);
+
+    Renderable * getRenderable() const;
+
+    const geos::geom::LineString * getGeometry() const;
+
+    Attributes * getAttributes() const;
+
+    std::vector<Edge *> neighbors;
+    
+    bool visited = false;
+
+    const glm::dvec2 start;
+    const glm::dvec2 end;
+
+private:
+
+    Renderable                   * renderable;
+    const geos::geom::LineString * geom;
+    Attributes                   * attributes;
+};
+
 class Network
 {
 public:
+
+    static void build(const std::vector<Edge *> & edges);
+
+    static Edge * setStartEdge(Edge * start);
 
 private:
 };
