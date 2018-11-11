@@ -5,7 +5,7 @@
 
 namespace topology
 {
-    std::vector<AttributedLineString> breakLineStrings(const std::vector<AttributedLineString> & lineStrings);
+    std::vector<AttributedLineString> breakLineStrings(std::vector<AttributedLineString> & lineStrings);
 }
 
 #endif // __WEB_ASM_PLAY_TOPOLOGY_H__

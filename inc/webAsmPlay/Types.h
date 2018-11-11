@@ -48,7 +48,7 @@ namespace geos
 typedef std::tuple<double, double, double, double> AABB2D;
 
 typedef std::pair<Attributes *, geos::geom::Geometry   *> AttributedGeometry;
-typedef std::pair<Attributes *, geos::geom::LineString *> AttributedLineString;
+typedef std::pair<Attributes *, const geos::geom::LineString *> AttributedLineString;
 typedef std::pair<Attributes *, geos::geom::Point      *> AttributedPoint;
 
 typedef std::pair<const geos::geom::Geometry *, const size_t> ColoredGeometry;
