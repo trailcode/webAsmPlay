@@ -30,8 +30,10 @@
 #include <tuple>
 #include <vector>
 #include <memory>
+#include <glm/vec2.hpp>
 
 class Attributes;
+class Edge;
 
 namespace geos
 {
@@ -52,6 +54,8 @@ typedef std::pair<Attributes *, geos::geom::LineString *> AttributedLineString;
 typedef std::pair<Attributes *, geos::geom::Point      *> AttributedPoint;
 
 typedef std::pair<const geos::geom::Geometry *, const size_t> ColoredGeometry;
+
+typedef std::pair<glm::dvec2, Edge *> PointOnEdge;
 
 typedef std::vector<ColoredGeometry> ColoredGeometryVec;
 

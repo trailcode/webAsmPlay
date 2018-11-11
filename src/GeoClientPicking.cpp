@@ -32,6 +32,7 @@
 #include <geos/algorithm/distance/PointPairDistance.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <webAsmPlay/GUI/GUI.h>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/renderables/Renderable.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeosUtil.h>
@@ -43,12 +44,13 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 using namespace geos::algorithm::distance;
+using namespace geosUtil;
 
-Edge * GeoClient::pickLineStringRenderable(const vec3 & _pos) const
+PointOnEdge GeoClient::pickLineStringRenderable(const vec3 & _pos) const
 {
     const vec4 pos = inverseTrans * vec4(_pos, 1.0);
     
-    vector< void * > query;
+    vector<void *> query;
     
     const Envelope bounds(pos.x, pos.x, pos.y, pos.y);
     
@@ -57,7 +59,9 @@ Edge * GeoClient::pickLineStringRenderable(const vec3 & _pos) const
     double minDist = numeric_limits<double>::max();
 
     Edge * closest = NULL;
-    
+
+    Coordinate pointOnEdge;
+
     const Coordinate p(pos.x, pos.y);
 
     for(const void * _data : query)
@@ -72,11 +76,12 @@ Edge * GeoClient::pickLineStringRenderable(const vec3 & _pos) const
 
         if(ptDist.getDistance() >= minDist) { continue ;}
 
-        minDist = ptDist.getDistance();
-        closest = data;
+        minDist     = ptDist.getDistance();
+        closest     = data;
+        pointOnEdge = ptDist.getCoordinate(0);
     }
 
-    return closest;
+    return PointOnEdge(__(pointOnEdge), closest);
 }
 
 pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _pos) const
@@ -165,7 +170,10 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
     {
         case GUI::PICK_MODE_LINESTRING:
         {
-            Edge * edge = pickLineStringRenderable(canvas->getCursorPosWC());
+            Edge * edge;
+            dvec2  pointOnEdge;
+
+            tie(pointOnEdge, edge) = pickLineStringRenderable(canvas->getCursorPosWC());
 
             if(!edge) { break ;}
 
