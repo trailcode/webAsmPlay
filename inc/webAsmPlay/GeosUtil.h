@@ -31,7 +31,8 @@
 #include <memory>
 #include <initializer_list>
 #include <glm/vec2.hpp>
-#include <geos/geom/Geometry.h>
+#include <geos/geom/Point.h>
+#include <geos/geom/LineString.h>
 
 namespace geos
 {
@@ -78,6 +79,8 @@ namespace geosUtil
 
     geos::geom::Point * __(const glm::dvec2 & pos);
 
+    inline geos::geom::Coordinate ___(const glm::dvec2 & pos) { return geos::geom::Coordinate(pos.x, pos.y) ;}
+
     glm::dvec2 __(const geos::geom::Coordinate & point);
 
     bool contains(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
@@ -98,6 +101,19 @@ namespace geosUtil
 
     glm::dvec2 getStartPoint(const geos::geom::LineString * ls);
     glm::dvec2 getEndPoint  (const geos::geom::LineString * ls);
+
+    inline bool samePoint(const geos::geom::Point * A, const geos::geom::Point * B)
+    {
+        return A->getX() == B->getX() && A->getY() == B->getY();
+    }
+
+    inline bool endPointsTouch(const geos::geom::LineString * A, const geos::geom::LineString * B)
+    {
+        return  samePoint(A->getStartPoint(), B->getStartPoint()) ||
+                samePoint(A->getEndPoint(),   B ->getEndPoint())  ||
+                samePoint(A->getStartPoint(), B->getEndPoint())   ||
+                samePoint(A->getEndPoint(),   B->getStartPoint());
+    }
 };
 
 #endif

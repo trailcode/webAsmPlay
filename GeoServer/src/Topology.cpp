@@ -26,15 +26,22 @@
 
 #include <memory>
 #include <list>
+#include <glm/vec2.hpp>
+#include <geos/geom/Point.h>
 #include <geos/geom/LineString.h>
-#include <GEOS/geom/GeometryCollection.h>
+#include <geos/geom/GeometryCollection.h>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/CoordinateArraySequence.h>
 #include <geos/index/quadtree/Quadtree.h>
-#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/Util.h>
 #include <geoServer/Topology.h>
 
 using namespace std;
+using namespace glm;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
+using namespace geosUtil;
 
 namespace
 {
@@ -46,15 +53,49 @@ namespace
 
         const LineString * getLS() const { return get<1>(*ls) ;}
 
-        list<const LineString *> splits;
+        list<const LineString *> splits; // TODO try to put the below ls in splits initially. 
 
         AttributedLineString * ls;
     };
 
-    void doSplitting(MyLineString * B, const LineString * ls, const LineString * curr)
+    size_t numSplits;
+
+    size_t lastNumSplits = 0;
+
+    const double epsilon = 0.00001;
+
+    inline LineString * extendEnds(const LineString * ls)
     {
-        //Geometry * g = B->getLS()->difference(curr);
-        Geometry * g = ls->difference(curr);
+        const auto coords = *ls->getCoordinatesRO()->toVector();
+
+        const dvec2 P1 = __(coords[0]);
+        const dvec2 P2 = __(coords[1]);
+        const dvec2 P3 = __(coords[coords.size() - 1]);
+        const dvec2 P4 = __(coords[coords.size() - 2]);
+
+        const dvec2 start = (normalize(P1 - P2) * epsilon) + P1;
+        const dvec2 end   = (normalize(P3 - P4) * epsilon) + P3;
+
+        vector<Coordinate> * newCoords = new vector<Coordinate>();
+
+        newCoords->reserve(coords.size() + 2);
+
+        newCoords->push_back(___(start));
+
+        newCoords->insert(newCoords->end(), coords.begin(), coords.end());
+
+        newCoords->push_back(___(end));
+
+        return GeometryFactory::getDefaultInstance()->createLineString(new CoordinateArraySequence(newCoords, 2));
+    }
+
+    // TODO Memory leaks!
+
+    inline void doSplitting(MyLineString * B, const LineString * ls, const unique_ptr<LineString> & curr)
+    {
+        Geometry * g = ls->difference(curr.get());
+
+        lastNumSplits = 0;
 
         switch(g->getGeometryTypeId())
         {
@@ -74,7 +115,15 @@ namespace
                         continue;
                     }
 
-                    B->splits.push_front(dynamic_cast<const LineString *>(g));
+                    const LineString * splitLS = dynamic_cast<const LineString *>(g);
+
+                    if(splitLS->getLength() < epsilon) { continue ;}
+
+                    ++numSplits;
+
+                    ++lastNumSplits;
+
+                    B->splits.push_front(splitLS);
                 }
 
                 break;
@@ -86,7 +135,7 @@ namespace
     }
 }
 
-vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
+vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & lineStrings)
 {
     dmess("start topology::breakLineStrings " << lineStrings.size());
 
@@ -107,6 +156,8 @@ vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineStr
 
     dmess("Tree depth " << tree.depth());
 
+    numSplits = 0;
+
     for(auto ls : myLineStrings)
     {
         vector< void * > query;
@@ -118,6 +169,8 @@ vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineStr
         vector<MyLineString *> intersecting;
 
         auto curr = ls->getLS();
+
+        unique_ptr<LineString> currExtended(extendEnds(curr));
 
         for(auto _B : query)
         {
@@ -133,18 +186,23 @@ vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineStr
 
                 while (it != B->splits.end())
                 {
-                    if((*it)->intersects(curr))
+                    if(endPointsTouch(*it, curr))
                     {
-                        doSplitting(B, *it, curr);
+                        ++it;
+
+                        continue;
+                    }
+
+                    if((*it)->intersects(currExtended.get()))
+                    //if((*it)->intersects(curr) || (*it)->touches(curr))
+                    {
+                        doSplitting(B, *it, currExtended);
 
                         gotIntersect = true;
 
                         it = B->splits.erase(it);
                     }
-                    else
-                    {
-                        ++it;  // go to next
-                    }
+                    else { ++it ;}
                 }
 
                 if(gotIntersect) { intersecting.push_back(B) ;}
@@ -152,19 +210,47 @@ vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineStr
                 continue;
             }
 
-            if(!B->getLS()->intersects(curr)) { continue ;}
+            if(endPointsTouch(B->getLS(), curr)) { continue ;}
+
+            if(!B->getLS()->intersects(currExtended.get())) { continue ;}
+            //if(!B->getLS()->intersects(curr) && !B->getLS()->touches(curr)) { continue ;}
             
             intersecting.push_back(B);
 
-            doSplitting(B, B->getLS(), curr);
+            doSplitting(B, B->getLS(), currExtended);
         }
         
-        //dmess("intersecting " << intersecting.size());
+        /*
+        for(auto B : intersecting)
+        {
+            //void doSplitting(MyLineString * B, const LineString * ls, const LineString * curr)
+            if(ls->splits.size())
+            {
+                auto it = ls->splits.begin();
+
+                while (it != ls->splits.end()) // TODO code duplication
+                {
+                    if((*it)->intersects(curr))
+                    {
+                        doSplitting(ls, *it, B->getLS());
+
+                        //dmess("lastNumSplits " << lastNumSplits);
+
+                        it = ls->splits.erase(it);
+                    }
+                    else { ++it ;}
+                }
+            }
+            else
+            {
+                doSplitting(ls, ls->getLS(), B->getLS());
+            }
+        }
+        //*/
     }
 
     for(auto ls : myLineStrings)
     {
-        // typedef std::pair<Attributes *, geos::geom::LineString *> AttributedLineString;
         if(ls->splits.size())
         {
             for(auto i : ls->splits)
@@ -180,7 +266,25 @@ vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineStr
         }
     }
 
-    dmess("end topology::breakLineStrings " << ret.size());
+    dmess("end topology::breakLineStrings " << ret.size() << " num splits: " << numSplits);
 
     return ret;
+}
+
+vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
+{
+    vector<AttributedLineString> curr = lineStrings;
+
+    size_t i = 0;
+
+    do
+    {
+        curr = _breakLineStrings(curr);
+
+        if(++i > 4) { break ;}
+    }
+
+    while(numSplits);
+
+    return curr;
 }
