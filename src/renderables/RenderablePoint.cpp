@@ -87,7 +87,9 @@ void RenderablePoint::render(Canvas * canvas) const
 RenderablePoint::RenderablePoint(   const GLuint      vao,
                                     const GLuint      ebo,
                                     const GLuint      vbo,
-                                    const bool        isMulti) : Renderable(isMulti),
+                                    const bool        isMulti) : Renderable(isMulti,
+                                                                            false,
+                                                                            false),
                                                                  vao       (vao),
                                                                  ebo       (ebo),
                                                                  vbo       (vbo)

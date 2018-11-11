@@ -42,38 +42,29 @@ void GUI::renderSettingsPanel()
 
     ImGui::Begin("Render Settings", &showRenderSettingsPanel);
 
-        static bool fillPolygons           = true;
-        static bool renderPolygonOutlines  = true;
-        static bool renderLinearFeatures   = true;
-        static bool renderSkyBox           = true;
-
-        if(ImGui::Checkbox("Fill Polygons", &fillPolygons))
+        if(ImGui::Checkbox("Fill Polygons", &renderSettingsFillPolygons))
         {
-            for(Renderable * r : canvas->getRenderiables()) { r->setRenderFill(fillPolygons) ;}
+            for(Renderable * r : canvas->getRenderiables()) { r->setRenderFill(renderSettingsFillPolygons) ;}
 
-            for(Renderable * r : geosTestCanvas->getRenderiables()) { r->setRenderFill(fillPolygons) ;}
-
-            //Renderable::setDefaultRenderFill(fillPolygons);
+            for(Renderable * r : geosTestCanvas->getRenderiables()) { r->setRenderFill(renderSettingsFillPolygons) ;}
         }
 
-        if(ImGui::Checkbox("Polygon Outlines", &renderPolygonOutlines))
+        if(ImGui::Checkbox("Polygon Outlines", &renderSettingsRenderPolygonOutlines))
         {
-            for(Renderable * r : canvas->getRenderiables()) { r->setRenderOutline(renderPolygonOutlines) ;}
+            for(Renderable * r : canvas->getRenderiables()) { r->setRenderOutline(renderSettingsRenderPolygonOutlines) ;}
 
-            for(Renderable * r : geosTestCanvas->getRenderiables()) { r->setRenderOutline(renderPolygonOutlines) ;}
-
-            //Renderable::setDefaultRenderOutline(renderPolygonOutlines);
+            for(Renderable * r : geosTestCanvas->getRenderiables()) { r->setRenderOutline(renderSettingsRenderPolygonOutlines) ;}
         }
 
-        if(ImGui::Checkbox("Linear Features", &renderLinearFeatures))
+        if(ImGui::Checkbox("Linear Features", &renderSettingsRenderLinearFeatures))
         {
             dmess("Linear Features");
         }
 
-        if(ImGui::Checkbox("SkyBox", &renderSkyBox))
+        if(ImGui::Checkbox("SkyBox", &renderSettingsRenderSkyBox))
         {   
-            if(renderSkyBox) { canvas->setSkyBox(skyBox) ;}
-            else             { canvas->setSkyBox(NULL)   ;}
+            if(renderSettingsRenderSkyBox) { canvas->setSkyBox(skyBox) ;} // TODO create check render functor
+            else                           { canvas->setSkyBox(NULL)   ;}
         }
         
         //ImGui::Spacing();

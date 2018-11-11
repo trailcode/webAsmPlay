@@ -67,7 +67,9 @@ public:
 
 protected:
 
-    Renderable( const bool isMulti);
+    Renderable( const bool isMulti,
+                const bool renderFill,
+                const bool renderOutline);
 
     Renderable(const Renderable&) {}                            // Prevent copy-construction
     Renderable& operator=(const Renderable&) { return *this ;}  // Prevent assignment
@@ -78,8 +80,8 @@ protected:
 
     Shader * shader = NULL;
 
-    bool renderFill = true;
-    bool renderOutline = true;
+    bool renderFill;
+    bool renderOutline;
 };
 
 #endif // __WEB_ASM_PLAY__GEOS_RENDERABLE_H__

@@ -42,7 +42,9 @@ using namespace geos::geom;
 
 // TODO Create better variable names. Try to simplify this class.
 
-RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable       (vertexArrayObject->isMulti()),
+RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable       (vertexArrayObject->isMulti(),
+                                                                                                  GUI::renderSettingsFillPolygons,
+                                                                                                  GUI::renderSettingsRenderPolygonOutlines),
                                                                                 vertexArrayObject(vertexArrayObject)
 {
 }

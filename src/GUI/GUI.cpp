@@ -107,17 +107,6 @@ SkyBox          * GUI::skyBox          = NULL;
 
 vector<Canvas *> GUI::auxCanvases;
 
-bool GUI::showViewMatrixPanel      = false;
-bool GUI::showMVP_MatrixPanel      = false;
-bool GUI::showSceneViewPanel       = false;
-bool GUI::showPerformancePanel     = false;
-bool GUI::showRenderSettingsPanel  = false;
-bool GUI::showLogPanel             = false;
-bool GUI::showAttributePanel       = false;
-bool GUI::showSymbologyPanel       = false;
-bool GUI::showGUI_Settings_Panel   = false;
-bool GUI::showOpenSteerPanel       = false;
-
 bool isFirst = true;
 
 FrameBuffer * frameBuffer = NULL;

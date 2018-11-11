@@ -110,7 +110,9 @@ RenderableMesh::~RenderableMesh()
     delete vertexArrayObject;
 }
 
-RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderable       (true),
+RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderable       (true,
+                                                                                          GUI::renderSettingsFillPolygons,
+                                                                                          GUI::renderSettingsRenderPolygonOutlines),
                                                                         vertexArrayObject(vertexArrayObject)
 {
 

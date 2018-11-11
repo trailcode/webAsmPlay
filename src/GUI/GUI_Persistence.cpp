@@ -37,6 +37,22 @@
 using namespace std;
 using namespace glm;
 
+bool GUI::showViewMatrixPanel      = false;
+bool GUI::showMVP_MatrixPanel      = false;
+bool GUI::showSceneViewPanel       = false;
+bool GUI::showPerformancePanel     = false;
+bool GUI::showRenderSettingsPanel  = false;
+bool GUI::showLogPanel             = false;
+bool GUI::showAttributePanel       = false;
+bool GUI::showSymbologyPanel       = false;
+bool GUI::showGUI_Settings_Panel   = false;
+bool GUI::showOpenSteerPanel       = false;
+
+bool GUI::renderSettingsFillPolygons           = true;
+bool GUI::renderSettingsRenderPolygonOutlines  = true;
+bool GUI::renderSettingsRenderLinearFeatures   = true;
+bool GUI::renderSettingsRenderSkyBox           = true;
+
 void GUI::loadState()
 {
     dmess("GUI::loadState");
@@ -68,6 +84,11 @@ void GUI::loadState()
     setBool(L"showGUI_Settings_Panel",  showGUI_Settings_Panel);
     setBool(L"showSymbologyPanel",      showSymbologyPanel);
     setBool(L"showOpenSteerPanel",      showOpenSteerPanel);
+
+    setBool(L"renderSettingsFillPolygons",          renderSettingsFillPolygons);
+    setBool(L"renderSettingsRenderPolygonOutlines", renderSettingsRenderPolygonOutlines);
+    setBool(L"renderSettingsRenderLinearFeatures",  renderSettingsRenderLinearFeatures);
+    setBool(L"renderSettingsRenderSkyBox",          renderSettingsRenderSkyBox);
 
     // Floats
 
@@ -112,6 +133,11 @@ void GUI::saveState()
     root[L"showGUI_Settings_Panel"]   = new JSONValue(showGUI_Settings_Panel);
     root[L"showSymbologyPanel"]       = new JSONValue(showSymbologyPanel);
     root[L"showOpenSteerPanel"]       = new JSONValue(showOpenSteerPanel);
+
+    root[L"renderSettingsFillPolygons"]           = new JSONValue(renderSettingsFillPolygons);
+    root[L"renderSettingsRenderPolygonOutlines"]  = new JSONValue(renderSettingsRenderPolygonOutlines);
+    root[L"renderSettingsRenderLinearFeatures"]   = new JSONValue(renderSettingsRenderLinearFeatures);
+    root[L"renderSettingsRenderSkyBox"]           = new JSONValue(renderSettingsRenderSkyBox);
 
     ColorDistanceShader  ::getDefaultInstance()->saveState(root);
     ColorDistanceShader3D::getDefaultInstance()->saveState(root);

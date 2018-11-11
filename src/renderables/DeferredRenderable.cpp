@@ -28,6 +28,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 
@@ -98,7 +99,9 @@ DeferredRenderable::DeferredRenderable( const GLuint & vao,
                                         const GLuint & ebo2,
                                         const GLuint & vbo,
                                         const GLuint & numTriIndices,
-                                        const GLuint & numLineIndices) : Renderable    (false),
+                                        const GLuint & numLineIndices) : Renderable    (false,
+                                                                                        GUI::renderSettingsFillPolygons,
+                                                                                        GUI::renderSettingsRenderPolygonOutlines),
                                                                          vao           (vao),
                                                                          ebo           (ebo),
                                                                          ebo2          (ebo2),
