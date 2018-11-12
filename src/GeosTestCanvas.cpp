@@ -84,7 +84,7 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
         
     //geom1->setOutlineColor(vec4(1,0,0,1));
 
-    addRenderiable(geom1);
+    addRenderable(geom1);
 
     geoms.push_back(unique_ptr<Renderable>(geom1));
 
@@ -103,7 +103,7 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
             //geom->setOutlineColor(vec4(0,1,0,1));
             //geom->setOutlineColor(1);
 
-            addRenderiable(geom);
+            addRenderable(geom);
 
             geoms.push_back(unique_ptr<Renderable>(geom));
         }
@@ -122,7 +122,7 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
             {
                 geom->setOutlineColor(vec4(0,1,0,1));
 
-                addRenderiable(geom);
+                addRenderable(geom);
 
                 geoms.push_back(unique_ptr<Renderable>(geom));
             }

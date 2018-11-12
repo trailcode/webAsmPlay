@@ -169,6 +169,8 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
     switch(mode)
     {
         case GUI::PICK_MODE_LINESTRING:
+        case GUI::SET_PATH_START_POINT:
+        case GUI::FIND_PATH:
         {
             Edge * edge;
             dvec2  pointOnEdge;
@@ -182,48 +184,51 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
             edge->getRenderable()->render(canvas);
 
-            attrsStr = edge->getAttributes()->toString();
+            canvas->renderCursor(trans * dvec4(pointOnEdge, 0, 1));
 
-            break;
+            //if(!GUI::leftMouseDown()) { return edge->getAttributes()->toString() ;}
+
+            switch(mode)
+            {
+                case GUI::SET_PATH_START_POINT: break;
+                case GUI::FIND_PATH: break;
+            }
+
+            return edge->getAttributes()->toString();
         }
         case GUI::PICK_MODE_POLYGON_SINGLE:
         {
             tie(renderiable, attrs) = pickPolygonRenderable(canvas->getCursorPosWC());
 
-            if(renderiable)
-            {
-                glDisable(GL_DEPTH_TEST);
-                glDisable(GL_BLEND);
+            if(!renderiable) { return "" ;}
+            
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_BLEND);
 
-                renderiable->render(canvas);
-
-                attrsStr = attrs->toString();
-            }
-
-            break;
+            renderiable->render(canvas);
         }
         case GUI::PICK_MODE_POLYGON_MULTIPLE:
         {
             vector<pair<Renderable *, Attributes *> > picked = pickPolygonRenderables(canvas->getCursorPosWC());
 
-            if(picked.size())
+            if(!picked.size()) { return "" ;}
+            
+            tie(renderiable, attrs) = picked[0];
+
+            renderiable->render(canvas);
+
+            attrsStr = attrs->toString();
+
+            for(size_t i = 1; i < picked.size(); ++i)
             {
-                tie(renderiable, attrs) = picked[0];
+                attrsStr += "\n";
 
-                renderiable->render(canvas);
-
-                attrsStr = attrs->toString();
-
-                for(size_t i = 1; i < picked.size(); ++i)
-                {
-                    attrsStr += "\n";
-
-                    attrsStr += get<1>(picked[i])->toString();
-                }
+                attrsStr += get<1>(picked[i])->toString();
             }
-
+            
             break;
         }
     }
+
     return attrsStr;
 }

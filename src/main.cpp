@@ -127,9 +127,7 @@ int main(int, char**)
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     GUI::setupCallbacks(window);
-
-    GUI::initOpenGL(window);
-
+    GUI::initOpenGL();
     GUI::loadState();
 
     OpenSteerGlue::init();
@@ -138,7 +136,7 @@ int main(int, char**)
         
         glfwSetWindowRefreshCallback(window, GUI::mainLoop);
 
-        GUI::refresh(window);
+        GUI::refresh();
 
     #else
 
@@ -155,7 +153,7 @@ int main(int, char**)
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            GUI::mainLoop(window);
+            GUI::mainLoop();
         }
 
         // Cleanup

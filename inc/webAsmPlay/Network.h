@@ -39,6 +39,7 @@ namespace geos
 
 class Renderable;
 class Attributes;
+class GeoClient;
 
 class Edge
 {
@@ -70,11 +71,20 @@ class Network
 {
 public:
 
-    static void build(const std::vector<Edge *> & edges);
+    Network(GeoClient * client);
+    ~Network();
 
-    static Edge * setStartEdge(Edge * start);
+    void setEdges(const std::vector<Edge *> & edges);
+
+    void setStartEdge(const PointOnEdge & start);
+
+    void findPath(const PointOnEdge & end);
 
 private:
+
+    Renderable * startPosRenderable = NULL;
+
+    GeoClient * client;
 };
 
 #endif // __WEB_ASM_PLAY_NETWORK_H__

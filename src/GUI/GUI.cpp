@@ -111,21 +111,19 @@ bool isFirst = true;
 
 FrameBuffer * frameBuffer = NULL;
 
-GLFWwindow * mainWindow = NULL;
+GLFWwindow * GUI::mainWindow = NULL;
 
 void errorCallback(int error, const char* description)
 {
     fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
-void GUI::refresh(GLFWwindow* window)
+void GUI::refresh()
 {
 #ifdef __EMSCRIPTEN__
     glfwPollEvents();
 
-    //dmess("Fix!");
-    if(window) { glfwMarkWindowForRefresh(window)     ;}
-    else       { glfwMarkWindowForRefresh(mainWindow) ;}
+    glfwMarkWindowForRefresh(mainWindow);
 
 #else
 
@@ -223,7 +221,7 @@ void dmessCallback(const string & file, const size_t line, const string & messag
     if(Buf) { Buf->appendf("%s %i %s", file.c_str(), (int)line, message.c_str()) ;}
 }
 
-GeoClient * client = NULL;
+GeoClient * GUI::client = NULL;
 
 static char mode = GUI::NORMAL_MODE;
 
@@ -308,7 +306,7 @@ void GUI::showMainToolBar()
     }
 }
 
-void GUI::showMainMenuBar(GLFWwindow * window)
+void GUI::showMainMenuBar()
 {
     if (!ImGui::BeginMainMenuBar()) { return ;}
 
@@ -418,7 +416,7 @@ void GUI::attributePanel(const string & attrsStr)
     ImGui::End();
 }
 
-void GUI::mainLoop(GLFWwindow * window)
+void GUI::mainLoop()
 {
     if(!Buf) {  Buf = new ImGuiTextBuffer() ;}
     // Game loop
@@ -469,7 +467,7 @@ void GUI::mainLoop(GLFWwindow * window)
     
     // Rendering
     int screenWidth, screenHeight;
-    glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
+    glfwGetFramebufferSize(mainWindow, &screenWidth, &screenHeight);
     
     GL_CHECK(glViewport(0, 0, screenWidth, screenHeight));
     
@@ -497,7 +495,7 @@ void GUI::mainLoop(GLFWwindow * window)
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
 
     showMainToolBar();
-    showMainMenuBar(window);
+    showMainMenuBar();
     showProgressBar();
     GUI_Settings_Panel();
     performacePanel();
@@ -519,16 +517,20 @@ void GUI::mainLoop(GLFWwindow * window)
 
     ImGui::EndFrame();
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(mainWindow);
 
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(mainWindow);
 
 #ifdef __EMSCRIPTEN__
 
-    refresh(window);
+    refresh(mainWindow);
 
 #endif
 }
+
+char GUI::getMode() { return mode ;}
+
+GLFWwindow * GUI::getMainWindow() { return mainWindow ;}
 
 void GUI::progress(const string & message, const float percent)
 {
@@ -546,10 +548,8 @@ void GUI::progress(const string & message, const float percent)
     progressBarValue = percent;
 }
 
-void GUI::initOpenGL(GLFWwindow * window) // TODO, need some code refactor here
+void GUI::initOpenGL() // TODO, need some code refactor here
 {
-    mainWindow = window;
-    
     debugLoggerFunc = &dmessCallback;
 
     infoIcon = Textures::load("if_Info_131908.png");
@@ -557,7 +557,7 @@ void GUI::initOpenGL(GLFWwindow * window) // TODO, need some code refactor here
     // Define the viewport dimensions
     static int width, height;
     
-    glfwGetWindowSize(window, &width, &height);
+    glfwGetWindowSize(mainWindow, &width, &height);
 
     GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
 
@@ -580,13 +580,13 @@ void GUI::initOpenGL(GLFWwindow * window) // TODO, need some code refactor here
 
     canvas->setSkyBox(skyBox);
 
-    client = new GeoClient(window, canvas);
+    client = new GeoClient(canvas);
 
     //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
     //client->loadGeometry("data.geo");
 
     //GridPlane * gridPlane = new GridPlane();
 
-    //canvas->addRenderiable(gridPlane);
+    //canvas->addRenderable(gridPlane);
 }
 

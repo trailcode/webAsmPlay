@@ -40,9 +40,9 @@
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
 
-class GLFWwindow;
 class Canvas;
 class Renderable;
+class Network;
 class Edge;
 
 namespace geos
@@ -60,7 +60,7 @@ class GeoClient
 {
 public:
 
-    GeoClient(GLFWwindow * window, Canvas * canvas);
+    GeoClient(Canvas * canvas);
 
     virtual ~GeoClient();
 
@@ -85,7 +85,7 @@ public:
     void loadGeometry(const std::string fileName);
 
     PointOnEdge pickLineStringRenderable(const glm::vec3 & pos) const;
-
+    
     std::pair<Renderable *, Attributes *> pickPolygonRenderable(const glm::vec3 & pos) const;
 
     std::vector<std::pair<Renderable *, Attributes *> > pickPolygonRenderables(const glm::vec3 & pos) const;
@@ -98,6 +98,10 @@ public:
     void doPathFinding(const char mode, const glm::dvec4 & pos) const;
 
     void addGeometry(const char * data);
+
+    Network * getNetwork() const;
+
+    Canvas * getCanvas() const;
 
 private:
     
@@ -113,6 +117,8 @@ private:
     glm::dmat4 inverseTrans;
 
     Canvas * canvas;
+
+    Network * network;
 
 #ifndef __EMSCRIPTEN__
 

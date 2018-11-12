@@ -32,15 +32,17 @@
 using namespace std;
 using namespace glm;
 
-Renderable * RenderablePoint::create(const vec3 & pos,
+Renderable * RenderablePoint::create(const vec3 & _pos,
                                      const mat4 & trans)
 {
     const float size = 0.05;
 
-    const vec3 verts[] = {  pos + vec3(-size, 0, 0),
-                            pos + vec3( size, 0, 0),
-                            pos + vec3(0, -size, 0),
-                            pos + vec3(0, size, 0) };
+    const vec3 pos = trans * vec4(_pos, 1);
+
+    const vec3 verts[] = {  pos + vec3(-size,  0,    0),
+                            pos + vec3( size,  0,    0),
+                            pos + vec3(0,     -size, 0),
+                            pos + vec3(0,     size,  0) };
 
     const GLuint indices[] = {0,1,2,3};
 

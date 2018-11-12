@@ -27,6 +27,14 @@
 #ifndef __WEB_ASM_PLAY_RENDERABLE_POINT_H__
 #define __WEB_ASM_PLAY_RENDERABLE_POINT_H__
 
+#ifdef __EMSCRIPTEN__
+    // GLEW
+    #define GLEW_STATIC
+    #include <GL/glew.h>
+#else
+    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+#endif
+
 #include <webAsmPlay/renderables/Renderable.h>
 
 class RenderablePoint : public Renderable

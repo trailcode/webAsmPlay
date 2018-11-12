@@ -78,7 +78,7 @@ namespace
     GetAllGeometriesRequests    getAllGeometriesRequests;
 }
 
-GeoClient::GeoClient(GLFWwindow * window, Canvas * canvas) : canvas(canvas)
+GeoClient::GeoClient(Canvas * canvas) : canvas(canvas)
 {
 #ifndef __EMSCRIPTEN__
 
@@ -108,11 +108,11 @@ GeoClient::GeoClient(GLFWwindow * window, Canvas * canvas) : canvas(canvas)
 
     dmess("_client " << _client);
 
-    clientThread = new thread([_client, window]()
+    clientThread = new thread([_client]()
     {
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 
-        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, window);
+        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
 
         glfwMakeContextCurrent(threadWin);
 
@@ -130,6 +130,8 @@ GeoClient::GeoClient(GLFWwindow * window, Canvas * canvas) : canvas(canvas)
     quadTreePolygons    = new Quadtree();
     quadTreeLineStrings = new Quadtree();
     quadTreePoints      = new Quadtree();
+
+    network = new Network(this);
 }
 
 GeoClient::~GeoClient()
@@ -674,6 +676,9 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         
         if(!r) { continue ;}
         
+        r->setRenderFill   (true);
+        r->setRenderOutline(true);
+
         tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
 
         quadTreePolygons->insert(g->getEnvelopeInternal(), data);
@@ -712,14 +717,9 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
             height = getHeight(attrs);
         }
-        else if(attrs->hasStringKeyValue("landuse", "grass") || attrs->hasStringKeyValue("surface", "grass"))
-        {
-            colorID = 1;
-        }
-        else if(attrs->hasStringKeyValue("landuse", "reservor"))
-        {
-            colorID = 2;
-        }
+        else if(attrs->hasStringKeyValue("landuse", "grass") ||
+                attrs->hasStringKeyValue("surface", "grass"))    { colorID = 1 ;}
+        else if(attrs->hasStringKeyValue("landuse", "reservor")) { colorID = 2 ;}
 
         if(height == 0.0) { polygons.push_back(ColoredGeometry(geoms[i].second, colorID)) ;}
 
@@ -734,14 +734,14 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     {
         r->setShader(ColorDistanceShader::getDefaultInstance());
 
-        canvas->addRenderiable(r);
+        canvas->addRenderable(r);
     }
 
     if((r = RenderableMesh::create(polygons3D, trans, true)))
     {
         r->setShader(ColorDistanceShader3D::getDefaultInstance());
 
-        canvas->addRenderiable(r);
+        canvas->addRenderable(r);
     }
     
     dmess("End base geom");
@@ -767,42 +767,15 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
         GLuint colorID = 0;
 
-        if(attrs->hasStringKeyValue("highway", "motorway"))
-        {
-            colorID = 1;
-        }
-        else if(attrs->hasStringKeyValue("highway", "trunk"))
-        {
-            colorID = 2;
-        }
-        else if(attrs->hasStringKeyValue("highway", "primary"))
-        {
-            colorID = 3;
-        }
-        else if(attrs->hasStringKeyValue("highway", "secondary"))
-        {
-            colorID = 4;
-        }
-        else if(attrs->hasStringKeyValue("highway", "tertiary"))
-        {
-            colorID = 5;
-        }
-        else if(attrs->hasStringKeyValue("highway", "unclassified"))
-        {
-            colorID = 6;
-        }
-        else if(attrs->hasStringKeyValue("highway", "residential"))
-        {
-            colorID = 7;
-        }
-        else if(attrs->hasStringKeyValue("highway", "service"))
-        {
-            colorID = 8;
-        }
-        else if(attrs->hasStringKey("highway"))
-        {
-            colorID = 9;
-        }
+             if(attrs->hasStringKeyValue("highway", "motorway"))     { colorID = 1 ;}
+        else if(attrs->hasStringKeyValue("highway", "trunk"))        { colorID = 2 ;}
+        else if(attrs->hasStringKeyValue("highway", "primary"))      { colorID = 3 ;}
+        else if(attrs->hasStringKeyValue("highway", "secondary"))    { colorID = 4 ;}
+        else if(attrs->hasStringKeyValue("highway", "tertiary"))     { colorID = 5 ;}
+        else if(attrs->hasStringKeyValue("highway", "unclassified")) { colorID = 6 ;}
+        else if(attrs->hasStringKeyValue("highway", "residential"))  { colorID = 7 ;}
+        else if(attrs->hasStringKeyValue("highway", "service"))      { colorID = 8 ;}
+        else if(attrs->hasStringKey     ("highway"))                 { colorID = 9 ;}
 
         //Renderable * r = Renderable::create(geom, trans);
 
@@ -812,6 +785,9 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
         
         if(!r) { continue ;}
         
+        r->setRenderFill   (true);
+        r->setRenderOutline(true);
+
         Edge * edge = new Edge(r, dynamic_cast<const LineString *>(geom), attrs);
 
         edges.push_back(edge);
@@ -823,7 +799,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     
     GUI::progress("Linestring index:", 1.0);
 
-    Network::build(edges);
+    network->setEdges(edges);
 
     dmess("linestring quadTree " << quadTreeLineStrings->depth() << " " << geoms.size());
 
@@ -831,7 +807,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 
-    canvas->addRenderiable(r);
+    canvas->addRenderable(r);
     
     dmess("Done creating renderable.");
 
@@ -877,7 +853,7 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     //r->setShader(ColorDistanceShader::getDefaultInstance());
 
-    canvas->addRenderiable(r);
+    canvas->addRenderable(r);
     
     dmess("Done creating renderable.");
 
@@ -891,6 +867,10 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 dmat4 GeoClient::getTrans() const { return trans ;}
 
 dmat4 GeoClient::getInverseTrans() const { return inverseTrans ;}
+
+Network * GeoClient::getNetwork() const { return network ;}
+
+Canvas * GeoClient::getCanvas() const { return canvas ;}
 
 #ifndef __EMSCRIPTEN__
 

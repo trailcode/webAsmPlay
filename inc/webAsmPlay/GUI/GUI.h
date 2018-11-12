@@ -30,11 +30,11 @@
 #include <string>
 
 class GLFWwindow;
-
 class Canvas;
 class GeosTestCanvas;
 class OpenSteerCanvas;
 class SkyBox;
+class GeoClient;
 
 class GUI
 {
@@ -50,18 +50,17 @@ public:
         FIND_PATH,
     };
 
+    static char getMode();
+
     static bool renderSettingsFillPolygons;
     static bool renderSettingsRenderPolygonOutlines;
     static bool renderSettingsRenderLinearFeatures;
     static bool renderSettingsRenderSkyBox;
 
     static void setupCallbacks(GLFWwindow* window);
-
-    static void initOpenGL(GLFWwindow* window);
-
-    static void mainLoop(GLFWwindow * window);
-
-    static void refresh(GLFWwindow * window = NULL);
+    static void initOpenGL();
+    static void mainLoop();
+    static void refresh();
 
     static void loadState();
     static void saveState();
@@ -70,13 +69,15 @@ public:
 
     static float getHeightMultiplier();
 
+    static GLFWwindow * getMainWindow(); 
+
 private:
 
     GUI() {}
     ~GUI() {}
 
     static void showMainToolBar();
-    static void showMainMenuBar(GLFWwindow * window);
+    static void showMainMenuBar();
     static void showProgressBar();
     static void performacePanel();
     static void viewMatrixPanel();
@@ -90,14 +91,14 @@ private:
 
     static void showHelpMarker(const char* desc);
 
-    static void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods);
-    static void cursorPosCallback(GLFWwindow * window, double xpos, double ypos);
-    static void scrollCallback(GLFWwindow * window, double xoffset, double yoffset);
-    static void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods);
-    static void charCallback(GLFWwindow * window, unsigned int c);
-    static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-    static void windowFocusCallback(GLFWwindow* window, int focused);
-    static void cursorEnterCallback(GLFWwindow * window, int entered);
+    static void mouseButtonCallback     (GLFWwindow * window, int button, int action, int mods);
+    static void cursorPosCallback       (GLFWwindow * window, double xpos, double ypos);
+    static void scrollCallback          (GLFWwindow * window, double xoffset, double yoffset);
+    static void keyCallback             (GLFWwindow * window, int key, int scancode, int action, int mods);
+    static void charCallback            (GLFWwindow * window, unsigned int c);
+    static void framebufferSizeCallback (GLFWwindow * window, int width, int height);
+    static void windowFocusCallback     (GLFWwindow * window, int focused);
+    static void cursorEnterCallback     (GLFWwindow * window, int entered);
 
     static bool showViewMatrixPanel;
     static bool showMVP_MatrixPanel;
@@ -110,10 +111,13 @@ private:
     static bool showSymbologyPanel;
     static bool showOpenSteerPanel;
 
+    static GLFWwindow * mainWindow;
+
     static GeosTestCanvas  * geosTestCanvas;
     static OpenSteerCanvas * openSteerCanvas;
     static Canvas          * canvas;
     static SkyBox          * skyBox;
+    static GeoClient       * client;
 
     static std::vector<Canvas *> auxCanvases;
 

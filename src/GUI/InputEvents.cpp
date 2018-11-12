@@ -29,14 +29,17 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/GeoClient.h>
+#include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/GUI/GUI.h>
 
+using namespace std;
 using namespace glm;
 
 namespace
 {
-  ivec2 lastShiftKeyDownMousePos;
+    ivec2 lastShiftKeyDownMousePos;
 }
 
 void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
@@ -45,9 +48,22 @@ void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int m
     
     if(!GImGui->IO.WantCaptureMouse) { canvas->onMouseButton(window, button, action, mods) ;}
 
+    if(action == GLFW_PRESS)
+    {
+        switch(GUI::getMode())
+        {
+        case SET_PATH_START_POINT:
+
+            // TODO code refactor!
+            client->getNetwork()->setStartEdge(client->pickLineStringRenderable(canvas->getCursorPosWC()));
+
+            break;
+        }
+    }
+
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
-    refresh(window);
+    refresh();
 }
 
 void GUI::cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
@@ -56,7 +72,7 @@ void GUI::cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 
     canvas->onMousePosition(window, vec2(xpos, ypos));
 
-    refresh(window);
+    refresh();
 }
 
 void GUI::scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
@@ -67,7 +83,7 @@ void GUI::scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 
     ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 
-    refresh(window);
+    refresh();
 }
 
 void GUI::keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods)
@@ -78,7 +94,7 @@ void GUI::keyCallback(GLFWwindow * window, int key, int scancode, int action, in
  
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 
-    refresh(window);
+    refresh();
 }
 
 void GUI::charCallback(GLFWwindow * window, unsigned int c)
@@ -89,7 +105,7 @@ void GUI::charCallback(GLFWwindow * window, unsigned int c)
 
     ImGui_ImplGlfw_CharCallback(window, c);
 
-    refresh(window);
+    refresh();
 }
 
 void GUI::framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -99,21 +115,23 @@ void GUI::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 
     canvas->setArea(ivec2(0,0), ivec2(width, height));
 
-    refresh(window);
+    refresh();
 }
 
 void GUI::windowFocusCallback(GLFWwindow* window, int focused)
 {
-    if(focused) { refresh(window) ;}
+    if(focused) { refresh() ;}
 }
 
 void GUI::cursorEnterCallback(GLFWwindow * window, int /* entered */)
 {
-    refresh(window);
+    refresh();
 }
 
 void GUI::setupCallbacks(GLFWwindow* window)
 {
+    mainWindow = window;
+
     glfwSetMouseButtonCallback      (window, mouseButtonCallback);
     glfwSetScrollCallback           (window, scrollCallback);
     glfwSetKeyCallback              (window, keyCallback);

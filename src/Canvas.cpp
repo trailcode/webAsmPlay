@@ -165,15 +165,22 @@ GLuint Canvas::render()
     return postRender();
 }
 
-GLuint Canvas::postRender()
+dvec2 Canvas::renderCursor(const dvec2 & pos)
 {
     if(!cursor) { cursor = RenderablePoint::create(vec3(0,0,0)) ;}
 
-    pushModel(translate(dmat4(1.0), cursorPosWC));
+    pushModel(translate(dmat4(1.0), dvec3(pos, 0.0)));
 
     cursor->render(this);
 
     popMVP();
+    
+    return pos;
+}
+
+GLuint Canvas::postRender()
+{
+    renderCursor(cursorPosWC);
 
     if(useFrameBuffer) { return frameBuffer->getTextureID() ;}
 
@@ -288,13 +295,13 @@ void Canvas::onChar(GLFWwindow * window, const size_t c)
     if(!enabled) { return ;}
 }
 
-Renderable * Canvas::addRenderiable(Renderable * renderiable)
+Renderable * Canvas::addRenderable(Renderable * renderiable)
 {
-    if(dynamic_cast<DeferredRenderable   *>(renderiable)) { return addRenderiable(deferredRenderables, renderiable) ;}
-    if(dynamic_cast<RenderableLineString *>(renderiable)) { return addRenderiable(lineStrings,         renderiable) ;}
-    if(dynamic_cast<RenderablePolygon    *>(renderiable)) { return addRenderiable(polygons,            renderiable) ;}
-    if(dynamic_cast<RenderablePoint      *>(renderiable)) { return addRenderiable(points,              renderiable) ;}
-    if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderiable(meshes,              renderiable) ;}
+    if(dynamic_cast<DeferredRenderable   *>(renderiable)) { return addRenderable(deferredRenderables, renderiable) ;}
+    if(dynamic_cast<RenderableLineString *>(renderiable)) { return addRenderable(lineStrings,         renderiable) ;}
+    if(dynamic_cast<RenderablePolygon    *>(renderiable)) { return addRenderable(polygons,            renderiable) ;}
+    if(dynamic_cast<RenderablePoint      *>(renderiable)) { return addRenderable(points,              renderiable) ;}
+    if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderable(meshes,              renderiable) ;}
 
     dmess("Error! Implement!");
     
@@ -303,7 +310,7 @@ Renderable * Canvas::addRenderiable(Renderable * renderiable)
     return renderiable;
 }
 
-Renderable * Canvas::addRenderiable(list<Renderable *> & container, Renderable * renderiable)
+Renderable * Canvas::addRenderable(list<Renderable *> & container, Renderable * renderiable)
 {   
     lock_guard<mutex> _(renderiablesMutex);
 
@@ -337,11 +344,11 @@ Camera * Canvas::getCamera() const { return trackBallInteractor->getCamera() ;}
 
 TrackBallInteractor * Canvas::getTrackBallInteractor() const { return trackBallInteractor ;}
 
-dmat4 Canvas::getView()       const { return currMVP.view       ;}
-dmat4 Canvas::getModel()      const { return currMVP.model      ;}
-dmat4 Canvas::getProjection() const { return currMVP.projection ;}
-dmat4 Canvas::getMVP()        const { return currMVP.MVP        ;}
-dmat4 Canvas::getMV()         const { return currMVP.MV         ;}
+dmat4 Canvas::getView()                  const { return currMVP.view       ;}
+dmat4 Canvas::getModel()                 const { return currMVP.model      ;}
+dmat4 Canvas::getProjection()            const { return currMVP.projection ;}
+dmat4 Canvas::getMVP()                   const { return currMVP.MVP        ;}
+dmat4 Canvas::getMV()                    const { return currMVP.MV         ;}
 
 const dmat4 & Canvas::getViewRef()       const { return currMVP.view       ;}
 const dmat4 & Canvas::getModelRef()      const { return currMVP.model      ;}
@@ -358,6 +365,8 @@ bool Canvas::setEnabled(const bool enabled) { return this->enabled = enabled ;}
 bool Canvas::getEnabled() const             { return enabled ;}
 
 dvec3 Canvas::getCursorPosWC() const { return cursorPosWC ;}
+
+Renderable * Canvas::getCursor() const { return cursor ;}
 
 #ifdef __EMSCRIPTEN__
 

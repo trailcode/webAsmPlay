@@ -24,10 +24,14 @@
   \copyright 2018
 */
 
+#include <memory>
 #include <unordered_map>
 #include <glm/gtx/hash.hpp>
-#include <GEOS/geom/LineString.h>
+#include <geos/geom/LineString.h>
+#include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Network.h>
 
@@ -59,10 +63,16 @@ namespace
 
     unordered_map<dvec2, Edges> edgeMap;
 
-    Edge * start = NULL;
+    PointOnEdge start;
+    PointOnEdge endPoint;
+
+    unique_ptr<Renderable> startRenderable;
 }
 
-void Network::build(const Edges & _edges)
+Network::Network(GeoClient * client) : client(client) {}
+Network::~Network() {}
+
+void Network::setEdges(const Edges & _edges)
 {
     edges = _edges;
 
@@ -75,7 +85,18 @@ void Network::build(const Edges & _edges)
     }
 }
 
-Edge * Network::setStartEdge(Edge * _start)
+void Network::setStartEdge(const PointOnEdge & _start)
 {
-    return start = _start;
+    dmess("Network::setStartEdge");
+
+    start = _start;
+
+    startRenderable = unique_ptr<Renderable>(RenderablePoint::create(vec3(get<0>(start), 0), client->getTrans()));
+
+    client->getCanvas()->addRenderable(startRenderable.get());
+}
+
+void Network::findPath(const PointOnEdge & end)
+{
+    endPoint = end;
 }

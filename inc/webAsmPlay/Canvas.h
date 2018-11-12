@@ -84,7 +84,7 @@ public:
 
     rsmz::TrackBallInteractor * getTrackBallInteractor() const;
 
-    Renderable * addRenderiable(Renderable * renderiable);
+    Renderable * addRenderable(Renderable * renderiable);
 
     glm::vec4 setClearColor(const glm::vec4 & clearColor);
 
@@ -115,6 +115,10 @@ public:
     
     glm::dvec3 getCursorPosWC() const;
 
+    Renderable * getCursor() const;
+
+    glm::dvec2 renderCursor(const glm::dvec2 & pos);
+
 protected:
 
     bool preRender();
@@ -126,7 +130,7 @@ protected:
 
 private:
 
-    Renderable * addRenderiable(std::list<Renderable *> & container, Renderable * renderiable);
+    Renderable * addRenderable(std::list<Renderable *> & container, Renderable * renderiable);
 
     void updateMVP();
 
