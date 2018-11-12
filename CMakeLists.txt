@@ -144,6 +144,8 @@ file(GLOB webAsmPlay_SRC        "src/GUI/GUI.cpp"
                                 "src/VertexArrayObject.cpp"
                                 "src/OpenSteerGlue.cpp"
                                 "src/OpenSteerCanvas.cpp"
+                                "src/Zombie.cpp"
+                                "src/ZombiePlugin.cpp"
                                 "src/Network.cpp"
                                 "src/Main.cpp"
                                 ${tceGeom_SRC}
