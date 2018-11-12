@@ -28,6 +28,7 @@
 #define __WEB_ASM_PLAY_NETWORK_H__
 
 #include <webAsmPlay/Types.h>
+#include <geos/geom/Coordinate.h>
 
 namespace geos
 {
@@ -82,7 +83,11 @@ public:
 
     void setStartEdge(const PointOnEdge & start);
 
-    void findPath(const PointOnEdge & end);
+    void findPath(const PointOnEdge & startPoint);
+
+    std::vector<geos::geom::Coordinate> * findPath(const PointOnEdge & start, const PointOnEdge & end);
+
+    void getRandomPath();
 
 private:
 

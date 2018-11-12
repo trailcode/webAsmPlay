@@ -35,6 +35,7 @@
     #include <GL/gl3w.h>
 #endif
 
+#include <geos/geom/Coordinate.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
 namespace geos
@@ -54,6 +55,9 @@ public:
     static Renderable * create( const geos::geom::LineString * lineString,
                                 const glm::mat4              & trans    = glm::mat4(1.0));
     
+    static Renderable * create( const std::vector<geos::geom::Coordinate> & coords,
+                                const glm::mat4                           & trans    = glm::mat4(1.0));
+
     static Renderable * create( const ColoredGeometryVec & lineStrings,
                                 const glm::mat4         & trans          = glm::mat4(1.0),
                                 const bool                showProgress   = false);

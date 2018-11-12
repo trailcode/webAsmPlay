@@ -46,8 +46,6 @@ void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int m
 {
     for(auto c : auxCanvases) { c->onMouseButton(window, button, action, mods) ;}
     
-    dmess("GImGui->IO.WantCaptureMouse " << GImGui->IO.WantCaptureMouse);
-
     if(!GImGui->IO.WantCaptureMouse)
     {
         canvas->onMouseButton(window, button, action, mods);

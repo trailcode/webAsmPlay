@@ -68,8 +68,11 @@ Renderable * RenderableLineString::create(  const LineString * lineString,
         return NULL;
     }
 
-    const vector<Coordinate> & coords = *lineString->getCoordinatesRO()->toVector();
+    return create(*lineString->getCoordinatesRO()->toVector());
+}
 
+Renderable * RenderableLineString::create(const vector<Coordinate> & coords, const mat4 & trans)
+{
     if(coords.size() < 2)
     {
         dmess("Bad gemetry!");

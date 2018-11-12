@@ -30,6 +30,8 @@
 #include <unordered_map>
 #include <glm/gtx/hash.hpp>
 #include <geos/geom/LineString.h>
+#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/geom/GeometryFactory.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Canvas.h>
@@ -51,8 +53,6 @@ Edge::Edge( Renderable       * renderable,
                                              end       (getEndPoint(geom))
 {
     weight = geom->getLength() * 1000000 + 1;
-
-    dmess("weight " << weight);
 }
 
 Renderable       * Edge::getRenderable() const { return renderable ;}
@@ -97,6 +97,8 @@ namespace
 
         int operator() (const Path & p1, const Path & p2) { return get<0>(p1) > get<0>(p2) ;}
     };
+
+    unique_ptr<Renderable> pathAnnotation;
 }
 
 Network::Network(GeoClient * client) : client(client) {}
@@ -151,8 +153,26 @@ void Network::setStartEdge(const PointOnEdge & start)
 
 vector<Renderable *> toRender;
 
-// Modified from: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-priority_queue-stl/
 void Network::findPath(const PointOnEdge & end)
+{
+    vector<Coordinate> * coords = findPath(startPoint, end);
+
+    if(!coords) { return ;}
+
+    Geometry::Ptr path(GeometryFactory::getDefaultInstance()->createLineString(new CoordinateArraySequence(coords, 2)));
+
+    Geometry::Ptr buffered(path->buffer(0.00005, 3));
+
+    pathAnnotation = unique_ptr<Renderable>(Renderable::create(buffered, client->getTrans()));
+
+    pathAnnotation->setRenderFill(true);
+    pathAnnotation->setRenderOutline(true);
+
+    client->getCanvas()->addRenderable(pathAnnotation.get());
+}
+
+// Modified from: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-priority_queue-stl/
+vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnEdge & end)
 {
     dmess("start Network::findPath");
 
@@ -160,27 +180,25 @@ void Network::findPath(const PointOnEdge & end)
 
     endPoint = end;
 
-    if(!get<1>(startPoint)) { return ;}
+    if(!get<1>(start)) { return NULL ;}
 
     priority_queue<Path, vector<Path> , PathCmp> pq;
 
-    const size_t startIndex = nodeMap[startPoint.second->start];
-
-    dmess("startIndex " << startIndex);
+    const size_t startIndex = nodeMap[start.second->start];
 
     vector<int> dist(nodes.size(), INF);
 
     vector<bool> seen(nodes.size(), false);
 
+    vector<size_t> parent(nodes.size());
+
     dist[startIndex] = 0;
+
+    parent[startIndex] = startIndex;
 
     pq.push(Path(0.0, startIndex));
 
-    const size_t endIndex = nodeMap[end.second->end];
-
-    dmess("endIndex " << endIndex);
-
-    int maxa = 0;
+    size_t v;
 
     while(!pq.empty())
     {
@@ -188,17 +206,15 @@ void Network::findPath(const PointOnEdge & end)
 
         seen[u] = true;
 
-        //dmess("pq " << pq.size() << " nodes[u].neighbors " << nodes[u].neighbors.size() << " u " << u);
-
-        //if(maxa++ > 500) { break ;}
-
         for(const auto x : nodes[u].neighbors)
         {
-            const size_t v = x.first;
+            v = x.first;
 
             if(x.second == end.second)
             {
                 dmess("Done!");
+
+                parent[v] = u;
 
                 goto done;
             }
@@ -207,20 +223,106 @@ void Network::findPath(const PointOnEdge & end)
 
             const int newDist = dist[u] + weight;
 
-            //dmess("    v " << v << " weight " << weight << " newDist " << newDist << " dist[v] " << dist[v] << " dist[u] " << dist[u]);
-
             if(!seen[v] && dist[v] > newDist)
             {
                 dist[v] = newDist;
 
-                toRender.push_back(x.second->getRenderable());
+                parent[v] = u;
+
+                //toRender.push_back(x.second->getRenderable());
 
                 pq.push(Path(newDist, v));
             }
         }
     }
 
+    return NULL;
+
     done:;
 
+    vector<dvec2> path;
+
+    vector<Edge *> edges;
+
+    do
+    {
+        const size_t next = parent[v];
+
+        for(const auto & i : nodes[next].neighbors)
+        {
+            if(i.first != v) { continue ;} // TODO should have O(1) access to edge
+
+            //toRender.push_back(i.second->getRenderable());
+
+            edges.push_back(i.second);
+
+            break;
+        }
+
+        v = next;
+
+    } while(v != startIndex);
+
+    if(edges.size() > 1)
+    {
+        vector<Coordinate> * coords = new vector<Coordinate>();
+
+        Edge * A = edges[0];
+        Edge * B = edges[1];
+
+        dvec2 lastPoint;
+
+        const vector<Coordinate> * points = A->getGeometry()->getCoordinatesRO()->toVector();
+
+        if(A->end == B->start || A->end == B->end)
+        {
+            lastPoint = A->end;
+
+            coords->insert(coords->end(), points->begin(), points->end());
+        }
+        else
+        {
+            lastPoint = A->start;
+
+            coords->insert(coords->end(), points->rbegin(), points->rend());
+        }
+        
+        for(size_t i = 1; i < edges.size(); ++i)
+        {
+            A = edges[i];
+            
+            const vector<Coordinate> * points = A->getGeometry()->getCoordinatesRO()->toVector();
+
+            if(lastPoint == A->start)
+            {
+                coords->insert(coords->end(), points->begin(), points->end());
+
+                lastPoint = A->end;
+            }
+            else
+            {
+                coords->insert(coords->end(), points->rbegin(), points->rend());
+
+                lastPoint = A->start;
+            }
+        }
+
+        return coords;        
+    }
+    else
+    {
+        dmess("Implement me!");
+    }
+
     dmess("end Network::findPath");
+}
+
+void Network::getRandomPath()
+{
+    dmess("Network::getRandomPath");
+
+    Edge * A = edges[rand() % edges.size()];
+    Edge * B = edges[rand() % edges.size()];
+
+    
 }

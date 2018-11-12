@@ -49,7 +49,7 @@ public:
     virtual void render(Canvas * canvas) const = 0;
 
     static Renderable * create( const geos::geom::Geometry::Ptr & geom,
-                                const glm::mat4                 & trans = glm::mat4(1.0));
+                                const glm::mat4                 & trans = glm::mat4(1.0)); // TODO use double precision. 
 
     static Renderable * create( const geos::geom::Geometry  * geom,
                                 const glm::mat4             & trans = glm::mat4(1.0));
