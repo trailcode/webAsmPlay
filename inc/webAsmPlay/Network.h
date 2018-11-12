@@ -55,16 +55,20 @@ public:
 
     std::vector<Edge *> neighbors;
     
-    bool visited = false;
+    //bool visited = false;
 
     const glm::dvec2 start;
     const glm::dvec2 end;
+
+    inline double getWeight() const { return weight ;}
 
 private:
 
     Renderable                   * renderable;
     const geos::geom::LineString * geom;
     Attributes                   * attributes;
+
+    int weight;
 };
 
 class Network

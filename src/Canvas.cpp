@@ -150,6 +150,8 @@ bool Canvas::preRender()
     return true;
 }
 
+extern vector<Renderable *> toRender;
+
 GLuint Canvas::render()
 {
     if(!preRender()) { return 0 ;}
@@ -161,6 +163,13 @@ GLuint Canvas::render()
     for(const auto r : points)              { r->render(this) ;}
     for(const auto r : deferredRenderables) { r->render(this) ;}
     for(const auto r : meshes)              { r->render(this) ;}
+
+    //dmess("toRender " << toRender.size());
+
+    for(auto i : toRender)
+    {
+        i->render(this);
+    }
 
     return postRender();
 }

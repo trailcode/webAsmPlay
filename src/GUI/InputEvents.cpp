@@ -46,18 +46,29 @@ void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int m
 {
     for(auto c : auxCanvases) { c->onMouseButton(window, button, action, mods) ;}
     
-    if(!GImGui->IO.WantCaptureMouse) { canvas->onMouseButton(window, button, action, mods) ;}
+    dmess("GImGui->IO.WantCaptureMouse " << GImGui->IO.WantCaptureMouse);
 
-    if(action == GLFW_PRESS)
+    if(!GImGui->IO.WantCaptureMouse)
     {
-        switch(GUI::getMode())
+        canvas->onMouseButton(window, button, action, mods);
+
+        if(action == GLFW_PRESS)
         {
-        case SET_PATH_START_POINT:
+            switch(GUI::getMode())
+            {
+            case SET_PATH_START_POINT:
 
-            // TODO code refactor!
-            client->getNetwork()->setStartEdge(client->pickLineStringRenderable(canvas->getCursorPosWC()));
+                // TODO code refactor!
+                client->getNetwork()->setStartEdge(client->pickLineStringRenderable(canvas->getCursorPosWC()));
 
-            break;
+                break;
+
+            case FIND_PATH:
+
+                client->getNetwork()->findPath(client->pickLineStringRenderable(canvas->getCursorPosWC()));
+
+                break;
+            }
         }
     }
 
