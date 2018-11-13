@@ -24,11 +24,13 @@
   \copyright 2018
 */
 
+#include <glm/vec4.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/CoordinateSequence.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
+#include <geos/geom/CoordinateArraySequence.h>
 #include <geos/operation/union/CascadedPolygonUnion.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GeosUtil.h>
@@ -165,8 +167,26 @@ Point * geosUtil::__(const dvec2 & pos)
 
 dvec2 geosUtil::__(const Coordinate & point) { return dvec2(point.x, point.y) ;}
 
+Coordinate ___(const dvec2 & point) { return Coordinate(point.x, point.y) ;}
+
 dvec2 geosUtil::getStartPoint(const LineString * ls) { return __(ls->getCoordinateN(0)) ;}
 dvec2 geosUtil::getEndPoint  (const LineString * ls) { return __(ls->getCoordinateN(ls->getNumPoints() - 1)) ;}
+
+void geosUtil::transformInPlace(vector<Coordinate> & points, const dmat4 & trans)
+{
+    for(size_t i = 0; i < points.size(); ++i) { points[i] = ___(trans * dvec4(__(points[i]), 0, 1)) ;}
+}
+
+LineString * geosUtil::getLineString(const vector<dvec2> & verts)
+{
+    //dmess("verts " << verts.size());
+
+    vector<Coordinate> * coords = new vector<Coordinate>(verts.size());
+
+    for(size_t i = 0; i < verts.size(); ++i) { (*coords)[i] = ___(verts[i]) ;}
+
+    return GeometryFactory::getDefaultInstance()->createLineString(new CoordinateArraySequence(coords, 2));
+}
 
 _ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : geom(geom) {}
 

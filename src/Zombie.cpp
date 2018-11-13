@@ -27,6 +27,8 @@
 //#include <OpenSteer/Annotation.h>
 #include <OpenSteer/Draw.h>
 #include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
+#include <webAsmPlay/OpenSteerGlue.h>
+#include <webAsmPlay/Network.h>
 #include <webAsmPlay/Zombie.h>
 
 using namespace OpenSteer;
@@ -40,46 +42,80 @@ namespace
 
     PolylineSegmentedPathwaySingleRadius * gTestPath = NULL;
 
-    PolylineSegmentedPathwaySingleRadius* getTestPath (void)
-    {
-        if (gTestPath == NULL)
-        {
-            const float pathRadius = 2;
-
-            const PolylineSegmentedPathwaySingleRadius::size_type pathPointCount = 7;
-            const float size = 30;
-            const float top = 2 * size;
-            const float gap = 1.2f * size;
-            const float out = 2 * size;
-            const float h = 0.5;
-            const Vec3 pathPoints[pathPointCount] =
-                {Vec3 (h+gap-out,     0,  h+top-out),  // 0 a
-                 Vec3 (h+gap,         0,  h+top),      // 1 b
-                 Vec3 (h+gap+(top/2), 0,  h+top/2),    // 2 c
-                 Vec3 (h+gap,         0,  h),          // 3 d
-                 Vec3 (h,             0,  h),          // 4 e
-                 Vec3 (h,             0,  h+top),      // 5 f
-                 Vec3 (h+gap,         0,  h+top/2)};   // 6 g
-
-            //gEndpoint0 = pathPoints[0];
-            //gEndpoint1 = pathPoints[pathPointCount-1];
-
-            gTestPath = new PolylineSegmentedPathwaySingleRadius (pathPointCount,
-                                                                  pathPoints,
-                                                                  pathRadius,
-                                                                  false);
-        }
-
-        return gTestPath;
-    }
+    
 }
 
-Zombie::Zombie(ProximityDatabase & pd)
+PolylineSegmentedPathwaySingleRadius* getTestPath (void)
+{
+    if (gTestPath == NULL)
+    {
+        const float pathRadius = 2;
+
+        const PolylineSegmentedPathwaySingleRadius::size_type pathPointCount = 7;
+        const float size = 30;
+        const float top = 2 * size;
+        const float gap = 1.2f * size;
+        const float out = 2 * size;
+        const float h = 0.5;
+        const Vec3 pathPoints[pathPointCount] =
+            {Vec3 (h+gap-out,     0,  h+top-out),  // 0 a
+                Vec3 (h+gap,         0,  h+top),      // 1 b
+                Vec3 (h+gap+(top/2), 0,  h+top/2),    // 2 c
+                Vec3 (h+gap,         0,  h),          // 3 d
+                Vec3 (h,             0,  h),          // 4 e
+                Vec3 (h,             0,  h+top),      // 5 f
+                Vec3 (h+gap,         0,  h+top/2)};   // 6 g
+
+        //gEndpoint0 = pathPoints[0];
+        //gEndpoint1 = pathPoints[pathPointCount-1];
+
+        gTestPath = new PolylineSegmentedPathwaySingleRadius (pathPointCount,
+                                                                pathPoints,
+                                                                pathRadius,
+                                                                false);
+    }
+
+    return gTestPath;
+}
+
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/renderables/Renderable.h>
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/GeosUtil.h>
+
+extern Canvas * theCanvas;
+
+Zombie::Zombie(ProximityDatabase & pd, Network * network)
 {
     // allocate a token for this boid in the proximity database
     proximityToken = NULL;
 
     newPD (pd);
+
+    path = OpenSteerGlue::getPath(network->getRandomPath());
+
+    /*
+    dmess("path->pointCount() " << path->pointCount());
+
+    if(path->pointCount() > 2)
+    {
+        std::vector<glm::dvec2> verts;
+
+        for(size_t i = 0; i < path->pointCount(); ++i)
+        {
+            Vec3 v = path->point(i);
+
+            verts.push_back(glm::dvec2(v.x, v.z));
+        }
+
+        Renderable * r = Renderable::create(geosUtil::getLineString(verts)->buffer(0.0005, 3));
+
+        r->setRenderFill(true);
+        r->setRenderOutline(true);
+
+        //theCanvas->addRenderable(r);
+    }
+    */
 
     // reset Pedestrian state
     reset ();
@@ -107,10 +143,12 @@ void Zombie::reset()
     setRadius (0.5); // width = 0.7, add 0.3 margin, take half
 
     // set the path for this Pedestrian to follow
-    path = getTestPath ();
+    //path = getTestPath ();
 
     endPoint0 = path->point(0);
     endPoint1 = path->point(path->pointCount() - 1);
+
+    dmess("path->length() " << path->length());
 
     // set initial position
     // (random point on path + random horizontal offset)

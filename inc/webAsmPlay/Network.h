@@ -27,6 +27,7 @@
 #ifndef __WEB_ASM_PLAY_NETWORK_H__
 #define __WEB_ASM_PLAY_NETWORK_H__
 
+#include <memory>
 #include <webAsmPlay/Types.h>
 #include <geos/geom/Coordinate.h>
 
@@ -87,7 +88,7 @@ public:
 
     std::vector<geos::geom::Coordinate> * findPath(const PointOnEdge & start, const PointOnEdge & end);
 
-    void getRandomPath();
+    std::unique_ptr<std::vector<geos::geom::Coordinate> > getRandomPath();
 
 private:
 

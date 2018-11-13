@@ -31,6 +31,7 @@
 #include <memory>
 #include <initializer_list>
 #include <glm/vec2.hpp>
+#include <glm/mat4x4.hpp>
 #include <geos/geom/Point.h>
 #include <geos/geom/LineString.h>
 
@@ -65,6 +66,8 @@ private:
 
 namespace geosUtil
 {
+    // TODO Inline a these!
+
     geos::geom::Geometry::Ptr makeBox(const double xmin, const double ymin, const double xmax, const double ymax);
     
     geos::geom::Geometry::Ptr unionPolygons(const std::initializer_list<geos::geom::Geometry::Ptr> & polys);
@@ -82,6 +85,8 @@ namespace geosUtil
     inline geos::geom::Coordinate ___(const glm::dvec2 & pos) { return geos::geom::Coordinate(pos.x, pos.y) ;}
 
     glm::dvec2 __(const geos::geom::Coordinate & point);
+
+    geos::geom::Coordinate ___(const glm::dvec2 & point);
 
     bool contains(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
 
@@ -114,6 +119,10 @@ namespace geosUtil
                 samePoint(A->getStartPoint(), B->getEndPoint())   ||
                 samePoint(A->getEndPoint(),   B->getStartPoint());
     }
+
+    void transformInPlace(std::vector<geos::geom::Coordinate> & points, const glm::dmat4 & trans);
+
+    geos::geom::LineString * getLineString(const std::vector<glm::dvec2> & verts);
 };
 
 #endif

@@ -86,6 +86,7 @@ namespace {
     void 
     checkForGLError (const char* locationDescription)
     {
+        return;
         // normally (when no error) just return
         const int lastGlError = glGetError();
         if (lastGlError == GL_NO_ERROR) return;

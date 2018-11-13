@@ -32,6 +32,7 @@
 #include <geos/geom/LineString.h>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/GeometryFactory.h>
+#include <geos/simplify/DouglasPeuckerLineSimplifier.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Canvas.h>
@@ -42,6 +43,7 @@
 using namespace std;
 using namespace glm;
 using namespace geos::geom;
+using namespace geos::simplify;
 using namespace geosUtil;
 
 Edge::Edge( Renderable       * renderable,
@@ -186,6 +188,8 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
     const size_t startIndex = nodeMap[start.second->start];
 
+    dmess("startIndex " << startIndex << " nodeMap " << nodeMap.size());
+
     vector<int> dist(nodes.size(), INF);
 
     vector<bool> seen(nodes.size(), false);
@@ -319,12 +323,44 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
     return NULL;
 }
 
-void Network::getRandomPath()
+Canvas * theCanvas = NULL;
+
+unique_ptr<vector<Coordinate> > Network::getRandomPath()
 {
     dmess("Network::getRandomPath");
 
-    Edge * A = edges[rand() % edges.size()];
-    Edge * B = edges[rand() % edges.size()];
+    unique_ptr<vector<Coordinate> > coords = NULL;
 
-    
+    for(; !coords ;)
+    {
+        Edge * A = edges[rand() % edges.size()];
+        Edge * B = edges[rand() % edges.size()];
+
+        dmess("Getting path " << A << " " << B);
+
+        coords = unique_ptr<vector<Coordinate> >(findPath(PointOnEdge(A->start, A), PointOnEdge(B->end, B)));
+    }
+
+    //transformInPlace(*coords, client->getInverseTrans());
+    transformInPlace(*coords, client->getTrans());
+
+    coords = DouglasPeuckerLineSimplifier::simplify(*coords, 0.000001);
+
+    LineString * ls = GeometryFactory::getDefaultInstance()->createLineString(new CoordinateArraySequence(new vector<Coordinate>(*coords), 2));
+
+    dmess("client->getTrans() " << mat4ToStr(client->getTrans()));
+
+    //Renderable * r = Renderable::create(ls->buffer(0.00005, 3), client->getTrans());
+    Renderable * r = Renderable::create(ls->buffer(0.0005, 3));
+
+    r->setRenderFill(true);
+    r->setRenderOutline(true);
+
+    dmess("r " << r);
+
+    theCanvas = client->getCanvas();
+
+    //client->getCanvas()->addRenderable(r);
+
+    return coords;
 }

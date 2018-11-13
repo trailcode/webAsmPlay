@@ -30,11 +30,26 @@
 class Canvas;
 class Network;
 
+#include <memory>
+#include <vector>
+#include <glm/mat4x4.hpp>
+#include <geos/geom/Coordinate.h>
+
+namespace OpenSteer
+{
+    class PolylineSegmentedPathwaySingleRadius;
+}
+
 class OpenSteerGlue
 {
 public:
 
-  static void init(Canvas * canvas, Network * network);
+    static void init(Canvas * canvas, Network * network);
+
+    static const glm::dmat4 & getGeomTrans();
+    static const glm::dmat4 & getGeomInverseTrans();
+
+    static OpenSteer::PolylineSegmentedPathwaySingleRadius * getPath(const std::unique_ptr<std::vector<geos::geom::Coordinate> > & path);
 
 private:
 };

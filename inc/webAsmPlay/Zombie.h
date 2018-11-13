@@ -30,6 +30,8 @@
 #include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/Proximity.h>
 
+class Network;  
+
 namespace OpenSteer
 {
     class PolylineSegmentedPathwaySingleRadius;
@@ -44,7 +46,7 @@ public:
     typedef OpenSteer::AbstractProximityDatabase        <OpenSteer::AbstractVehicle *> ProximityDatabase;
     typedef OpenSteer::AbstractTokenForProximityDatabase<OpenSteer::AbstractVehicle *> ProximityToken;
     
-    Zombie(ProximityDatabase & pd);
+    Zombie(ProximityDatabase & pd, Network * network);
 
     virtual ~Zombie();
 

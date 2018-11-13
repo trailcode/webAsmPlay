@@ -38,8 +38,6 @@
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>
-#include <geos/simplify/TopologyPreservingSimplifier.h>
-#include <geos/simplify/DouglasPeuckerSimplifier.h>
 #include <GLU/tessellate.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -86,7 +84,6 @@
 
 using namespace std;
 using namespace geos::geom;
-using namespace geos::simplify;
 using namespace rsmz;
 using namespace glm;
 
@@ -491,7 +488,8 @@ void GUI::mainLoop()
 
     const dvec4 pos(canvas->getCursorPosWC(), 1.0);
 
-    showCursorPositionOverlay(NULL, client->getInverseTrans() * pos);
+    //showCursorPositionOverlay(NULL, client->getInverseTrans() * pos);
+    showCursorPositionOverlay(NULL, pos);
 
     string attrsStr = client->doPicking(mode, pos); // TODO move to updatables
 

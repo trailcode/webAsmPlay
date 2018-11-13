@@ -25,6 +25,8 @@
  *
  * @author Bjoern Knafla <bknafla@uni-kassel.de>
  */
+
+#include <webAsmPlay/Debug.h>
 #include "OpenSteer/PolylineSegmentedPathwaySingleRadius.h"
 
 
@@ -112,6 +114,7 @@ OpenSteer::PolylineSegmentedPathwaySingleRadius::movePoints( size_type startInde
                                                              size_type numOfPoints,
                                                              Vec3 const newPointValues[] )
 {
+    dmess("PolylineSegmentedPathwaySingleRadius::movePoints");
     path_.movePoints( startIndex, numOfPoints, newPointValues );
 }
 
@@ -124,6 +127,7 @@ OpenSteer::PolylineSegmentedPathwaySingleRadius::setPathway( size_type numOfPoin
                                                              float r,
                                                              bool closedCycle )
 {
+    dmess("PolylineSegmentedPathwaySingleRadius::setPathway");
     path_.setPath( numOfPoints, points, closedCycle );
     setRadius( r );
 }

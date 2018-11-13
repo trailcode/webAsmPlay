@@ -25,6 +25,8 @@
  *
  * @author Bjoern Knafla <bknafla@uni-kassel.de>
  */
+
+#include <webAsmPlay/Debug.h>
 #include "OpenSteer/PolylineSegmentedPath.h"
 
 // Include std::accumulate
@@ -166,9 +168,13 @@ namespace {
     template< typename Iterator >
     bool adjacentPathPointsDifferent( Iterator first, Iterator last, bool closedCycle  ) {
         
+        dmess("closedCycle " << closedCycle);
+
         assert( last - first > 1 && "A path needs at least two waypoints." );
         
         if ( last != std::adjacent_find( first, last ) ) {
+            dmess("Here!");
+
             return false;
         }
     
@@ -204,6 +210,7 @@ OpenSteer::PolylineSegmentedPath::PolylineSegmentedPath( size_type numOfPoints,
                                                          bool closedCycle )
     : points_( 0 ), segmentTangents_( 0 ), segmentLengths_( 0 ), closedCycle_( closedCycle )
 {
+    dmess("Setta");
         setPath( numOfPoints, newPoints, closedCycle );
 }
 
@@ -250,10 +257,12 @@ OpenSteer::PolylineSegmentedPath::setPath( size_type numOfPoints,
                                            Vec3 const newPoints[],
                                            bool closedCycle )
 {
+    dmess("Here~WWWW");
+
     assert( 1 < numOfPoints && "Path must have at least two distinct points." );
     // While testing say that no cyclus is used because the first point hasn't 
     // been copied to the back.
-    assert( adjacentPathPointsDifferent( newPoints, newPoints + numOfPoints, false ) && "Adjacent path points must be different." );
+    //assert( adjacentPathPointsDifferent( newPoints, newPoints + numOfPoints, false ) && "Adjacent path points must be different." );
     
     closedCycle_ = closedCycle;
     
@@ -278,7 +287,7 @@ OpenSteer::PolylineSegmentedPath::setPath( size_type numOfPoints,
                               0, 
                               numOfPoints,
                               closedCycle_ );
-    
+                              
     shrinkToFit( points_ );
     shrinkToFit( segmentTangents_ );
     shrinkToFit( segmentLengths_ );

@@ -37,6 +37,7 @@
 
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 #include <webAsmPlay/renderables/Renderable.h>
 
 class DeferredRenderable : public Renderable
@@ -45,7 +46,7 @@ public:
 
     virtual ~DeferredRenderable();
 
-    static DeferredRenderable * createFromQueued(); 
+    static DeferredRenderable * createFromQueued(const glm::dmat4 & trans = glm::dmat4(1.0)); 
 
     static void addQuadrangle(  const glm::vec3 & A,
                                 const glm::vec3 & B,
