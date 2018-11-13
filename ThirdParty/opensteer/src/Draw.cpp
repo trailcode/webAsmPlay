@@ -519,7 +519,7 @@ OpenSteer::drawBasic2dCircularVehicle (const AbstractVehicle& vehicle,
     endDoubleSidedDrawing ();
 
     // draw the circular collision boundary
-    drawXZCircle (r, p + u, gWhite, 20);
+    drawXZCircle (r, p + u, gWhite, 8);
 }
 
 

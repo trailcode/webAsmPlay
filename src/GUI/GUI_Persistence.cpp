@@ -46,6 +46,7 @@ bool GUI::showLogPanel             = false;
 bool GUI::showAttributePanel       = false;
 bool GUI::showSymbologyPanel       = false;
 bool GUI::showGUI_Settings_Panel   = false;
+bool GUI::showOpenSteerTestPanel   = false;
 bool GUI::showOpenSteerPanel       = false;
 
 bool GUI::renderSettingsFillPolygons           = true;
@@ -83,6 +84,7 @@ void GUI::loadState()
     setBool(L"showAttributePanel",      showAttributePanel);
     setBool(L"showGUI_Settings_Panel",  showGUI_Settings_Panel);
     setBool(L"showSymbologyPanel",      showSymbologyPanel);
+    setBool(L"showOpenSteerTestPanel",  showOpenSteerTestPanel);
     setBool(L"showOpenSteerPanel",      showOpenSteerPanel);
 
     setBool(L"renderSettingsFillPolygons",          renderSettingsFillPolygons);
@@ -132,6 +134,7 @@ void GUI::saveState()
     root[L"showAttributePanel"]       = new JSONValue(showAttributePanel);
     root[L"showGUI_Settings_Panel"]   = new JSONValue(showGUI_Settings_Panel);
     root[L"showSymbologyPanel"]       = new JSONValue(showSymbologyPanel);
+    root[L"showOpenSteerTestPanel"]   = new JSONValue(showOpenSteerTestPanel);
     root[L"showOpenSteerPanel"]       = new JSONValue(showOpenSteerPanel);
 
     root[L"renderSettingsFillPolygons"]           = new JSONValue(renderSettingsFillPolygons);

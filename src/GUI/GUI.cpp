@@ -361,7 +361,7 @@ void GUI::showMainMenuBar()
         if(ImGui::MenuItem("Attributes"))      { showAttributePanel      = !showAttributePanel         ;}
         if(ImGui::MenuItem("GUI Settings"))    { showGUI_Settings_Panel  = !showGUI_Settings_Panel     ;}
         if(ImGui::MenuItem("Symbology"))       { showSymbologyPanel      = !showSymbologyPanel         ;}
-        if(ImGui::MenuItem("OpenSteer"))       { showOpenSteerPanel      = !showOpenSteerPanel         ;}
+        if(ImGui::MenuItem("OpenSteer"))       { showOpenSteerTestPanel      = !showOpenSteerTestPanel         ;}
 
         ImGui::EndMenu();
     }
@@ -418,7 +418,7 @@ void GUI::attributePanel(const string & attrsStr)
     ImGui::End();
 }
 
-void GUI::mainLoop()
+void GUI::mainLoop(GLFWwindow * window)
 {
     if(!Buf) {  Buf = new ImGuiTextBuffer() ;}
     // Game loop
@@ -518,6 +518,7 @@ void GUI::mainLoop()
     attributePanel(attrsStr);
     geosTestPanel();
     openSteerTestPanel();
+    openSteerPanel();
 
     ImGui::End();
 
@@ -535,7 +536,7 @@ void GUI::mainLoop()
 
 #ifdef __EMSCRIPTEN__
 
-    refresh(mainWindow);
+    refresh();
 
 #endif
 }

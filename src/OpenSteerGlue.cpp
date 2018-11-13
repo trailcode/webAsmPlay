@@ -47,16 +47,17 @@ void openSteerDisplayFunc();
 
 namespace
 {
-    const double scaleValue = 1.0 / 60.0;
+    const double scaleValue = 1.0 / (60.0 * 2.0);
 
     const dmat4 geomTrans(scale(dmat4(1.0), dvec3(scaleValue, scaleValue, scaleValue)));
 
     const dmat4 geomInverseTrans(inverse(geomTrans));
-    //const dmat4 geomInverseTrans(scale(dmat4(1.0), dvec3(60, 60, 60)));
 }
 
 void OpenSteerGlue::init(Canvas * canvas, Network * network)
 {
+    //return;
+    
     dmess("OpenSteerGlue::init");
 
     //OpenSteer::OpenSteerDemo::initialize();
@@ -64,6 +65,8 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
     ZombiePlugin::setNetwork(network);
 
     OpenSteer::OpenSteerDemo::initialize();
+
+    dmess("DOne OpenSteer::OpenSteerDemo::initialize();");
 
     GUI::addUpdatable([canvas]()
     {
@@ -78,9 +81,8 @@ const dmat4 & OpenSteerGlue::getGeomInverseTrans()  { return geomInverseTrans ;}
 
 PolylineSegmentedPathwaySingleRadius * OpenSteerGlue::getPath(const unique_ptr<vector<Coordinate> > & path)
 {
-    dmess("OpenSteerGlue::getPath");
-
-    const float pathRadius = 0.0001;
+    //const float pathRadius = 2.0;
+    const float pathRadius = 1.0;
 
     vector<Vec3> points;
 
@@ -88,17 +90,10 @@ PolylineSegmentedPathwaySingleRadius * OpenSteerGlue::getPath(const unique_ptr<v
 
     unordered_set<dvec3> seen;
 
-    dmess("path->size() " << path->size());
-
     for(size_t i = 0; i < path->size(); ++i)
     {
         const dvec3 pos(geomInverseTrans * dvec4(__((*path)[i]), 0, 1));
         
-        //const dvec3 pos();
-        //const dvec3 pos(__((*path)[i]), 0);
-
-        //dmess("pos " << pos);
-
         if(seen.find(pos) != seen.end())
         {
             dmess("Seen!");

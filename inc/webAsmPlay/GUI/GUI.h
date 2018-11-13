@@ -60,7 +60,7 @@ public:
 
     static void setupCallbacks(GLFWwindow* window);
     static void initOpenGL();
-    static void mainLoop();
+    static void mainLoop(GLFWwindow * window);
     static void refresh();
 
     static void loadState();
@@ -91,6 +91,7 @@ private:
     static void GUI_Settings_Panel();
     static void symbologyPanel();
     static void openSteerTestPanel();
+    static void openSteerPanel();
 
     static void showHelpMarker(const char* desc);
 
@@ -112,6 +113,7 @@ private:
     static bool showAttributePanel;
     static bool showGUI_Settings_Panel;
     static bool showSymbologyPanel;
+    static bool showOpenSteerTestPanel;
     static bool showOpenSteerPanel;
 
     static GLFWwindow * mainWindow;

@@ -36,7 +36,7 @@ using namespace OpenSteer;
 
 namespace
 {
-    int const gPedestrianStartCount = 1000;
+    int const gPedestrianStartCount = 1500;
     bool gUseDirectedPathFollowing = true;  // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
 
@@ -186,63 +186,20 @@ void ZombiePlugin::serialNumberAnnotationUtility(const AbstractVehicle & selecte
     }
 }
 
-PolylineSegmentedPathwaySingleRadius* getTestPath();
-
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/renderables/Renderable.h>
-#include <webAsmPlay/Util.h>
-#include <webAsmPlay/GeosUtil.h>
-
-extern Canvas * theCanvas;
-
-std::vector<Renderable *> paths;
-
 void ZombiePlugin::drawPathAndObstacles()
 {
     typedef PolylineSegmentedPathwaySingleRadius::size_type size_type;
-            
-    for(auto r : paths) { delete r ;}
 
-    paths.clear();
-
+    /*            
     for (iterator i = crowd.begin(); i != crowd.end(); i++)
     {
         const PolylineSegmentedPathwaySingleRadius& path = *(*i)->path;
 
-        /*
-        std::vector<glm::dvec2> verts;
-
-        for(size_t i = 0; i < path.pointCount(); ++i)
-        {
-            Vec3 v = path.point(i);
-
-            verts.push_back(glm::dvec2(v.x, v.z));
-        }
-
-        Renderable * r = Renderable::create(geosUtil::getLineString(verts)->buffer(0.0010, 3));
-
-        r->setRenderFill(true);
-        r->setRenderOutline(true);
-
-        theCanvas->addRenderable(r);
-
-        paths.push_back(r);
-        */
-
         for (size_type i = 1; i < path.pointCount(); ++i ) {
             drawLine (path.point( i ), path.point( i-1) , gGreen);
         }
-        //drawLine (Vec3(0,0,0), Vec3(10,0,10) , gYellow);
     }
-
-    // draw a line along each segment of path
-    /*
-    const PolylineSegmentedPathwaySingleRadius& path = *getTestPath ();
-    for (size_type i = 1; i < path.pointCount(); ++i ) {
-        drawLine (path.point( i ), path.point( i-1) , gRed);
-    }
-    //*/
-
+    */
     
     /*
     // draw obstacles

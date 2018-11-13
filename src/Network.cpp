@@ -176,7 +176,7 @@ void Network::findPath(const PointOnEdge & end)
 // Modified from: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-priority_queue-stl/
 vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnEdge & end)
 {
-    dmess("start Network::findPath");
+    //dmess("start Network::findPath");
 
     toRender.clear();
 
@@ -188,7 +188,7 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
     const size_t startIndex = nodeMap[start.second->start];
 
-    dmess("startIndex " << startIndex << " nodeMap " << nodeMap.size());
+    //dmess("startIndex " << startIndex << " nodeMap " << nodeMap.size());
 
     vector<int> dist(nodes.size(), INF);
 
@@ -216,7 +216,7 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
             if(x.second == end.second)
             {
-                dmess("Done!");
+                //dmess("Done!");
 
                 parent[v] = u;
 
@@ -315,10 +315,10 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
     }
     else
     {
-        dmess("Implement me!");
+        //dmess("Implement me!");
     }
 
-    dmess("end Network::findPath");
+    //dmess("end Network::findPath");
 
     return NULL;
 }
@@ -327,8 +327,6 @@ Canvas * theCanvas = NULL;
 
 unique_ptr<vector<Coordinate> > Network::getRandomPath()
 {
-    dmess("Network::getRandomPath");
-
     unique_ptr<vector<Coordinate> > coords = NULL;
 
     for(; !coords ;)
@@ -336,31 +334,10 @@ unique_ptr<vector<Coordinate> > Network::getRandomPath()
         Edge * A = edges[rand() % edges.size()];
         Edge * B = edges[rand() % edges.size()];
 
-        dmess("Getting path " << A << " " << B);
-
         coords = unique_ptr<vector<Coordinate> >(findPath(PointOnEdge(A->start, A), PointOnEdge(B->end, B)));
     }
 
-    //transformInPlace(*coords, client->getInverseTrans());
     transformInPlace(*coords, client->getTrans());
 
-    coords = DouglasPeuckerLineSimplifier::simplify(*coords, 0.000001);
-
-    LineString * ls = GeometryFactory::getDefaultInstance()->createLineString(new CoordinateArraySequence(new vector<Coordinate>(*coords), 2));
-
-    dmess("client->getTrans() " << mat4ToStr(client->getTrans()));
-
-    //Renderable * r = Renderable::create(ls->buffer(0.00005, 3), client->getTrans());
-    Renderable * r = Renderable::create(ls->buffer(0.0005, 3));
-
-    r->setRenderFill(true);
-    r->setRenderOutline(true);
-
-    dmess("r " << r);
-
-    theCanvas = client->getCanvas();
-
-    //client->getCanvas()->addRenderable(r);
-
-    return coords;
+    return DouglasPeuckerLineSimplifier::simplify(*coords, 0.000001);
 }

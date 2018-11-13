@@ -148,8 +148,6 @@ void Zombie::reset()
     endPoint0 = path->point(0);
     endPoint1 = path->point(path->pointCount() - 1);
 
-    dmess("path->length() " << path->length());
-
     // set initial position
     // (random point on path + random horizontal offset)
     const float d = path->length() * frandom01();
@@ -277,7 +275,8 @@ Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
 
 void Zombie::draw()
 {
-    drawBasic2dCircularVehicle (*this, gGray50);
+    //drawBasic2dCircularVehicle (*this, gGray50);
+    drawBasic2dCircularVehicle (*this, gYellow);
     drawTrail ();
 }
 
