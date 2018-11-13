@@ -88,6 +88,10 @@ namespace OpenSteer {
         //     XXX  class structure this becomes the constructor
         static void initialize (void);
 
+        static void updateSimulation();
+
+        static void redraw();
+
         // main update function: step simulation forward and redraw scene
         static void updateSimulationAndRedraw (void);
 

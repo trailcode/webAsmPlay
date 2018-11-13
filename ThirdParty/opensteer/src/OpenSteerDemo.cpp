@@ -153,9 +153,7 @@ OpenSteer::OpenSteerDemo::initialize (void)
 // ----------------------------------------------------------------------------
 // main update function: step simulation forward and redraw scene
 
-
-void 
-OpenSteer::OpenSteerDemo::updateSimulationAndRedraw (void)
+void OpenSteer::OpenSteerDemo::updateSimulation()
 {
     // update global simulation clock
     clock.update ();
@@ -168,10 +166,21 @@ OpenSteer::OpenSteerDemo::updateSimulationAndRedraw (void)
     // run selected PlugIn (with simulation's current time and step size)
     updateSelectedPlugIn (clock.getTotalSimulationTime (),
                           clock.getElapsedSimulationTime ());
+}
 
+void OpenSteer::OpenSteerDemo::redraw()
+{
     // redraw selected PlugIn (based on real time)
     redrawSelectedPlugIn (clock.getTotalRealTime (),
                           clock.getElapsedRealTime ());
+}
+
+void 
+OpenSteer::OpenSteerDemo::updateSimulationAndRedraw (void)
+{
+    updateSimulation();
+
+    redraw();
 }
 
 

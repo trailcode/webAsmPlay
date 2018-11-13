@@ -25,6 +25,7 @@
 */
 
 #include <unordered_set>
+#include <thread>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/hash.hpp>
 #include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
@@ -34,6 +35,7 @@
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/ZombiePlugin.h>
+#include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/OpenSteerGlue.h>
 
@@ -52,6 +54,12 @@ namespace
     const dmat4 geomTrans(scale(dmat4(1.0), dvec3(scaleValue, scaleValue, scaleValue)));
 
     const dmat4 geomInverseTrans(inverse(geomTrans));
+
+    thread * openSteerThread = NULL;
+
+    unique_ptr<Renderable> openSteerGeom;
+
+    mutex openSteerMutex;
 }
 
 void OpenSteerGlue::init(Canvas * canvas, Network * network)
@@ -66,13 +74,41 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
     OpenSteer::OpenSteerDemo::initialize();
 
-    dmess("DOne OpenSteer::OpenSteerDemo::initialize();");
+    openSteerThread = new thread([]()
+    {
+        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
+        glfwMakeContextCurrent(threadWin);
+
+        gl3wInit();
+
+        for(;;)
+        {
+            //openSteerDisplayFunc();
+            OpenSteer::OpenSteerDemo::updateSimulation();
+
+            lock_guard<mutex> _(openSteerMutex);
+
+            OpenSteer::OpenSteerDemo::redraw();
+
+            openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans));
+        }
+
+        // TODO cleanup threadWin!
+    });
+
+    dmess("Done OpenSteer::OpenSteerDemo::initialize();");
 
     GUI::addUpdatable([canvas]()
     {
-        openSteerDisplayFunc();
+        //openSteerDisplayFunc();
 
-        unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans))->render(canvas);
+        //unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans))->render(canvas);
+        lock_guard<mutex> _(openSteerMutex);
+
+        if(openSteerGeom) { openSteerGeom->render(canvas) ;}
     });
 }
 
