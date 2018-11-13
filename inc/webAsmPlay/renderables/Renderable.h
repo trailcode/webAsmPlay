@@ -27,9 +27,7 @@
 #ifndef __WEB_ASM_PLAY__GEOS_RENDERABLE_H__
 #define __WEB_ASM_PLAY__GEOS_RENDERABLE_H__
 
-#include <vector>
 #include <functional>
-#include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
 #include <geos/geom/Geometry.h>
 #include <webAsmPlay/Types.h>

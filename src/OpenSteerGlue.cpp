@@ -27,11 +27,29 @@
 #include <OpenSteer/OpenSteerDemo.h>
 #include <OpenSteer/Draw.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
+#include <webAsmPlay/ZombiePlugin.h>
+#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/OpenSteerGlue.h>
 
-void OpenSteerGlue::init()
+using namespace std;
+
+void openSteerDisplayFunc();
+
+void OpenSteerGlue::init(Canvas * canvas, Network * network)
 {
     dmess("OpenSteerGlue::init");
 
+    //OpenSteer::OpenSteerDemo::initialize();
+
+    ZombiePlugin::setNetwork(network);
+
     OpenSteer::OpenSteerDemo::initialize();
+
+    GUI::addUpdatable([canvas]()
+    {
+        openSteerDisplayFunc();
+
+        unique_ptr<Renderable>(DeferredRenderable::createFromQueued())->render(canvas);
+    });
 }

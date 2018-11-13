@@ -1426,7 +1426,7 @@ void openSteerKeyboardFunc (unsigned char key)
 void openSteerDisplayFunc()
 {
     // clear color and depth buffers
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // run simulation and draw associated graphics
     OpenSteer::OpenSteerDemo::updateSimulationAndRedraw ();
@@ -1447,7 +1447,7 @@ void openSteerDisplayFunc()
     OpenSteer::checkForDrawError ("OpenSteerDemo::updateSimulationAndRedraw");
 
     // double buffering, swap back and front buffers
-    glFlush ();
+    //glFlush ();
     //glutSwapBuffers();
 }
 

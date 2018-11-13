@@ -44,6 +44,7 @@
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeometryConverter.h>
+#include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableMesh.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
@@ -53,6 +54,7 @@
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeoClientRequest.h>
+#include <webAsmPlay/ZombiePlugin.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GeoClient.h>
@@ -800,6 +802,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     GUI::progress("Linestring index:", 1.0);
 
     network->setEdges(edges);
+
+    OpenSteerGlue::init(canvas, network);
 
     dmess("linestring quadTree " << quadTreeLineStrings->depth() << " " << geoms.size());
 

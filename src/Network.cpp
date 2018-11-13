@@ -315,6 +315,8 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
     }
 
     dmess("end Network::findPath");
+
+    return NULL;
 }
 
 void Network::getRandomPath()

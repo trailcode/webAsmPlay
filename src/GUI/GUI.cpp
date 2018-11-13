@@ -55,6 +55,7 @@
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/SkyBox.h>
@@ -100,12 +101,16 @@ static int mouse_buttons_down = 0;
 
 static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
 
+void openSteerDisplayFunc();
+
 GeosTestCanvas  * GUI::geosTestCanvas  = NULL;
 OpenSteerCanvas * GUI::openSteerCanvas = NULL;
 Canvas          * GUI::canvas          = NULL;
 SkyBox          * GUI::skyBox          = NULL;
 
 vector<Canvas *> GUI::auxCanvases;
+
+list<Updatable> updatables;
 
 bool isFirst = true;
 
@@ -488,9 +493,18 @@ void GUI::mainLoop()
 
     showCursorPositionOverlay(NULL, client->getInverseTrans() * pos);
 
-    string attrsStr = client->doPicking(mode, pos);
+    string attrsStr = client->doPicking(mode, pos); // TODO move to updatables
 
-    client->doPathFinding(mode, pos);
+    client->doPathFinding(mode, pos); // TODO move to updatables
+
+    for(auto & i : updatables) { i() ;}
+
+    //dmess("network " << client->getNetwork());
+    /*
+    openSteerDisplayFunc();
+
+    unique_ptr<Renderable>(DeferredRenderable::createFromQueued())->render(canvas);
+    */
 
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
 
@@ -590,3 +604,9 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     //canvas->addRenderable(gridPlane);
 }
 
+Updatable GUI::addUpdatable(Updatable updatable)
+{
+    updatables.push_back(updatable);
+
+    return updatable;
+}

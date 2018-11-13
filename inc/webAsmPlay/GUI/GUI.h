@@ -28,6 +28,7 @@
 #define __WEB_ASM_PLAY_GUI_H__
 
 #include <string>
+#include <webAsmPlay/Types.h>
 
 class GLFWwindow;
 class Canvas;
@@ -69,7 +70,9 @@ public:
 
     static float getHeightMultiplier();
 
-    static GLFWwindow * getMainWindow(); 
+    static GLFWwindow * getMainWindow();
+
+    static Updatable addUpdatable(Updatable updatable);
 
 private:
 

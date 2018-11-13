@@ -27,6 +27,7 @@
 #ifndef __WEB_ASM_PLAY_TYPES_H__
 #define __WEB_ASM_PLAY_TYPES_H__
 
+#include <functional>
 #include <tuple>
 #include <vector>
 #include <memory>
@@ -34,6 +35,7 @@
 
 class Attributes;
 class Edge;
+class Renderable;
 
 namespace geos
 {
@@ -70,6 +72,8 @@ typedef std::vector<float> FloatVec;
 typedef std::vector<uint32_t> Uint32Vec;
 
 typedef std::vector<std::string> StrVec;
+
+typedef std::function<void ()> Updatable;
 
 #endif // __WEB_ASM_PLAY_TYPES_H__
 

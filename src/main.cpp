@@ -29,7 +29,6 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
@@ -129,8 +128,6 @@ int main(int, char**)
     GUI::setupCallbacks(window);
     GUI::initOpenGL();
     GUI::loadState();
-
-    OpenSteerGlue::init();
 
     #ifdef __EMSCRIPTEN__
         

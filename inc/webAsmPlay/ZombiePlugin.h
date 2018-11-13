@@ -28,6 +28,10 @@
 #define __WEB_ASM_PLAY_ZOMBIE_PLUGIN_H__
 
 #include <OpenSteer/PlugIn.h>
+#include <OpenSteer/Proximity.h>
+#include <webAsmPlay/Zombie.h>
+
+class Network;
 
 namespace OpenSteer
 {
@@ -37,6 +41,8 @@ namespace OpenSteer
 class ZombiePlugin : public OpenSteer::PlugIn
 {
 public:
+
+    typedef OpenSteer::AbstractProximityDatabase<OpenSteer::AbstractVehicle *> ProximityDatabase; // TODO Code dup!
 
     const char * name();
 
@@ -71,13 +77,16 @@ public:
 
     const OpenSteer::AVGroup & allVehicles();
 
-    //Pedestrian::groupType crowd;
+    static Network * setNetwork(Network * network);
+    static Network * getNetwork();
 
-    //typedef Pedestrian::groupType::const_iterator iterator;
+    Zombie::groupType crowd;
+
+    typedef Zombie::groupType::const_iterator iterator;
 
     OpenSteer::Vec3 gridCenter;
 
-    OpenSteer::ProximityDatabase * pd;
+    ProximityDatabase * pd;
 
     int population;
 

@@ -28,17 +28,25 @@
 #define __WEB_ASM_PLAY_ZOMBIE_H__
 
 #include <OpenSteer/SimpleVehicle.h>
+#include <OpenSteer/Proximity.h>
 
 namespace OpenSteer
 {
-    class ProximityDatabase;
+    class PolylineSegmentedPathwaySingleRadius;
 }
 
-class Zombi : public OpenSteer::SimpleVehicle
+class Zombie : public OpenSteer::SimpleVehicle
 {
 public:
 
-    virtual ~Zombi();
+    typedef std::vector<Zombie *> groupType;
+
+    typedef OpenSteer::AbstractProximityDatabase        <OpenSteer::AbstractVehicle *> ProximityDatabase;
+    typedef OpenSteer::AbstractTokenForProximityDatabase<OpenSteer::AbstractVehicle *> ProximityToken;
+    
+    Zombie(ProximityDatabase & pd);
+
+    virtual ~Zombie();
 
     // reset all instance state
     void reset();
@@ -64,7 +72,18 @@ public:
 
     void annotateAvoidObstacle(const float minDistanceToCollision);
 
-    void newPD(OpenSteer::ProximityDatabase& pd);
+    void newPD(ProximityDatabase & pd);
+
+    ProximityToken * proximityToken;
+
+    static OpenSteer::AVGroup neighbors;
+
+    OpenSteer::PolylineSegmentedPathwaySingleRadius * path;
+
+    int pathDirection;
+
+    OpenSteer::Vec3 endPoint0;
+    OpenSteer::Vec3 endPoint1;
 
 private:
 };

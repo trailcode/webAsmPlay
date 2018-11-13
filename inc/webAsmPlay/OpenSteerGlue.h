@@ -27,11 +27,14 @@
 #ifndef __WEB_ASM_PLAY_OPEN_STEER_H__
 #define __WEB_ASM_PLAY_OPEN_STEER_H__
 
+class Canvas;
+class Network;
+
 class OpenSteerGlue
 {
 public:
 
-  static void init();
+  static void init(Canvas * canvas, Network * network);
 
 private:
 };
