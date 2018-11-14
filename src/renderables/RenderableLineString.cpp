@@ -52,9 +52,9 @@ RenderableLineString::RenderableLineString( const GLuint  vao,
 
 RenderableLineString::~RenderableLineString()
 {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers     (1, &ebo);
-    glDeleteBuffers     (1, &vbo);
+    GL_CHECK(glDeleteVertexArrays(1, &vao));
+    GL_CHECK(glDeleteBuffers     (1, &ebo));
+    GL_CHECK(glDeleteBuffers     (1, &vbo));
 }
 
 Renderable * RenderableLineString::create(  const LineString * lineString,
@@ -134,7 +134,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
         if(showProgress) { doProgress("(3/6) Creating geometry:", i, lineStrings.size(), startTime) ;}
 
         const Geometry  * geom        = get<0>(lineStrings[i]);
-        const GLuint      symbologyID = get<1>(lineStrings[i]);
+        const float       symbologyID = (float(get<1>(lineStrings[i]) * 4) + 0.5) / 32.0;
 
         const vector<Coordinate> & coords = *dynamic_cast<const LineString *>(geom)->getCoordinatesRO()->toVector();
 
@@ -148,7 +148,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
         {
             append2f(vertsPtr, trans * vec4(coords[0].x, coords[0].y, 0, 1));
 
-            *vertsPtr = (float(symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
+            append(vertsPtr, symbologyID);
             
             indices.push_back(index++);
 
@@ -156,7 +156,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
             {
                 append2f(vertsPtr, trans * vec4(coords[i].x, coords[i].y, 0, 1));
                 
-                *vertsPtr = (float(symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
+                append(vertsPtr, symbologyID);
 
                 indices.push_back(index);
                 indices.push_back(index);
@@ -166,7 +166,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
 
             append2f(vertsPtr, trans * vec4(coords.rbegin()->x, coords.rbegin()->y, 0, 1));
 
-            *vertsPtr = (float(symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
+            append(vertsPtr, symbologyID);
 
             indices.push_back(index++);
         }
@@ -184,20 +184,20 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
                                             const bool        isMulti)
 {
     GLuint vao = 0;
-    GLuint ebo = 0; // Try to remove
+    GLuint ebo = 0;
     GLuint vbo = 0;
 
-    glGenVertexArrays(1, &vao); // TODO check for errors! Return null if error!
-    glGenBuffers     (1, &ebo);
-    glGenBuffers     (1, &vbo);
+    GL_CHECK(glGenVertexArrays(1, &vao));
+    GL_CHECK(glGenBuffers     (1, &ebo));
+    GL_CHECK(glGenBuffers     (1, &vbo));
     
-    glBindVertexArray(vao);
+    GL_CHECK(glBindVertexArray(vao));
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW));
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * verts.size(), &verts[0], GL_STATIC_DRAW);
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * verts.size(), &verts[0], GL_STATIC_DRAW));
 
     return new RenderableLineString(vao,
                                     ebo,
@@ -210,27 +210,26 @@ void RenderableLineString::render(Canvas * canvas) const
 {
     shader->bind(canvas, true);
     
-    glBindVertexArray(vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER,         vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    GL_CHECK(glBindVertexArray(                    vao));
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
     
-    glDisable(GL_DEPTH_TEST);
+    GL_CHECK(glDisable(GL_DEPTH_TEST));
 
     if(!isMulti)
     {
         shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
 
-        glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL);
+        GL_CHECK(glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL));
     }
     else
     {
         shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
         shader->enableColorArray (1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
-        glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, NULL);
+        GL_CHECK(glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, NULL));
     }
 
-    glBindVertexArray(0);
+    GL_CHECK(glBindVertexArray(0));
 }
 

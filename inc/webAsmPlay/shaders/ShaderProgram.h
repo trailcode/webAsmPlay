@@ -34,8 +34,7 @@
 #else
     #include <GL/gl3w.h>
 #endif
-#include <string>
-#include <vector>
+
 #include <unordered_map>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>

@@ -25,8 +25,6 @@
   \copyright 2018
 */
 
-#include <geos/geom/Point.h>
-#include <geos/geom/LineString.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/algorithm/distance/DistanceToPoint.h>
 #include <geos/algorithm/distance/PointPairDistance.h>
@@ -114,10 +112,8 @@ pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _
 
         if(area >= minArea) { continue ;}
 
-        minArea = area; 
-
-        smallest = get<0>(*data);
-
+        minArea       = area; 
+        smallest      = get<0>(*data);
         smallestAttrs = get<2>(*data); 
     }
 
@@ -179,20 +175,9 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
             if(!edge) { break ;}
 
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_BLEND);
-
             edge->getRenderable()->render(canvas);
 
             canvas->renderCursor(trans * dvec4(pointOnEdge, 0, 1));
-
-            //if(!GUI::leftMouseDown()) { return edge->getAttributes()->toString() ;}
-
-            switch(mode)
-            {
-                case GUI::SET_PATH_START_POINT: break;
-                case GUI::FIND_PATH: break;
-            }
 
             return edge->getAttributes()->toString();
         }

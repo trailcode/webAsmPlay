@@ -29,7 +29,6 @@
     #include <emscripten/bind.h>
 #endif
 #include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/Textures.h>
@@ -195,10 +194,7 @@ void SkyBox::render(Canvas * canvas)
     
     skyboxShader->bind();
 
-    const mat4 MVP = mat4(canvas->getProjectionRef()) * centeredView * model;
-
-    skyboxShader->setUniform(MVP_Loc, MVP);
-
+    skyboxShader->setUniform (MVP_Loc,        mat4(canvas->getProjectionRef()) * centeredView * model);
     skyboxShader->setUniformi(cubeTextureLoc, 0);
 
     skyboxShader->enableVertexAttribArray(vertInLoc, 3);
@@ -208,7 +204,6 @@ void SkyBox::render(Canvas * canvas)
     GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, texID));
     GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 36));
     GL_CHECK(glDepthMask(GL_TRUE));
-    GL_CHECK(glFlush());
 }
 
 vector<SkyBox *> SkyBox::getInstances() { return instances ;}

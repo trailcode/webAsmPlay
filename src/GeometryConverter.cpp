@@ -24,10 +24,8 @@
   \copyright 2018
 */
 
-#include <glm/vec2.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LinearRing.h>
-#include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/GeometryFactory.h>
@@ -39,7 +37,7 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-string GeometryConverter::convert(const geos::geom::Polygon * poly, const Attributes * attrs)
+string GeometryConverter::convert(const Polygon * poly, const Attributes * attrs)
 {
     stringstream ret;
 

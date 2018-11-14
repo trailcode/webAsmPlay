@@ -34,6 +34,7 @@
 #else
     #include <GL/gl3w.h>    // Initialize with gl3wInit()
 #endif
+
 #include <glm/vec2.hpp>
 
 class FrameBuffer

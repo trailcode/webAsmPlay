@@ -32,8 +32,7 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram * shaderProgram = NULL;
-
+    ShaderProgram     * shaderProgram   = NULL;
     ColorVertexShader * defaultInstance = NULL;
 
     GLint vertInAttrLoc;

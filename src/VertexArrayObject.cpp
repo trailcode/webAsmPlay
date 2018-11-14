@@ -201,7 +201,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     GLuint vbo  = 0;
     
     GL_CHECK(glGenVertexArrays(1, &vao));
-    GL_CHECK(glBindVertexArray(vao));
+    GL_CHECK(glBindVertexArray(    vao));
 
     GL_CHECK(glGenBuffers(1, &vbo));
     GL_CHECK(glGenBuffers(1, &ebo));

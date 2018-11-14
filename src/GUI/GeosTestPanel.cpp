@@ -24,10 +24,10 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/GUI/ImguiInclude.h>
-#include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GUI/GUI.h>
+#include <webAsmPlay/GUI/ImguiInclude.h>
+#include <webAsmPlay/GeosTestCanvas.h>
 
 void GUI::geosTestPanel()
 {

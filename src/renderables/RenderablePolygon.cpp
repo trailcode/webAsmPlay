@@ -25,14 +25,12 @@
 */
 
 #include <chrono>
-#include <glm/gtc/type_ptr.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/VertexArrayObject.h>
 #include <webAsmPlay/shaders/Shader.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 
 using namespace std;
@@ -40,11 +38,9 @@ using namespace std::chrono;
 using namespace glm;
 using namespace geos::geom;
 
-// TODO Create better variable names. Try to simplify this class.
-
-RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable       (vertexArrayObject->isMulti(),
-                                                                                                  GUI::renderSettingsFillPolygons,
-                                                                                                  GUI::renderSettingsRenderPolygonOutlines),
+RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable(vertexArrayObject->isMulti(),
+                                                                                           GUI::renderSettingsFillPolygons,
+                                                                                           GUI::renderSettingsRenderPolygonOutlines),
                                                                                 vertexArrayObject(vertexArrayObject)
 {
 }
@@ -160,6 +156,4 @@ void RenderablePolygon::render(Canvas * canvas) const
         
         vertexArrayObject->drawLines();
     }
-
-    glDisable(GL_BLEND); // TODO Remove!
 }

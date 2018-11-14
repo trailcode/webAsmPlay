@@ -35,7 +35,6 @@
 
 #include <string>
 #include <functional>
-#include <vector>
 #include <unordered_map>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
@@ -94,8 +93,6 @@ public:
     glm::dmat4 getInverseTrans() const;
 
     std::string doPicking(const char mode, const glm::dvec4 & pos) const;
-
-    void doPathFinding(const char mode, const glm::dvec4 & pos) const;
 
     void addGeometry(const char * data);
 

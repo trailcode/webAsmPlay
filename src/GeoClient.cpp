@@ -29,15 +29,8 @@
 #include <emscripten/fetch.h>
 #endif
 
-#include <utility>
-#include <memory>
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/geom/GeometryFactory.h>
-#include <geos/geom/Polygon.h>
-#include <geos/geom/LineString.h>
-#include <geos/geom/Point.h>
-#include <geos/io/WKTReader.h>
-#include <geos/io/WKBReader.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Util.h>
@@ -62,10 +55,8 @@
 using namespace std;
 using namespace std::chrono;
 using namespace glm;
-using namespace geos::io;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
-//using namespace geos::algorithm::distance;
 
 typedef unordered_map<size_t, GeoRequestGetNumGeoms      *> NumGeomsRequests;
 typedef unordered_map<size_t, GeoRequestLayerBounds      *> LayerBoundsRequests;
@@ -132,8 +123,7 @@ GeoClient::GeoClient(Canvas * canvas) : canvas(canvas)
     quadTreePolygons    = new Quadtree();
     quadTreeLineStrings = new Quadtree();
     quadTreePoints      = new Quadtree();
-
-    network = new Network(this);
+    network             = new Network(this);
 }
 
 GeoClient::~GeoClient()
@@ -668,8 +658,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     {
         doProgress("(5/6) Indexing polygons:", i, geoms.size(), startTime);
 
-        Attributes * attrs;
-
+        Attributes     * attrs;
         const Geometry * g;
         
         tie(attrs, g) = geoms[i];
@@ -701,8 +690,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         Attributes * attrs = geoms[i].first;
 
         GLuint colorID = 0;
-
-        double height = 0.0;
+        double height  = 0.0;
 
         if( attrs->hasStringKey("addr_house") ||
             attrs->hasStringKey("addr::housenumber") ||
@@ -763,11 +751,9 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     {
         doProgress("(2/6) Indexing linestrings:", i, geoms.size(), startTime);
 
-        Attributes * attrs = geoms[i].first;
-
-        const Geometry * geom = geoms[i].second;
-
-        GLuint colorID = 0;
+        Attributes     * attrs   = geoms[i].first;
+        const Geometry * geom    = geoms[i].second;
+        GLuint           colorID = 0;
 
              if(attrs->hasStringKeyValue("highway", "motorway"))     { colorID = 1 ;}
         else if(attrs->hasStringKeyValue("highway", "trunk"))        { colorID = 2 ;}
@@ -779,9 +765,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
         else if(attrs->hasStringKeyValue("highway", "service"))      { colorID = 8 ;}
         else if(attrs->hasStringKey     ("highway"))                 { colorID = 9 ;}
 
-        //Renderable * r = Renderable::create(geom, trans);
-
-        unique_ptr<Geometry> buffered(geom->buffer(0.00001));
+        unique_ptr<Geometry> buffered(geom->buffer(0.00001, 3));
 
         Renderable * r = Renderable::create(buffered.get(), trans);
         
@@ -834,9 +818,8 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
     {
         doProgress("(2/6) Indexing points:", i, geoms.size(), startTime);
 
-        Attributes * attrs = geoms[i].first;
-
-        const Geometry * geom = geoms[i].second;
+        Attributes     * attrs = geoms[i].first;
+        const Geometry * geom  = geoms[i].second;
         
         Renderable * r = Renderable::create(geom, trans);
         
@@ -854,8 +837,6 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
     dmess("Points quadTree " << quadTreePoints->depth() << " " << geoms.size());
 
     Renderable * r = RenderablePoint::create(points, trans, true);
-
-    //r->setShader(ColorDistanceShader::getDefaultInstance());
 
     canvas->addRenderable(r);
     

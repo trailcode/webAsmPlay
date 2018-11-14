@@ -24,8 +24,6 @@
   \copyright 2018
 */
 
-#include <glm/vec4.hpp>
-#include <geos/geom/Coordinate.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
@@ -196,12 +194,6 @@ void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
 
 bool Tessellation::isEmpty() const { return verts == NULL ;}
 
-/*
-const uint32_t * Tessellation::getTriangleIndices() const { return triangleIndices ;}
-uint32_t Tessellation::getNumVerts() const { return numVerts ;}
-uint32_t Tessellation::getNumTriangles() const { return numTriangles ;}
-const Uint32Vec & Tessellation::getCounterVertIndices() const { 
-const Uint32Vec & Tessellation::getLineIndices() const;
-*/
 uint32_t Tessellation::getSymbologyID() const { return symbologyID ;}
+
 double Tessellation::getHeight() const { return height ;}

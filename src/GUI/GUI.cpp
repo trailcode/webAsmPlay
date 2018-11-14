@@ -28,32 +28,18 @@
 #include <emscripten/fetch.h>
 #endif
 
-#include <cmath>
-#include <memory>
-#include <iostream>
-#include <geos/geom/Coordinate.h>
-#include <geos/geom/CoordinateSequenceFactory.h>
-#include <geos/geom/CoordinateSequence.h>
-#include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>
-#include <GLU/tessellate.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <imguitoolbar.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Camera.h>
-#include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
-#include <webAsmPlay/renderables/RenderablePolygon.h>
-#include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/SkyBox.h>
@@ -460,8 +446,6 @@ void GUI::mainLoop(GLFWwindow * window)
     //showCursorPositionOverlay(NULL, pos);
 
     string attrsStr = client->doPicking(mode, pos); // TODO move to updatables
-
-    client->doPathFinding(mode, pos); // TODO move to updatables
 
     for(auto & i : updatables) { i() ;}
 

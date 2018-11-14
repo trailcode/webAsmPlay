@@ -2,7 +2,8 @@
 #define RSMZ_CAMERA_H
 
 #include <vector>
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace rsmz
 {

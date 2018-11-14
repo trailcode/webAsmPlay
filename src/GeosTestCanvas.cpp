@@ -79,11 +79,7 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
     const mat4 trans = scale(mat4(1.0), vec3(0.6, 0.6, 0.6));
 
     Renderable * geom1 = Renderable::create(shape, trans);
-     
-    //geom1->setFillColor(vec4(0.3,0.3,0,1));
-        
-    //geom1->setOutlineColor(vec4(1,0,0,1));
-
+    
     addRenderable(geom1);
 
     geoms.push_back(unique_ptr<Renderable>(geom1));
@@ -100,34 +96,9 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
         {   
             Renderable * geom = Renderable::create(ring, trans);
 
-            //geom->setOutlineColor(vec4(0,1,0,1));
-            //geom->setOutlineColor(1);
-
             addRenderable(geom);
 
             geoms.push_back(unique_ptr<Renderable>(geom));
         }
-
-        /*
-        for(const LineString * ring : getExternalRings(buffered2))
-        {   
-            Geometry * gg = ring->difference(inside.get());
-
-            //dmess("gg " << gg->getGeometryType());
-
-            Renderable * geom = Renderable::create(gg, trans);
-            //Renderable * geom = RenderableLineString::create(ring, trans);
-            //Renderable * geom = RenderableLineString::create(dynamic_cast<const LineString *>(gg), trans);
-            if(geom)
-            {
-                geom->setOutlineColor(vec4(0,1,0,1));
-
-                addRenderable(geom);
-
-                geoms.push_back(unique_ptr<Renderable>(geom));
-            }
-        }
-        //*/
     }
-    
 }

@@ -90,8 +90,6 @@ Attributes::Attributes(const char *& attrs)
 
 Attributes::Attributes(const unordered_map<string, unordered_set<string> > & multiStrsIn)
 {
-    //dmess("multiStrs " << multiStrs.size());
-
     for(const unordered_map<string, unordered_set<string> >::value_type & i : multiStrsIn)
     {
         for(const string & value : i.second) { multiStrs[i.first].push_back(value) ;}

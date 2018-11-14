@@ -24,7 +24,6 @@
   \copyright 2018
 */
 
-//#include <OpenSteer/Annotation.h>
 #include <OpenSteer/Draw.h>
 #include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
 #include <webAsmPlay/OpenSteerGlue.h>

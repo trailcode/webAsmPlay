@@ -25,13 +25,12 @@
   \copyright 2018
 */
 
-#include <glm/vec2.hpp>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeosTestCanvas.h>
+#include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;

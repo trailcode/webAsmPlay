@@ -25,7 +25,6 @@
 */
 
 #include <fstream>
-#include <vector>
 #include <SDL_image.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Textures.h>

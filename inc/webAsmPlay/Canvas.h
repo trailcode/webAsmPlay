@@ -40,18 +40,17 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
-#include "Types.h"
+
+class FrameBuffer;
+class GLFWwindow;
+class Renderable;
+class SkyBox;
 
 namespace rsmz
 {
     class Camera;
     class TrackBallInteractor;
 }
-
-class FrameBuffer;
-class GLFWwindow;
-class Renderable;
-class SkyBox;
 
 class Canvas
 {
@@ -134,11 +133,11 @@ private:
 
     void updateMVP();
 
-    rsmz::TrackBallInteractor * trackBallInteractor;
+    rsmz::TrackBallInteractor * trackBallInteractor = NULL;
 
-    FrameBuffer * frameBuffer;
+    FrameBuffer * frameBuffer = NULL;
 
-    bool wantMouseCapture;
+    bool wantMouseCapture = true;
 
     glm::ivec2 lastShiftKeyDownMousePos;
 
@@ -167,13 +166,13 @@ private:
     
     glm::dvec3 cursorPosWC;
 
-    SkyBox * skyBox;
+    SkyBox * skyBox = NULL;
 
-    bool enabled;
+    bool enabled = true;
 
     std::mutex renderiablesMutex;
 
-    Renderable * cursor;
+    Renderable * cursor = NULL;
 };
 
 #endif // __WEB_ASM_PLAY_CANVAS_H__

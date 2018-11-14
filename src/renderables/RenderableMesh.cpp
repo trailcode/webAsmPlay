@@ -157,5 +157,5 @@ void RenderableMesh::render(Canvas * canvas) const
         vertexArrayObject->drawLines();
     }
 
-    glDisable(GL_BLEND); // TODO Remove!
+    GL_CHECK(glDisable(GL_BLEND)); // TODO Remove!
 }

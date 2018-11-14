@@ -24,9 +24,8 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/Shader.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 
 using namespace std;
@@ -50,17 +49,17 @@ Renderable * RenderablePoint::create(const vec3 & _pos,
     GLuint ebo = 0;
     GLuint vbo = 0;
 
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &ebo);
-    glGenBuffers(1, &vbo);
+    GL_CHECK(glGenVertexArrays(1, &vao));
+    GL_CHECK(glGenBuffers     (1, &ebo));
+    GL_CHECK(glGenBuffers     (1, &vbo));
 
-    glBindVertexArray(vao);
+    GL_CHECK(glBindVertexArray(vao));
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW));
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
 
     return new RenderablePoint(vao, ebo, vbo, false);
 }
@@ -77,13 +76,13 @@ void RenderablePoint::render(Canvas * canvas) const
 {
     shader->bind(canvas, false);
 
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    GL_CHECK(glBindVertexArray(                    vao));
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
 
     shader->enableVertexArray(3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-    glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL);
+    GL_CHECK(glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL));
 }
 
 RenderablePoint::RenderablePoint(   const GLuint      vao,
@@ -101,6 +100,6 @@ RenderablePoint::RenderablePoint(   const GLuint      vao,
 
 RenderablePoint::~RenderablePoint()
 {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers     (1, &vbo);
+    GL_CHECK(glDeleteVertexArrays(1, &vao));
+    GL_CHECK(glDeleteBuffers     (1, &vbo));
 }

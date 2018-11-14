@@ -153,8 +153,6 @@ void Network::setStartEdge(const PointOnEdge & start)
 
 # define INF 0x3f3f3f3f
 
-vector<Renderable *> toRender;
-
 void Network::findPath(const PointOnEdge & end)
 {
     vector<Coordinate> * coords = findPath(startPoint, end);
@@ -177,8 +175,6 @@ void Network::findPath(const PointOnEdge & end)
 vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnEdge & end)
 {
     //dmess("start Network::findPath");
-
-    toRender.clear();
 
     endPoint = end;
 
@@ -233,8 +229,6 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
                 parent[v] = u;
 
-                //toRender.push_back(x.second->getRenderable());
-
                 pq.push(Path(newDist, v));
             }
         }
@@ -255,8 +249,6 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
         for(const auto & i : nodes[next].neighbors)
         {
             if(i.first != v) { continue ;} // TODO should have O(1) access to edge
-
-            //toRender.push_back(i.second->getRenderable());
 
             edges.push_back(i.second);
 

@@ -24,7 +24,6 @@
   \copyright 2018
 */
 
-#include <glm/vec4.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryFactory.h>
@@ -179,8 +178,6 @@ void geosUtil::transformInPlace(vector<Coordinate> & points, const dmat4 & trans
 
 LineString * geosUtil::getLineString(const vector<dvec2> & verts)
 {
-    //dmess("verts " << verts.size());
-
     vector<Coordinate> * coords = new vector<Coordinate>(verts.size());
 
     for(size_t i = 0; i < verts.size(); ++i) { (*coords)[i] = ___(verts[i]) ;}

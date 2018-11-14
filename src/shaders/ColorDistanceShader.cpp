@@ -24,7 +24,6 @@
   \copyright 2018
 */
 
-#include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Textures.h>
@@ -37,9 +36,8 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram * shaderProgram = NULL;
-
-    ColorDistanceShader * defaultInstance = NULL;
+    ShaderProgram       * shaderProgram     = NULL;
+    ColorDistanceShader * defaultInstance   = NULL;
 
     GLint vertInAttrLoc;
     GLint vertColorInAttrLoc;

@@ -24,8 +24,6 @@
   \copyright 2018
 */
 
-#include <glm/vec4.hpp>
-#include <glm/gtc/type_ptr.hpp> // value_ptr
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>

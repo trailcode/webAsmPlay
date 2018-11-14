@@ -27,7 +27,6 @@
 #ifndef __WEB_ASM_PLAY_GUI_H__
 #define __WEB_ASM_PLAY_GUI_H__
 
-#include <string>
 #include <webAsmPlay/Types.h>
 
 class GLFWwindow;

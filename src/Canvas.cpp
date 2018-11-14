@@ -25,7 +25,6 @@
 */
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp> // value_ptr
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
@@ -56,20 +55,11 @@ namespace
 }
 
 Canvas::Canvas( const bool   useFrameBuffer,
-                const vec4 & clearColor) : trackBallInteractor (NULL),
-                                            frameBuffer        (NULL),
-                                            wantMouseCapture   (true),
-                                            useFrameBuffer     (useFrameBuffer),
+                const vec4 & clearColor) :  useFrameBuffer     (useFrameBuffer),
                                             clearColor         (clearColor),
-                                            skyBox             (NULL),
-                                            enabled            (true)
+                                            trackBallInteractor(new TrackBallInteractor())
 {
-    trackBallInteractor = new TrackBallInteractor();
-
     instances.push_back(this);
-
-    //cursor = RenderablePoint::create(vec3(0,0,0));
-    cursor = NULL;
 }
 
 Canvas::~Canvas()
@@ -154,18 +144,8 @@ bool Canvas::preRender()
     return true;
 }
 
-extern vector<Renderable *> toRender;
-
 GLuint Canvas::render()
 {
-    /*
-    getCamera()->setCenter(lookat);
-    getCamera()->setEye   (pos);
-    getCamera()->setUp    (up);
-
-    getCamera()->update();
-    //*/
-
     if(!preRender()) { return 0 ;}
 
     lock_guard<mutex> _(renderiablesMutex);
@@ -175,13 +155,6 @@ GLuint Canvas::render()
     for(const auto r : points)              { r->render(this) ;}
     for(const auto r : deferredRenderables) { r->render(this) ;}
     for(const auto r : meshes)              { r->render(this) ;}
-
-    //dmess("toRender " << toRender.size());
-
-    for(auto i : toRender)
-    {
-        i->render(this);
-    }
 
     return postRender();
 }

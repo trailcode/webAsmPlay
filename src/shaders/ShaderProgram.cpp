@@ -24,7 +24,6 @@
   \copyright 2018
 */
 
-#include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 
@@ -196,15 +195,6 @@ void ShaderProgram::enableVertexAttribArray(const GLint       vertexLoc,
 
     GL_CHECK(glVertexAttribPointer(vertexLoc, size, type, normalized, stride, pointer));
 }
-
-/*
-GLuint ShaderProgram::setTexture1Slot(const GLuint slot) const
-{
-    GL_CHECK(glUniform1i(textureCoordsUniform, slot));
-
-    return slot;
-}
-*/
 
 GLint ShaderProgram::getUniformLoc(const string & name) const
 {

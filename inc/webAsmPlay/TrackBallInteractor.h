@@ -1,7 +1,7 @@
 #ifndef RSMZ_TRACKBALLINTERACTOR_H
 #define RSMZ_TRACKBALLINTERACTOR_H
 
-#include "Camera.h"
+#include <webAsmPlay/Camera.h>
 #include <glm/gtc/quaternion.hpp>
 
 namespace rsmz

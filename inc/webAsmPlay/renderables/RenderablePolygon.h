@@ -35,7 +35,6 @@
     #include <GL/gl3w.h>
 #endif
 
-#include <vector>
 #include <webAsmPlay/Tessellation.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
