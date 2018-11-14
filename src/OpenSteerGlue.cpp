@@ -96,7 +96,7 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
         gl3wInit();
 
-        for(;;)
+        for(; !GUI::isShuttingDown() ;)
         {
             //openSteerDisplayFunc();
             OpenSteerDemo::updateSimulation();

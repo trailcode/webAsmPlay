@@ -73,8 +73,7 @@ public:
     static void refresh();
 
     static void loadState();
-    static void saveState();
-
+    
     static void progress(const std::string & message, const float percent);
 
     static float getHeightMultiplier();
@@ -83,10 +82,16 @@ public:
 
     static Updatable addUpdatable(Updatable updatable);
 
+    static void shutdown();
+
+    static bool isShuttingDown();
+
 private:
 
     GUI() {}
     ~GUI() {}
+
+    static void saveState();
 
     static void showMainToolBar();
     static void showMainMenuBar();
@@ -138,6 +143,8 @@ private:
     static float heightMultiplier;
 
     static int cameraMode;
+
+    static bool shuttingDown;
 };
 
 #endif // __WEB_ASM_PLAY_GUI_H__

@@ -162,7 +162,7 @@ int main(int, char**)
         glfwTerminate();
     #endif
 
-    GUI::saveState();
+    GUI::shutdown();
 
     return 0;
 }

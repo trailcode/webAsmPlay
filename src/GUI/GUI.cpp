@@ -107,6 +107,8 @@ SkyBox          * GUI::skyBox          = NULL;
 
 int GUI::cameraMode = GUI::CAMERA_TRACK_BALL;
 
+bool GUI::shuttingDown = false;
+
 vector<Canvas *> GUI::auxCanvases;
 
 list<Updatable> updatables;
@@ -613,3 +615,12 @@ Updatable GUI::addUpdatable(Updatable updatable)
 }
 
 int GUI::getCameraMode() { return cameraMode ;}
+
+void GUI::shutdown()
+{
+    saveState();
+
+    shuttingDown = true;
+}
+
+bool GUI::isShuttingDown() { return shuttingDown ;}
