@@ -66,6 +66,7 @@ namespace
 }
 
 extern float openSteerCameraDist; // TODO Un-globalize
+extern bool gotoNextZombie; // TODO Un-globalize
 
 namespace
 {
@@ -87,11 +88,22 @@ namespace
 
         pos = vec4(vec3(lookat) + normalize(vec3(pos) - vec3(lookat)) * openSteerCameraDist, 1);
 
+        pos.z = glm::max(float(openSteerCameraDist * 0.5f), float(pos.z)); // When switching camera to next Zombie, keep camera above ground.
+
         //pos = vec4(normalize(vec3(pos) - vec3(lookat)) * dvec3(openSteerCameraDist, openSteerCameraDist, openSteerCameraDist), 1);
     }
 
     void updateOpenSteer()
     {
+        if(gotoNextZombie)
+        {
+            dmess("gotoNextZombie");
+
+            gotoNextZombie = false;
+
+            OpenSteerDemo::selectNextVehicle();
+        }
+
         OpenSteerDemo::updateSimulation();
 
         lock_guard<mutex> _(openSteerMutex);
@@ -122,7 +134,11 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
         gl3wInit();
 
+        dmess("Start OpenSteerDemo::initialize()");
+
         OpenSteerDemo::initialize();
+
+        dmess("Done OpenSteerDemo::initialize()");
 
         for(; !GUI::isShuttingDown() ;) { updateOpenSteer() ;}
 

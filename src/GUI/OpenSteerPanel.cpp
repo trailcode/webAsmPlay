@@ -31,7 +31,9 @@
 
 using namespace OpenSteer;
 
-float openSteerCameraDist = 1.0;
+float openSteerCameraDist = 0.4;
+
+bool gotoNextZombie = false; // TODO find a better way!
 
 void GUI::openSteerPanel()
 {
@@ -44,17 +46,9 @@ void GUI::openSteerPanel()
 
         }
 
-        static bool followZombie = false;
-
-        if(ImGui::Checkbox("Follow Zombie", &followZombie))
-        {
-            dmess("Follow");
-        }
-
-        if(ImGui::SliderFloat("", &openSteerCameraDist, 0.0f, 3.0f, "Height mult: %.3f"))
-        {
-
-        }
+        ImGui::SliderFloat("", &openSteerCameraDist, 0.007f, 1.5f, "Camera dist: %.3f");
+        
+        if(ImGui::Button("Next Zombie")) { gotoNextZombie = true ;}
 
     ImGui::End();
 }
