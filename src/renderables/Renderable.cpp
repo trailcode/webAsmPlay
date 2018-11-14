@@ -52,8 +52,7 @@ Renderable * Renderable::create(const Geometry * geom,
         case GEOS_POINT:                dmess("Implement me!"); return NULL;
         case GEOS_LINESTRING:           
         case GEOS_LINEARRING:           return RenderableLineString::create(dynamic_cast<const LineString *>(geom), trans);
-
-        case GEOS_POLYGON:              return RenderablePolygon::create(   dynamic_cast<const Polygon *>(geom), trans);
+        case GEOS_POLYGON:              return RenderablePolygon   ::create(dynamic_cast<const Polygon    *>(geom), trans);
 
         case GEOS_MULTIPOINT:           dmess("Implement me!"); return NULL;
         case GEOS_MULTILINESTRING:      dmess("Implement me!"); return NULL;

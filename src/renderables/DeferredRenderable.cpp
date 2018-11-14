@@ -23,12 +23,10 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-#include <vector>
+
 #include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 
@@ -60,8 +58,6 @@ namespace
         *triangleIndicesPtr = startIndex++; ++triangleIndicesPtr;
     }
 }
-
-bool thisOne = false;
 
 DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
 {
@@ -96,7 +92,7 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
 
     DeferredRenderable * ret = new DeferredRenderable(vao, ebo, ebo2, vbo, triangleIndices.size(), lineIndices.size());
 
-    vertsAndColors  .clear();
+    vertsAndColors .clear();
     triangleIndices.clear();
     lineIndices    .clear();
 
@@ -197,7 +193,6 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
 
 void DeferredRenderable::render(Canvas * canvas) const
 {
-    //*
     GL_CHECK(glBindVertexArray(vao));
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
@@ -205,8 +200,6 @@ void DeferredRenderable::render(Canvas * canvas) const
 
     glDisable(GL_DEPTH_TEST);
 
-    //canvas->pushModel(rotate(dmat4(1.0), radians(90.0), dvec3(1, 0, 0)));
-    //canvas->pushModel(rotate(canvas->getModelRef(), radians(90.0), dvec3(1, 0, 0)));
     canvas->pushModel(rotate(canvas->getModelRef(), radians(-90.0), dvec3(1, 0, 0)));
 
     shader->bind(canvas, false);
@@ -215,18 +208,11 @@ void DeferredRenderable::render(Canvas * canvas) const
 
     shader->enableColorArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
 
-    //ColorVertexShader::getInstance()->enableVertexAttribArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
-
-    //ColorVertexShader::getInstance()->enableColorAttribArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
-
-    //dmess("numTriIndices " << numTriIndices);
-
     GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
 
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
 
     GL_CHECK(glDrawElements(GL_LINES, numLineIndices, GL_UNSIGNED_INT, NULL));
-    //*/
 
     canvas->popMVP();
 }

@@ -24,10 +24,8 @@
   \copyright 2018
 */
 
-#include <chrono>
-#include <glm/gtc/type_ptr.hpp>
-#include <geos/geom/LineString.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
@@ -36,6 +34,7 @@ using namespace std;
 using namespace std::chrono;
 using namespace glm;
 using namespace geos::geom;
+using namespace geosUtil;
 
 RenderableLineString::RenderableLineString( const GLuint  vao,
                                             const GLuint  ebo,
@@ -75,7 +74,7 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
 {
     if(coords.size() < 2)
     {
-        dmess("Bad gemetry!");
+        dmess("Bad geometry!");
 
         return NULL;
     }
@@ -89,8 +88,7 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
     {
         for(size_t i = 0; i < coords.size(); ++i)
         {
-            *vertsPtr = coords[i].x; ++vertsPtr;
-            *vertsPtr = coords[i].y; ++vertsPtr;
+            append2f(vertsPtr, coords[i]);
 
             indices[i] = i;
         }
@@ -99,10 +97,7 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
     {
         for(size_t i = 0; i < coords.size(); ++i)
         {
-            const vec4 v = trans * vec4(coords[i].x, coords[i].y, 0, 1);
-
-            *vertsPtr = v.x; ++vertsPtr;
-            *vertsPtr = v.y; ++vertsPtr;
+            append2f(vertsPtr, trans * vec4(coords[i].x, coords[i].y, 0, 1));
 
             indices[i] = i;
         }
@@ -151,22 +146,16 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
         }
         else
         {
-            vec4 v = trans * vec4(coords[0].x, coords[0].y, 0, 1);
+            append2f(vertsPtr, trans * vec4(coords[0].x, coords[0].y, 0, 1));
 
-            *vertsPtr = v.x; ++vertsPtr;
-            *vertsPtr = v.y; ++vertsPtr;
-            
             *vertsPtr = (float(symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
             
             indices.push_back(index++);
 
             for(size_t i = 1; i < coords.size() - 1; ++i)
             {
-                const vec4 v = trans * vec4(coords[i].x, coords[i].y, 0, 1);
-
-                *vertsPtr = v.x; ++vertsPtr;
-                *vertsPtr = v.y; ++vertsPtr;
-
+                append2f(vertsPtr, trans * vec4(coords[i].x, coords[i].y, 0, 1));
+                
                 *vertsPtr = (float(symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
 
                 indices.push_back(index);
@@ -175,10 +164,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
                 ++index;
             }
 
-            v = trans * vec4(coords.rbegin()->x, coords.rbegin()->y, 0, 1);
-
-            *vertsPtr = v.x; ++vertsPtr;
-            *vertsPtr = v.y; ++vertsPtr;
+            append2f(vertsPtr, trans * vec4(coords.rbegin()->x, coords.rbegin()->y, 0, 1));
 
             *vertsPtr = (float(symbologyID * 4) + 0.5) / 32.0; ++vertsPtr;
 
@@ -233,19 +219,14 @@ void RenderableLineString::render(Canvas * canvas) const
 
     if(!isMulti)
     {
-        //shader->enableVertexAttribArray();
-        //shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO try to remove!
-        //shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-        shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0); // TODO try to remove!
+        shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
 
         glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL);
     }
     else
     {
-        //shader->enableVertexAttribArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO try to remove!
-        //shader->enableColorAttribArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-        shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // TODO try to remove!
-        shader->enableColorArray(1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+        shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+        shader->enableColorArray (1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
         glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, NULL);
     }

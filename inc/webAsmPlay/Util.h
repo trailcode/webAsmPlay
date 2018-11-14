@@ -75,25 +75,11 @@ static glm::vec4 __(const OpenSteer::Color & v) { return glm::vec4(v.r(), v.g(),
 
 std::wstring stringToWstring(const std::string& t_str);
 
-inline void doProgress( const std::string                                    & message,
-                        const size_t                                         i,
-                        const size_t                                         num,
-                        std::chrono::time_point<std::chrono::system_clock> & startTime,
-                        const size_t                                         sampleRate = 1000)
-{
-    if(i % sampleRate) { return ;}
-
-    const auto now = std::chrono::system_clock::now();
-
-    if((now - startTime).count() > 20000)
-    {
-        GUI::progress(message, float(i) / float(num));
-
-        startTime = now;
-
-        //GUI::refresh();
-    }
-}
+void doProgress(const std::string                                    & message,
+                const size_t                                         i,
+                const size_t                                         num,
+                std::chrono::time_point<std::chrono::system_clock> & startTime,
+                const size_t                                         sampleRate = 1000);
 
 #ifdef OPENGL_CALL_CHECKING
     #define GL_CHECK(stmt) do { stmt; \
@@ -187,6 +173,14 @@ inline glm::vec3 append(float *& dataStream, const glm::vec3 & value)
     memcpy(dataStream, value_ptr(value), sizeof(glm::vec3));
 
     dataStream += 3;
+
+    return value;
+}
+
+inline glm::vec4 append2f(float *& dataStream, const glm::vec4 & value)
+{
+    *dataStream = value.x; ++dataStream;
+    *dataStream = value.y; ++dataStream;
 
     return value;
 }

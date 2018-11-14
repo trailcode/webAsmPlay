@@ -26,9 +26,11 @@
 */
 
 #include <codecvt>
+#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/Util.h>
 
 using namespace std;
+using namespace std::chrono;
 using namespace glm;
 
 string toStr(const mat4 & m)
@@ -84,4 +86,25 @@ wstring stringToWstring(const string& t_str)
 
     //use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
     return converter.from_bytes(t_str);
+}
+
+
+void doProgress( const string             & message,
+                 const size_t               i,
+                 const size_t               num,
+                 time_point<system_clock> & startTime,
+                 const size_t               sampleRate)
+{
+    if(i % sampleRate) { return ;}
+
+    const auto now = std::chrono::system_clock::now();
+
+    if((now - startTime).count() > 20000)
+    {
+        GUI::progress(message, float(i) / float(num));
+
+        startTime = now;
+
+        //GUI::refresh();
+    }
 }

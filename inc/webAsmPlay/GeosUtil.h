@@ -110,6 +110,14 @@ namespace geosUtil
     void transformInPlace(std::vector<geos::geom::Coordinate> & points, const glm::dmat4 & trans);
 
     geos::geom::LineString * getLineString(const std::vector<glm::dvec2> & verts);
+
+    inline geos::geom::Coordinate append2f(float *& dataStream, const geos::geom::Coordinate & v)
+    {
+        *dataStream = v.x; ++dataStream;
+        *dataStream = v.y; ++dataStream;
+
+        return v;
+    }
 };
 
 #endif
