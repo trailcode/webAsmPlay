@@ -32,6 +32,7 @@
 #include <geos/geom/GeometryCollection.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/CoordinateArraySequence.h>
+#include <geos/geom/prep/PreparedLineString.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/GeosUtil.h>
@@ -43,6 +44,7 @@
 using namespace std;
 using namespace glm;
 using namespace geos::geom;
+using namespace geos::geom::prep;
 using namespace geos::index::quadtree;
 using namespace geosUtil;
 
@@ -63,7 +65,12 @@ namespace
             ++counterMyLineString;
         }
 
-        ~MyLineString() { --counterMyLineString ;}
+        ~MyLineString()
+        { 
+            --counterMyLineString;
+
+            delete pls;
+        }
 
         const LineString * getLS() const { return get<1>(*ls) ;}
 
@@ -86,6 +93,13 @@ namespace
             }
         }
 
+        PreparedLineString * getPLS()
+        {
+            if(pls) { return pls ;}
+
+            return pls = new PreparedLineString(getLS());
+        }
+
         void deleteOrigionalGeom()
         {
             //GeometryFactory::getDefaultInstance()->destroyGeometry(get<1>(*ls));
@@ -97,6 +111,8 @@ namespace
         list<LineString *> splits; // TODO try to put the below ls in splits initially. 
 
         AttributedLineString * ls;
+
+        PreparedLineString * pls = NULL;
 
         bool noSplits;
 
@@ -138,7 +154,8 @@ namespace
         {
             if(A->intersects(B))
             {
-                if(A->overlaps(B) || B->overlaps(A))
+                //if(A->overlaps(B) || B->overlaps(A))
+                if(false && A->overlaps(B) || B->overlaps(A))
                 {
                     dmess("jfskdfd");
 
@@ -162,10 +179,8 @@ namespace
     }
 
     // TODO Memory leaks!
-
     inline bool doSplitting(MyLineString * B, const LineString * ls, const LineString * curr)
     {
-        //unique_ptr<Geometry> g(ls->difference(curr));
         Geometry * g = scopedGeosGeometry(ls->difference(curr));
 
         lastNumSplits = 0;
@@ -217,6 +232,21 @@ namespace
 
         return didSplit;
     }
+
+    inline bool samePoint(const geos::geom::Point * A, const geos::geom::Point * B)
+    {
+        return A->getX() == B->getX() && A->getY() == B->getY();
+    }
+
+    inline bool endPointsTouch2D(const geos::geom::LineString * A, const geos::geom::LineString * B)
+    {
+        const Coordinate & P1 = A->getCoordinatesRO()->getAt(0);
+        const Coordinate & P2 = B->getCoordinatesRO()->getAt(0);
+        const Coordinate & P3 = A->getCoordinatesRO()->getAt(A->getCoordinatesRO()->getSize() - 1);
+        const Coordinate & P4 = B->getCoordinatesRO()->getAt(B->getCoordinatesRO()->getSize() - 1);
+
+        return P1.equals2D(P2) || P3.equals2D(P4) || P1.equals2D(P4) || P3.equals2D(P2);
+    }
 }
 
 vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & lineStrings, vector<AttributedLineString> & nonSplitting)
@@ -262,7 +292,7 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
 
         if(!ls->getLS()) { continue ;}
 
-        /*
+        //*
         if(ls->splits.size()) { continue ;}
 
         if(ls->splits.size() > maxNumSplits)
@@ -281,7 +311,8 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
 
         //vector<MyLineString *> intersecting;
 
-        auto curr = ls->getLS();
+        auto curr    = ls->getLS();
+        auto currPLS = ls->getPLS();
 
         //unique_ptr<LineString> currExtended(extendEnds(curr));
 
@@ -294,7 +325,8 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
 
             if(B->getLS() == curr) { continue ;}
             
-            if(false && B->splits.size() > maxNumSplits)
+            //if(false && B->splits.size() > maxNumSplits)
+            if(B->splits.size() > maxNumSplits)
             {
                 didSkip = true;
 
@@ -309,7 +341,7 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
 
                 while (it != B->splits.end())
                 {
-                    if(endPointsTouch(*it, curr))
+                    if(endPointsTouch2D(*it, curr))
                     {
                         ++it;
 
@@ -317,7 +349,8 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
                     }
 
                     //if(intersects(*it, currExtended.get()))
-                    if(intersects(*it, curr))
+                    //if(intersects(*it, curr))
+                    if(currPLS->intersects(*it))
                     {
                         //didSplit |= doSplitting(B, *it, currExtended);
                         didSplit |= doSplitting(B, *it, curr);
@@ -336,10 +369,11 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
 
             if(!B->getLS()) { continue ;}
 
-            if(endPointsTouch(B->getLS(), curr)) { continue ;}
+            if(endPointsTouch2D(B->getLS(), curr)) { continue ;}
 
             //if(!intersects(B->getLS(), currExtended.get())) { continue ;}
-            if(!intersects(B->getLS(), curr)) { continue ;}
+            //if(!intersects(B->getLS(), curr)) { continue ;}
+            if(!currPLS->intersects(B->getLS())) { continue ;}
 
             //intersecting.push_back(B);
 
@@ -353,34 +387,6 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
 
             ls->noSplits = true;
         }
-
-        /*
-        for(auto B : intersecting)
-        {
-            //void doSplitting(MyLineString * B, const LineString * ls, const LineString * curr)
-            if(ls->splits.size())
-            {
-                auto it = ls->splits.begin();
-
-                while (it != ls->splits.end()) // TODO code duplication
-                {
-                    if((*it)->intersects(curr))
-                    {
-                        doSplitting(ls, *it, B->getLS());
-
-                        //dmess("lastNumSplits " << lastNumSplits);
-
-                        it = ls->splits.erase(it);
-                    }
-                    else { ++it ;}
-                }
-            }
-            else
-            {
-                doSplitting(ls, ls->getLS(), B->getLS());
-            }
-        }
-        //*/
     }
 
     for(auto ls : myLineStrings)
@@ -409,12 +415,12 @@ vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineStr
 
     for(auto & i : lineStrings)
     {
-        //if(get<0>(i)->hasStringKey("footway") || get<0>(i)->hasStringKeyValue("footway", "sidewalk") || get<0>(i)->hasStringKeyValue("highway", "footway")) { curr.push_back(i) ;}
-
+        if(get<0>(i)->hasStringKey("footway") || get<0>(i)->hasStringKeyValue("footway", "sidewalk") || get<0>(i)->hasStringKeyValue("highway", "footway")) { curr.push_back(i) ;}
+        //if(get<0>(i)->hasStringKey("footway"))
         //if( get<0>(i)->hasStringKeyValue("highway", "residential") || get<0>(i)->hasStringKeyValue("highway", "service")) { curr.push_back(i) ;}
         //if(get<0>(i)->hasStringKeyValue("highway", "service")) { curr.push_back(i) ;}
         //if(get<0>(i)->hasStringKeyValue("highway", "residential") || get<0>(i)->hasStringKeyValue("highway", "motorway"))
-        if(get<0>(i)->hasStringKeyValue("highway", "motorway"))
+        //if(get<0>(i)->hasStringKeyValue("highway", "motorway"))
         //if(get<0>(i)->hasStringKeyValue("highway", "motorway"))
         {
             curr.push_back(i);
@@ -425,7 +431,7 @@ vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineStr
         }
     }
 
-    return curr;
+    //return curr;
 
     vector<AttributedLineString> nonSplitting;
 

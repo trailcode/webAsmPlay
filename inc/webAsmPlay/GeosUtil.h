@@ -107,19 +107,6 @@ namespace geosUtil
     glm::dvec2 getStartPoint(const geos::geom::LineString * ls);
     glm::dvec2 getEndPoint  (const geos::geom::LineString * ls);
 
-    inline bool samePoint(const geos::geom::Point * A, const geos::geom::Point * B)
-    {
-        return A->getX() == B->getX() && A->getY() == B->getY();
-    }
-
-    inline bool endPointsTouch(const geos::geom::LineString * A, const geos::geom::LineString * B)
-    {
-        return  samePoint(A->getStartPoint(), B->getStartPoint()) ||
-                samePoint(A->getEndPoint(),   B ->getEndPoint())  ||
-                samePoint(A->getStartPoint(), B->getEndPoint())   ||
-                samePoint(A->getEndPoint(),   B->getStartPoint());
-    }
-
     void transformInPlace(std::vector<geos::geom::Coordinate> & points, const glm::dmat4 & trans);
 
     geos::geom::LineString * getLineString(const std::vector<glm::dvec2> & verts);
