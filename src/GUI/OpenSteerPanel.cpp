@@ -37,6 +37,8 @@ bool gotoNextZombie = false; // TODO find a better way!
 
 void GUI::openSteerPanel()
 {
+    if(!showOpenSteerPanel) { return ;}
+    
     ImGui::Begin("OpenSteer Settings", &showOpenSteerPanel);
 
         static int lines = 1000;

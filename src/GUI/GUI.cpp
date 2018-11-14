@@ -93,31 +93,32 @@ using namespace glm;
 
 #define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
-static ImVec4 clear_color = ImColor(114, 144, 154);
-static int mouse_buttons_down = 0;
-
-static bool mouse_buttons[GLFW_MOUSE_BUTTON_LAST + 1] = { false, };
-
-void openSteerDisplayFunc();
-
 GeosTestCanvas  * GUI::geosTestCanvas  = NULL;
 OpenSteerCanvas * GUI::openSteerCanvas = NULL;
 Canvas          * GUI::canvas          = NULL;
 SkyBox          * GUI::skyBox          = NULL;
+GLFWwindow      * GUI::mainWindow      = NULL;
+int               GUI::cameraMode      = GUI::CAMERA_TRACK_BALL;
+bool              GUI::shuttingDown    = false;
+GeoClient       * GUI::client          = NULL;
+vector<Canvas *>  GUI::auxCanvases;
 
-int GUI::cameraMode = GUI::CAMERA_TRACK_BALL;
+namespace
+{
+    bool doShowProgressBar = false;
 
-bool GUI::shuttingDown = false;
+    string progressText = "progress";
 
-vector<Canvas *> GUI::auxCanvases;
+    float progressBarValue = 0.0f;
 
-list<Updatable> updatables;
+    ImGuiTextBuffer * Buf = NULL;
 
-bool isFirst = true;
+    uint32_t infoIcon = 0;
 
-FrameBuffer * frameBuffer = NULL;
+    static char mode = GUI::NORMAL_MODE;
 
-GLFWwindow * GUI::mainWindow = NULL;
+    list<Updatable> updatables;
+}
 
 void errorCallback(int error, const char* description)
 {
@@ -138,16 +139,13 @@ void GUI::refresh()
 #endif
 }
 
+/*
 int counter = 0;
-
 void cback(char* data, int size, void* arg) {
     std::cout << "Callback " << data << " " << size << std::endl;
     counter++;
 }
-
-ImGuiTextBuffer * Buf = NULL;
-
-uint32_t infoIcon = 0;
+*/
 
 struct AppLog
 {
@@ -184,6 +182,11 @@ struct AppLog
     }
 };
 
+namespace
+{
+    AppLog logPanel;
+}
+
 static void showCursorPositionOverlay(bool* p_open, const dvec4 & cursorPos)
 {
     const float DISTANCE = 10.0f;
@@ -217,26 +220,11 @@ static void showCursorPositionOverlay(bool* p_open, const dvec4 & cursorPos)
     ImGui::End();
 }
 
-AppLog logPanel;
-
 void dmessCallback(const string & file, const size_t line, const string & message)
 {
     cout << file << " " << line << " " << message;
     
     if(Buf) { Buf->appendf("%s %i %s", file.c_str(), (int)line, message.c_str()) ;}
-}
-
-GeoClient * GUI::client = NULL;
-
-static char mode = GUI::NORMAL_MODE;
-
-namespace
-{
-    bool doShowProgressBar = false;
-
-    string progressText = "progress";
-
-    float progressBarValue = 0.0f;
 }
 
 void GUI::showProgressBar()
@@ -468,21 +456,14 @@ void GUI::mainLoop(GLFWwindow * window)
 
     const dvec4 pos(canvas->getCursorPosWC(), 1.0);
 
-    //showCursorPositionOverlay(NULL, client->getInverseTrans() * pos);
-    showCursorPositionOverlay(NULL, pos);
+    showCursorPositionOverlay(NULL, client->getInverseTrans() * pos);
+    //showCursorPositionOverlay(NULL, pos);
 
     string attrsStr = client->doPicking(mode, pos); // TODO move to updatables
 
     client->doPathFinding(mode, pos); // TODO move to updatables
 
     for(auto & i : updatables) { i() ;}
-
-    //dmess("network " << client->getNetwork());
-    /*
-    openSteerDisplayFunc();
-
-    unique_ptr<Renderable>(DeferredRenderable::createFromQueued())->render(canvas);
-    */
 
     if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
 
@@ -553,10 +534,10 @@ void GUI::initOpenGL() // TODO, need some code refactor here
 
     GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
 
-    ColorDistanceShader::ensureShader();
+    ColorDistanceShader  ::ensureShader();
     ColorDistanceShader3D::ensureShader();
-    ColorShader::ensureShader();
-    ColorVertexShader::ensureShader();
+    ColorShader          ::ensureShader();
+    ColorVertexShader    ::ensureShader();
     
     canvas = new Canvas(false);
 

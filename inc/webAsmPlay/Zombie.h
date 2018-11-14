@@ -53,6 +53,8 @@ public:
     // reset all instance state
     void reset();
 
+    //void updateSteering(const float currentTime, const float elapsedTime);
+
     void update(const float currentTime, const float elapsedTime);
 
     OpenSteer::Vec3 determineCombinedSteering (const float elapsedTime);

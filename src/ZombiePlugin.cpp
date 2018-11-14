@@ -40,7 +40,7 @@ namespace
 #ifdef __EMSCRIPTEN__
     int const gPedestrianStartCount = 700;
 #else
-    int const gPedestrianStartCount = 1500;
+    int const gPedestrianStartCount = 2000;
 #endif
     bool gUseDirectedPathFollowing = true;  // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
@@ -50,7 +50,7 @@ namespace
     ZombiePlugin gZombiePlugin;
 }
 
-const char * ZombiePlugin::name() { return "Zombies" ;}
+const char * ZombiePlugin::name() { return "Zomb    ies" ;}
 
 float ZombiePlugin::selectionOrderSortKey() { return 0.1f ;}
 

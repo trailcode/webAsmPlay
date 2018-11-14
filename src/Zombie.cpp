@@ -39,43 +39,6 @@ namespace
 {
     bool gUseDirectedPathFollowing = true; // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
-
-    PolylineSegmentedPathwaySingleRadius * gTestPath = NULL;
-
-    
-}
-
-PolylineSegmentedPathwaySingleRadius* getTestPath (void)
-{
-    if (gTestPath == NULL)
-    {
-        const float pathRadius = 2;
-
-        const PolylineSegmentedPathwaySingleRadius::size_type pathPointCount = 7;
-        const float size = 30;
-        const float top = 2 * size;
-        const float gap = 1.2f * size;
-        const float out = 2 * size;
-        const float h = 0.5;
-        const Vec3 pathPoints[pathPointCount] =
-            {Vec3 (h+gap-out,     0,  h+top-out),  // 0 a
-                Vec3 (h+gap,         0,  h+top),      // 1 b
-                Vec3 (h+gap+(top/2), 0,  h+top/2),    // 2 c
-                Vec3 (h+gap,         0,  h),          // 3 d
-                Vec3 (h,             0,  h),          // 4 e
-                Vec3 (h,             0,  h+top),      // 5 f
-                Vec3 (h+gap,         0,  h+top/2)};   // 6 g
-
-        //gEndpoint0 = pathPoints[0];
-        //gEndpoint1 = pathPoints[pathPointCount-1];
-
-        gTestPath = new PolylineSegmentedPathwaySingleRadius (pathPointCount,
-                                                                pathPoints,
-                                                                pathRadius,
-                                                                false);
-    }
-
-    return gTestPath;
 }
 
 #include <webAsmPlay/Canvas.h>
@@ -93,29 +56,6 @@ Zombie::Zombie(ProximityDatabase & pd, Network * network)
     newPD (pd);
 
     path = OpenSteerGlue::getPath(network->getRandomPath());
-
-    /*
-    dmess("path->pointCount() " << path->pointCount());
-
-    if(path->pointCount() > 2)
-    {
-        std::vector<glm::dvec2> verts;
-
-        for(size_t i = 0; i < path->pointCount(); ++i)
-        {
-            Vec3 v = path->point(i);
-
-            verts.push_back(glm::dvec2(v.x, v.z));
-        }
-
-        Renderable * r = Renderable::create(geosUtil::getLineString(verts)->buffer(0.0005, 3));
-
-        r->setRenderFill(true);
-        r->setRenderOutline(true);
-
-        //theCanvas->addRenderable(r);
-    }
-    */
 
     // reset Pedestrian state
     reset ();
@@ -168,11 +108,17 @@ void Zombie::reset()
     proximityToken->updateForNewPosition (position());
 }
 
+/*
+void Zombie::updateSteering(const float currentTime, const float elapsedTime)
+{
+
+}
+*/
+
 void Zombie::update(const float currentTime, const float elapsedTime)
 {
     // apply steering force to our momentum
-    applySteeringForce (determineCombinedSteering (elapsedTime),
-                        elapsedTime);
+    applySteeringForce(determineCombinedSteering(elapsedTime), elapsedTime);
 
     // reverse direction when we reach an endpoint
     if (gUseDirectedPathFollowing)
@@ -183,12 +129,12 @@ void Zombie::update(const float currentTime, const float elapsedTime)
         if (Vec3::distance (position(), endPoint0) < pathRadius )
         {
             pathDirection = +1;
-            annotationXZCircle (pathRadius, endPoint0, darkRed, 20);
+            //annotationXZCircle (pathRadius, endPoint0, darkRed, 20);
         }
         if (Vec3::distance (position(), endPoint1) < pathRadius )
         {
             pathDirection = -1;
-            annotationXZCircle (pathRadius, endPoint1, darkRed, 20);
+            //annotationXZCircle (pathRadius, endPoint1, darkRed, 20);
         }
     }
 
