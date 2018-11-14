@@ -130,7 +130,7 @@ void ColorDistanceShader3D::ensureShader()
 
             outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
 
-            /*
+            //*
             vec4 color = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
             vec3 objectColor = vec3(color);
 
@@ -154,7 +154,7 @@ void ColorDistanceShader3D::ensureShader()
             vec3 result = (ambient + diffuse + specular) * objectColor;
             //outColor = vec4(result, color.w);
             outColor = color;
-            */
+            //*/
         }
     )glsl";
 

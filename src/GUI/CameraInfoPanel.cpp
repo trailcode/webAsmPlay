@@ -1,5 +1,4 @@
-
- /**
+/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -25,63 +24,34 @@
   \copyright 2018
 */
 
-#include <codecvt>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/GUI/ImguiInclude.h>
+#include <webAsmPlay/GUI/GUI.h>
 
-using namespace std;
-using namespace glm;
-
-string toStr(const mat4 & m)
+void GUI::cameraInfoPanel()
 {
-    char buf[1024];
+    if(!showCameraInfoPanel) { return ;}
 
-    sprintf(buf,
-            "[[% 2.9f, % 2.9f, % 2.9f, % 2.9f]\n"
-            " [% 2.9f, % 2.9f, % 2.9f, % 2.9f]\n"
-            " [% 2.9f, % 2.9f, % 2.9f, % 2.9f]\n"
-            " [% 2.9f, % 2.9f, % 2.9f, % 2.9f]]\n",
-            static_cast<double>(m[0][0]), static_cast<double>(m[0][1]), static_cast<double>(m[0][2]), static_cast<double>(m[0][3]),
-            static_cast<double>(m[1][0]), static_cast<double>(m[1][1]), static_cast<double>(m[1][2]), static_cast<double>(m[1][3]),
-            static_cast<double>(m[2][0]), static_cast<double>(m[2][1]), static_cast<double>(m[2][2]), static_cast<double>(m[2][3]),
-            static_cast<double>(m[3][0]), static_cast<double>(m[3][1]), static_cast<double>(m[3][2]), static_cast<double>(m[3][3]));
+    ImGui::Begin("Camera", &showCameraInfoPanel);
 
-    return buf;
-}
+    if(ImGui::CollapsingHeader("Orientation", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Text(("   Eye: " + toStr(canvas->getCamera()->getEyeConstRef()))   .c_str());
+        ImGui::Text(("Center: " + toStr(canvas->getCamera()->getCenterConstRef())).c_str());
+        ImGui::Text(("    Up: " + toStr(canvas->getCamera()->getUpConstRef()))    .c_str());
+    }
 
-string toStr(const vec2 & v)
-{
-    char buf[1024];
+    if(ImGui::CollapsingHeader("View Matrix", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Text(toStr(canvas->getViewRef()).c_str());
+    }
 
-    sprintf(buf, "[% 2.9f, % 2.9f]\n", v.x, v.y);
+    if(ImGui::CollapsingHeader("MVP Matrix", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Text(toStr(canvas->getMVP_Ref()).c_str());
+    }
 
-    return buf;
-}
-
-string toStr(const vec3 & v)
-{
-    char buf[1024];
-
-    sprintf(buf, "[% 2.9f, % 2.9f, % 2.9f]\n", v.x, v.y, v.z);
-
-    return buf;
-}
-
-string toStr(const vec4 & v)
-{
-    char buf[1024];
-
-    sprintf(buf, "[% 2.9f, % 2.9f, % 2.9f, % 2.9f]\n", v.x, v.y, v.z, v.w);
-
-    return buf;
-}
-
-wstring stringToWstring(const string& t_str)
-{
-    //setup converter
-    typedef codecvt_utf8<wchar_t> convert_type;
-
-    wstring_convert<convert_type, wchar_t> converter;
-
-    //use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
-    return converter.from_bytes(t_str);
+    ImGui::End();
 }

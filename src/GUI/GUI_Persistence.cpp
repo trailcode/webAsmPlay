@@ -37,8 +37,6 @@
 using namespace std;
 using namespace glm;
 
-bool GUI::showViewMatrixPanel      = false;
-bool GUI::showMVP_MatrixPanel      = false;
 bool GUI::showSceneViewPanel       = false;
 bool GUI::showPerformancePanel     = false;
 bool GUI::showRenderSettingsPanel  = false;
@@ -48,6 +46,7 @@ bool GUI::showSymbologyPanel       = false;
 bool GUI::showGUI_Settings_Panel   = false;
 bool GUI::showOpenSteerTestPanel   = false;
 bool GUI::showOpenSteerPanel       = false;
+bool GUI::showCameraInfoPanel      = false;
 
 bool GUI::renderSettingsFillPolygons           = true;
 bool GUI::renderSettingsRenderPolygonOutlines  = true;
@@ -74,8 +73,6 @@ void GUI::loadState()
         if(root.find(key) != root.end()) { value = root[key]->AsBool() ;}
     };
 
-    setBool(L"showViewMatrixPanel",     showViewMatrixPanel);
-    setBool(L"showMVP_MatrixPanel",     showMVP_MatrixPanel);
     setBool(L"showSceneViewPanel",      showSceneViewPanel);
     setBool(L"showPerformancePanel",    showPerformancePanel);
     setBool(L"showPerformancePanel",    showPerformancePanel);
@@ -86,6 +83,7 @@ void GUI::loadState()
     setBool(L"showSymbologyPanel",      showSymbologyPanel);
     setBool(L"showOpenSteerTestPanel",  showOpenSteerTestPanel);
     setBool(L"showOpenSteerPanel",      showOpenSteerPanel);
+    setBool(L"showCameraInfoPanel",     showCameraInfoPanel);
 
     setBool(L"renderSettingsFillPolygons",          renderSettingsFillPolygons);
     setBool(L"renderSettingsRenderPolygonOutlines", renderSettingsRenderPolygonOutlines);
@@ -125,8 +123,6 @@ void GUI::saveState()
     JSONObject root;
 
     // Booleans
-    root[L"showViewMatrixPanel"]      = new JSONValue(showViewMatrixPanel);
-    root[L"showMVP_MatrixPanel"]      = new JSONValue(showMVP_MatrixPanel);
     root[L"showSceneViewPanel"]       = new JSONValue(showSceneViewPanel);
     root[L"showPerformancePanel"]     = new JSONValue(showPerformancePanel);
     root[L"showRenderSettingsPanel"]  = new JSONValue(showRenderSettingsPanel);
@@ -136,6 +132,7 @@ void GUI::saveState()
     root[L"showSymbologyPanel"]       = new JSONValue(showSymbologyPanel);
     root[L"showOpenSteerTestPanel"]   = new JSONValue(showOpenSteerTestPanel);
     root[L"showOpenSteerPanel"]       = new JSONValue(showOpenSteerPanel);
+    root[L"showCameraInfoPanel"]      = new JSONValue(showCameraInfoPanel);
 
     root[L"renderSettingsFillPolygons"]           = new JSONValue(renderSettingsFillPolygons);
     root[L"renderSettingsRenderPolygonOutlines"]  = new JSONValue(renderSettingsRenderPolygonOutlines);

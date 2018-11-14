@@ -151,12 +151,11 @@ uint32_t infoIcon = 0;
 
 struct AppLog
 {
-    //ImGuiTextBuffer     Buf;
-    bool                ScrollToBottom;
+    bool ScrollToBottom = true;
 
-    void    Clear()     { Buf->clear(); }
+    void Clear() { Buf->clear(); }
 
-    void    AddLog(const char* fmt, ...)
+    void AddLog(const char* fmt, ...)
     {
         va_list args;
         va_start(args, fmt);
@@ -356,16 +355,15 @@ void GUI::showMainMenuBar()
 
     if(ImGui::BeginMenu("View"))
     {
-        if(ImGui::MenuItem("View Matrix"))     { showViewMatrixPanel     = !showViewMatrixPanel        ;}
-        if(ImGui::MenuItem("MVP Matrix"))      { showMVP_MatrixPanel     = !showMVP_MatrixPanel        ;}
-        if(ImGui::MenuItem("Geos Tests"))      { showSceneViewPanel      = !showSceneViewPanel         ;}
-        if(ImGui::MenuItem("Performance"))     { showPerformancePanel    = !showPerformancePanel       ;}
-        if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel = !showRenderSettingsPanel    ;}
-        if(ImGui::MenuItem("Log"))             { showLogPanel            = !showLogPanel               ;}
-        if(ImGui::MenuItem("Attributes"))      { showAttributePanel      = !showAttributePanel         ;}
-        if(ImGui::MenuItem("GUI Settings"))    { showGUI_Settings_Panel  = !showGUI_Settings_Panel     ;}
-        if(ImGui::MenuItem("Symbology"))       { showSymbologyPanel      = !showSymbologyPanel         ;}
-        if(ImGui::MenuItem("OpenSteer"))       { showOpenSteerTestPanel      = !showOpenSteerTestPanel         ;}
+        if(ImGui::MenuItem("Geos Tests"))      { showSceneViewPanel      ^= 1 ;}
+        if(ImGui::MenuItem("Performance"))     { showPerformancePanel    ^= 1 ;}
+        if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel ^= 1 ;}
+        if(ImGui::MenuItem("Log"))             { showLogPanel            ^= 1 ;}
+        if(ImGui::MenuItem("Attributes"))      { showAttributePanel      ^= 1 ;}
+        if(ImGui::MenuItem("GUI Settings"))    { showGUI_Settings_Panel  ^= 1 ;}
+        if(ImGui::MenuItem("Symbology"))       { showSymbologyPanel      ^= 1 ;}
+        if(ImGui::MenuItem("OpenSteer"))       { showOpenSteerTestPanel  ^= 1 ;}
+        if(ImGui::MenuItem("Camera Info"))     { showCameraInfoPanel     ^= 1 ;}
 
         ImGui::EndMenu();
     }
@@ -385,28 +383,6 @@ void GUI::performacePanel()
         frameTimes[ARRAYSIZE(frameTimes) - 1] = ImGui::GetIO().Framerate;
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::PlotLines("Frame History", frameTimes, ARRAYSIZE(frameTimes), 0, "", 0.0f, 100.0f, ImVec2(0, 50));
-
-    ImGui::End();
-}
-
-void GUI::viewMatrixPanel()
-{
-    if(!showViewMatrixPanel) { return ;}
-
-    ImGui::Begin("View Matrix", &showViewMatrixPanel);
-
-        ImGui::Text(mat4ToStr(canvas->getViewRef()).c_str());
-
-    ImGui::End();
-}
-
-void GUI::MVP_MatrixPanel()
-{
-    if(!showMVP_MatrixPanel) { return ;}
-    
-    ImGui::Begin("MVP Matrix", &showMVP_MatrixPanel);
-
-        ImGui::Text(mat4ToStr(canvas->getMVP_Ref()).c_str());
 
     ImGui::End();
 }
@@ -515,14 +491,13 @@ void GUI::mainLoop(GLFWwindow * window)
     showProgressBar();
     GUI_Settings_Panel();
     performacePanel();
-    viewMatrixPanel();
-    MVP_MatrixPanel();
     renderSettingsPanel();
     symbologyPanel();
     attributePanel(attrsStr);
     geosTestPanel();
     openSteerTestPanel();
     openSteerPanel();
+    cameraInfoPanel();
 
     ImGui::End();
 

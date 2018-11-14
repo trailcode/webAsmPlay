@@ -97,7 +97,6 @@ private:
     static void showMainMenuBar();
     static void showProgressBar();
     static void performacePanel();
-    static void viewMatrixPanel();
     static void MVP_MatrixPanel();
     static void renderSettingsPanel();
     static void attributePanel(const std::string & attrsStr);
@@ -106,6 +105,7 @@ private:
     static void symbologyPanel();
     static void openSteerTestPanel();
     static void openSteerPanel();
+    static void cameraInfoPanel();
 
     static void showHelpMarker(const char* desc);
 
@@ -117,9 +117,7 @@ private:
     static void framebufferSizeCallback (GLFWwindow * window, int width, int height);
     static void windowFocusCallback     (GLFWwindow * window, int focused);
     static void cursorEnterCallback     (GLFWwindow * window, int entered);
-
-    static bool showViewMatrixPanel;
-    static bool showMVP_MatrixPanel;
+    
     static bool showSceneViewPanel;
     static bool showPerformancePanel;
     static bool showRenderSettingsPanel;
@@ -129,6 +127,7 @@ private:
     static bool showSymbologyPanel;
     static bool showOpenSteerTestPanel;
     static bool showOpenSteerPanel;
+    static bool showCameraInfoPanel;
 
     static GLFWwindow * mainWindow;
 
