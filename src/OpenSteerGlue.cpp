@@ -65,26 +65,48 @@ namespace
     mutex openSteerMutex;
 }
 
-//namespace
-//{
+namespace
+{
     vec4 lookat;
     vec4 pos;   
     vec4 up;
-//}
+
+    void updateOpenSteerCamera()
+    {
+        const vec3 scale(0.1, 0.1, 0.1);
+            
+        const dmat4 rotate = glm::rotate(radians(-90.0), dvec3(1, 0, 0));
+
+        lookat = rotate * geomTrans * vec4(__(OpenSteerDemo::camera.target)     * scale, 1);
+        pos    = rotate * geomTrans * vec4(__(OpenSteerDemo::camera.position()) * scale, 1);
+        pos.z *= -1;
+        up     = rotate * vec4(__(OpenSteer::OpenSteerDemo::camera.up()), 1);
+        up.z *= -1;
+    }
+
+    void updateOpenSteer()
+    {
+        OpenSteerDemo::updateSimulation();
+
+        lock_guard<mutex> _(openSteerMutex);
+
+        updateOpenSteerCamera();
+
+        OpenSteerDemo::redraw();
+
+        openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans));
+    }
+}
 
 void OpenSteerGlue::init(Canvas * canvas, Network * network)
 {
-    //return;
-    
     dmess("OpenSteerGlue::init");
-
-    //OpenSteer::OpenSteerDemo::initialize();
 
     ZombiePlugin::setNetwork(network);
 
     OpenSteerDemo::initialize();
 
-    //OpenSteerDemo::camera.fixedDistVOffset = 60.0;
+#ifndef __EMSCRIPTEN__
 
     openSteerThread = new thread([]()
     {
@@ -96,32 +118,12 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
         gl3wInit();
 
-        for(; !GUI::isShuttingDown() ;)
-        {
-            //openSteerDisplayFunc();
-            OpenSteerDemo::updateSimulation();
-
-            lock_guard<mutex> _(openSteerMutex);
-
-            const vec3 scale(0.1, 0.1, 0.1);
-            //const vec3 scale(1,1,1);
-
-            //const dmat4 rotate = glm::rotate(geomTrans, radians(-90.0), dvec3(1, 0, 0));
-            const dmat4 rotate = glm::rotate(radians(-90.0), dvec3(1, 0, 0));
-
-            lookat = rotate * geomTrans * vec4(__(OpenSteerDemo::camera.target)     * scale, 1);
-            pos    = rotate * geomTrans * vec4(__(OpenSteerDemo::camera.position()) * scale, 1);
-            pos.z *= -1;
-            up     = rotate * vec4(__(OpenSteer::OpenSteerDemo::camera.up()), 1);
-            up.z *= -1;
-
-            OpenSteerDemo::redraw();
-
-            openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans));
-        }
+        for(; !GUI::isShuttingDown() ;) { updateOpenSteer() ;}
 
         // TODO cleanup threadWin!
     });
+
+#endif
 
     dmess("Done OpenSteer::OpenSteerDemo::initialize();");
 
@@ -129,6 +131,11 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
     {
         lock_guard<mutex> _(openSteerMutex);
 
+#ifdef __EMSCRIPTEN__
+
+        updateOpenSteer();
+
+#endif
         if(GUI::getCameraMode() == GUI::CAMERA_FOLLOW_ENTITY)
         {
             // TODO this will be one frame behind!
