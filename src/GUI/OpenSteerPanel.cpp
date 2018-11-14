@@ -31,6 +31,8 @@
 
 using namespace OpenSteer;
 
+float openSteerCameraDist = 1.0;
+
 void GUI::openSteerPanel()
 {
     ImGui::Begin("OpenSteer Settings", &showOpenSteerPanel);
@@ -49,12 +51,10 @@ void GUI::openSteerPanel()
             dmess("Follow");
         }
 
-        //if(ImGui::SliderFloat("", &, 0.0f, 500.0f, "Height mult: %.3f"))
+        if(ImGui::SliderFloat("", &openSteerCameraDist, 0.0f, 3.0f, "Height mult: %.3f"))
         {
 
         }
-
-        ;
 
     ImGui::End();
 }

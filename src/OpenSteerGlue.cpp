@@ -65,6 +65,8 @@ namespace
     mutex openSteerMutex;
 }
 
+extern float openSteerCameraDist; // TODO Un-globalize
+
 namespace
 {
     vec4 lookat;
@@ -82,6 +84,10 @@ namespace
         pos.z *= -1;
         up     = rotate * vec4(__(OpenSteer::OpenSteerDemo::camera.up()), 1);
         up.z *= -1;
+
+        pos = vec4(vec3(lookat) + normalize(vec3(pos) - vec3(lookat)) * openSteerCameraDist, 1);
+
+        //pos = vec4(normalize(vec3(pos) - vec3(lookat)) * dvec3(openSteerCameraDist, openSteerCameraDist, openSteerCameraDist), 1);
     }
 
     void updateOpenSteer()
