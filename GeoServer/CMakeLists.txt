@@ -12,6 +12,7 @@ find_package(gdal REQUIRED)
 find_package(websocketpp REQUIRED)
 find_package(geos REQUIRED)
 find_package(expat REQUIRED)
+find_package(tbb REQUIRED)
 
 include_directories(${GEOS_INCLUDE_DIR})
 include_directories(./inc)

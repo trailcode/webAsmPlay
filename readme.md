@@ -12,22 +12,30 @@ Cross platform development is achieved using cmake.
 
 ![Screenshot](docs/webAsmPlay.jpg)
 
-After initial evaluation the next goal of this project is to create a Real-Time Strategy game using
-OpenSteer (http://opensteer.sourceforge.net/)  and OpenStreetMap (https://www.openstreetmap.org)
+The current goal of this project is morphing into a Real-Time Strategy game using
+OpenSteer (http://opensteer.sourceforge.net/) and OpenStreetMap (https://www.openstreetmap.org)
 To provide a starting point for non player character(NPC) zombie bots who roam Open Street Map cities.
 NPC positions will be calculated on a server and the client application running in the browser or natively
 can query bot positions and states for the given viewport. The server will also be responsible for geometry
-generalization, bot AI, navigation graphs generated from Open Street Map data and state persistence. 
+generalization, bot AI, navigation graphs generated from Open Street Map data and state persistence.
+In the near future this project is going to be renamed to ZombieGeoSim. 
 
 ### Features
 
 * Ability to run the client in a supported web browser or as a native client. 
     * Object Picking where the picked object under the mouse cursor is highlighted and it's attributes are displayed.
-    * Skybox Renderer
+    * Skybox Renderer.
+    * Path finding over linear features.
+    * Autonomous zombies wonder on paths while steering to avoid each other.
+    * Multiple camera modes: TrackBall and zombie tracking camera mode.
+    * User definable symbology color rendering supporting transparency for both fill and outlines.
+        * Camera near and far symbology can be defined for each attribute allowing for interpolated symbology blending proportional to object to camera distance.
+    * Ability to render 3D buildings. 
 
 * Geometry Server
-    * ESRI Shapefile and OpenStreetMap XML GIS formats with line string and polygon ingestion with object attribution.
-    * Fast custom attributed transport protocol. 
+    * ESRI Shapefile and OpenStreetMap XML GIS formats with linestring and polygon ingestion along with attribution.
+    * Fast custom attributed transport protocol.
+    * Ensures linear feature topology correctness. Breaks linestrings at intersections and connections. Removes overlapping linestrings.
 
 ### Dependencies
 
@@ -45,6 +53,7 @@ does not fully support c++ 17.
 * Gdal: https://www.gdal.org/ [[Must be built with Geos]]
 * Geos https://trac.osgeo.org/geos
 * SDL2_image: https://www.libsdl.org/
+* Intel TBB: https://www.threadingbuildingblocks.org/
 
 ### Sources
 
@@ -154,10 +163,13 @@ No notes.
       This also might be a start at generalization.
     * Transparency shader based on feature area or length.
       
-* Interpolate line string color in relation to the distance to the camera.
+* ~~Interpolate line string color in relation to the distance to the camera.~~
 
 * Auto parse shader source to determine uniforms and attributes.
-    * Or better, pass into shader name and location reference pairs.
+    * ~~Or better, pass into shader name and location reference pairs.~~
+
+* Determine topological relationships of the polygonal features in the GeoServer.
+  This will allow associating OSM building parts and extruding them on top of their parent geometry. 
 
 ### TODO
 

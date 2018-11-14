@@ -74,7 +74,7 @@ void GUI::renderSettingsPanel()
             ColorDistanceShader3D::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
         }
 
-        const char* items[] = { "Track Ball", "First Person", "Track Entity" };
+        const char* items[] = { "TrackBall", "First Person", "Track Entity" };
         
         ImGui::Combo("Camera", &cameraMode, items, IM_ARRAYSIZE(items));
         
