@@ -104,8 +104,6 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
     ZombiePlugin::setNetwork(network);
 
-    OpenSteerDemo::initialize();
-
 #ifndef __EMSCRIPTEN__
 
     openSteerThread = new thread([]()
@@ -118,10 +116,16 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
         gl3wInit();
 
+        OpenSteerDemo::initialize();
+
         for(; !GUI::isShuttingDown() ;) { updateOpenSteer() ;}
 
         // TODO cleanup threadWin!
     });
+
+#else
+
+    OpenSteerDemo::initialize();
 
 #endif
 

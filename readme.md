@@ -185,6 +185,7 @@ No notes.
 * Generate OpenGL vertex buffers in the GeoServer.
 * Assign default values of class member variables in header file. Must be a C++ 11 or C++ 14 feature.
 * All renderables should use the VertexArrayObject class. This will be a step in using multiple GPU interfaces such as Vulkan, Direct3D, or Metal
+* Zombie bots need to avoid walking through building walls.
 
 ### Bugs
 
