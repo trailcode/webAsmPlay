@@ -24,12 +24,37 @@
   \copyright 2018
 */
 
+#include <OpenSteer/OpenSteerDemo.h>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
+
+using namespace OpenSteer;
 
 void GUI::openSteerPanel()
 {
     ImGui::Begin("OpenSteer Settings", &showOpenSteerPanel);
+
+        static int lines = 1000;
+
+        if(ImGui::SliderInt("Zombies", &lines, 1, 3000))
+        {
+
+        }
+
+        static bool followZombie = false;
+
+        if(ImGui::Checkbox("Follow Zombie", &followZombie))
+        {
+            dmess("Follow");
+        }
+
+        //if(ImGui::SliderFloat("", &, 0.0f, 500.0f, "Height mult: %.3f"))
+        {
+
+        }
+
+        ;
 
     ImGui::End();
 }

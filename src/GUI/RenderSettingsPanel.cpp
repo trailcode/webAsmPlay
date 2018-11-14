@@ -74,6 +74,12 @@ void GUI::renderSettingsPanel()
             ColorDistanceShader3D::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
         }
 
+        const char* items[] = { "Track Ball", "First Person", "Track Entity" };
+        
+        ImGui::Combo("Camera", &cameraMode, items, IM_ARRAYSIZE(items));
+        
+        //ImGui::SameLine(); ShowHelpMarker("Refer to the \"Combo\" section below for an explanation of the full BeginCombo/EndCombo API, and demonstration of various flags.\n");
+
     ImGui::End();
 }
 

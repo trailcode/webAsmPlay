@@ -26,13 +26,16 @@
 
 #include <unordered_set>
 #include <thread>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/hash.hpp>
 #include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
 #include <OpenSteer/OpenSteerDemo.h>
 #include <OpenSteer/Draw.h>
-#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/ZombiePlugin.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
@@ -62,6 +65,13 @@ namespace
     mutex openSteerMutex;
 }
 
+//namespace
+//{
+    vec4 lookat;
+    vec4 pos;   
+    vec4 up;
+//}
+
 void OpenSteerGlue::init(Canvas * canvas, Network * network)
 {
     //return;
@@ -72,7 +82,9 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
     ZombiePlugin::setNetwork(network);
 
-    OpenSteer::OpenSteerDemo::initialize();
+    OpenSteerDemo::initialize();
+
+    //OpenSteerDemo::camera.fixedDistVOffset = 60.0;
 
     openSteerThread = new thread([]()
     {
@@ -87,11 +99,23 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
         for(;;)
         {
             //openSteerDisplayFunc();
-            OpenSteer::OpenSteerDemo::updateSimulation();
+            OpenSteerDemo::updateSimulation();
 
             lock_guard<mutex> _(openSteerMutex);
 
-            OpenSteer::OpenSteerDemo::redraw();
+            const vec3 scale(0.1, 0.1, 0.1);
+            //const vec3 scale(1,1,1);
+
+            //const dmat4 rotate = glm::rotate(geomTrans, radians(-90.0), dvec3(1, 0, 0));
+            const dmat4 rotate = glm::rotate(radians(-90.0), dvec3(1, 0, 0));
+
+            lookat = rotate * geomTrans * vec4(__(OpenSteerDemo::camera.target)     * scale, 1);
+            pos    = rotate * geomTrans * vec4(__(OpenSteerDemo::camera.position()) * scale, 1);
+            pos.z *= -1;
+            up     = rotate * vec4(__(OpenSteer::OpenSteerDemo::camera.up()), 1);
+            up.z *= -1;
+
+            OpenSteerDemo::redraw();
 
             openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans));
         }
@@ -103,10 +127,17 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
     GUI::addUpdatable([canvas]()
     {
-        //openSteerDisplayFunc();
-
-        //unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans))->render(canvas);
         lock_guard<mutex> _(openSteerMutex);
+
+        if(GUI::getCameraMode() == GUI::CAMERA_FOLLOW_ENTITY)
+        {
+            // TODO this will be one frame behind!
+            canvas->getCamera()->setCenter(lookat);
+            canvas->getCamera()->setEye   (pos);
+            canvas->getCamera()->setUp    (up);
+
+            canvas->getCamera()->update();
+        }
 
         if(openSteerGeom) { openSteerGeom->render(canvas) ;}
     });

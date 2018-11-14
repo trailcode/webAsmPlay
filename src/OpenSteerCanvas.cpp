@@ -59,9 +59,9 @@ GLuint OpenSteerCanvas::render()
 
     const mat4 rotate = glm::rotate(radians(90.0f), vec3(1, 0, 0));
 
-    getCamera()->setCenter(rotate * vec4(lookat, 1));
-    getCamera()->setEye   (rotate * vec4(pos,    1));
-    getCamera()->setUp    (rotate * vec4(up,     1));
+    getCamera()->setCenter(lookat);
+    getCamera()->setEye   (pos);
+    getCamera()->setUp    (up);
 
     getCamera()->update();
 

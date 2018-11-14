@@ -105,6 +105,8 @@ OpenSteerCanvas * GUI::openSteerCanvas = NULL;
 Canvas          * GUI::canvas          = NULL;
 SkyBox          * GUI::skyBox          = NULL;
 
+int GUI::cameraMode = GUI::CAMERA_TRACK_BALL;
+
 vector<Canvas *> GUI::auxCanvases;
 
 list<Updatable> updatables;
@@ -484,7 +486,7 @@ void GUI::mainLoop(GLFWwindow * window)
 
     const double dist = distance(canvas->getCamera()->getCenter(), canvas->getCamera()->getEye());
 
-    const double scale = canvas->getTrackBallInteractor()->mZoomScale = dist * 0.02;
+    canvas->getTrackBallInteractor()->setZoomScale(dist * 0.02);
 
     const dvec4 pos(canvas->getCursorPosWC(), 1.0);
 
@@ -609,3 +611,5 @@ Updatable GUI::addUpdatable(Updatable updatable)
 
     return updatable;
 }
+
+int GUI::getCameraMode() { return cameraMode ;}

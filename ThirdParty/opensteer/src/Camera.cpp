@@ -135,6 +135,7 @@ OpenSteer::Camera::update (const float /*currentTime*/,
     switch (mode)
     {
     case cmFixed:
+        dmess("cmFixed");
         newPosition = fixedPosition;
         newTarget = fixedTarget;
         newUp = fixedUp;
@@ -148,6 +149,7 @@ OpenSteer::Camera::update (const float /*currentTime*/,
         break;
 
     case cmStraightDown:
+        dmess("cmStraightDown");
         if (noVehicle) break;
         newUp = v.forward();
         newTarget = v.predictFuturePosition (predictionTime);
@@ -156,6 +158,7 @@ OpenSteer::Camera::update (const float /*currentTime*/,
         break;
 
     case cmFixedLocalOffset:
+        dmess("cmFixedLocalOffset");
         if (noVehicle) break;
         newUp = v.up();
         newTarget = v.predictFuturePosition (predictionTime);
@@ -163,6 +166,7 @@ OpenSteer::Camera::update (const float /*currentTime*/,
         break;
 
     case cmOffsetPOV:
+        dmess("cmOffsetPOV");
         {
             if (noVehicle) break;
             newUp = v.up();
@@ -264,10 +268,19 @@ OpenSteer::Camera::constDistHelper (const float /*elapsedTime*/)
     {
         // unit vector along original offset
         const Vec3 unitOffset = offset / distance;
+        //Vec3 unitOffset = offset / distance;
+
+        //unitOffset = Vec3(0,0,2).normalize();
+        //unitOffset.normalize();
 
         // new offset of length XXX
-        const float xxxDistance = sqrtXXX (square (fixedDistDistance) -
+        float xxxDistance = sqrtXXX (square (fixedDistDistance) -
                                            square (fixedDistVOffset));
+        
+        //xxxDistance = 40.0;
+
+        //dmess("xxxDistance " << xxxDistance);
+
         const Vec3 newOffset = unitOffset * xxxDistance;
 
         // return new camera position: adjust distance to target
@@ -326,6 +339,8 @@ OpenSteer::Camera::modeName (void)
 void 
 OpenSteer::Camera::mouseAdjustOffset (const Vec3& adjustment)
 {
+    dmess("OpenSteer::Camera::mouseAdjustOffset");
+
     // vehicle being tracked (just a reference with a more concise name)
     const AbstractVehicle& v = *vehicleToTrack;
 

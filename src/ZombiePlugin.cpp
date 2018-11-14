@@ -30,13 +30,14 @@
 #include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/ZombiePlugin.h>
 
 using namespace OpenSteer;
 
 namespace
 {
-    int const gPedestrianStartCount = 1500;
+    int const gPedestrianStartCount = 1000;
     bool gUseDirectedPathFollowing = true;  // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
 
@@ -68,10 +69,18 @@ void ZombiePlugin::open()
 
     // initialize camera and selectedVehicle
     Zombie& firstPedestrian = **crowd.begin();
-    OpenSteerDemo::init3dCamera (firstPedestrian);
+
+    float distance = 10 * 1.0;
+    float elevation = 8 * 1.0;
+
+    OpenSteerDemo::init3dCamera (firstPedestrian, distance, elevation);
+
     OpenSteerDemo::camera.mode = Camera::cmFixedDistanceOffset;
     OpenSteerDemo::camera.fixedTarget.set (15, 0, 30);
     OpenSteerDemo::camera.fixedPosition.set (15, 70, -70);
+    //OpenSteerDemo::camera.fixedPosition.set (15, 70, -60);
+    //OpenSteerDemo::camera.mouseAdjustOffset(Vec3(15, 70, -60));
+    
 }
 
 void ZombiePlugin::update(const float currentTime, const float elapsedTime)
@@ -94,6 +103,8 @@ void ZombiePlugin::redraw(const float currentTime, const float elapsedTime)
 
     // Pedestrian nearest mouse (to be highlighted)
     AbstractVehicle& nearMouse = *OpenSteerDemo::vehicleNearestToMouse ();
+
+    //OpenSteerDemo::camera.mouseAdjustOffset(Vec3(0.001,0.001,0.001));
 
     // update camera
     OpenSteerDemo::updateCamera (currentTime, elapsedTime, selected);

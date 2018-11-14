@@ -433,6 +433,8 @@ namespace rsmz
         mCamera->update();
     }
 
+    float TrackBallInteractor::setZoomScale(const float scale) { return mZoomScale = scale ;}
+
 } // end namespace rsmz
 
 /*

@@ -12,7 +12,7 @@ namespace rsmz
         FIRSTPERSON,
         PAN,
         ROLL,
-        ZOOM
+        ZOOM,
     } CameraMotionType;
 
     class TrackBallInteractor
@@ -46,9 +46,10 @@ namespace rsmz
         void setRightClicked(bool value);
         void setScreenSize(float width, float height);
         void setSpeed(float s);
+        float setZoomScale(const float scale);
         void update();
 
-    //protected:
+    protected:
         char clickQuadrant(float x, float y);
         void computeCameraEye(glm::vec3 & eye);
         void computeCameraUp(glm::vec3 & up);
@@ -70,7 +71,7 @@ namespace rsmz
         void scroll();
         void updateCameraEyeUp(bool eye, bool up);
 
-    //private:
+    private:
         Camera *mCamera;
         CameraMotionType mCameraMotionLeftClick;
         CameraMotionType mCameraMotionMiddleClick;

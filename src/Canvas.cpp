@@ -90,14 +90,6 @@ void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
     trackBallInteractor->setScreenSize(size.x, size.y);
 }
 
-void Canvas::updateMVP()
-{
-    currMVP.view        = trackBallInteractor->getCamera()->getMatrix();
-    currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.01, 300.0);
-    currMVP.MV          = currMVP.view * currMVP.model;
-    currMVP.MVP         = currMVP.projection * currMVP.MV;
-}
-
 void Canvas::pushModel(const dmat4 & model)
 {
     stackMVP.push(currMVP);
@@ -112,6 +104,18 @@ void Canvas::popMVP()
     currMVP = stackMVP.top();
 
     stackMVP.pop();
+}
+
+extern vec4 lookat;
+extern vec4 pos;   
+extern vec4 up;
+
+void Canvas::updateMVP()
+{
+    currMVP.view        = trackBallInteractor->getCamera()->getMatrix();
+    currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.0001, 300.0);
+    currMVP.MV          = currMVP.view * currMVP.model;
+    currMVP.MVP         = currMVP.projection * currMVP.MV;
 }
 
 bool Canvas::preRender()
@@ -154,6 +158,14 @@ extern vector<Renderable *> toRender;
 
 GLuint Canvas::render()
 {
+    /*
+    getCamera()->setCenter(lookat);
+    getCamera()->setEye   (pos);
+    getCamera()->setUp    (up);
+
+    getCamera()->update();
+    //*/
+
     if(!preRender()) { return 0 ;}
 
     lock_guard<mutex> _(renderiablesMutex);

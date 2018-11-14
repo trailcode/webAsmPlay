@@ -519,6 +519,7 @@ OpenSteer::OpenSteerDemo::init3dCamera (AbstractVehicle& selected,
                                   float distance,
                                   float elevation)
 {
+    dmess("OpenSteer::OpenSteerDemo::init3dCamera");
     position3dCamera (selected, distance, elevation);
     camera.fixedDistDistance = distance;
     camera.fixedDistVOffset = elevation;

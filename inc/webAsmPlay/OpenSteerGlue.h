@@ -49,6 +49,9 @@ public:
     static const glm::dmat4 & getGeomTrans();
     static const glm::dmat4 & getGeomInverseTrans();
 
+    static size_t setNumZombies(const size_t numZombies);
+    static size_t getNumZombies();
+
     static OpenSteer::PolylineSegmentedPathwaySingleRadius * getPath(const std::unique_ptr<std::vector<geos::geom::Coordinate> > & path);
 
 private:

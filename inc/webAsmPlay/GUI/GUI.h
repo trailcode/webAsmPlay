@@ -51,7 +51,16 @@ public:
         FIND_PATH,
     };
 
+    enum
+    {
+        CAMERA_TRACK_BALL = 0,
+        CAMERA_FIRST_PERSON,
+        CAMERA_FOLLOW_ENTITY,
+    };
+
     static char getMode();
+
+    static int getCameraMode();
 
     static bool renderSettingsFillPolygons;
     static bool renderSettingsRenderPolygonOutlines;
@@ -127,6 +136,8 @@ private:
     static std::vector<Canvas *> auxCanvases;
 
     static float heightMultiplier;
+
+    static int cameraMode;
 };
 
 #endif // __WEB_ASM_PLAY_GUI_H__
