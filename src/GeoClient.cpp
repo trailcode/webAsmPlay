@@ -647,9 +647,10 @@ namespace
         double height = scale;
         
         // See: https://wiki.openstreetmap.org/wiki/OSM-3D.org
-        if(attrs->hasStringKey("height")) { height = atof(attrs->strings["height"].c_str()) * scale * 0.3;}
-
-        else if(attrs->hasStringKey("building:levels")) { height = atof(attrs->strings["building:levels"].c_str()) * scale ;}
+        
+             if(attrs->hasStringKey("height"))          { height    = atof(attrs->strings["height"]         .c_str()) * scale * 0.3 ;}
+        else if(attrs->hasStringKey("building:levels")) { height    = atof(attrs->strings["building:levels"].c_str()) * scale       ;}
+        else if(attrs->hasStringKey("min_height"))      { minHeight = atof(attrs->strings["min_height"]     .c_str()) * scale * 0.3 ;}
 
         return make_pair(height, minHeight);
     }
@@ -702,16 +703,20 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         double height    = 0.0;
         double minHeight = 0.0;
 
-        if( attrs->hasStringKey("addr_house") ||
+        // TODO look into the OSM docs for extruded types. E.G. barrier wall
+
+        if( attrs->hasStringKey("addr_house")        ||
             attrs->hasStringKey("addr::housenumber") ||
-            attrs->hasStringKey("addr::housename") ||
+            attrs->hasStringKey("addr::housename")   ||
             attrs->hasStringKeyValue("building", "house")) // TODO Are the ones above even doing anything?
         {
             colorID = 0;
 
             tie(height, minHeight) = getHeight(attrs);
         }
-        else if(attrs->hasStringKey("building"))
+        else if(attrs->hasStringKey("building")      ||
+                attrs->hasStringKey("building:part") ||
+                attrs->hasStringKey("height"))
         {
             colorID = 1;
 

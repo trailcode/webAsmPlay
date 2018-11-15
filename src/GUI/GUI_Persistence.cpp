@@ -75,17 +75,17 @@ void GUI::loadState()
         if(root.find(key) != root.end()) { value = root[key]->AsBool() ;}
     };
 
-    setBool(L"showSceneViewPanel",      showSceneViewPanel);
-    setBool(L"showPerformancePanel",    showPerformancePanel);
-    setBool(L"showPerformancePanel",    showPerformancePanel);
-    setBool(L"showRenderSettingsPanel", showRenderSettingsPanel);
-    setBool(L"showLogPanel",            showLogPanel);
-    setBool(L"showAttributePanel",      showAttributePanel);
-    setBool(L"showGUI_Settings_Panel",  showGUI_Settings_Panel);
-    setBool(L"showSymbologyPanel",      showSymbologyPanel);
-    setBool(L"showOpenSteerTestPanel",  showOpenSteerTestPanel);
-    setBool(L"showOpenSteerPanel",      showOpenSteerPanel);
-    setBool(L"showCameraInfoPanel",     showCameraInfoPanel);
+    setBool(L"showSceneViewPanel",                  showSceneViewPanel);
+    setBool(L"showPerformancePanel",                showPerformancePanel);
+    setBool(L"showPerformancePanel",                showPerformancePanel);
+    setBool(L"showRenderSettingsPanel",             showRenderSettingsPanel);
+    setBool(L"showLogPanel",                        showLogPanel);
+    setBool(L"showAttributePanel",                  showAttributePanel);
+    setBool(L"showGUI_Settings_Panel",              showGUI_Settings_Panel);
+    setBool(L"showSymbologyPanel",                  showSymbologyPanel);
+    setBool(L"showOpenSteerTestPanel",              showOpenSteerTestPanel);
+    setBool(L"showOpenSteerPanel",                  showOpenSteerPanel);
+    setBool(L"showCameraInfoPanel",                 showCameraInfoPanel);
 
     setBool(L"renderSettingsFillPolygons",          renderSettingsFillPolygons);
     setBool(L"renderSettingsRenderPolygonOutlines", renderSettingsRenderPolygonOutlines);
