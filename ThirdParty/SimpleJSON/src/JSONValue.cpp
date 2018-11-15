@@ -392,6 +392,15 @@ JSONValue::JSONValue(const glm::vec4 & value)
 									new JSONValue(value.w)});
 }
 
+JSONValue::JSONValue(const glm::vec3 & value)
+{
+	type = JSONType_Array;
+
+	array_value = new JSONArray({	new JSONValue(value.x),
+									new JSONValue(value.y),
+									new JSONValue(value.z)});
+}
+
 /**
  * Basic constructor for creating a JSON Value of type Array
  *
@@ -619,6 +628,13 @@ glm::vec4 JSONValue::AsVec4() const
 						(*array_value)[1]->AsNumber(),
 						(*array_value)[2]->AsNumber(),
 						(*array_value)[3]->AsNumber());
+}
+
+glm::vec3 JSONValue::AsVec3() const
+{
+	return glm::vec3(	(*array_value)[0]->AsNumber(),
+						(*array_value)[1]->AsNumber(),
+						(*array_value)[2]->AsNumber());
 }
 
 /**

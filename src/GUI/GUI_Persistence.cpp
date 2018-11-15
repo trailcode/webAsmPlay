@@ -30,6 +30,8 @@
 #include <codecvt>
 #include <JSON.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/Camera.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -116,6 +118,12 @@ void GUI::loadState()
 
     ColorDistanceShader  ::getDefaultInstance()->loadState(root);
     ColorDistanceShader3D::getDefaultInstance()->loadState(root);
+
+    if(root.find(L"cameraEye")    != root.end()) { canvas->getCamera()->setEye   (root[L"cameraEye"]   ->AsVec3()) ;}
+    if(root.find(L"cameraCenter") != root.end()) { canvas->getCamera()->setCenter(root[L"cameraCenter"]->AsVec3()) ;}
+    if(root.find(L"cameraUp")     != root.end()) { canvas->getCamera()->setUp    (root[L"cameraUp"]    ->AsVec3()) ;}
+
+    canvas->getCamera()->update();
 }
 
 void GUI::saveState()
@@ -123,21 +131,25 @@ void GUI::saveState()
     JSONObject root;
 
     // Booleans
-    root[L"showSceneViewPanel"]       = new JSONValue(showSceneViewPanel);
-    root[L"showPerformancePanel"]     = new JSONValue(showPerformancePanel);
-    root[L"showRenderSettingsPanel"]  = new JSONValue(showRenderSettingsPanel);
-    root[L"showLogPanel"]             = new JSONValue(showLogPanel);
-    root[L"showAttributePanel"]       = new JSONValue(showAttributePanel);
-    root[L"showGUI_Settings_Panel"]   = new JSONValue(showGUI_Settings_Panel);
-    root[L"showSymbologyPanel"]       = new JSONValue(showSymbologyPanel);
-    root[L"showOpenSteerTestPanel"]   = new JSONValue(showOpenSteerTestPanel);
-    root[L"showOpenSteerPanel"]       = new JSONValue(showOpenSteerPanel);
-    root[L"showCameraInfoPanel"]      = new JSONValue(showCameraInfoPanel);
+    root[L"showSceneViewPanel"]                   = new JSONValue(showSceneViewPanel);
+    root[L"showPerformancePanel"]                 = new JSONValue(showPerformancePanel);
+    root[L"showRenderSettingsPanel"]              = new JSONValue(showRenderSettingsPanel);
+    root[L"showLogPanel"]                         = new JSONValue(showLogPanel);
+    root[L"showAttributePanel"]                   = new JSONValue(showAttributePanel);
+    root[L"showGUI_Settings_Panel"]               = new JSONValue(showGUI_Settings_Panel);
+    root[L"showSymbologyPanel"]                   = new JSONValue(showSymbologyPanel);
+    root[L"showOpenSteerTestPanel"]               = new JSONValue(showOpenSteerTestPanel);
+    root[L"showOpenSteerPanel"]                   = new JSONValue(showOpenSteerPanel);
+    root[L"showCameraInfoPanel"]                  = new JSONValue(showCameraInfoPanel);
 
     root[L"renderSettingsFillPolygons"]           = new JSONValue(renderSettingsFillPolygons);
     root[L"renderSettingsRenderPolygonOutlines"]  = new JSONValue(renderSettingsRenderPolygonOutlines);
     root[L"renderSettingsRenderLinearFeatures"]   = new JSONValue(renderSettingsRenderLinearFeatures);
     root[L"renderSettingsRenderSkyBox"]           = new JSONValue(renderSettingsRenderSkyBox);
+
+    root[L"cameraEye"]                            = new JSONValue(canvas->getCamera()->getEyeConstRef());
+    root[L"cameraCenter"]                         = new JSONValue(canvas->getCamera()->getCenterConstRef());
+    root[L"cameraUp"]                             = new JSONValue(canvas->getCamera()->getUpConstRef());
 
     ColorDistanceShader  ::getDefaultInstance()->saveState(root);
     ColorDistanceShader3D::getDefaultInstance()->saveState(root);

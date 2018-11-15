@@ -30,6 +30,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
 class JSON;
@@ -42,7 +43,6 @@ enum JSONType
 	JSONType_Number,
 	JSONType_Array,
 	JSONType_Object,
-	JSONType_vec4,
 };
 
 class JSONValue;
@@ -61,6 +61,7 @@ class JSONValue
 		JSONValue(bool m_bool_value);
 		JSONValue(double m_number_value);
 		JSONValue(int m_integer_value);
+        JSONValue(const glm::vec3 & value);
 		JSONValue(const glm::vec4 & value);
 		JSONValue(const JSONArray &m_array_value);
 		JSONValue(const JSONObject &m_object_value);
@@ -77,6 +78,7 @@ class JSONValue
 		const std::wstring &AsString() const;
 		bool AsBool() const;
 		double AsNumber() const;
+        glm::vec3 AsVec3() const;
 		glm::vec4 AsVec4() const;
 		const JSONArray &AsArray() const;
 		const JSONObject &AsObject() const;
