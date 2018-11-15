@@ -76,8 +76,10 @@ private:
                  const double height,
                  const double minHeight);
 
-    Tessellation(const Tessellation&);             // Prevent copy-construction
-    Tessellation& operator=(const Tessellation&);  // Prevent assignment
+    Tessellation(const Tessellation &)              = delete;
+    Tessellation(Tessellation &&)                   = delete;
+    Tessellation & operator=(const Tessellation &)  = delete;
+    Tessellation & operator=(Tessellation &)        = delete;
     
 };
 

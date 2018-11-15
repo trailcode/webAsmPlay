@@ -71,8 +71,10 @@ private:
                         const size_t      numContourLines,
                         const bool        isMulti);
 
-    VertexArrayObject(const VertexArrayObject&) {}                            // Prevent copy-construction
-    VertexArrayObject& operator=(const VertexArrayObject&) { return *this ;}  // Prevent assignment
+    VertexArrayObject(const VertexArrayObject &)              = delete;
+    VertexArrayObject(VertexArrayObject &&)                   = delete;
+    VertexArrayObject & operator=(const VertexArrayObject &)  = delete;
+    VertexArrayObject & operator=(VertexArrayObject &)        = delete;
 
     const GLuint    vao                 = 0;
     const GLuint    ebo                 = 0;

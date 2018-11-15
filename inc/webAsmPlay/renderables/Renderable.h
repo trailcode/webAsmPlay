@@ -69,8 +69,10 @@ protected:
                 const bool renderFill,
                 const bool renderOutline);
 
-    Renderable(const Renderable&) {}                            // Prevent copy-construction
-    Renderable& operator=(const Renderable&) { return *this ;}  // Prevent assignment
+    Renderable(const Renderable &)              = delete;
+    Renderable(Renderable &&)                   = delete;
+    Renderable & operator=(const Renderable &)  = delete;
+    Renderable & operator=(Renderable &)        = delete;
 
     std::vector<OnDelete> onDeleteCallbacks;
 

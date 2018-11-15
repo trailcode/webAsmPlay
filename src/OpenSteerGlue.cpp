@@ -50,6 +50,8 @@ using namespace geosUtil;
 
 void openSteerDisplayFunc();
 
+thread * openSteerThread = NULL; // TODO make a thread waiting collection.
+
 namespace
 {
     const double scaleValue = 1.0 / (60.0 * 2.0);
@@ -57,8 +59,6 @@ namespace
     const dmat4 geomTrans(scale(dmat4(1.0), dvec3(scaleValue, scaleValue, scaleValue)));
 
     const dmat4 geomInverseTrans(inverse(geomTrans));
-
-    thread * openSteerThread = NULL;
 
     unique_ptr<Renderable> openSteerGeom;
 

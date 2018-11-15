@@ -40,20 +40,11 @@ Tessellation::Tessellation(const size_t symbologyID,
                            const double minHeight) : symbologyID(symbologyID),
                                                      height     (height),
                                                      minHeight  (minHeight) {}
-
-Tessellation::Tessellation(const Tessellation&) { abort() ;}
     
 Tessellation::~Tessellation()
 {
     free(verts);
     free(triangleIndices);
-}
-
-Tessellation& Tessellation::operator=(const Tessellation&)
-{
-    abort();
-
-    return *this;
 }
 
 unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * poly,

@@ -193,14 +193,6 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
     const size_t startIndex = nodeMap[start.second->start];
 
-    //dmess("startIndex " << startIndex << " nodeMap " << nodeMap.size());
-
-    /*
-    vector<int> dist(nodes.size(), INF);
-    vector<bool> seen(nodes.size(), false);
-    vector<size_t> parent(nodes.size());
-    */
-
     // TODO, try to only reset the ones which have been modified.
     for(size_t i = 0; i < nodes.size(); ++i)
     {

@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <thread>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -47,6 +48,8 @@ static void glfw_error_callback(int error, const char* description)
 }
 
 void errorCallback(int error, const char* description);
+
+extern std::thread * openSteerThread;
 
 int main(int, char**)
 {
@@ -159,6 +162,12 @@ int main(int, char**)
     #endif
 
     GUI::shutdown();
+
+    dmess("Before join");
+
+    openSteerThread->join();
+
+    dmess("After join");
 
     return 0;
 }
