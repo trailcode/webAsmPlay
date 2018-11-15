@@ -55,6 +55,7 @@ public:
     void saveState(JSONObject & dataStore);
 
     float setHeightMultiplier(const float multiplier);
+    float getHeightMultiplier() const;
 
 private:
 

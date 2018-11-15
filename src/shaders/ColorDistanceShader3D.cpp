@@ -269,3 +269,5 @@ void ColorDistanceShader3D::saveState(JSONObject & dataStore)
 }
 
 float ColorDistanceShader3D::setHeightMultiplier(const float multiplier) { return heightMultiplier = multiplier ;}
+
+float ColorDistanceShader3D::getHeightMultiplier() const { return heightMultiplier ;}

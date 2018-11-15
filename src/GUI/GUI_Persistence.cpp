@@ -92,30 +92,6 @@ void GUI::loadState()
     setBool(L"renderSettingsRenderLinearFeatures",  renderSettingsRenderLinearFeatures);
     setBool(L"renderSettingsRenderSkyBox",          renderSettingsRenderSkyBox);
 
-    // Floats
-
-    typedef float (*_setFloat)(const float & value);
-
-    ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
-
-    auto setFloat = [&root, shader](const wstring & key, _setFloat setFunc)->void
-    {
-        //if(root.find(key) != root.end()) { shader->setFunc(root[key]->AsNumber()) ;}
-    };
-
-    //setFloat(L"ColorDistanceShader::minDist", &ColorDistanceShader::setMinDist);
-    //setFloat(L"ColorDistanceShader::maxDist", &ColorDistanceShader::setMaxDist);
-
-    typedef vec4 (*_setVec4)(const vec4 & value);
-
-    auto setVec4 = [&root](const wstring & key, _setVec4 setFunc)->void
-    {
-        if(root.find(key) != root.end()) { setFunc(root[key]->AsVec4()) ;}
-    };
-
-    //setVec4(L"ColorDistanceShader::minColor", &ColorDistanceShader::setMinColor);
-    //setVec4(L"ColorDistanceShader::maxColor", &ColorDistanceShader::setMaxColor);
-
     ColorDistanceShader  ::getDefaultInstance()->loadState(root);
     ColorDistanceShader3D::getDefaultInstance()->loadState(root);
 
@@ -124,6 +100,11 @@ void GUI::loadState()
     if(root.find(L"cameraUp")     != root.end()) { canvas->getCamera()->setUp    (root[L"cameraUp"]    ->AsVec3()) ;}
 
     canvas->getCamera()->update();
+
+    if(root.find(L"buildingHeightMultiplier") != root.end())
+    {
+        ColorDistanceShader3D::getDefaultInstance()->setHeightMultiplier(root[L"buildingHeightMultiplier"]->AsNumber());
+    }
 }
 
 void GUI::saveState()
@@ -146,6 +127,7 @@ void GUI::saveState()
     root[L"renderSettingsRenderPolygonOutlines"]  = new JSONValue(renderSettingsRenderPolygonOutlines);
     root[L"renderSettingsRenderLinearFeatures"]   = new JSONValue(renderSettingsRenderLinearFeatures);
     root[L"renderSettingsRenderSkyBox"]           = new JSONValue(renderSettingsRenderSkyBox);
+    root[L"buildingHeightMultiplier"]             = new JSONValue(ColorDistanceShader3D::getDefaultInstance()->getHeightMultiplier());
 
     root[L"cameraEye"]                            = new JSONValue(canvas->getCamera()->getEyeConstRef());
     root[L"cameraCenter"]                         = new JSONValue(canvas->getCamera()->getCenterConstRef());
