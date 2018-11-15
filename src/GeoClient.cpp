@@ -255,7 +255,9 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 #endif
 }
 
-void GeoClient::getPolygons(const size_t startIndex, const size_t numPolys, function<void (vector<AttributedGeometry> geoms)> callback)
+void GeoClient::getPolygons(const size_t                                      startIndex,
+                            const size_t                                      numPolys,
+                            function<void (vector<AttributedGeometry> geoms)> callback)
 {
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
@@ -292,8 +294,9 @@ void GeoClient::getPolygons(const size_t startIndex, const size_t numPolys, func
 #endif
 }
 
-void GeoClient::getPolylines(const size_t startIndex, const size_t numPolylines,
-                                function<void(vector<AttributedGeometry> geoms)> callback) // TODO Code duplication.
+void GeoClient::getPolylines(const size_t                                     startIndex,
+                             const size_t                                     numPolylines,
+                             function<void(vector<AttributedGeometry> geoms)> callback)
 {
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
@@ -330,7 +333,9 @@ void GeoClient::getPolylines(const size_t startIndex, const size_t numPolylines,
 #endif
 }
 
-void GeoClient::getPoints(const size_t startIndex, const size_t numPoints, function<void (vector<AttributedGeometry> geoms)> callback)
+void GeoClient::getPoints(const size_t                              startIndex,
+                          const size_t                              numPoints,
+                          function<void (vector<AttributedGeometry> geoms)> callback)
 {
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
@@ -634,15 +639,19 @@ void GeoClient::addGeometry(const char * data)
 
 namespace
 {
-    double getHeight(Attributes * attrs)
+    pair<double, double> getHeight(Attributes * attrs)
     {
         const double scale = 0.005;
+
+        double minHeight = 0;
+        double height = scale;
+        
         // See: https://wiki.openstreetmap.org/wiki/OSM-3D.org
-        if(attrs->hasStringKey("height")) { return atof(attrs->strings["height"].c_str()) * scale * 0.3;}
+        if(attrs->hasStringKey("height")) { height = atof(attrs->strings["height"].c_str()) * scale * 0.3;}
 
-        if(attrs->hasStringKey("building:levels")) { return atof(attrs->strings["building:levels"].c_str()) * scale ;}
+        else if(attrs->hasStringKey("building:levels")) { height = atof(attrs->strings["building:levels"].c_str()) * scale ;}
 
-        return scale;
+        return make_pair(height, minHeight);
     }
 }
 
@@ -689,8 +698,9 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     {
         Attributes * attrs = geoms[i].first;
 
-        GLuint colorID = 0;
-        double height  = 0.0;
+        GLuint colorID   = 0;
+        double height    = 0.0;
+        double minHeight = 0.0;
 
         if( attrs->hasStringKey("addr_house") ||
             attrs->hasStringKey("addr::housenumber") ||
@@ -699,13 +709,13 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         {
             colorID = 0;
 
-            height = getHeight(attrs);
+            tie(height, minHeight) = getHeight(attrs);
         }
         else if(attrs->hasStringKey("building"))
         {
             colorID = 1;
 
-            height = getHeight(attrs);
+            tie(height, minHeight) = getHeight(attrs);
         }
         else if(attrs->hasStringKeyValue("landuse", "grass") ||
                 attrs->hasStringKeyValue("surface", "grass"))    { colorID = 1 ;}
@@ -713,7 +723,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
         if(height == 0.0) { polygons.push_back(ColoredGeometry(geoms[i].second, colorID)) ;}
 
-        else { polygons3D.push_back(ColoredExtrudedGeometry(geoms[i].second, colorID, height)) ;}
+        else { polygons3D.push_back(ColoredExtrudedGeometry(geoms[i].second, colorID, height, minHeight)) ;}
     }
 
     dmess("polygons " << polygons.size() << " polygons3D " << polygons3D.size());

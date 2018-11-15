@@ -71,7 +71,9 @@ typedef std::pair<glm::dvec2, Edge *> PointOnEdge;
 
 typedef std::vector<ColoredGeometry> ColoredGeometryVec;
 
-typedef std::tuple<const geos::geom::Geometry *, const size_t, const double> ColoredExtrudedGeometry;
+typedef std::tuple<const geos::geom::Geometry *, const size_t, const double, const double> ColoredExtrudedGeometry;
+
+//inline const geos::geom::Geometry *& geom
 
 typedef std::vector<ColoredExtrudedGeometry> ColoredExtrudedGeometryVec; 
 

@@ -40,7 +40,8 @@ public:
     static std::unique_ptr<const Tessellation> tessellatePolygon(const geos::geom::Polygon * poly,
                                                                  const glm::dmat4          & trans,
                                                                  const size_t                symbologyID = 0,
-                                                                 const double                height      = 0.0);
+                                                                 const double                height      = 0.0,
+                                                                 const double                minHeight   = 0.0);
 
     static void tessellateMultiPolygon( const geos::geom::MultiPolygon  * multiPoly,
                                         const glm::dmat4                & trans,
@@ -67,10 +68,13 @@ private:
     uint32_t symbologyID;
 
     double height;
+    double minHeight;
 
 private:
 
-    Tessellation();
+    Tessellation(const size_t symbologyID,
+                 const double height,
+                 const double minHeight);
 
     Tessellation(const Tessellation&);             // Prevent copy-construction
     Tessellation& operator=(const Tessellation&);  // Prevent assignment

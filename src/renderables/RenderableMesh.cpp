@@ -55,6 +55,7 @@ Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons
         const Geometry  * geom        = get<0>(polygons[i]);
         const GLuint      symbologyID = get<1>(polygons[i]);
         const double      height      = get<2>(polygons[i]);
+        const double      minHeight   = get<3>(polygons[i]);
         
         const Polygon      * poly;
         const MultiPolygon * multiPoly;

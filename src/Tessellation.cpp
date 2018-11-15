@@ -35,7 +35,11 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-Tessellation::Tessellation() { }
+Tessellation::Tessellation(const size_t symbologyID,
+                           const double height,
+                           const double minHeight) : symbologyID(symbologyID),
+                                                     height     (height),
+                                                     minHeight  (minHeight) {}
 
 Tessellation::Tessellation(const Tessellation&) { abort() ;}
     
@@ -55,12 +59,10 @@ Tessellation& Tessellation::operator=(const Tessellation&)
 unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * poly,
                                                                 const dmat4   & trans,
                                                                 const size_t    symbologyID,
-                                                                const double    height)
+                                                                const double    height,
+                                                                const double    minHeight)
 {
-    Tessellation * ret = new Tessellation;
-
-    ret->symbologyID = symbologyID; // TODO create Tessellation constructor
-    ret->height      = height;
+    Tessellation * ret = new Tessellation(symbologyID, height, minHeight);
 
     const LineString * ring = poly->getExteriorRing();
 

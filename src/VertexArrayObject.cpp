@@ -89,13 +89,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             lineIndices.push_back((i + 1) % tess->numVerts + offset);
         }
 
-        //offset = verts.size() / 7;
         offset += tess->numVerts;
-
-        if(offset != verts.size() / 7)
-        {
-            //dmess("offset " << offset << " verts " << verts.size() << " " << verts.size() / 7);
-        }
 
         if(!IS_3D) { continue ;}
 
