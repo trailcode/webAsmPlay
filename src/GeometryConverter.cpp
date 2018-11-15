@@ -37,11 +37,11 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 
-string GeometryConverter::convert(const Polygon * poly, const Attributes * attrs)
+string GeometryConverter::convert(const AttributedPoligonalArea & polygon)
 {
     stringstream ret;
 
-    convert(poly, attrs, ret);
+    convert(get<1>(polygon), get<0>(polygon), ret);
 
     return ret.str();
 }

@@ -46,7 +46,7 @@ class GeometryConverter
 {
 public:
 
-    static std::string convert(const geos::geom::Polygon * poly, const Attributes * attrs); // TODO code refactor, create AttributedPolygon
+    static std::string convert(const AttributedPoligonalArea & polygon);
 
     static std::string convert(const AttributedLineString & lineString);
 

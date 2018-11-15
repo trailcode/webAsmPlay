@@ -30,5 +30,6 @@ using namespace std;
 
 void topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & polygons)
 {
-
+    sort(polygons.begin(), polygons.end(), [](const AttributedPoligonalArea & lhs,
+                                              const AttributedPoligonalArea & rhs) { return get<2>(lhs) < get<2>(rhs) ;});
 }

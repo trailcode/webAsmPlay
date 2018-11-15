@@ -26,7 +26,6 @@
 
 #include <memory>
 #include <list>
-#include <glm/vec2.hpp>
 #include <geos/geom/Point.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryCollection.h>
@@ -403,10 +402,8 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
     return ret;
 }
 
-vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
+void topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
 {
-    //return lineStrings;
-
     AttributeStatistics::addLineStrings(lineStrings);
 
     vector<AttributedLineString> curr; // = lineStrings;
@@ -435,22 +432,19 @@ vector<AttributedLineString> topology::breakLineStrings(vector<AttributedLineStr
 
     vector<AttributedLineString> nonSplitting;
 
-    size_t i = 0;
-
     do
     {
+        // TODO do we have a memory leak here?
         curr = _breakLineStrings(curr, nonSplitting);
 
         for(auto & j : nonSplitting)
         {
             //delete get<1>(j);
         }
-
-        //if(++i > 4) { break ;}
     }
     while(numSplits);
 
-    nonSplitting.insert(nonSplitting.end(), curr.begin(), curr.end());
+    lineStrings.clear();
 
-    return nonSplitting;
+    lineStrings.insert(lineStrings.end(), nonSplitting.begin(), nonSplitting.end());
 }

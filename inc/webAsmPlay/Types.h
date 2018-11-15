@@ -55,7 +55,7 @@ typedef std::pair<Attributes *, geos::geom::Geometry   *> AttributedGeometry;
 typedef std::pair<Attributes *, geos::geom::LineString *> AttributedLineString;
 typedef std::pair<Attributes *, geos::geom::Point      *> AttributedPoint;
 
-typedef std::tuple<Attributes *, geos::geom::Geometry *, double> AttributedPoligonalArea;
+typedef std::tuple<Attributes *, geos::geom::Polygon *, double> AttributedPoligonalArea;
 
 typedef std::pair<const geos::geom::Geometry *, const size_t> ColoredGeometry;
 

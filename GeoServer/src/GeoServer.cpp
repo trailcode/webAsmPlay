@@ -133,25 +133,18 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
         
         switch(geom->getGeometryTypeId())
         {
-            case GEOS_POLYGON:    polygons   .push_back(AttributedPoligonalArea(attrs, geom, geom->getArea()));     break;
+            case GEOS_POLYGON:    polygons   .push_back(AttributedPoligonalArea(attrs, dynamic_cast<Polygon    *>(geom), geom->getArea())); break;
             case GEOS_LINESTRING: lineStrings.push_back(AttributedLineString   (attrs, dynamic_cast<LineString *>(geom))); break;
             default:
                 dmess("Implement for " << geom->getGeometryType());
         }
     }
     
-    sort(polygons.begin(), polygons.end(), [](const AttributedPoligonalArea & lhs,
-                                              const AttributedPoligonalArea & rhs) { return get<2>(lhs) < get<2>(rhs) ;});
+    discoverTopologicalRelations(polygons);
+    breakLineStrings            (lineStrings);
 
-    for(const AttributedPoligonalArea & g : polygons)
-    {
-        serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<1>(g)), get<0>(g)));
-    }
-
-    for(const AttributedLineString & l : breakLineStrings(lineStrings))
-    {
-        serializedLineStrings.push_back(GeometryConverter::convert(l));
-    }
+    for(const AttributedPoligonalArea & g : polygons)    { serializedPolygons.push_back   (GeometryConverter::convert(g)) ;}
+    for(const AttributedLineString    & l : lineStrings) { serializedLineStrings.push_back(GeometryConverter::convert(l)) ;}
 
     OGREnvelope extent;
 
@@ -239,19 +232,13 @@ string GeoServer::addOsmFile(const string & osmFile)
         //unique_ptr<CoordinateSequence>(i.second->getCoordinates())->toVector();
     }
 
-    sort(polygons.begin(), polygons.end(), [](const AttributedPoligonalArea & lhs,
-                                              const AttributedPoligonalArea & rhs) { return get<1>(lhs) > get<1>(rhs) ;});
+    discoverTopologicalRelations(polygons);
 
-    for(const AttributedPoligonalArea & g : polygons)
-    {
-        serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<1>(g)), get<0>(g)));
-    }
+    breakLineStrings(lineStrings);
 
-    for(const AttributedLineString & l : breakLineStrings(lineStrings))
-    {
-        serializedLineStrings.push_back(GeometryConverter::convert(l));
-    }
-
+    for(const AttributedPoligonalArea & g : polygons)    { serializedPolygons   .push_back(GeometryConverter::convert(g)) ;}
+    for(const AttributedLineString    & l : lineStrings) { serializedLineStrings.push_back(GeometryConverter::convert(l)) ;}
+    
     dmess("numEmptyPoints " << numEmptyPoints);
 
     dmess("numVertices " << numVertices);
