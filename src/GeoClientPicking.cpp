@@ -160,8 +160,6 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
     Renderable * renderiable;
     Attributes * attrs;
 
-    string attrsStr;
-
     switch(mode)
     {
         case GUI::PICK_MODE_LINESTRING:
@@ -191,6 +189,8 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
             glDisable(GL_BLEND);
 
             renderiable->render(canvas);
+
+            return attrs->toString();
         }
         case GUI::PICK_MODE_POLYGON_MULTIPLE:
         {
@@ -202,7 +202,7 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
             renderiable->render(canvas);
 
-            attrsStr = attrs->toString();
+            string attrsStr = attrs->toString();
 
             for(size_t i = 1; i < picked.size(); ++i)
             {
@@ -211,9 +211,9 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
                 attrsStr += get<1>(picked[i])->toString();
             }
             
-            break;
+            return attrsStr;
         }
     }
 
-    return attrsStr;
+    return "";
 }
