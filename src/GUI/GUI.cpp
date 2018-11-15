@@ -336,7 +336,8 @@ void GUI::showMainMenuBar()
         if(ImGui::MenuItem("Attributes"))      { showAttributePanel      ^= 1 ;}
         if(ImGui::MenuItem("GUI Settings"))    { showGUI_Settings_Panel  ^= 1 ;}
         if(ImGui::MenuItem("Symbology"))       { showSymbologyPanel      ^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer"))       { showOpenSteerTestPanel  ^= 1 ;}
+        if(ImGui::MenuItem("OpenSteer Test"))  { showOpenSteerTestPanel  ^= 1 ;}
+        if(ImGui::MenuItem("OpenSteer"))       { showOpenSteerPanel      ^= 1 ;}
         if(ImGui::MenuItem("Camera Info"))     { showCameraInfoPanel     ^= 1 ;}
 
         ImGui::EndMenu();

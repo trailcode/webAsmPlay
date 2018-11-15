@@ -61,6 +61,8 @@ Renderable       * Edge::getRenderable() const { return renderable ;}
 const LineString * Edge::getGeometry()   const { return geom       ;}
 Attributes       * Edge::getAttributes() const { return attributes ;}
 
+#define INF 0x3f3f3f3f // TODO use numeric_limits!
+
 namespace
 {
     typedef vector<Edge *> Edges;
@@ -101,6 +103,11 @@ namespace
     };
 
     unique_ptr<Renderable> pathAnnotation;
+
+    // Dijkstra state arrays
+    vector<int>    dist;
+    vector<bool>   seen;
+    vector<size_t> parent;
 }
 
 Network::Network(GeoClient * client) : client(client) {}
@@ -119,6 +126,10 @@ void Network::setEdges(const Edges & _edges)
     }
 
     nodes.resize(edgeMap.size());
+
+    dist   = vector<int>   (nodes.size(), INF);
+    seen   = vector<bool>  (nodes.size(), false);
+    parent = vector<size_t>(nodes.size());
 
     size_t currNode = 0;
 
@@ -150,8 +161,6 @@ void Network::setStartEdge(const PointOnEdge & start)
 
     client->getCanvas()->addRenderable(startRenderable.get());
 }
-
-# define INF 0x3f3f3f3f
 
 void Network::findPath(const PointOnEdge & end)
 {
@@ -186,11 +195,19 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
     //dmess("startIndex " << startIndex << " nodeMap " << nodeMap.size());
 
+    /*
     vector<int> dist(nodes.size(), INF);
-
     vector<bool> seen(nodes.size(), false);
-
     vector<size_t> parent(nodes.size());
+    */
+
+    // TODO, try to only reset the ones which have been modified.
+    for(size_t i = 0; i < nodes.size(); ++i)
+    {
+        dist[i] = INF;
+
+        seen[i] = false;
+    }
 
     dist[startIndex] = 0;
 

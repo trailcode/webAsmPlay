@@ -190,6 +190,8 @@ No notes.
 * Zombie bots need to avoid walking through building walls.
 * Make a unified camera class.
 * Move OpenSteer Vec3 objects to glm::dvec objects.
+* Detect OSM building polygons which have the same base but different heights. Use only the one with the smallest height.
+    * Investigate this some more.
 
 ### Bugs
 

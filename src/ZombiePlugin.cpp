@@ -69,7 +69,12 @@ void ZombiePlugin::open()
 
     // create the specified number of Pedestrians
     population = 0;
-    for (int i = 0; i < gPedestrianStartCount; i++) addPedestrianToCrowd ();
+    for (int i = 0; i < gPedestrianStartCount; i++)
+    {
+        dmess("Add Pedestrian " << i << " of " << gPedestrianStartCount);
+        
+        addPedestrianToCrowd ();
+    }
 
     // initialize camera and selectedVehicle
     Zombie& firstPedestrian = **crowd.begin();
