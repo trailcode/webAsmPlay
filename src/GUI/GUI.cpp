@@ -298,8 +298,8 @@ void GUI::showMainMenuBar()
         if(ImGui::MenuItem("Test Web Worker"))
         {
             #ifdef __EMSCRIPTEN__
-                worker_handle worker = emscripten_create_worker("worker.js");
-                emscripten_call_worker(worker, "one", 0, 0, cback, (void*)42);
+                //worker_handle worker = emscripten_create_worker("worker.js");
+                //emscripten_call_worker(worker, "one", 0, 0, cback, (void*)42);
             #else
                 dmess("Implement me!");
             #endif

@@ -88,8 +88,6 @@ string GeoServer::addGeoFile(const string & geomFile)
     return geomFile;
 }
 
-typedef tuple<Geometry *, double, Attributes *> PolyAndArea; // TODO better name.
-
 string GeoServer::addGdalSupportedFile(const string & gdalFile)
 {
     cout << "Loading: " << gdalFile << endl;
@@ -108,8 +106,8 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
 
     const GEOSContextHandle_t gctx = OGRGeometry::createGEOSContext();
 
-    vector<PolyAndArea>          polygons;
-    vector<AttributedLineString> lineStrings;
+    vector<AttributedPoligonalArea> polygons;
+    vector<AttributedLineString>    lineStrings;
 
     for(const auto & poFeature : *poLayer)
     {
@@ -135,23 +133,19 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
         
         switch(geom->getGeometryTypeId())
         {
-            case GEOS_POLYGON:    polygons   .push_back(PolyAndArea(geom, geom->getArea(), attrs)); break;
-            case GEOS_LINESTRING: lineStrings.push_back(AttributedLineString(attrs, dynamic_cast<LineString *>(geom))); break;
+            case GEOS_POLYGON:    polygons   .push_back(AttributedPoligonalArea(attrs, geom, geom->getArea()));     break;
+            case GEOS_LINESTRING: lineStrings.push_back(AttributedLineString   (attrs, dynamic_cast<LineString *>(geom))); break;
             default:
                 dmess("Implement for " << geom->getGeometryType());
         }
     }
     
-    sort(polygons.begin(), polygons.end(), [](const PolyAndArea & lhs, const PolyAndArea & rhs) { return get<1>(lhs) < get<1>(rhs) ;});
+    sort(polygons.begin(), polygons.end(), [](const AttributedPoligonalArea & lhs,
+                                              const AttributedPoligonalArea & rhs) { return get<2>(lhs) < get<2>(rhs) ;});
 
-    for(const PolyAndArea & g : polygons)
+    for(const AttributedPoligonalArea & g : polygons)
     {
-        //dmess("g " << get<1>(g) << " " << get<0>(g)->getGeometryType());
-    }
-
-    for(const PolyAndArea & g : polygons)
-    {
-        serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g)));
+        serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<1>(g)), get<0>(g)));
     }
 
     for(const AttributedLineString & l : breakLineStrings(lineStrings))
@@ -196,8 +190,8 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     size_t numEmptyPoints = 0;
 
-    vector<PolyAndArea>          polygons;
-    vector<AttributedLineString> lineStrings;
+    vector<AttributedPoligonalArea> polygons;
+    vector<AttributedLineString>    lineStrings;
 
     for(const AttributedGeometry & i : geometry)
     {
@@ -207,7 +201,7 @@ string GeoServer::addOsmFile(const string & osmFile)
 
             i.first->doubles["area"] = area;
 
-            polygons.push_back(PolyAndArea(polygon, area, i.first));
+            polygons.push_back(AttributedPoligonalArea(i.first, polygon, area));
 
             unique_ptr<CoordinateSequence> coords(i.second->getCoordinates());
 
@@ -245,16 +239,12 @@ string GeoServer::addOsmFile(const string & osmFile)
         //unique_ptr<CoordinateSequence>(i.second->getCoordinates())->toVector();
     }
 
-    sort(polygons.begin(), polygons.end(), [](const PolyAndArea & lhs, const PolyAndArea & rhs) { return get<1>(lhs) > get<1>(rhs) ;});
+    sort(polygons.begin(), polygons.end(), [](const AttributedPoligonalArea & lhs,
+                                              const AttributedPoligonalArea & rhs) { return get<1>(lhs) > get<1>(rhs) ;});
 
-    for(const PolyAndArea & g : polygons)
+    for(const AttributedPoligonalArea & g : polygons)
     {
-        //dmess("g " << get<1>(g) << " " << get<0>(g)->getGeometryType());
-    }
-
-    for(const PolyAndArea & g : polygons)
-    {
-        serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<0>(g)), get<2>(g)));
+        serializedPolygons.push_back(GeometryConverter::convert(dynamic_cast<const Polygon *>(get<1>(g)), get<0>(g)));
     }
 
     for(const AttributedLineString & l : breakLineStrings(lineStrings))

@@ -24,58 +24,11 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_TYPES_H__
-#define __WEB_ASM_PLAY_TYPES_H__
+#include <geoServer/Topology.h>
 
-#include <functional>
-#include <tuple>
-#include <vector>
-#include <memory>
-#include <glm/vec2.hpp>
+using namespace std;
 
-class Attributes;
-class Edge;
-class Renderable;
-
-namespace geos
+void topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & polygons)
 {
-    namespace geom
-    {
-        class Geometry;
-        class Polygon;
-        class LineString;
-        class Point;
-        class MultiPolygon;
-    }
+
 }
-
-typedef std::tuple<double, double, double, double> AABB2D;
-
-typedef std::pair<Attributes *, geos::geom::Geometry   *> AttributedGeometry;
-typedef std::pair<Attributes *, geos::geom::LineString *> AttributedLineString;
-typedef std::pair<Attributes *, geos::geom::Point      *> AttributedPoint;
-
-typedef std::tuple<Attributes *, geos::geom::Geometry *, double> AttributedPoligonalArea;
-
-typedef std::pair<const geos::geom::Geometry *, const size_t> ColoredGeometry;
-
-typedef std::pair<glm::dvec2, Edge *> PointOnEdge;
-
-typedef std::vector<ColoredGeometry> ColoredGeometryVec;
-
-typedef std::tuple<const geos::geom::Geometry *, const size_t, const double> ColoredExtrudedGeometry;
-
-typedef std::vector<ColoredExtrudedGeometry> ColoredExtrudedGeometryVec; 
-
-typedef std::vector<const geos::geom::Geometry *> ConstGeosGeomVec;
-
-typedef std::vector<float> FloatVec;
-
-typedef std::vector<uint32_t> Uint32Vec;
-
-typedef std::vector<std::string> StrVec;
-
-typedef std::function<void ()> Updatable;
-
-#endif // __WEB_ASM_PLAY_TYPES_H__
-
