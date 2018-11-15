@@ -57,6 +57,14 @@ typedef std::pair<Attributes *, geos::geom::Point      *> AttributedPoint;
 
 typedef std::tuple<Attributes *, geos::geom::Polygon *, double> AttributedPoligonalArea;
 
+inline Attributes          *& attrs(AttributedPoligonalArea & v) { return std::get<0>(v) ;}
+inline geos::geom::Polygon *& poly (AttributedPoligonalArea & v) { return std::get<1>(v) ;}
+inline double               & area (AttributedPoligonalArea & v) { return std::get<2>(v) ;}
+
+inline Attributes          * attrs(const AttributedPoligonalArea & v) { return std::get<0>(v) ;}
+inline geos::geom::Polygon * poly (const AttributedPoligonalArea & v) { return std::get<1>(v) ;}
+inline double                area (const AttributedPoligonalArea & v) { return std::get<2>(v) ;}
+
 typedef std::pair<const geos::geom::Geometry *, const size_t> ColoredGeometry;
 
 typedef std::pair<glm::dvec2, Edge *> PointOnEdge;
