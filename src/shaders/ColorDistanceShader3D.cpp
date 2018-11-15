@@ -93,7 +93,7 @@ void ColorDistanceShader3D::ensureShader()
             gl_Position = projection * MV * vert;
 
             vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
-            vertexColorFar  = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
+            vertexColorFar  = texture(tex, vec2(vertColorIn + (2.0 + colorLookupOffset) / 32.0, 0.5));
 
             normal = mat3(transpose(inverse(model))) * normalIn;
         }
@@ -220,7 +220,7 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
     shaderProgram->setUniform(viewLoc,       canvas->getViewRef());
     shaderProgram->setUniform(projectionLoc, canvas->getProjectionRef());
 
-    if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 2.0f) ;}
+    if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 1.0f) ;}
     else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}
 }
 

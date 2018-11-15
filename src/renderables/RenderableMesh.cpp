@@ -144,6 +144,8 @@ void RenderableMesh::render(Canvas * canvas) const
         vertexArrayObject->drawTriangles();
     }
 
+    GL_CHECK(glDisable(GL_BLEND)); // TODO Remove!
+
     if(getRenderOutline())
     {
         shader->bind(canvas, true);
@@ -158,5 +160,5 @@ void RenderableMesh::render(Canvas * canvas) const
         vertexArrayObject->drawLines();
     }
 
-    GL_CHECK(glDisable(GL_BLEND)); // TODO Remove!
+    //GL_CHECK(glDisable(GL_BLEND)); // TODO Remove!
 }

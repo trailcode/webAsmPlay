@@ -58,12 +58,14 @@ namespace
     {
         ColorDistanceShader3D * shader = ColorDistanceShader3D::getDefaultInstance();
 
-        if(ImGui::ColorEdit4((name + " roof near")   .c_str(), value_ptr(colors[0]), flags)) { shader->setColor(colorIndex * 6 + 0, colors[0]) ;}
-        if(ImGui::ColorEdit4((name + " roof far")    .c_str(), value_ptr(colors[1]), flags)) { shader->setColor(colorIndex * 6 + 1, colors[1]) ;}
-        if(ImGui::ColorEdit4((name + " outline near").c_str(), value_ptr(colors[2]), flags)) { shader->setColor(colorIndex * 6 + 2, colors[2]) ;}
-        if(ImGui::ColorEdit4((name + " outline far") .c_str(), value_ptr(colors[3]), flags)) { shader->setColor(colorIndex * 6 + 3, colors[3]) ;}
-        if(ImGui::ColorEdit4((name + " wall near")   .c_str(), value_ptr(colors[4]), flags)) { shader->setColor(colorIndex * 6 + 4, colors[4]) ;}
-        if(ImGui::ColorEdit4((name + " wall far")    .c_str(), value_ptr(colors[5]), flags)) { shader->setColor(colorIndex * 6 + 5, colors[5]) ;}
+        if(ImGui::ColorEdit4((name + " roof near")        .c_str(), value_ptr(colors[0]), flags)) { shader->setColor(colorIndex * 8 + 0, colors[0]) ;}
+        if(ImGui::ColorEdit4((name + " roof outline near").c_str(), value_ptr(colors[1]), flags)) { shader->setColor(colorIndex * 8 + 1, colors[1]) ;}
+        if(ImGui::ColorEdit4((name + " roof far")         .c_str(), value_ptr(colors[2]), flags)) { shader->setColor(colorIndex * 8 + 2, colors[2]) ;}
+        if(ImGui::ColorEdit4((name + " roof outline far") .c_str(), value_ptr(colors[3]), flags)) { shader->setColor(colorIndex * 8 + 3, colors[3]) ;}
+        if(ImGui::ColorEdit4((name + " wall near")        .c_str(), value_ptr(colors[4]), flags)) { shader->setColor(colorIndex * 8 + 4, colors[4]) ;}
+        if(ImGui::ColorEdit4((name + " wall outline near").c_str(), value_ptr(colors[5]), flags)) { shader->setColor(colorIndex * 8 + 5, colors[5]) ;}
+        if(ImGui::ColorEdit4((name + " wall far")         .c_str(), value_ptr(colors[6]), flags)) { shader->setColor(colorIndex * 8 + 6, colors[6]) ;}
+        if(ImGui::ColorEdit4((name + " wall outline far") .c_str(), value_ptr(colors[7]), flags)) { shader->setColor(colorIndex * 8 + 7, colors[7]) ;}
     }
 }
 
@@ -91,8 +93,8 @@ void GUI::symbologyPanel()
     {
         ColorDistanceShader3D * shader = ColorDistanceShader3D::getDefaultInstance();
 
-        addMeshSymbologyColorControls(0, "House",    &shader->getColorRef(0 * 6));
-        addMeshSymbologyColorControls(1, "Building", &shader->getColorRef(1 * 6));
+        addMeshSymbologyColorControls(0, "House",    &shader->getColorRef(0 * 8));
+        addMeshSymbologyColorControls(1, "Building", &shader->getColorRef(1 * 8));
     }
 
     ImGui::End();

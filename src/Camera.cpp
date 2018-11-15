@@ -114,11 +114,15 @@ namespace rsmz
         mCenter.x = x;
         mCenter.y = y;
         mCenter.z = z;
+
+        mCenter.z = 0; // TODO This is a hack
     }
 
     void Camera::setCenter(const glm::vec3 & c)
     {
         mCenter = c;
+
+        mCenter.z = 0; // TODO This is a hack
     }
 
     void Camera::setUp(float x, float y, float z)

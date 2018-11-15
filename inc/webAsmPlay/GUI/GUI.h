@@ -75,8 +75,6 @@ public:
     
     static void progress(const std::string & message, const float percent);
 
-    static float getHeightMultiplier();
-
     static GLFWwindow * getMainWindow();
 
     static Updatable addUpdatable(Updatable updatable);
@@ -137,8 +135,6 @@ private:
     static GeoClient       * client;
 
     static std::vector<Canvas *> auxCanvases;
-
-    static float heightMultiplier;
 
     static int cameraMode;
 

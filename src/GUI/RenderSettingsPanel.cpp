@@ -34,8 +34,6 @@
 using namespace std;
 using namespace glm;
 
-float GUI::heightMultiplier = 1.0f;
-
 void GUI::renderSettingsPanel()
 {
     if(!showRenderSettingsPanel) { return ;}
@@ -69,6 +67,8 @@ void GUI::renderSettingsPanel()
         
         //ImGui::Spacing();
 
+        float heightMultiplier = ColorDistanceShader3D::getDefaultInstance()->getHeightMultiplier();
+
         if(ImGui::SliderFloat("", &heightMultiplier, 0.0f, 5.0f, "Height mult: %.3f"))
         {
             ColorDistanceShader3D::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
@@ -83,4 +83,4 @@ void GUI::renderSettingsPanel()
     ImGui::End();
 }
 
-float GUI::getHeightMultiplier() { return heightMultiplier ;}
+//float GUI::getHeightMultiplier() { return heightMultiplier ;}

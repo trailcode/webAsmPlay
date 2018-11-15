@@ -169,7 +169,9 @@ No notes.
     * ~~Or better, pass into shader name and location reference pairs.~~
 
 * Determine topological relationships of the polygonal features in the GeoServer.
-  This will allow associating OSM building parts and extruding them on top of their parent geometry. 
+  This will allow associating OSM building parts and extruding them on top of their parent geometry.
+
+* Implement movable clip planes.
 
 ### TODO
 
