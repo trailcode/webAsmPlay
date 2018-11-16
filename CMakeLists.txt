@@ -99,7 +99,7 @@ file(GLOB tceRender_SRC     "./tceRender/src/*.cpp")
 
 file(GLOB simpleJSON_SRC "ThirdParty/SimpleJSON/src/*.cpp")
 
-file(GLOB imguiSrc  "ThirdParty/imgui/*.cpp")
+file(GLOB imguiSrc  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
 
 file(GLOB webAsmPlay_SRC        "src/GUI/GUI.cpp"
                                 "src/GUI/GeosTestPanel.cpp"
@@ -234,11 +234,13 @@ else()
     find_package(Boost COMPONENTS filesystem REQUIRED)
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
-    
-    include_directories(${GLEW_INCLUDE_DIRS})
+	find_package(GLEW REQUIRED)
+
+	include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${Boost_INCLUDE_DIRS})
-    include_directories(${SDL2_INCLUDE_DIRS})
+    include_directories(${SDL2_INCLUDE_DIR})
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
+	include_directories(${GLFW3_INCLUDE_PATH})
     include_directories(ThirdParty/ctpl)
     include_directories(./)
     
@@ -246,7 +248,8 @@ else()
     link_libraries(glfw)
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
-    link_libraries(${Boost_LIBRARIES})
+    #link_libraries(${Boost_LIBRARIES})
+	link_libraries(${Boost_LIBRARY})
 
     set(ASSET_FILES
             back.png

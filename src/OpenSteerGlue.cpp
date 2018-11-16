@@ -42,6 +42,10 @@
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/OpenSteerGlue.h>
 
+#ifdef max
+#undef max
+#endif
+
 using namespace std;
 using namespace glm;
 using namespace geos::geom;

@@ -36,7 +36,9 @@
 #endif
 
 #include <list>
+#include <vector>
 #include <stack>
+#include <mutex>
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>

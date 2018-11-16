@@ -42,7 +42,7 @@ In the near future this project is going to be renamed to ZombieGeoSim.
 Unfortunately during development notes on build depends were not tracked. Development is currently
 being done on OSX. Macports (https://www.macports.org/) and Brew (https://brew.sh/) is being used to
 install third party dependencies. C++ 14 is being used. Currently emscripten is using clang 5.0 which
-does not fully support c++ 17. 
+does not fully support c++ 17. On windows it is recommened to use scoop (https://scoop.sh) to install third party requirements
 
 * Cmake: https://cmake.org
 * Emscripten: http://kripken.github.io/emscripten-site
@@ -75,6 +75,7 @@ and allow C++ 17 compilation:
 * https://www.iconfinder.com/iconsets/32x32-free-design-icons
 
 #### Building
+
 
 The web client:
 

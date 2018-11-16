@@ -36,6 +36,7 @@
 using namespace std;
 using namespace std::chrono;
 using namespace glm;
+using namespace geos;
 using namespace geos::geom;
 
 Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons,
@@ -57,10 +58,10 @@ Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons
         const double      height      = get<2>(polygons[i]);
         const double      minHeight   = get<3>(polygons[i]);
         
-        const Polygon      * poly;
+        const geom::Polygon      * poly;
         const MultiPolygon * multiPoly;
 
-        if((poly = dynamic_cast<const Polygon *>(geom)))
+        if((poly = dynamic_cast<const geom::Polygon *>(geom)))
         {
             tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID, height));
             

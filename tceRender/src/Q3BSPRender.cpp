@@ -8,6 +8,8 @@
  *   (at your option) any later version.                                   *
  ***************************************************************************/
 
+#ifdef WORKING
+
 #include <iostream>
 //#include <GL/glew.h>
 #ifdef __APPLE__
@@ -1085,3 +1087,5 @@ just renders the nav graph. perhaps your could create an algorithm that combines
 Then as you knwo with q3dm13 with 60 bots a big cluster fuck happens. Find an algorithm to detect cluster fucks and rate them. Then find the bots that are on the outside of the cluster fuck and have them find another destination. 
 */
 
+
+#endif

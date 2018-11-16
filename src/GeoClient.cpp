@@ -29,6 +29,7 @@
 #include <emscripten/fetch.h>
 #endif
 
+#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
@@ -42,6 +43,10 @@
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GeoClient.h>
+
+#ifdef min
+#undef min
+#endif
 
 using namespace std;
 using namespace std::chrono;
