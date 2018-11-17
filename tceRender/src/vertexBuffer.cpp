@@ -1,3 +1,6 @@
+
+#ifdef WORKING
+
 //#include <GL/glew.h>
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -67,3 +70,4 @@ int VertexBuffer::GetSize() {
 	return size;
 }
 
+#endif

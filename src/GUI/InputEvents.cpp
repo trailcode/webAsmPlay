@@ -25,6 +25,8 @@
   \copyright 2018
 */
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeoClient.h>

@@ -39,9 +39,10 @@ In the near future this project is going to be renamed to ZombieGeoSim.
 
 ### Dependencies
 
-For development on OSX it is suggested to use Macports (https://www.macports.org) or Brew (https://brew.sh) to
-install supported third party dependencies. C++ 14 is being used. Currently emscripten is using clang 5.0 which
-does not fully support c++ 17. 
+Unfortunately during development notes on build depends were not tracked. Development is currently
+being done on OSX. Macports (https://www.macports.org/) and Brew (https://brew.sh/) is being used to
+install third party dependencies. C++ 14 is being used. Currently emscripten is using clang 5.0 which
+does not fully support c++ 17. On windows it is recommened to use scoop (https://scoop.sh) to install third party requirements
 
 * Cmake: https://cmake.org
 * Emscripten: http://kripken.github.io/emscripten-site
@@ -49,7 +50,7 @@ does not fully support c++ 17.
 * Glew: http://glew.sourceforge.net/
 * Boost: https://www.boost.org/
 * Websocketpp: https://www.zaphoyd.com/websocketpp
-* Gdal: https://www.gdal.org/ [[Must be built with Geos]]
+* Gdal: https://www.gdal.org/ [[Must be built with Geos]]  For Windows: http://www.gisinternals.com
 * Geos https://trac.osgeo.org/geos
 * SDL2_image: https://www.libsdl.org/
 * Intel TBB: https://www.threadingbuildingblocks.org/
@@ -74,6 +75,7 @@ and allow C++ 17 compilation:
 * https://www.iconfinder.com/iconsets/32x32-free-design-icons
 
 #### Building
+
 
 The web client:
 

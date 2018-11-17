@@ -28,6 +28,9 @@
 #include <emscripten/fetch.h>
 #endif
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>

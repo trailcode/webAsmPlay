@@ -29,6 +29,7 @@
 #include <emscripten/fetch.h>
 #endif
 
+#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
@@ -39,9 +40,13 @@
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
-#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
+#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GeoClient.h>
+
+#ifdef min
+#undef min
+#endif
 
 using namespace std;
 using namespace std::chrono;
@@ -100,7 +105,7 @@ GeoClient::GeoClient(Canvas * canvas) : canvas(canvas)
 
         glfwMakeContextCurrent(threadWin);
 
-        gl3wInit();
+        //gl3wInit();
 
         _client->run();
 

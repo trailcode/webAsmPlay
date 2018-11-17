@@ -29,7 +29,7 @@
 #include <limits>
 #include <ctpl.h>
 #include <glm/vec2.hpp>
-#include <boost/histogram.hpp>
+//#include <boost/histogram.hpp>
 #include <boost/filesystem.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
@@ -44,13 +44,18 @@
 #include <geoServer/Topology.h>
 #include <geoServer/GeoServer.h>
 
+#ifdef max
+#undef max
+#endif
+
+
 using namespace std;
 using namespace glm;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 using namespace boost;
-using namespace boost::histogram;
+//using namespace boost::histogram;
 using namespace geos::io;
 using namespace geos::geom;
 using namespace topology;
@@ -90,6 +95,8 @@ string GeoServer::addGeoFile(const string & geomFile)
 
 string GeoServer::addGdalSupportedFile(const string & gdalFile)
 {
+	using geos::geom::Polygon;
+
     cout << "Loading: " << gdalFile << endl;
 
     GDALAllRegister();
@@ -167,6 +174,8 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
 
 string GeoServer::addOsmFile(const string & osmFile)
 {
+	using geos::geom::Polygon;
+
     cout << "Loading: " << osmFile << endl;
 
     vector<AttributedGeometry> geometry = OSM_Reader::import(osmFile);

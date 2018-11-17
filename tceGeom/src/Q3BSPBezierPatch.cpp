@@ -1,3 +1,5 @@
+#ifdef WORKING
+
 #include <tceGeom/Q3BSPBezierPatch.h>
 #include <tceGeom/Q3BSPMap.h>
 #include <tceRender/vertexBuffer.h>
@@ -408,3 +410,5 @@ Q3BSPBezierPatch::QuadraticBezierSubdivide2 (Vec3f G[], int iLevel)
 	QuadraticBezierSubdivide2 (&G[iMid], iLevel);
 
 }
+
+#endif

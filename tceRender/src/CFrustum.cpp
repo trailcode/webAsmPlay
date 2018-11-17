@@ -4,6 +4,8 @@
 // Created on: Sun Mar 23 16:27:04 2003
 //
 
+#ifdef WORKING
+
 #include <math.h>
 //#include <GL/glew.h>
 #ifdef __APPLE__
@@ -214,3 +216,4 @@ CFrustum::AABBInFrustum(const Vec3f & pos, const Vec3f & AABB)
 	return true;
 }
 
+#endif

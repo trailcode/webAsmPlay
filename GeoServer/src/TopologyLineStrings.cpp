@@ -26,6 +26,7 @@
 
 #include <memory>
 #include <list>
+#include <algorithm>
 #include <geos/geom/Point.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryCollection.h>

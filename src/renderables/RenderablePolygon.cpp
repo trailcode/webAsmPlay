@@ -36,6 +36,7 @@
 using namespace std;
 using namespace std::chrono;
 using namespace glm;
+using namespace geos;
 using namespace geos::geom;
 
 RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable(vertexArrayObject->isMulti(),
@@ -50,7 +51,7 @@ RenderablePolygon::~RenderablePolygon()
     delete vertexArrayObject;
 }
 
-Renderable * RenderablePolygon::create( const Polygon * poly,
+Renderable * RenderablePolygon::create( const geom::Polygon * poly,
                                         const dmat4   & trans,
                                         const size_t    symbologyID)
 {
@@ -91,10 +92,10 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
         const Geometry  * geom        = get<0>(polygons[i]);
         const GLuint      symbologyID = get<1>(polygons[i]);
         
-        const Polygon      * poly;
+        const geom::Polygon      * poly;
         const MultiPolygon * multiPoly;
 
-        if((poly = dynamic_cast<const Polygon *>(geom)))
+        if((poly = dynamic_cast<const geom::Polygon *>(geom)))
         {
             tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
             

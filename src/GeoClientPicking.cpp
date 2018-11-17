@@ -38,6 +38,10 @@
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeoClient.h>
 
+#ifdef max
+#undef max
+#endif
+
 using namespace std;
 using namespace glm;
 using namespace geos::geom;

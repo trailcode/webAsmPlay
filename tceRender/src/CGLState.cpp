@@ -1,4 +1,5 @@
 
+#ifdef WORKING
 //#include <GL/glew.h>
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -198,3 +199,5 @@ void CGLState::setCullFunc(const Q3BSPShader & shader)
 
 	}
 }
+
+#endif

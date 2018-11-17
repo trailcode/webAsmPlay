@@ -42,6 +42,10 @@
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/OpenSteerGlue.h>
 
+#ifdef max
+#undef max
+#endif
+
 using namespace std;
 using namespace glm;
 using namespace geos::geom;
@@ -132,7 +136,7 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
         glfwMakeContextCurrent(threadWin);
 
-        gl3wInit();
+        //gl3wInit();
 
         dmess("Start OpenSteerDemo::initialize()");
 

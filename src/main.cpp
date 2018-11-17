@@ -37,7 +37,25 @@
 // You may use another loader/header of your choice (glext, glLoadGen, etc.), or chose to manually implement your own.
 #ifndef __EMSCRIPTEN__
 
-    #include <GL/gl3w.h>    // Initialize with gl3wInit()
+#ifdef USE_GL_ES3
+	// OpenGL ES 3
+#include <GLES3/gl3.h>  // Use GL ES 3
+#else
+// Regular OpenGL
+// About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
+// Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
+// You may use another loader/header of your choice (glext, glLoadGen, etc.), or chose to manually implement your own.
+#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
+#include <GL/gl3w.h>
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
+#include <GL/glew.h>
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
+#include <glad/glad.h>
+#else
+#include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
+#endif
+#endif
+
 #endif
 
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions 
@@ -70,7 +88,7 @@ int main(int, char**)
     // GL 3.0 + GLSL 130
     const char* glsl_version = "#version 330";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
@@ -81,16 +99,23 @@ int main(int, char**)
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
+
+#ifndef __EMSCRIPTEN__
+	// Initialize OpenGL loader
+
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	/*
+		if (gl3wInit() != 0)
+		{
+			fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+			return 1;
+		}
+		*/
+#endif
+
     glfwSwapInterval(1); // Enable vsync
 
-    #ifndef __EMSCRIPTEN__
-        // Initialize OpenGL loader
-        if (gl3wInit() != 0)
-        {
-            fprintf(stderr, "Failed to initialize OpenGL loader!\n");
-            return 1;
-        }
-    #endif
+    
 
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
@@ -165,7 +190,7 @@ int main(int, char**)
 
     dmess("Before join");
 
-    openSteerThread->join();
+	if (openSteerThread) { openSteerThread->join(); }
 
     dmess("After join");
 
