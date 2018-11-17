@@ -55,8 +55,9 @@ private:
     Server serverEndPoint;
 
     static void onMessage(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
-
+#ifdef __USE_GDAL__
     std::string addGdalSupportedFile(const std::string & gdalFile);
+#endif
 
     std::string addOsmFile(const std::string & osmFile);
 

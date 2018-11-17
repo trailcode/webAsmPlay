@@ -35,7 +35,9 @@
 #include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>
 #include <geos/io/WKTWriter.h>
-#include "ogrsf_frmts.h"
+#ifdef __USE_GDAL__
+    #include "ogrsf_frmts.h"
+#endif
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Attributes.h>
@@ -81,7 +83,9 @@ string GeoServer::addGeoFile(const string & geomFile)
     const string ext = filesystem::path(geomFile).extension().string();
 
          if(ext == ".osm") { addOsmFile          (geomFile) ;}
+#ifdef __USE_GDAL__
     else if(ext == ".shp") { addGdalSupportedFile(geomFile) ;}
+#endif
     else if(ext == ".geo") { _addGeoFile         (geomFile) ;}
     else
     {
@@ -93,6 +97,7 @@ string GeoServer::addGeoFile(const string & geomFile)
     return geomFile;
 }
 
+#ifdef __USE_GDAL__
 string GeoServer::addGdalSupportedFile(const string & gdalFile)
 {
 	using geos::geom::Polygon;
@@ -171,6 +176,7 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
 
     return gdalFile;
 }
+#endif
 
 string GeoServer::addOsmFile(const string & osmFile)
 {
