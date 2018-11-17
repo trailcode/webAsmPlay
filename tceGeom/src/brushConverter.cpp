@@ -1,3 +1,5 @@
+#ifdef WORKING
+
 #include <iostream>
 #include <tceGeom/polygon.h>
 #include <tceGeom/BSPTree.h>
@@ -391,3 +393,5 @@ namespace tce
 		template class BrushConverter<BSPFacePolyvfVector, BSPPolyPlaneAccess<Plane3f, BSPFacePolyvfVector::polyType> >;
 	}
 }
+
+#endif

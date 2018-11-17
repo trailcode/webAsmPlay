@@ -4,4 +4,6 @@ cmake-build-debug
 build2
 build3
 .vscode
+.vs
 geoServerBuild
+/CMakeSettings.json

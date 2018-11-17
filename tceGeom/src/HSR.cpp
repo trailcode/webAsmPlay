@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
  
+#ifdef WORKING
+
 #include <iostream>
 #include <tceGeom/HSR.h>
 #include <tceGeom/BSPTree.h>
@@ -186,3 +188,4 @@ HiddenSurfaceRemoval::getPolys(BSPTree & BSPTree)
 	}
 }
 
+#endif

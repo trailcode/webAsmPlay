@@ -4,7 +4,13 @@ set(default_build_type "Release")
 set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_BUILD_TYPE Debug)
 #set(EMCC_DEBUG 1)
- 
+
+set(BOOST_ROOT "C:/boost_1_68_0")
+set(SDL2_PATH "C:/tp/SDL2-2.0.9")
+set(SDL2_IMAGE_PATH "C:/tp/SDL2_image-2.0.4")
+set(GLEW_LOCATION "C:/tp/glew-2.1.0")
+set(GLFW_ROOT_DIR "C:/tp/glfw-3.2.1")
+
 #set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD 14)
 
@@ -101,7 +107,12 @@ file(GLOB simpleJSON_SRC "ThirdParty/SimpleJSON/src/*.cpp")
 
 file(GLOB imguiSrc  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
 
-file(GLOB webAsmPlay_SRC        "src/GUI/GUI.cpp"
+file(GLOB webAsmPlay_SRC        
+"inc/webAsmPlay/*.h"
+"inc/webAsmPlay/GUI/*.h"
+"inc/webAsmPlay/renderables/*.h"
+"inc/webAsmPlay/shaders/*.h"
+								"src/GUI/GUI.cpp"
                                 "src/GUI/GeosTestPanel.cpp"
                                 "src/GUI/RenderSettingsPanel.cpp"
                                 "src/GUI/GUI_Settings_Panel.cpp"
@@ -182,6 +193,8 @@ add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 add_definitions(-DGLM_FORCE_RADIANS)
 
+#add_definitions(-DIMGUI_API)
+
 set(sourcePath ${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")
 
@@ -230,8 +243,9 @@ else()
 
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
 
+	find_package(OpenGL)
     find_package(glfw3 REQUIRED)
-    find_package(Boost COMPONENTS filesystem REQUIRED)
+    find_package(Boost COMPONENTS filesystem random REQUIRED)
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
 	find_package(GLEW REQUIRED)
@@ -240,16 +254,24 @@ else()
     include_directories(${Boost_INCLUDE_DIRS})
     include_directories(${SDL2_INCLUDE_DIR})
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
+	#include_directories(${GLFW3_INCLUDE_PATH})
+	message(${GLFW3_INCLUDE_PATH})
 	include_directories(${GLFW3_INCLUDE_PATH})
     include_directories(ThirdParty/ctpl)
+	#include_directories(ThirdParty/imgui/gl3w)
     include_directories(./)
     
     link_libraries(${GLEW_LIBRARIES})
-    link_libraries(glfw)
+    #link_libraries(glfw)
+	message(${GLFW3_LIBRARY})
+	link_libraries(${GLFW3_LIBRARY})
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
-    #link_libraries(${Boost_LIBRARIES})
+    link_libraries(${Boost_LIBRARIES})
 	link_libraries(${Boost_LIBRARY})
+	link_libraries(${OPENGL_gl_LIBRARY})
+	
+	link_directories(${Boost_LIBRARY_DIRS})
 
     set(ASSET_FILES
             back.png
@@ -297,6 +319,8 @@ else()
 	    SET(CMAKE_CXX_LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
 	endif()
 
+	add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+
 endif()
 
 file(GLOB sources   ${webAsmPlay_SRC}
@@ -304,11 +328,12 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     ${GLUTesselatorSrc}
                     ${simpleJSON_SRC}
                     ${opensteerSrc}
+					${imguiSrc}
                     )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
-    add_executable(webAsmPlay ${sources} ${imguiSrc})
+    add_executable(webAsmPlay ${sources})
 
     add_executable(worker "src/Worker.cpp")
 
@@ -318,9 +343,15 @@ else()
 
     #set(CMAKE_CXX_FLAGS "-fsanitize=address -O1 -fno-omit-frame-pointer -g")
 
-    add_executable(webAsmPlay ${sources} ${imguiSrc} "ThirdParty/imgui/gl3w/GL/gl3w.c")
+    #add_executable(webAsmPlay ${sources} "ThirdParty/imgui/gl3w/GL/gl3w.c")
+	add_executable(webAsmPlay ${sources} "ThirdParty/imgui/glad/glad.c")
+	#add_executable(webAsmPlay ${webAsmPlay_SRC} ${opensteerSrc} ${imguiSrc} "ThirdParty/imgui/gl3w/GL/gl3w.c")
 endif()
 
+source_group("webAsmPlay" FILES ${webAsmPlay_SRC})
+source_group("OpenSteer" FILES ${opensteerSrc})
+source_group("imgui" FILES ${imguiSrc})
+source_group("simpleJSON" FILES ${simpleJSON_SRC})
 
 
 

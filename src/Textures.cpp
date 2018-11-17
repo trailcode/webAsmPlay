@@ -40,7 +40,7 @@ namespace
     {
         auto temp_row = std::unique_ptr<char>(new char[width]);
         if (temp_row.get() == nullptr) {
-            SDL_SetError("Not enough memory for image inversion");
+            //SDL_SetError("Not enough memory for image inversion");
             return -1;
         }
         //if height is odd, don't need to swap middle row
@@ -94,6 +94,13 @@ Textures::~Textures()
 GLuint Textures::load(const string & filename)
 {
     SDL_Surface * img = IMG_Load(filename.c_str());
+
+	if(!img)
+	{
+		dmess("Error! could not load: " << filename);
+
+		return 0;
+	}
 
     GLuint texture;
 

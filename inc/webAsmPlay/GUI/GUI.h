@@ -27,9 +27,10 @@
 #ifndef __WEB_ASM_PLAY_GUI_H__
 #define __WEB_ASM_PLAY_GUI_H__
 
+#include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Types.h>
 
-class GLFWwindow;
+//class GLFWwindow;
 class Canvas;
 class GeosTestCanvas;
 class OpenSteerCanvas;

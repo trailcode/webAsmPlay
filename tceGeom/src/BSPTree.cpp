@@ -1,3 +1,5 @@
+#ifdef WORKING
+
 #include <iostream>
 //#include <SDL.h>
 //#include <GL/glew.h>
@@ -707,3 +709,4 @@ BSPTree::drawLeaf(size_t leafIndex)
 
 
 
+#endif

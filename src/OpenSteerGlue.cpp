@@ -136,7 +136,7 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
         glfwMakeContextCurrent(threadWin);
 
-        gl3wInit();
+        //gl3wInit();
 
         dmess("Start OpenSteerDemo::initialize()");
 

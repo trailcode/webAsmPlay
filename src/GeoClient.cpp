@@ -40,8 +40,8 @@
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
-#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
+#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GeoClient.h>
 
 #ifdef min
@@ -105,7 +105,7 @@ GeoClient::GeoClient(Canvas * canvas) : canvas(canvas)
 
         glfwMakeContextCurrent(threadWin);
 
-        gl3wInit();
+        //gl3wInit();
 
         _client->run();
 

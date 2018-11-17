@@ -35,6 +35,7 @@
 
 using namespace std;
 using namespace glm;
+using namespace geos;
 using namespace geos::geom;
 
 string GeometryConverter::convert(const AttributedPoligonalArea & polygon)
@@ -64,7 +65,7 @@ string GeometryConverter::convert(const AttributedPoint & point)
     return ret.str();
 }
 
-void GeometryConverter::convert(const Polygon * poly, const Attributes * attrs, stringstream & data)
+void GeometryConverter::convert(const geom::Polygon * poly, const Attributes * attrs, stringstream & data)
 {
     attrs->write(data);
 
