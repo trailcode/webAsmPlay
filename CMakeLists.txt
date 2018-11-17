@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
 set(default_build_type "Release")
-set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_BUILD_TYPE Debug)
 #set(EMCC_DEBUG 1)
 
@@ -10,6 +10,13 @@ set(SDL2_PATH "C:/tp/SDL2-2.0.9")
 set(SDL2_IMAGE_PATH "C:/tp/SDL2_image-2.0.4")
 set(GLEW_LOCATION "C:/tp/glew-2.1.0")
 set(GLFW_ROOT_DIR "C:/tp/glfw-3.2.1")
+set(GEOS_ROOT "C:/tp/geos-3.7.0")
+#set(GEOS_LIBRARY "C:/tp/geos_Release_3_5_0_x64/lib/geos_i.lib")
+#set(GEOS_INCLUDE_DIR "C:/tp/geos_Release_3_5_0_x64/include")
+set(PC_EXPAT_INCLUDE_DIRS "C:/tp/expat_Release_2_1_0_x64/include")
+set(PC_EXPAT_LIBRARY_DIRS "C:/tp/expat_Release_2_1_0_x64/lib")
+set(GDAL_LIBRARY "C:/tp/gdal_Release_2_3_2_x64/lib/gdal_i.lib")
+set(GDAL_INCLUDE_DIR "C:/tp/gdal_Release_2_3_2_x64/include")
 
 #set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD 14)
@@ -108,10 +115,10 @@ file(GLOB simpleJSON_SRC "ThirdParty/SimpleJSON/src/*.cpp")
 file(GLOB imguiSrc  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
 
 file(GLOB webAsmPlay_SRC        
-"inc/webAsmPlay/*.h"
-"inc/webAsmPlay/GUI/*.h"
-"inc/webAsmPlay/renderables/*.h"
-"inc/webAsmPlay/shaders/*.h"
+								"inc/webAsmPlay/*.h"
+								"inc/webAsmPlay/GUI/*.h"
+								"inc/webAsmPlay/renderables/*.h"
+								"inc/webAsmPlay/shaders/*.h"
 								"src/GUI/GUI.cpp"
                                 "src/GUI/GeosTestPanel.cpp"
                                 "src/GUI/RenderSettingsPanel.cpp"
@@ -160,11 +167,17 @@ file(GLOB webAsmPlay_SRC
                                 "src/Zombie.cpp"
                                 "src/ZombiePlugin.cpp"
                                 "src/Network.cpp"
-                                "src/Main.cpp"
+                                #"src/Main.cpp"
                                 ${tceGeom_SRC}
                                 ${tceCore_SRC}
                                 ${tceOpenSteer_SRC}
                                 ${tceRender_SRC})
+
+file(GLOB geoServer_SRC 
+	"GeoServer/src/*.cpp"
+	"GeoServer/include/geoServer/*.h"
+
+)
 
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
@@ -248,14 +261,14 @@ else()
     find_package(Boost COMPONENTS filesystem random REQUIRED)
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
-	find_package(GLEW REQUIRED)
+	#find_package(GLEW REQUIRED)
+	find_package(GLEW)
 
 	include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${Boost_INCLUDE_DIRS})
     include_directories(${SDL2_INCLUDE_DIR})
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 	#include_directories(${GLFW3_INCLUDE_PATH})
-	message(${GLFW3_INCLUDE_PATH})
 	include_directories(${GLFW3_INCLUDE_PATH})
     include_directories(ThirdParty/ctpl)
 	#include_directories(ThirdParty/imgui/gl3w)
@@ -267,8 +280,9 @@ else()
 	link_libraries(${GLFW3_LIBRARY})
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
+	set(Boost_USE_STATIC_LIBS ON)
     link_libraries(${Boost_LIBRARIES})
-	link_libraries(${Boost_LIBRARY})
+	#link_libraries(${Boost_LIBRARY})
 	link_libraries(${OPENGL_gl_LIBRARY})
 	
 	link_directories(${Boost_LIBRARY_DIRS})
@@ -343,15 +357,48 @@ else()
 
     #set(CMAKE_CXX_FLAGS "-fsanitize=address -O1 -fno-omit-frame-pointer -g")
 
+	if(MSVC_VERSION)
+
+	message("Compiler is MSVC")
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc /std:c++latest /MP")
+
+	endif()
+
     #add_executable(webAsmPlay ${sources} "ThirdParty/imgui/gl3w/GL/gl3w.c")
-	add_executable(webAsmPlay ${sources} "ThirdParty/imgui/glad/glad.c")
+	add_library(libWebAsmPlay STATIC ${sources} "ThirdParty/imgui/glad/glad.c")
 	#add_executable(webAsmPlay ${webAsmPlay_SRC} ${opensteerSrc} ${imguiSrc} "ThirdParty/imgui/gl3w/GL/gl3w.c")
+
+	add_executable(webAsmPlay "src/Main.cpp")
+	target_link_libraries(webAsmPlay libWebAsmPlay)
+
+	find_package(expat REQUIRED)
+	find_package(Boost COMPONENTS filesystem REQUIRED)
+	find_package(gdal REQUIRED)
+
+	#project(geoServer)
+
+	add_executable(geoServer ${geoServer_SRC})
+	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
+	target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
+	target_include_directories(geoServer PRIVATE ${GDAL_INCLUDE_DIR})
+	target_link_libraries(geoServer libWebAsmPlay)
+	target_link_libraries(geoServer ${GDAL_LIBRARY})
+	target_link_libraries(geoServer ${Boost_LIBRARIES})
+	target_link_libraries(geoServer ${EXPAT_LIBRARIES})
+
+	#add_subdirectory(GeoServer)
+
+	
+
 endif()
 
 source_group("webAsmPlay" FILES ${webAsmPlay_SRC})
 source_group("OpenSteer" FILES ${opensteerSrc})
 source_group("imgui" FILES ${imguiSrc})
 source_group("simpleJSON" FILES ${simpleJSON_SRC})
+source_group("GLUTesselator" FILES ${GLUTesselatorSrc})
+source_group("Geos" FILES ${geosSrc})
 
 
 

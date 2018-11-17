@@ -50,7 +50,7 @@ does not fully support c++ 17. On windows it is recommened to use scoop (https:/
 * Glew: http://glew.sourceforge.net/
 * Boost: https://www.boost.org/
 * Websocketpp: https://www.zaphoyd.com/websocketpp
-* Gdal: https://www.gdal.org/ [[Must be built with Geos]]
+* Gdal: https://www.gdal.org/ [[Must be built with Geos]]  For Windows: http://www.gisinternals.com
 * Geos https://trac.osgeo.org/geos
 * SDL2_image: https://www.libsdl.org/
 * Intel TBB: https://www.threadingbuildingblocks.org/

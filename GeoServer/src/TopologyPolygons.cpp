@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <algorithm>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/prep/PreparedPolygon.h>
 #include <geos/index/quadtree/Quadtree.h>

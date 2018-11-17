@@ -31,14 +31,17 @@ IF(WIN32)
     FIND_PATH(GEOS_INCLUDE_DIR geos_c.h 
 		$ENV{LIB_DIR}/include 
 		$ENV{INCLUDE} 
-		${OSGEO4W_INCLUDE_DIR})
+		${OSGEO4W_INCLUDE_DIR}
+		${GEOS_ROOT}/include
+		${GEOS_ROOT}/inc
+		)
     FIND_LIBRARY(GEOS_LIBRARY NAMES geos geos_c PATHS 
       "$ENV{LIB}/lib"
       $ENV{LIB}
       #mingw
       c:/msys/local/lib
 	  ${OSGEO4W_LIB_DIR}
-      
+      ${GEOS_ROOT}/lib
       )
     IF (GEOS_LIBRARY)
        SET (
