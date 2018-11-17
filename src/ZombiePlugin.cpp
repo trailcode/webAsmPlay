@@ -71,8 +71,8 @@ void ZombiePlugin::open()
     population = 0;
     for (int i = 0; i < gPedestrianStartCount; i++)
     {
-        dmess("Add Pedestrian " << i << " of " << gPedestrianStartCount);
-        
+        if(!(i % 10)) { dmess("Add Pedestrian " << i << " of " << gPedestrianStartCount) ;}
+
         addPedestrianToCrowd ();
     }
 

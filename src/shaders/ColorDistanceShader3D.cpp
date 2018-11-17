@@ -114,7 +114,7 @@ void ColorDistanceShader3D::ensureShader()
             float minDist = 0.0;
             float maxDist = 5.0;
 
-            vec3 lightPos = vec3(0.1,0.1,0.1);
+            vec3 lightPos = vec3(1,1,1);
             vec3 lightColor = vec3(1,1,1);
             vec3 viewPos = vec3(0,0,0);
 
@@ -128,7 +128,7 @@ void ColorDistanceShader3D::ensureShader()
 
             outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
 
-            //*
+            
             vec4 color = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
             vec3 objectColor = vec3(color);
 
@@ -150,9 +150,8 @@ void ColorDistanceShader3D::ensureShader()
             vec3 specular = specularStrength * spec * lightColor;  
                 
             vec3 result = (ambient + diffuse + specular) * objectColor;
-            //outColor = vec4(result, color.w);
-            outColor = color;
-            //*/
+            outColor = vec4(result, color.w);
+            //outColor = color;
         }
     )glsl";
 

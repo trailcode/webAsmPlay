@@ -39,9 +39,8 @@ In the near future this project is going to be renamed to ZombieGeoSim.
 
 ### Dependencies
 
-Unfortunately during development notes on build depends were not tracked. Development is currently
-being done on OSX. Macports (https://www.macports.org/) and Brew (https://brew.sh/) is being used to
-install third party dependencies. C++ 14 is being used. Currently emscripten is using clang 5.0 which
+For development on OSX it is suggested to use Macports (https://www.macports.org) or Brew (https://brew.sh) to
+install supported third party dependencies. C++ 14 is being used. Currently emscripten is using clang 5.0 which
 does not fully support c++ 17. 
 
 * Cmake: https://cmake.org
