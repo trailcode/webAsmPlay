@@ -69,7 +69,23 @@ namespace
 
 GeoClient::GeoClient(Canvas * canvas) : canvas(canvas)
 {
+
+    quadTreePolygons    = new Quadtree();
+    quadTreeLineStrings = new Quadtree();
+    quadTreePoints      = new Quadtree();
+    network             = new Network(this);
+}
+
+GeoClient::~GeoClient()
+{
+    // TODO cleanup!
+}
+
+void GeoClient::ensureClient()
+{
 #ifndef __EMSCRIPTEN__
+    
+    if(client) { return ;}
 
     client = new Client;
 
@@ -115,20 +131,12 @@ GeoClient::GeoClient(Canvas * canvas) : canvas(canvas)
     std::this_thread::sleep_for(std::chrono::milliseconds(150)); // TODO Find a better way
 
 #endif
-
-    quadTreePolygons    = new Quadtree();
-    quadTreeLineStrings = new Quadtree();
-    quadTreePoints      = new Quadtree();
-    network             = new Network(this);
-}
-
-GeoClient::~GeoClient()
-{
-    // TODO cleanup!
 }
 
 void GeoClient::getNumPolygons(const function<void (const size_t)> & callback)
 {
+    ensureClient();
+
     GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
 
     numGeomsRequests[request->ID] = request;
@@ -191,6 +199,8 @@ void GeoClient::getNumPolylines(const function<void (const size_t)> & callback)
 
 void GeoClient::getNumPoints(const function<void (const size_t)> & callback)
 {
+    ensureClient();
+
     GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
 
     numGeomsRequests[request->ID] = request;
@@ -222,6 +232,8 @@ void GeoClient::getNumPoints(const function<void (const size_t)> & callback)
 
 void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 {
+    ensureClient();
+
     GeoRequestLayerBounds * request = new GeoRequestLayerBounds(callback);
 
     layerBoundsRequests[request->ID] = request;
@@ -255,6 +267,8 @@ void GeoClient::getPolygons(const size_t                                      st
                             const size_t                                      numPolys,
                             function<void (vector<AttributedGeometry> geoms)> callback)
 {
+    ensureClient();
+
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
     getAllGeometriesRequests[request->ID] = request;
@@ -294,6 +308,8 @@ void GeoClient::getPolylines(const size_t                                     st
                              const size_t                                     numPolylines,
                              function<void(vector<AttributedGeometry> geoms)> callback)
 {
+    ensureClient();
+
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
     getAllGeometriesRequests[request->ID] = request;
@@ -333,6 +349,8 @@ void GeoClient::getPoints(const size_t                              startIndex,
                           const size_t                              numPoints,
                           function<void (vector<AttributedGeometry> geoms)> callback)
 {
+    ensureClient();
+
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
     getAllGeometriesRequests[request->ID] = request;
@@ -460,6 +478,8 @@ void GeoClient::onMessage(const string & data)
 void GeoClient::loadGeoServerGeometry()
 {
     dmess("GeoClient::loadGeoServerGeometry");
+
+    ensureClient();
 
     for(auto renderiable : canvas->getRenderiables()) { delete renderiable ;}
 

@@ -106,6 +106,8 @@ private:
     void createLineStringRenderiables(const std::vector<AttributedGeometry> & geoms);
     void createPointRenderiables     (const std::vector<AttributedGeometry> & geoms);
 
+    void ensureClient();
+
     geos::index::quadtree::Quadtree * quadTreePolygons;
     geos::index::quadtree::Quadtree * quadTreeLineStrings;
     geos::index::quadtree::Quadtree * quadTreePoints;
@@ -130,9 +132,9 @@ private:
     
     Client::connection_ptr con;
 
-    Client * client;
+    Client * client = NULL;
 
-    std::thread * clientThread;
+    std::thread * clientThread = NULL;
 
 #endif
 };

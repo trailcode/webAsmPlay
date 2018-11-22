@@ -51,6 +51,7 @@ namespace
     GLint viewLoc;
     GLint projectionLoc;
     GLint texUniformLoc;
+    GLint lightPosUniformLoc;
 
     GLuint colorTexture = 0;
 
@@ -106,6 +107,7 @@ void ColorDistanceShader3D::ensureShader()
         in vec4 position_in_view_space;
         in vec3 normal; 
         in vec3 fragPos;
+        uniform vec3 lightPos;
 
         out vec4 outColor;
 
@@ -114,44 +116,16 @@ void ColorDistanceShader3D::ensureShader()
             float minDist = 0.0;
             float maxDist = 5.0;
 
-            vec3 lightPos = vec3(1,1,1);
             vec3 lightColor = vec3(1,1,1);
+            vec3 objectColor = vec3(1,1,0);
             vec3 viewPos = vec3(0,0,0);
 
-            // computes the distance between the fragment position 
-            // and the origin (4th coordinate should always be 1 
-            // for points). The origin in view space is actually 
-            // the camera position.
-            float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
-            
-            dist = min(maxDist, dist) / maxDist;
-
-            outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
-
-            
-            vec4 color = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
-            vec3 objectColor = vec3(color);
-
-            // ambient
-            float ambientStrength = 0.1;
-            vec3 ambient = ambientStrength * lightColor;
-                
-            // diffuse 
-            vec3 norm = normalize(normal);
             vec3 lightDir = normalize(lightPos - fragPos);
-            float diff = max(dot(norm, lightDir), 0.0);
+
+            float diff = max(dot(normal, lightDir), 0.0);
             vec3 diffuse = diff * lightColor;
-            
-            // specular
-            float specularStrength = 0.5;
-            vec3 viewDir = normalize(viewPos - fragPos);
-            vec3 reflectDir = reflect(-lightDir, norm);  
-            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-            vec3 specular = specularStrength * spec * lightColor;  
-                
-            vec3 result = (ambient + diffuse + specular) * objectColor;
-            outColor = vec4(result, color.w);
-            //outColor = color;
+            vec3 result = diffuse * objectColor;
+            outColor = vec4(result, 1.0);
         }
     )glsl";
 
@@ -167,7 +141,8 @@ void ColorDistanceShader3D::ensureShader()
                                                        {"view",                 viewLoc},
                                                        {"projection",           projectionLoc},
                                                        {"colorLookupOffset",    colorLookupOffsetLoc},
-                                                       {"heightMultiplier",     heightMultiplierLoc}}));
+                                                       {"heightMultiplier",     heightMultiplierLoc},
+                                                       {"lightPos",             lightPosUniformLoc}}));
 
     defaultInstance = new ColorDistanceShader3D();
 }
