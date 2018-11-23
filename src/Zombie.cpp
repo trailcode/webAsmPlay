@@ -142,7 +142,7 @@ void Zombie::update(const float currentTime, const float elapsedTime)
     recordTrailVertex (currentTime, position());
 
     // notify proximity database that our position has changed
-    proximityToken->updateForNewPosition (position());
+    //proximityToken->updateForNewPosition (position());
 }
 
 Vec3 Zombie::determineCombinedSteering(const float elapsedTime)

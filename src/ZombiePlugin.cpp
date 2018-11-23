@@ -40,7 +40,7 @@ namespace
 #ifdef __EMSCRIPTEN__
     int const gPedestrianStartCount = 700;
 #else
-    int const gPedestrianStartCount = 4000;
+    int const gPedestrianStartCount = 2000;
 #endif
     bool gUseDirectedPathFollowing = true;  // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
@@ -50,7 +50,7 @@ namespace
     ZombiePlugin gZombiePlugin;
 }
 
-const char * ZombiePlugin::name() { return "Zomb    ies" ;}
+const char * ZombiePlugin::name() { return "Zombies" ;}
 
 float ZombiePlugin::selectionOrderSortKey() { return 0.1f ;}
 
@@ -106,6 +106,8 @@ void ZombiePlugin::update(const float currentTime, const float elapsedTime)
 
 void ZombiePlugin::redraw(const float currentTime, const float elapsedTime)
 {
+    //dmess("elapsedTime " << elapsedTime);
+
     // selected Pedestrian (user can mouse click to select another)
 
     AbstractVehicle& selected = *OpenSteerDemo::selectedVehicle;
