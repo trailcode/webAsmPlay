@@ -125,10 +125,7 @@ void ColorDistanceShader::ensureShader()
     dmess("Done ColorDistanceShader::ensureShader");
 }
 
-ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader",
-                                                    shaderProgram,
-                                                    vertInAttrLoc,
-                                                    vertColorInAttrLoc)
+ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader")
 {
 
     colors[0] = vec4(1,0,0,1);

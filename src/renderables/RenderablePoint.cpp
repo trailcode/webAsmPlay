@@ -74,13 +74,13 @@ Renderable * RenderablePoint::create(const ConstGeosGeomVec & points,
 
 void RenderablePoint::render(Canvas * canvas) const
 {
+    shader->setVertexArrayFormat(3, 3 * sizeof(GLfloat), 0);
+
     shader->bind(canvas, false);
 
     GL_CHECK(glBindVertexArray(                    vao));
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-
-    shader->enableVertexArray(3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
     GL_CHECK(glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL));
 }

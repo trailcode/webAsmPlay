@@ -78,10 +78,7 @@ void ColorVertexShader::ensureShader()
     defaultInstance = new ColorVertexShader();
 }
 
-ColorVertexShader::ColorVertexShader() : Shader("ColorVertexShader",
-                                                shaderProgram,
-                                                vertInAttrLoc,
-                                                vertColorInAttrLoc) {}
+ColorVertexShader::ColorVertexShader() : Shader("ColorVertexShader") {}
 ColorVertexShader::~ColorVertexShader() {}
 
 ColorVertexShader * ColorVertexShader::getInstance() { return defaultInstance ;}

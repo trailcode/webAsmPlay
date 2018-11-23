@@ -80,9 +80,7 @@ void ColorShader::ensureShader()
 
 ColorShader * ColorShader::getDefaultInstance() { return defaultInstance ;}
 
-ColorShader::ColorShader() :    Shader      ("ColorShader",
-                                             shaderProgram,
-                                             vertInAttrLoc),
+ColorShader::ColorShader() :    Shader      ("ColorShader"),
                                 fillColor   (0,1,0,0.5),
                                 outlineColor(1,1,0,1)
 {

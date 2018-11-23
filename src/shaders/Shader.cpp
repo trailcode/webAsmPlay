@@ -30,15 +30,7 @@
 using namespace std;
 using namespace glm;
 
-Shader::Shader( const string  & shaderName,
-                ShaderProgram * program,
-                const GLint     vertexInLoc,
-                const GLint     colorInLoc,
-                const GLint     normalInLoc) :  shaderName  (shaderName),
-                                                program     (program),
-                                                vertexInLoc (vertexInLoc),
-                                                colorInLoc  (colorInLoc),
-                                                normalInLoc (normalInLoc){}
+Shader::Shader(const string  & shaderName) :  shaderName(shaderName) {}
 
 void Shader::setVertexArrayFormat(  const GLint     size,
                                     const GLsizei   stride,
@@ -65,48 +57,6 @@ void Shader::setColorArrayFormat(   const GLint     size,
     sizeColor      = size;
     strideColor    = stride;
     pointerColor   = pointer;
-}
-
-void Shader::enableVertexArray(const GLint       size,
-                               const GLenum      type,
-                               const GLboolean   normalized,
-                               const GLsizei     stride,
-                               const GLvoid    * pointer)
-{
-    ShaderProgram::enableVertexAttribArray(vertexInLoc,
-                                           size,
-                                           type,
-                                           normalized,
-                                           stride,
-                                           pointer);
-}
-
-void Shader::enableColorArray( const GLint       size,
-                               const GLenum      type,
-                               const GLboolean   normalized,
-                               const GLsizei     stride,
-                               const GLvoid    * pointer)
-{
-    ShaderProgram::enableVertexAttribArray(colorInLoc,
-                                           size,
-                                           type,
-                                           normalized,
-                                           stride,
-                                           pointer);
-}
-
-void Shader::enableNormalArray( const GLint       size,
-                                const GLenum      type,
-                                const GLboolean   normalized,
-                                const GLsizei     stride,
-                                const GLvoid    * pointer)
-{
-    ShaderProgram::enableVertexAttribArray(normalInLoc,
-                                           size,
-                                           type,
-                                           normalized,
-                                           stride,
-                                           pointer);
 }
 
 string Shader::getName() const { return shaderName ;}

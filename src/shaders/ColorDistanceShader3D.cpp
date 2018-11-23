@@ -227,11 +227,7 @@ void ColorDistanceShader3D::ensureShader()
     defaultInstance = new ColorDistanceShader3D();
 }
 
-ColorDistanceShader3D::ColorDistanceShader3D() : Shader("ColorDistanceShader3D",
-                                                        shaderProgramFill,
-                                                        vertInAttrFill,
-                                                        vertColorInAttrFill,
-                                                        normalInAttrFill)
+ColorDistanceShader3D::ColorDistanceShader3D() : Shader("ColorDistanceShader3D")
 {
     colors[0] = vec4(1,0,0,1);
     colors[1] = vec4(1,1,0,1);

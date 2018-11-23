@@ -30,7 +30,6 @@
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 
-class ShaderProgram;
 class Canvas;
 
 class Shader
@@ -51,43 +50,15 @@ public:
                                 const GLsizei   stride  = 0,
                                 const GLvoid  * pointer = NULL);
 
-    void enableVertexArray(const GLint       size        = 2,
-                           const GLenum      type        = GL_FLOAT,
-                           const GLboolean   normalized  = GL_FALSE,
-                           const GLsizei     stride      = 0,
-                           const GLvoid    * pointer     = NULL);
-
-    void enableColorArray( const GLint       size        = 2,
-                           const GLenum      type        = GL_FLOAT,
-                           const GLboolean   normalized  = GL_FALSE,
-                           const GLsizei     stride      = 0,
-                           const GLvoid    * pointer     = NULL);
-
-    void enableNormalArray( const GLint       size        = 2,
-                            const GLenum      type        = GL_FLOAT,
-                            const GLboolean   normalized  = GL_FALSE,
-                            const GLsizei     stride      = 0,
-                            const GLvoid    * pointer     = NULL);
-
     std::string getName() const;
 
 protected:
 
-    Shader( const std::string & shaderName,
-            ShaderProgram     * program,
-            const GLint         vertexInLoc = -1,
-            const GLint         colorInLoc  = -1,
-            const GLint         normalInLoc = -1);
+    Shader( const std::string & shaderName);
 
     virtual ~Shader() {}
 
     const std::string shaderName;
-
-    ShaderProgram * program;
-
-    const GLint vertexInLoc;
-    const GLint colorInLoc;
-    const GLint normalInLoc;
 
     GLint            sizeVertex     = 2;
     GLsizei          strideVertex   = 0;
