@@ -60,6 +60,7 @@ namespace
     GLint MV_Outline;
     GLint MVP_Outline;
     GLint texUniformOutline;
+    GLint heightMultiplierOutline;
 
     GLuint colorTexture = 0;
 
@@ -116,7 +117,7 @@ void ColorDistanceShader3D::ensureShader()
         in vec3 normal; 
         in vec3 fragPos;
         uniform vec3 lightPos;
-
+        
         out vec4 outColor;
 
         void main()
@@ -162,12 +163,13 @@ void ColorDistanceShader3D::ensureShader()
     const GLchar* vertexSourceOutline = R"glsl(#version 150 core
         uniform sampler2D tex;
 
-        in vec2  vertIn;
+        in vec3  vertIn;
         in float vertColorIn;
         
-        uniform mat4 MVP;
-        uniform mat4 MV;
+        uniform mat4  MVP;
+        uniform mat4  MV;
         uniform float colorLookupOffset;
+        uniform float heightMultiplier;
         
         out vec4 vertexColorNear;
         out vec4 vertexColorFar;
@@ -175,8 +177,7 @@ void ColorDistanceShader3D::ensureShader()
 
         void main()
         {
-            vec4 vert = vec4(vertIn.xy, 0, 1);
-            //vec4 vert = vec4(vertIn.xyz, 1);
+            vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
 
             position_in_view_space = MV * vert;
 
@@ -218,7 +219,8 @@ void ColorDistanceShader3D::ensureShader()
                                                     Variables({{"MV",                MV_Outline                 },
                                                                {"MVP",               MVP_Outline                },
                                                                {"tex",               texUniformOutline          },
-                                                               {"colorLookupOffset", colorLookupOffsetOutline   }}));
+                                                               {"colorLookupOffset", colorLookupOffsetOutline   },
+                                                               {"heightMultiplier",  heightMultiplierOutline    }}));
 
     colorTexture = Textures::create(initalColors, 32);
 
@@ -262,38 +264,69 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
 
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorTexture));
 
-    shaderProgramFill->bind();
+    if(!isOutline)
+    {
+        shaderProgramFill->bind();
 
-    ShaderProgram::enableVertexAttribArray( vertInAttrFill,
-                                            sizeVertex,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            strideVertex,
-                                            pointerVertex);
+        ShaderProgram::enableVertexAttribArray( vertInAttrFill,
+                                                sizeVertex,
+                                                GL_FLOAT,
+                                                GL_FALSE,
+                                                strideVertex,
+                                                pointerVertex);
 
-    ShaderProgram::enableVertexAttribArray( normalInAttrFill,
-                                            sizeNormal,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            strideNormal,
-                                            pointerNormal);
+        ShaderProgram::enableVertexAttribArray( normalInAttrFill,
+                                                sizeNormal,
+                                                GL_FLOAT,
+                                                GL_FALSE,
+                                                strideNormal,
+                                                pointerNormal);
 
-    ShaderProgram::enableVertexAttribArray( vertColorInAttrFill,
-                                            sizeColor,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            strideColor,
-                                            pointerColor);
+        ShaderProgram::enableVertexAttribArray( vertColorInAttrFill,
+                                                sizeColor,
+                                                GL_FLOAT,
+                                                GL_FALSE,
+                                                strideColor,
+                                                pointerColor);
 
-    shaderProgramFill->setUniformi(texUniformFill,          0);
-    shaderProgramFill->setUniformf(heightMultiplierFill,    heightMultiplier);
-    shaderProgramFill->setUniform (modelFill,               canvas->getModelRef());
-    shaderProgramFill->setUniform (viewFill,                canvas->getViewRef());
-    shaderProgramFill->setUniform (projectionFill,          canvas->getProjectionRef());
-    shaderProgramFill->setUniform (lightPosUniformFill,     lightPos);
+        shaderProgramFill->setUniformi(texUniformFill,          0);
+        shaderProgramFill->setUniformf(heightMultiplierFill,    heightMultiplier);
+        shaderProgramFill->setUniform (modelFill,               canvas->getModelRef());
+        shaderProgramFill->setUniform (viewFill,                canvas->getViewRef());
+        shaderProgramFill->setUniform (projectionFill,          canvas->getProjectionRef());
+        shaderProgramFill->setUniform (lightPosUniformFill,     lightPos);
 
-    if(isOutline) { shaderProgramFill->setUniformf(colorLookupOffsetFill, 1.0f) ;}
-    else          { shaderProgramFill->setUniformf(colorLookupOffsetFill, 0.0f) ;}
+        shaderProgramFill->setUniformf(colorLookupOffsetFill, 0.0f);
+    }
+    else
+    {
+        shaderProgramOutline->bind();
+
+        ShaderProgram::enableVertexAttribArray( vertInAttrOutline,
+                                                sizeVertex,
+                                                GL_FLOAT,
+                                                GL_FALSE,
+                                                strideVertex,
+                                                pointerVertex);
+
+        ShaderProgram::enableVertexAttribArray( vertColorInAttrOutline,
+                                                sizeColor,
+                                                GL_FLOAT,
+                                                GL_FALSE,
+                                                strideColor,
+                                                pointerColor);
+
+        //shaderProgramOutline->colorLookupOffsetOutline;
+        shaderProgramOutline->setUniformf(heightMultiplierOutline,    heightMultiplier);
+        shaderProgramOutline->setUniform(MV_Outline, canvas->getMV_Ref());
+        shaderProgramOutline->setUniform(MVP_Outline, canvas->getMVP_Ref());
+        shaderProgramOutline->setUniformi(texUniformOutline, 0);
+
+        shaderProgramOutline->setUniformf(colorLookupOffsetOutline, 1.0f);
+    }
+
+    //if(isOutline) { shaderProgramFill->setUniformf(colorLookupOffsetFill, 1.0f) ;}
+    //else          { shaderProgramFill->setUniformf(colorLookupOffsetFill, 0.0f) ;}
 }
 
 vec4 ColorDistanceShader3D::setColor(const size_t index, const vec4 & color)

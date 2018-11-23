@@ -130,8 +130,8 @@ void RenderableMesh::render(Canvas * canvas) const
 
     GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-    GL_CHECK(glDisable(GL_DEPTH_TEST));
-    //GL_CHECK(glEnable(GL_DEPTH_TEST));
+    //GL_CHECK(glDisable(GL_DEPTH_TEST));
+    GL_CHECK(glEnable(GL_DEPTH_TEST));
 
     shader->setVertexArrayFormat(3, 7 * sizeof(GLfloat), 0);
     shader->setColorArrayFormat (1, 7 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
@@ -145,6 +145,8 @@ void RenderableMesh::render(Canvas * canvas) const
     }
 
     GL_CHECK(glDisable(GL_BLEND)); // TODO Remove!
+
+    //GL_CHECK(glDisable(GL_DEPTH_TEST));
 
     if(getRenderOutline())
     {
