@@ -40,7 +40,7 @@ namespace
 #ifdef __EMSCRIPTEN__
     int const gPedestrianStartCount = 700;
 #else
-    int const gPedestrianStartCount = 700;
+    int const gPedestrianStartCount = 4000;
 #endif
     bool gUseDirectedPathFollowing = true;  // TODO dup!
     bool gWanderSwitch = true; // TODO dup!

@@ -108,6 +108,7 @@ namespace
     vector<int>    dist;
     vector<bool>   seen;
     vector<size_t> parent;
+    vector<Path>   Q;
 }
 
 Network::Network(GeoClient * client) : client(client) {}
@@ -126,6 +127,8 @@ void Network::setEdges(const Edges & _edges)
     }
 
     nodes.resize(edgeMap.size());
+
+    Q.reserve(nodes.size());
 
     dist   = vector<int>   (nodes.size(), INF);
     seen   = vector<bool>  (nodes.size(), false);
@@ -180,6 +183,53 @@ void Network::findPath(const PointOnEdge & end)
     client->getCanvas()->addRenderable(pathAnnotation.get());
 }
 
+class nodeTotalGreater
+{
+
+	public:
+		nodeTotalGreater() { ;}
+		bool operator() ( const Path & p1, const Path & p2)
+		const
+		{
+            return get<0>(p1) > get<0>(p2);
+		}
+};
+
+Path popPriorityQueue()
+{
+	Path path = Q.front();
+	pop_heap(Q.begin(), Q.end(), nodeTotalGreater() );
+	Q.pop_back();
+	return path;
+}
+
+void pushPriorityQueue(const Path & path)
+{
+	Q.push_back(path);
+
+	push_heap(Q.begin(), Q.end(), nodeTotalGreater() );
+}
+
+void updateTileOnPriorityQueue(const size_t path, const int newDist)
+{
+	vector<Path>::iterator i;
+
+	for(i = Q.begin(); i != Q.end(); ++i)
+	{
+		if(i->second != path) { continue ;}
+		
+        if(i->first >= newDist) { return ;}
+        
+        i->first = newDist;
+
+        push_heap(Q.begin(), i + 1, nodeTotalGreater());
+
+        return;
+	}
+}
+
+//priority_queue<Path, vector<Path> , PathCmp> pq;
+
 // Modified from: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-priority_queue-stl/
 vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnEdge & end)
 {
@@ -189,7 +239,11 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
     if(!get<1>(start)) { return NULL ;}
 
-    priority_queue<Path, vector<Path> , PathCmp> pq;
+    Q.clear();
+    Q.reserve(nodes.size());
+
+    priority_queue<Path, vector<Path> , PathCmp> pq(PathCmp(), Q);
+    //pq.clear();
 
     const size_t startIndex = nodeMap[start.second->start];
 
@@ -207,11 +261,18 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
     pq.push(Path(0.0, startIndex));
 
+    //Q.clear();
+
+    pushPriorityQueue(Path(0.0, startIndex));
+
     size_t v;
 
     while(!pq.empty())
+    //while(!Q.empty())
     {
         const size_t u = pq.top().second; pq.pop();
+
+        //const size_t u = popPriorityQueue().second;
 
         seen[u] = true;
 
@@ -232,13 +293,18 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
             const int newDist = dist[u] + weight;
 
-            if(!seen[v] && dist[v] > newDist)
+            if(seen[v])
+            {
+                //updateTileOnPriorityQueue(v, newDist);
+            }
+            else if(dist[v] > newDist)
             {
                 dist[v] = newDist;
 
                 parent[v] = u;
 
                 pq.push(Path(newDist, v));
+                //pushPriorityQueue(Path(newDist, v));
             }
         }
     }
