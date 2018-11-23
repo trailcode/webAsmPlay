@@ -115,17 +115,26 @@ void ColorDistanceShader3D::ensureShader()
         {
             float minDist = 0.0;
             float maxDist = 5.0;
-            vec3 lightPosa = vec3(1,1,1);
             vec3 lightColor = vec3(1,1,1);
-            vec3 objectColor = vec3(1,1,0);
+            //vec3 objectColor = vec3(1,1,0);
             vec3 viewPos = vec3(0,0,0);
 
-            vec3 lightDir = normalize(lightPosa - fragPos);
+            // computes the distance between the fragment position 
+            // and the origin (4th coordinate should always be 1 
+            // for points). The origin in view space is actually 
+            // the camera position.
+            float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
+            
+            dist = min(maxDist, dist) / maxDist;
+
+            vec4 objectColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
+
+            vec3 lightDir = normalize(lightPos - fragPos);
 
             float diff = max(dot(normal, lightDir), 0.0);
             vec3 diffuse = diff * lightColor;
-            vec3 result = diffuse * objectColor;
-            outColor = vec4(result, 1.0);
+            vec3 result = diffuse * vec3(objectColor);
+            outColor = vec4(result, objectColor.w);
         }
     )glsl";
 
@@ -190,9 +199,10 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
 
     shaderProgram->setUniformf(heightMultiplierLoc, heightMultiplier);
 
-    shaderProgram->setUniform(modelLoc,      canvas->getModelRef());
-    shaderProgram->setUniform(viewLoc,       canvas->getViewRef());
-    shaderProgram->setUniform(projectionLoc, canvas->getProjectionRef());
+    shaderProgram->setUniform(modelLoc,             canvas->getModelRef());
+    shaderProgram->setUniform(viewLoc,              canvas->getViewRef());
+    shaderProgram->setUniform(projectionLoc,        canvas->getProjectionRef());
+    shaderProgram->setUniform(lightPosUniformLoc,   lightPos);
 
     if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 1.0f) ;}
     else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}
@@ -245,3 +255,7 @@ void ColorDistanceShader3D::saveState(JSONObject & dataStore)
 float ColorDistanceShader3D::setHeightMultiplier(const float multiplier) { return heightMultiplier = multiplier ;}
 
 float ColorDistanceShader3D::getHeightMultiplier() const { return heightMultiplier ;}
+
+vec3 ColorDistanceShader3D::setLightPos(const vec3 & pos) { return lightPos = pos ;}
+
+vec3 ColorDistanceShader3D::getLightPos() const { return lightPos ;}

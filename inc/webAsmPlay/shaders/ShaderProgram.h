@@ -27,36 +27,11 @@
 #ifndef __WEB_ASM_PLAY_SHADER_PROGRAM_H__
 #define __WEB_ASM_PLAY_SHADER_PROGRAM_H__
 
-#ifdef __EMSCRIPTEN__
-    // GLEW
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-#else
-
-	#ifdef USE_GL_ES3
-	// OpenGL ES 3
-	#include <GLES3/gl3.h>  // Use GL ES 3
-	#else
-	// Regular OpenGL
-	// About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
-	// Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
-	// You may use another loader/header of your choice (glext, glLoadGen, etc.), or chose to manually implement your own.
-	#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
-	#include <GL/gl3w.h>
-	#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
-	#include <GL/glew.h>
-	#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-	#include <glad/glad.h>
-	#else
-	#include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
-	#endif
-	#endif
-
-#endif
-
 #include <unordered_map>
 #include <glm/vec4.hpp>
+#include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
+#include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/Types.h>
 
 typedef std::vector<std::pair<std::string, GLint &> > Variables;
@@ -93,6 +68,7 @@ public:
 
     void setUniform (const GLint location, const glm::mat4 & value) const;
     void setUniform (const GLint location, const glm::vec4 & value) const;
+    void setUniform (const GLint location, const glm::vec3 & value) const;
     void setUniformf(const GLint location, const float     & value) const;
     void setUniformi(const GLint location, const GLuint    & value) const;
 

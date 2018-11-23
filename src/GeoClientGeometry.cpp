@@ -87,7 +87,8 @@ namespace
              if(attrs->hasStringKey("height"))          { height    = atof(attrs->strings["height"]         .c_str()) * scale * 0.3 ;}
         else if(attrs->hasStringKey("building:height")) { height    = atof(attrs->strings["building:height"].c_str()) * scale * 0.3 ;}
         else if(attrs->hasStringKey("building:levels")) { height    = atof(attrs->strings["building:levels"].c_str()) * scale       ;}
-        else if(attrs->hasStringKey("min_height"))      { minHeight = atof(attrs->strings["min_height"]     .c_str()) * scale * 0.3 ;}
+        
+        if(attrs->hasStringKey("min_height")) { minHeight = atof(attrs->strings["min_height"].c_str()) * scale * 0.3 ;}
 
         return make_pair(height, minHeight);
     }

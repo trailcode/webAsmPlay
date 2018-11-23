@@ -146,6 +146,9 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             triangleIndices.push_back(offset + 3);
             triangleIndices.push_back(offset);
 
+            lineIndices.push_back(offset + 0);
+            lineIndices.push_back(offset + 3);
+
             offset += 4;
         }
 

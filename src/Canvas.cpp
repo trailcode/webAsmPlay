@@ -37,6 +37,7 @@
 #include <webAsmPlay/renderables/RenderableMesh.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
+#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/Canvas.h>
 
@@ -122,6 +123,8 @@ bool Canvas::preRender()
     Camera * camera = trackBallInteractor->getCamera();
 
     updateMVP();
+
+    ColorDistanceShader3D::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
 
     if(useFrameBuffer)
     {

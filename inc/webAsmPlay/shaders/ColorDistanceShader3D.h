@@ -50,6 +50,9 @@ public:
     glm::vec4 getColor(const size_t index);
     glm::vec4 & getColorRef(const size_t index);
 
+    glm::vec3 setLightPos(const glm::vec3 & pos);
+    glm::vec3 getLightPos() const;
+
     void loadState(const JSONObject & dataStore);
 
     void saveState(JSONObject & dataStore);
@@ -64,6 +67,8 @@ private:
     bool colorTextureDirty;
 
     float heightMultiplier = 1.0f;
+
+    glm::vec3 lightPos;
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_3D_H__
