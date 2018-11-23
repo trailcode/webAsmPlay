@@ -115,12 +115,12 @@ void ColorDistanceShader3D::ensureShader()
         {
             float minDist = 0.0;
             float maxDist = 5.0;
-
+            vec3 lightPosa = vec3(1,1,1);
             vec3 lightColor = vec3(1,1,1);
             vec3 objectColor = vec3(1,1,0);
             vec3 viewPos = vec3(0,0,0);
 
-            vec3 lightDir = normalize(lightPos - fragPos);
+            vec3 lightDir = normalize(lightPosa - fragPos);
 
             float diff = max(dot(normal, lightDir), 0.0);
             vec3 diffuse = diff * lightColor;

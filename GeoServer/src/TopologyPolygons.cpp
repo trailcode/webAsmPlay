@@ -77,6 +77,8 @@ void topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & po
 
     for(const auto & i : polygons)
     {
+        poly(i)->normalize();
+        
         MyPolygon * myPoly = new MyPolygon(attrs(i), poly(i), area(i));
 
         myPolygons.push_back(unique_ptr<MyPolygon>(myPoly));

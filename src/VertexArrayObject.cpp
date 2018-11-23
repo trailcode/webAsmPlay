@@ -38,6 +38,25 @@ VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellation
     return _create<false>(tessellations);
 }
 
+namespace
+{
+    void addVert(   FloatVec & verts,
+                    const vec3 & v,
+                    const vec3 & n,
+                    const float c)
+    {
+        verts.push_back(v.x);
+        verts.push_back(v.y);
+        verts.push_back(v.z);
+
+        verts.push_back(n.x);
+        verts.push_back(n.y);
+        verts.push_back(n.z);
+
+        verts.push_back(c);
+    }
+}
+
 template<bool IS_3D>
 VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellations)
 {
@@ -94,6 +113,43 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         if(!IS_3D) { continue ;}
 
+        for(size_t a = 0; a < tess->numVerts; ++a)
+        {
+            const size_t b = (a + 1) % tess->numVerts;
+
+            /*
+            A   B
+            p1  p2
+
+            p4  p3
+            */
+            const vec2 A(tess->verts[a * 2], tess->verts[a * 2 + 1]);
+            const vec2 B(tess->verts[b * 2], tess->verts[b * 2 + 1]);
+
+            const vec3 p1(A, tess->height);
+            const vec3 p2(B, tess->height);
+            const vec3 p3(B, 0);
+            const vec3 p4(A, 0);
+
+            const vec3 normal = normalize(triangleNormal(p1, p2, p3));
+
+            addVert(verts, p1, normal, symbologyWallID_value);
+            addVert(verts, p2, normal, symbologyWallID_value);
+            addVert(verts, p3, normal, symbologyWallID_value);
+            addVert(verts, p4, normal, symbologyWallID_value);
+
+            triangleIndices.push_back(offset + 0);
+            triangleIndices.push_back(offset + 1);
+            triangleIndices.push_back(offset + 2);
+
+            triangleIndices.push_back(offset + 2);
+            triangleIndices.push_back(offset + 3);
+            triangleIndices.push_back(offset);
+
+            offset += 4;
+        }
+
+#ifdef WORKING
         size_t prevIndexA;
         size_t prevIndexB;
 
@@ -106,7 +162,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         const vec3 C(tess->verts[2], tess->verts[3], 0);
 
-        const vec3 normal = triangleNormal(prevA, prevB, C);
+        //const vec3 normal = normalize(triangleNormal(prevA, prevB, C)) * vec3(-1,-1,-1);
+        const vec3 normal = normalize(triangleNormal(prevA, prevB, C));
         //const vec3 normal(0,0,0);
 
         verts.push_back(prevA.x);
@@ -139,19 +196,10 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             lineIndices.push_back(indexA = offset++);
             lineIndices.push_back(indexB = offset++);
 
-            // pA   A
-            //
-            // pB   B
-
             triangleIndices.push_back(indexA);
             triangleIndices.push_back(indexB);
             triangleIndices.push_back(prevIndexA);
             
-            /*
-            triangleIndices.push_back(prevIndexA);
-            triangleIndices.push_back(indexB);
-            triangleIndices.push_back(prevIndexB);
-            */
             triangleIndices.push_back(prevIndexB);
             triangleIndices.push_back(indexB);
             triangleIndices.push_back(prevIndexA);
@@ -162,7 +210,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             const vec3 A(tess->verts[vertIndex * 2 + 0], tess->verts[vertIndex * 2 + 1], 0);
             const vec3 B(tess->verts[vertIndex * 2 + 0], tess->verts[vertIndex * 2 + 1], tess->height);
 
-            const vec3 normal = triangleNormal(A, B, prevA);
+            //const vec3 normal = normalize(triangleNormal(A, B, prevA)) * vec3(-1,-1,-1);
+            const vec3 normal = normalize(triangleNormal(A, B, prevA));
             //const vec3 normal(0,0,0);
 
             prevA = A;
@@ -187,6 +236,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             verts.push_back(symbologyWallID_value);
         }
+#endif
     }
 
     GLuint vao  = 0;
