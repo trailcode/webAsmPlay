@@ -40,6 +40,33 @@ Shader::Shader( const string  & shaderName,
                                                 colorInLoc  (colorInLoc),
                                                 normalInLoc (normalInLoc){}
 
+void Shader::setVertexArrayFormat(  const GLint     size,
+                                    const GLsizei   stride,
+                                    const GLvoid  * pointer)
+{
+    sizeVertex     = size;
+    strideVertex   = stride;
+    pointerVertex  = pointer;
+}
+
+void Shader::setNormalArrayFormat(  const GLint     size,
+                                    const GLsizei   stride,
+                                    const GLvoid  * pointer)
+{
+    sizeNormal     = size;
+    strideNormal   = stride;
+    pointerNormal  = pointer;
+}
+
+void Shader::setColorArrayFormat(   const GLint     size,
+                                    const GLsizei   stride,
+                                    const GLvoid  * pointer)
+{
+    sizeColor      = size;
+    strideColor    = stride;
+    pointerColor   = pointer;
+}
+
 void Shader::enableVertexArray(const GLint       size,
                                const GLenum      type,
                                const GLboolean   normalized,

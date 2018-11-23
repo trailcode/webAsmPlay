@@ -39,6 +39,18 @@ public:
 
     virtual void bind(Canvas * canvas, const bool isOutline) = 0;
 
+    void setVertexArrayFormat(  const GLint     size    = 2,
+                                const GLsizei   stride  = 0,
+                                const GLvoid  * pointer = NULL);
+
+    void setColorArrayFormat(   const GLint     size    = 2,
+                                const GLsizei   stride  = 0,
+                                const GLvoid  * pointer = NULL);
+
+    void setNormalArrayFormat(  const GLint     size    = 2,
+                                const GLsizei   stride  = 0,
+                                const GLvoid  * pointer = NULL);
+
     void enableVertexArray(const GLint       size        = 2,
                            const GLenum      type        = GL_FLOAT,
                            const GLboolean   normalized  = GL_FALSE,
@@ -76,6 +88,18 @@ protected:
     const GLint vertexInLoc;
     const GLint colorInLoc;
     const GLint normalInLoc;
+
+    GLint            sizeVertex     = 2;
+    GLsizei          strideVertex   = 0;
+    const GLvoid   * pointerVertex  = NULL;
+
+    GLint            sizeNormal     = 2;
+    GLsizei          strideNormal   = 0;
+    const GLvoid   * pointerNormal  = NULL;
+
+    GLint            sizeColor      = 2;
+    GLsizei          strideColor    = 0;
+    const GLvoid   * pointerColor   = NULL;
 };
 
 #endif // __WEB_ASM_PLAY_SHADER_H__

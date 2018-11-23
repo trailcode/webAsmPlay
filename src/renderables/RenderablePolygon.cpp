@@ -139,8 +139,8 @@ void RenderablePolygon::render(Canvas * canvas) const
 
     GL_CHECK(glDisable(GL_DEPTH_TEST));
 
-    shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
-    shader->enableColorArray (1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+    shader->setVertexArrayFormat(2, 3 * sizeof(GLfloat), 0);
+    shader->setColorArrayFormat (1, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
     if(getRenderFill())
     {

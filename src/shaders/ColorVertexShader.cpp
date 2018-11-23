@@ -90,5 +90,19 @@ void ColorVertexShader::bind(Canvas * canvas, const bool isOutline)
 {
     shaderProgram->bind();
 
+    ShaderProgram::enableVertexAttribArray( vertInAttrLoc,
+                                            sizeVertex,
+                                            GL_FLOAT,
+                                            GL_FALSE,
+                                            strideVertex,
+                                            pointerVertex);
+
+    ShaderProgram::enableVertexAttribArray( vertColorInAttrLoc,
+                                            sizeColor,
+                                            GL_FLOAT,
+                                            GL_FALSE,
+                                            strideColor,
+                                            pointerColor);
+
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }

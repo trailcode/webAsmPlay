@@ -78,36 +78,36 @@ file(GLOB geosSrc   "ThirdParty/geos/src/util/*.cpp"
 file(GLOB GLUTesselatorSrc  "ThirdParty/GLUTesselator/src/*.cpp")
 
 file(GLOB opensteerSrc  "ThirdParty/opensteer/src/Clock.cpp"
-                            "ThirdParty/opensteer/src/Color.cpp"
-                            "ThirdParty/opensteer/src/Obstacle.cpp"
-                            "ThirdParty/opensteer/src/OldPathway.cpp"
-                            "ThirdParty/opensteer/src/Path.cpp"
-                            "ThirdParty/opensteer/src/Pathway.cpp"
-                            "ThirdParty/opensteer/src/PlugIn.cpp"
-                            "ThirdParty/opensteer/src/PolylineSegmentedPath.cpp"
-                            "ThirdParty/opensteer/src/PolylineSegmentedPathwaySegmentRadii.cpp"
-                            "ThirdParty/opensteer/src/PolylineSegmentedPathwaySingleRadius.cpp"
-                            "ThirdParty/opensteer/src/SegmentedPath.cpp"
-                            "ThirdParty/opensteer/src/SegmentedPathway.cpp"
-                            "ThirdParty/opensteer/src/SimpleVehicle.cpp"
-                            "ThirdParty/opensteer/src/TerrainRayTest.cpp"
-                            "ThirdParty/opensteer/src/TerrainRayTest.h"
-                            "ThirdParty/opensteer/src/Vec3.cpp"
-                            "ThirdParty/opensteer/src/Vec3Utilities.cpp"
-                            "ThirdParty/opensteer/src/lq.c"
-                            "ThirdParty/opensteer/src/Draw.cpp"
-                            "ThirdParty/opensteer/src/OpenSteerDemo.cpp"
-                            "ThirdParty/opensteer/src/Camera.cpp"
-                            "ThirdParty/opensteer/plugins/Boids.cpp"
-                            "ThirdParty/opensteer/plugins/CaptureTheFlag.cpp"
-                            "ThirdParty/opensteer/plugins/LowSpeedTurn.cpp"
-                            "ThirdParty/opensteer/plugins/MapDrive.cpp"
-                            "ThirdParty/opensteer/plugins/MultiplePursuit.cpp"
-                            "ThirdParty/opensteer/plugins/OneTurning.cpp"
-                            "ThirdParty/opensteer/plugins/Pedestrian.cpp"
-                            "ThirdParty/opensteer/plugins/PedestriansWalkingAnEight.cpp"
-                            "ThirdParty/opensteer/plugins/Soccer.cpp"
-                            )
+                        "ThirdParty/opensteer/src/Color.cpp"
+                        "ThirdParty/opensteer/src/Obstacle.cpp"
+                        "ThirdParty/opensteer/src/OldPathway.cpp"
+                        "ThirdParty/opensteer/src/Path.cpp"
+                        "ThirdParty/opensteer/src/Pathway.cpp"
+                        "ThirdParty/opensteer/src/PlugIn.cpp"
+                        "ThirdParty/opensteer/src/PolylineSegmentedPath.cpp"
+                        "ThirdParty/opensteer/src/PolylineSegmentedPathwaySegmentRadii.cpp"
+                        "ThirdParty/opensteer/src/PolylineSegmentedPathwaySingleRadius.cpp"
+                        "ThirdParty/opensteer/src/SegmentedPath.cpp"
+                        "ThirdParty/opensteer/src/SegmentedPathway.cpp"
+                        "ThirdParty/opensteer/src/SimpleVehicle.cpp"
+                        "ThirdParty/opensteer/src/TerrainRayTest.cpp"
+                        "ThirdParty/opensteer/src/TerrainRayTest.h"
+                        "ThirdParty/opensteer/src/Vec3.cpp"
+                        "ThirdParty/opensteer/src/Vec3Utilities.cpp"
+                        "ThirdParty/opensteer/src/lq.c"
+                        "ThirdParty/opensteer/src/Draw.cpp"
+                        "ThirdParty/opensteer/src/OpenSteerDemo.cpp"
+                        "ThirdParty/opensteer/src/Camera.cpp"
+                        "ThirdParty/opensteer/plugins/Boids.cpp"
+                        "ThirdParty/opensteer/plugins/CaptureTheFlag.cpp"
+                        "ThirdParty/opensteer/plugins/LowSpeedTurn.cpp"
+                        "ThirdParty/opensteer/plugins/MapDrive.cpp"
+                        "ThirdParty/opensteer/plugins/MultiplePursuit.cpp"
+                        "ThirdParty/opensteer/plugins/OneTurning.cpp"
+                        "ThirdParty/opensteer/plugins/Pedestrian.cpp"
+                        "ThirdParty/opensteer/plugins/PedestriansWalkingAnEight.cpp"
+                        "ThirdParty/opensteer/plugins/Soccer.cpp"
+                        )
 
 file(GLOB tceGeom_SRC       "./tceGeom/src/*.cpp")
 file(GLOB tceOpenSteer_SRC  "./tceOpenSteer/src/*.cpp")
@@ -118,70 +118,67 @@ file(GLOB simpleJSON_SRC "ThirdParty/SimpleJSON/src/*.cpp")
 
 file(GLOB imguiSrc  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
 
-file(GLOB webAsmPlay_SRC        
-								"inc/webAsmPlay/*.h"
-								"inc/webAsmPlay/GUI/*.h"
-								"inc/webAsmPlay/renderables/*.h"
-								"inc/webAsmPlay/shaders/*.h"
-								"src/GUI/GUI.cpp"
-                                "src/GUI/GeosTestPanel.cpp"
-                                "src/GUI/RenderSettingsPanel.cpp"
-                                "src/GUI/GUI_Settings_Panel.cpp"
-                                "src/GUI/GUI_Persistence.cpp"
-                                "src/GUI/SymbologyPanel.cpp"
-                                "src/GUI/InputEvents.cpp"
-                                "src/GUI/OpenSteerTestPanel.cpp"
-                                "src/GUI/OpenSteerPanel.cpp"
-                                "src/GUI/cameraInfoPanel.cpp"
-                                "src/shaders/Shader.cpp"
-                                "src/shaders/ShaderProgram.cpp"
-                                "src/shaders/ColorShader.cpp"
-                                "src/shaders/ColorDistanceShader.cpp"
-                                "src/shaders/ColorDistanceShader3D.cpp"
-                                "src/shaders/ColorVertexShader.cpp"
-                                "src/Camera.cpp"
-                                "src/Debug.cpp"
-                                "src/TrackBallInteractor.cpp"
-                                "src/renderables/Renderable.cpp"
-                                "src/renderables/RenderableLineString.cpp"
-                                "src/renderables/RenderablePolygon.cpp"
-                                "src/renderables/RenderablePoint.cpp"
-                                "src/renderables/RenderableMesh.cpp"
-                                "src/renderables/DeferredRenderable.cpp"
-                                "src/GeosUtil.cpp"
-                                "src/Util.cpp"
-                                "src/FrameBuffer.cpp"
-                                "src/Canvas.cpp"
-                                "src/GeoClient.cpp"
-                                "src/GeoClientGeometry.cpp"
-                                "src/GeoClientRequest.cpp"
-                                "src/GeoClientPicking.cpp"
-                                "src/GeosTestCanvas.cpp"
-                                "src/SkyBox.cpp"
-                                "src/Textures.cpp"
-                                "src/GridPlane.cpp"
-                                "src/K2DTree.cpp"
-                                "src/GeometryConverter.cpp"
-                                "src/Attributes.cpp"
-                                "src/Relation.cpp"
-                                "src/Tessellation.cpp"
-                                "src/VertexArrayObject.cpp"
-                                "src/OpenSteerGlue.cpp"
-                                "src/OpenSteerCanvas.cpp"
-                                "src/Zombie.cpp"
-                                "src/ZombiePlugin.cpp"
-                                "src/Network.cpp"
-                                #"src/Main.cpp"
-                                ${tceGeom_SRC}
-                                ${tceCore_SRC}
-                                ${tceOpenSteer_SRC}
-                                ${tceRender_SRC})
+file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
+                            "inc/webAsmPlay/GUI/*.h"
+                            "inc/webAsmPlay/renderables/*.h"
+                            "inc/webAsmPlay/shaders/*.h"
+                            "src/GUI/GUI.cpp"
+                            "src/GUI/GeosTestPanel.cpp"
+                            "src/GUI/RenderSettingsPanel.cpp"
+                            "src/GUI/GUI_Settings_Panel.cpp"
+                            "src/GUI/GUI_Persistence.cpp"
+                            "src/GUI/SymbologyPanel.cpp"
+                            "src/GUI/InputEvents.cpp"
+                            "src/GUI/OpenSteerTestPanel.cpp"
+                            "src/GUI/OpenSteerPanel.cpp"
+                            "src/GUI/cameraInfoPanel.cpp"
+                            "src/shaders/Shader.cpp"
+                            "src/shaders/ShaderProgram.cpp"
+                            "src/shaders/ColorShader.cpp"
+                            "src/shaders/ColorDistanceShader.cpp"
+                            "src/shaders/ColorDistanceShader3D.cpp"
+                            "src/shaders/ColorVertexShader.cpp"
+                            "src/Camera.cpp"
+                            "src/Debug.cpp"
+                            "src/TrackBallInteractor.cpp"
+                            "src/renderables/Renderable.cpp"
+                            "src/renderables/RenderableLineString.cpp"
+                            "src/renderables/RenderablePolygon.cpp"
+                            "src/renderables/RenderablePoint.cpp"
+                            "src/renderables/RenderableMesh.cpp"
+                            "src/renderables/DeferredRenderable.cpp"
+                            "src/GeosUtil.cpp"
+                            "src/Util.cpp"
+                            "src/FrameBuffer.cpp"
+                            "src/Canvas.cpp"
+                            "src/GeoClient.cpp"
+                            "src/GeoClientGeometry.cpp"
+                            "src/GeoClientRequest.cpp"
+                            "src/GeoClientPicking.cpp"
+                            "src/GeosTestCanvas.cpp"
+                            "src/SkyBox.cpp"
+                            "src/Textures.cpp"
+                            "src/GridPlane.cpp"
+                            "src/K2DTree.cpp"
+                            "src/GeometryConverter.cpp"
+                            "src/Attributes.cpp"
+                            "src/Relation.cpp"
+                            "src/Tessellation.cpp"
+                            "src/VertexArrayObject.cpp"
+                            "src/OpenSteerGlue.cpp"
+                            "src/OpenSteerCanvas.cpp"
+                            "src/Zombie.cpp"
+                            "src/ZombiePlugin.cpp"
+                            "src/Network.cpp"
+                            #"src/Main.cpp"
+                            ${tceGeom_SRC}
+                            ${tceCore_SRC}
+                            ${tceOpenSteer_SRC}
+                            ${tceRender_SRC})
 
-file(GLOB geoServer_SRC 
-	"GeoServer/src/*.cpp"
-	"GeoServer/include/geoServer/*.h"
-
-)
+file(GLOB geoServer_SRC     "GeoServer/src/*.cpp"
+                            "GeoServer/include/geoServer/*.h"
+                            )
 
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
@@ -238,11 +235,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
     add_definitions(-D__EMSCRIPTEN__)
 
-    set(WEB_FILES
-        index.html
-        jquery.mousewheel.js
-        styles/main.css
-        )
+    set(WEB_FILES   index.html
+                    jquery.mousewheel.js
+                    styles/main.css
+                    )
 
     foreach(webfile ${WEB_FILES})
         ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${webfile}"
@@ -291,21 +287,20 @@ else()
 	
 	link_directories(${Boost_LIBRARY_DIRS})
 
-    set(ASSET_FILES
-            back.png
-            bot.png
-            front.png
-            left.png
-            right.png
-            top.png
-            xneg.png
-            xpos.png
-            yneg.png
-            ypos.png
-            zneg.png
-            zpos.png
-            if_Info_131908.png
-        )
+    set(ASSET_FILES     back.png
+                        bot.png
+                        front.png
+                        left.png
+                        right.png
+                        top.png
+                        xneg.png
+                        xpos.png
+                        yneg.png
+                        ypos.png
+                        zneg.png
+                        zpos.png
+                        if_Info_131908.png
+                        )
 
     foreach(assetFile ${ASSET_FILES})
         ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}"

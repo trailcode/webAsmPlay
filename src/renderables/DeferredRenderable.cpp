@@ -202,11 +202,10 @@ void DeferredRenderable::render(Canvas * canvas) const
 
     canvas->pushModel(rotate(canvas->getModelRef(), radians(-90.0), dvec3(1, 0, 0)));
 
+    shader->setVertexArrayFormat(3, 7 * sizeof(GLfloat), 0);
+    shader->setColorArrayFormat (4, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
+
     shader->bind(canvas, false);
-
-    shader->enableVertexArray(3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
-
-    shader->enableColorArray(4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
 
     GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
 

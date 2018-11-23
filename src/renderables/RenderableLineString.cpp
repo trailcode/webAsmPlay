@@ -208,8 +208,8 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
 
 void RenderableLineString::render(Canvas * canvas) const
 {
-    shader->bind(canvas, true);
-    
+    //shader->bind(canvas, true);
+
     GL_CHECK(glBindVertexArray(                    vao));
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
@@ -218,14 +218,18 @@ void RenderableLineString::render(Canvas * canvas) const
 
     if(!isMulti)
     {
-        shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
+        shader->setVertexArrayFormat(2, 2 * sizeof(GLfloat), 0);
+        
+        shader->bind(canvas, true);
 
         GL_CHECK(glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL));
     }
     else
     {
-        shader->enableVertexArray(2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
-        shader->enableColorArray (1, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+        shader->setVertexArrayFormat(2, 3 * sizeof(GLfloat), 0);
+        shader->setColorArrayFormat (1, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+
+        shader->bind(canvas, true);
 
         GL_CHECK(glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, NULL));
     }

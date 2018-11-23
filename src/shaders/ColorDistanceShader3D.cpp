@@ -38,20 +38,28 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram         * shaderProgram   = NULL;
-    ColorDistanceShader3D * defaultInstance = NULL;
+    ShaderProgram         * shaderProgramFill    = NULL;
+    ShaderProgram         * shaderProgramOutline = NULL;
+    ColorDistanceShader3D * defaultInstance      = NULL;
 
-    GLint vertInAttrLoc;
-    GLint normalInAttrLoc;
-    GLint vertColorInAttrLoc;
+    GLint vertInAttrFill;
+    GLint normalInAttrFill;
+    GLint vertColorInAttrFill;
 
-    GLint colorLookupOffsetLoc;
-    GLint heightMultiplierLoc;
-    GLint modelLoc;
-    GLint viewLoc;
-    GLint projectionLoc;
-    GLint texUniformLoc;
-    GLint lightPosUniformLoc;
+    GLint colorLookupOffsetFill;
+    GLint heightMultiplierFill;
+    GLint modelFill;
+    GLint viewFill;
+    GLint projectionFill;
+    GLint texUniformFill;
+    GLint lightPosUniformFill;
+
+    GLint vertInAttrOutline;
+    GLint vertColorInAttrOutline;
+    GLint colorLookupOffsetOutline;
+    GLint MV_Outline;
+    GLint MVP_Outline;
+    GLint texUniformOutline;
 
     GLuint colorTexture = 0;
 
@@ -61,7 +69,7 @@ namespace
 void ColorDistanceShader3D::ensureShader()
 {
     // Shader sources
-    const GLchar* vertexSource = R"glsl(#version 150 core
+    const GLchar* vertexSourceFill = R"glsl(#version 150 core
 
         uniform sampler2D tex; // TODO why does the ordering matter here? Something must not be correct.
 
@@ -100,7 +108,7 @@ void ColorDistanceShader3D::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSource = R"glsl(#version 150 core
+    const GLchar* fragmentSourceFill = R"glsl(#version 150 core
         
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
@@ -138,29 +146,90 @@ void ColorDistanceShader3D::ensureShader()
         }
     )glsl";
 
-    colorTexture = Textures::create(initalColors, 32);
+    shaderProgramFill = ShaderProgram::create(  vertexSourceFill,
+                                                fragmentSourceFill,
+                                                Variables({{"vertIn",               vertInAttrFill          },
+                                                           {"vertColorIn",          vertColorInAttrFill     },
+                                                           {"normalIn",             normalInAttrFill        }}),
+                                                Variables({{"tex",                  texUniformFill          },
+                                                           {"model",                modelFill               },
+                                                           {"view",                 viewFill                },
+                                                           {"projection",           projectionFill          },
+                                                           {"colorLookupOffset",    colorLookupOffsetFill   },
+                                                           {"heightMultiplier",     heightMultiplierFill    },
+                                                           {"lightPos",             lightPosUniformFill     }}));
 
-    shaderProgram = ShaderProgram::create(  vertexSource,
-                                            fragmentSource,
-                                            Variables({{"vertIn",               vertInAttrLoc},
-                                                       {"vertColorIn",          vertColorInAttrLoc},
-                                                       {"normalIn",             normalInAttrLoc}}),
-                                            Variables({{"tex",                  texUniformLoc},
-                                                       {"model",                modelLoc},
-                                                       {"view",                 viewLoc},
-                                                       {"projection",           projectionLoc},
-                                                       {"colorLookupOffset",    colorLookupOffsetLoc},
-                                                       {"heightMultiplier",     heightMultiplierLoc},
-                                                       {"lightPos",             lightPosUniformLoc}}));
+    const GLchar* vertexSourceOutline = R"glsl(#version 150 core
+        uniform sampler2D tex;
+
+        in vec2  vertIn;
+        in float vertColorIn;
+        
+        uniform mat4 MVP;
+        uniform mat4 MV;
+        uniform float colorLookupOffset;
+        
+        out vec4 vertexColorNear;
+        out vec4 vertexColorFar;
+        out vec4 position_in_view_space;
+
+        void main()
+        {
+            vec4 vert = vec4(vertIn.xy, 0, 1);
+            //vec4 vert = vec4(vertIn.xyz, 1);
+
+            position_in_view_space = MV * vert;
+
+            gl_Position = MVP * vert;
+
+            vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
+            vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
+        }
+    )glsl";
+
+    const GLchar* fragmentSourceOutline = R"glsl(#version 150 core
+        in vec4 vertexColorNear;
+        in vec4 vertexColorFar;
+        in vec4 position_in_view_space;
+
+        out vec4 outColor;
+
+        void main()
+        {
+            float minDist = 0.0;
+            float maxDist = 5.0;
+
+            // computes the distance between the fragment position 
+            // and the origin (4th coordinate should always be 1 
+            // for points). The origin in view space is actually 
+            // the camera position.
+            float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
+            
+            dist = min(maxDist, dist) / maxDist;
+
+            outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
+        }
+    )glsl";
+
+    shaderProgramOutline = ShaderProgram::create(   vertexSourceOutline,
+                                                    fragmentSourceOutline,
+                                                    Variables({{"vertIn",            vertInAttrOutline          },
+                                                               {"vertColorIn",       vertColorInAttrOutline     }}),
+                                                    Variables({{"MV",                MV_Outline                 },
+                                                               {"MVP",               MVP_Outline                },
+                                                               {"tex",               texUniformOutline          },
+                                                               {"colorLookupOffset", colorLookupOffsetOutline   }}));
+
+    colorTexture = Textures::create(initalColors, 32);
 
     defaultInstance = new ColorDistanceShader3D();
 }
 
 ColorDistanceShader3D::ColorDistanceShader3D() : Shader("ColorDistanceShader3D",
-                                                        shaderProgram,
-                                                        vertInAttrLoc,
-                                                        vertColorInAttrLoc,
-                                                        normalInAttrLoc)
+                                                        shaderProgramFill,
+                                                        vertInAttrFill,
+                                                        vertColorInAttrFill,
+                                                        normalInAttrFill)
 {
     colors[0] = vec4(1,0,0,1);
     colors[1] = vec4(1,1,0,1);
@@ -193,19 +262,38 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
 
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorTexture));
 
-    shaderProgram->bind();
+    shaderProgramFill->bind();
 
-    shaderProgram->setUniformi(texUniformLoc, 0);
+    ShaderProgram::enableVertexAttribArray( vertInAttrFill,
+                                            sizeVertex,
+                                            GL_FLOAT,
+                                            GL_FALSE,
+                                            strideVertex,
+                                            pointerVertex);
 
-    shaderProgram->setUniformf(heightMultiplierLoc, heightMultiplier);
+    ShaderProgram::enableVertexAttribArray( normalInAttrFill,
+                                            sizeNormal,
+                                            GL_FLOAT,
+                                            GL_FALSE,
+                                            strideNormal,
+                                            pointerNormal);
 
-    shaderProgram->setUniform(modelLoc,             canvas->getModelRef());
-    shaderProgram->setUniform(viewLoc,              canvas->getViewRef());
-    shaderProgram->setUniform(projectionLoc,        canvas->getProjectionRef());
-    shaderProgram->setUniform(lightPosUniformLoc,   lightPos);
+    ShaderProgram::enableVertexAttribArray( vertColorInAttrFill,
+                                            sizeColor,
+                                            GL_FLOAT,
+                                            GL_FALSE,
+                                            strideColor,
+                                            pointerColor);
 
-    if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 1.0f) ;}
-    else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}
+    shaderProgramFill->setUniformi(texUniformFill,          0);
+    shaderProgramFill->setUniformf(heightMultiplierFill,    heightMultiplier);
+    shaderProgramFill->setUniform (modelFill,               canvas->getModelRef());
+    shaderProgramFill->setUniform (viewFill,                canvas->getViewRef());
+    shaderProgramFill->setUniform (projectionFill,          canvas->getProjectionRef());
+    shaderProgramFill->setUniform (lightPosUniformFill,     lightPos);
+
+    if(isOutline) { shaderProgramFill->setUniformf(colorLookupOffsetFill, 1.0f) ;}
+    else          { shaderProgramFill->setUniformf(colorLookupOffsetFill, 0.0f) ;}
 }
 
 vec4 ColorDistanceShader3D::setColor(const size_t index, const vec4 & color)
