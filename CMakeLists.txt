@@ -178,6 +178,7 @@ file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
 
 file(GLOB geoServer_SRC     "GeoServer/src/*.cpp"
                             "GeoServer/include/geoServer/*.h"
+                            #"src/Network.cpp"
                             )
 
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")

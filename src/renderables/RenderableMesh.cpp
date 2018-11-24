@@ -63,7 +63,7 @@ Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons
 
         if((poly = dynamic_cast<const geom::Polygon *>(geom)))
         {
-            tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID, height));
+            tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID, height, minHeight));
             
             if((*tessellations.rbegin())->isEmpty())
             {

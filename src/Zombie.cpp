@@ -170,7 +170,7 @@ Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
     }
 
     // if obstacle avoidance is needed, do it
-    if (obstacleAvoidance != Vec3::zero)
+    if (false && obstacleAvoidance != Vec3::zero)
     {
         steeringForce += obstacleAvoidance;
     }
@@ -187,9 +187,10 @@ Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
         neighbors.clear();
         proximityToken->findNeighbors (position(), maxRadius, neighbors);
 
-        if (leakThrough < frandom01())
-            collisionAvoidance =
-                steerToAvoidNeighbors (caLeadTime, neighbors) * 10;
+        if (true || leakThrough < frandom01())
+        {
+            collisionAvoidance = steerToAvoidNeighbors (caLeadTime, neighbors) * 10.0;
+        }
 
         // if collision avoidance is needed, do it
         if (collisionAvoidance != Vec3::zero)
@@ -199,8 +200,10 @@ Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
         else
         {
             // add in wander component (according to user switch)
-            if (gWanderSwitch)
+            if (false && gWanderSwitch)
+            {
                 steeringForce += steerForWander (elapsedTime);
+            }
 
             // do (interactively) selected type of path following
             const float pfLeadTime = 3;

@@ -128,8 +128,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             const vec3 p1(A, tess->height);
             const vec3 p2(B, tess->height);
-            const vec3 p3(B, 0);
-            const vec3 p4(A, 0);
+            const vec3 p3(B, tess->minHeight);
+            const vec3 p4(A, tess->minHeight);
 
             const vec3 normal = normalize(triangleNormal(p1, p2, p3));
 
