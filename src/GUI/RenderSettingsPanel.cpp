@@ -27,7 +27,10 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/renderables/Renderable.h>
+#include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
+#include <webAsmPlay/shaders/ColorShader.h>
+#include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -74,10 +77,36 @@ void GUI::renderSettingsPanel()
             ColorDistanceShader3D::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
         }
 
-        const char* items[] = { "TrackBall", "First Person", "Track Entity" };
+        const char * items[] = { "TrackBall", "First Person", "Track Entity" };
         
         ImGui::Combo("Camera", &cameraMode, items, IM_ARRAYSIZE(items));
+
+        ImGui::Text("Linestring Shader");
+
+        const char * shaders[] = { "ColorDistanceShader", "ColorDistanceShader3D", "ColorShader", "ColorVertexShader" };
+
+        static int lineStringShader = 0;
+
+        ImGui::Combo("Linestring", &lineStringShader, shaders, IM_ARRAYSIZE(shaders)); 
         
+        static int meshShader = 0;
+
+        if(ImGui::Combo("Mesh", &meshShader, shaders, IM_ARRAYSIZE(shaders)))
+        {
+            dmess("meshShader " << meshShader);
+
+            vector<Shader *> shaderMap({ColorDistanceShader::getDefaultInstance(),
+            ColorDistanceShader3D::getDefaultInstance(),
+            ColorShader::getDefaultInstance(),
+            ColorVertexShader::getDefaultInstance()
+            });
+
+            for(auto i : canvas->getMeshRenderiables())
+            {
+                i->setShader(shaderMap[meshShader]);
+            }
+        }
+
         //ImGui::SameLine(); ShowHelpMarker("Refer to the \"Combo\" section below for an explanation of the full BeginCombo/EndCombo API, and demonstration of various flags.\n");
 
     ImGui::End();

@@ -81,9 +81,11 @@ void ColorVertexShader::ensureShader()
 ColorVertexShader::ColorVertexShader() : Shader("ColorVertexShader") {}
 ColorVertexShader::~ColorVertexShader() {}
 
-ColorVertexShader * ColorVertexShader::getInstance() { return defaultInstance ;}
+ColorVertexShader * ColorVertexShader::getDefaultInstance() { return defaultInstance ;}
 
-void ColorVertexShader::bind(Canvas * canvas, const bool isOutline)
+void ColorVertexShader::bind(Canvas     * canvas,
+                             const bool   isOutline,
+                             const size_t renderingStage)
 {
     shaderProgram->bind();
 

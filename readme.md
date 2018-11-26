@@ -193,6 +193,7 @@ No notes.
 * Move OpenSteer Vec3 objects to glm::dvec objects.
 * Detect OSM building polygons which have the same base but different heights. Use only the one with the smallest height.
     * Investigate this some more.
+* Add overrides keywords. 
 
 ### Bugs
 

@@ -55,7 +55,7 @@ public:
                         const glm::vec3 & B,
                         const glm::vec4 & color);
 
-    void render(Canvas * canvas) const;
+    void render(Canvas * canvas, const size_t renderStage = 0) const;
 
 private:
 

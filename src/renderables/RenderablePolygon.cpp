@@ -127,13 +127,15 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
     return ret;
 }
 
-void RenderablePolygon::render(Canvas * canvas) const
+void RenderablePolygon::render(Canvas * canvas, const size_t renderStage) const
 {
+    //if(renderStage >= shader->getNumRenderingStages()) { return ;} // TODO code dup!
+
     vertexArrayObject->bind();
 
     vertexArrayObject->bindTriangles();
 
-    GL_CHECK(glEnable(GL_BLEND));
+    GL_CHECK(glEnable(GL_BLEND)); // TODO move into shader
 
     GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
@@ -142,16 +144,16 @@ void RenderablePolygon::render(Canvas * canvas) const
     shader->setVertexArrayFormat(2, 3 * sizeof(GLfloat), 0);
     shader->setColorArrayFormat (1, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
-    if(getRenderFill())
+    if(getRenderFill() && shader->shouldRender(false, renderStage))
     {
-        shader->bind(canvas, false);
+        shader->bind(canvas, false, renderStage);
 
         vertexArrayObject->drawTriangles();
     }
 
-    if(getRenderOutline())
+    if(getRenderOutline() && shader->shouldRender(true, renderStage))
     {
-        shader->bind(canvas, true);
+        shader->bind(canvas, true, renderStage);
 
         vertexArrayObject->bindLines();
         

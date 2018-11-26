@@ -148,7 +148,8 @@ ColorDistanceShader::~ColorDistanceShader()
 ColorDistanceShader * ColorDistanceShader::getDefaultInstance() { return defaultInstance ;}
 
 void ColorDistanceShader::bind(Canvas     * canvas,
-                               const bool   isOutline)
+                               const bool   isOutline,
+                               const size_t renderingStage)
 {
     if(colorTextureDirty)
     {

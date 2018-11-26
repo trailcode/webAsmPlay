@@ -120,37 +120,30 @@ RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderab
 
 }
 
-void RenderableMesh::render(Canvas * canvas) const
+void RenderableMesh::render(Canvas * canvas, const size_t renderStage) const
 {
+    //if(renderStage >= shader->getNumRenderingStages()) { return ;} // TODO code dup!
+
     vertexArrayObject->bind();
 
     vertexArrayObject->bindTriangles();
-
-    GL_CHECK(glEnable(GL_BLEND));
-
-    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
-    //GL_CHECK(glDisable(GL_DEPTH_TEST));
-    GL_CHECK(glEnable(GL_DEPTH_TEST));
 
     shader->setVertexArrayFormat(3, 7 * sizeof(GLfloat), 0);
     shader->setColorArrayFormat (1, 7 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
     shader->setNormalArrayFormat(3, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 
-    if(getRenderFill())
+    if(getRenderFill() && shader->shouldRender(false, renderStage))
     {
-        shader->bind(canvas, false);
+        shader->bind(canvas, false, renderStage);
 
         vertexArrayObject->drawTriangles();
     }
 
-    GL_CHECK(glDisable(GL_BLEND)); // TODO Remove!
-
     //GL_CHECK(glDisable(GL_DEPTH_TEST));
 
-    if(getRenderOutline())
+    if(getRenderOutline() && shader->shouldRender(true, renderStage))
     {
-        shader->bind(canvas, true);
+        shader->bind(canvas, true, renderStage);
 
         vertexArrayObject->bindLines();
         

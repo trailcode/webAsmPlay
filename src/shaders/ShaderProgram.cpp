@@ -139,7 +139,7 @@ ShaderProgram * ShaderProgram::create(const GLchar    * vertexSource,
 
         if(variable.second == -1)
         {
-            dmess("Warning could not find shader attribute: " << variable.first);
+            dmess("Warning could not find shader attribute: " << variable.first << " Check it is being used in shader.");
 
             continue;
         }
@@ -153,7 +153,7 @@ ShaderProgram * ShaderProgram::create(const GLchar    * vertexSource,
 
         if(variable.second == -1)
         {
-            dmess("Warning could not find shader uniform: " << variable.first);
+            dmess("Warning could not find shader uniform: " << variable.first << " Check it is being used in shader.");
 
             continue;
         }

@@ -36,7 +36,7 @@ class Shader
 {
 public:
 
-    virtual void bind(Canvas * canvas, const bool isOutline) = 0;
+    virtual void bind(Canvas * canvas, const bool isOutline, const size_t renderingStage) = 0;
 
     void setVertexArrayFormat(  const GLint     size    = 2,
                                 const GLsizei   stride  = 0,
@@ -51,6 +51,10 @@ public:
                                 const GLvoid  * pointer = NULL);
 
     std::string getName() const;
+
+    virtual size_t getNumRenderingStages() const;
+
+    virtual bool shouldRender(const bool isOutline, const size_t renderingStage) const;
 
 protected:
 

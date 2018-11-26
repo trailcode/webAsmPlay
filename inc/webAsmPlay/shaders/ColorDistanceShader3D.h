@@ -44,7 +44,8 @@ public:
     static void ensureShader();
 
     void bind(Canvas     * canvas,
-              const bool   isOutline);
+              const bool   isOutline,
+              const size_t renderingStage = 0);
 
     glm::vec4 setColor(const size_t index, const glm::vec4 & color);
     glm::vec4 getColor(const size_t index);
@@ -60,7 +61,14 @@ public:
     float setHeightMultiplier(const float multiplier);
     float getHeightMultiplier() const;
 
+    size_t getNumRenderingStages() const;
+
+    bool shouldRender(const bool isOutline, const size_t renderingStage) const;
+
 private:
+
+    void bindStage0(Canvas * canvas, const bool isOutline);
+    void bindStage1(Canvas * canvas, const bool isOutline);
 
     glm::vec4 colors[32];
 

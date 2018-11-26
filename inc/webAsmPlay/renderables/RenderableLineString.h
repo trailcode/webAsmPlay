@@ -55,7 +55,7 @@ public:
                                 const glm::mat4         & trans          = glm::mat4(1.0),
                                 const bool                showProgress   = false);
 
-    void render(Canvas * canvas) const;
+    void render(Canvas * canvas, const size_t renderStage = 0) const;
 
     static void ensureShaders();
 

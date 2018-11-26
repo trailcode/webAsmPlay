@@ -114,7 +114,7 @@ DeferredRenderable::DeferredRenderable( const GLuint & vao,
                                                                          numTriIndices (numTriIndices),
                                                                          numLineIndices(numLineIndices)
 {
-    setShader(ColorVertexShader::getInstance());
+    setShader(ColorVertexShader::getDefaultInstance());
 }
 
 DeferredRenderable::~DeferredRenderable()
@@ -191,8 +191,12 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
     triangleIndices.push_back(index + 5);
 }
 
-void DeferredRenderable::render(Canvas * canvas) const
+void DeferredRenderable::render(Canvas * canvas, const size_t renderStage) const
 {
+    if(!shader->shouldRender(false, renderStage)) { return ;}
+
+    shader->bind(canvas, false, renderStage);
+
     GL_CHECK(glBindVertexArray(vao));
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
@@ -204,8 +208,6 @@ void DeferredRenderable::render(Canvas * canvas) const
 
     shader->setVertexArrayFormat(3, 7 * sizeof(GLfloat), 0);
     shader->setColorArrayFormat (4, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
-
-    shader->bind(canvas, false);
 
     GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
 

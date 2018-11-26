@@ -376,6 +376,8 @@ void GUI::attributePanel(const string & attrsStr)
     ImGui::End();
 }
 
+#include <webAsmPlay/FrameBuffer.h>
+
 void GUI::mainLoop(GLFWwindow * window)
 {
     if(!Buf) {  Buf = new ImGuiTextBuffer() ;}
@@ -428,7 +430,7 @@ void GUI::mainLoop(GLFWwindow * window)
     // Rendering
     int screenWidth, screenHeight;
     glfwGetFramebufferSize(mainWindow, &screenWidth, &screenHeight);
-    
+    dmess("screenWidth " << screenWidth << " screenHeight " << screenHeight);
     GL_CHECK(glViewport(0, 0, screenWidth, screenHeight));
     
     static float time = 0.f;
@@ -439,6 +441,21 @@ void GUI::mainLoop(GLFWwindow * window)
     GL_CHECK(glDisable(GL_DEPTH_TEST));
  
     canvas->render();
+    {
+     ImGui::Begin("Tests");
+
+        const ImVec2 pos = ImGui::GetCursorScreenPos();
+
+        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+
+        ImGui::GetWindowDrawList()->AddImage(   (void *)canvas->auxFrameBuffer->getTextureID(),
+                                                pos,
+                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+                                                ImVec2(0, 1),
+                                                ImVec2(1, 0));
+ 
+    ImGui::End();
+    }
 
     const double dist = distance(canvas->getCamera()->getCenter(), canvas->getCamera()->getEye());
 
@@ -530,6 +547,12 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     canvas = new Canvas(false);
 
     canvas->setArea(ivec2(0,0), ivec2(width, height));
+
+    int fbWidth, fbHeight;
+
+    glfwGetFramebufferSize(mainWindow, &fbWidth, &fbHeight);
+
+    canvas->setFrameBufferSize(ivec2(fbWidth, fbHeight));
 
     auxCanvases = vector<Canvas *>(
     {

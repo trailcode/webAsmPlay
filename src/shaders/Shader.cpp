@@ -60,3 +60,10 @@ void Shader::setColorArrayFormat(   const GLint     size,
 }
 
 string Shader::getName() const { return shaderName ;}
+
+size_t Shader::getNumRenderingStages() const { return 1 ;}
+
+bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) const
+{
+    return renderingStage == 0;
+}

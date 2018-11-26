@@ -142,7 +142,7 @@ void Zombie::update(const float currentTime, const float elapsedTime)
     recordTrailVertex (currentTime, position());
 
     // notify proximity database that our position has changed
-    //proximityToken->updateForNewPosition (position());
+    proximityToken->updateForNewPosition (position());
 }
 
 Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
@@ -186,7 +186,7 @@ Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
         const float maxRadius = caLeadTime * maxSpeed() * 2;
         neighbors.clear();
         proximityToken->findNeighbors (position(), maxRadius, neighbors);
-
+        //dmess("neighbors " << neighbors.size())
         if (true || leakThrough < frandom01())
         {
             collisionAvoidance = steerToAvoidNeighbors (caLeadTime, neighbors) * 10.0;

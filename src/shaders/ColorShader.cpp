@@ -92,7 +92,9 @@ ColorShader::~ColorShader()
 
 }
 
-void ColorShader::bind(Canvas * canvas, const bool isOutline)
+void ColorShader::bind( Canvas     * canvas,
+                        const bool   isOutline,
+                        const size_t renderingStage)
 {
     shaderProgram->bind();
 

@@ -76,10 +76,19 @@ void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
     this->upperLeft = upperLeft;
     this->size      = size;
 
-    if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, size) ;}
-
     trackBallInteractor->setScreenSize(size.x, size.y);
 }
+
+ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
+{
+    if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, fbSize) ;}
+
+    auxFrameBuffer = FrameBuffer::ensureFrameBuffer(auxFrameBuffer, fbSize);
+
+    return frameBufferSize = fbSize;
+}
+
+ivec2 Canvas::getFrameBufferSize() const { return frameBufferSize ;}
 
 void Canvas::pushModel(const dmat4 & model)
 {
@@ -104,7 +113,7 @@ extern vec4 up;
 void Canvas::updateMVP()
 {
     currMVP.view        = trackBallInteractor->getCamera()->getMatrix();
-    currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.0001, 300.0);
+    currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.01, 30.0);
     currMVP.MV          = currMVP.view * currMVP.model;
     currMVP.MVP         = currMVP.projection * currMVP.MV;
 }
@@ -152,12 +161,30 @@ GLuint Canvas::render()
     if(!preRender()) { return 0 ;}
 
     lock_guard<mutex> _(renderiablesMutex);
-    
-    for(const auto r : polygons)            { r->render(this) ;}
-    for(const auto r : lineStrings)         { r->render(this) ;}
-    for(const auto r : points)              { r->render(this) ;}
-    for(const auto r : deferredRenderables) { r->render(this) ;}
-    for(const auto r : meshes)              { r->render(this) ;}
+
+    auxFrameBuffer->bind();
+
+    //GL_CHECK(glViewport(0, 0, size.x, size.y));
+
+    dmess("auxFrameBuffer->getBufferSize() " << auxFrameBuffer->getBufferSize().x << " " << auxFrameBuffer->getBufferSize().y);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //dmess("============ " << meshes.size());
+
+    for(const auto r : meshes)              { r->render(this, 1) ;}
+
+    glFlush();
+
+    auxFrameBuffer->unbind();
+
+    for(const auto r : polygons)            { r->render(this, 0) ;}
+    for(const auto r : lineStrings)         { r->render(this, 0) ;}
+    for(const auto r : points)              { r->render(this, 0) ;}
+    for(const auto r : deferredRenderables) { r->render(this, 0) ;}
+    //for(const auto r : meshes)              { r->render(this) ;}
+
+    for(const auto r : meshes)              { r->render(this, 0) ;}
 
     return postRender();
 }
@@ -168,7 +195,7 @@ dvec2 Canvas::renderCursor(const dvec2 & pos)
 
     pushModel(translate(dmat4(1.0), dvec3(pos, 0.0)));
 
-    cursor->render(this);
+    cursor->render(this, 0);
 
     popMVP();
     
@@ -331,6 +358,15 @@ vector<Renderable *> Canvas::getRenderiables() const
     ret.insert(ret.end(), lineStrings.begin(),  lineStrings.end());
     ret.insert(ret.end(), polygons.begin(),     polygons.end());
     ret.insert(ret.end(), meshes.begin(),       meshes.end());
+
+    return ret;
+}
+
+vector<Renderable *> Canvas::getMeshRenderiables() const
+{
+    vector<Renderable *> ret;
+
+    ret.insert(ret.end(), meshes.begin(), meshes.end());
 
     return ret;
 }

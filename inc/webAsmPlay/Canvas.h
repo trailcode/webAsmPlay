@@ -38,7 +38,6 @@
 #include <webAsmPlay/GUI/ImguiInclude.h>
 
 class FrameBuffer;
-//class GLFWwindow;
 class Renderable;
 class SkyBox;
 
@@ -58,6 +57,9 @@ public:
     virtual ~Canvas();
 
     virtual void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size);
+
+    virtual glm::ivec2 setFrameBufferSize(const glm::ivec2 & fbSize);
+    virtual glm::ivec2 getFrameBufferSize() const;
 
     virtual GLuint render();
 
@@ -103,6 +105,8 @@ public:
 
     std::vector<Renderable *> getRenderiables() const;
 
+    std::vector<Renderable *> getMeshRenderiables() const;
+
     static std::vector<Canvas *> getInstances();
 
     bool setEnabled(const bool enabled);
@@ -114,16 +118,18 @@ public:
 
     glm::dvec2 renderCursor(const glm::dvec2 & pos);
 
-protected:
+//protected:
 
     bool preRender();
 
     GLuint postRender();
 
     glm::ivec2 upperLeft;
-    glm::ivec2 size;
+    glm::ivec2 size = glm::ivec2(1,1);
 
-private:
+    glm::ivec2 frameBufferSize = glm::ivec2(1,1);
+
+//private:
 
     Renderable * addRenderable(std::list<Renderable *> & container, Renderable * renderiable);
 
@@ -169,6 +175,8 @@ private:
     std::mutex renderiablesMutex;
 
     Renderable * cursor = NULL;
+
+    FrameBuffer * auxFrameBuffer = NULL;
 };
 
 #endif // __WEB_ASM_PLAY_CANVAS_H__

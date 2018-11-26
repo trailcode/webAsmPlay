@@ -35,9 +35,11 @@ public:
 
     static void ensureShader();
 
-    static ColorVertexShader * getInstance();
+    static ColorVertexShader * getDefaultInstance();
 
-    void bind(Canvas * canvas, const bool isOutline);
+    void bind(  Canvas     * canvas,
+                const bool   isOutline,
+                const size_t renderingStage = 0);
 
 private:
 

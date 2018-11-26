@@ -330,6 +330,7 @@ void ZombiePlugin::nextPD()
         }
     case 1:
         {
+            abort();
             pd = new BruteForceProximityDatabase<AbstractVehicle*> ();
             break;
         }
