@@ -194,6 +194,7 @@ No notes.
 * Detect OSM building polygons which have the same base but different heights. Use only the one with the smallest height.
     * Investigate this some more.
 * Add overrides keywords. 
+* Experiment with compute shaders for updating bot positions. 
 
 ### Bugs
 

@@ -429,8 +429,9 @@ void GUI::mainLoop(GLFWwindow * window)
     
     // Rendering
     int screenWidth, screenHeight;
+
     glfwGetFramebufferSize(mainWindow, &screenWidth, &screenHeight);
-    dmess("screenWidth " << screenWidth << " screenHeight " << screenHeight);
+    
     GL_CHECK(glViewport(0, 0, screenWidth, screenHeight));
     
     static float time = 0.f;

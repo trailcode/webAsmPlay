@@ -122,8 +122,6 @@ RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderab
 
 void RenderableMesh::render(Canvas * canvas, const size_t renderStage) const
 {
-    //if(renderStage >= shader->getNumRenderingStages()) { return ;} // TODO code dup!
-
     vertexArrayObject->bind();
 
     vertexArrayObject->bindTriangles();
@@ -139,8 +137,6 @@ void RenderableMesh::render(Canvas * canvas, const size_t renderStage) const
         vertexArrayObject->drawTriangles();
     }
 
-    //GL_CHECK(glDisable(GL_DEPTH_TEST));
-
     if(getRenderOutline() && shader->shouldRender(true, renderStage))
     {
         shader->bind(canvas, true, renderStage);
@@ -149,6 +145,4 @@ void RenderableMesh::render(Canvas * canvas, const size_t renderStage) const
         
         vertexArrayObject->drawLines();
     }
-
-    //GL_CHECK(glDisable(GL_BLEND)); // TODO Remove!
 }

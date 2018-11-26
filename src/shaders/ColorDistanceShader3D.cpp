@@ -248,6 +248,7 @@ void ColorDistanceShader3D::ensureShader()
         out vec4 vertexColorNear;
         out vec4 vertexColorFar;
         out vec4 position_in_view_space;
+        out vec4 glPos;
 
         void main()
         {
@@ -256,6 +257,8 @@ void ColorDistanceShader3D::ensureShader()
             position_in_view_space = MV * vert;
 
             gl_Position = MVP * vert;
+
+            glPos = gl_Position;
 
             vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
             vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
@@ -266,6 +269,7 @@ void ColorDistanceShader3D::ensureShader()
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
+        in vec4 glPos;
 
         out vec4 outColor;
 
@@ -273,9 +277,28 @@ void ColorDistanceShader3D::ensureShader()
         uniform float     height;
         uniform sampler2D depthTex;
 
+        bool canDiscard()
+        {
+            float posX = gl_FragCoord.x / width;
+            float posY = gl_FragCoord.y / height;
+            float deltaX = 1.0f / width;
+            float deltaY = 1.0f / height;
+            for(float x = -1.0f; x < 2.0f; x += 1.0f) 
+            for(float y = -1.0f; y < 2.0f; y += 1.0f)
+            {
+                vec4 t = texture(depthTex, vec2(posX + x * deltaX, posY + y * deltaY));
+
+                float v = abs(t.x - glPos.w);
+
+                if(v <= 0.001) { return false ;}
+            }
+
+            return true;
+        }
+
         void main()
         {
-            vec4 t = texture(depthTex, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height));
+            if(canDiscard()) { discard ;}
 
             float minDist = 0.0;
             float maxDist = 5.0;
@@ -348,7 +371,7 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
 
 void ColorDistanceShader3D::bindStage1(Canvas * canvas, const bool isOutline)
 {
-    dmess("ColorDistanceShader3D::bindStage1");
+    //dmess("ColorDistanceShader3D::bindStage1");
 
     shaderProgramDepth->bind();
 
@@ -371,7 +394,7 @@ void ColorDistanceShader3D::bindStage1(Canvas * canvas, const bool isOutline)
 
 void ColorDistanceShader3D::bindStage0(Canvas * canvas, const bool isOutline)
 {
-    dmess("ColorDistanceShader3D::bindStage0");
+    //dmess("ColorDistanceShader3D::bindStage0");
 
     if(colorTextureDirty)
     {
@@ -386,19 +409,17 @@ void ColorDistanceShader3D::bindStage0(Canvas * canvas, const bool isOutline)
 
     GL_CHECK(glActiveTexture(GL_TEXTURE1));
 
-    dmess("canvas->auxFrameBuffer->getTextureID() " << canvas->auxFrameBuffer->getTextureID());
-
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, canvas->auxFrameBuffer->getTextureID()));
+
+    GL_CHECK(glEnable(GL_BLEND));
+
+    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+    GL_CHECK(glDisable(GL_DEPTH_TEST));
+    //GL_CHECK(glEnable(GL_DEPTH_TEST));
 
     if(!isOutline)
     {
-        GL_CHECK(glEnable(GL_BLEND));
-
-        GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
-        GL_CHECK(glDisable(GL_DEPTH_TEST));
-        //GL_CHECK(glEnable(GL_DEPTH_TEST));
-
         shaderProgramFill->bind();
 
         ShaderProgram::enableVertexAttribArray( vertInAttrFill,
@@ -436,8 +457,6 @@ void ColorDistanceShader3D::bindStage0(Canvas * canvas, const bool isOutline)
     }
     else
     {
-        GL_CHECK(glDisable(GL_BLEND));
-
         shaderProgramOutline->bind();
 
         ShaderProgram::enableVertexAttribArray( vertInAttrOutline,
@@ -457,8 +476,8 @@ void ColorDistanceShader3D::bindStage0(Canvas * canvas, const bool isOutline)
         //shaderProgramOutline->colorLookupOffsetOutline;
         shaderProgramOutline->setUniformf(heightMultiplierOutline,    heightMultiplier);
         shaderProgramOutline->setUniformi(depthTexUniformOutline,          1);
-        shaderProgramOutline->setUniformf(widthUniformOutline,          canvas->size.x);
-        shaderProgramOutline->setUniformf(heightUniformOutline,          canvas->size.y);
+        shaderProgramOutline->setUniformf(widthUniformOutline,          canvas->frameBufferSize.x);
+        shaderProgramOutline->setUniformf(heightUniformOutline,          canvas->frameBufferSize.y);
         shaderProgramOutline->setUniform(MV_Outline, canvas->getMV_Ref());
         shaderProgramOutline->setUniform(MVP_Outline, canvas->getMVP_Ref());
         shaderProgramOutline->setUniformi(texUniformOutline, 0);
