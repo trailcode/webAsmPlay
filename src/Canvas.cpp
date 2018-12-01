@@ -38,6 +38,7 @@
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
+#include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/Canvas.h>
 
@@ -133,7 +134,8 @@ bool Canvas::preRender()
 
     updateMVP();
 
-    ColorDistanceShader3D::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
+    ColorDistanceShader3D     ::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
+    ColorDistanceDepthShader3D::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
 
     if(useFrameBuffer)
     {

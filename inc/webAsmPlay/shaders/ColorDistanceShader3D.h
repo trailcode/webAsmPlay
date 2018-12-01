@@ -32,6 +32,8 @@
 #include <JSON.h>
 #include <webAsmPlay/shaders/Shader.h>
 
+class ColorSymbology;
+
 class ColorDistanceShader3D : public Shader
 {
 public:
@@ -45,30 +47,18 @@ public:
 
     void bind(Canvas     * canvas,
               const bool   isOutline,
-              const size_t renderingStage = 0);
-
-    glm::vec4 setColor(const size_t index, const glm::vec4 & color);
-    glm::vec4 getColor(const size_t index);
-    glm::vec4 & getColorRef(const size_t index);
+              const size_t renderingStage);
 
     glm::vec3 setLightPos(const glm::vec3 & pos);
     glm::vec3 getLightPos() const;
 
-    void loadState(const JSONObject & dataStore);
-
-    void saveState(JSONObject & dataStore);
-
     float setHeightMultiplier(const float multiplier);
     float getHeightMultiplier() const;
 
-    size_t getNumRenderingStages() const;
-
-    bool shouldRender(const bool isOutline, const size_t renderingStage) const;
+    ColorSymbology * setColorSymbology(ColorSymbology * colorSymbology);
+    ColorSymbology * getColorSymbology() const;
 
 private:
-
-    void bindStage0(Canvas * canvas, const bool isOutline);
-    void bindStage1(Canvas * canvas, const bool isOutline);
 
     glm::vec4 colors[32];
 
@@ -77,6 +67,8 @@ private:
     float heightMultiplier = 1.0f;
 
     glm::vec3 lightPos;
+
+    ColorSymbology * colorSymbology = NULL;
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_3D_H__

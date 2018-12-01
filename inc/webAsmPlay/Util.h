@@ -81,18 +81,6 @@ void doProgress(const std::string                                    & message,
                 std::chrono::time_point<std::chrono::system_clock> & startTime,
                 const size_t                                         sampleRate = 1000);
 
-#ifdef OPENGL_CALL_CHECKING
-    #define GL_CHECK(stmt) do { stmt; \
-            const GLenum err = glGetError(); \
-            if (err != GL_NO_ERROR) { \
-            dmess("OpenGL error " << err << " call " << #stmt); \
-            abort(); \
-            } \
-        } while (0)
-#else
-    #define GL_CHECK(stmt) stmt
-#endif
-
 inline uint32_t getUint32(const char *& dataStream)
 {
     const uint32_t ret = *(uint32_t *)dataStream; dataStream += sizeof(uint32_t);

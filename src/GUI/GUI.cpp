@@ -41,6 +41,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
+#include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/FrameBuffer.h>
@@ -431,7 +432,7 @@ void GUI::mainLoop(GLFWwindow * window)
     int screenWidth, screenHeight;
 
     glfwGetFramebufferSize(mainWindow, &screenWidth, &screenHeight);
-    
+
     GL_CHECK(glViewport(0, 0, screenWidth, screenHeight));
     
     static float time = 0.f;
@@ -442,22 +443,7 @@ void GUI::mainLoop(GLFWwindow * window)
     GL_CHECK(glDisable(GL_DEPTH_TEST));
  
     canvas->render();
-    {
-     ImGui::Begin("Tests");
-
-        const ImVec2 pos = ImGui::GetCursorScreenPos();
-
-        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
-
-        ImGui::GetWindowDrawList()->AddImage(   (void *)canvas->auxFrameBuffer->getTextureID(),
-                                                pos,
-                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-                                                ImVec2(0, 1),
-                                                ImVec2(1, 0));
- 
-    ImGui::End();
-    }
-
+    
     const double dist = distance(canvas->getCamera()->getCenter(), canvas->getCamera()->getEye());
 
     canvas->getTrackBallInteractor()->setZoomScale(dist * 0.02);
@@ -540,10 +526,12 @@ void GUI::initOpenGL() // TODO, need some code refactor here
 
     GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
 
-    ColorDistanceShader  ::ensureShader();
-    ColorDistanceShader3D::ensureShader();
-    ColorShader          ::ensureShader();
-    ColorVertexShader    ::ensureShader();
+    // TODO make these plugins!
+    ColorDistanceShader       ::ensureShader();
+    ColorDistanceShader3D     ::ensureShader();
+    ColorDistanceDepthShader3D::ensureShader();
+    ColorShader               ::ensureShader();
+    ColorVertexShader         ::ensureShader();
     
     canvas = new Canvas(false);
 

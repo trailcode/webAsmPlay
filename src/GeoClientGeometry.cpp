@@ -40,7 +40,7 @@
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
+#include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GeoClient.h>
 
@@ -182,7 +182,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     if((r = RenderableMesh::create(polygons3D, trans, true)))
     {
-        r->setShader(ColorDistanceShader3D::getDefaultInstance());
+        r->setShader(ColorDistanceDepthShader3D::getDefaultInstance());
 
         canvas->addRenderable(r);
     }

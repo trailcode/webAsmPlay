@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
 set(default_build_type "Release")
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 #set(EMCC_DEBUG 1)
 
 if(MSVC_VERSION)
@@ -137,7 +137,9 @@ file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
                             "src/shaders/ColorShader.cpp"
                             "src/shaders/ColorDistanceShader.cpp"
                             "src/shaders/ColorDistanceShader3D.cpp"
+                            "src/shaders/ColorDistanceDepthShader3D.cpp"
                             "src/shaders/ColorVertexShader.cpp"
+                            "src/shaders/ColorSymbology.cpp"
                             "src/Camera.cpp"
                             "src/Debug.cpp"
                             "src/TrackBallInteractor.cpp"

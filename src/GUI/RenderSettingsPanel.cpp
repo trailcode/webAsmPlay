@@ -29,6 +29,7 @@
 #include <webAsmPlay/renderables/Renderable.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
+#include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
@@ -74,7 +75,8 @@ void GUI::renderSettingsPanel()
 
         if(ImGui::SliderFloat("", &heightMultiplier, 0.0f, 5.0f, "Height mult: %.3f"))
         {
-            ColorDistanceShader3D::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
+            ColorDistanceShader3D     ::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
+            ColorDistanceDepthShader3D::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
         }
 
         const char * items[] = { "TrackBall", "First Person", "Track Entity" };
@@ -83,7 +85,7 @@ void GUI::renderSettingsPanel()
 
         ImGui::Text("Linestring Shader");
 
-        const char * shaders[] = { "ColorDistanceShader", "ColorDistanceShader3D", "ColorShader", "ColorVertexShader" };
+        const char * shaders[] = { "ColorDistanceShader", "ColorDistanceShader3D", "ColorDistanceDepthShader3D", "ColorShader", "ColorVertexShader" };
 
         static int lineStringShader = 0;
 
@@ -95,11 +97,12 @@ void GUI::renderSettingsPanel()
         {
             dmess("meshShader " << meshShader);
 
-            vector<Shader *> shaderMap({ColorDistanceShader::getDefaultInstance(),
-            ColorDistanceShader3D::getDefaultInstance(),
-            ColorShader::getDefaultInstance(),
-            ColorVertexShader::getDefaultInstance()
-            });
+            vector<Shader *> shaderMap({ColorDistanceShader       ::getDefaultInstance(),
+                                        ColorDistanceShader3D     ::getDefaultInstance(),
+                                        ColorDistanceDepthShader3D::getDefaultInstance(),
+                                        ColorShader               ::getDefaultInstance(),
+                                        ColorVertexShader         ::getDefaultInstance()
+                                        });
 
             for(auto i : canvas->getMeshRenderiables())
             {

@@ -26,7 +26,7 @@
 
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -56,16 +56,16 @@ namespace
 
     void addMeshSymbologyColorControls(const size_t colorIndex, const string & name, vec4 * colors)
     {
-        ColorDistanceShader3D * shader = ColorDistanceShader3D::getDefaultInstance();
+        ColorSymbology * symbology = ColorSymbology::getDefaultInstance();
 
-        if(ImGui::ColorEdit4((name + " roof near")        .c_str(), value_ptr(colors[0]), flags)) { shader->setColor(colorIndex * 8 + 0, colors[0]) ;}
-        if(ImGui::ColorEdit4((name + " roof outline near").c_str(), value_ptr(colors[1]), flags)) { shader->setColor(colorIndex * 8 + 1, colors[1]) ;}
-        if(ImGui::ColorEdit4((name + " roof far")         .c_str(), value_ptr(colors[2]), flags)) { shader->setColor(colorIndex * 8 + 2, colors[2]) ;}
-        if(ImGui::ColorEdit4((name + " roof outline far") .c_str(), value_ptr(colors[3]), flags)) { shader->setColor(colorIndex * 8 + 3, colors[3]) ;}
-        if(ImGui::ColorEdit4((name + " wall near")        .c_str(), value_ptr(colors[4]), flags)) { shader->setColor(colorIndex * 8 + 4, colors[4]) ;}
-        if(ImGui::ColorEdit4((name + " wall outline near").c_str(), value_ptr(colors[5]), flags)) { shader->setColor(colorIndex * 8 + 5, colors[5]) ;}
-        if(ImGui::ColorEdit4((name + " wall far")         .c_str(), value_ptr(colors[6]), flags)) { shader->setColor(colorIndex * 8 + 6, colors[6]) ;}
-        if(ImGui::ColorEdit4((name + " wall outline far") .c_str(), value_ptr(colors[7]), flags)) { shader->setColor(colorIndex * 8 + 7, colors[7]) ;}
+        if(ImGui::ColorEdit4((name + " roof near")        .c_str(), value_ptr(colors[0]), flags)) { symbology->setColor(colorIndex * 8 + 0, colors[0]) ;}
+        if(ImGui::ColorEdit4((name + " roof outline near").c_str(), value_ptr(colors[1]), flags)) { symbology->setColor(colorIndex * 8 + 1, colors[1]) ;}
+        if(ImGui::ColorEdit4((name + " roof far")         .c_str(), value_ptr(colors[2]), flags)) { symbology->setColor(colorIndex * 8 + 2, colors[2]) ;}
+        if(ImGui::ColorEdit4((name + " roof outline far") .c_str(), value_ptr(colors[3]), flags)) { symbology->setColor(colorIndex * 8 + 3, colors[3]) ;}
+        if(ImGui::ColorEdit4((name + " wall near")        .c_str(), value_ptr(colors[4]), flags)) { symbology->setColor(colorIndex * 8 + 4, colors[4]) ;}
+        if(ImGui::ColorEdit4((name + " wall outline near").c_str(), value_ptr(colors[5]), flags)) { symbology->setColor(colorIndex * 8 + 5, colors[5]) ;}
+        if(ImGui::ColorEdit4((name + " wall far")         .c_str(), value_ptr(colors[6]), flags)) { symbology->setColor(colorIndex * 8 + 6, colors[6]) ;}
+        if(ImGui::ColorEdit4((name + " wall outline far") .c_str(), value_ptr(colors[7]), flags)) { symbology->setColor(colorIndex * 8 + 7, colors[7]) ;}
     }
 }
 
@@ -91,10 +91,10 @@ void GUI::symbologyPanel()
 
     if (ImGui::CollapsingHeader("Mesh features", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ColorDistanceShader3D * shader = ColorDistanceShader3D::getDefaultInstance();
+        ColorSymbology * symbology = ColorSymbology::getDefaultInstance();
 
-        addMeshSymbologyColorControls(0, "House",    &shader->getColorRef(0 * 8));
-        addMeshSymbologyColorControls(1, "Building", &shader->getColorRef(1 * 8));
+        addMeshSymbologyColorControls(0, "House",    &symbology->getColorRef(0 * 8));
+        addMeshSymbologyColorControls(1, "Building", &symbology->getColorRef(1 * 8));
     }
 
     ImGui::End();

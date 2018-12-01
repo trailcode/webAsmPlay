@@ -24,46 +24,36 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_OPEN_GL_UTIL_H__
-#define __WEB_ASM_PLAY_OPEN_GL_UTIL_H__
+#ifndef __WEB_ASM_PLAY_COLOR_SYMBOLOGY_H__
+#define __WEB_ASM_PLAY_COLOR_SYMBOLOGY_H__
 
-#ifdef __EMSCRIPTEN__
+#include <glm/vec4.hpp>
+#include <JSONValue.h>
+#include <webAsmPlay/OpenGL_Util.h>
 
-    #define GLEW_STATIC
-    #include <GL/glew.h>
-#else
+class ColorSymbology
+{
+public:
 
-	#ifdef USE_GL_ES3
-	// OpenGL ES 3
-	#include <GLES3/gl3.h>  // Use GL ES 3
-	#else
-	// Regular OpenGL
-	// About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
-	// Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
-	// You may use another loader/header of your choice (glext, glLoadGen, etc.), or chose to manually implement your own.
-	#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
-	#include <GL/gl3w.h>
-	#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
-	#include <GL/glew.h>
-	#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-	#include <glad/glad.h>
-	#else
-	//#include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
-	#endif
-	#endif
+    static void ensureInstance();
 
-#endif
+    static ColorSymbology * getDefaultInstance();
 
-#ifdef OPENGL_CALL_CHECKING
-    #define GL_CHECK(stmt) do { stmt; \
-            const GLenum err = glGetError(); \
-            if (err != GL_NO_ERROR) { \
-            dmess("OpenGL error " << err << " call " << #stmt); \
-            abort(); \
-            } \
-        } while (0)
-#else
-    #define GL_CHECK(stmt) stmt
-#endif
+    GLuint getTextureID();
 
-#endif // __WEB_ASM_PLAY_OPEN_GL_UTIL_H__
+    glm::vec4 setColor(const size_t index, const glm::vec4 & color);
+    glm::vec4 getColor(const size_t index);
+    glm::vec4 & getColorRef(const size_t index);
+
+    void loadState(const JSONObject & dataStore);
+
+    void saveState(JSONObject & dataStore);
+
+private:
+
+    ColorSymbology();
+    ~ColorSymbology();
+
+};
+
+#endif // __WEB_ASM_PLAY_COLOR_SYMBOLOGY_H__

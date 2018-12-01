@@ -24,11 +24,12 @@
   \copyright 2018
 */
 
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
+#include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 
 using namespace std;
 using namespace glm;
@@ -37,9 +38,16 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram         * shaderProgramFill    = NULL;
-    ShaderProgram         * shaderProgramOutline = NULL;
-    ColorDistanceShader3D * defaultInstance      = NULL;
+    ShaderProgram              * shaderProgramDepth    = NULL;
+    ShaderProgram              * shaderProgramFill     = NULL;
+    ShaderProgram              * shaderProgramOutline  = NULL;
+    ColorDistanceDepthShader3D * defaultInstance       = NULL;
+
+    GLint vertInAttrDepth;
+    GLint heightMultiplierDepth;
+    GLint modelDepth;
+    GLint viewDepth;
+    GLint projectionDepth;
 
     GLint vertInAttrFill;
     GLint normalInAttrFill;
@@ -51,39 +59,85 @@ namespace
     GLint viewFill;
     GLint projectionFill;
     GLint texUniformFill;
+    GLint depthTexUniformFill;
     GLint lightPosUniformFill;
-
+    GLint widthUniformFill;
+    GLint heightUniformFill;
+    
     GLint vertInAttrOutline;
     GLint vertColorInAttrOutline;
     GLint colorLookupOffsetOutline;
     GLint MV_Outline;
     GLint MVP_Outline;
     GLint texUniformOutline;
+    GLint depthTexUniformOutline;
     GLint heightMultiplierOutline;
+    GLint widthUniformOutline;
+    GLint heightUniformOutline;
 }
 
-void ColorDistanceShader3D::ensureShader()
+void ColorDistanceDepthShader3D::ensureShader()
 {
+    const GLchar* vertexSourceDepth = R"glsl(#version 150 core
+
+        in vec3  vertIn;
+        
+        uniform mat4   model;
+        uniform mat4   view;
+        uniform mat4   projection;
+        uniform float  heightMultiplier;
+
+        out vec4 glPos;
+
+        void main()
+        {
+            vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
+
+            gl_Position = projection * view * model * vert;
+
+            glPos = gl_Position;
+        }
+    )glsl";
+
+    const GLchar* fragmentSourceDepth = R"glsl(#version 150 core
+        in  vec4 glPos;
+        out vec4 outColor;
+
+        void main()
+        {
+            //outColor = vec4(1,1,1,1);
+            outColor = vec4(glPos.w, glPos.w, glPos.w, 1);
+        }
+    )glsl";
+
+    shaderProgramDepth = ShaderProgram::create( vertexSourceDepth,
+                                                fragmentSourceDepth,
+                                                Variables({{"vertIn",               vertInAttrDepth       }}),
+                                                Variables({{"model",                modelDepth            },
+                                                           {"view",                 viewDepth             },
+                                                           {"projection",           projectionDepth       },
+                                                           {"heightMultiplier",     heightMultiplierDepth }}));
+
     // Shader sources
     const GLchar* vertexSourceFill = R"glsl(#version 150 core
-
-        uniform sampler2D tex; // TODO why does the ordering matter here? Something must not be correct.
 
         in vec3  vertIn;
         in vec3  normalIn;
         in float vertColorIn;
         
-        uniform mat4   model;
-        uniform mat4   view;
-        uniform mat4   projection;
-        uniform float  colorLookupOffset;
-        uniform float  heightMultiplier;
+        uniform mat4      model;
+        uniform mat4      view;
+        uniform mat4      projection;
+        uniform float     colorLookupOffset;
+        uniform float     heightMultiplier;
+        uniform sampler2D tex;
         
         out vec4 vertexColorNear;
         out vec4 vertexColorFar;
         out vec4 position_in_view_space;
         out vec3 normal;
         out vec3 fragPos;
+        out vec4 glPos;
 
         void main()
         {
@@ -97,6 +151,8 @@ void ColorDistanceShader3D::ensureShader()
 
             gl_Position = projection * MV * vert;
 
+            glPos = gl_Position; // TODO just use gl_Position?
+
             vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
             vertexColorFar  = texture(tex, vec2(vertColorIn + (2.0 + colorLookupOffset) / 32.0, 0.5));
 
@@ -105,18 +161,32 @@ void ColorDistanceShader3D::ensureShader()
     )glsl";
 
     const GLchar* fragmentSourceFill = R"glsl(#version 150 core
-        
+        uniform sampler2D depthTex;
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
         in vec3 normal; 
         in vec3 fragPos;
-        uniform vec3 lightPos;
+        in vec4 glPos;
+
+        uniform vec3      lightPos;
+        uniform float     width;
+        uniform float     height;
+        
         
         out vec4 outColor;
 
         void main()
         {
+            vec4 t = texture(depthTex, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height));
+
+            float v = abs(t.x - glPos.w);
+
+            if(v > 0.0001)
+            {
+                discard;
+            }
+
             float minDist = 0.0;
             float maxDist = 5.0;
             vec3 lightColor = vec3(1,1,1);
@@ -148,27 +218,31 @@ void ColorDistanceShader3D::ensureShader()
                                                            {"vertColorIn",          vertColorInAttrFill     },
                                                            {"normalIn",             normalInAttrFill        }}),
                                                 Variables({{"tex",                  texUniformFill          },
+                                                           {"depthTex",             depthTexUniformFill     },
                                                            {"model",                modelFill               },
                                                            {"view",                 viewFill                },
                                                            {"projection",           projectionFill          },
                                                            {"colorLookupOffset",    colorLookupOffsetFill   },
                                                            {"heightMultiplier",     heightMultiplierFill    },
-                                                           {"lightPos",             lightPosUniformFill     }}));
+                                                           {"lightPos",             lightPosUniformFill     },
+                                                           {"width",                widthUniformFill        },
+                                                           {"height",               heightUniformFill       }}));
 
     const GLchar* vertexSourceOutline = R"glsl(#version 150 core
-        uniform sampler2D tex;
 
         in vec3  vertIn;
         in float vertColorIn;
         
-        uniform mat4  MVP;
-        uniform mat4  MV;
-        uniform float colorLookupOffset;
-        uniform float heightMultiplier;
-        
+        uniform mat4      MVP;
+        uniform mat4      MV;
+        uniform float     colorLookupOffset;
+        uniform float     heightMultiplier;
+        uniform sampler2D tex; // TODO Rename, and the one above
+
         out vec4 vertexColorNear;
         out vec4 vertexColorFar;
         out vec4 position_in_view_space;
+        out vec4 glPos;
 
         void main()
         {
@@ -177,6 +251,8 @@ void ColorDistanceShader3D::ensureShader()
             position_in_view_space = MV * vert;
 
             gl_Position = MVP * vert;
+
+            glPos = gl_Position;
 
             vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
             vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
@@ -187,11 +263,37 @@ void ColorDistanceShader3D::ensureShader()
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
+        in vec4 glPos;
 
         out vec4 outColor;
 
+        uniform float     width;
+        uniform float     height;
+        uniform sampler2D depthTex;
+
+        bool canDiscard()
+        {
+            float posX = gl_FragCoord.x / width;
+            float posY = gl_FragCoord.y / height;
+            float deltaX = 1.0f / width;
+            float deltaY = 1.0f / height;
+            for(float x = -1.0f; x < 2.0f; x += 1.0f) 
+            for(float y = -1.0f; y < 2.0f; y += 1.0f)
+            {
+                vec4 t = texture(depthTex, vec2(posX + x * deltaX, posY + y * deltaY));
+
+                float v = abs(t.x - glPos.w);
+
+                if(v <= 0.0001) { return false ;}
+            }
+
+            return true;
+        }
+
         void main()
         {
+            if(canDiscard()) { discard ;}
+
             float minDist = 0.0;
             float maxDist = 5.0;
 
@@ -214,30 +316,82 @@ void ColorDistanceShader3D::ensureShader()
                                                     Variables({{"MV",                MV_Outline                 },
                                                                {"MVP",               MVP_Outline                },
                                                                {"tex",               texUniformOutline          },
+                                                               {"depthTex",          depthTexUniformOutline     },
                                                                {"colorLookupOffset", colorLookupOffsetOutline   },
-                                                               {"heightMultiplier",  heightMultiplierOutline    }}));
+                                                               {"heightMultiplier",  heightMultiplierOutline    },
+                                                               {"width",             widthUniformOutline        },
+                                                               {"height",            heightUniformOutline       }
+                                                               }));
 
-    defaultInstance = new ColorDistanceShader3D();
+    defaultInstance = new ColorDistanceDepthShader3D();
 }
 
-ColorDistanceShader3D::ColorDistanceShader3D() : Shader("ColorDistanceShader3D")
+ColorDistanceDepthShader3D::ColorDistanceDepthShader3D() : Shader("ColorDistanceDepthShader3D")
 {
 }
 
-ColorDistanceShader3D::~ColorDistanceShader3D()
+ColorDistanceDepthShader3D::~ColorDistanceDepthShader3D()
 {
 
 }
 
-ColorDistanceShader3D * ColorDistanceShader3D::getDefaultInstance() { return defaultInstance ;}
+ColorDistanceDepthShader3D * ColorDistanceDepthShader3D::getDefaultInstance() { return defaultInstance ;}
 
-void ColorDistanceShader3D::bind(Canvas     * canvas,
-                                 const bool   isOutline,
-                                 const size_t renderingStage)
+void ColorDistanceDepthShader3D::bind(Canvas     * canvas,
+                                      const bool   isOutline,
+                                      const size_t renderingStage)
 {
+    switch(renderingStage)
+    {
+        case 0: return bindStage0(canvas, isOutline);
+        case 1: return bindStage1(canvas, isOutline);
+        default: 
+            dmess("Error!");
+            abort();
+    }
+}
+
+void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutline)
+{
+    //dmess("ColorDistanceDepthShader3D::bindStage1");
+
+    shaderProgramDepth->bind();
+
+    GL_CHECK(glEnable(GL_DEPTH_TEST));
+
+    ShaderProgram::enableVertexAttribArray( vertInAttrFill,
+                                            sizeVertex,
+                                            GL_FLOAT,
+                                            GL_FALSE,
+                                            strideVertex,
+                                            pointerVertex);
+
+    shaderProgramDepth->setUniformf(heightMultiplierDepth,    heightMultiplier);
+    shaderProgramDepth->setUniform (modelDepth,               canvas->getModelRef());
+    shaderProgramDepth->setUniform (viewDepth,                canvas->getViewRef());
+    shaderProgramDepth->setUniform (projectionDepth,          canvas->getProjectionRef());
+}
+
+#include <webAsmPlay/FrameBuffer.h>
+
+void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutline)
+{
+    //dmess("ColorDistanceDepthShader3D::bindStage0");
+
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
 
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorSymbology->getTextureID()));
+
+    GL_CHECK(glActiveTexture(GL_TEXTURE1));
+
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, canvas->auxFrameBuffer->getTextureID()));
+
+    GL_CHECK(glEnable(GL_BLEND));
+
+    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+    GL_CHECK(glDisable(GL_DEPTH_TEST));
+    //GL_CHECK(glEnable(GL_DEPTH_TEST));
 
     if(!isOutline)
     {
@@ -265,6 +419,9 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
                                                 pointerColor);
 
         shaderProgramFill->setUniformi(texUniformFill,          0);
+        shaderProgramFill->setUniformi(depthTexUniformFill,          1);
+        shaderProgramFill->setUniformf(widthUniformFill,          canvas->frameBufferSize.x);
+        shaderProgramFill->setUniformf(heightUniformFill,          canvas->frameBufferSize.y);
         shaderProgramFill->setUniformf(heightMultiplierFill,    heightMultiplier);
         shaderProgramFill->setUniform (modelFill,               canvas->getModelRef());
         shaderProgramFill->setUniform (viewFill,                canvas->getViewRef());
@@ -293,6 +450,9 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
 
         //shaderProgramOutline->colorLookupOffsetOutline;
         shaderProgramOutline->setUniformf(heightMultiplierOutline,    heightMultiplier);
+        shaderProgramOutline->setUniformi(depthTexUniformOutline,          1);
+        shaderProgramOutline->setUniformf(widthUniformOutline,          canvas->frameBufferSize.x);
+        shaderProgramOutline->setUniformf(heightUniformOutline,          canvas->frameBufferSize.y);
         shaderProgramOutline->setUniform(MV_Outline, canvas->getMV_Ref());
         shaderProgramOutline->setUniform(MVP_Outline, canvas->getMVP_Ref());
         shaderProgramOutline->setUniformi(texUniformOutline, 0);
@@ -304,13 +464,24 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
     //else          { shaderProgramFill->setUniformf(colorLookupOffsetFill, 0.0f) ;}
 }
 
-float ColorDistanceShader3D::setHeightMultiplier(const float multiplier) { return heightMultiplier = multiplier ;}
+bool ColorDistanceDepthShader3D::shouldRender(const bool isOutline, const size_t renderingStage) const
+{
+    if(renderingStage == 0) { return true ;}
 
-float ColorDistanceShader3D::getHeightMultiplier() const { return heightMultiplier ;}
+    if(renderingStage == 1 && !isOutline) { return true ;}
 
-vec3 ColorDistanceShader3D::setLightPos(const vec3 & pos) { return lightPos = pos ;}
+    return false;
+}
 
-vec3 ColorDistanceShader3D::getLightPos() const { return lightPos ;}
+float ColorDistanceDepthShader3D::setHeightMultiplier(const float multiplier) { return heightMultiplier = multiplier ;}
 
-ColorSymbology * ColorDistanceShader3D::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
-ColorSymbology * ColorDistanceShader3D::getColorSymbology() const { return colorSymbology ;}
+float ColorDistanceDepthShader3D::getHeightMultiplier() const { return heightMultiplier ;}
+
+vec3 ColorDistanceDepthShader3D::setLightPos(const vec3 & pos) { return lightPos = pos ;}
+
+vec3 ColorDistanceDepthShader3D::getLightPos() const { return lightPos ;}
+
+size_t ColorDistanceDepthShader3D::getNumRenderingStages() const { return 2 ;}
+
+ColorSymbology * ColorDistanceDepthShader3D::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
+ColorSymbology * ColorDistanceDepthShader3D::getColorSymbology() const { return colorSymbology ;}

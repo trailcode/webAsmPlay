@@ -195,8 +195,6 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage) const
 {
     if(!shader->shouldRender(false, renderStage)) { return ;}
 
-    shader->bind(canvas, false, renderStage);
-
     GL_CHECK(glBindVertexArray(vao));
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
@@ -205,6 +203,8 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage) const
     glDisable(GL_DEPTH_TEST);
 
     canvas->pushModel(rotate(canvas->getModelRef(), radians(-90.0), dvec3(1, 0, 0)));
+
+    shader->bind(canvas, false, renderStage);
 
     shader->setVertexArrayFormat(3, 7 * sizeof(GLfloat), 0);
     shader->setColorArrayFormat (4, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));

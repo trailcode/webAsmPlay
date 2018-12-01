@@ -32,6 +32,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/Camera.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -92,8 +93,8 @@ void GUI::loadState()
     setBool(L"renderSettingsRenderLinearFeatures",  renderSettingsRenderLinearFeatures);
     setBool(L"renderSettingsRenderSkyBox",          renderSettingsRenderSkyBox);
 
-    ColorDistanceShader  ::getDefaultInstance()->loadState(root);
-    ColorDistanceShader3D::getDefaultInstance()->loadState(root);
+    ColorDistanceShader::getDefaultInstance()->loadState(root);
+    ColorSymbology     ::getDefaultInstance()->loadState(root);
 
     if(root.find(L"cameraEye")    != root.end()) { canvas->getCamera()->setEye   (root[L"cameraEye"]   ->AsVec3()) ;}
     if(root.find(L"cameraCenter") != root.end()) { canvas->getCamera()->setCenter(root[L"cameraCenter"]->AsVec3()) ;}
@@ -133,8 +134,8 @@ void GUI::saveState()
     root[L"cameraCenter"]                         = new JSONValue(canvas->getCamera()->getCenterConstRef());
     root[L"cameraUp"]                             = new JSONValue(canvas->getCamera()->getUpConstRef());
 
-    ColorDistanceShader  ::getDefaultInstance()->saveState(root);
-    ColorDistanceShader3D::getDefaultInstance()->saveState(root);
+    ColorDistanceShader::getDefaultInstance()->saveState(root);
+    ColorSymbology     ::getDefaultInstance()->saveState(root);
 
     wstring_convert<codecvt_utf8<wchar_t>, wchar_t> converter;
 
