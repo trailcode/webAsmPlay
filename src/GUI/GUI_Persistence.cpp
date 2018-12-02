@@ -35,6 +35,7 @@
 #include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
+#include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
@@ -104,7 +105,8 @@ void GUI::loadState()
 
     if(root.find(L"buildingHeightMultiplier") != root.end())
     {
-        ColorDistanceShader3D::getDefaultInstance()->setHeightMultiplier(root[L"buildingHeightMultiplier"]->AsNumber());
+        ColorDistanceShader3D     ::getDefaultInstance()->setHeightMultiplier(root[L"buildingHeightMultiplier"]->AsNumber());
+        ColorDistanceDepthShader3D::getDefaultInstance()->setHeightMultiplier(root[L"buildingHeightMultiplier"]->AsNumber());
     }
 }
 

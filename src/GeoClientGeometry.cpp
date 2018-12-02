@@ -50,6 +50,7 @@ using namespace glm;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
 
+
 void GeoClient::addGeometry(const char * data)
 {
     dmess("GeoClient::addGeometry");

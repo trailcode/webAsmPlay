@@ -204,6 +204,7 @@ void ColorDistanceShader3D::ensureShader()
             dist = min(maxDist, dist) / maxDist;
 
             outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
+            outColor = vec4(1,1,1,1);
         }
     )glsl";
 

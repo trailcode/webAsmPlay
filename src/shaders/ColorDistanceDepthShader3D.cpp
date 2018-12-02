@@ -359,7 +359,7 @@ void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutlin
 
     GL_CHECK(glEnable(GL_DEPTH_TEST));
 
-    ShaderProgram::enableVertexAttribArray( vertInAttrFill,
+    ShaderProgram::enableVertexAttribArray( vertInAttrDepth,
                                             sizeVertex,
                                             GL_FLOAT,
                                             GL_FALSE,
@@ -391,7 +391,6 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
     GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
     GL_CHECK(glDisable(GL_DEPTH_TEST));
-    //GL_CHECK(glEnable(GL_DEPTH_TEST));
 
     if(!isOutline)
     {

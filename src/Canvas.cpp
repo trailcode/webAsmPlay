@@ -164,6 +164,7 @@ GLuint Canvas::render()
 
     lock_guard<mutex> _(renderiablesMutex);
 
+    //*
     auxFrameBuffer->bind();
 
     //GL_CHECK(glViewport(0, 0, size.x, size.y));
@@ -177,11 +178,12 @@ GLuint Canvas::render()
     glFlush();
 
     auxFrameBuffer->unbind();
+    //*/
 
     for(const auto r : polygons)            { r->render(this, 0) ;}
     for(const auto r : lineStrings)         { r->render(this, 0) ;}
     for(const auto r : points)              { r->render(this, 0) ;}
-    for(const auto r : deferredRenderables) { r->render(this, 0) ;}
+    for(const auto r : deferredRenderables) { r->render(this, 0) ;} 
     //for(const auto r : meshes)              { r->render(this) ;}
 
     for(const auto r : meshes)              { r->render(this, 0) ;}

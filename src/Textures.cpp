@@ -125,6 +125,8 @@ GLuint Textures::load(const string & filename)
 
 GLuint Textures::loadCube(const vector<string> & files)
 {
+    dmess("loadCube " << files.size());
+    
     if(files.size() != 6)
     {
         dmess("Error, cube texture incorrect number of files!")

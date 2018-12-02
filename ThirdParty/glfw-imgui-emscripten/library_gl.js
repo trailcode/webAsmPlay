@@ -646,7 +646,9 @@ var LibraryGL = {
       }
 
       var exts = GLctx.getSupportedExtensions();
+      console.log("------------");
       console.log(exts);
+      console.log("------------");
       if (exts && exts.length > 0) {
         GLctx.getSupportedExtensions().forEach(function(ext) {
           if (automaticallyEnabledExtensions.indexOf(ext) != -1) {
@@ -655,6 +657,9 @@ var LibraryGL = {
           }
         });
       }
+
+      var ex = GLctx.getExtension("WEBGL_color_buffer_float");
+      console.log(ex);
       
     },
 
@@ -7623,7 +7628,7 @@ keys(LibraryGL).forEach(function(x) {
       fixed = fixed.substr(0, 9) + '_' + y + fixed.substr(9);
       LibraryGL[x] = eval('(function() { return ' + fixed + ' })()');
     }
-    return dep;
+    return dep; 
   });
   // copy it
   copyLibEntry(y, x);

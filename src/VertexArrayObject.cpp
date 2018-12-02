@@ -33,6 +33,8 @@ using namespace glm;
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations)
 {
+    //return _create<false>(tessellations);
+
     if(tessellations[0]->getHeight() != 0.0) { return _create<true>(tessellations) ;}
 
     return _create<false>(tessellations);
@@ -86,7 +88,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             verts.push_back(tess->verts[i * 2 + 0]);
             verts.push_back(tess->verts[i * 2 + 1]);
 
-            if(IS_3D)
+            if(IS_3D)  
             {
                 verts.push_back(tess->height);
 
@@ -151,95 +153,6 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             offset += 4;
         }
-
-#ifdef WORKING
-        size_t prevIndexA;
-        size_t prevIndexB;
-
-        lineIndices.push_back(prevIndexA = offset++);
-        lineIndices.push_back(prevIndexB = offset++);
-
-        vec3 prevA(tess->verts[0], tess->verts[1], 0);
-        
-        const vec3 prevB(tess->verts[0], tess->verts[1], tess->height);
-
-        const vec3 C(tess->verts[2], tess->verts[3], 0);
-
-        //const vec3 normal = normalize(triangleNormal(prevA, prevB, C)) * vec3(-1,-1,-1);
-        const vec3 normal = normalize(triangleNormal(prevA, prevB, C));
-        //const vec3 normal(0,0,0);
-
-        verts.push_back(prevA.x);
-        verts.push_back(prevA.y);
-        verts.push_back(prevA.z);
-
-        verts.push_back(normal.x);
-        verts.push_back(normal.y);
-        verts.push_back(normal.z);
-
-        verts.push_back(symbologyWallID_value);
-
-        verts.push_back(prevB.x);
-        verts.push_back(prevB.y);
-        verts.push_back(prevB.z);
-
-        verts.push_back(normal.x);
-        verts.push_back(normal.y);
-        verts.push_back(normal.z);
-
-        verts.push_back(symbologyWallID_value);
-
-        for(size_t i = 1; i <= tess->numVerts; ++i)
-        {
-            const size_t vertIndex = i % tess->numVerts;
-
-            size_t indexA;
-            size_t indexB;
-
-            lineIndices.push_back(indexA = offset++);
-            lineIndices.push_back(indexB = offset++);
-
-            triangleIndices.push_back(indexA);
-            triangleIndices.push_back(indexB);
-            triangleIndices.push_back(prevIndexA);
-            
-            triangleIndices.push_back(prevIndexB);
-            triangleIndices.push_back(indexB);
-            triangleIndices.push_back(prevIndexA);
-
-            prevIndexA = indexA;
-            prevIndexB = indexB;
-
-            const vec3 A(tess->verts[vertIndex * 2 + 0], tess->verts[vertIndex * 2 + 1], 0);
-            const vec3 B(tess->verts[vertIndex * 2 + 0], tess->verts[vertIndex * 2 + 1], tess->height);
-
-            //const vec3 normal = normalize(triangleNormal(A, B, prevA)) * vec3(-1,-1,-1);
-            const vec3 normal = normalize(triangleNormal(A, B, prevA));
-            //const vec3 normal(0,0,0);
-
-            prevA = A;
-
-            verts.push_back(A.x);
-            verts.push_back(A.y);
-            verts.push_back(A.z);
-
-            verts.push_back(normal.x);
-            verts.push_back(normal.y);
-            verts.push_back(normal.z);
-
-            verts.push_back(symbologyWallID_value);
-
-            verts.push_back(B.x);
-            verts.push_back(B.y);
-            verts.push_back(B.z);
-
-            verts.push_back(normal.x);
-            verts.push_back(normal.y);
-            verts.push_back(normal.z);
-
-            verts.push_back(symbologyWallID_value);
-        }
-#endif
     }
 
     GLuint vao  = 0;
@@ -259,10 +172,10 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     GL_CHECK(glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW));
     
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * triangleIndices.size(), &triangleIndices[0], GL_STATIC_DRAW));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * triangleIndices.size(), &triangleIndices[0], GL_STATIC_DRAW));
     
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
 
     return new VertexArrayObject(vao,
                                  ebo,

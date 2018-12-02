@@ -59,6 +59,8 @@ private:
     const GLuint rbo;
 
     const glm::ivec2 bufferSize;
+
+    GLint prevFB = 0;
 };
 
 #endif // __WEB_ASM_PLAY_FRAME_BUFFER_H__

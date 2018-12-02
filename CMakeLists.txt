@@ -217,6 +217,10 @@ add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     
+    #--js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_glfw.js \
+    #--js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_gl.js \
+    #--js-library /Users/trailcode/emsdk/emscripten/1.37.35/src/library_gl.js \
+
     SET(CMAKE_CXX_LINK_FLAGS   "--bind \
                                 -s ALLOW_MEMORY_GROWTH=1 \
                                 --no-heap-copy \
@@ -226,6 +230,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
                                 -s USE_GLFW=3 \
                                 --js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_glfw.js \
                                 --js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_gl.js \
+                                -s USE_SDL=2 \
                                 -s USE_SDL_IMAGE=2 \
                                 -s SDL2_IMAGE_FORMATS='[\"png\"]' \
                                 -s DISABLE_EXCEPTION_CATCHING=0 \
@@ -349,7 +354,8 @@ file(GLOB sources   ${webAsmPlay_SRC}
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
-    add_executable(webAsmPlay ${sources})
+    add_executable(webAsmPlay ${sources} "src/Main.cpp")
+    #target_link_libraries(webAsmPlay libWebAsmPlay)
 
     add_executable(worker "src/Worker.cpp")
 

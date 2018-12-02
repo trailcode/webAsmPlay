@@ -38,7 +38,7 @@ using namespace OpenSteer;
 namespace
 {
 #ifdef __EMSCRIPTEN__
-    int const gPedestrianStartCount = 700;
+    int const gPedestrianStartCount = 1000;
 #else
     int const gPedestrianStartCount = 2000;
 #endif

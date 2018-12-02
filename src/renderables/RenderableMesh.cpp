@@ -58,8 +58,8 @@ Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons
         const double      height      = get<2>(polygons[i]);
         const double      minHeight   = get<3>(polygons[i]);
         
-        const geom::Polygon      * poly;
-        const MultiPolygon * multiPoly;
+        const geom::Polygon  * poly;
+        const MultiPolygon   * multiPoly;
 
         if((poly = dynamic_cast<const geom::Polygon *>(geom)))
         {
@@ -123,7 +123,6 @@ RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderab
 void RenderableMesh::render(Canvas * canvas, const size_t renderStage) const
 {
     vertexArrayObject->bind();
-
     vertexArrayObject->bindTriangles();
 
     shader->setVertexArrayFormat(3, 7 * sizeof(GLfloat), 0);
