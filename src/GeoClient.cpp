@@ -629,7 +629,30 @@ void GeoClient::loadGeometry(const string fileName)
 
 #else
 
-    addGeometry(NULL);
+    FILE * fp = fopen(fileName.c_str(), "rb");
+
+    if(!fp)
+    {
+        dmess("Error! Could not open: " << fileName);
+
+        return;
+    }
+
+    fseek(fp, 0, SEEK_END); // seek to end of file
+
+    const size_t size = ftell(fp); // get current file pointer
+
+    fseek(fp, 0, SEEK_SET);
+
+    vector<char> data(size);
+
+    fread(&data[0], sizeof(char), size, fp);
+
+    fclose(fp);
+
+    addGeometry(&data[0]);
+
+    GUI::progress("", 1.0);
 
 #endif
 }
