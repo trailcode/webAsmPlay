@@ -41,8 +41,6 @@ namespace geos
     {
         class Geometry;
         class Polygon;
-        class LineString;
-        class Point;
     }
 }
 
@@ -85,6 +83,12 @@ namespace geosUtil
     inline geos::geom::Coordinate ___(const glm::dvec2 & pos) { return geos::geom::Coordinate(pos.x, pos.y) ;}
 
     glm::dvec2 __(const geos::geom::Coordinate & point);
+
+    std::vector<glm::dvec2> __(const std::vector<geos::geom::Coordinate> & coords);
+
+    std::vector<glm::dvec2> __(const std::vector<geos::geom::Coordinate> * coords);
+
+    std::vector<glm::dvec2> __(const std::unique_ptr<std::vector<geos::geom::Coordinate> > & coords);
 
     geos::geom::Coordinate ___(const glm::dvec2 & point);
 

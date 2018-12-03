@@ -52,6 +52,8 @@ public:
 
     static std::string convert(const AttributedPoint & point);
 
+    static std::string convert(const std::vector<glm::dvec2> & points);
+
     static AttributedGeometry getGeosPolygon(const char *& poly);
 
     static AttributedGeometry getGeosLineString(const char *& lineString);
@@ -66,11 +68,15 @@ public:
 
     static geos::geom::CoordinateSequence * getGeosCoordinateSequence(const char *& lineString);
 
+    static std::vector<glm::dvec2> getPointSequence(const char *& pointSequence);
+
     static void convert(const geos::geom::Polygon * poly, const Attributes * attrs, std::stringstream & data);
 
     static void convert(const geos::geom::LineString * lineString, std::stringstream & data);
 
     static void convert(const geos::geom::Point * point, std::stringstream & data);
+
+    static void convert(const std::vector<glm::dvec2> & points, std::stringstream & data);
 
     static void convert(const AttributedLineString & lineString, std::stringstream & data);
 

@@ -559,7 +559,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     client = new GeoClient(canvas);
 
     //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
-    //client->loadGeometry("data.geo");
+    client->loadGeometry("data.geo");
 
     //GridPlane * gridPlane = new GridPlane();
 

@@ -32,10 +32,13 @@ using namespace std;
 
 void (*debugLoggerFunc)(const std::string & file, const size_t line, const std::string & message) = NULL;
 
+/*
 void dmessCallback(const string & file, const size_t line, const string & message)
 {
     cout << file << " " << line << " " << message;
 }
+*/
+void dmessCallback(const string & file, const size_t line, const string & message);
 
 void showHelp()
 {

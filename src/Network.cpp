@@ -48,11 +48,11 @@ using namespace geosUtil;
 
 Edge::Edge( Renderable       * renderable,
             const LineString * geom,
-            Attributes       * attributes) : renderable(renderable),
-                                             geom      (geom),
-                                             attributes(attributes),
-                                             start     (getStartPoint(geom)),
-                                             end       (getEndPoint(geom))
+            Attributes       * attributes) : renderable (renderable),
+                                             geom       (geom),
+                                             attributes (attributes),
+                                             start      (getStartPoint(geom)),
+                                             end        (getEndPoint(geom))
 {
     weight = geom->getLength() * 1000000 + 1;
 }
@@ -112,6 +112,12 @@ namespace
 }
 
 Network::Network(GeoClient * client) : client(client) {}
+
+Network::Network(const vector<AttributedLineString> & lineStrings, const dmat4 & trans) : trans(trans)
+{
+    setEdges(lineStrings);
+}
+
 Network::~Network() {}
 
 void Network::setEdges(const Edges & _edges)
@@ -152,6 +158,21 @@ void Network::setEdges(const Edges & _edges)
     }
 
     dmess("end Network::build " << edges.size());
+}
+
+void Network::setEdges(const vector<AttributedLineString> & lineStrings)
+{
+    Edges edges;
+
+    for(size_t i = 0; i < lineStrings.size(); ++i)
+    {
+        Attributes     * attrs   = lineStrings[i].first;
+        const Geometry * geom    = lineStrings[i].second;
+
+        edges.push_back(new Edge(NULL, dynamic_cast<const LineString *>(geom), attrs));
+    }
+
+    setEdges(edges);
 }
 
 void Network::setStartEdge(const PointOnEdge & start)
@@ -390,9 +411,7 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
     return NULL;
 }
 
-Canvas * theCanvas = NULL;
-
-unique_ptr<vector<Coordinate> > Network::getRandomPath()
+vector<dvec2> Network::getRandomPath()
 {
     unique_ptr<vector<Coordinate> > coords = NULL;
 
@@ -404,7 +423,9 @@ unique_ptr<vector<Coordinate> > Network::getRandomPath()
         coords = unique_ptr<vector<Coordinate> >(findPath(PointOnEdge(A->start, A), PointOnEdge(B->end, B)));
     }
 
-    transformInPlace(*coords, client->getTrans());
+    if(client) { trans = client->getTrans() ;}
 
-    return DouglasPeuckerLineSimplifier::simplify(*coords, 0.000001);
+    transformInPlace(*coords, trans);
+
+    return __(DouglasPeuckerLineSimplifier::simplify(*coords, 0.000001));
 }

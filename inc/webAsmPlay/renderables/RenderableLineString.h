@@ -29,6 +29,7 @@
 
 #include <geos/geom/Coordinate.h>
 #include <webAsmPlay/OpenGL_Util.h>
+#include <webAsmPlay/Types.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
 namespace geos

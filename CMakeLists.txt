@@ -350,6 +350,7 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     ${simpleJSON_SRC}
                     ${opensteerSrc}
 					${imguiSrc}
+                    "ThirdParty/imgui/glad/glad.c"
                     )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
@@ -374,7 +375,7 @@ else()
 	endif()
 
     #add_executable(webAsmPlay ${sources} "ThirdParty/imgui/gl3w/GL/gl3w.c")
-	add_library(libWebAsmPlay STATIC ${sources} "ThirdParty/imgui/glad/glad.c")
+	add_library(libWebAsmPlay STATIC ${sources})
 	#add_executable(webAsmPlay ${webAsmPlay_SRC} ${opensteerSrc} ${imguiSrc} "ThirdParty/imgui/gl3w/GL/gl3w.c")
 
 	add_executable(webAsmPlay "src/Main.cpp")
@@ -386,7 +387,7 @@ else()
 
 	#project(geoServer)
 
-	add_executable(geoServer ${geoServer_SRC})
+	add_executable(geoServer ${geoServer_SRC} "ThirdParty/imgui/glad/glad.c")
 	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
 	target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
 	#target_include_directories(geoServer PRIVATE ${GDAL_INCLUDE_DIR})

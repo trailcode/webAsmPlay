@@ -120,6 +120,14 @@ inline double getDouble(const char *& dataStream)
     return ret;
 }
 
+inline glm::dvec2 getDVec2(const char *& dataStream)
+{
+    const double x = getDouble(dataStream);
+    const double y = getDouble(dataStream);
+
+    return glm::dvec2(x, y);
+}
+
 inline float append(float *& dataStream, const float value)
 {
     *dataStream = value; 

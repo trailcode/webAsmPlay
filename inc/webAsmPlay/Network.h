@@ -28,6 +28,8 @@
 #define __WEB_ASM_PLAY_NETWORK_H__
 
 #include <memory>
+//#include <glm/vec2.hpp>
+#include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
 #include <geos/geom/Coordinate.h>
 
@@ -77,10 +79,15 @@ class Network
 {
 public:
 
-    Network(GeoClient * client);
+    Network(GeoClient * client = NULL);
+
+    Network(const std::vector<AttributedLineString> & lineStrings, const glm::dmat4 & trans);
+
     ~Network();
 
     void setEdges(const std::vector<Edge *> & edges);
+
+    void setEdges(const std::vector<AttributedLineString> & lineStrings);
 
     void setStartEdge(const PointOnEdge & start);
 
@@ -88,13 +95,15 @@ public:
 
     std::vector<geos::geom::Coordinate> * findPath(const PointOnEdge & start, const PointOnEdge & end);
 
-    std::unique_ptr<std::vector<geos::geom::Coordinate> > getRandomPath();
+    std::vector<glm::dvec2> getRandomPath();
 
 private:
 
     Renderable * startPosRenderable = NULL;
 
-    GeoClient * client;
+    GeoClient * client = NULL;
+
+    glm::dmat4 trans;
 };
 
 #endif // __WEB_ASM_PLAY_NETWORK_H__

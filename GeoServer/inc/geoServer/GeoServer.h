@@ -29,8 +29,10 @@
 
 #include <string>
 #include <vector>
+#include <glm/mat4x4.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
+#include <webAsmPlay/Types.h>
 #include <geoServer/GeoServerBase.h>
 
 class GeoServer : public GeoServerBase
@@ -45,6 +47,8 @@ public:
     void start();
 
     std::string saveGeoFile(const std::string & fileName);
+
+    void createNavigationPaths(const std::vector<AttributedLineString> & lineStrings);
 
 private:
     
@@ -67,11 +71,14 @@ private:
     std::vector<std::string> serializedLineStrings;
     std::vector<std::string> serializedPoints;
     std::vector<std::string> serializedRelations;
+    std::vector<std::string> serializedPaths;
 
     double boundsMinX;
     double boundsMinY;
     double boundsMaxX;
     double boundsMaxY;
+
+    glm::dmat4 trans;
 };
 
 #endif // __WEB_ASM_PLAY_GEO_SERVER_H__

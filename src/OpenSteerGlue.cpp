@@ -48,7 +48,6 @@
 
 using namespace std;
 using namespace glm;
-using namespace geos::geom;
 using namespace OpenSteer;
 using namespace geosUtil;
 
@@ -183,20 +182,20 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 const dmat4 & OpenSteerGlue::getGeomTrans()         { return geomTrans ;}
 const dmat4 & OpenSteerGlue::getGeomInverseTrans()  { return geomInverseTrans ;}
 
-PolylineSegmentedPathwaySingleRadius * OpenSteerGlue::getPath(const unique_ptr<vector<Coordinate> > & path)
+PolylineSegmentedPathwaySingleRadius * OpenSteerGlue::getPath(const vector<dvec2> & path)
 {
     //const float pathRadius = 2.0;
     const float pathRadius = 1.0;
 
     vector<Vec3> points;
 
-    points.reserve(path->size());
+    points.reserve(path.size());
 
     unordered_set<dvec3> seen;
 
-    for(size_t i = 0; i < path->size(); ++i)
+    for(const auto & i : path)
     {
-        const dvec3 pos(geomInverseTrans * dvec4(__((*path)[i]), 0, 1));
+        const dvec3 pos(geomInverseTrans * dvec4(i, 0, 1));
         
         if(seen.find(pos) != seen.end())
         {

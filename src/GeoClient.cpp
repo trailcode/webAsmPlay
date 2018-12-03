@@ -627,6 +627,10 @@ void GeoClient::loadGeometry(const string fileName)
     attr.userData = this;
     emscripten_fetch(&attr, fileName.c_str());
 
+#else
+
+    addGeometry(NULL);
+
 #endif
 }
 

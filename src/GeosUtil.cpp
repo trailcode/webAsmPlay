@@ -185,6 +185,19 @@ LineString * geosUtil::getLineString(const vector<dvec2> & verts)
     return GeometryFactory::getDefaultInstance()->createLineString(new CoordinateArraySequence(coords, 2));
 }
 
+vector<dvec2> geosUtil::__(const vector<Coordinate> & coords)
+{
+    vector<dvec2> ret(coords.size());
+
+    for(size_t i = 0; i < coords.size(); ++i) { ret[i] = __(coords[i]) ;}
+
+    return ret;
+}
+
+vector<dvec2> geosUtil::__(const vector<Coordinate> * coords) { return __(*coords) ;}
+
+vector<dvec2> geosUtil::__(const unique_ptr<vector<Coordinate> > & coords) { return __(coords.get()) ;}
+
 _ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : geom(geom) {}
 
 _ScopedGeosGeometry::~_ScopedGeosGeometry() { GeometryFactory::getDefaultInstance()->destroyGeometry(geom) ;}

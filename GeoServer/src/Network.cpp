@@ -24,41 +24,18 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_GEO_SERVER_BASE_H__
-#define __WEB_ASM_PLAY_GEO_SERVER_BASE_H__
+#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/GeometryConverter.h>
+#include <webAsmPlay/Network.h>
+#include <geoServer/GeoServer.h>
 
-//#include <utility>
-//#include <string>
+using namespace std;
 
-class GeoServerBase
+void GeoServer::createNavigationPaths(const vector<AttributedLineString> & lineStrings)
 {
-public:
-    
-    enum
-    {
-        GET_NUM_POLYGONS_REQUEST = 0,
-        GET_NUM_POLYGONS_RESPONCE,
-        GET_NUM_POLYLINES_REQUEST,
-        GET_NUM_POLYLINES_RESPONCE,
-        GET_NUM_POINTS_REQUEST,
-        GET_NUM_POINTS_RESPONCE,
-        GET_LAYER_BOUNDS_REQUEST,
-        GET_LAYER_BOUNDS_RESPONCE,
-        GET_POLYGONS_REQUEST,
-        GET_POLYGONS_RESPONCE,
-        GET_POLYLINES_REQUEST,
-        GET_POLYLINES_RESPONCE,
-        GET_POINTS_REQUEST,
-        GET_POINTS_RESPONCE,
-        GET_NAVIGATION_PATHS_REQUEST,
-        GET_NAVIGATION_PATHS_RESPONCE,
-    };
+    dmess("GeoServer::createNavigationPaths");
 
-    virtual ~GeoServerBase() {}
+    Network network(lineStrings, trans);
 
-protected:
-
-    GeoServerBase() {}
-};
-
-#endif // __WEB_ASM_PLAY_GEO_SERVER_BASE_H__
+    for(size_t i = 0; i < 300; ++i) { serializedPaths.push_back(GeometryConverter::convert(network.getRandomPath())) ;}
+}

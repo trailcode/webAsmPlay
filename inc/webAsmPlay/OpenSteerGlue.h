@@ -32,8 +32,8 @@ class Network;
 
 #include <memory>
 #include <vector>
+#include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
-#include <geos/geom/Coordinate.h>
 
 namespace OpenSteer
 {
@@ -52,7 +52,7 @@ public:
     static size_t setNumZombies(const size_t numZombies);
     static size_t getNumZombies();
 
-    static OpenSteer::PolylineSegmentedPathwaySingleRadius * getPath(const std::unique_ptr<std::vector<geos::geom::Coordinate> > & path);
+    static OpenSteer::PolylineSegmentedPathwaySingleRadius * getPath(const std::vector<glm::dvec2> & path);
 
 private:
 };

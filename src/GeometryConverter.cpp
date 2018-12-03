@@ -201,3 +201,38 @@ vector<AttributedGeometry> GeometryConverter::getGeosPoints(const char *& points
 
     return ret;
 }
+
+void GeometryConverter::convert(const vector<dvec2> & points, stringstream & data)
+{
+    const uint32_t numPoints = points.size();
+
+    data.write((const char *)&numPoints, sizeof(uint32_t));
+
+    for(size_t i = 0; i < numPoints; ++i)
+    {
+        const dvec2 & p = points[i];
+
+        data.write((const char *)&p.x, sizeof(double));
+        data.write((const char *)&p.y, sizeof(double));
+    } 
+}
+
+string GeometryConverter::convert(const vector<dvec2> & points)
+{
+    stringstream data;
+
+    convert(points, data);
+
+    return data.str();
+}
+
+vector<dvec2> GeometryConverter::getPointSequence(const char *& pointSequence)
+{
+    const size_t numPoints = getUint32(pointSequence);
+
+    vector<dvec2> ret(numPoints);
+
+    for(size_t i = 0; i < numPoints; ++i) { ret[i] = getDVec2(pointSequence) ;}
+
+    return ret;
+}

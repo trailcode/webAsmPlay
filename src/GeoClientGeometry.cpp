@@ -209,6 +209,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
         const Geometry * geom    = geoms[i].second;
         GLuint           colorID = 0;
 
+        // TODO Code dup!
+
              if(attrs->hasStringKeyValue("highway", "motorway"))     { colorID = 1 ;}
         else if(attrs->hasStringKeyValue("highway", "trunk"))        { colorID = 2 ;}
         else if(attrs->hasStringKeyValue("highway", "primary"))      { colorID = 3 ;}

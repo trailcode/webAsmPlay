@@ -29,6 +29,7 @@
 #include <limits>
 #include <ctpl.h>
 #include <glm/vec2.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 //#include <boost/histogram.hpp>
 #include <boost/filesystem.hpp>
 #include <geos/geom/Polygon.h>
@@ -251,6 +252,8 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     breakLineStrings(lineStrings);
 
+    createNavigationPaths(lineStrings);
+
     for(const AttributedPoligonalArea & g : polygons)    { serializedPolygons   .push_back(GeometryConverter::convert(g)) ;}
     for(const AttributedLineString    & l : lineStrings) { serializedLineStrings.push_back(GeometryConverter::convert(l)) ;}
     
@@ -264,6 +267,14 @@ string GeoServer::addOsmFile(const string & osmFile)
     boundsMaxX = center.x;
     boundsMinY = center.y;
     boundsMaxY = center.y;
+
+    const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
+
+    // TODO code dup!
+    trans = translate(  s,
+                        dvec3((boundsMinY + boundsMinX) * -0.5,
+                                (boundsMaxY + boundsMaxX) * -0.5,
+                                0.0));
 
     /*
     boundsMinX = -104.979;
@@ -570,6 +581,30 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
                                                 server->boundsMaxY);
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
+                });
+
+                break;
+
+            case GET_NAVIGATION_PATHS_REQUEST:
+
+                pool.push([hdl, s, server, requestID](int ID)
+                {
+                    /*
+                    vector<char> data(sizeof(char) + sizeof(uint32_t) + sizeof(AABB2D)); // TODO make a AABB2D class
+
+                    data[0] = GET_LAYER_BOUNDS_RESPONCE;
+
+                    char * ptr = &data[1];
+
+                    *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
+
+                    *((AABB2D *)ptr) = AABB2D(  server->boundsMinX,
+                                                server->boundsMinY,
+                                                server->boundsMaxX,
+                                                server->boundsMaxY);
+
+                    s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
+                    */
                 });
 
                 break;
