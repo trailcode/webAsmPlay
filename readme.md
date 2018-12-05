@@ -203,6 +203,7 @@ No notes.
 * Upgraded OSX, glfw is having problems now :( Happened after upgrading to xcode 10
     * https://github.com/glfw/glfw/issues/1337
     * https://www.syntaxbomb.com/index.php?topic=4927.0
+* Bots seem to get tot the end of the path, but do not detect they are there and just spin around the end. 
 
 
 

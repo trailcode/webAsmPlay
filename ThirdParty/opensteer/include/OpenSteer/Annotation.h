@@ -45,9 +45,9 @@
 #ifndef OPENSTEER_ANNOTATION_H
 #define OPENSTEER_ANNOTATION_H
 
-#ifdef OPENSTEERDEMO  // only when building OpenSteerDemo
+//#ifdef OPENSTEERDEMO  // only when building OpenSteerDemo
 #include "Draw.h"
-#endif // OPENSTEERDEMO
+//#endif // OPENSTEERDEMO
 #include "OpenSteer/Vec3.h"
 #include "OpenSteer/Color.h"
 
@@ -379,7 +379,7 @@ OpenSteer::AnnotationMixin<Super>::drawTrail (const Color& trailColor,
 // segment is queued to be drawn during OpenSteerDemo's redraw phase.
 
 
-#ifdef OPENSTEERDEMO  // only when building OpenSteerDemo
+//#ifdef OPENSTEERDEMO  // only when building OpenSteerDemo
 template<class Super>
 void 
 OpenSteer::AnnotationMixin<Super>::annotationLine (const Vec3& startPoint,
@@ -388,20 +388,20 @@ OpenSteer::AnnotationMixin<Super>::annotationLine (const Vec3& startPoint,
 {
     if (enableAnnotation)
     {
-        if (drawPhaseActive)
-        {
-            drawLine (startPoint, endPoint, color);
-        }
-        else
+        //if (drawPhaseActive)
+        //{
+        //    drawLine (startPoint, endPoint, color);
+        //}
+        //else
         {
             deferredDrawLine (startPoint, endPoint, color);
         }
     }
 }
-#else
-template<class Super> void OpenSteer::AnnotationMixin<Super>::annotationLine
- (const Vec3&, const Vec3&, const Color&) const {}
-#endif // OPENSTEERDEMO
+//#else
+//template<class Super> void OpenSteer::AnnotationMixin<Super>::annotationLine
+//(const Vec3&, const Vec3&, const Color&) const {}
+//#endif // OPENSTEERDEMO
 
 
 // ----------------------------------------------------------------------------
@@ -412,7 +412,7 @@ template<class Super> void OpenSteer::AnnotationMixin<Super>::annotationLine
 // "circle or disk" is queued to be drawn during OpenSteerDemo's redraw phase.
 
 
-#ifdef OPENSTEERDEMO  // only when building OpenSteerDemo
+//#ifdef OPENSTEERDEMO  // only when building OpenSteerDemo
 template<class Super>
 void 
 OpenSteer::AnnotationMixin<Super>::annotationCircleOrDisk (const float radius,
@@ -425,24 +425,26 @@ OpenSteer::AnnotationMixin<Super>::annotationCircleOrDisk (const float radius,
 {
     if (enableAnnotation)
     {
-        if (drawPhaseActive)
-        {
-            drawCircleOrDisk (radius, axis, center, color,
-                              segments, filled, in3d);
-        }
-        else
+        //if (drawPhaseActive)
+        //{
+        //   drawCircleOrDisk (radius, axis, center, color,
+        //                      segments, filled, in3d);
+        //}
+        //else
         {
             deferredDrawCircleOrDisk (radius, axis, center, color,
                                       segments, filled, in3d);
         }
     }
 }
+/*
 #else
 template<class Super>
 void OpenSteer::AnnotationMixin<Super>::annotationCircleOrDisk
 (const float, const Vec3&, const Vec3&, const Color&, const int,
  const bool, const bool) const {}
 #endif // OPENSTEERDEMO
+*/
 
 
 // ----------------------------------------------------------------------------

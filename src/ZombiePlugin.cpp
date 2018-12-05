@@ -38,9 +38,9 @@ using namespace OpenSteer;
 namespace
 {
 #ifdef __EMSCRIPTEN__
-    int const gPedestrianStartCount = 1000;
+    int const gPedestrianStartCount = 2000;
 #else
-    int const gPedestrianStartCount = 4000;
+    int const gPedestrianStartCount = 3000;
 #endif
     bool gUseDirectedPathFollowing = true;  // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
