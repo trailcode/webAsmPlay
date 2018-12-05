@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <OpenSteer/OpenSteerDemo.h>
 #include <OpenSteer/Draw.h>
 #include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
 #include <webAsmPlay/OpenSteerGlue.h>
@@ -72,7 +73,7 @@ void Zombie::reset()
     SimpleVehicle::reset ();
 
     // max speed and max steering force (maneuverability) 
-    setMaxSpeed (2.0);
+    setMaxSpeed (2.0 + frandom01() * 2.0);
     setMaxForce (8.0);
 
     // initially stopped
@@ -200,7 +201,7 @@ Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
         else
         {
             // add in wander component (according to user switch)
-            if (false && gWanderSwitch)
+            if (gWanderSwitch)
             {
                 steeringForce += steerForWander (elapsedTime);
             }
@@ -224,7 +225,15 @@ Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
 void Zombie::draw()
 {
     //drawBasic2dCircularVehicle (*this, gGray50);
-    drawBasic2dCircularVehicle (*this, gYellow);
+    if(OpenSteerDemo::selectedVehicle == this)
+    {
+        drawBasic2dCircularVehicle (*this, gGreen);
+    }
+    else
+    {
+        drawBasic2dCircularVehicle (*this, gYellow);
+    }
+
     drawTrail ();
 }
 

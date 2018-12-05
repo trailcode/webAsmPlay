@@ -208,6 +208,10 @@ void ColorDistanceDepthShader3D::ensureShader()
             float diff = max(dot(normal, lightDir), 0.0);
             vec3 diffuse = diff * lightColor;
             vec3 result = diffuse * vec3(objectColor);
+            if(distance(result, vec3(0,0,0)) < 0.0001)
+            {
+                discard;
+            }
             outColor = vec4(result, objectColor.w);
         }
     )glsl";

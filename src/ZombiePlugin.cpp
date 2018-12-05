@@ -40,7 +40,7 @@ namespace
 #ifdef __EMSCRIPTEN__
     int const gPedestrianStartCount = 1000;
 #else
-    int const gPedestrianStartCount = 2000;
+    int const gPedestrianStartCount = 4000;
 #endif
     bool gUseDirectedPathFollowing = true;  // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
@@ -94,9 +94,6 @@ void ZombiePlugin::open()
 
 void ZombiePlugin::update(const float currentTime, const float elapsedTime)
 {
-    Vec3 p = crowd[0]->position();
-    //dmess("crowd " << crowd.size() << p.x << " " << p.z);
-
     // update each Pedestrian
     for (iterator i = crowd.begin(); i != crowd.end(); i++)
     {
@@ -320,11 +317,12 @@ void ZombiePlugin::nextPD()
     case 0:
         {
             const Vec3 center;
-            const float div = 20.0f;
-            const Vec3 divisions (div, 1.0f, div);
-            const float diameter = 80.0f; //XXX need better way to get this
+            const float div = 100.0f;
+            const Vec3 divisions (div, div, div);
+            const float diameter = 1000.0f; //XXX need better way to get this
             const Vec3 dimensions (diameter, diameter, diameter);
-            typedef LQProximityDatabase<AbstractVehicle*> LQPDAV;
+            typedef LQProximityDatabase2D<AbstractVehicle*> LQPDAV;
+            //typedef LQProximityDatabase<AbstractVehicle*> LQPDAV;
             pd = new LQPDAV (center, dimensions, divisions);
             break;
         }

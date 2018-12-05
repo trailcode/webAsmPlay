@@ -47,6 +47,7 @@
 #include <vector>
 #include "OpenSteer/Vec3.h"
 #include "OpenSteer/lq.h"   // XXX temp?
+#include "OpenSteer/lq2D.h"   // XXX temp?
 
 
 namespace OpenSteer {
@@ -327,6 +328,124 @@ namespace OpenSteer {
 
     private:
         lqDB* lq;
+    };
+
+    template <class ContentType>
+    class LQProximityDatabase2D : public AbstractProximityDatabase<ContentType>
+    {
+    public:
+
+        // constructor
+        LQProximityDatabase2D ( const Vec3& center,
+                                const Vec3& dimensions, // TODO use Vec2
+                                const Vec3& divisions)
+        {
+            const Vec3 halfsize (dimensions * 0.5f);
+            const Vec3 origin (center - halfsize);
+
+            lq = lqCreateDatabase2D (origin.x, origin.z, 
+                                   dimensions.x, dimensions.z,  
+                                   (int) round (divisions.x),
+                                   (int) round (divisions.z));
+        }
+
+        // destructor
+        virtual ~LQProximityDatabase2D ()
+        {
+            lqDeleteDatabase2D (lq);
+            lq = NULL;
+        }
+
+        // "token" to represent objects stored in the database
+        class tokenType : public AbstractTokenForProximityDatabase<ContentType>
+        {
+        public:
+
+            // constructor
+            tokenType (ContentType parentObject, LQProximityDatabase2D& lqsd)
+            {
+                lqInitClientProxy2D (&proxy, parentObject);
+                lq = lqsd.lq;
+            }
+
+            // destructor
+            virtual ~tokenType (void)
+            {
+                lqRemoveFromBin2D (&proxy);
+            }
+
+            // the client object calls this each time its position changes
+            void updateForNewPosition (const Vec3& p)
+            {
+                lqUpdateForNewLocation2D (lq, &proxy, p.x, p.z);
+            }
+
+            // find all neighbors within the given sphere (as center and radius)
+            void findNeighbors (const Vec3& center,
+                                const float radius,
+                                std::vector<ContentType>& results)
+            {
+                lqMapOverAllObjectsInLocality2D (lq, 
+                                               center.x, center.z,
+                                               radius,
+                                               perNeighborCallBackFunction,
+                                               (void*)&results);
+            }
+
+            // called by LQ for each clientObject in the specified neighborhood:
+            // push that clientObject onto the ContentType vector in void*
+            // clientQueryState
+            // (parameter names commented out to prevent compiler warning from "-W")
+            static void perNeighborCallBackFunction  (void* clientObject,
+                                                      float /*distanceSquared*/,
+                                                      void* clientQueryState)
+            {
+                typedef std::vector<ContentType> ctv;
+                ctv& results = *((ctv*) clientQueryState);
+                results.push_back ((ContentType) clientObject);
+            }
+
+#ifndef NO_LQ_BIN_STATS
+            // Get statistics about bin populations: min, max and
+            // average of non-empty bins.
+            void getBinPopulationStats (int& min, int& max, float& average)
+            {
+                lqGetBinPopulationStats2D (lq, &min, &max, &average);
+            }
+#endif // NO_LQ_BIN_STATS
+
+        private:
+            lqClientProxy2D proxy;
+            lqDB_2D* lq;
+        };
+
+
+        // allocate a token to represent a given client object in this database
+        tokenType* allocateToken (ContentType parentObject)
+        {
+            return new tokenType (parentObject, *this);
+        }
+
+        // count the number of tokens currently in the database
+        int getPopulation (void)
+        {
+            int count = 0;
+            lqMapOverAllObjects2D (lq, counterCallBackFunction, &count);
+            return count;
+        }
+        
+        // (parameter names commented out to prevent compiler warning from "-W")
+        static void counterCallBackFunction  (void* /*clientObject*/,
+                                              float /*distanceSquared*/,
+                                              void* clientQueryState)
+        {
+            int& counter = *(int*)clientQueryState;
+            counter++;
+        }
+
+
+    private:
+        lqDB_2D* lq;
     };
 
 } // namespace OpenSteer
