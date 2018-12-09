@@ -29,6 +29,7 @@
 #include <locale>
 #include <codecvt>
 #include <JSON.h>
+#include <OpenSteer/Annotation.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/Camera.h>
@@ -93,6 +94,7 @@ void GUI::loadState()
     setBool(L"renderSettingsRenderPolygonOutlines", renderSettingsRenderPolygonOutlines);
     setBool(L"renderSettingsRenderLinearFeatures",  renderSettingsRenderLinearFeatures);
     setBool(L"renderSettingsRenderSkyBox",          renderSettingsRenderSkyBox);
+    setBool(L"OpenSteerAnnotation",                 OpenSteer::enableAnnotation);
 
     ColorDistanceShader::getDefaultInstance()->loadState(root);
     ColorSymbology     ::getDefaultInstance()->loadState(root);
@@ -100,6 +102,11 @@ void GUI::loadState()
     if(root.find(L"cameraEye")    != root.end()) { canvas->getCamera()->setEye   (root[L"cameraEye"]   ->AsVec3()) ;}
     if(root.find(L"cameraCenter") != root.end()) { canvas->getCamera()->setCenter(root[L"cameraCenter"]->AsVec3()) ;}
     if(root.find(L"cameraUp")     != root.end()) { canvas->getCamera()->setUp    (root[L"cameraUp"]    ->AsVec3()) ;}
+
+    if(root.find(L"openSteerCameraDist") != root.end())
+    {
+        GUI::openSteerCameraDist = root[L"openSteerCameraDist"]->AsNumber();
+    }
 
     canvas->getCamera()->update();
 
@@ -135,6 +142,9 @@ void GUI::saveState()
     root[L"cameraEye"]                            = new JSONValue(canvas->getCamera()->getEyeConstRef());
     root[L"cameraCenter"]                         = new JSONValue(canvas->getCamera()->getCenterConstRef());
     root[L"cameraUp"]                             = new JSONValue(canvas->getCamera()->getUpConstRef());
+
+    root[L"OpenSteerAnnotation"]                  = new JSONValue(OpenSteer::enableAnnotation);
+    root[L"openSteerCameraDist"]                  = new JSONValue(GUI::openSteerCameraDist);
 
     ColorDistanceShader::getDefaultInstance()->saveState(root);
     ColorSymbology     ::getDefaultInstance()->saveState(root);

@@ -68,7 +68,6 @@ namespace
     mutex openSteerMutex;
 }
 
-extern float openSteerCameraDist; // TODO Un-globalize
 extern bool gotoNextZombie; // TODO Un-globalize
 
 namespace
@@ -89,11 +88,9 @@ namespace
         up     = rotate * vec4(__(OpenSteer::OpenSteerDemo::camera.up()), 1);
         up.z *= -1;
 
-        pos = vec4(vec3(lookat) + normalize(vec3(pos) - vec3(lookat)) * openSteerCameraDist, 1);
+        pos = vec4(vec3(lookat) + normalize(vec3(pos) - vec3(lookat)) * GUI::openSteerCameraDist, 1);
 
-        pos.z = glm::max(float(openSteerCameraDist * 0.5f), float(pos.z)); // When switching camera to next Zombie, keep camera above ground.
-
-        //pos = vec4(normalize(vec3(pos) - vec3(lookat)) * dvec3(openSteerCameraDist, openSteerCameraDist, openSteerCameraDist), 1);
+        pos.z = glm::max(float(GUI::openSteerCameraDist * 0.5f), float(pos.z)); // When switching camera to next Zombie, keep camera above ground.
     }
 
     void updateOpenSteer()

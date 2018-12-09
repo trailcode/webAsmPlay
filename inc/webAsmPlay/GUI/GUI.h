@@ -85,6 +85,8 @@ public:
 
     static bool isShuttingDown();
 
+    static float openSteerCameraDist;
+
 private:
 
     GUI() {}
@@ -139,7 +141,7 @@ private:
     static std::vector<Canvas *> auxCanvases;
 
     static int cameraMode;
-
+    
     static bool shuttingDown;
 };
 

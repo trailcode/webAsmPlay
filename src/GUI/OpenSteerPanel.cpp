@@ -25,13 +25,14 @@
 */
 
 #include <OpenSteer/OpenSteerDemo.h>
+#include <OpenSteer/Annotation.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace OpenSteer;
 
-float openSteerCameraDist = 0.4;
+float GUI::openSteerCameraDist = 0.4;
 
 bool gotoNextZombie = false; // TODO find a better way!
 
@@ -51,6 +52,8 @@ void GUI::openSteerPanel()
         ImGui::SliderFloat("", &openSteerCameraDist, 0.007f, 1.5f, "Camera dist: %.3f");
         
         if(ImGui::Button("Next Zombie")) { gotoNextZombie = true ;}
+
+        ImGui::SameLine(); ImGui::Checkbox("Annotation", &OpenSteer::enableAnnotation);
 
     ImGui::End();
 }
