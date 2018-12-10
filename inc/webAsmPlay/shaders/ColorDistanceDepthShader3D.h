@@ -31,8 +31,6 @@
 #include <glm/vec4.hpp>
 #include <webAsmPlay/shaders/Shader.h>
 
-class ColorSymbology;
-
 class ColorDistanceDepthShader3D : public Shader
 {
 public:
@@ -58,9 +56,6 @@ public:
 
     bool shouldRender(const bool isOutline, const size_t renderingStage) const;
 
-    ColorSymbology * setColorSymbology(ColorSymbology * colorSymbology);
-    ColorSymbology * getColorSymbology() const;
-
 private:
 
     void bindStage0(Canvas * canvas, const bool isOutline);
@@ -69,8 +64,6 @@ private:
     float heightMultiplier = 1.0f;
 
     glm::vec3 lightPos;
-
-    ColorSymbology * colorSymbology = NULL;
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_DISTANCE_DEPTH_SHADER_3D_H__

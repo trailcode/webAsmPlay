@@ -42,21 +42,26 @@ namespace
 
     const ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoInputs;
 
-    void addSymbologyColorControls(const size_t colorIndex, const string & name, vec4 * colors)
+    void addSymbologyColorControls(const size_t colorIndex, const string & name)
     {
-        ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
+        //ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
+        ColorSymbology * symbology = ColorSymbology::getInstance("defaultPolygon");
 
-        if(ImGui::ColorEdit4((name + " fill near")   .c_str(), value_ptr(colors[0]), flags)) { shader->setColor(colorIndex * 4 + 0, colors[0]) ;}
-        if(ImGui::ColorEdit4((name + " fill far")    .c_str(), value_ptr(colors[1]), flags)) { shader->setColor(colorIndex * 4 + 1, colors[1]) ;}
-        if(ImGui::ColorEdit4((name + " outline near").c_str(), value_ptr(colors[2]), flags)) { shader->setColor(colorIndex * 4 + 2, colors[2]) ;}
-        if(ImGui::ColorEdit4((name + " outline far") .c_str(), value_ptr(colors[3]), flags)) { shader->setColor(colorIndex * 4 + 3, colors[3]) ;}
+        vec4 * colors = &symbology->getColorRef(colorIndex * 4);
+
+        if(ImGui::ColorEdit4((name + " fill near")   .c_str(), value_ptr(colors[0]), flags)) { symbology->setColor(colorIndex * 4 + 0, colors[0]) ;}
+        if(ImGui::ColorEdit4((name + " fill far")    .c_str(), value_ptr(colors[1]), flags)) { symbology->setColor(colorIndex * 4 + 1, colors[1]) ;}
+        if(ImGui::ColorEdit4((name + " outline near").c_str(), value_ptr(colors[2]), flags)) { symbology->setColor(colorIndex * 4 + 2, colors[2]) ;}
+        if(ImGui::ColorEdit4((name + " outline far") .c_str(), value_ptr(colors[3]), flags)) { symbology->setColor(colorIndex * 4 + 3, colors[3]) ;}
 
         ImGui::Separator();
     }
 
-    void addMeshSymbologyColorControls(const size_t colorIndex, const string & name, vec4 * colors)
+    void addMeshSymbologyColorControls(const size_t colorIndex, const string & name)
     {
-        ColorSymbology * symbology = ColorSymbology::getDefaultInstance();
+        ColorSymbology * symbology = ColorSymbology::getInstance("defaultMesh");
+
+        vec4 * colors = &symbology->getColorRef(colorIndex * 8);
 
         if(ImGui::ColorEdit4((name + " roof near")        .c_str(), value_ptr(colors[0]), flags)) { symbology->setColor(colorIndex * 8 + 0, colors[0]) ;}
         if(ImGui::ColorEdit4((name + " roof outline near").c_str(), value_ptr(colors[1]), flags)) { symbology->setColor(colorIndex * 8 + 1, colors[1]) ;}
@@ -66,6 +71,16 @@ namespace
         if(ImGui::ColorEdit4((name + " wall outline near").c_str(), value_ptr(colors[5]), flags)) { symbology->setColor(colorIndex * 8 + 5, colors[5]) ;}
         if(ImGui::ColorEdit4((name + " wall far")         .c_str(), value_ptr(colors[6]), flags)) { symbology->setColor(colorIndex * 8 + 6, colors[6]) ;}
         if(ImGui::ColorEdit4((name + " wall outline far") .c_str(), value_ptr(colors[7]), flags)) { symbology->setColor(colorIndex * 8 + 7, colors[7]) ;}
+    }
+
+    void addLinearSymbologyColorControls(const size_t colorIndex, const string & name)
+    {
+        ColorSymbology * symbology = ColorSymbology::getInstance("defaultLinear");
+
+        vec4 * colors = &symbology->getColorRef(colorIndex * 4);
+
+        if(ImGui::ColorEdit4((name + " near").c_str(), value_ptr(colors[2]), flags)) { symbology->setColor(colorIndex * 4 + 2, colors[2]) ;}
+        if(ImGui::ColorEdit4((name + " far") .c_str(), value_ptr(colors[3]), flags)) { symbology->setColor(colorIndex * 4 + 3, colors[3]) ;}
     }
 }
 
@@ -77,24 +92,29 @@ void GUI::symbologyPanel()
 
     if (ImGui::CollapsingHeader("Linear Features", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        
+        addLinearSymbologyColorControls(0, "Default");
+        addLinearSymbologyColorControls(1, "Motorway");
+        addLinearSymbologyColorControls(2, "Trunk");
+        addLinearSymbologyColorControls(3, "Primary");
+        addLinearSymbologyColorControls(4, "Secondary");
+        addLinearSymbologyColorControls(5, "Tertiary");
+        addLinearSymbologyColorControls(6, "Unclassified");
+        addLinearSymbologyColorControls(7, "Residential");
+        addLinearSymbologyColorControls(8, "Service");
+        addLinearSymbologyColorControls(9, "Highway");
     }
 
     if (ImGui::CollapsingHeader("Polygonal features", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ColorDistanceShader * shader = ColorDistanceShader::getDefaultInstance();
-
-        addSymbologyColorControls(0, "Default",  &shader->getColorRef(0 * 4 ));
-        addSymbologyColorControls(1, "Grass",    &shader->getColorRef(1 * 4 ));
-        addSymbologyColorControls(2, "water",    &shader->getColorRef(2 * 4 ));
+        addSymbologyColorControls(0, "Default");
+        addSymbologyColorControls(1, "Grass");
+        addSymbologyColorControls(2, "water");
     }
 
     if (ImGui::CollapsingHeader("Mesh features", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ColorSymbology * symbology = ColorSymbology::getDefaultInstance();
-
-        addMeshSymbologyColorControls(0, "House",    &symbology->getColorRef(0 * 8));
-        addMeshSymbologyColorControls(1, "Building", &symbology->getColorRef(1 * 8));
+        addMeshSymbologyColorControls(0, "House");
+        addMeshSymbologyColorControls(1, "Building");
     }
 
     ImGui::End();

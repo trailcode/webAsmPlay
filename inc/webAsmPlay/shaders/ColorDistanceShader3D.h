@@ -60,10 +60,6 @@ public:
 
 private:
 
-    glm::vec4 colors[32];
-
-    bool colorTextureDirty;
-
     float heightMultiplier = 1.0f;
 
     glm::vec3 lightPos;

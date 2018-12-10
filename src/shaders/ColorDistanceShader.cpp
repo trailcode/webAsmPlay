@@ -28,6 +28,7 @@
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 
@@ -46,10 +47,6 @@ namespace
     GLint MV_Loc;
     GLint MVP_Loc;
     GLint texUniformLoc;
-
-    GLuint colorTexture = 0;
-
-    glm::vec4 initalColors[32];
 }
 
 void ColorDistanceShader::ensureShader()
@@ -109,8 +106,6 @@ void ColorDistanceShader::ensureShader()
         }
     )glsl";
 
-    colorTexture = Textures::create(initalColors, 32);
-
     shaderProgram = ShaderProgram::create(  vertexSource,
                                             fragmentSource,
                                             Variables({{"vertIn",            vertInAttrLoc},
@@ -127,17 +122,6 @@ void ColorDistanceShader::ensureShader()
 
 ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader")
 {
-
-    colors[0] = vec4(1,0,0,1);
-    colors[1] = vec4(1,1,0,1);
-    colors[2] = vec4(1,0,1,1);
-    colors[3] = vec4(0,1,0,1);
-    colors[4] = vec4(0,1,1,1);
-    colors[5] = vec4(0,0,1,1);
-    colors[6] = vec4(1,0,0,1);
-    colors[7] = vec4(1,0,0,1);
-
-    for(size_t i = 8; i < 32; ++i) { colors[i] = vec4(1,1,0,1) ;}
 }
 
 ColorDistanceShader::~ColorDistanceShader()
@@ -151,16 +135,9 @@ void ColorDistanceShader::bind(Canvas     * canvas,
                                const bool   isOutline,
                                const size_t renderingStage)
 {
-    if(colorTextureDirty)
-    {
-        Textures::set1D(colorTexture, colors, 32);
-
-        colorTextureDirty = false;
-    }
-
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorTexture));
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorSymbology->getTextureID()));
 
     shaderProgram->bind();
 
@@ -186,49 +163,5 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 
     if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 2.0f) ;}
     else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}
-}
-
-vec4 ColorDistanceShader::setColor(const size_t index, const vec4 & color)
-{
-    colorTextureDirty = true;
-
-    return colors[index] = color;
-}
-
-vec4 ColorDistanceShader::getColor(const size_t index) { return colors[index] ;}
-
-vec4 & ColorDistanceShader::getColorRef(const size_t index) { return colors[index] ;}
-
-void ColorDistanceShader::loadState(const JSONObject & dataStore)
-{
-    auto setVec4 = [&dataStore](const wstring & key, vec4 & color)->void
-    {
-        JSONObject::const_iterator i = dataStore.find(key);
-
-        if(i != dataStore.end()) { color = i->second->AsVec4() ;}
-    };
-
-    char buf[1024];
-
-    for(size_t i = 0; i < 32; ++i)
-    {
-        sprintf(buf, "ColorDistanceShader_attributeColor_%i", (int)i);
-
-        setVec4(stringToWstring(buf), colors[i]);
-    }
-
-    colorTextureDirty = true;
-}
-
-void ColorDistanceShader::saveState(JSONObject & dataStore)
-{
-    char buf[1024];
-
-    for(size_t i = 0; i < 32; ++i)
-    {
-        sprintf(buf, "ColorDistanceShader_attributeColor_%i", (int)i);
-
-        dataStore[stringToWstring(buf)] = new JSONValue(colors[i]);
-    }
 }
 

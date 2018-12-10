@@ -96,8 +96,10 @@ void GUI::loadState()
     setBool(L"renderSettingsRenderSkyBox",          renderSettingsRenderSkyBox);
     setBool(L"OpenSteerAnnotation",                 OpenSteer::enableAnnotation);
 
-    ColorDistanceShader::getDefaultInstance()->loadState(root);
-    ColorSymbology     ::getDefaultInstance()->loadState(root);
+    //ColorDistanceShader::getDefaultInstance()->loadState(root);
+    ColorSymbology::getInstance("defaultMesh")   ->loadState(root);
+    ColorSymbology::getInstance("defaultPolygon")->loadState(root);
+    ColorSymbology::getInstance("defaultLinear") ->loadState(root);
 
     if(root.find(L"cameraEye")    != root.end()) { canvas->getCamera()->setEye   (root[L"cameraEye"]   ->AsVec3()) ;}
     if(root.find(L"cameraCenter") != root.end()) { canvas->getCamera()->setCenter(root[L"cameraCenter"]->AsVec3()) ;}
@@ -146,8 +148,11 @@ void GUI::saveState()
     root[L"OpenSteerAnnotation"]                  = new JSONValue(OpenSteer::enableAnnotation);
     root[L"openSteerCameraDist"]                  = new JSONValue(GUI::openSteerCameraDist);
 
-    ColorDistanceShader::getDefaultInstance()->saveState(root);
-    ColorSymbology     ::getDefaultInstance()->saveState(root);
+    //ColorDistanceShader::getDefaultInstance()->saveState(root);
+    //ColorSymbology     ::getDefaultInstance()->saveState(root);
+    ColorSymbology::getInstance("defaultMesh")   ->saveState(root);
+    ColorSymbology::getInstance("defaultPolygon")->saveState(root);
+    ColorSymbology::getInstance("defaultLinear") ->saveState(root);
 
     wstring_convert<codecvt_utf8<wchar_t>, wchar_t> converter;
 

@@ -24,13 +24,15 @@
   \copyright 2018
 */
 
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/Shader.h>
 
 using namespace std;
 using namespace glm;
 
-Shader::Shader(const string  & shaderName) :  shaderName(shaderName) {}
+Shader::Shader(const string  & shaderName) :    shaderName      (shaderName),
+                                                colorSymbology  (ColorSymbology::getInstance("defaultPolygon")) {}
 
 void Shader::setVertexArrayFormat(  const GLint     size,
                                     const GLsizei   stride,
@@ -63,7 +65,7 @@ string Shader::getName() const { return shaderName ;}
 
 size_t Shader::getNumRenderingStages() const { return 1 ;}
 
-bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) const
-{
-    return renderingStage == 0;
-}
+bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) const { return renderingStage == 0 ;}
+
+ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
+ColorSymbology * Shader::getColorSymbology() const { return colorSymbology ;}

@@ -35,9 +35,11 @@ class ColorSymbology
 {
 public:
 
-    static void ensureInstance();
+    //static void ensureInstance();
 
-    static ColorSymbology * getDefaultInstance();
+    static ColorSymbology * getInstance(const std::string & name);
+
+    //static ColorSymbology * createInstance(const std::string name);
 
     GLuint getTextureID();
 
@@ -51,9 +53,16 @@ public:
 
 private:
 
-    ColorSymbology();
+    ColorSymbology(const std::string & name);
     ~ColorSymbology();
 
+    const std::string name;
+
+    GLuint colorTexture = 0;
+
+    glm::vec4 colors[32];
+
+    bool colorTextureDirty = true;
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_SYMBOLOGY_H__

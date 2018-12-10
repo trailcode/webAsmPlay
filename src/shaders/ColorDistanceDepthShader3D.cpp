@@ -485,6 +485,3 @@ vec3 ColorDistanceDepthShader3D::setLightPos(const vec3 & pos) { return lightPos
 vec3 ColorDistanceDepthShader3D::getLightPos() const { return lightPos ;}
 
 size_t ColorDistanceDepthShader3D::getNumRenderingStages() const { return 2 ;}
-
-ColorSymbology * ColorDistanceDepthShader3D::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
-ColorSymbology * ColorDistanceDepthShader3D::getColorSymbology() const { return colorSymbology ;}

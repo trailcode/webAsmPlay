@@ -44,22 +44,10 @@ public:
               const bool   isOutline,
               const size_t renderingStage = 0);
 
-    glm::vec4 setColor(const size_t index, const glm::vec4 & color);
-    glm::vec4 getColor(const size_t index);
-    glm::vec4 & getColorRef(const size_t index);
-
-    void loadState(const JSONObject & dataStore);
-
-    void saveState(JSONObject & dataStore);
-
     ColorDistanceShader();
     ~ColorDistanceShader();
 
 private:
-
-    glm::vec4 colors[32];
-
-    bool colorTextureDirty;
 };
 
 #endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__

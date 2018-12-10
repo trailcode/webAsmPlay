@@ -158,6 +158,9 @@ bool Canvas::preRender()
     return true;
 }
 
+#include <webAsmPlay/shaders/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
+
 GLuint Canvas::render()
 {
     if(!preRender()) { return 0 ;}
@@ -180,11 +183,19 @@ GLuint Canvas::render()
     auxFrameBuffer->unbind();
     //*/
 
+    // TODO try to refactor this. Who owns the symbology?
+    ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
+
     for(const auto r : polygons)            { r->render(this, 0) ;}
+
+    ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultLinear"));
+
     for(const auto r : lineStrings)         { r->render(this, 0) ;}
     for(const auto r : points)              { r->render(this, 0) ;}
     for(const auto r : deferredRenderables) { r->render(this, 0) ;} 
     //for(const auto r : meshes)              { r->render(this) ;}
+
+    ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
 
     for(const auto r : meshes)              { r->render(this, 0) ;}
 

@@ -31,6 +31,7 @@
 #include <webAsmPlay/OpenGL_Util.h>
 
 class Canvas;
+class ColorSymbology;
 
 class Shader
 {
@@ -56,6 +57,9 @@ public:
 
     virtual bool shouldRender(const bool isOutline, const size_t renderingStage) const;
 
+    ColorSymbology * setColorSymbology(ColorSymbology * colorSymbology);
+    ColorSymbology * getColorSymbology() const;
+
 protected:
 
     Shader( const std::string & shaderName);
@@ -75,6 +79,8 @@ protected:
     GLint            sizeColor      = 2;
     GLsizei          strideColor    = 0;
     const GLvoid   * pointerColor   = NULL;
+
+    ColorSymbology * colorSymbology = NULL;
 };
 
 #endif // __WEB_ASM_PLAY_SHADER_H__
