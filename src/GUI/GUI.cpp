@@ -281,12 +281,12 @@ void GUI::showMainToolBar()
     if (pressed>=0) fprintf(stderr,"Toolbar1: pressed:%d\n",pressed);
     switch(pressed)
     {
-        case 0: mode = NORMAL_MODE; break;
-        case 1: mode = PICK_MODE_LINESTRING; break;
-        case 2: mode = PICK_MODE_POLYGON_SINGLE; break;
-        case 3: mode = PICK_MODE_POLYGON_MULTIPLE; break;
-        case 4: mode = SET_PATH_START_POINT; break;
-        case 5: mode = FIND_PATH; break;
+        case 0: mode = NORMAL_MODE;                 break;
+        case 1: mode = PICK_MODE_LINESTRING;        break;
+        case 2: mode = PICK_MODE_POLYGON_SINGLE;    break;
+        case 3: mode = PICK_MODE_POLYGON_MULTIPLE;  break;
+        case 4: mode = SET_PATH_START_POINT;        break;
+        case 5: mode = FIND_PATH;                   break;
     }
 }
 

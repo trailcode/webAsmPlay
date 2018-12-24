@@ -292,6 +292,8 @@ void Canvas::onMouseScroll(GLFWwindow * window, const vec2 & mouseScroll)
         return;
     }
 
+    //trackBallInteractor->setSpeed(fabs(mouseScroll.y) * 0.1);
+
     trackBallInteractor->setScrollDirection(mouseScroll.y > 0);
     trackBallInteractor->update();
 }
