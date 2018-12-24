@@ -110,7 +110,7 @@ var LibraryGLFW = {
       0x0002100A:0, // GLFW_ACCUM_ALPHA_BITS
       0x0002100B:0, // GLFW_AUX_BUFFERS
       0x0002100C:0, // GLFW_STEREO
-      0x0002100D:4, // GLFW_SAMPLES
+      0x0002100D:0, // GLFW_SAMPLES
       0x0002100E:0, // GLFW_SRGB_CAPABLE
       0x0002100F:0, // GLFW_REFRESH_RATE
 
@@ -511,9 +511,10 @@ var LibraryGLFW = {
       event.preventDefault();
     },
 
-    onCanvasResize: function(width, height) {
+    onCanvasResize: function(_width, _height) {
       if (!GLFW.active) return;
-
+        var width = _width * 2;
+        var height = _height * 2;
       var resizeNeeded = true;
 
 #if 1
@@ -523,7 +524,7 @@ var LibraryGLFW = {
       GLFW.active.height = Module.ctx.cliehtHeight;
       console.log(Module.ctx, Module.ctx.clientWidth);
 #else
-      console.log("foo");
+      //console.log("foo");
       // If the client is requestiong fullscreen mode
       if (document["fullscreen"] || document["fullScreen"] || document["mozFullScreen"] || document["webkitIsFullScreen"]) {
         GLFW.active.storedX = GLFW.active.x;
@@ -554,6 +555,7 @@ var LibraryGLFW = {
 
       // If any of the above conditions were true, we need to resize the canvas
       if (resizeNeeded) {
+          console.log('Resize', GLFW.active.width, GLFW.active.height);
         // resets the canvas size to counter the aspect preservation of Browser.updateCanvasDimensions
         Browser.setCanvasSize(GLFW.active.width, GLFW.active.height, true);
         // TODO: Client dimensions (clientWidth/clientHeight) vs pixel dimensions (width/height) of
