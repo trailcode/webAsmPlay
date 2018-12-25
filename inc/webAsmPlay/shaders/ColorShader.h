@@ -43,7 +43,7 @@ public:
 
     void bind(  Canvas      * canvas,
                 const bool    isOutline,
-                const size_t  renderingStage = 0);
+                const size_t  renderingStage = 0) override;
 
 private:
 

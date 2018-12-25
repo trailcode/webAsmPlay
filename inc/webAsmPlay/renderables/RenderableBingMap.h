@@ -35,8 +35,8 @@ public:
 
     static Renderable * create();
 
-    void render(Canvas * canvas, const size_t renderStage = 0) const;
-    
+    void render(Canvas * canvas, const size_t renderStage = 0) const override;
+
 private:
 
     RenderableBingMap();
