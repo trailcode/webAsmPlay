@@ -40,6 +40,7 @@
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
+#include <webAsmPlay/renderables/RenderableBingMap.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GeoClient.h>
@@ -655,6 +656,11 @@ void GeoClient::loadGeometry(const string fileName)
     GUI::progress("", 1.0);
 
 #endif
+}
+
+void GeoClient::addBingMap()
+{
+    getCanvas()->addRenderable(RenderableBingMap::create());
 }
 
 dmat4 GeoClient::getTrans() const { return trans ;}

@@ -83,6 +83,8 @@ public:
 
     void loadGeometry(const std::string fileName);
 
+    void addBingMap();
+
     PointOnEdge pickLineStringRenderable(const glm::vec3 & pos) const;
     
     std::pair<Renderable *, Attributes *> pickPolygonRenderable(const glm::vec3 & pos) const;
