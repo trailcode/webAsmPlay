@@ -334,16 +334,17 @@ void GUI::showMainMenuBar()
 
     if(ImGui::BeginMenu("View"))
     {
-        if(ImGui::MenuItem("Geos Tests"))      { showSceneViewPanel      ^= 1 ;}
-        if(ImGui::MenuItem("Performance"))     { showPerformancePanel    ^= 1 ;}
-        if(ImGui::MenuItem("Render Settings")) { showRenderSettingsPanel ^= 1 ;}
-        if(ImGui::MenuItem("Log"))             { showLogPanel            ^= 1 ;}
-        if(ImGui::MenuItem("Attributes"))      { showAttributePanel      ^= 1 ;}
-        if(ImGui::MenuItem("GUI Settings"))    { showGUI_Settings_Panel  ^= 1 ;}
-        if(ImGui::MenuItem("Symbology"))       { showSymbologyPanel      ^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer Test"))  { showOpenSteerTestPanel  ^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer"))       { showOpenSteerPanel      ^= 1 ;}
-        if(ImGui::MenuItem("Camera Info"))     { showCameraInfoPanel     ^= 1 ;}
+        if(ImGui::MenuItem("Geos Tests"))       { showSceneViewPanel      ^= 1 ;}
+        if(ImGui::MenuItem("Performance"))      { showPerformancePanel    ^= 1 ;}
+        if(ImGui::MenuItem("Render Settings"))  { showRenderSettingsPanel ^= 1 ;}
+        if(ImGui::MenuItem("Log"))              { showLogPanel            ^= 1 ;}
+        if(ImGui::MenuItem("Attributes"))       { showAttributePanel      ^= 1 ;}
+        if(ImGui::MenuItem("GUI Settings"))     { showGUI_Settings_Panel  ^= 1 ;}
+        if(ImGui::MenuItem("Symbology"))        { showSymbologyPanel      ^= 1 ;}
+        if(ImGui::MenuItem("OpenSteer Test"))   { showOpenSteerTestPanel  ^= 1 ;}
+        if(ImGui::MenuItem("OpenSteer"))        { showOpenSteerPanel      ^= 1 ;}
+        if(ImGui::MenuItem("Camera Info"))      { showCameraInfoPanel     ^= 1 ;}
+        if(ImGui::MenuItem("Bing Tile System")) { showBingTileSystemPanel ^= 1 ;}
 
         ImGui::EndMenu();
     }
@@ -472,6 +473,7 @@ void GUI::mainLoop(GLFWwindow * window)
     openSteerTestPanel();
     openSteerPanel();
     cameraInfoPanel();
+    bingTileSystemPanel();
 
     ImGui::End();
 

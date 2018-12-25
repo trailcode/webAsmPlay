@@ -107,6 +107,7 @@ private:
     static void openSteerTestPanel();
     static void openSteerPanel();
     static void cameraInfoPanel();
+    static void bingTileSystemPanel();
 
     static void showHelpMarker(const char* desc);
 
@@ -129,6 +130,7 @@ private:
     static bool showOpenSteerTestPanel;
     static bool showOpenSteerPanel;
     static bool showCameraInfoPanel;
+    static bool showBingTileSystemPanel;
 
     static GLFWwindow * mainWindow;
 
