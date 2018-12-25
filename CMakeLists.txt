@@ -174,6 +174,7 @@ file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
                             "src/Zombie.cpp"
                             "src/ZombiePlugin.cpp"
                             "src/Network.cpp"
+                            "src/BingTileSystem.cpp"
                             #"src/Main.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}

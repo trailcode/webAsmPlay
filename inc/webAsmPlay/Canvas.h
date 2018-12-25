@@ -148,6 +148,7 @@ public:
     std::list<Renderable *> polygons;
     std::list<Renderable *> meshes;
     std::list<Renderable *> deferredRenderables;
+    std::list<Renderable *> rasters;
 
     const bool useFrameBuffer;
 

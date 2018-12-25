@@ -24,25 +24,34 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__
-#define __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__
+#ifndef __WEB_ASM_PLAY_BING_TILE_SYSTEM_H__
+#define __WEB_ASM_PLAY_BING_TILE_SYSTEM_H__
 
-#include <webAsmPlay/renderables/Renderable.h>
+#include <string>
+#include <utility>
+#include <glm/vec2.hpp>
 
-class RenderableBingMap : public Renderable
+// From: https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
+
+namespace BingTileSystem
 {
-public:
+    size_t mapSize(const size_t levelOfDetail);
 
-    static Renderable * create();
+    double groundResolution(double latitude, const size_t levelOfDetail);
 
-    void render(Canvas * canvas, const size_t renderStage = 0) const override;
+    double mapScale(const double latitude, const size_t levelOfDetail, const size_t screenDpi);
 
-private:
+    glm::ivec2 latLongToPixel(const glm::dvec2 & latLong, const size_t levelOfDetail);
 
-    RenderableBingMap();
-    ~RenderableBingMap();
+    glm::dvec2 pixelToLatLong(const glm::ivec2 & pixel, const size_t levelOfDetail);
 
-    
-};
+    glm::ivec2 pixelToTile(const glm::ivec2 & pixel);
 
-#endif // __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__
+    glm::ivec2 tileToPixel(const glm::ivec2 & tile);
+
+    std::string tileToQuadKey(const glm::ivec2 & tile, const size_t levelOfDetail);
+
+    std::pair<size_t, glm::ivec2> quadKeyToTile(const std::string & quadKey);
+}
+
+#endif // __WEB_ASM_PLAY_BING_TILE_SYSTEM_H__

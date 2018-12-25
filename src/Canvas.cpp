@@ -37,6 +37,7 @@
 #include <webAsmPlay/renderables/RenderableMesh.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
+#include <webAsmPlay/renderables/RenderableBingMap.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/SkyBox.h>
@@ -339,6 +340,7 @@ Renderable * Canvas::addRenderable(Renderable * renderiable)
     if(dynamic_cast<RenderablePolygon    *>(renderiable)) { return addRenderable(polygons,            renderiable) ;}
     if(dynamic_cast<RenderablePoint      *>(renderiable)) { return addRenderable(points,              renderiable) ;}
     if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderable(meshes,              renderiable) ;}
+    if(dynamic_cast<RenderableBingMap    *>(renderiable)) { return addRenderable(rasters,             renderiable) ;}
 
     dmess("Error! Implement!");
     
