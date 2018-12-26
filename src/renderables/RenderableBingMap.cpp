@@ -40,6 +40,8 @@ namespace
     const size_t levelOfDetail = 15;
 
     vector<Renderable *> tiles;
+
+    
 }
 
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds)
@@ -80,6 +82,8 @@ Renderable * RenderableBingMap::create(const AABB2D & bounds, const dmat4 & tran
 
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 {
+    //return;
+
     //dmess("minTile " << maxTile.x - minTile.x << " " << maxTile.y - minTile.y);
 
     for(const auto r : tiles)
