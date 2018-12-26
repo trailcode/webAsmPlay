@@ -63,6 +63,8 @@ public:
 
     static int getCameraMode();
 
+    static bool renderSettingsFillMeshes;
+    static bool renderSettingsRenderMeshOutlines;
     static bool renderSettingsFillPolygons;
     static bool renderSettingsRenderPolygonOutlines;
     static bool renderSettingsRenderLinearFeatures;

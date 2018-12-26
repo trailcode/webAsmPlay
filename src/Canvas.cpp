@@ -377,14 +377,12 @@ vector<Renderable *> Canvas::getRenderiables() const
     return ret;
 }
 
-vector<Renderable *> Canvas::getMeshRenderiables() const
-{
-    vector<Renderable *> ret;
-
-    ret.insert(ret.end(), meshes.begin(), meshes.end());
-
-    return ret;
-}
+const list<Renderable *> & Canvas::getPointsRef()               const { return points               ;}
+const list<Renderable *> & Canvas::getLineStringsRef()          const { return lineStrings          ;}
+const list<Renderable *> & Canvas::getPolygonsRef()             const { return polygons             ;}
+const list<Renderable *> & Canvas::getMeshesRef()               const { return meshes               ;}
+const list<Renderable *> & Canvas::getDeferredRenderablesRef()  const { return deferredRenderables  ;}
+const list<Renderable *> & Canvas::getRastersRef()              const { return rasters              ;}
 
 vec4 Canvas::setClearColor(const vec4 & clearColor) { return this->clearColor = clearColor ;}
 

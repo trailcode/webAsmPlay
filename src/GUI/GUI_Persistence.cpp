@@ -42,18 +42,20 @@
 using namespace std;
 using namespace glm;
 
-bool GUI::showSceneViewPanel       = false;
-bool GUI::showPerformancePanel     = false;
-bool GUI::showRenderSettingsPanel  = false;
-bool GUI::showLogPanel             = false;
-bool GUI::showAttributePanel       = false;
-bool GUI::showSymbologyPanel       = false;
-bool GUI::showGUI_Settings_Panel   = false;
-bool GUI::showOpenSteerTestPanel   = false;
-bool GUI::showOpenSteerPanel       = false;
-bool GUI::showCameraInfoPanel      = false;
-bool GUI::showBingTileSystemPanel  = false;
+bool GUI::showSceneViewPanel                   = false;
+bool GUI::showPerformancePanel                 = false;
+bool GUI::showRenderSettingsPanel              = false;
+bool GUI::showLogPanel                         = false;
+bool GUI::showAttributePanel                   = false;
+bool GUI::showSymbologyPanel                   = false;
+bool GUI::showGUI_Settings_Panel               = false;
+bool GUI::showOpenSteerTestPanel               = false;
+bool GUI::showOpenSteerPanel                   = false;
+bool GUI::showCameraInfoPanel                  = false;
+bool GUI::showBingTileSystemPanel              = false;
 
+bool GUI::renderSettingsFillMeshes             = true;
+bool GUI::renderSettingsRenderMeshOutlines     = true;
 bool GUI::renderSettingsFillPolygons           = true;
 bool GUI::renderSettingsRenderPolygonOutlines  = true;
 bool GUI::renderSettingsRenderLinearFeatures   = true;
