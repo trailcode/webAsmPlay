@@ -24,6 +24,10 @@
   \copyright 2018
 */
 
+#ifndef __EMSCRIPTEN__
+    #include <curl/curl.h>
+#endif
+
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
@@ -41,7 +45,95 @@ namespace
 
     vector<Renderable *> tiles;
 
-    
+    // Define our struct for accepting LCs output
+    struct BufferStruct
+    {
+        char * buffer;
+        size_t size;
+    };
+
+    // This is the function we pass to LC, which writes the output to a BufferStruct
+    static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
+    {
+        dmess("nmemb " << nmemb);
+
+        size_t realsize = size * nmemb;
+
+        struct BufferStruct * mem = (struct BufferStruct *) data;
+
+        mem->buffer = (char *)realloc(mem->buffer, mem->size + realsize + 1);
+
+        if ( mem->buffer )
+        {
+            memcpy( &( mem->buffer[ mem->size ] ), ptr, realsize );
+            mem->size += realsize;
+            mem->buffer[ mem->size ] = 0;
+        }
+        
+        return realsize;
+    }
+
+    class BingTile
+    {
+    public:
+
+        BingTile(const string & quadKey) : quadKey(quadKey)
+        {
+            fetchTile();
+        }
+
+        ~BingTile()
+        {
+
+        }
+
+        void fetchTile()
+        {
+            CURL * myHandle;
+            CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
+            struct BufferStruct output; // Create an instance of out BufferStruct to accept LCs output
+            output.buffer = NULL;
+            output.size = 0;
+            myHandle = curl_easy_init ( ) ;
+
+            /* Notice the lack of major error checking, for brevity */
+
+            curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
+            curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)&output); // Passing our BufferStruct to LC
+
+            const string url =  "https://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
+                                quadKey +
+                                "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
+
+            curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
+            result = curl_easy_perform( myHandle );
+            curl_easy_cleanup( myHandle );
+
+            FILE * fp;
+            string outPath = "./tiles/" + quadKey + ".jpg";
+
+            fp = fopen(outPath.c_str(), "wb");
+            //if( !fp )
+            dmess("output.size " << output.size);
+            //return;
+            //fprintf(fp, output.buffer );
+            fwrite(output.buffer, sizeof(char), output.size, fp);
+            fclose( fp );
+
+            if( output.buffer )
+            {
+            free ( output.buffer );
+            output.buffer = 0;
+            output.size = 0;
+            }
+
+            dmess("done " << quadKey);
+        }
+
+        const string quadKey;
+
+    private:
+    };
 }
 
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds)
@@ -62,11 +154,19 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
         dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 0), levelOfDetail);
         dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 1), levelOfDetail);
 
+        string quadKey = tileToQuadKey(ivec2(x, y), levelOfDetail);
+
+        dmess("quadKey " << quadKey);
+
+        new BingTile(quadKey);
+
         double tmp = tMin.x; tMin.x = tMin.y; tMin.y = tmp;
 
         tmp = tMax.x; tMax.x = tMax.y; tMax.y = tmp;
 
         tiles.push_back(Renderable::create(makeBox(tMin, tMax), trans));
+
+        
     }
 }
 

@@ -25,6 +25,11 @@
 */
 
 #include <thread>
+
+#ifndef __EMSCRIPTEN__
+    #include <curl/curl.h>
+#endif
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -77,20 +82,13 @@ int main(int, char**)
 
 #ifndef __EMSCRIPTEN__
 	// Initialize OpenGL loader
-
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-	/*
-		if (gl3wInit() != 0)
-		{
-			fprintf(stderr, "Failed to initialize OpenGL loader!\n");
-			return 1;
-		}
-		*/
+	
+    curl_global_init( CURL_GLOBAL_ALL );
+
 #endif
 
     glfwSwapInterval(1); // Enable vsync
-
-    
 
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
