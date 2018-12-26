@@ -7,3 +7,4 @@ build3
 .vs
 geoServerBuild
 /CMakeSettings.json
+.DS_Store
