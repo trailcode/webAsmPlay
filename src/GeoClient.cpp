@@ -663,6 +663,11 @@ void GeoClient::addBingMap()
     getCanvas()->addRenderable(RenderableBingMap::create());
 }
 
+void GeoClient::addMapBounds()
+{
+
+}
+
 dmat4 GeoClient::getTrans() const { return trans ;}
 
 dmat4 GeoClient::getInverseTrans() const { return inverseTrans ;}

@@ -27,14 +27,13 @@
 #ifndef __WEB_ASM_PLAY_OSM_READER_H__
 #define __WEB_ASM_PLAY_OSM_READER_H__
 
-#include <string>
-#include <webAsmPlay/Types.h>
+#include <geoServer/MapData.h>
 
 class OSM_Reader
 {
 public:
 
-    static std::vector<AttributedGeometry> import(const std::string & fileName);
+    static MapData import(const std::string & fileName);
 
 private:
 
@@ -48,6 +47,7 @@ private:
     static void handleNode      (const char **atts);
     static void handleWay       (const char **atts);
     static void handleND        (const char **atts);
+    static void handleBounds    (const char **atts);
 
     OSM_Reader() {}
     ~OSM_Reader() {}

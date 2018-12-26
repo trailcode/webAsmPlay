@@ -24,47 +24,24 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/Util.h>
-#include <webAsmPlay/BingTileSystem.h>
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/GeoClient.h>
-#include <webAsmPlay/GUI/GUI.h>
+#ifndef __WEB_ASM_PLAY_GEO_SERVER_MAP_DATA_H__
+#define __WEB_ASM_PLAY_GEO_SERVER_MAP_DATA_H__
 
-using namespace std;
-using namespace glm;
+#include <string>
+#include <webAsmPlay/Types.h>
 
-void GUI::bingTileSystemPanel()
+class MapData
 {
-    if(!showBingTileSystemPanel) { return ;}
+public:
 
-    dvec4 pos(canvas->getCursorPosWC(), 1.0);
+    std::vector<AttributedGeometry> geometry;
 
-    pos = client->getInverseTrans() * pos;
+    double boundsMinX = 0;
+    double boundsMaxX = 0;
+    double boundsMinY = 0;
+    double boundsMaxY = 0;
 
-    double tmp = pos.x;
-    pos.x = pos.y;
-    pos.y = tmp;
+private:
+};
 
-    const size_t zoomLevel = 19;
-
-    ivec2 pix = BingTileSystem::latLongToPixel(pos, zoomLevel);
-
-    dvec2 pos2 = BingTileSystem::pixelToLatLong(pix, zoomLevel);
-
-    ivec2 tile = BingTileSystem::pixelToTile(pix);
-
-    string quadKey = BingTileSystem::tileToQuadKey(tile, zoomLevel);
-
-    //dmess("pix " << pos.x << " " << pos.y << " " << pix.x << " " << pix.y << " " << pos2.x << " " << pos2.y);
-    dmess("quadKey " << quadKey);
-
-    ImGui::Begin("Bing Tile System", &showBingTileSystemPanel);
-
-    ImGui::Text(("    pos: " + toStr(vec2(pos))).c_str());
-    ImGui::Text(("    pix: " + toStr(pix)).c_str());
-    ImGui::Text(("   tile: " + toStr(tile)).c_str());
-    ImGui::Text(("quadKey: " + quadKey).c_str());
-
-    ImGui::End();
-}
-
+#endif // __WEB_ASM_PLAY_GEO_SERVER_MAP_DATA_H__

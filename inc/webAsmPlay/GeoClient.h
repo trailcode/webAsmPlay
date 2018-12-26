@@ -85,6 +85,8 @@ public:
 
     void addBingMap();
 
+    void addMapBounds();
+
     PointOnEdge pickLineStringRenderable(const glm::vec3 & pos) const;
     
     std::pair<Renderable *, Attributes *> pickPolygonRenderable(const glm::vec3 & pos) const;

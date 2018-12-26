@@ -59,6 +59,8 @@ std::string toStr(const glm::mat4 & m);
 
 std::string toStr(const glm::vec2 & v);
 
+std::string toStr(const glm::ivec2 & v);
+
 std::string toStr(const glm::vec3 & v);
 
 std::string toStr(const glm::vec4 & v);
