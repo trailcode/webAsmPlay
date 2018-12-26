@@ -83,9 +83,7 @@ public:
 
     void loadGeometry(const std::string fileName);
 
-    void addBingMap();
-
-    void addMapBounds();
+    void addBingMap(); // TODO make private?
 
     PointOnEdge pickLineStringRenderable(const glm::vec3 & pos) const;
     
@@ -104,25 +102,10 @@ public:
 
     Canvas * getCanvas() const;
 
+    AABB2D getBounds() const;
+
 private:
     
-    void createPolygonRenderiables   (const std::vector<AttributedGeometry> & geoms);
-    void createLineStringRenderiables(const std::vector<AttributedGeometry> & geoms);
-    void createPointRenderiables     (const std::vector<AttributedGeometry> & geoms);
-
-    void ensureClient();
-
-    geos::index::quadtree::Quadtree * quadTreePolygons;
-    geos::index::quadtree::Quadtree * quadTreeLineStrings;
-    geos::index::quadtree::Quadtree * quadTreePoints;
-    
-    glm::dmat4 trans;
-    glm::dmat4 inverseTrans;
-
-    Canvas * canvas;
-
-    Network * network;
-
 #ifndef __EMSCRIPTEN__
 
     static void on_open(GeoClient * client, websocketpp::connection_hdl hdl);
@@ -141,6 +124,25 @@ private:
     std::thread * clientThread = NULL;
 
 #endif
+
+    void createPolygonRenderiables   (const std::vector<AttributedGeometry> & geoms);
+    void createLineStringRenderiables(const std::vector<AttributedGeometry> & geoms);
+    void createPointRenderiables     (const std::vector<AttributedGeometry> & geoms);
+
+    void ensureClient();
+
+    geos::index::quadtree::Quadtree * quadTreePolygons;
+    geos::index::quadtree::Quadtree * quadTreeLineStrings;
+    geos::index::quadtree::Quadtree * quadTreePoints;
+    
+    glm::dmat4 trans;
+    glm::dmat4 inverseTrans;
+
+    Canvas * canvas;
+
+    Network * network;
+
+    AABB2D bounds;
 };
 
 #endif // __WEB_ASM_PLAY_GEO_CLIENT_H__

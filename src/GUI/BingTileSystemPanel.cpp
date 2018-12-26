@@ -56,7 +56,7 @@ void GUI::bingTileSystemPanel()
     string quadKey = BingTileSystem::tileToQuadKey(tile, zoomLevel);
 
     //dmess("pix " << pos.x << " " << pos.y << " " << pix.x << " " << pix.y << " " << pos2.x << " " << pos2.y);
-    dmess("quadKey " << quadKey);
+    //dmess("quadKey " << quadKey);
 
     ImGui::Begin("Bing Tile System", &showBingTileSystemPanel);
 

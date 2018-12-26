@@ -77,6 +77,11 @@ ivec2 BingTileSystem::latLongToPixel(const dvec2 & latLong, const size_t levelOf
                  (int) clip(y * _mapSize + 0.5, 0, _mapSize - 1));
 }
 
+ivec2 BingTileSystem::latLongToTile(const dvec2 & latLong, const size_t levelOfDetail)
+{
+    return pixelToTile(latLongToPixel(latLong, levelOfDetail));
+}
+
 dvec2 BingTileSystem::pixelToLatLong(const ivec2 & pixel, const size_t levelOfDetail)
 {
     const double _mapSize = mapSize(levelOfDetail);  
@@ -89,6 +94,11 @@ dvec2 BingTileSystem::pixelToLatLong(const ivec2 & pixel, const size_t levelOfDe
 ivec2 BingTileSystem::pixelToTile(const ivec2 & pixel) { return pixel / ivec2(256, 256) ;}
 
 ivec2 BingTileSystem::tileToPixel(const ivec2 & tile) { return tile * ivec2(256, 256) ;}
+
+dvec2 BingTileSystem::tileToLatLong(const ivec2 & tile, const size_t levelOfDetail)
+{
+    return pixelToLatLong(tileToPixel(tile), levelOfDetail);
+}
 
 string BingTileSystem::tileToQuadKey(const ivec2 & tile, const size_t levelOfDetail)
 {

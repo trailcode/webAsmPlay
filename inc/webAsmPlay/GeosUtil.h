@@ -68,6 +68,8 @@ namespace geosUtil
 
     geos::geom::Geometry::Ptr makeBox(const double xmin, const double ymin, const double xmax, const double ymax);
     
+    geos::geom::Geometry::Ptr makeBox(const glm::dvec2 & min, const glm::dvec2 & max);
+
     geos::geom::Geometry::Ptr unionPolygons(const std::initializer_list<geos::geom::Geometry::Ptr> & polys);
 
     std::vector<const geos::geom::LineString *> getExternalRings(const geos::geom::Geometry * geom);

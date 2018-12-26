@@ -43,11 +43,15 @@ namespace BingTileSystem
 
     glm::ivec2 latLongToPixel(const glm::dvec2 & latLong, const size_t levelOfDetail);
 
+    glm::ivec2 latLongToTile(const glm::dvec2 & latLong, const size_t levelOfDetail);
+
     glm::dvec2 pixelToLatLong(const glm::ivec2 & pixel, const size_t levelOfDetail);
 
     glm::ivec2 pixelToTile(const glm::ivec2 & pixel);
 
     glm::ivec2 tileToPixel(const glm::ivec2 & tile);
+
+    glm::dvec2 tileToLatLong(const glm::ivec2 & tile, const size_t levelOfDetail);
 
     std::string tileToQuadKey(const glm::ivec2 & tile, const size_t levelOfDetail);
 

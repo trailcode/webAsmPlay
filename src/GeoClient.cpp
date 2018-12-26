@@ -658,15 +658,9 @@ void GeoClient::loadGeometry(const string fileName)
 #endif
 }
 
-void GeoClient::addBingMap()
-{
-    getCanvas()->addRenderable(RenderableBingMap::create());
-}
+void GeoClient::addBingMap() { getCanvas()->addRenderable(RenderableBingMap::create(getBounds(), trans)) ;}
 
-void GeoClient::addMapBounds()
-{
-
-}
+AABB2D GeoClient::getBounds() const { return bounds ;}
 
 dmat4 GeoClient::getTrans() const { return trans ;}
 

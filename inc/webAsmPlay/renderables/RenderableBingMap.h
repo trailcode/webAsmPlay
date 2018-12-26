@@ -33,16 +33,19 @@ class RenderableBingMap : public Renderable
 {
 public:
 
-    static Renderable * create();
+    static Renderable * create(const AABB2D & bounds, const glm::dmat4 & trans = glm::dmat4(1.0));
 
     void render(Canvas * canvas, const size_t renderStage = 0) const override;
 
 private:
 
-    RenderableBingMap();
+    RenderableBingMap(const AABB2D & bounds, const glm::dmat4 & trans);
     ~RenderableBingMap();
 
-    
+    const AABB2D bounds;
+
+    glm::ivec2 minTile;
+    glm::ivec2 maxTile;
 };
 
 #endif // __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__

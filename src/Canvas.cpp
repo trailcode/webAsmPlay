@@ -168,21 +168,17 @@ GLuint Canvas::render()
 
     lock_guard<mutex> _(renderiablesMutex);
 
-    //*
     auxFrameBuffer->bind();
 
-    //GL_CHECK(glViewport(0, 0, size.x, size.y));
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //dmess("============ " << meshes.size());
 
     for(const auto r : meshes)              { r->render(this, 1) ;}
 
     glFlush();
 
     auxFrameBuffer->unbind();
-    //*/
+
+    for(const auto r : rasters) { r->render(this, 0) ;}
 
     // TODO try to refactor this. Who owns the symbology?
     ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
@@ -373,6 +369,7 @@ vector<Renderable *> Canvas::getRenderiables() const
     ret.insert(ret.end(), lineStrings.begin(),  lineStrings.end());
     ret.insert(ret.end(), polygons.begin(),     polygons.end());
     ret.insert(ret.end(), meshes.begin(),       meshes.end());
+    ret.insert(ret.end(), rasters.begin(),      rasters.end());
 
     return ret;
 }
