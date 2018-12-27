@@ -203,3 +203,25 @@ GLuint Textures::set1D(const GLuint texture, const glm::vec4 * values, const siz
 
     return texture;
 }
+
+GLuint Textures::createFromJpeg(const char * data, const size_t size)
+{
+    SDL_RWops * mem = SDL_RWFromConstMem(data, size);
+    //SDL_RWops * mem = SDL_RWFromMem((void *)data, size);
+
+    SDL_Surface * image = IMG_LoadJPG_RW(mem);
+
+    dmess("w " << image->w << " h " << image->h << " pitch " << image->pitch);
+
+    SDL_RWclose(mem);
+
+    if(!image)
+    {
+        dmess("Error!");
+
+        return 0;
+    }
+
+    return 0;
+}
+

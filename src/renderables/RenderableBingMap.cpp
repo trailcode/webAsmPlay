@@ -30,6 +30,7 @@
 
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/BingTileSystem.h>
+#include <webAsmPlay/Textures.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 
 #include <webAsmPlay/GeosUtil.h>
@@ -109,6 +110,8 @@ namespace
             result = curl_easy_perform( myHandle );
             curl_easy_cleanup( myHandle );
 
+            Textures::createFromJpeg(output.buffer, output.size);
+
             FILE * fp;
             string outPath = "./tiles/" + quadKey + ".jpg";
 
@@ -122,9 +125,9 @@ namespace
 
             if( output.buffer )
             {
-            free ( output.buffer );
-            output.buffer = 0;
-            output.size = 0;
+                free ( output.buffer );
+                output.buffer = 0;
+                output.size = 0;
             }
 
             dmess("done " << quadKey);

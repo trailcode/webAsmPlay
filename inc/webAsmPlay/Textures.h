@@ -43,6 +43,8 @@ public:
     static GLuint loadCube(const std::vector<std::string> & files);
 
     static GLuint create(const glm::vec4 * values, const size_t num);
+
+    static GLuint createFromJpeg(const char * data, const size_t size);
     
     static GLuint set1D(const GLuint texture, const glm::vec4 * values, const size_t num);
 
