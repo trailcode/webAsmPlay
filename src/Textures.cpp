@@ -209,19 +209,37 @@ GLuint Textures::createFromJpeg(const char * data, const size_t size)
     SDL_RWops * mem = SDL_RWFromConstMem(data, size);
     //SDL_RWops * mem = SDL_RWFromMem((void *)data, size);
 
-    SDL_Surface * image = IMG_LoadJPG_RW(mem);
+    SDL_Surface * img = IMG_LoadJPG_RW(mem);
 
-    dmess("w " << image->w << " h " << image->h << " pitch " << image->pitch);
+    //dmess("w " << image->w << " h " << image->h << " pitch " << image->pitch);
 
     SDL_RWclose(mem);
 
-    if(!image)
+    if(!img)
     {
         dmess("Error!");
 
         return 0;
     }
 
-    return 0;
+    GLuint texture;
+
+    GL_CHECK(glGenTextures(1, &texture));
+
+    /* Typical Texture Generation Using Data From The Bitmap */
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, texture));
+
+    /* Generate The Texture */
+    GL_CHECK(glTexImage2D(  GL_TEXTURE_2D, 0, GL_RGB, img->w,
+                            img->h, 0, GL_RGB,
+                            GL_UNSIGNED_BYTE, img->pixels));
+
+    /* Linear Filtering */
+    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+
+    SDL_FreeSurface(img);
+
+    return texture;
 }
 

@@ -45,6 +45,7 @@
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/shaders/ColorSymbology.h>
+#include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/SkyBox.h>
@@ -535,6 +536,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     ColorDistanceDepthShader3D::ensureShader();
     ColorShader               ::ensureShader();
     ColorVertexShader         ::ensureShader();
+    TextureShader             ::ensureShader();
     
     canvas = new Canvas(false);
 

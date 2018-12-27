@@ -90,6 +90,8 @@ namespace
 
         void fetchTile()
         {
+#ifndef __EMSCRIPTEN__
+
             CURL * myHandle;
             CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
             struct BufferStruct output; // Create an instance of out BufferStruct to accept LCs output
@@ -131,6 +133,7 @@ namespace
             }
 
             dmess("done " << quadKey);
+#endif
         }
 
         const string quadKey;
