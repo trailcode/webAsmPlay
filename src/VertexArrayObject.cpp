@@ -33,19 +33,35 @@ using namespace glm;
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations)
 {
-    //return _create<false>(tessellations);
+    if(tessellations[0]->getHeight() != 0.0)
+    {
+        return _create< true, // 3D extrude
+                        true, // Use symbology ID
+                        false // Use UV coords
+                      > (tessellations, AABB2D());
+    }
 
-    if(tessellations[0]->getHeight() != 0.0) { return _create<true>(tessellations) ;}
+    return _create< false, // 3D extrude
+                    true,  // Use symbology ID
+                    false  // Use UV coords
+                  > (tessellations, AABB2D());
+}
 
-    return _create<false>(tessellations);
+VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations, const AABB2D & boxUV)
+{
+    return _create< false, // 3D extrude
+                    false, // Use symbology ID
+                    true   // Use UV coords
+                  > (tessellations, boxUV);
 }
 
 namespace
 {
-    void addVert(   FloatVec & verts,
-                    const vec3 & v,
-                    const vec3 & n,
-                    const float c)
+    template <bool USE_SYMBOLOGY_ID>
+    void addVert(   FloatVec    & verts,
+                    const vec3  & v,
+                    const vec3  & n,
+                    const float   c)
     {
         verts.push_back(v.x);
         verts.push_back(v.y);
@@ -55,12 +71,12 @@ namespace
         verts.push_back(n.y);
         verts.push_back(n.z);
 
-        verts.push_back(c);
+        if(USE_SYMBOLOGY_ID) { verts.push_back(c) ;}
     }
 }
 
-template<bool IS_3D>
-VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellations)
+template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS>
+VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellations, const AABB2D & boxUV)
 {
     if(!tessellations.size()) { return NULL ;}
 
@@ -79,8 +95,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     for(const auto & tess : tessellations)
     {
         // TODO try to remove hard coded values.
-        const float symbologyID_value = (float(tess->symbologyID * symbologyID_Stride) + 0.5) / 32.0;
-
+        const float symbologyID_value     = (float(tess->symbologyID * symbologyID_Stride) + 0.5) / 32.0;
         const float symbologyWallID_value = (float(tess->symbologyID * symbologyID_Stride) + 0.5) / 32.0 + 4.0 / 32.0;
 
         for(size_t i = 0; i < tess->numVerts; ++i)
@@ -97,7 +112,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                 verts.push_back(1);
             }
 
-            verts.push_back(symbologyID_value);
+            if(USE_SYMBOLOGY_ID) { verts.push_back(symbologyID_value) ;}
         }
 
         for(size_t i = 0; i < tess->numTriangles * 3; ++i)
@@ -119,12 +134,6 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
         {
             const size_t b = (a + 1) % tess->numVerts;
 
-            /*
-            A   B
-            p1  p2
-
-            p4  p3
-            */
             const vec2 A(tess->verts[a * 2], tess->verts[a * 2 + 1]);
             const vec2 B(tess->verts[b * 2], tess->verts[b * 2 + 1]);
 
@@ -135,10 +144,10 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             const vec3 normal = normalize(triangleNormal(p1, p2, p3));
 
-            addVert(verts, p1, normal, symbologyWallID_value);
-            addVert(verts, p2, normal, symbologyWallID_value);
-            addVert(verts, p3, normal, symbologyWallID_value);
-            addVert(verts, p4, normal, symbologyWallID_value);
+            addVert<USE_SYMBOLOGY_ID>(verts, p1, normal, symbologyWallID_value);
+            addVert<USE_SYMBOLOGY_ID>(verts, p2, normal, symbologyWallID_value);
+            addVert<USE_SYMBOLOGY_ID>(verts, p3, normal, symbologyWallID_value);
+            addVert<USE_SYMBOLOGY_ID>(verts, p4, normal, symbologyWallID_value);
 
             triangleIndices.push_back(offset + 0);
             triangleIndices.push_back(offset + 1);
@@ -214,7 +223,7 @@ VertexArrayObject::~VertexArrayObject()
     GL_CHECK(glDeleteBuffers     (1, &ebo2));
 }
 
-void VertexArrayObject::bind() const
+void VertexArrayObject::bind(Shader * shader) const
 {
     GL_CHECK(glBindVertexArray(vao));
     

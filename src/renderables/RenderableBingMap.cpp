@@ -31,6 +31,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/Textures.h>
+#include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 
 #include <webAsmPlay/GeosUtil.h>
@@ -164,15 +165,17 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 
         dmess("quadKey " << quadKey);
 
-        new BingTile(quadKey);
+        //new BingTile(quadKey);
 
         double tmp = tMin.x; tMin.x = tMin.y; tMin.y = tmp;
 
         tmp = tMax.x; tMax.x = tMax.y; tMax.y = tmp;
 
-        tiles.push_back(Renderable::create(makeBox(tMin, tMax), trans));
+        Renderable * r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D());
 
-        
+        r->setShader(TextureShader::getDefaultInstance());
+
+        tiles.push_back(r);
     }
 }
 

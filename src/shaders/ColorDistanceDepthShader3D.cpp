@@ -364,11 +364,11 @@ void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutlin
     GL_CHECK(glEnable(GL_DEPTH_TEST));
 
     ShaderProgram::enableVertexAttribArray( vertInAttrDepth,
-                                            sizeVertex,
+                                            vertexFormat.size,
                                             GL_FLOAT,
                                             GL_FALSE,
-                                            strideVertex,
-                                            pointerVertex);
+                                            vertexFormat.stride,
+                                            vertexFormat.pointer);
 
     shaderProgramDepth->setUniformf(heightMultiplierDepth,    heightMultiplier);
     shaderProgramDepth->setUniform (modelDepth,               canvas->getModelRef());
@@ -401,30 +401,30 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
         shaderProgramFill->bind();
 
         ShaderProgram::enableVertexAttribArray( vertInAttrFill,
-                                                sizeVertex,
+                                                vertexFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
-                                                strideVertex,
-                                                pointerVertex);
+                                                vertexFormat.stride,
+                                                vertexFormat.pointer);
 
         ShaderProgram::enableVertexAttribArray( normalInAttrFill,
-                                                sizeNormal,
+                                                normalFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
-                                                strideNormal,
-                                                pointerNormal);
+                                                normalFormat.stride,
+                                                normalFormat.pointer);
 
         ShaderProgram::enableVertexAttribArray( vertColorInAttrFill,
-                                                sizeColor,
+                                                colorFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
-                                                strideColor,
-                                                pointerColor);
+                                                colorFormat.stride,
+                                                colorFormat.pointer);
 
         shaderProgramFill->setUniformi(texUniformFill,          0);
-        shaderProgramFill->setUniformi(depthTexUniformFill,          1);
-        shaderProgramFill->setUniformf(widthUniformFill,          canvas->frameBufferSize.x);
-        shaderProgramFill->setUniformf(heightUniformFill,          canvas->frameBufferSize.y);
+        shaderProgramFill->setUniformi(depthTexUniformFill,     1);
+        shaderProgramFill->setUniformf(widthUniformFill,        canvas->frameBufferSize.x);
+        shaderProgramFill->setUniformf(heightUniformFill,       canvas->frameBufferSize.y);
         shaderProgramFill->setUniformf(heightMultiplierFill,    heightMultiplier);
         shaderProgramFill->setUniform (modelFill,               canvas->getModelRef());
         shaderProgramFill->setUniform (viewFill,                canvas->getViewRef());
@@ -438,18 +438,18 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
         shaderProgramOutline->bind();
 
         ShaderProgram::enableVertexAttribArray( vertInAttrOutline,
-                                                sizeVertex,
+                                                vertexFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
-                                                strideVertex,
-                                                pointerVertex);
+                                                vertexFormat.stride,
+                                                vertexFormat.pointer);
 
         ShaderProgram::enableVertexAttribArray( vertColorInAttrOutline,
-                                                sizeColor,
+                                                colorFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
-                                                strideColor,
-                                                pointerColor);
+                                                colorFormat.stride,
+                                                colorFormat.pointer);
 
         //shaderProgramOutline->colorLookupOffsetOutline;
         shaderProgramOutline->setUniformf(heightMultiplierOutline,    heightMultiplier);

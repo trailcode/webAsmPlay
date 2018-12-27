@@ -206,8 +206,8 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage) const
 
     shader->bind(canvas, false, renderStage);
 
-    shader->setVertexArrayFormat(3, 7 * sizeof(GLfloat), 0);
-    shader->setColorArrayFormat (4, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
+    shader->setVertexArrayFormat(ArrayFormat(3, 7 * sizeof(GLfloat), 0));
+    shader->setColorArrayFormat (ArrayFormat(4, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT))));
 
     GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
 

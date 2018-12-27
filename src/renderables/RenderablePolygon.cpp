@@ -51,9 +51,10 @@ RenderablePolygon::~RenderablePolygon()
     delete vertexArrayObject;
 }
 
-Renderable * RenderablePolygon::create( const geom::Polygon * poly,
+Renderable * RenderablePolygon::create( const Polygon * poly,
                                         const dmat4   & trans,
-                                        const size_t    symbologyID)
+                                        const size_t    symbologyID,
+                                        const AABB2D  & boxUV)
 {
     Tessellations tesselations;
 
@@ -61,12 +62,15 @@ Renderable * RenderablePolygon::create( const geom::Polygon * poly,
 
     if((*tesselations.begin())->isEmpty()) { return NULL ;}
 
+    //return new RenderablePolygon(VertexArrayObject::create(tesselations, boxUV));
     return new RenderablePolygon(VertexArrayObject::create(tesselations));
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
                                         const dmat4         & trans,
-                                        const size_t          symbologyID)
+                                        const size_t          symbologyID,
+                                        const AABB2D        & boxUV // TODO Implement!
+                                        )
 {
     Tessellations tessellations;
 
@@ -131,7 +135,7 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage) const
 {
     //if(renderStage >= shader->getNumRenderingStages()) { return ;} // TODO code dup!
 
-    vertexArrayObject->bind();
+    vertexArrayObject->bind(shader);
 
     vertexArrayObject->bindTriangles();
 
@@ -141,8 +145,8 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage) const
 
     GL_CHECK(glDisable(GL_DEPTH_TEST));
 
-    shader->setVertexArrayFormat(2, 3 * sizeof(GLfloat), 0);
-    shader->setColorArrayFormat (1, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+    shader->setVertexArrayFormat(ArrayFormat(2, 3 * sizeof(GLfloat), 0));
+    shader->setColorArrayFormat (ArrayFormat(1, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat))));
 
     if(getRenderFill() && shader->shouldRender(false, renderStage))
     {

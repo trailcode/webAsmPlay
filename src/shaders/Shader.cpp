@@ -34,32 +34,9 @@ using namespace glm;
 Shader::Shader(const string  & shaderName) :    shaderName      (shaderName),
                                                 colorSymbology  (ColorSymbology::getInstance("defaultPolygon")) {}
 
-void Shader::setVertexArrayFormat(  const GLint     size,
-                                    const GLsizei   stride,
-                                    const GLvoid  * pointer)
-{
-    sizeVertex     = size;
-    strideVertex   = stride;
-    pointerVertex  = pointer;
-}
-
-void Shader::setNormalArrayFormat(  const GLint     size,
-                                    const GLsizei   stride,
-                                    const GLvoid  * pointer)
-{
-    sizeNormal     = size;
-    strideNormal   = stride;
-    pointerNormal  = pointer;
-}
-
-void Shader::setColorArrayFormat(   const GLint     size,
-                                    const GLsizei   stride,
-                                    const GLvoid  * pointer)
-{
-    sizeColor      = size;
-    strideColor    = stride;
-    pointerColor   = pointer;
-}
+void Shader::setVertexArrayFormat(const ArrayFormat & vertexFormat) { this->vertexFormat = vertexFormat ;}
+void Shader::setNormalArrayFormat(const ArrayFormat & normalFormat) { this->normalFormat = normalFormat ;}
+void Shader::setColorArrayFormat (const ArrayFormat & colorFormat)  { this->colorFormat  = colorFormat  ;}
 
 string Shader::getName() const { return shaderName ;}
 

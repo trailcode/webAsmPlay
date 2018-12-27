@@ -76,7 +76,7 @@ void RenderablePoint::render(Canvas * canvas, const size_t renderStage) const
 {
     if(!shader->shouldRender(true, renderStage)) { return ;}
 
-    shader->setVertexArrayFormat(3, 3 * sizeof(GLfloat), 0);
+    shader->setVertexArrayFormat(ArrayFormat(3, 3 * sizeof(GLfloat), 0));
 
     shader->bind(canvas, false, renderStage);
 

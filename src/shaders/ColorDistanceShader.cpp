@@ -142,21 +142,20 @@ void ColorDistanceShader::bind(Canvas     * canvas,
     shaderProgram->bind();
 
     ShaderProgram::enableVertexAttribArray( vertInAttrLoc,
-                                            sizeVertex,
+                                            vertexFormat.size,
                                             GL_FLOAT,
                                             GL_FALSE,
-                                            strideVertex,
-                                            pointerVertex);
+                                            vertexFormat.stride,
+                                            vertexFormat.pointer);
 
     ShaderProgram::enableVertexAttribArray( vertColorInAttrLoc,
-                                            sizeColor,
+                                            colorFormat.size,
                                             GL_FLOAT,
                                             GL_FALSE,
-                                            strideColor,
-                                            pointerColor);
+                                            colorFormat.stride,
+                                            colorFormat.pointer);
 
-    shaderProgram->setUniform(MV_Loc, canvas->getMV_Ref());
-
+    shaderProgram->setUniform(MV_Loc,  canvas->getMV_Ref());
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 
     shaderProgram->setUniformi(texUniformLoc, 0);

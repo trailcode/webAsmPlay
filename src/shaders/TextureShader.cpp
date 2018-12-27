@@ -24,16 +24,68 @@
   \copyright 2018
 */
 
+#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 
-TextureShader * TextureShader::getDefaultInstance()
+namespace
 {
-    return NULL;
+    ShaderProgram * shaderProgram   = NULL;
+    TextureShader * defaultInstance = NULL;
+
+    GLint vertInAttrLoc;
+    GLint vertUV_InAttrLoc;
+
+    GLint MVP_Loc;
+    GLint texLoc;
 }
+
+TextureShader * TextureShader::getDefaultInstance() { return defaultInstance ;}
 
 void TextureShader::ensureShader()
 {
+    if(shaderProgram) { return ;}
 
+    // Shader sources
+    const GLchar* vertexSource = R"glsl(#version 330 core
+        in vec3 vertIn;
+        //in vec2 vertUV_In;
+        out vec2 UV;
+        uniform mat4 MVP;
+        
+        void main()
+        {
+            gl_Position = MVP * vec4(vertIn.xyz, 1);
+            //UV = vertUV_In;
+            UV = vec2(0,0);
+        }
+    )glsl";
+
+    const GLchar* fragmentSource = R"glsl(#version 330 core
+        out vec4 outColor;
+        in vec2 UV;
+        //uniform sampler2D tex;
+
+        void main()
+        {
+            //outColor = texture( tex, UV ).rgb;
+            outColor = vec4(0,1,1,0.5);
+        }
+    )glsl";
+
+    shaderProgram = ShaderProgram::create(  vertexSource,
+                                            fragmentSource,
+                                            Variables({{"vertIn",       vertInAttrLoc}//,
+                                                       //{"vertUV_In",    vertUV_InAttrLoc}
+                                                       }),
+                                            Variables({{"MVP",          MVP_Loc}//,
+                                                       //{"tex",          texLoc}
+                                                       }));
+
+    dmess("shaderProgram " << shaderProgram);
+
+    defaultInstance = new TextureShader();
 }
 
 TextureShader::TextureShader() : Shader("TextureShader")
@@ -50,5 +102,14 @@ void TextureShader::bind(   Canvas     * canvas,
                             const bool   isOutline,
                             const size_t renderingStage)
 {
+    shaderProgram->bind();
 
+    ShaderProgram::enableVertexAttribArray( vertInAttrLoc,
+                                            vertexFormat.size,
+                                            GL_FLOAT,
+                                            GL_FALSE,
+                                            vertexFormat.stride,
+                                            vertexFormat.pointer);
+
+    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }

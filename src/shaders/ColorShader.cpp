@@ -99,11 +99,11 @@ void ColorShader::bind( Canvas     * canvas,
     shaderProgram->bind();
 
     ShaderProgram::enableVertexAttribArray( vertInAttrLoc,
-                                            sizeVertex,
+                                            vertexFormat.size,
                                             GL_FLOAT,
                                             GL_FALSE,
-                                            strideVertex,
-                                            pointerVertex);
+                                            vertexFormat.stride,
+                                            vertexFormat.pointer);
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 

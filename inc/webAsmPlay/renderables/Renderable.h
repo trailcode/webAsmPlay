@@ -47,10 +47,12 @@ public:
     virtual void render(Canvas * canvas, const size_t renderStage = 0) const = 0;
 
     static Renderable * create( const geos::geom::Geometry::Ptr & geom,
-                                const glm::mat4                 & trans = glm::mat4(1.0)); // TODO use double precision. 
+                                const glm::dmat4                & trans = glm::mat4(1.0),
+                                const AABB2D                    & boxUV = AABB2D());
 
     static Renderable * create( const geos::geom::Geometry  * geom,
-                                const glm::mat4             & trans = glm::mat4(1.0));
+                                const glm::dmat4            & trans = glm::mat4(1.0),
+                                const AABB2D                & boxUV = AABB2D());
 
     void addOnDeleteCallback(const OnDelete & callback);
 

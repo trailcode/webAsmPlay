@@ -30,15 +30,19 @@
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/Tessellation.h>
 
+class Shader;
+
 class VertexArrayObject
 {
 public:
 
     static VertexArrayObject * create(const Tessellations & tessellations);
 
+    static VertexArrayObject * create(const Tessellations & tessellations, const AABB2D & boxUV);
+
     ~VertexArrayObject();
 
-    void bind() const;
+    void bind(Shader * shader) const;
 
     void bindTriangles() const;
 
@@ -52,8 +56,8 @@ public:
 
 private:
 
-    template<bool IS_3D>
-    static VertexArrayObject * _create(const Tessellations & tessellations);
+    template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS>
+    static VertexArrayObject * _create(const Tessellations & tessellations, const AABB2D & boxUV);
 
     VertexArrayObject(  const GLuint      vao,
                         const GLuint      ebo,
@@ -78,6 +82,18 @@ private:
     const bool      _isMulti            = false;
 
     const Uint32Vec counterVertIndices;
+
+    GLint            sizeVertex         = 2;
+    GLsizei          strideVertex       = 0;
+    const GLvoid   * pointerVertex      = NULL;
+
+    GLint            sizeNormal         = 0;
+    GLsizei          strideNormal       = 0;
+    const GLvoid   * pointerNormal      = NULL;
+
+    GLint            sizeColor          = 0;
+    GLsizei          strideColor        = 0;
+    const GLvoid   * pointerColor       = NULL;
 };
 
 #endif // __WEB_ASM_PLAY_VERTEX_ARRAY_OBJECT_H__

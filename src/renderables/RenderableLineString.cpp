@@ -218,7 +218,7 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage) con
 
     if(!isMulti)
     {
-        shader->setVertexArrayFormat(2, 2 * sizeof(GLfloat), 0);
+        shader->setVertexArrayFormat(ArrayFormat(2, 2 * sizeof(GLfloat), 0));
         
         shader->bind(canvas, true, renderStage);
 
@@ -226,8 +226,8 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage) con
     }
     else
     {
-        shader->setVertexArrayFormat(2, 3 * sizeof(GLfloat), 0);
-        shader->setColorArrayFormat (1, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+        shader->setVertexArrayFormat(ArrayFormat(2, 3 * sizeof(GLfloat), 0));
+        shader->setColorArrayFormat (ArrayFormat(1, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat))));
 
         shader->bind(canvas, true, renderStage);
 
