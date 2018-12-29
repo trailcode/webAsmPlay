@@ -45,8 +45,6 @@ namespace
 {
     const size_t levelOfDetail = 15;
 
-    vector<Renderable *> tiles;
-
     // Define our struct for accepting LCs output
     struct BufferStruct
     {
@@ -79,7 +77,7 @@ namespace
     {
     public:
 
-        BingTile(const string & quadKey) : quadKey(quadKey)
+        BingTile(const string & quadKey, Renderable * r) : quadKey(quadKey), r(r)
         {
             fetchTile();
         }
@@ -113,7 +111,9 @@ namespace
             result = curl_easy_perform( myHandle );
             curl_easy_cleanup( myHandle );
 
-            Textures::createFromJpeg(output.buffer, output.size);
+            textureID = Textures::createFromJpeg(output.buffer, output.size);
+
+            dmess("textureID " << textureID);
 
             FILE * fp;
             string outPath = "./tiles/" + quadKey + ".jpg";
@@ -139,8 +139,14 @@ namespace
 
         const string quadKey;
 
+        Renderable * r = NULL;
+
+        GLuint textureID = 0;
+
     private:
     };
+
+    vector<BingTile *> tiles;
 }
 
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds)
@@ -165,17 +171,17 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 
         dmess("quadKey " << quadKey);
 
-        //new BingTile(quadKey);
-
         double tmp = tMin.x; tMin.x = tMin.y; tMin.y = tmp;
 
         tmp = tMax.x; tMax.x = tMax.y; tMax.y = tmp;
 
-        Renderable * r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D());
+        Renderable * r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
 
         r->setShader(TextureShader::getDefaultInstance());
 
-        tiles.push_back(r);
+        tiles.push_back(new BingTile(quadKey, r));
+
+        //tiles.push_back(r);
     }
 }
 
@@ -197,6 +203,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
     for(const auto r : tiles)
     {
-        r->render(canvas, 0);
+        TextureShader::getDefaultInstance()->setTextureID(r->textureID);
+
+        r->r->render(canvas, 0);
     }
 }

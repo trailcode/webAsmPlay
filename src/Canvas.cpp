@@ -83,7 +83,7 @@ void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
 
 ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
 {
-    if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, fbSize) ;}
+    //if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, fbSize) ;}
 
     auxFrameBuffer = FrameBuffer::ensureFrameBuffer(auxFrameBuffer, fbSize);
 

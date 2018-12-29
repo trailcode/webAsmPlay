@@ -399,7 +399,7 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
     if(!isOutline)
     {
         shaderProgramFill->bind();
-
+        
         ShaderProgram::enableVertexAttribArray( vertInAttrFill,
                                                 vertexFormat.size,
                                                 GL_FLOAT,

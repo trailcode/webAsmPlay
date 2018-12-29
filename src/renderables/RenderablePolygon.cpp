@@ -62,8 +62,17 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
 
     if((*tesselations.begin())->isEmpty()) { return NULL ;}
 
-    return new RenderablePolygon(VertexArrayObject::create(tesselations, boxUV));
-    //return new RenderablePolygon(VertexArrayObject::create(tesselations));
+    if(get<0>(boxUV) != get<2>(boxUV))
+    {
+        dmess("heraaaaaaaaa");
+        
+        const dvec2 min = trans * dvec4(get<0>(boxUV), get<1>(boxUV), 0, 1);
+        const dvec2 max = trans * dvec4(get<2>(boxUV), get<3>(boxUV), 0, 1);
+
+        return new RenderablePolygon(VertexArrayObject::create(tesselations, AABB2D(min.x, min.y, max.x, max.y)));
+    }
+    
+    return new RenderablePolygon(VertexArrayObject::create(tesselations));
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
@@ -96,10 +105,10 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
         const Geometry  * geom        = get<0>(polygons[i]);
         const GLuint      symbologyID = get<1>(polygons[i]);
         
-        const geom::Polygon      * poly;
+        const Polygon      * poly;
         const MultiPolygon * multiPoly;
 
-        if((poly = dynamic_cast<const geom::Polygon *>(geom)))
+        if((poly = dynamic_cast<const Polygon *>(geom)))
         {
             tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
             

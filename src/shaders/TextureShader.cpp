@@ -50,38 +50,38 @@ void TextureShader::ensureShader()
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
         in vec3 vertIn;
-        //in vec2 vertUV_In;
+        in vec2 vertUV_In;
         out vec2 UV;
         uniform mat4 MVP;
         
         void main()
         {
             gl_Position = MVP * vec4(vertIn.xyz, 1);
-            //UV = vertUV_In;
-            UV = vec2(0,0);
+            UV = vertUV_In;
+            //UV = vec2(0,0);
         }
     )glsl";
 
     const GLchar* fragmentSource = R"glsl(#version 330 core
         out vec4 outColor;
         in vec2 UV;
-        //uniform sampler2D tex;
+        uniform sampler2D tex;
 
         void main()
         {
-            //outColor = texture( tex, UV ).rgb;
-            outColor = vec4(0,1,1,0.5);
+            outColor = texture( tex, UV );
+            //outColor = vec4(0,1,1,0.5);
+            outColor.a = 1.0;
         }
     )glsl";
 
     shaderProgram = ShaderProgram::create(  vertexSource,
                                             fragmentSource,
-                                            Variables({{"vertIn",       vertInAttrLoc}//,
-                                                       //{"vertUV_In",    vertUV_InAttrLoc}
+                                            Variables({{"vertIn",       vertInAttrLoc},
+                                                       {"vertUV_In",    vertUV_InAttrLoc}
                                                        }),
-                                            Variables({{"MVP",          MVP_Loc}//,
-                                                       //{"tex",          texLoc}
-                                                       }));
+                                            Variables({{"MVP",          MVP_Loc},
+                                                       {"tex",          texLoc}}));
 
     dmess("shaderProgram " << shaderProgram);
 
@@ -98,6 +98,8 @@ TextureShader::~TextureShader()
 
 }
 
+GLuint TextureShader::setTextureID(const GLuint textureID) { return this->textureID = textureID ;}
+
 void TextureShader::bind(   Canvas     * canvas,
                             const bool   isOutline,
                             const size_t renderingStage)
@@ -110,6 +112,19 @@ void TextureShader::bind(   Canvas     * canvas,
                                             GL_FALSE,
                                             vertexFormat.stride,
                                             vertexFormat.pointer);
+
+    ShaderProgram::enableVertexAttribArray( vertUV_InAttrLoc,
+                                            uvFormat.size,
+                                            GL_FLOAT,
+                                            GL_FALSE,
+                                            uvFormat.stride,
+                                            uvFormat.pointer);
+
+    GL_CHECK(glActiveTexture(GL_TEXTURE0));
+
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, textureID));
+
+    shaderProgram->setUniformi(texLoc, 0);
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }

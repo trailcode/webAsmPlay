@@ -69,7 +69,8 @@ private:
                         const bool          isMulti,
                         const ArrayFormat & vertexFormat,
                         const ArrayFormat & colorFormat,
-                        const ArrayFormat & normalFormat);
+                        const ArrayFormat & normalFormat,
+                        const ArrayFormat & uvFormat);
 
     VertexArrayObject(const VertexArrayObject &)              = delete;
     VertexArrayObject(VertexArrayObject &&)                   = delete;
@@ -89,6 +90,7 @@ private:
     const ArrayFormat vertexFormat;
     const ArrayFormat colorFormat;
     const ArrayFormat normalFormat;
+    const ArrayFormat uvFormat;
 };
 
 #endif // __WEB_ASM_PLAY_VERTEX_ARRAY_OBJECT_H__

@@ -50,10 +50,12 @@ VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellation
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations, const AABB2D & boxUV)
 {
+    dmess("Here!!!!!!!!");
+    
     return _create< false, // 3D extrude
                     false, // Use symbology ID
                     true   // Use UV coords
-                  > (tessellations, boxUV);
+                > (tessellations, boxUV);
 }
 
 namespace
@@ -101,8 +103,12 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
         for(size_t i = 0; i < tess->numVerts; ++i)
         {
-            verts.push_back(tess->verts[i * 2 + 0]);
-            verts.push_back(tess->verts[i * 2 + 1]);
+            const dvec2 P(tess->verts[i * 2 + 0], tess->verts[i * 2 + 1]);
+
+            //verts.push_back(tess->verts[i * 2 + 0]);
+            //verts.push_back(tess->verts[i * 2 + 1]);
+            verts.push_back(P.x);
+            verts.push_back(P.y);
 
             if(IS_3D)  
             {
@@ -114,6 +120,17 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             }
 
             if(USE_SYMBOLOGY_ID) { verts.push_back(symbologyID_value) ;}
+
+            if(USE_UV_COORDS)
+            {
+                const dvec2 min(get<0>(boxUV), get<1>(boxUV));
+                const dvec2 max(get<2>(boxUV), get<3>(boxUV));
+
+                const dvec2 uv = (P - min) / (max - min);
+
+                verts.push_back(uv.x);
+                verts.push_back(uv.y);
+            }
         }
 
         for(size_t i = 0; i < tess->numTriangles * 3; ++i)
@@ -192,6 +209,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     size_t sizeVertex = 2;
     size_t sizeColor  = 0;
     size_t sizeNormal = 0;
+    size_t sizeUV     = 0;
 
     if(IS_3D)
     {
@@ -206,14 +224,15 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
     if(USE_UV_COORDS)
     {
-
+        sizeUV = 2;
     }
 
-    const size_t totalSize = (sizeVertex + sizeColor + sizeNormal) * sizeof(GLfloat);
+    const size_t totalSize = (sizeVertex + sizeColor + sizeNormal + sizeUV) * sizeof(GLfloat);
 
     ArrayFormat vertexFormat(sizeVertex, totalSize, 0);
     ArrayFormat normalFormat(sizeNormal, totalSize, (void *)(sizeVertex * sizeof(GLfloat)));
     ArrayFormat colorFormat (sizeColor,  totalSize, (void *)((sizeVertex + sizeNormal) * sizeof(GLfloat)));
+    ArrayFormat uvFormat    (sizeUV,     totalSize, (void *)((sizeVertex + sizeNormal + sizeColor) * sizeof(GLfloat)));
 
     return new VertexArrayObject(vao,
                                  ebo,
@@ -225,7 +244,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                                  tessellations.size() > 1,
                                  vertexFormat,
                                  colorFormat,
-                                 normalFormat);
+                                 normalFormat,
+                                 uvFormat);
 }
 
 VertexArrayObject::VertexArrayObject(   const GLuint        vao,
@@ -238,17 +258,19 @@ VertexArrayObject::VertexArrayObject(   const GLuint        vao,
                                         const bool          isMulti,
                                         const ArrayFormat & vertexFormat,
                                         const ArrayFormat & colorFormat,
-                                        const ArrayFormat & normalFormat) : vao                (vao),
-                                                                            ebo                (ebo),
-                                                                            ebo2               (ebo2),
-                                                                            vbo                (vbo),
-                                                                            numTrianglesIndices(numTrianglesIndices),
-                                                                            counterVertIndices (counterVertIndices),
-                                                                            numContourLines    (numContourLines),
-                                                                            _isMulti           (isMulti),
-                                                                            vertexFormat       (vertexFormat),
-                                                                            colorFormat        (colorFormat),
-                                                                            normalFormat       (normalFormat)
+                                        const ArrayFormat & normalFormat,
+                                        const ArrayFormat & uvFormat) : vao                (vao),
+                                                                        ebo                (ebo),
+                                                                        ebo2               (ebo2),
+                                                                        vbo                (vbo),
+                                                                        numTrianglesIndices(numTrianglesIndices),
+                                                                        counterVertIndices (counterVertIndices),
+                                                                        numContourLines    (numContourLines),
+                                                                        _isMulti           (isMulti),
+                                                                        vertexFormat       (vertexFormat),
+                                                                        colorFormat        (colorFormat),
+                                                                        normalFormat       (normalFormat),
+                                                                        uvFormat           (uvFormat)
 {
 
 }
@@ -277,6 +299,11 @@ void VertexArrayObject::bind(Shader * shader) const
     if(normalFormat.size)
     {
         shader->setNormalArrayFormat(normalFormat);
+    }
+
+    if(uvFormat.size)
+    {
+        shader->setUV_ArrayFormat(uvFormat);
     }
 }
 

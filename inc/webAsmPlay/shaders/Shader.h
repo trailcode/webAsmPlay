@@ -42,6 +42,7 @@ public:
     void setVertexArrayFormat(const ArrayFormat & vertexFormat = ArrayFormat());
     void setNormalArrayFormat(const ArrayFormat & normalFormat = ArrayFormat());
     void setColorArrayFormat (const ArrayFormat & colorFormat  = ArrayFormat());
+    void setUV_ArrayFormat   (const ArrayFormat & uvFormat     = ArrayFormat());
 
     std::string getName() const;
 
@@ -63,6 +64,7 @@ protected:
     ArrayFormat vertexFormat;
     ArrayFormat colorFormat;
     ArrayFormat normalFormat;
+    ArrayFormat uvFormat;
     
     ColorSymbology * colorSymbology = NULL;
 };

@@ -44,7 +44,11 @@ public:
               const bool   isOutline,
               const size_t renderingStage = 0) override;
 
+    GLuint setTextureID(const GLuint textureID);
+
 private:
+
+    GLuint textureID = 0;
 };
 
 #endif // __WEB_ASM_PLAY_TEXTURE_SHADER_H__
