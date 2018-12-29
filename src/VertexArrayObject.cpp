@@ -26,6 +26,7 @@
 
 #include <glm/gtx/normal.hpp>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/VertexArrayObject.h>
 
 using namespace std;
@@ -186,6 +187,34 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
     GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
 
+    //IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS
+
+    size_t sizeVertex = 2;
+    size_t sizeColor  = 0;
+    size_t sizeNormal = 0;
+
+    if(IS_3D)
+    {
+        sizeVertex = 3;
+        sizeNormal = 3;
+    }
+
+    if(USE_SYMBOLOGY_ID)
+    {
+        sizeColor = 1;
+    }
+
+    if(USE_UV_COORDS)
+    {
+
+    }
+
+    const size_t totalSize = (sizeVertex + sizeColor + sizeNormal) * sizeof(GLfloat);
+
+    ArrayFormat vertexFormat(sizeVertex, totalSize, 0);
+    ArrayFormat normalFormat(sizeNormal, totalSize, (void *)(sizeVertex * sizeof(GLfloat)));
+    ArrayFormat colorFormat (sizeColor,  totalSize, (void *)((sizeVertex + sizeNormal) * sizeof(GLfloat)));
+
     return new VertexArrayObject(vao,
                                  ebo,
                                  ebo2,
@@ -193,24 +222,33 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                                  triangleIndices.size(),
                                  counterVertIndices,
                                  lineIndices.size(),
-                                 tessellations.size() > 1);
+                                 tessellations.size() > 1,
+                                 vertexFormat,
+                                 colorFormat,
+                                 normalFormat);
 }
 
-VertexArrayObject::VertexArrayObject(   const GLuint      vao,
-                                        const GLuint      ebo,
-                                        const GLuint      ebo2,
-                                        const GLuint      vbo,
-                                        const GLuint      numTrianglesIndices,
-                                        const Uint32Vec & counterVertIndices,
-                                        const size_t      numContourLines,
-                                        const bool        isMulti) : vao                (vao),
-                                                                     ebo                (ebo),
-                                                                     ebo2               (ebo2),
-                                                                     vbo                (vbo),
-                                                                     numTrianglesIndices(numTrianglesIndices),
-                                                                     counterVertIndices (counterVertIndices),
-                                                                     numContourLines    (numContourLines),
-                                                                     _isMulti           (isMulti)
+VertexArrayObject::VertexArrayObject(   const GLuint        vao,
+                                        const GLuint        ebo,
+                                        const GLuint        ebo2,
+                                        const GLuint        vbo,
+                                        const GLuint        numTrianglesIndices,
+                                        const Uint32Vec   & counterVertIndices,
+                                        const size_t        numContourLines,
+                                        const bool          isMulti,
+                                        const ArrayFormat & vertexFormat,
+                                        const ArrayFormat & colorFormat,
+                                        const ArrayFormat & normalFormat) : vao                (vao),
+                                                                            ebo                (ebo),
+                                                                            ebo2               (ebo2),
+                                                                            vbo                (vbo),
+                                                                            numTrianglesIndices(numTrianglesIndices),
+                                                                            counterVertIndices (counterVertIndices),
+                                                                            numContourLines    (numContourLines),
+                                                                            _isMulti           (isMulti),
+                                                                            vertexFormat       (vertexFormat),
+                                                                            colorFormat        (colorFormat),
+                                                                            normalFormat       (normalFormat)
 {
 
 }
@@ -228,6 +266,18 @@ void VertexArrayObject::bind(Shader * shader) const
     GL_CHECK(glBindVertexArray(vao));
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+
+    shader->setVertexArrayFormat(vertexFormat);
+
+    if(colorFormat.size)
+    {
+        shader->setColorArrayFormat(colorFormat);
+    }
+
+    if(normalFormat.size)
+    {
+        shader->setNormalArrayFormat(normalFormat);
+    }
 }
 
 void VertexArrayObject::bindTriangles() const

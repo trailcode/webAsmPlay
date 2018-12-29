@@ -59,14 +59,17 @@ private:
     template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS>
     static VertexArrayObject * _create(const Tessellations & tessellations, const AABB2D & boxUV);
 
-    VertexArrayObject(  const GLuint      vao,
-                        const GLuint      ebo,
-                        const GLuint      ebo2,
-                        const GLuint      vbo,
-                        const GLuint      numTrianglesIndices,
-                        const Uint32Vec & counterVertIndices,
-                        const size_t      numContourLines,
-                        const bool        isMulti);
+    VertexArrayObject(  const GLuint        vao,
+                        const GLuint        ebo,
+                        const GLuint        ebo2,
+                        const GLuint        vbo,
+                        const GLuint        numTrianglesIndices,
+                        const Uint32Vec   & counterVertIndices,
+                        const size_t        numContourLines,
+                        const bool          isMulti,
+                        const ArrayFormat & vertexFormat,
+                        const ArrayFormat & colorFormat,
+                        const ArrayFormat & normalFormat);
 
     VertexArrayObject(const VertexArrayObject &)              = delete;
     VertexArrayObject(VertexArrayObject &&)                   = delete;
@@ -83,17 +86,9 @@ private:
 
     const Uint32Vec counterVertIndices;
 
-    GLint            sizeVertex         = 2;
-    GLsizei          strideVertex       = 0;
-    const GLvoid   * pointerVertex      = NULL;
-
-    GLint            sizeNormal         = 0;
-    GLsizei          strideNormal       = 0;
-    const GLvoid   * pointerNormal      = NULL;
-
-    GLint            sizeColor          = 0;
-    GLsizei          strideColor        = 0;
-    const GLvoid   * pointerColor       = NULL;
+    const ArrayFormat vertexFormat;
+    const ArrayFormat colorFormat;
+    const ArrayFormat normalFormat;
 };
 
 #endif // __WEB_ASM_PLAY_VERTEX_ARRAY_OBJECT_H__

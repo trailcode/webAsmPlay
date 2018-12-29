@@ -125,10 +125,6 @@ void RenderableMesh::render(Canvas * canvas, const size_t renderStage) const
     vertexArrayObject->bind(shader);
     vertexArrayObject->bindTriangles();
 
-    shader->setVertexArrayFormat(ArrayFormat(3, 7 * sizeof(GLfloat), 0));
-    shader->setColorArrayFormat (ArrayFormat(1, 7 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat))));
-    shader->setNormalArrayFormat(ArrayFormat(3, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat))));
-
     if(getRenderFill() && shader->shouldRender(false, renderStage))
     {
         shader->bind(canvas, false, renderStage);

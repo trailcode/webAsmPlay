@@ -62,8 +62,8 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
 
     if((*tesselations.begin())->isEmpty()) { return NULL ;}
 
-    //return new RenderablePolygon(VertexArrayObject::create(tesselations, boxUV));
-    return new RenderablePolygon(VertexArrayObject::create(tesselations));
+    return new RenderablePolygon(VertexArrayObject::create(tesselations, boxUV));
+    //return new RenderablePolygon(VertexArrayObject::create(tesselations));
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
@@ -133,8 +133,6 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
 
 void RenderablePolygon::render(Canvas * canvas, const size_t renderStage) const
 {
-    //if(renderStage >= shader->getNumRenderingStages()) { return ;} // TODO code dup!
-
     vertexArrayObject->bind(shader);
 
     vertexArrayObject->bindTriangles();
@@ -144,9 +142,6 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage) const
     GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
     GL_CHECK(glDisable(GL_DEPTH_TEST));
-
-    shader->setVertexArrayFormat(ArrayFormat(2, 3 * sizeof(GLfloat), 0));
-    shader->setColorArrayFormat (ArrayFormat(1, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat))));
 
     if(getRenderFill() && shader->shouldRender(false, renderStage))
     {
