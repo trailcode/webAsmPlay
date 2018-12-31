@@ -28,6 +28,7 @@
     #include <curl/curl.h>
 #endif
 
+#include <unistd.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/Textures.h>
@@ -43,7 +44,8 @@ using namespace BingTileSystem;
 
 namespace
 {
-    const size_t levelOfDetail = 15;
+    const size_t levelOfDetail = 19;
+    //const size_t levelOfDetail = 17;
 
     // Define our struct for accepting LCs output
     struct BufferStruct
@@ -55,8 +57,6 @@ namespace
     // This is the function we pass to LC, which writes the output to a BufferStruct
     static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
     {
-        dmess("nmemb " << nmemb);
-
         size_t realsize = size * nmemb;
 
         struct BufferStruct * mem = (struct BufferStruct *) data;
@@ -91,49 +91,59 @@ namespace
         {
 #ifndef __EMSCRIPTEN__
 
-            CURL * myHandle;
-            CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
-            struct BufferStruct output; // Create an instance of out BufferStruct to accept LCs output
-            output.buffer = NULL;
-            output.size = 0;
-            myHandle = curl_easy_init ( ) ;
-
-            /* Notice the lack of major error checking, for brevity */
-
-            curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
-            curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)&output); // Passing our BufferStruct to LC
-
-            const string url =  "https://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
-                                quadKey +
-                                "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
-
-            curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
-            result = curl_easy_perform( myHandle );
-            curl_easy_cleanup( myHandle );
-
-            textureID = Textures::createFromJpeg(output.buffer, output.size);
-
-            dmess("textureID " << textureID);
-
-            FILE * fp;
             string outPath = "./tiles/" + quadKey + ".jpg";
 
-            fp = fopen(outPath.c_str(), "wb");
-            //if( !fp )
-            dmess("output.size " << output.size);
-            //return;
-            //fprintf(fp, output.buffer );
-            fwrite(output.buffer, sizeof(char), output.size, fp);
-            fclose( fp );
-
-            if( output.buffer )
+            if(access(outPath.c_str(), F_OK) != -1)
             {
-                free ( output.buffer );
-                output.buffer = 0;
+                textureID = Textures::load(outPath);
+            }
+            else
+            {
+                return;
+
+                CURL * myHandle;
+                CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
+                struct BufferStruct output; // Create an instance of out BufferStruct to accept LCs output
+                output.buffer = NULL;
                 output.size = 0;
+                myHandle = curl_easy_init ( ) ;
+
+                /* Notice the lack of major error checking, for brevity */
+
+                curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
+                curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)&output); // Passing our BufferStruct to LC
+
+                const string url =  "https://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
+                                    quadKey +
+                                    "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
+
+                curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
+                result = curl_easy_perform( myHandle );
+                curl_easy_cleanup( myHandle );
+
+                textureID = Textures::createFromJpeg(output.buffer, output.size);
+
+                dmess("textureID " << textureID);
+
+                FILE * fp;
+                
+                fp = fopen(outPath.c_str(), "wb");
+                //if( !fp )
+                dmess("output.size " << output.size);
+                //return;
+                //fprintf(fp, output.buffer );
+                fwrite(output.buffer, sizeof(char), output.size, fp);
+                fclose( fp );
+
+                if( output.buffer )
+                {
+                    free ( output.buffer );
+                    output.buffer = 0;
+                    output.size = 0;
+                }
             }
 
-            dmess("done " << quadKey);
+            //dmess("done " << quadKey);
 #endif
         }
 
@@ -151,6 +161,8 @@ namespace
 
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds)
 {
+    return;
+    
     minTile = latLongToTile(dvec2(get<1>(bounds), get<0>(bounds)), levelOfDetail);
 
     maxTile = latLongToTile(dvec2(get<3>(bounds), get<2>(bounds)), levelOfDetail);

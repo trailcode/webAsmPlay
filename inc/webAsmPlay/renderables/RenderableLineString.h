@@ -47,13 +47,13 @@ public:
     ~RenderableLineString();
 
     static Renderable * create( const geos::geom::LineString * lineString,
-                                const glm::mat4              & trans    = glm::mat4(1.0));
+                                const glm::dmat4             & trans    = glm::dmat4(1.0));
     
     static Renderable * create( const std::vector<geos::geom::Coordinate> & coords,
-                                const glm::mat4                           & trans    = glm::mat4(1.0));
+                                const glm::dmat4                          & trans    = glm::dmat4(1.0));
 
     static Renderable * create( const ColoredGeometryVec & lineStrings,
-                                const glm::mat4         & trans          = glm::mat4(1.0),
+                                const glm::dmat4         & trans          = glm::dmat4(1.0),
                                 const bool                showProgress   = false);
 
     void render(Canvas * canvas, const size_t renderStage = 0) const override;

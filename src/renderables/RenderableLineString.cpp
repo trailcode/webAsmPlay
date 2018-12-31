@@ -58,7 +58,7 @@ RenderableLineString::~RenderableLineString()
 }
 
 Renderable * RenderableLineString::create(  const LineString * lineString,
-                                            const mat4       & trans)
+                                            const dmat4      & trans)
 {
     if(!lineString)
     {
@@ -67,10 +67,10 @@ Renderable * RenderableLineString::create(  const LineString * lineString,
         return NULL;
     }
 
-    return create(*lineString->getCoordinatesRO()->toVector());
+    return create(*lineString->getCoordinatesRO()->toVector(), trans);
 }
 
-Renderable * RenderableLineString::create(const vector<Coordinate> & coords, const mat4 & trans)
+Renderable * RenderableLineString::create(const vector<Coordinate> & coords, const dmat4 & trans)
 {
     if(coords.size() < 2)
     {
@@ -84,7 +84,7 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
 
     GLfloat * vertsPtr = &verts[0];
 
-    if(trans == mat4(1.0))
+    if(trans == dmat4(1.0))
     {
         for(size_t i = 0; i < coords.size(); ++i)
         {
@@ -97,7 +97,7 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
     {
         for(size_t i = 0; i < coords.size(); ++i)
         {
-            append2f(vertsPtr, trans * vec4(coords[i].x, coords[i].y, 0, 1));
+            append2f(vertsPtr, trans * dvec4(coords[i].x, coords[i].y, 0, 1));
 
             indices[i] = i;
         }
@@ -110,7 +110,7 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
 }
 
 Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings,
-                                          const mat4               & trans,
+                                          const dmat4              & trans,
                                           const bool                 showProgress)
 {
     time_point<system_clock> startTime;
@@ -138,7 +138,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
 
         const vector<Coordinate> & coords = *dynamic_cast<const LineString *>(geom)->getCoordinatesRO()->toVector();
 
-        if(trans == mat4(1.0))
+        if(trans == dmat4(1.0))
         {
             dmess("Fix!");
 
@@ -146,7 +146,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
         }
         else
         {
-            append2f(vertsPtr, trans * vec4(coords[0].x, coords[0].y, 0, 1));
+            append2f(vertsPtr, trans * dvec4(coords[0].x, coords[0].y, 0, 1));
 
             append(vertsPtr, symbologyID);
             
@@ -154,7 +154,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
 
             for(size_t i = 1; i < coords.size() - 1; ++i)
             {
-                append2f(vertsPtr, trans * vec4(coords[i].x, coords[i].y, 0, 1));
+                append2f(vertsPtr, trans * dvec4(coords[i].x, coords[i].y, 0, 1));
                 
                 append(vertsPtr, symbologyID);
 
@@ -164,7 +164,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
                 ++index;
             }
 
-            append2f(vertsPtr, trans * vec4(coords.rbegin()->x, coords.rbegin()->y, 0, 1));
+            append2f(vertsPtr, trans * dvec4(coords.rbegin()->x, coords.rbegin()->y, 0, 1));
 
             append(vertsPtr, symbologyID);
 
@@ -218,17 +218,12 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage) con
 
     if(!isMulti)
     {
-        //shader->setVertexArrayFormat(ArrayFormat(2, 2 * sizeof(GLfloat), 0));
-        
         shader->bind(canvas, true, renderStage);
 
         GL_CHECK(glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL));
     }
     else
     {
-        //shader->setVertexArrayFormat(ArrayFormat(2, 3 * sizeof(GLfloat), 0));
-        //shader->setColorArrayFormat (ArrayFormat(1, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat))));
-
         shader->bind(canvas, true, renderStage);
 
         GL_CHECK(glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, NULL));

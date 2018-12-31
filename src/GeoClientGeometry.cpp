@@ -70,6 +70,7 @@ void GeoClient::addGeometry(const char * data)
 
     createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
     createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
+    //createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
 
     addBingMap(); // TODO, this does not belong here!
 }

@@ -50,8 +50,6 @@ VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellation
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations, const AABB2D & boxUV)
 {
-    dmess("Here!!!!!!!!");
-    
     return _create< false, // 3D extrude
                     false, // Use symbology ID
                     true   // Use UV coords
@@ -105,8 +103,6 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
         {
             const dvec2 P(tess->verts[i * 2 + 0], tess->verts[i * 2 + 1]);
 
-            //verts.push_back(tess->verts[i * 2 + 0]);
-            //verts.push_back(tess->verts[i * 2 + 1]);
             verts.push_back(P.x);
             verts.push_back(P.y);
 

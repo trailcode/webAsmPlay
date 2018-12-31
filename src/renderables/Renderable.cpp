@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <geos/geom/Point.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
@@ -32,6 +33,7 @@
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
+#include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
 using namespace std;
@@ -52,7 +54,9 @@ Renderable * Renderable::create(const Geometry * geom,
 {
     switch(geom->getGeometryTypeId())
     {
-        case GEOS_POINT:                dmess("Implement me!"); return NULL;
+        //case GEOS_POINT:                dmess("Implement me!"); return NULL;
+        case GEOS_POINT:
+            return RenderablePoint::create(dynamic_cast<const Point *>(geom), trans);
         case GEOS_LINESTRING:           
         case GEOS_LINEARRING:           return RenderableLineString::create(dynamic_cast<const LineString *>(geom), trans);
 		case GEOS_POLYGON:              return RenderablePolygon   ::create(dynamic_cast<const Polygon    *>(geom), trans, 0, boxUV);

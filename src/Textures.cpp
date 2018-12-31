@@ -110,8 +110,8 @@ GLuint Textures::load(const string & filename)
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, texture));
 
     /* Generate The Texture */
-    GL_CHECK(glTexImage2D(  GL_TEXTURE_2D, 0, GL_RGBA, img->w,
-                            img->h, 0, GL_RGBA,
+    GL_CHECK(glTexImage2D(  GL_TEXTURE_2D, 0, GL_RGB, img->w,
+                            img->h, 0, GL_RGB,
                             GL_UNSIGNED_BYTE, img->pixels));
 
     /* Linear Filtering */

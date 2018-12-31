@@ -503,8 +503,6 @@ void OSM_Reader::handleBounds(const char **atts)
 {
     for(size_t i = 0; atts[i] != NULL; i += 2)
     {
-        //dmess("key " << atts[i] << " value " << atts[i + 1]);
-
         switch(getKey(atts[i]))
         {
         case OSM_KEY_MIN_LAT: boundsMinY = atof(atts[i + 1]); break;
