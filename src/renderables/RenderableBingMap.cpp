@@ -29,6 +29,7 @@
 #endif
 
 #include <unistd.h>
+#include <ctpl.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/Textures.h>
@@ -39,8 +40,9 @@
 
 using namespace std;
 using namespace glm;
+using namespace ctpl;
 using namespace geosUtil;
-using namespace BingTileSystem;
+using namespace bingTileSystem;
 
 namespace
 {
@@ -91,11 +93,11 @@ namespace
         {
 #ifndef __EMSCRIPTEN__
 
-            string outPath = "./tiles/" + quadKey + ".jpg";
+            string tileCachePath = "./tiles/" + quadKey + ".jpg";
 
-            if(access(outPath.c_str(), F_OK) != -1)
+            if(access(tileCachePath.c_str(), F_OK) != -1)
             {
-                textureID = Textures::load(outPath);
+                textureID = Textures::load(tileCachePath);
             }
             else
             {
@@ -127,7 +129,7 @@ namespace
 
                 FILE * fp;
                 
-                fp = fopen(outPath.c_str(), "wb");
+                fp = fopen(tileCachePath.c_str(), "wb");
                 //if( !fp )
                 dmess("output.size " << output.size);
                 //return;

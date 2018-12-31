@@ -32,6 +32,7 @@
 
 using namespace std;
 using namespace glm;
+using namespace bingTileSystem;
 
 void GUI::bingTileSystemPanel()
 {
@@ -47,13 +48,13 @@ void GUI::bingTileSystemPanel()
 
     const size_t zoomLevel = 19;
 
-    ivec2 pix = BingTileSystem::latLongToPixel(pos, zoomLevel);
+    ivec2 pix = latLongToPixel(pos, zoomLevel);
 
-    dvec2 pos2 = BingTileSystem::pixelToLatLong(pix, zoomLevel);
+    dvec2 pos2 = pixelToLatLong(pix, zoomLevel);
 
-    ivec2 tile = BingTileSystem::pixelToTile(pix);
+    ivec2 tile = pixelToTile(pix);
 
-    string quadKey = BingTileSystem::tileToQuadKey(tile, zoomLevel);
+    string quadKey = tileToQuadKey(tile, zoomLevel);
 
     //dmess("pix " << pos.x << " " << pos.y << " " << pix.x << " " << pix.y << " " << pos2.x << " " << pos2.y);
     //dmess("quadKey " << quadKey);

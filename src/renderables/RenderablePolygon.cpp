@@ -127,6 +127,7 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
         else
         {
             dmess("Warning not a polygon or multi-polygon.");
+            
             abort();
         }
     }

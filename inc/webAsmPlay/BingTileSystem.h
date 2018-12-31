@@ -33,7 +33,7 @@
 
 // From: https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
 
-namespace BingTileSystem
+namespace bingTileSystem
 {
     size_t mapSize(const size_t levelOfDetail);
 

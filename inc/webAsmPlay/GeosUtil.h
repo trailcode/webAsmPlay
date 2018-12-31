@@ -94,6 +94,11 @@ namespace geosUtil
 
     geos::geom::Coordinate ___(const glm::dvec2 & point);
 
+    inline glm::dvec4 __(const geos::geom::Coordinate & v, const double z, const double w)
+    {
+        return glm::dvec4(v.x, v.y, z, w);
+    }
+
     bool contains(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
 
     bool contains(const geos::geom::Geometry * A, const geos::geom::Geometry * B);
@@ -121,6 +126,14 @@ namespace geosUtil
     {
         *dataStream = v.x; ++dataStream;
         *dataStream = v.y; ++dataStream;
+
+        return v;
+    }
+
+    inline geos::geom::Coordinate append2d(std::vector<double> & data, const geos::geom::Coordinate & v)
+    {
+        data.push_back(v.x);
+        data.push_back(v.y);
 
         return v;
     }
