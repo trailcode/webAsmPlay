@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
 set(default_build_type "Release")
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 #set(EMCC_DEBUG 1)
 
 if(MSVC_VERSION)

@@ -26,10 +26,10 @@
 
 #ifndef __EMSCRIPTEN__
     #include <curl/curl.h>
+    #include <ctpl.h>
 #endif
 
 #include <unistd.h>
-#include <ctpl.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/Textures.h>
@@ -40,7 +40,6 @@
 
 using namespace std;
 using namespace glm;
-using namespace ctpl;
 using namespace geosUtil;
 using namespace bingTileSystem;
 
