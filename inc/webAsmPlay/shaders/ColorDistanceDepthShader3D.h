@@ -44,7 +44,7 @@ public:
 
     void bind(Canvas     * canvas,
               const bool   isOutline,
-              const size_t renderingStage = 0);
+              const size_t renderingStage = 0) override;
 
     glm::vec3 setLightPos(const glm::vec3 & pos);
     glm::vec3 getLightPos() const;
@@ -52,9 +52,9 @@ public:
     float setHeightMultiplier(const float multiplier);
     float getHeightMultiplier() const;
 
-    size_t getNumRenderingStages() const;
+    size_t getNumRenderingStages() const override;
 
-    bool shouldRender(const bool isOutline, const size_t renderingStage) const;
+    bool shouldRender(const bool isOutline, const size_t renderingStage) const override;
 
 private:
 

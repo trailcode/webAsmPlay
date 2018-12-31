@@ -26,6 +26,7 @@
 
 #include <glm/gtx/normal.hpp>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/VertexArrayObject.h>
 
 using namespace std;
@@ -33,19 +34,35 @@ using namespace glm;
 
 VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations)
 {
-    //return _create<false>(tessellations);
+    if(tessellations[0]->getHeight() != 0.0)
+    {
+        return _create< true, // 3D extrude
+                        true, // Use symbology ID
+                        false // Use UV coords
+                      > (tessellations, AABB2D());
+    }
 
-    if(tessellations[0]->getHeight() != 0.0) { return _create<true>(tessellations) ;}
+    return _create< false, // 3D extrude
+                    true,  // Use symbology ID
+                    false  // Use UV coords
+                  > (tessellations, AABB2D());
+}
 
-    return _create<false>(tessellations);
+VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations, const AABB2D & boxUV)
+{
+    return _create< false, // 3D extrude
+                    false, // Use symbology ID
+                    true   // Use UV coords
+                > (tessellations, boxUV);
 }
 
 namespace
 {
-    void addVert(   FloatVec & verts,
-                    const vec3 & v,
-                    const vec3 & n,
-                    const float c)
+    template <bool USE_SYMBOLOGY_ID>
+    void addVert(   FloatVec    & verts,
+                    const vec3  & v,
+                    const vec3  & n,
+                    const float   c)
     {
         verts.push_back(v.x);
         verts.push_back(v.y);
@@ -55,12 +72,12 @@ namespace
         verts.push_back(n.y);
         verts.push_back(n.z);
 
-        verts.push_back(c);
+        if(USE_SYMBOLOGY_ID) { verts.push_back(c) ;}
     }
 }
 
-template<bool IS_3D>
-VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellations)
+template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS>
+VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellations, const AABB2D & boxUV)
 {
     if(!tessellations.size()) { return NULL ;}
 
@@ -79,14 +96,15 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     for(const auto & tess : tessellations)
     {
         // TODO try to remove hard coded values.
-        const float symbologyID_value = (float(tess->symbologyID * symbologyID_Stride) + 0.5) / 32.0;
-
+        const float symbologyID_value     = (float(tess->symbologyID * symbologyID_Stride) + 0.5) / 32.0;
         const float symbologyWallID_value = (float(tess->symbologyID * symbologyID_Stride) + 0.5) / 32.0 + 4.0 / 32.0;
 
         for(size_t i = 0; i < tess->numVerts; ++i)
         {
-            verts.push_back(tess->verts[i * 2 + 0]);
-            verts.push_back(tess->verts[i * 2 + 1]);
+            const dvec2 P(tess->verts[i * 2 + 0], tess->verts[i * 2 + 1]);
+
+            verts.push_back(P.x);
+            verts.push_back(P.y);
 
             if(IS_3D)  
             {
@@ -97,7 +115,18 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                 verts.push_back(1);
             }
 
-            verts.push_back(symbologyID_value);
+            if(USE_SYMBOLOGY_ID) { verts.push_back(symbologyID_value) ;}
+
+            if(USE_UV_COORDS)
+            {
+                const dvec2 min(get<0>(boxUV), get<1>(boxUV));
+                const dvec2 max(get<2>(boxUV), get<3>(boxUV));
+
+                const dvec2 uv = (P - min) / (max - min);
+
+                verts.push_back(uv.x);
+                verts.push_back(uv.y);
+            }
         }
 
         for(size_t i = 0; i < tess->numTriangles * 3; ++i)
@@ -119,12 +148,6 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
         {
             const size_t b = (a + 1) % tess->numVerts;
 
-            /*
-            A   B
-            p1  p2
-
-            p4  p3
-            */
             const vec2 A(tess->verts[a * 2], tess->verts[a * 2 + 1]);
             const vec2 B(tess->verts[b * 2], tess->verts[b * 2 + 1]);
 
@@ -135,10 +158,10 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             const vec3 normal = normalize(triangleNormal(p1, p2, p3));
 
-            addVert(verts, p1, normal, symbologyWallID_value);
-            addVert(verts, p2, normal, symbologyWallID_value);
-            addVert(verts, p3, normal, symbologyWallID_value);
-            addVert(verts, p4, normal, symbologyWallID_value);
+            addVert<USE_SYMBOLOGY_ID>(verts, p1, normal, symbologyWallID_value);
+            addVert<USE_SYMBOLOGY_ID>(verts, p2, normal, symbologyWallID_value);
+            addVert<USE_SYMBOLOGY_ID>(verts, p3, normal, symbologyWallID_value);
+            addVert<USE_SYMBOLOGY_ID>(verts, p4, normal, symbologyWallID_value);
 
             triangleIndices.push_back(offset + 0);
             triangleIndices.push_back(offset + 1);
@@ -177,6 +200,36 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
     GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
 
+    //IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS
+
+    size_t sizeVertex = 2;
+    size_t sizeColor  = 0;
+    size_t sizeNormal = 0;
+    size_t sizeUV     = 0;
+
+    if(IS_3D)
+    {
+        sizeVertex = 3;
+        sizeNormal = 3;
+    }
+
+    if(USE_SYMBOLOGY_ID)
+    {
+        sizeColor = 1;
+    }
+
+    if(USE_UV_COORDS)
+    {
+        sizeUV = 2;
+    }
+
+    const size_t totalSize = (sizeVertex + sizeColor + sizeNormal + sizeUV) * sizeof(GLfloat);
+
+    ArrayFormat vertexFormat(sizeVertex, totalSize, 0);
+    ArrayFormat normalFormat(sizeNormal, totalSize, (void *)(sizeVertex * sizeof(GLfloat)));
+    ArrayFormat colorFormat (sizeColor,  totalSize, (void *)((sizeVertex + sizeNormal) * sizeof(GLfloat)));
+    ArrayFormat uvFormat    (sizeUV,     totalSize, (void *)((sizeVertex + sizeNormal + sizeColor) * sizeof(GLfloat)));
+
     return new VertexArrayObject(vao,
                                  ebo,
                                  ebo2,
@@ -184,24 +237,36 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                                  triangleIndices.size(),
                                  counterVertIndices,
                                  lineIndices.size(),
-                                 tessellations.size() > 1);
+                                 tessellations.size() > 1,
+                                 vertexFormat,
+                                 colorFormat,
+                                 normalFormat,
+                                 uvFormat);
 }
 
-VertexArrayObject::VertexArrayObject(   const GLuint      vao,
-                                        const GLuint      ebo,
-                                        const GLuint      ebo2,
-                                        const GLuint      vbo,
-                                        const GLuint      numTrianglesIndices,
-                                        const Uint32Vec & counterVertIndices,
-                                        const size_t      numContourLines,
-                                        const bool        isMulti) : vao                (vao),
-                                                                     ebo                (ebo),
-                                                                     ebo2               (ebo2),
-                                                                     vbo                (vbo),
-                                                                     numTrianglesIndices(numTrianglesIndices),
-                                                                     counterVertIndices (counterVertIndices),
-                                                                     numContourLines    (numContourLines),
-                                                                     _isMulti           (isMulti)
+VertexArrayObject::VertexArrayObject(   const GLuint        vao,
+                                        const GLuint        ebo,
+                                        const GLuint        ebo2,
+                                        const GLuint        vbo,
+                                        const GLuint        numTrianglesIndices,
+                                        const Uint32Vec   & counterVertIndices,
+                                        const size_t        numContourLines,
+                                        const bool          isMulti,
+                                        const ArrayFormat & vertexFormat,
+                                        const ArrayFormat & colorFormat,
+                                        const ArrayFormat & normalFormat,
+                                        const ArrayFormat & uvFormat) : vao                (vao),
+                                                                        ebo                (ebo),
+                                                                        ebo2               (ebo2),
+                                                                        vbo                (vbo),
+                                                                        numTrianglesIndices(numTrianglesIndices),
+                                                                        counterVertIndices (counterVertIndices),
+                                                                        numContourLines    (numContourLines),
+                                                                        _isMulti           (isMulti),
+                                                                        vertexFormat       (vertexFormat),
+                                                                        colorFormat        (colorFormat),
+                                                                        normalFormat       (normalFormat),
+                                                                        uvFormat           (uvFormat)
 {
 
 }
@@ -214,11 +279,28 @@ VertexArrayObject::~VertexArrayObject()
     GL_CHECK(glDeleteBuffers     (1, &ebo2));
 }
 
-void VertexArrayObject::bind() const
+void VertexArrayObject::bind(Shader * shader) const
 {
     GL_CHECK(glBindVertexArray(vao));
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+
+    shader->setVertexArrayFormat(vertexFormat);
+
+    if(colorFormat.size)
+    {
+        shader->setColorArrayFormat(colorFormat);
+    }
+
+    if(normalFormat.size)
+    {
+        shader->setNormalArrayFormat(normalFormat);
+    }
+
+    if(uvFormat.size)
+    {
+        shader->setUV_ArrayFormat(uvFormat);
+    }
 }
 
 void VertexArrayObject::bindTriangles() const

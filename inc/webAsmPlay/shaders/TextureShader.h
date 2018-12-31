@@ -24,26 +24,31 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/shaders/ColorSymbology.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
+#ifndef __WEB_ASM_PLAY_TEXTURE_SHADER_H__
+#define __WEB_ASM_PLAY_TEXTURE_SHADER_H__
+
 #include <webAsmPlay/shaders/Shader.h>
 
-using namespace std;
-using namespace glm;
+class TextureShader : public Shader
+{
+public:
 
-Shader::Shader(const string  & shaderName) :    shaderName      (shaderName),
-                                                colorSymbology  (ColorSymbology::getInstance("defaultPolygon")) {}
+    static TextureShader * getDefaultInstance();
 
-void Shader::setVertexArrayFormat(const ArrayFormat & vertexFormat) { this->vertexFormat = vertexFormat ;}
-void Shader::setNormalArrayFormat(const ArrayFormat & normalFormat) { this->normalFormat = normalFormat ;}
-void Shader::setColorArrayFormat (const ArrayFormat & colorFormat)  { this->colorFormat  = colorFormat  ;}
-void Shader::setUV_ArrayFormat   (const ArrayFormat & uvFormat)     { this->uvFormat     = uvFormat     ;}
+    static void ensureShader();
 
-string Shader::getName() const { return shaderName ;}
+    TextureShader();
+    ~TextureShader();
 
-size_t Shader::getNumRenderingStages() const { return 1 ;}
+    void bind(Canvas     * canvas,
+              const bool   isOutline,
+              const size_t renderingStage = 0) override;
 
-bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) const { return renderingStage == 0 ;}
+    GLuint setTextureID(const GLuint textureID);
 
-ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
-ColorSymbology * Shader::getColorSymbology() const { return colorSymbology ;}
+private:
+
+    GLuint textureID = 0;
+};
+
+#endif // __WEB_ASM_PLAY_TEXTURE_SHADER_H__

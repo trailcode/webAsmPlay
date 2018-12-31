@@ -39,17 +39,10 @@ public:
 
     virtual void bind(Canvas * canvas, const bool isOutline, const size_t renderingStage) = 0;
 
-    void setVertexArrayFormat(  const GLint     size    = 2,
-                                const GLsizei   stride  = 0,
-                                const GLvoid  * pointer = NULL);
-
-    void setColorArrayFormat(   const GLint     size    = 2,
-                                const GLsizei   stride  = 0,
-                                const GLvoid  * pointer = NULL);
-
-    void setNormalArrayFormat(  const GLint     size    = 2,
-                                const GLsizei   stride  = 0,
-                                const GLvoid  * pointer = NULL);
+    void setVertexArrayFormat(const ArrayFormat & vertexFormat = ArrayFormat());
+    void setNormalArrayFormat(const ArrayFormat & normalFormat = ArrayFormat());
+    void setColorArrayFormat (const ArrayFormat & colorFormat  = ArrayFormat());
+    void setUV_ArrayFormat   (const ArrayFormat & uvFormat     = ArrayFormat());
 
     std::string getName() const;
 
@@ -68,18 +61,11 @@ protected:
 
     const std::string shaderName;
 
-    GLint            sizeVertex     = 2;
-    GLsizei          strideVertex   = 0;
-    const GLvoid   * pointerVertex  = NULL;
-
-    GLint            sizeNormal     = 2;
-    GLsizei          strideNormal   = 0;
-    const GLvoid   * pointerNormal  = NULL;
-
-    GLint            sizeColor      = 2;
-    GLsizei          strideColor    = 0;
-    const GLvoid   * pointerColor   = NULL;
-
+    ArrayFormat vertexFormat;
+    ArrayFormat colorFormat;
+    ArrayFormat normalFormat;
+    ArrayFormat uvFormat;
+    
     ColorSymbology * colorSymbology = NULL;
 };
 

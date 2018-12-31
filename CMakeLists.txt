@@ -133,6 +133,7 @@ file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
                             "src/GUI/OpenSteerTestPanel.cpp"
                             "src/GUI/OpenSteerPanel.cpp"
                             "src/GUI/cameraInfoPanel.cpp"
+                            "src/GUI/BingTileSystemPanel.cpp"
                             "src/shaders/Shader.cpp"
                             "src/shaders/ShaderProgram.cpp"
                             "src/shaders/ColorShader.cpp"
@@ -141,6 +142,7 @@ file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
                             "src/shaders/ColorDistanceDepthShader3D.cpp"
                             "src/shaders/ColorVertexShader.cpp"
                             "src/shaders/ColorSymbology.cpp"
+                            "src/shaders/TextureShader.cpp"
                             "src/Camera.cpp"
                             "src/Debug.cpp"
                             "src/TrackBallInteractor.cpp"
@@ -149,6 +151,7 @@ file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
                             "src/renderables/RenderablePolygon.cpp"
                             "src/renderables/RenderablePoint.cpp"
                             "src/renderables/RenderableMesh.cpp"
+                            "src/renderables/RenderableBingMap.cpp"
                             "src/renderables/DeferredRenderable.cpp"
                             "src/GeosUtil.cpp"
                             "src/Util.cpp"
@@ -173,6 +176,7 @@ file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
                             "src/Zombie.cpp"
                             "src/ZombiePlugin.cpp"
                             "src/Network.cpp"
+                            "src/BingTileSystem.cpp"
                             #"src/Main.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
@@ -271,9 +275,11 @@ else()
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
 	#find_package(GLEW REQUIRED)
-	find_package(GLEW)
+	find_package(GLEW REQUIRED)
+    find_package(curl REQUIRED)
 
 	include_directories(${GLEW_INCLUDE_DIR})
+    include_directories(${CURL_INCLUDE_DIR})
     include_directories(${Boost_INCLUDE_DIRS})
     include_directories(${SDL2_INCLUDE_DIR})
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
@@ -284,11 +290,13 @@ else()
     include_directories(./)
     
     link_libraries(${GLEW_LIBRARIES})
+    link_libraries(${CURL_LIBRARIES})
     #link_libraries(glfw)
 	message(${GLFW3_LIBRARY})
 	link_libraries(${GLFW3_LIBRARY})
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
+    link_libraries(${SDL2_LIBRARY})
 	set(Boost_USE_STATIC_LIBS ON)
     link_libraries(${Boost_LIBRARIES})
 	#link_libraries(${Boost_LIBRARY})

@@ -57,8 +57,6 @@ void GeoClient::addGeometry(const char * data)
 
     GUI::progress("Polygon index:", 0.0f);
 
-    AABB2D bounds;
-    
     bounds = *(AABB2D *)data; data += sizeof(double) * 4;
 
     const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
@@ -72,6 +70,9 @@ void GeoClient::addGeometry(const char * data)
 
     createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
     createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
+    //createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
+
+    addBingMap(); // TODO, this does not belong here!
 }
 
 namespace

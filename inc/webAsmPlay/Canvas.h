@@ -105,7 +105,12 @@ public:
 
     std::vector<Renderable *> getRenderiables() const;
 
-    std::vector<Renderable *> getMeshRenderiables() const;
+    const std::list<Renderable *> & getPointsRef() const;
+    const std::list<Renderable *> & getLineStringsRef() const;
+    const std::list<Renderable *> & getPolygonsRef() const;
+    const std::list<Renderable *> & getMeshesRef() const;
+    const std::list<Renderable *> & getDeferredRenderablesRef() const;
+    const std::list<Renderable *> & getRastersRef() const;
 
     static std::vector<Canvas *> getInstances();
 
@@ -148,6 +153,7 @@ public:
     std::list<Renderable *> polygons;
     std::list<Renderable *> meshes;
     std::list<Renderable *> deferredRenderables;
+    std::list<Renderable *> rasters;
 
     const bool useFrameBuffer;
 

@@ -59,6 +59,8 @@ std::string toStr(const glm::mat4 & m);
 
 std::string toStr(const glm::vec2 & v);
 
+std::string toStr(const glm::ivec2 & v);
+
 std::string toStr(const glm::vec3 & v);
 
 std::string toStr(const glm::vec4 & v);
@@ -180,5 +182,20 @@ inline glm::vec4 append2f(float *& dataStream, const glm::vec4 & value)
 
     return value;
 }
+
+inline glm::dvec4 append2d(std::vector<double> & data, const glm::dvec4 & value)
+{
+    data.push_back(value.x);
+    data.push_back(value.y);
+
+    return value;
+}
+
+inline void append2ui(std::vector<uint32_t> & data, const uint32_t A, const uint32_t B)
+{
+    data.push_back(A);
+    data.push_back(B);
+}
+
 
 #endif // __WEB_ASM_PLAY_UTIL_H__

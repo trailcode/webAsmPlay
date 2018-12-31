@@ -38,11 +38,11 @@ public:
 
     ~OpenSteerCanvas();
 
-    GLuint render();
+    GLuint render() override;
 
-    void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size);
+    void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size) override;
 
-    void onChar(GLFWwindow * window, const size_t c);
+    void onChar(GLFWwindow * window, const size_t c) override;
 
 private:
 };

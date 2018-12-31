@@ -44,23 +44,37 @@ void GUI::renderSettingsPanel()
 
     ImGui::Begin("Render Settings", &showRenderSettingsPanel);
 
+        if(ImGui::Checkbox("Fill Meshes", &renderSettingsFillMeshes))
+        {
+            for(Renderable * r : canvas->getMeshesRef()) { r->setRenderFill(renderSettingsFillMeshes) ;}
+        }
+
+        if(ImGui::Checkbox("Mesh Outlines", &renderSettingsRenderMeshOutlines))
+        {
+            for(Renderable * r : canvas->getMeshesRef()) { r->setRenderOutline(renderSettingsRenderMeshOutlines) ;}
+        }
+
         if(ImGui::Checkbox("Fill Polygons", &renderSettingsFillPolygons))
         {
-            for(Renderable * r : canvas->getRenderiables()) { r->setRenderFill(renderSettingsFillPolygons) ;}
+            for(Renderable * r : canvas->getPolygonsRef()) { r->setRenderFill(renderSettingsFillPolygons) ;}
 
-            for(Renderable * r : geosTestCanvas->getRenderiables()) { r->setRenderFill(renderSettingsFillPolygons) ;}
+            for(Renderable * r : geosTestCanvas->getPolygonsRef()) { r->setRenderFill(renderSettingsFillPolygons) ;}
         }
 
         if(ImGui::Checkbox("Polygon Outlines", &renderSettingsRenderPolygonOutlines))
         {
-            for(Renderable * r : canvas->getRenderiables()) { r->setRenderOutline(renderSettingsRenderPolygonOutlines) ;}
+            for(Renderable * r : canvas->getPolygonsRef()) { r->setRenderOutline(renderSettingsRenderPolygonOutlines) ;}
 
-            for(Renderable * r : geosTestCanvas->getRenderiables()) { r->setRenderOutline(renderSettingsRenderPolygonOutlines) ;}
+            for(Renderable * r : geosTestCanvas->getPolygonsRef()) { r->setRenderOutline(renderSettingsRenderPolygonOutlines) ;}
         }
 
         if(ImGui::Checkbox("Linear Features", &renderSettingsRenderLinearFeatures))
         {
-            dmess("Linear Features");
+            for(Renderable * r : canvas->getLineStringsRef())
+            {
+                r->setRenderFill    (renderSettingsRenderLinearFeatures);
+                r->setRenderOutline (renderSettingsRenderLinearFeatures);
+            }
         }
 
         if(ImGui::Checkbox("SkyBox", &renderSettingsRenderSkyBox))
@@ -104,10 +118,7 @@ void GUI::renderSettingsPanel()
                                         ColorVertexShader         ::getDefaultInstance()
                                         });
 
-            for(auto i : canvas->getMeshRenderiables())
-            {
-                i->setShader(shaderMap[meshShader]);
-            }
+            for(auto i : canvas->getMeshesRef()) { i->setShader(shaderMap[meshShader]) ;}
         }
 
         //ImGui::SameLine(); ShowHelpMarker("Refer to the \"Combo\" section below for an explanation of the full BeginCombo/EndCombo API, and demonstration of various flags.\n");

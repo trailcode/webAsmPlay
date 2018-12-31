@@ -24,24 +24,32 @@
   \copyright 2018
 */
 
+#include <geos/geom/Point.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 
 using namespace std;
 using namespace glm;
+using namespace geos::geom;
 
-Renderable * RenderablePoint::create(const vec3 & _pos,
-                                     const mat4 & trans)
+Renderable * RenderablePoint::create(const Point * point,
+                                     const dmat4 & trans)
+{
+    return NULL;
+}
+
+Renderable * RenderablePoint::create(const dvec3 & _pos,
+                                     const dmat4 & trans)
 {
     const float size = 0.05;
 
-    const vec3 pos = trans * vec4(_pos, 1);
+    const vec3 pos = trans * dvec4(_pos, 1);
 
     const vec3 verts[] = {  pos + vec3(-size,  0,    0),
                             pos + vec3( size,  0,    0),
                             pos + vec3(0,     -size, 0),
-                            pos + vec3(0,     size,  0) };
+                            pos + vec3(0,      size, 0) };
 
     const GLuint indices[] = {0,1,2,3};
 
@@ -65,7 +73,7 @@ Renderable * RenderablePoint::create(const vec3 & _pos,
 }
 
 Renderable * RenderablePoint::create(const ConstGeosGeomVec & points,
-                                     const mat4             & trans,
+                                     const dmat4            & trans,
                                      const bool               showProgress)
 {
     abort();
@@ -76,7 +84,7 @@ void RenderablePoint::render(Canvas * canvas, const size_t renderStage) const
 {
     if(!shader->shouldRender(true, renderStage)) { return ;}
 
-    shader->setVertexArrayFormat(3, 3 * sizeof(GLfloat), 0);
+    shader->setVertexArrayFormat(ArrayFormat(3, 3 * sizeof(GLfloat), 0));
 
     shader->bind(canvas, false, renderStage);
 

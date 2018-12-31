@@ -185,9 +185,9 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     cout << "Loading: " << osmFile << endl;
 
-    vector<AttributedGeometry> geometry = OSM_Reader::import(osmFile);
+    const MapData mapData = OSM_Reader::import(osmFile);
 
-    dmess("geometry " << geometry.size());
+    dmess("geometry " << mapData.geometry.size());
 
     dvec2 center;
 
@@ -202,7 +202,7 @@ string GeoServer::addOsmFile(const string & osmFile)
     vector<AttributedPoligonalArea> polygons;
     vector<AttributedLineString>    lineStrings;
 
-    for(const AttributedGeometry & i : geometry)
+    for(const AttributedGeometry & i : mapData.geometry)
     {
         if((polygon = dynamic_cast<Polygon *>(i.second)))
         {
@@ -268,49 +268,24 @@ string GeoServer::addOsmFile(const string & osmFile)
     boundsMinY = center.y;
     boundsMaxY = center.y;
 
+    if( mapData.boundsMinX != 0.0 &&
+        mapData.boundsMaxX != 0.0 &&
+        mapData.boundsMinY != 0.0 &&
+        mapData.boundsMaxY != 0.0)
+    {
+        boundsMinX = mapData.boundsMinX;
+        boundsMaxX = mapData.boundsMaxX;
+        boundsMinY = mapData.boundsMinY;
+        boundsMaxY = mapData.boundsMaxY;
+    }
+
     const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
 
     // TODO code dup!
     trans = translate(  s,
-                        dvec3((boundsMinY + boundsMinX) * -0.5,
+                        dvec3(  (boundsMinY + boundsMinX) * -0.5,
                                 (boundsMaxY + boundsMaxX) * -0.5,
                                 0.0));
-
-    /*
-    boundsMinX = -104.979;
-    boundsMinY = 39.75;
-    boundsMaxX = -104.961;
-    boundsMaxY = 39.7685;
-    */
-
-    //dmess("shift x " << boundsMaxX + boundsMinX);
-    //dmess("shift y " << boundsMinY + boundsMaxY);
-    //dmess("here " << int(boundsMinY < boundsMaxX) << " boundsMinY " << boundsMinY << " boundsMaxX " << boundsMaxX);
-
-    /*
-    auto histX = make_static_histogram(axis::regular<>(1024, boundsMinX, boundsMaxX, "x"));
-    auto histY = make_static_histogram(axis::regular<>(1024, boundsMinY, boundsMaxY, "y"));
-
-    for(const AttributedGeometry & i : polygons)
-    {
-        CoordinateSequence * coords = i.second->getCoordinates(); // TODO memory leak.
-
-        for(size_t i = 0; i < coords->getSize(); ++i)
-        {
-            histX(coords->getX(i));
-            histY(coords->getY(i));
-        }
-    }
-
-    //histX.sum
-
-    for(size_t i = 0; i < 1024; ++i)
-    {
-        dmess(i << " " << histX.at(i).value());
-    }
-    */
-
-    //*/
 
     saveGeoFile("data.geo");
 

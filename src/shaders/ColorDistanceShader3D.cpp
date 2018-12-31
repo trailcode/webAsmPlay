@@ -245,25 +245,25 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
         shaderProgramFill->bind();
 
         ShaderProgram::enableVertexAttribArray( vertInAttrFill,
-                                                sizeVertex,
+                                                vertexFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
-                                                strideVertex,
-                                                pointerVertex);
+                                                vertexFormat.stride,
+                                                vertexFormat.pointer);
 
         ShaderProgram::enableVertexAttribArray( normalInAttrFill,
-                                                sizeNormal,
+                                                normalFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
-                                                strideNormal,
-                                                pointerNormal);
+                                                normalFormat.stride,
+                                                normalFormat.pointer);
 
         ShaderProgram::enableVertexAttribArray( vertColorInAttrFill,
-                                                sizeColor,
+                                                colorFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
-                                                strideColor,
-                                                pointerColor);
+                                                colorFormat.stride,
+                                                colorFormat.pointer);
 
         shaderProgramFill->setUniformi(texUniformFill,          0);
         shaderProgramFill->setUniformf(heightMultiplierFill,    heightMultiplier);
@@ -279,24 +279,23 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
         shaderProgramOutline->bind();
 
         ShaderProgram::enableVertexAttribArray( vertInAttrOutline,
-                                                sizeVertex,
+                                                vertexFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
-                                                strideVertex,
-                                                pointerVertex);
+                                                vertexFormat.stride,
+                                                vertexFormat.pointer);
 
         ShaderProgram::enableVertexAttribArray( vertColorInAttrOutline,
-                                                sizeColor,
+                                                colorFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
-                                                strideColor,
-                                                pointerColor);
+                                                colorFormat.stride,
+                                                colorFormat.pointer);
 
-        //shaderProgramOutline->colorLookupOffsetOutline;
-        shaderProgramOutline->setUniformf(heightMultiplierOutline,    heightMultiplier);
-        shaderProgramOutline->setUniform(MV_Outline, canvas->getMV_Ref());
-        shaderProgramOutline->setUniform(MVP_Outline, canvas->getMVP_Ref());
-        shaderProgramOutline->setUniformi(texUniformOutline, 0);
+        shaderProgramOutline->setUniformf(heightMultiplierOutline,  heightMultiplier);
+        shaderProgramOutline->setUniform(MV_Outline,                canvas->getMV_Ref());
+        shaderProgramOutline->setUniform(MVP_Outline,               canvas->getMVP_Ref());
+        shaderProgramOutline->setUniformi(texUniformOutline,        0);
 
         shaderProgramOutline->setUniformf(colorLookupOffsetOutline, 1.0f);
     }

@@ -37,6 +37,7 @@
 #include <webAsmPlay/renderables/RenderableMesh.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
+#include <webAsmPlay/renderables/RenderableBingMap.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/SkyBox.h>
@@ -82,7 +83,7 @@ void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
 
 ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
 {
-    if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, fbSize) ;}
+    //if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, fbSize) ;}
 
     auxFrameBuffer = FrameBuffer::ensureFrameBuffer(auxFrameBuffer, fbSize);
 
@@ -167,21 +168,17 @@ GLuint Canvas::render()
 
     lock_guard<mutex> _(renderiablesMutex);
 
-    //*
     auxFrameBuffer->bind();
 
-    //GL_CHECK(glViewport(0, 0, size.x, size.y));
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //dmess("============ " << meshes.size());
 
     for(const auto r : meshes)              { r->render(this, 1) ;}
 
     glFlush();
 
     auxFrameBuffer->unbind();
-    //*/
+
+    for(const auto r : rasters) { r->render(this, 0) ;}
 
     // TODO try to refactor this. Who owns the symbology?
     ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
@@ -341,6 +338,7 @@ Renderable * Canvas::addRenderable(Renderable * renderiable)
     if(dynamic_cast<RenderablePolygon    *>(renderiable)) { return addRenderable(polygons,            renderiable) ;}
     if(dynamic_cast<RenderablePoint      *>(renderiable)) { return addRenderable(points,              renderiable) ;}
     if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderable(meshes,              renderiable) ;}
+    if(dynamic_cast<RenderableBingMap    *>(renderiable)) { return addRenderable(rasters,             renderiable) ;}
 
     dmess("Error! Implement!");
     
@@ -373,18 +371,17 @@ vector<Renderable *> Canvas::getRenderiables() const
     ret.insert(ret.end(), lineStrings.begin(),  lineStrings.end());
     ret.insert(ret.end(), polygons.begin(),     polygons.end());
     ret.insert(ret.end(), meshes.begin(),       meshes.end());
+    ret.insert(ret.end(), rasters.begin(),      rasters.end());
 
     return ret;
 }
 
-vector<Renderable *> Canvas::getMeshRenderiables() const
-{
-    vector<Renderable *> ret;
-
-    ret.insert(ret.end(), meshes.begin(), meshes.end());
-
-    return ret;
-}
+const list<Renderable *> & Canvas::getPointsRef()               const { return points               ;}
+const list<Renderable *> & Canvas::getLineStringsRef()          const { return lineStrings          ;}
+const list<Renderable *> & Canvas::getPolygonsRef()             const { return polygons             ;}
+const list<Renderable *> & Canvas::getMeshesRef()               const { return meshes               ;}
+const list<Renderable *> & Canvas::getDeferredRenderablesRef()  const { return deferredRenderables  ;}
+const list<Renderable *> & Canvas::getRastersRef()              const { return rasters              ;}
 
 vec4 Canvas::setClearColor(const vec4 & clearColor) { return this->clearColor = clearColor ;}
 

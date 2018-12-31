@@ -24,6 +24,7 @@
   \copyright 2018
 */
 
+#include <geos/geom/Point.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
@@ -32,6 +33,7 @@
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
+#include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
 using namespace std;
@@ -40,24 +42,28 @@ using namespace geos;
 using namespace geos::geom;
 
 Renderable * Renderable::create(const Geometry::Ptr & geom,
-                                const mat4          & trans)
+                                const dmat4         & trans,
+                                const AABB2D        & boxUV)
 {
-    return create(geom.get(), trans);
+    return create(geom.get(), trans, boxUV);
 }
 
 Renderable * Renderable::create(const Geometry * geom,
-                                const mat4     & trans)
+                                const dmat4    & trans,
+                                const AABB2D   & boxUV)
 {
     switch(geom->getGeometryTypeId())
     {
-        case GEOS_POINT:                dmess("Implement me!"); return NULL;
+        //case GEOS_POINT:                dmess("Implement me!"); return NULL;
+        case GEOS_POINT:
+            return RenderablePoint::create(dynamic_cast<const Point *>(geom), trans);
         case GEOS_LINESTRING:           
         case GEOS_LINEARRING:           return RenderableLineString::create(dynamic_cast<const LineString *>(geom), trans);
-		case GEOS_POLYGON:              return RenderablePolygon   ::create(dynamic_cast<const geom::Polygon    *>(geom), trans);
+		case GEOS_POLYGON:              return RenderablePolygon   ::create(dynamic_cast<const Polygon    *>(geom), trans, 0, boxUV);
 
         case GEOS_MULTIPOINT:           dmess("Implement me!"); return NULL;
         case GEOS_MULTILINESTRING:      dmess("Implement me!"); return NULL;
-        case GEOS_MULTIPOLYGON:         return RenderablePolygon::create(   dynamic_cast<const MultiPolygon *>(geom), trans);
+        case GEOS_MULTIPOLYGON:         return RenderablePolygon::create(   dynamic_cast<const MultiPolygon *>(geom), trans, 0, boxUV);
 
         case GEOS_GEOMETRYCOLLECTION:   dmess("Implement me!"); return NULL;
         default:

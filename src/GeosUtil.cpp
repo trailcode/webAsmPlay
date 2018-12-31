@@ -61,6 +61,11 @@ Geometry::Ptr geosUtil::makeBox(const double xmin, const double ymin, const doub
     return Geometry::Ptr(geomFact->createPolygon(shell, NULL));
 }
 
+Geometry::Ptr geosUtil::makeBox(const dvec2 & min, const dvec2 & max)
+{
+    return makeBox(min.x, min.y, max.x, max.y);
+}
+
 Geometry::Ptr geosUtil::unionPolygons(const initializer_list<Geometry::Ptr> & polys)
 {
     vector<Polygon *> _polys;

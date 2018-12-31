@@ -24,26 +24,38 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/shaders/ColorSymbology.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/Shader.h>
+#ifndef __WEB_ASM_PLAY_BING_TILE_SYSTEM_H__
+#define __WEB_ASM_PLAY_BING_TILE_SYSTEM_H__
 
-using namespace std;
-using namespace glm;
+#include <string>
+#include <utility>
+#include <glm/vec2.hpp>
 
-Shader::Shader(const string  & shaderName) :    shaderName      (shaderName),
-                                                colorSymbology  (ColorSymbology::getInstance("defaultPolygon")) {}
+// From: https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
 
-void Shader::setVertexArrayFormat(const ArrayFormat & vertexFormat) { this->vertexFormat = vertexFormat ;}
-void Shader::setNormalArrayFormat(const ArrayFormat & normalFormat) { this->normalFormat = normalFormat ;}
-void Shader::setColorArrayFormat (const ArrayFormat & colorFormat)  { this->colorFormat  = colorFormat  ;}
-void Shader::setUV_ArrayFormat   (const ArrayFormat & uvFormat)     { this->uvFormat     = uvFormat     ;}
+namespace bingTileSystem
+{
+    size_t mapSize(const size_t levelOfDetail);
 
-string Shader::getName() const { return shaderName ;}
+    double groundResolution(double latitude, const size_t levelOfDetail);
 
-size_t Shader::getNumRenderingStages() const { return 1 ;}
+    double mapScale(const double latitude, const size_t levelOfDetail, const size_t screenDpi);
 
-bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) const { return renderingStage == 0 ;}
+    glm::ivec2 latLongToPixel(const glm::dvec2 & latLong, const size_t levelOfDetail);
 
-ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
-ColorSymbology * Shader::getColorSymbology() const { return colorSymbology ;}
+    glm::ivec2 latLongToTile(const glm::dvec2 & latLong, const size_t levelOfDetail);
+
+    glm::dvec2 pixelToLatLong(const glm::ivec2 & pixel, const size_t levelOfDetail);
+
+    glm::ivec2 pixelToTile(const glm::ivec2 & pixel);
+
+    glm::ivec2 tileToPixel(const glm::ivec2 & tile);
+
+    glm::dvec2 tileToLatLong(const glm::ivec2 & tile, const size_t levelOfDetail);
+
+    std::string tileToQuadKey(const glm::ivec2 & tile, const size_t levelOfDetail);
+
+    std::pair<size_t, glm::ivec2> quadKeyToTile(const std::string & quadKey);
+}
+
+#endif // __WEB_ASM_PLAY_BING_TILE_SYSTEM_H__

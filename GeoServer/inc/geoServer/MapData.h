@@ -24,26 +24,24 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/shaders/ColorSymbology.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/Shader.h>
+#ifndef __WEB_ASM_PLAY_GEO_SERVER_MAP_DATA_H__
+#define __WEB_ASM_PLAY_GEO_SERVER_MAP_DATA_H__
 
-using namespace std;
-using namespace glm;
+#include <string>
+#include <webAsmPlay/Types.h>
 
-Shader::Shader(const string  & shaderName) :    shaderName      (shaderName),
-                                                colorSymbology  (ColorSymbology::getInstance("defaultPolygon")) {}
+class MapData
+{
+public:
 
-void Shader::setVertexArrayFormat(const ArrayFormat & vertexFormat) { this->vertexFormat = vertexFormat ;}
-void Shader::setNormalArrayFormat(const ArrayFormat & normalFormat) { this->normalFormat = normalFormat ;}
-void Shader::setColorArrayFormat (const ArrayFormat & colorFormat)  { this->colorFormat  = colorFormat  ;}
-void Shader::setUV_ArrayFormat   (const ArrayFormat & uvFormat)     { this->uvFormat     = uvFormat     ;}
+    std::vector<AttributedGeometry> geometry;
 
-string Shader::getName() const { return shaderName ;}
+    double boundsMinX = 0;
+    double boundsMaxX = 0;
+    double boundsMinY = 0;
+    double boundsMaxY = 0;
 
-size_t Shader::getNumRenderingStages() const { return 1 ;}
+private:
+};
 
-bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) const { return renderingStage == 0 ;}
-
-ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
-ColorSymbology * Shader::getColorSymbology() const { return colorSymbology ;}
+#endif // __WEB_ASM_PLAY_GEO_SERVER_MAP_DATA_H__

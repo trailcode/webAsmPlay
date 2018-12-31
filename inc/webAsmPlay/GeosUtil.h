@@ -68,6 +68,8 @@ namespace geosUtil
 
     geos::geom::Geometry::Ptr makeBox(const double xmin, const double ymin, const double xmax, const double ymax);
     
+    geos::geom::Geometry::Ptr makeBox(const glm::dvec2 & min, const glm::dvec2 & max);
+
     geos::geom::Geometry::Ptr unionPolygons(const std::initializer_list<geos::geom::Geometry::Ptr> & polys);
 
     std::vector<const geos::geom::LineString *> getExternalRings(const geos::geom::Geometry * geom);
@@ -91,6 +93,11 @@ namespace geosUtil
     std::vector<glm::dvec2> __(const std::unique_ptr<std::vector<geos::geom::Coordinate> > & coords);
 
     geos::geom::Coordinate ___(const glm::dvec2 & point);
+
+    inline glm::dvec4 __(const geos::geom::Coordinate & v, const double z, const double w)
+    {
+        return glm::dvec4(v.x, v.y, z, w);
+    }
 
     bool contains(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
 
@@ -119,6 +126,14 @@ namespace geosUtil
     {
         *dataStream = v.x; ++dataStream;
         *dataStream = v.y; ++dataStream;
+
+        return v;
+    }
+
+    inline geos::geom::Coordinate append2d(std::vector<double> & data, const geos::geom::Coordinate & v)
+    {
+        data.push_back(v.x);
+        data.push_back(v.y);
 
         return v;
     }

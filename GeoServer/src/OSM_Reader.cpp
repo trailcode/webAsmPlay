@@ -74,6 +74,11 @@ namespace
     OSM_Way      * currWay      = NULL;
     OSM_Relation * currRelation = NULL;
 
+    double boundsMinX = 0;
+    double boundsMaxX = 0;
+    double boundsMinY = 0;
+    double boundsMaxY = 0;
+
     inline OSM_Node * getNode(const uint64_t ID)
     {
         const auto i = nodes.find(ID);
@@ -102,8 +107,15 @@ namespace
     }
 }
 
-vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
+MapData OSM_Reader::import(const string & fileName)
 {
+    MapData ret;
+
+    boundsMinX = 0;
+    boundsMaxX = 0;
+    boundsMinY = 0;
+    boundsMaxY = 0;
+
     char buf[BUFSIZ];
 
     XML_Parser parser = XML_ParserCreate(NULL);
@@ -115,8 +127,6 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
     XML_SetElementHandler(parser, startElement, endElement);
 
     FILE * fp = fopen(fileName.c_str(), "r");
-
-    vector<AttributedGeometry> ret;
 
     do
     {
@@ -184,6 +194,8 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
     size_t numInvalidPoints    = 0;
     size_t geomOperationErrors = 0;
 
+    Geometry::Ptr bounds = makeBox(boundsMinX, boundsMinY, boundsMaxX, boundsMaxY);
+
     for(const OSM_Relations::value_type & i : relations)
     {
         vector<OSM_Way *> outers;
@@ -204,7 +216,8 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
                         break;
                     }
 
-                    ret.push_back(AttributedGeometry(node->attrs.release(), __(node->pos)));
+                    // TODO, do we need to clip to the bounds?
+                    ret.geometry.push_back(AttributedGeometry(node->attrs.release(), __(node->pos)));
 
                     break;
                 }
@@ -282,9 +295,13 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
 
         if(way && way->geom)
         {
+            Geometry * geom = bounds->intersection(way->geom.get());
+
+            if(!geom) { continue ;}
+
             Attributes * attrs = way->attrs.release();
 
-            ret.push_back(AttributedGeometry(attrs, way->geom.get())); // TODO not safe!
+            ret.geometry.push_back(AttributedGeometry(attrs, geom)); // TODO not safe!
         }
         else
         {
@@ -295,6 +312,11 @@ vector<AttributedGeometry> OSM_Reader::import(const string & fileName)
     dmess("numInvalidWays " << numInvalidWays);
     dmess("numInvalidPoints " << numInvalidPoints);
     dmess("geomOperationErrors " << geomOperationErrors);
+
+    ret.boundsMinY = boundsMinY;
+    ret.boundsMinX = boundsMinX;
+    ret.boundsMaxY = boundsMaxY;
+    ret.boundsMaxX = boundsMaxX;
 
     return ret;
 }
@@ -309,6 +331,7 @@ void OSM_Reader::startElement(void *userData, const char *name, const char **att
         case OSM_KEY_NODE:      handleNode     (atts); break;
         case OSM_KEY_WAY:       handleWay      (atts); break;
         case OSM_KEY_ND:        handleND       (atts); break;
+        case OSM_KEY_BOUNDS:    handleBounds   (atts); break;
 
         // Unused
         case OSM_KEY_META: 
@@ -472,6 +495,22 @@ void OSM_Reader::handleND(const char **atts)
             }
 
             default: dmess("Unknown tag: " << atts[i]);
+        }
+    }
+}
+
+void OSM_Reader::handleBounds(const char **atts)
+{
+    for(size_t i = 0; atts[i] != NULL; i += 2)
+    {
+        switch(getKey(atts[i]))
+        {
+        case OSM_KEY_MIN_LAT: boundsMinY = atof(atts[i + 1]); break;
+        case OSM_KEY_MIN_LON: boundsMinX = atof(atts[i + 1]); break;
+        case OSM_KEY_MAX_LAT: boundsMaxY = atof(atts[i + 1]); break;
+        case OSM_KEY_MAX_LON: boundsMaxX = atof(atts[i + 1]); break;
+
+        default: dmess("Unknown tag: " << atts[i]);
         }
     }
 }

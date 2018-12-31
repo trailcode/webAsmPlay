@@ -51,6 +51,12 @@ namespace dataModelOSM
         OSM_KEY_OSM,
         OSM_KEY_NOTE,
         OSM_KEY_REMARK,
+        OSM_KEY_BOUNDS,
+
+        OSM_KEY_MIN_LAT,
+        OSM_KEY_MIN_LON,
+        OSM_KEY_MAX_LAT,
+        OSM_KEY_MAX_LON,
 
         OSM_KEY_ROLE,
         OSM_KEY_REF,

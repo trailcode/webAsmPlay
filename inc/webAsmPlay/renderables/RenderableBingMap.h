@@ -24,26 +24,28 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/shaders/ColorSymbology.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/Shader.h>
+#ifndef __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__
+#define __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__
 
-using namespace std;
-using namespace glm;
+#include <webAsmPlay/renderables/Renderable.h>
 
-Shader::Shader(const string  & shaderName) :    shaderName      (shaderName),
-                                                colorSymbology  (ColorSymbology::getInstance("defaultPolygon")) {}
+class RenderableBingMap : public Renderable
+{
+public:
 
-void Shader::setVertexArrayFormat(const ArrayFormat & vertexFormat) { this->vertexFormat = vertexFormat ;}
-void Shader::setNormalArrayFormat(const ArrayFormat & normalFormat) { this->normalFormat = normalFormat ;}
-void Shader::setColorArrayFormat (const ArrayFormat & colorFormat)  { this->colorFormat  = colorFormat  ;}
-void Shader::setUV_ArrayFormat   (const ArrayFormat & uvFormat)     { this->uvFormat     = uvFormat     ;}
+    static Renderable * create(const AABB2D & bounds, const glm::dmat4 & trans = glm::dmat4(1.0));
 
-string Shader::getName() const { return shaderName ;}
+    void render(Canvas * canvas, const size_t renderStage = 0) const override;
 
-size_t Shader::getNumRenderingStages() const { return 1 ;}
+private:
 
-bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) const { return renderingStage == 0 ;}
+    RenderableBingMap(const AABB2D & bounds, const glm::dmat4 & trans);
+    ~RenderableBingMap();
 
-ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
-ColorSymbology * Shader::getColorSymbology() const { return colorSymbology ;}
+    const AABB2D bounds;
+
+    glm::ivec2 minTile;
+    glm::ivec2 maxTile;
+};
+
+#endif // __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__

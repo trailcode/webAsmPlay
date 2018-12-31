@@ -59,6 +59,15 @@ string toStr(const vec2 & v)
     return buf;
 }
 
+string toStr(const ivec2 & v)
+{
+    char buf[1024];
+
+    sprintf(buf, "[%i, %i]\n", v.x, v.y);
+
+    return buf;
+}
+
 string toStr(const vec3 & v)
 {
     char buf[1024];

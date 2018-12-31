@@ -28,12 +28,14 @@
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
 #include <GLU/tessellate.h>
-#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Tessellation.h>
 
 using namespace std;
 using namespace glm;
 using namespace geos::geom;
+using namespace geosUtil;
 
 Tessellation::Tessellation(const size_t symbologyID,
                            const double height,
@@ -74,28 +76,18 @@ unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * 
     {
         for(size_t i = 0; i < num; ++i)
         {
-            const Coordinate & C = coords[i];
+            append2d(verts, coords[i]);
 
-            verts.push_back(C.x);
-            verts.push_back(C.y);
-
-            ret->lineIndices.push_back(i);
-            ret->lineIndices.push_back((i + 1) % num);
+            append2ui(ret->lineIndices, i, (i + 1) % num);
         }
     }
     else
     {
         for(size_t i = 0; i < num; ++i)
         {
-            const Coordinate & C = coords[i];
+            append2d(verts, trans * __(coords[i], 0, 1));
 
-            const dvec4 v = trans * dvec4(C.x, C.y, 0, 1);
-
-            verts.push_back(v.x);
-            verts.push_back(v.y);
-
-            ret->lineIndices.push_back(i);
-            ret->lineIndices.push_back((i + 1) % num);
+            append2ui(ret->lineIndices, i, (i + 1) % num);
         }
     }
 
@@ -121,32 +113,22 @@ unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * 
         {
             for(size_t i = 0; i < num; ++i)
             {
-                const Coordinate & C = coords[i];
+                append2d(verts, coords[i]);
 
-                verts.push_back(C.x);
-                verts.push_back(C.y);
-
-                ret->lineIndices.push_back(i + offset);
-                ret->lineIndices.push_back(((i + 1) % num) + offset);
+                append2ui(ret->lineIndices, i + offset, ((i + 1) % num) + offset);
             }
         }
         else
         {
             for(size_t i = 0; i < num; ++i)
             {
-                const Coordinate & C = coords[i];
+                append2d(verts, trans * __(coords[i], 0, 1));
 
-                const vec4 v = trans * vec4(C.x, C.y, 0, 1);
-
-                verts.push_back(v.x);
-                verts.push_back(v.y);
-
-                ret->lineIndices.push_back(i + offset);
-                ret->lineIndices.push_back(((i + 1) % num) + offset);
+                append2ui(ret->lineIndices, i + offset, ((i + 1) % num) + offset);
             }
         }
 
-        ret->counterVertIndices.push_back(verts.size());
+        //ret->counterVertIndices.push_back(verts.size()); // TODO Fix!
     }
 
     vector<const double *> counterVertPtrs;

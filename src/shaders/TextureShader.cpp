@@ -24,77 +24,85 @@
   \copyright 2018
 */
 
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/ColorShader.h>
-
-using namespace glm;
+#include <webAsmPlay/shaders/TextureShader.h>
 
 namespace
 {
     ShaderProgram * shaderProgram   = NULL;
-    ColorShader   * defaultInstance = NULL;
+    TextureShader * defaultInstance = NULL;
 
     GLint vertInAttrLoc;
-    GLint colorInUniformLoc;
+    GLint vertUV_InAttrLoc;
 
     GLint MVP_Loc;
+    GLint texLoc;
 }
 
-void ColorShader::ensureShader()
+TextureShader * TextureShader::getDefaultInstance() { return defaultInstance ;}
+
+void TextureShader::ensureShader()
 {
     if(shaderProgram) { return ;}
 
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
         in vec3 vertIn;
-        out vec4 vertexColor;
+        in vec2 vertUV_In;
+        out vec2 UV;
         uniform mat4 MVP;
-        uniform vec4 colorIn;
-
+        
         void main()
         {
             gl_Position = MVP * vec4(vertIn.xyz, 1);
-            vertexColor = colorIn;
+            UV = vertUV_In;
+            //UV = vec2(0,0);
         }
     )glsl";
 
     const GLchar* fragmentSource = R"glsl(#version 330 core
         out vec4 outColor;
-        in vec4 vertexColor;
+        in vec2 UV;
+        uniform sampler2D tex;
 
         void main()
         {
-            outColor = vertexColor;
+            outColor = texture( tex, UV );
+            //outColor = vec4(0,1,1,0.5);
+            outColor.a = 1.0;
         }
     )glsl";
 
     shaderProgram = ShaderProgram::create(  vertexSource,
                                             fragmentSource,
-                                            Variables({{"vertIn",   vertInAttrLoc}}),
-                                            Variables({{"MVP",      MVP_Loc},
-                                                       {"colorIn",  colorInUniformLoc}}));
+                                            Variables({{"vertIn",       vertInAttrLoc},
+                                                       {"vertUV_In",    vertUV_InAttrLoc}
+                                                       }),
+                                            Variables({{"MVP",          MVP_Loc},
+                                                       {"tex",          texLoc}}));
 
-    defaultInstance = new ColorShader();
+    dmess("shaderProgram " << shaderProgram);
+
+    defaultInstance = new TextureShader();
 }
 
-ColorShader * ColorShader::getDefaultInstance() { return defaultInstance ;}
-
-ColorShader::ColorShader() :    Shader      ("ColorShader"),
-                                fillColor   (0,1,0,0.5),
-                                outlineColor(1,1,0,1)
+TextureShader::TextureShader() : Shader("TextureShader")
 {
 
 }
 
-ColorShader::~ColorShader()
+TextureShader::~TextureShader()
 {
 
 }
 
-void ColorShader::bind( Canvas     * canvas,
-                        const bool   isOutline,
-                        const size_t renderingStage)
+GLuint TextureShader::setTextureID(const GLuint textureID) { return this->textureID = textureID ;}
+
+void TextureShader::bind(   Canvas     * canvas,
+                            const bool   isOutline,
+                            const size_t renderingStage)
 {
     shaderProgram->bind();
 
@@ -105,8 +113,18 @@ void ColorShader::bind( Canvas     * canvas,
                                             vertexFormat.stride,
                                             vertexFormat.pointer);
 
-    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+    ShaderProgram::enableVertexAttribArray( vertUV_InAttrLoc,
+                                            uvFormat.size,
+                                            GL_FLOAT,
+                                            GL_FALSE,
+                                            uvFormat.stride,
+                                            uvFormat.pointer);
 
-    if(isOutline) { shaderProgram->setUniform(colorInUniformLoc, outlineColor) ;}
-    else          { shaderProgram->setUniform(colorInUniformLoc, fillColor)    ;}
+    GL_CHECK(glActiveTexture(GL_TEXTURE0));
+
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, textureID));
+
+    shaderProgram->setUniformi(texLoc, 0);
+
+    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }

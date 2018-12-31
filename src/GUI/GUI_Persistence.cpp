@@ -42,17 +42,20 @@
 using namespace std;
 using namespace glm;
 
-bool GUI::showSceneViewPanel       = false;
-bool GUI::showPerformancePanel     = false;
-bool GUI::showRenderSettingsPanel  = false;
-bool GUI::showLogPanel             = false;
-bool GUI::showAttributePanel       = false;
-bool GUI::showSymbologyPanel       = false;
-bool GUI::showGUI_Settings_Panel   = false;
-bool GUI::showOpenSteerTestPanel   = false;
-bool GUI::showOpenSteerPanel       = false;
-bool GUI::showCameraInfoPanel      = false;
+bool GUI::showSceneViewPanel                   = false;
+bool GUI::showPerformancePanel                 = false;
+bool GUI::showRenderSettingsPanel              = false;
+bool GUI::showLogPanel                         = false;
+bool GUI::showAttributePanel                   = false;
+bool GUI::showSymbologyPanel                   = false;
+bool GUI::showGUI_Settings_Panel               = false;
+bool GUI::showOpenSteerTestPanel               = false;
+bool GUI::showOpenSteerPanel                   = false;
+bool GUI::showCameraInfoPanel                  = false;
+bool GUI::showBingTileSystemPanel              = false;
 
+bool GUI::renderSettingsFillMeshes             = true;
+bool GUI::renderSettingsRenderMeshOutlines     = true;
 bool GUI::renderSettingsFillPolygons           = true;
 bool GUI::renderSettingsRenderPolygonOutlines  = true;
 bool GUI::renderSettingsRenderLinearFeatures   = true;
@@ -89,6 +92,7 @@ void GUI::loadState()
     setBool(L"showOpenSteerTestPanel",              showOpenSteerTestPanel);
     setBool(L"showOpenSteerPanel",                  showOpenSteerPanel);
     setBool(L"showCameraInfoPanel",                 showCameraInfoPanel);
+    setBool(L"showBingTileSystemPanel",             showBingTileSystemPanel);
 
     setBool(L"renderSettingsFillPolygons",          renderSettingsFillPolygons);
     setBool(L"renderSettingsRenderPolygonOutlines", renderSettingsRenderPolygonOutlines);
@@ -134,6 +138,7 @@ void GUI::saveState()
     root[L"showOpenSteerTestPanel"]               = new JSONValue(showOpenSteerTestPanel);
     root[L"showOpenSteerPanel"]                   = new JSONValue(showOpenSteerPanel);
     root[L"showCameraInfoPanel"]                  = new JSONValue(showCameraInfoPanel);
+    root[L"showBingTileSystemPanel"]              = new JSONValue(showBingTileSystemPanel);
 
     root[L"renderSettingsFillPolygons"]           = new JSONValue(renderSettingsFillPolygons);
     root[L"renderSettingsRenderPolygonOutlines"]  = new JSONValue(renderSettingsRenderPolygonOutlines);

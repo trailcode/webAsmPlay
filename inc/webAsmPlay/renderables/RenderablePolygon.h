@@ -50,17 +50,19 @@ public:
 
     static Renderable * create( const geos::geom::Polygon       * poly,
                                 const glm::dmat4                & trans         = glm::dmat4(1.0),
-                                const size_t                      symbologyID   = 0);
+                                const size_t                      symbologyID   = 0,
+                                const AABB2D                    & boxUV         = AABB2D());
 
     static Renderable * create( const geos::geom::MultiPolygon  * multyPoly,
                                 const glm::dmat4                & trans         = glm::dmat4(1.0),
-                                const size_t                      symbologyID   = 0);
+                                const size_t                      symbologyID   = 0,
+                                const AABB2D                    & boxUV         = AABB2D());
 
     static Renderable * create( const ColoredGeometryVec        & polygons,
                                 const glm::dmat4                & trans         = glm::mat4(1.0),
                                 const bool                        showProgress  = false);
 
-    void render(Canvas * canvas, const size_t renderStage = 0) const;
+    void render(Canvas * canvas, const size_t renderStage = 0) const override;
 
 private:
 

@@ -30,20 +30,31 @@
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
+namespace geos
+{
+    namespace geom
+    {
+        class Point;
+    }
+}
+
 class RenderablePoint : public Renderable
 {
 public:
 
     ~RenderablePoint();
 
-    static Renderable * create( const glm::vec3 & pos,
-                                const glm::mat4 & trans = glm::mat4(1.0));
+    static Renderable * create( const glm::dvec3 & pos,
+                                const glm::dmat4 & trans = glm::dmat4(1.0));
+
+    static Renderable * create( const geos::geom::Point * point,
+                                const glm::dmat4        & trans = glm::dmat4(1.0));
 
     static Renderable * create( const ConstGeosGeomVec & points,
-                                const glm::mat4        & trans        = glm::mat4(1.0),
+                                const glm::dmat4       & trans        = glm::dmat4(1.0),
                                 const bool               showProgress = false);
 
-    void render(Canvas * canvas, const size_t renderStage = 0) const;
+    void render(Canvas * canvas, const size_t renderStage = 0) const override;
 
 private:
 

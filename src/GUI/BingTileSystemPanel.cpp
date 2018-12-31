@@ -24,26 +24,48 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/shaders/ColorSymbology.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/Shader.h>
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/BingTileSystem.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/GeoClient.h>
+#include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
 using namespace glm;
+using namespace bingTileSystem;
 
-Shader::Shader(const string  & shaderName) :    shaderName      (shaderName),
-                                                colorSymbology  (ColorSymbology::getInstance("defaultPolygon")) {}
+void GUI::bingTileSystemPanel()
+{
+    if(!showBingTileSystemPanel) { return ;}
 
-void Shader::setVertexArrayFormat(const ArrayFormat & vertexFormat) { this->vertexFormat = vertexFormat ;}
-void Shader::setNormalArrayFormat(const ArrayFormat & normalFormat) { this->normalFormat = normalFormat ;}
-void Shader::setColorArrayFormat (const ArrayFormat & colorFormat)  { this->colorFormat  = colorFormat  ;}
-void Shader::setUV_ArrayFormat   (const ArrayFormat & uvFormat)     { this->uvFormat     = uvFormat     ;}
+    dvec4 pos(canvas->getCursorPosWC(), 1.0);
 
-string Shader::getName() const { return shaderName ;}
+    pos = client->getInverseTrans() * pos;
 
-size_t Shader::getNumRenderingStages() const { return 1 ;}
+    double tmp = pos.x;
+    pos.x = pos.y;
+    pos.y = tmp;
 
-bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) const { return renderingStage == 0 ;}
+    const size_t zoomLevel = 19;
 
-ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
-ColorSymbology * Shader::getColorSymbology() const { return colorSymbology ;}
+    ivec2 pix = latLongToPixel(pos, zoomLevel);
+
+    dvec2 pos2 = pixelToLatLong(pix, zoomLevel);
+
+    ivec2 tile = pixelToTile(pix);
+
+    string quadKey = tileToQuadKey(tile, zoomLevel);
+
+    //dmess("pix " << pos.x << " " << pos.y << " " << pix.x << " " << pix.y << " " << pos2.x << " " << pos2.y);
+    //dmess("quadKey " << quadKey);
+
+    ImGui::Begin("Bing Tile System", &showBingTileSystemPanel);
+
+    ImGui::Text(("    pos: " + toStr(vec2(pos))).c_str());
+    ImGui::Text(("    pix: " + toStr(pix)).c_str());
+    ImGui::Text(("   tile: " + toStr(tile)).c_str());
+    ImGui::Text(("quadKey: " + quadKey).c_str());
+
+    ImGui::End();
+}
+

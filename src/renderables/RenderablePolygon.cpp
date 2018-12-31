@@ -51,9 +51,10 @@ RenderablePolygon::~RenderablePolygon()
     delete vertexArrayObject;
 }
 
-Renderable * RenderablePolygon::create( const geom::Polygon * poly,
+Renderable * RenderablePolygon::create( const Polygon * poly,
                                         const dmat4   & trans,
-                                        const size_t    symbologyID)
+                                        const size_t    symbologyID,
+                                        const AABB2D  & boxUV)
 {
     Tessellations tesselations;
 
@@ -61,12 +62,22 @@ Renderable * RenderablePolygon::create( const geom::Polygon * poly,
 
     if((*tesselations.begin())->isEmpty()) { return NULL ;}
 
+    if(get<0>(boxUV) != get<2>(boxUV))
+    {
+        const dvec2 min = trans * dvec4(get<0>(boxUV), get<1>(boxUV), 0, 1);
+        const dvec2 max = trans * dvec4(get<2>(boxUV), get<3>(boxUV), 0, 1);
+
+        return new RenderablePolygon(VertexArrayObject::create(tesselations, AABB2D(min.x, min.y, max.x, max.y)));
+    }
+    
     return new RenderablePolygon(VertexArrayObject::create(tesselations));
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
                                         const dmat4         & trans,
-                                        const size_t          symbologyID)
+                                        const size_t          symbologyID,
+                                        const AABB2D        & boxUV // TODO Implement!
+                                        )
 {
     Tessellations tessellations;
 
@@ -92,10 +103,10 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
         const Geometry  * geom        = get<0>(polygons[i]);
         const GLuint      symbologyID = get<1>(polygons[i]);
         
-        const geom::Polygon      * poly;
+        const Polygon      * poly;
         const MultiPolygon * multiPoly;
 
-        if((poly = dynamic_cast<const geom::Polygon *>(geom)))
+        if((poly = dynamic_cast<const Polygon *>(geom)))
         {
             tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
             
@@ -116,6 +127,7 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
         else
         {
             dmess("Warning not a polygon or multi-polygon.");
+            
             abort();
         }
     }
@@ -129,9 +141,7 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
 
 void RenderablePolygon::render(Canvas * canvas, const size_t renderStage) const
 {
-    //if(renderStage >= shader->getNumRenderingStages()) { return ;} // TODO code dup!
-
-    vertexArrayObject->bind();
+    vertexArrayObject->bind(shader);
 
     vertexArrayObject->bindTriangles();
 
@@ -140,9 +150,6 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage) const
     GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
     GL_CHECK(glDisable(GL_DEPTH_TEST));
-
-    shader->setVertexArrayFormat(2, 3 * sizeof(GLfloat), 0);
-    shader->setColorArrayFormat (1, 3 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
     if(getRenderFill() && shader->shouldRender(false, renderStage))
     {

@@ -47,7 +47,7 @@ public:
 
     void bind(Canvas     * canvas,
               const bool   isOutline,
-              const size_t renderingStage);
+              const size_t renderingStage) override;
 
     glm::vec3 setLightPos(const glm::vec3 & pos);
     glm::vec3 getLightPos() const;

@@ -413,7 +413,7 @@ void topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
 
     for(auto & i : lineStrings)
     {
-        if(get<0>(i)->hasStringKey("footway") || get<0>(i)->hasStringKeyValue("footway", "sidewalk") || get<0>(i)->hasStringKeyValue("highway", "footway")) { curr.push_back(i) ;}
+        //if(get<0>(i)->hasStringKey("footway") || get<0>(i)->hasStringKeyValue("footway", "sidewalk") || get<0>(i)->hasStringKeyValue("highway", "footway")) { curr.push_back(i) ;}
         //if(get<0>(i)->hasStringKey("footway"))
         //if( get<0>(i)->hasStringKeyValue("highway", "residential") || get<0>(i)->hasStringKeyValue("highway", "service")) { curr.push_back(i) ;}
         //if(get<0>(i)->hasStringKeyValue("highway", "service")) { curr.push_back(i) ;}

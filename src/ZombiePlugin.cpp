@@ -41,7 +41,7 @@ namespace
     //int const gPedestrianStartCount = 1000;
     int const gPedestrianStartCount = 1;
 #else
-    //int const gPedestrianStartCount = 3000;
+    //int const gPedestrianStartCount = 3500;
     int const gPedestrianStartCount = 1;
 #endif
     bool gUseDirectedPathFollowing = true;  // TODO dup!
