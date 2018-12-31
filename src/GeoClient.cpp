@@ -401,7 +401,7 @@ void GeoClient::onMessage(const string & data)
 
             const uint32_t numGeoms = getUint32(ptr);
 
-            NumGeomsRequests::const_iterator i = numGeomsRequests.find(requestID);
+            const auto i = numGeomsRequests.find(requestID);
 
             unique_ptr<GeoRequestGetNumGeoms> request(i->second);
 
@@ -416,7 +416,7 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = getUint32(++ptr);
 
-            GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
+            const auto i = getAllGeometriesRequests.find(requestID);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
@@ -431,7 +431,7 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = getUint32(++ptr);;
 
-            GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
+            const auto i = getAllGeometriesRequests.find(requestID);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
@@ -446,7 +446,7 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = getUint32(++ptr);;
 
-            GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
+            const auto i = getAllGeometriesRequests.find(requestID);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
@@ -463,7 +463,7 @@ void GeoClient::onMessage(const string & data)
 
             const AABB2D & bounds = *(AABB2D *)ptr;
 
-            LayerBoundsRequests::const_iterator i = layerBoundsRequests.find(requestID);
+            const auto i = layerBoundsRequests.find(requestID);
 
             unique_ptr<GeoRequestLayerBounds> request(i->second);
 

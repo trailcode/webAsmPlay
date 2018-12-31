@@ -30,10 +30,13 @@
 #endif
 
 #include <unistd.h>
+#include <mutex>
+#include <unordered_set>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/shaders/TextureShader.h>
+#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 
 #include <webAsmPlay/GeosUtil.h>
@@ -45,7 +48,19 @@ using namespace bingTileSystem;
 
 namespace
 {
-    const size_t levelOfDetail = 19;
+#ifndef __EMSCRIPTEN__
+
+    ctpl::thread_pool loaderPool(1);
+
+    ctpl::thread_pool uploaderPool(1);
+
+    mutex loaderMutex;
+    mutex uploaderMutex;
+
+#endif
+
+    //const size_t levelOfDetail = 19;
+    const size_t levelOfDetail = 18;
     //const size_t levelOfDetail = 17;
 
     // Define our struct for accepting LCs output
@@ -74,13 +89,42 @@ namespace
         return realsize;
     }
 
+    unordered_set<int> createdContexts;
+
+    bool contextCreated = false;
+
+    CURL * myHandle = NULL;
+
     class BingTile
     {
     public:
 
         BingTile(const string & quadKey, Renderable * r) : quadKey(quadKey), r(r)
         {
-            fetchTile();
+            loaderPool.push([this](int ID)
+            {
+                /*
+                {
+                    lock_guard<mutex> _(loaderMutex);
+
+                    // They seem to be ordered. Do this once.
+                    if(createdContexts.find(ID) == createdContexts.end())
+                    {
+                        // TODO Create a openGL context class;
+                        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+                        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
+                        glfwMakeContextCurrent(threadWin);
+
+                        createdContexts.insert(ID);
+                    }
+                }
+                */
+
+                fetchTile();
+            });
+            
         }
 
         ~BingTile()
@@ -96,23 +140,39 @@ namespace
 
             if(access(tileCachePath.c_str(), F_OK) != -1)
             {
-                textureID = Textures::load(tileCachePath);
+                uploaderPool.push([this, tileCachePath](int ID)
+                {
+                    if(!contextCreated)
+                    {
+                        // TODO Create a openGL context class;
+                        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+                        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
+                        glfwMakeContextCurrent(threadWin);
+
+                        contextCreated = true;
+                    }
+
+                    textureID = Textures::load(tileCachePath);
+                });
             }
             else
             {
-                return;
+                //return;
 
-                CURL * myHandle;
+                //CURL * myHandle;
                 CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
-                struct BufferStruct output; // Create an instance of out BufferStruct to accept LCs output
-                output.buffer = NULL;
-                output.size = 0;
-                myHandle = curl_easy_init ( ) ;
+                struct BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
+                output->buffer = NULL;
+                output->size = 0;
+
+                if(!myHandle) { myHandle = curl_easy_init() ;}
 
                 /* Notice the lack of major error checking, for brevity */
 
                 curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
-                curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)&output); // Passing our BufferStruct to LC
+                curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)output); // Passing our BufferStruct to LC
 
                 const string url =  "https://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
                                     quadKey +
@@ -120,28 +180,48 @@ namespace
 
                 curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
                 result = curl_easy_perform( myHandle );
-                curl_easy_cleanup( myHandle );
+                dmess("result " << result << " myHandle " << myHandle);
+                //curl_easy_cleanup( myHandle );
 
-                textureID = Textures::createFromJpeg(output.buffer, output.size);
-
-                dmess("textureID " << textureID);
-
-                FILE * fp;
-                
-                fp = fopen(tileCachePath.c_str(), "wb");
-                //if( !fp )
-                dmess("output.size " << output.size);
-                //return;
-                //fprintf(fp, output.buffer );
-                fwrite(output.buffer, sizeof(char), output.size, fp);
-                fclose( fp );
-
-                if( output.buffer )
+                uploaderPool.push([this, output](int ID)
                 {
-                    free ( output.buffer );
-                    output.buffer = 0;
-                    output.size = 0;
-                }
+                    if(!contextCreated)
+                    {
+                        // TODO Create a openGL context class;
+                        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+                        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
+                        glfwMakeContextCurrent(threadWin);
+
+                        contextCreated = true;
+                    }
+
+                    textureID = Textures::createFromJpeg(output->buffer, output->size);
+
+                    //dmess("textureID " << textureID);
+
+                    /*
+                    FILE * fp;
+                    
+                    fp = fopen(tileCachePath.c_str(), "wb");
+                    //if( !fp )
+                    //dmess("output.size " << output.size);
+                    //return;
+                    //fprintf(fp, output.buffer );
+                    fwrite(output.buffer, sizeof(char), output.size, fp);
+                    fclose( fp );
+                    */
+
+                    if( output->buffer )
+                    {
+                        free ( output->buffer );
+                        //output.buffer = 0;
+                        //output.size = 0;
+                    }
+
+                    delete output;
+                });
             }
 
             //dmess("done " << quadKey);
@@ -162,7 +242,7 @@ namespace
 
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds)
 {
-    return;
+    //return;
     
     minTile = latLongToTile(dvec2(get<1>(bounds), get<0>(bounds)), levelOfDetail);
 
@@ -182,7 +262,7 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 
         string quadKey = tileToQuadKey(ivec2(x, y), levelOfDetail);
 
-        dmess("quadKey " << quadKey);
+        //dmess("quadKey " << quadKey);
 
         double tmp = tMin.x; tMin.x = tMin.y; tMin.y = tmp;
 
@@ -216,6 +296,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
     for(const auto r : tiles)
     {
+        if(!r->textureID) { continue ;}
+
         TextureShader::getDefaultInstance()->setTextureID(r->textureID);
 
         r->r->render(canvas, 0);
