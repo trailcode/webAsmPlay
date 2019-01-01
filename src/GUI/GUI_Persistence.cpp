@@ -60,6 +60,7 @@ bool GUI::renderSettingsFillPolygons           = true;
 bool GUI::renderSettingsRenderPolygonOutlines  = true;
 bool GUI::renderSettingsRenderLinearFeatures   = true;
 bool GUI::renderSettingsRenderSkyBox           = true;
+bool GUI::renderSettingsRenderBingMaps         = true;
 
 void GUI::loadState()
 {
@@ -100,6 +101,7 @@ void GUI::loadState()
     setBool(L"renderSettingsRenderPolygonOutlines", renderSettingsRenderPolygonOutlines);
     setBool(L"renderSettingsRenderLinearFeatures",  renderSettingsRenderLinearFeatures);
     setBool(L"renderSettingsRenderSkyBox",          renderSettingsRenderSkyBox);
+    setBool(L"renderSettingsRenderBingMaps",        renderSettingsRenderBingMaps);
     setBool(L"OpenSteerAnnotation",                 OpenSteer::enableAnnotation);
 
     //ColorDistanceShader::getDefaultInstance()->loadState(root);
@@ -148,6 +150,7 @@ void GUI::saveState()
     root[L"renderSettingsRenderPolygonOutlines"]  = new JSONValue(renderSettingsRenderPolygonOutlines);
     root[L"renderSettingsRenderLinearFeatures"]   = new JSONValue(renderSettingsRenderLinearFeatures);
     root[L"renderSettingsRenderSkyBox"]           = new JSONValue(renderSettingsRenderSkyBox);
+    root[L"renderSettingsRenderBingMaps"]         = new JSONValue(renderSettingsRenderBingMaps);
     root[L"buildingHeightMultiplier"]             = new JSONValue(ColorDistanceShader3D::getDefaultInstance()->getHeightMultiplier());
 
     root[L"cameraEye"]                            = new JSONValue(canvas->getCamera()->getEyeConstRef());

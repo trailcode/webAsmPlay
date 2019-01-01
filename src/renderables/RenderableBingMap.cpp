@@ -291,9 +291,7 @@ Renderable * RenderableBingMap::create(const AABB2D & bounds, const dmat4 & tran
 
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 {
-    //return;
-
-    //dmess("minTile " << maxTile.x - minTile.x << " " << maxTile.y - minTile.y);
+    if(!getRenderFill()) { return ;}
 
     for(const auto r : tiles)
     {

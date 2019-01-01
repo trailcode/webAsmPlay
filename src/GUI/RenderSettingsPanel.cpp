@@ -83,6 +83,14 @@ void GUI::renderSettingsPanel()
             else                           { canvas->setSkyBox(NULL)   ;}
         }
         
+        if(ImGui::Checkbox("BingMaps", &renderSettingsRenderBingMaps))
+        {
+            for(Renderable * r : canvas->getRastersRef())
+            {
+                r->setRenderFill(renderSettingsRenderBingMaps);
+            }
+        }
+
         //ImGui::Spacing();
 
         float heightMultiplier = ColorDistanceShader3D::getDefaultInstance()->getHeightMultiplier();

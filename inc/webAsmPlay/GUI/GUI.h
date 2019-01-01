@@ -69,6 +69,7 @@ public:
     static bool renderSettingsRenderPolygonOutlines;
     static bool renderSettingsRenderLinearFeatures;
     static bool renderSettingsRenderSkyBox;
+    static bool renderSettingsRenderBingMaps;
 
     static void setupCallbacks(GLFWwindow* window);
     static void initOpenGL();
