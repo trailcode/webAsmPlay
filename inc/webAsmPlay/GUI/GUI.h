@@ -89,6 +89,10 @@ public:
 
     static float openSteerCameraDist;
 
+    static GeoClient * getClient();
+
+    static void createWorld();
+
 private:
 
     GUI() {}

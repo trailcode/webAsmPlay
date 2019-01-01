@@ -94,6 +94,8 @@ void GUI::loadState()
     setBool(L"showCameraInfoPanel",                 showCameraInfoPanel);
     setBool(L"showBingTileSystemPanel",             showBingTileSystemPanel);
 
+    setBool(L"renderSettingsFillMeshes",            renderSettingsFillMeshes);
+    setBool(L"renderSettingsRenderMeshOutlines",    renderSettingsRenderMeshOutlines);
     setBool(L"renderSettingsFillPolygons",          renderSettingsFillPolygons);
     setBool(L"renderSettingsRenderPolygonOutlines", renderSettingsRenderPolygonOutlines);
     setBool(L"renderSettingsRenderLinearFeatures",  renderSettingsRenderLinearFeatures);
@@ -140,6 +142,8 @@ void GUI::saveState()
     root[L"showCameraInfoPanel"]                  = new JSONValue(showCameraInfoPanel);
     root[L"showBingTileSystemPanel"]              = new JSONValue(showBingTileSystemPanel);
 
+    root[L"renderSettingsFillMeshes"]             = new JSONValue(renderSettingsFillMeshes);
+    root[L"renderSettingsRenderMeshOutlines"]     = new JSONValue(renderSettingsRenderMeshOutlines);
     root[L"renderSettingsFillPolygons"]           = new JSONValue(renderSettingsFillPolygons);
     root[L"renderSettingsRenderPolygonOutlines"]  = new JSONValue(renderSettingsRenderPolygonOutlines);
     root[L"renderSettingsRenderLinearFeatures"]   = new JSONValue(renderSettingsRenderLinearFeatures);
@@ -153,8 +157,6 @@ void GUI::saveState()
     root[L"OpenSteerAnnotation"]                  = new JSONValue(OpenSteer::enableAnnotation);
     root[L"openSteerCameraDist"]                  = new JSONValue(GUI::openSteerCameraDist);
 
-    //ColorDistanceShader::getDefaultInstance()->saveState(root);
-    //ColorSymbology     ::getDefaultInstance()->saveState(root);
     ColorSymbology::getInstance("defaultMesh")   ->saveState(root);
     ColorSymbology::getInstance("defaultPolygon")->saveState(root);
     ColorSymbology::getInstance("defaultLinear") ->saveState(root);

@@ -501,6 +501,8 @@ char GUI::getMode() { return mode ;}
 
 GLFWwindow * GUI::getMainWindow() { return mainWindow ;}
 
+GeoClient * GUI::getClient() { return client ;}
+
 void GUI::progress(const string & message, const float percent)
 {
     if(percent >= 1.0)
@@ -553,19 +555,6 @@ void GUI::initOpenGL() // TODO, need some code refactor here
         geosTestCanvas  = new GeosTestCanvas(),
         openSteerCanvas = new OpenSteerCanvas()
     });
-
-    skyBox = new SkyBox();
-
-    canvas->setSkyBox(skyBox);
-
-    client = new GeoClient(canvas);
-
-    //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
-    client->loadGeometry("data.geo");
-
-    //GridPlane * gridPlane = new GridPlane();
-
-    //canvas->addRenderable(gridPlane);
 }
 
 Updatable GUI::addUpdatable(Updatable updatable)
@@ -585,3 +574,17 @@ void GUI::shutdown()
 }
 
 bool GUI::isShuttingDown() { return shuttingDown ;}
+
+void GUI::createWorld()
+{
+    skyBox = new SkyBox();
+
+    if(renderSettingsRenderSkyBox) { canvas->setSkyBox(skyBox) ;} // TODO create check render functor
+    else                           { canvas->setSkyBox(NULL)   ;}
+
+    client = new GeoClient(canvas);
+
+    //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
+    client->loadGeometry("data.geo");
+}
+

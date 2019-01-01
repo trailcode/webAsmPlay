@@ -175,9 +175,14 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     Renderable * r;
 
+    dmess("GUI::renderSettingsFillPolygons " << GUI::renderSettingsFillPolygons);
+
     if((r = RenderablePolygon::create(polygons, trans, true)))
     {
         r->setShader(ColorDistanceShader::getDefaultInstance());
+
+        r->setRenderFill    (GUI::renderSettingsFillPolygons);
+        r->setRenderOutline (GUI::renderSettingsRenderPolygonOutlines);
 
         canvas->addRenderable(r);
     }
@@ -185,6 +190,9 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     if((r = RenderableMesh::create(polygons3D, trans, true)))
     {
         r->setShader(ColorDistanceDepthShader3D::getDefaultInstance());
+
+        r->setRenderFill    (GUI::renderSettingsFillMeshes);
+        r->setRenderOutline (GUI::renderSettingsRenderMeshOutlines);
 
         canvas->addRenderable(r);
     }
@@ -251,6 +259,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     Renderable * r = RenderableLineString::create(polylines, trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
+
+    r->setRenderOutline(GUI::renderSettingsRenderLinearFeatures);
 
     canvas->addRenderable(r);
     

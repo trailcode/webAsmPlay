@@ -60,8 +60,8 @@ namespace
 #endif
 
     //const size_t levelOfDetail = 19;
-    const size_t levelOfDetail = 18;
-    //const size_t levelOfDetail = 17;
+    //const size_t levelOfDetail = 18;
+    const size_t levelOfDetail = 17;
 
     // Define our struct for accepting LCs output
     struct BufferStruct
@@ -272,9 +272,10 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 
         r->setShader(TextureShader::getDefaultInstance());
 
-        tiles.push_back(new BingTile(quadKey, r));
+        r->setRenderOutline (false);
+        r->setRenderFill    (true);
 
-        //tiles.push_back(r);
+        tiles.push_back(new BingTile(quadKey, r));
     }
 }
 
