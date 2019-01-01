@@ -54,6 +54,7 @@
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/OpenSteerCanvas.h>
+#include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -599,6 +600,8 @@ void GUI::createWorld()
         client->loadGeometry("data.geo");
 
         client->addBingMap(renderSettingsRenderBingMaps);
+
+        OpenSteerGlue::init(canvas, client->getNetwork());
 
     });
 }

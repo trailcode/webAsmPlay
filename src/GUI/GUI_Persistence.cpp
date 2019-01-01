@@ -82,6 +82,11 @@ void GUI::loadState()
         if(root.find(key) != root.end()) { value = root[key]->AsBool() ;}
     };
 
+    auto setNumber = [&root](const wstring & key, auto & value)->void
+    {
+        if(root.find(key) != root.end()) { value = root[key]->AsNumber() ;}
+    };
+
     setBool(L"showSceneViewPanel",                  showSceneViewPanel);
     setBool(L"showPerformancePanel",                showPerformancePanel);
     setBool(L"showPerformancePanel",                showPerformancePanel);
@@ -104,7 +109,9 @@ void GUI::loadState()
     setBool(L"renderSettingsRenderBingMaps",        renderSettingsRenderBingMaps);
     setBool(L"OpenSteerAnnotation",                 OpenSteer::enableAnnotation);
 
-    //ColorDistanceShader::getDefaultInstance()->loadState(root);
+    setNumber(L"cameraMode",                        cameraMode);
+    setNumber(L"openSteerCameraDist",               openSteerCameraDist);
+
     ColorSymbology::getInstance("defaultMesh")   ->loadState(root);
     ColorSymbology::getInstance("defaultPolygon")->loadState(root);
     ColorSymbology::getInstance("defaultLinear") ->loadState(root);
@@ -112,11 +119,6 @@ void GUI::loadState()
     if(root.find(L"cameraEye")    != root.end()) { canvas->getCamera()->setEye   (root[L"cameraEye"]   ->AsVec3()) ;}
     if(root.find(L"cameraCenter") != root.end()) { canvas->getCamera()->setCenter(root[L"cameraCenter"]->AsVec3()) ;}
     if(root.find(L"cameraUp")     != root.end()) { canvas->getCamera()->setUp    (root[L"cameraUp"]    ->AsVec3()) ;}
-
-    if(root.find(L"openSteerCameraDist") != root.end())
-    {
-        GUI::openSteerCameraDist = root[L"openSteerCameraDist"]->AsNumber();
-    }
 
     canvas->getCamera()->update();
 
@@ -158,7 +160,9 @@ void GUI::saveState()
     root[L"cameraUp"]                             = new JSONValue(canvas->getCamera()->getUpConstRef());
 
     root[L"OpenSteerAnnotation"]                  = new JSONValue(OpenSteer::enableAnnotation);
-    root[L"openSteerCameraDist"]                  = new JSONValue(GUI::openSteerCameraDist);
+    root[L"openSteerCameraDist"]                  = new JSONValue(openSteerCameraDist);
+
+    root[L"cameraMode"]                           = new JSONValue(cameraMode);
 
     ColorSymbology::getInstance("defaultMesh")   ->saveState(root);
     ColorSymbology::getInstance("defaultPolygon")->saveState(root);

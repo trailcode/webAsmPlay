@@ -51,7 +51,12 @@ void GUI::openSteerPanel()
 
         ImGui::SliderFloat("", &openSteerCameraDist, 0.007f, 1.5f, "Camera dist: %.3f");
         
-        if(ImGui::Button("Next Zombie")) { gotoNextZombie = true ;}
+        if(ImGui::Button("Next Zombie"))
+        {
+            gotoNextZombie = true;
+
+            cameraMode = 2; // TODO create an enum!
+        }
 
         ImGui::SameLine(); ImGui::Checkbox("Annotation", &OpenSteer::enableAnnotation);
 

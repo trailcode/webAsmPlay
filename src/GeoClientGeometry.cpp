@@ -250,7 +250,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     network->setEdges(edges);
 
-    OpenSteerGlue::init(canvas, network);
+    //OpenSteerGlue::init(canvas, network);
 
     dmess("linestring quadTree " << quadTreeLineStrings->depth() << " " << geoms.size());
 
