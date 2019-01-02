@@ -105,7 +105,7 @@ void GUI::renderSettingsPanel()
         
         ImGui::Combo("Camera", &cameraMode, items, IM_ARRAYSIZE(items));
 
-        ImGui::Text("Linestring Shader");
+        //ImGui::Text("Linestring Shader");
 
         const char * shaders[] = { "ColorDistanceShader", "ColorDistanceShader3D", "ColorDistanceDepthShader3D", "ColorShader", "ColorVertexShader" };
 
@@ -113,7 +113,7 @@ void GUI::renderSettingsPanel()
 
         ImGui::Combo("Linestring", &lineStringShader, shaders, IM_ARRAYSIZE(shaders)); 
         
-        static int meshShader = 0;
+        static int meshShader = 2;
 
         if(ImGui::Combo("Mesh", &meshShader, shaders, IM_ARRAYSIZE(shaders)))
         {

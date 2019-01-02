@@ -242,7 +242,7 @@ namespace
 
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds)
 {
-    //return;
+    return;
     
     minTile = latLongToTile(dvec2(get<1>(bounds), get<0>(bounds)), levelOfDetail);
 

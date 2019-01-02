@@ -57,8 +57,8 @@ void TextureShader::ensureShader()
         void main()
         {
             gl_Position = MVP * vec4(vertIn.xyz, 1);
+
             UV = vertUV_In;
-            //UV = vec2(0,0);
         }
     )glsl";
 
@@ -70,7 +70,7 @@ void TextureShader::ensureShader()
         void main()
         {
             outColor = texture( tex, UV );
-            //outColor = vec4(0,1,1,0.5);
+            
             outColor.a = 1.0;
         }
     )glsl";

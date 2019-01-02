@@ -40,8 +40,8 @@ namespace
 #ifdef __EMSCRIPTEN__
     int const gPedestrianStartCount = 2000;
 #else
-    int const gPedestrianStartCount = 3500;
-    //int const gPedestrianStartCount = 1;
+    //int const gPedestrianStartCount = 3500;
+    int const gPedestrianStartCount = 1;
 #endif
     bool gUseDirectedPathFollowing = true;  // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
@@ -72,7 +72,7 @@ void ZombiePlugin::open()
     population = 0;
     for (int i = 0; i < gPedestrianStartCount; i++)
     {
-        if(!(i % 10)) { dmess("Add Pedestrian " << i << " of " << gPedestrianStartCount) ;}
+        if(!(i % 300)) { dmess("Add Pedestrian " << i << " of " << gPedestrianStartCount) ;}
 
         addPedestrianToCrowd ();
     }

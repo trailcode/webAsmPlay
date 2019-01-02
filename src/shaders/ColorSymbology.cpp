@@ -104,8 +104,6 @@ vec4 & ColorSymbology::getColorRef(const size_t index) { return colors[index] ;}
 
 void ColorSymbology::loadState(const JSONObject & dataStore)
 {
-    dmess("loadState " << name);
-
     auto setVec4 = [&dataStore](const wstring & key, vec4 & color)->void
     {
         JSONObject::const_iterator i = dataStore.find(key);
@@ -127,8 +125,6 @@ void ColorSymbology::loadState(const JSONObject & dataStore)
 
 void ColorSymbology::saveState(JSONObject & dataStore)
 {
-    dmess("saveState " << name);
-
     char buf[1024];
 
     for(size_t i = 0; i < 32; ++i)

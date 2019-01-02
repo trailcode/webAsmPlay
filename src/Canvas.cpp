@@ -172,7 +172,7 @@ GLuint Canvas::render()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for(const auto r : meshes)              { r->render(this, 1) ;}
+    for(const auto r : meshes) { r->render(this, 1) ;}
 
     glFlush();
 
@@ -192,6 +192,7 @@ GLuint Canvas::render()
     for(const auto r : deferredRenderables) { r->render(this, 0) ;} 
     //for(const auto r : meshes)              { r->render(this) ;}
 
+    ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
     ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
 
     for(const auto r : meshes)              { r->render(this, 0) ;}

@@ -70,7 +70,7 @@ void GeoClient::addGeometry(const char * data)
 
     createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
     createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
-    //createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
+    createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
 }
 
 namespace
@@ -172,8 +172,6 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     dmess("polygons " << polygons.size() << " polygons3D " << polygons3D.size());
 
     Renderable * r;
-
-    dmess("GUI::renderSettingsFillPolygons " << GUI::renderSettingsFillPolygons);
 
     if((r = RenderablePolygon::create(polygons, trans, true)))
     {
@@ -277,7 +275,8 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     auto startTime = system_clock::now();
 
-    vector<const Geometry *> points;
+    //vector<const Geometry *> points;
+    ColoredGeometryVec points;
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
@@ -294,14 +293,18 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
         quadTreePoints->insert(geom->getEnvelopeInternal(), data);
 
-        points.push_back(geom);
+        points.push_back(ColoredGeometry(geom->buffer(0.001), 2));
+        //points.push_back(geom);
     }
     
     GUI::progress("", 1.0);
 
     dmess("Points quadTree " << quadTreePoints->depth() << " " << geoms.size());
 
-    Renderable * r = RenderablePoint::create(points, trans, true);
+    //Renderable * r = RenderablePoint::create(points, trans, true);
+    Renderable * r = RenderablePolygon::create(points, trans, true);
+
+    r->setShader(ColorDistanceShader::getDefaultInstance());
 
     canvas->addRenderable(r);
     

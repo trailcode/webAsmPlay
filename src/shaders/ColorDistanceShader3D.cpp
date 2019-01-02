@@ -204,7 +204,7 @@ void ColorDistanceShader3D::ensureShader()
             dist = min(maxDist, dist) / maxDist;
 
             outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
-            outColor = vec4(1,1,1,1);
+            //outColor = vec4(1,1,1,1);
         }
     )glsl";
 
@@ -299,9 +299,6 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
 
         shaderProgramOutline->setUniformf(colorLookupOffsetOutline, 1.0f);
     }
-
-    //if(isOutline) { shaderProgramFill->setUniformf(colorLookupOffsetFill, 1.0f) ;}
-    //else          { shaderProgramFill->setUniformf(colorLookupOffsetFill, 0.0f) ;}
 }
 
 float ColorDistanceShader3D::setHeightMultiplier(const float multiplier) { return heightMultiplier = multiplier ;}

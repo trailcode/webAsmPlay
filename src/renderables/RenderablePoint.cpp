@@ -36,7 +36,7 @@ using namespace geos::geom;
 Renderable * RenderablePoint::create(const Point * point,
                                      const dmat4 & trans)
 {
-    return NULL;
+    return create(dvec3(point->getX(), point->getY(), point->getZ()), trans);
 }
 
 Renderable * RenderablePoint::create(const dvec3 & _pos,
@@ -76,7 +76,14 @@ Renderable * RenderablePoint::create(const ConstGeosGeomVec & points,
                                      const dmat4            & trans,
                                      const bool               showProgress)
 {
-    abort();
+    //abort();
+    for(const auto i : points)
+    {
+        const dvec2 P(dynamic_cast<const Point *>(i)->getX(), dynamic_cast<const Point *>(i)->getY());
+
+        dmess("P " << P.x << " " << P.y);
+    }
+
     return NULL;
 }
 

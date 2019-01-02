@@ -223,8 +223,6 @@ string GeoServer::addOsmFile(const string & osmFile)
         }
         else if((lineString = dynamic_cast<LineString *>(i.second)))
         {
-            //serializedLineStrings.push_back(GeometryConverter::convert(AttributedLineString(i.first, lineString)));
-
             lineStrings.push_back(AttributedLineString(i.first, lineString));
         }
         else if((point = dynamic_cast<Point *>(i.second)))
