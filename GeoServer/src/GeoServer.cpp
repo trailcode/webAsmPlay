@@ -246,11 +246,11 @@ string GeoServer::addOsmFile(const string & osmFile)
         //unique_ptr<CoordinateSequence>(i.second->getCoordinates())->toVector();
     }
 
-    discoverTopologicalRelations(polygons);
+    //discoverTopologicalRelations(polygons);
 
-    breakLineStrings(lineStrings);
+    //breakLineStrings(lineStrings);
 
-    createNavigationPaths(lineStrings);
+    //createNavigationPaths(lineStrings);
 
     for(const AttributedPoligonalArea & g : polygons)    { serializedPolygons   .push_back(GeometryConverter::convert(g)) ;}
     for(const AttributedLineString    & l : lineStrings) { serializedLineStrings.push_back(GeometryConverter::convert(l)) ;}

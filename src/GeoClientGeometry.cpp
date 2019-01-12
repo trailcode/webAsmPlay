@@ -293,7 +293,7 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
         quadTreePoints->insert(geom->getEnvelopeInternal(), data);
 
-        points.push_back(ColoredGeometry(geom->buffer(0.001), 2));
+        points.push_back(ColoredGeometry(geom->buffer(0.0001), 1));
         //points.push_back(geom);
     }
     

@@ -309,6 +309,19 @@ MapData OSM_Reader::import(const string & fileName)
         }
     }
 
+    dmess("Nodes " << nodes.size());
+
+    size_t a = 0;
+    size_t b = 0;
+
+    for(const auto & i : nodes)
+    {
+        if(!i.second->relations.size()) { ++a ;}
+        else { ++b ;}
+    }
+
+    dmess("a " << a << " b " << b);
+
     dmess("numInvalidWays " << numInvalidWays);
     dmess("numInvalidPoints " << numInvalidPoints);
     dmess("geomOperationErrors " << geomOperationErrors);
