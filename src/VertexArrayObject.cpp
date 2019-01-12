@@ -29,6 +29,11 @@
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/VertexArrayObject.h>
 
+#ifdef WIN32
+#undef min
+#undef max
+#endif
+
 using namespace std;
 using namespace glm;
 
@@ -177,6 +182,13 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             offset += 4;
         }
     }
+
+	if (!triangleIndices.size())
+	{
+		dmess("Warning !triangleIndices.size()");
+
+		return NULL;
+	}
 
     GLuint vao  = 0;
     GLuint ebo  = 0;

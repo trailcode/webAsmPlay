@@ -24,6 +24,9 @@
   \copyright 2018
 */
 
+#ifdef WIN32
+#define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #include <algorithm>
 #include <webAsmPlay/Debug.h>

@@ -19,6 +19,8 @@ if(MSVC_VERSION)
     set(PC_EXPAT_LIBRARY_DIRS "C:/tp/expat_Release_2_1_0_x64/lib")
     set(GDAL_LIBRARY "C:/tp/gdal_Release_2_3_2_x64/lib/gdal_i.lib")
     set(GDAL_INCLUDE_DIR "C:/tp/gdal_Release_2_3_2_x64/include")
+	set(CURL_INCLUDE_DIR "C:/tp/curl_Release_7_31_0_x64/include")
+	set(CURL_LIBRARY "C:/tp/curl_Release_7_31_0_x64/lib/libcurl.lib")
 
 endif()
 
