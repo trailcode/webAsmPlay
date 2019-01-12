@@ -149,8 +149,9 @@ AttributedGeometry GeometryConverter::getGeosPolygon(const char *& poly)
 
 AttributedGeometry GeometryConverter::getGeosLineString(const char *& lineString)
 {
-    return AttributedGeometry(new Attributes(lineString),
-                              GeometryFactory::getDefaultInstance()->createLineString(getGeosCoordinateSequence(lineString)));
+	Attributes * attrs = new Attributes(lineString);
+
+    return AttributedGeometry(attrs, GeometryFactory::getDefaultInstance()->createLineString(getGeosCoordinateSequence(lineString)));
 }
 
 AttributedGeometry GeometryConverter::getGeosPoint(const char *& point)
