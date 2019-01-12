@@ -585,24 +585,26 @@ void GUI::createWorld()
     if(renderSettingsRenderSkyBox) { canvas->setSkyBox(skyBox) ;} // TODO create check render functor
     else                           { canvas->setSkyBox(NULL)   ;}
 
-    pool.push([](int ID)
-    {
+    //pool.push([](int ID)
+    //{
         // TODO Create a openGL context class;
+		/*
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 
         GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
 
         glfwMakeContextCurrent(threadWin);
+		*/
 
         client = new GeoClient(canvas);
 
-        //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
-        client->loadGeometry("data.geo");
+        client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
+        //client->loadGeometry("data.geo");
 
         client->addBingMap(renderSettingsRenderBingMaps);
 
         OpenSteerGlue::init(canvas, client->getNetwork());
 
-    });
+    //});
 }
 

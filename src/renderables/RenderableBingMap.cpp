@@ -29,7 +29,11 @@
     #include <ctpl.h>
 #endif
 
+#ifdef WIN32
+
+#else
 #include <unistd.h>
+#endif
 #include <mutex>
 #include <unordered_set>
 #include <webAsmPlay/Debug.h>
@@ -64,14 +68,14 @@ namespace
     //const size_t levelOfDetail = 17;
 
     // Define our struct for accepting LCs output
-    struct BufferStruct
+    struct BufferStruct // TODO code dupilcation
     {
         char * buffer;
         size_t size;
     };
 
     // This is the function we pass to LC, which writes the output to a BufferStruct
-    static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
+    static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) // TODO code dupilcation
     {
         size_t realsize = size * nmemb;
 
@@ -138,7 +142,11 @@ namespace
 
             string tileCachePath = "./tiles/" + quadKey + ".jpg";
 
+#ifdef WIN32
+			if (false)
+#else
             if(access(tileCachePath.c_str(), F_OK) != -1)
+#endif
             {
                 uploaderPool.push([this, tileCachePath](int ID)
                 {

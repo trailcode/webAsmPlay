@@ -24,6 +24,12 @@
   \copyright 2018
 */
 
+#ifdef WIN32
+#define Polygon Polygon_Custom // Prevent Polygon ambiguity
+#include <windows.h>
+#undef Polygon
+#endif
+
 #include <chrono>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
@@ -67,10 +73,18 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
         const dvec2 min = trans * dvec4(get<0>(boxUV), get<1>(boxUV), 0, 1);
         const dvec2 max = trans * dvec4(get<2>(boxUV), get<3>(boxUV), 0, 1);
 
-        return new RenderablePolygon(VertexArrayObject::create(tesselations, AABB2D(min.x, min.y, max.x, max.y)));
+		VertexArrayObject * vao = VertexArrayObject::create(tesselations, AABB2D(min.x, min.y, max.x, max.y));
+
+		if (!vao) { return NULL ;}
+
+        return new RenderablePolygon(vao);
     }
-    
-    return new RenderablePolygon(VertexArrayObject::create(tesselations));
+
+	VertexArrayObject * vao = VertexArrayObject::create(tesselations);
+
+	if (!vao) { return NULL; }
+
+    return new RenderablePolygon(vao);
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
