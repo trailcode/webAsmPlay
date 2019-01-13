@@ -598,6 +598,8 @@ void GUI::createWorld()
 
         client = new GeoClient(canvas);
 
+        return;
+
         //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
         client->loadGeometry("data.geo");
 

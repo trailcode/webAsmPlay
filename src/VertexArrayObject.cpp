@@ -139,10 +139,21 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             triangleIndices.push_back(tess->triangleIndices[i] + offset);
         }
 
-        for(size_t i = 0; i < tess->numVerts; ++i)
+        size_t lastIndex = 0;
+
+        for(size_t i = 1; i < tess->counterVertIndices.size(); ++i)
         {
-            lineIndices.push_back(i + offset);
-            lineIndices.push_back((i + 1) % tess->numVerts + offset);
+            const size_t num = tess->counterVertIndices[i] - lastIndex;
+
+            const size_t localOffset = offset + lastIndex;
+
+            for(size_t j = 0; j < num; ++j)
+            {
+                lineIndices.push_back(j + localOffset);
+                lineIndices.push_back((j + 1) % num + localOffset);
+            }
+
+            lastIndex = tess->counterVertIndices[i];
         }
 
         offset += tess->numVerts;
