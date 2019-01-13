@@ -92,7 +92,7 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
         buffered = Geometry::Ptr(buffered->difference(inside.get()));
 
-        /*
+        //*
         for(const LineString * ring : getExternalRings(buffered))
         {   
             Renderable * geom = Renderable::create(ring, trans);
@@ -101,6 +101,6 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
             geoms.push_back(unique_ptr<Renderable>(geom));
         }
-        */
+        //*/
     }
 }
