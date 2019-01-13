@@ -38,7 +38,6 @@ using namespace OpenSteer;
 namespace
 {
 #ifdef __EMSCRIPTEN__
-    //int const gPedestrianStartCount = 1000;
     int const gPedestrianStartCount = 1;
 #else
     //int const gPedestrianStartCount = 3500;
@@ -73,7 +72,7 @@ void ZombiePlugin::open()
     population = 0;
     for (int i = 0; i < gPedestrianStartCount; i++)
     {
-        if(!(i % 10)) { dmess("Add Pedestrian " << i << " of " << gPedestrianStartCount) ;}
+        if(!(i % 300)) { dmess("Add Pedestrian " << i << " of " << gPedestrianStartCount) ;}
 
         addPedestrianToCrowd ();
     }

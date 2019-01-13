@@ -24,6 +24,12 @@
   \copyright 2018
 */
 
+#ifdef WIN32
+#define Polygon Polygon_Custom // Prevent Polygon ambiguity
+#include <windows.h>
+#undef Polygon
+#endif
+
 #include <geos/geom/LineString.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
@@ -106,7 +112,7 @@ unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * 
         }
 
         const size_t num = coords.size() - 1;
-
+        
         const size_t offset = verts.size() / 2;
 
         if(trans == dmat4(1.0))
@@ -128,7 +134,7 @@ unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * 
             }
         }
 
-        //ret->counterVertIndices.push_back(verts.size()); // TODO Fix!
+        ret->counterVertIndices.push_back(verts.size());
     }
 
     vector<const double *> counterVertPtrs;

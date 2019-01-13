@@ -24,6 +24,12 @@
   \copyright 2018
 */
 
+#ifdef WIN32
+#define Polygon Polygon_Custom // Prevent Polygon ambiguity
+#include <windows.h>
+#undef Polygon
+#endif
+
 #include <geos/geom/Point.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>

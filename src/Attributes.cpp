@@ -125,49 +125,49 @@ void Attributes::write(ostream & out) const
 
     for(const Ints32::value_type & i : ints32)
     {
-        out.write(i.first.data(), i.first.length() + 1);
+        out.write(i.first.c_str(), i.first.length() + 1);
 
         out.write((const char *)&i.second, sizeof(int32_t));
     }
 
     for(const Ints64::value_type & i : ints64)
     {
-        out.write(i.first.data(), i.first.length() + 1);
+        out.write(i.first.c_str(), i.first.length() + 1);
 
         out.write((const char *)&i.second, sizeof(int64_t));
     }
 
     for(const UInts32::value_type & i : uints32)
     {
-        out.write(i.first.data(), i.first.length() + 1);
+        out.write(i.first.c_str(), i.first.length() + 1);
 
         out.write((const char *)&i.second, sizeof(uint32_t));
     }
 
     for(const UInts64::value_type & i : uints64)
     {
-        out.write(i.first.data(), i.first.length() + 1);
+        out.write(i.first.c_str(), i.first.length() + 1);
 
         out.write((const char *)&i.second, sizeof(uint64_t));
     }
 
     for(const Doubles::value_type & i : doubles)
     {
-        out.write(i.first.data(), i.first.length() + 1);
+        out.write(i.first.c_str(), i.first.length() + 1);
 
         out.write((const char *)&i.second, sizeof(double));
     }
 
     for(const Strings::value_type & i : strings)
     {
-        out.write(i.first.data(), i.first.length() + 1);
+        out.write(i.first.c_str(), i.first.length() + 1);
 
         out.write(i.second.data(), i.second.length() + 1);
     }
 
     for(const MultiStrs::value_type & i : multiStrs)
     {
-        out.write(i.first.data(), i.first.length() + 1);
+        out.write(i.first.c_str(), i.first.length() + 1);
 
         const uint16_t numValues = i.second.size();
 
@@ -175,7 +175,7 @@ void Attributes::write(ostream & out) const
 
         for(const string & value : i.second)
         {
-            out.write(value.data(), value.length() + 1);
+            out.write(value.c_str(), value.length() + 1);
         }
     }
 }

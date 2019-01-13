@@ -79,6 +79,7 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
         return NULL;
     }
 
+    //FloatVec  verts  (coords.size() * 3);
     FloatVec  verts  (coords.size() * 2);
     Uint32Vec indices(coords.size());
 
@@ -98,6 +99,8 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
         for(size_t i = 0; i < coords.size(); ++i)
         {
             append2f(vertsPtr, trans * dvec4(coords[i].x, coords[i].y, 0, 1));
+
+            //append(vertsPtr, 0);
 
             indices[i] = i;
         }
@@ -210,6 +213,8 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage) con
 {
     if(!shader->shouldRender(true, renderStage)) { return ;}
 
+    if(!getRenderOutline()) { return ;}
+
     GL_CHECK(glBindVertexArray(                    vao));
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
@@ -218,12 +223,16 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage) con
 
     if(!isMulti)
     {
+        shader->setVertexArrayFormat(ArrayFormat(2, 2 * sizeof(GLfloat), 0));
+
         shader->bind(canvas, true, renderStage);
 
         GL_CHECK(glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL));
     }
     else
     {
+        shader->setVertexArrayFormat(ArrayFormat(3, 3 * sizeof(GLfloat), 0));
+
         shader->bind(canvas, true, renderStage);
 
         GL_CHECK(glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, NULL));

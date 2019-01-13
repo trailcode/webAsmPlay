@@ -140,6 +140,8 @@ bool Canvas::preRender()
 
     if(useFrameBuffer)
     {
+        frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, size);
+
         frameBuffer->bind();
     
         GL_CHECK(glViewport(0, 0, size.x, size.y));
@@ -168,15 +170,18 @@ GLuint Canvas::render()
 
     lock_guard<mutex> _(renderiablesMutex);
 
-    auxFrameBuffer->bind();
+    if(auxFrameBuffer)
+    {
+        auxFrameBuffer->bind();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for(const auto r : meshes)              { r->render(this, 1) ;}
+        for(const auto r : meshes) { r->render(this, 1) ;}
 
-    glFlush();
+        glFlush();
 
-    auxFrameBuffer->unbind();
+        auxFrameBuffer->unbind();
+    }
 
     for(const auto r : rasters) { r->render(this, 0) ;}
 
@@ -192,6 +197,7 @@ GLuint Canvas::render()
     for(const auto r : deferredRenderables) { r->render(this, 0) ;} 
     //for(const auto r : meshes)              { r->render(this) ;}
 
+    ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
     ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
 
     for(const auto r : meshes)              { r->render(this, 0) ;}

@@ -19,6 +19,8 @@ if(MSVC_VERSION)
     set(PC_EXPAT_LIBRARY_DIRS "C:/tp/expat_Release_2_1_0_x64/lib")
     set(GDAL_LIBRARY "C:/tp/gdal_Release_2_3_2_x64/lib/gdal_i.lib")
     set(GDAL_INCLUDE_DIR "C:/tp/gdal_Release_2_3_2_x64/include")
+	set(CURL_INCLUDE_DIR "C:/tp/curl_Release_7_31_0_x64/include")
+	set(CURL_LIBRARY "C:/tp/curl_Release_7_31_0_x64/lib/libcurl.lib")
 
 endif()
 
@@ -240,10 +242,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
                                 -s SDL2_IMAGE_FORMATS='[\"png\"]' \
                                 -s DISABLE_EXCEPTION_CATCHING=0 \
                                 -s FETCH=1 \
+                                -s DEMANGLE_SUPPORT=1 \
                                 --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/ \
                                 --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/config@/")
 
     #-s DEMANGLE_SUPPORT=1 \
+    #-s ASSERTIONS=2 \
     #set (CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-s DEMANGLE_SUPPORT=1")
 
     add_definitions(-D__EMSCRIPTEN__)

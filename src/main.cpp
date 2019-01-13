@@ -35,6 +35,7 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions 
@@ -125,6 +126,7 @@ int main(int, char**)
     GUI::setupCallbacks(window);
     GUI::initOpenGL();
     GUI::loadState();
+    GUI::createWorld();
 
     #ifdef __EMSCRIPTEN__
         
@@ -157,6 +159,7 @@ int main(int, char**)
 
         glfwDestroyWindow(window);
         glfwTerminate();
+        
     #endif
 
     GUI::shutdown();

@@ -26,11 +26,12 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/fetch.h>
+#else
+#include <ctpl.h>
 #endif
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
-
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>
@@ -110,6 +111,12 @@ namespace
     static char mode = GUI::NORMAL_MODE;
 
     list<Updatable> updatables;
+
+#ifndef __EMSCRIPTEN__
+
+    ctpl::thread_pool pool(1);
+
+#endif
 }
 
 void errorCallback(int error, const char* description)
@@ -501,6 +508,8 @@ char GUI::getMode() { return mode ;}
 
 GLFWwindow * GUI::getMainWindow() { return mainWindow ;}
 
+GeoClient * GUI::getClient() { return client ;}
+
 void GUI::progress(const string & message, const float percent)
 {
     if(percent >= 1.0)
@@ -553,19 +562,6 @@ void GUI::initOpenGL() // TODO, need some code refactor here
         geosTestCanvas  = new GeosTestCanvas(),
         openSteerCanvas = new OpenSteerCanvas()
     });
-
-    skyBox = new SkyBox();
-
-    canvas->setSkyBox(skyBox);
-
-    client = new GeoClient(canvas);
-
-    //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
-    client->loadGeometry("data.geo");
-
-    //GridPlane * gridPlane = new GridPlane();
-
-    //canvas->addRenderable(gridPlane);
 }
 
 Updatable GUI::addUpdatable(Updatable updatable)
@@ -585,3 +581,33 @@ void GUI::shutdown()
 }
 
 bool GUI::isShuttingDown() { return shuttingDown ;}
+
+void GUI::createWorld()
+{
+    skyBox = new SkyBox();
+
+    if(renderSettingsRenderSkyBox) { canvas->setSkyBox(skyBox) ;} // TODO create check render functor
+    else                           { canvas->setSkyBox(NULL)   ;}
+
+    //pool.push([](int ID)
+    //{
+        // TODO Create a openGL context class;
+		/*
+        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
+        glfwMakeContextCurrent(threadWin);
+		*/
+
+        client = new GeoClient(canvas);
+
+        //return;
+
+        //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
+        client->loadGeometry("data.geo");
+
+        client->addBingMap(renderSettingsRenderBingMaps);
+    //});
+}
+

@@ -42,6 +42,7 @@
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/GUI/GUI.h>
+#include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/GeoClient.h>
 
 using namespace std;
@@ -49,7 +50,6 @@ using namespace std::chrono;
 using namespace glm;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
-
 
 void GeoClient::addGeometry(const char * data)
 {
@@ -62,7 +62,7 @@ void GeoClient::addGeometry(const char * data)
     const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
 
     trans = translate(  s,
-                        dvec3((get<2>(bounds) + get<0>(bounds)) * -0.5,
+                        dvec3(  (get<2>(bounds) + get<0>(bounds)) * -0.5,
                                 (get<3>(bounds) + get<1>(bounds)) * -0.5,
                                 0.0));
     
@@ -70,9 +70,9 @@ void GeoClient::addGeometry(const char * data)
 
     createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
     createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
-    //createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
+    createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
 
-    addBingMap(); // TODO, this does not belong here!
+    OpenSteerGlue::init(canvas, getNetwork());
 }
 
 namespace
@@ -179,12 +179,18 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     {
         r->setShader(ColorDistanceShader::getDefaultInstance());
 
+        r->setRenderFill    (GUI::renderSettingsFillPolygons);
+        r->setRenderOutline (GUI::renderSettingsRenderPolygonOutlines);
+
         canvas->addRenderable(r);
     }
 
     if((r = RenderableMesh::create(polygons3D, trans, true)))
     {
         r->setShader(ColorDistanceDepthShader3D::getDefaultInstance());
+
+        r->setRenderFill    (GUI::renderSettingsFillMeshes);
+        r->setRenderOutline (GUI::renderSettingsRenderMeshOutlines);
 
         canvas->addRenderable(r);
     }
@@ -242,15 +248,19 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     
     GUI::progress("Linestring index:", 1.0);
 
+    dmess("edges " << edges.size());
+
     network->setEdges(edges);
 
-    OpenSteerGlue::init(canvas, network);
+    //OpenSteerGlue::init(canvas, network);
 
     dmess("linestring quadTree " << quadTreeLineStrings->depth() << " " << geoms.size());
 
     Renderable * r = RenderableLineString::create(polylines, trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
+
+    r->setRenderOutline(GUI::renderSettingsRenderLinearFeatures);
 
     canvas->addRenderable(r);
     
@@ -269,7 +279,8 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     auto startTime = system_clock::now();
 
-    vector<const Geometry *> points;
+    //vector<const Geometry *> points;
+    ColoredGeometryVec points;
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
@@ -286,14 +297,18 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
         quadTreePoints->insert(geom->getEnvelopeInternal(), data);
 
-        points.push_back(geom);
+        points.push_back(ColoredGeometry(geom->buffer(0.0001), 1));
+        //points.push_back(geom);
     }
     
     GUI::progress("", 1.0);
 
     dmess("Points quadTree " << quadTreePoints->depth() << " " << geoms.size());
 
-    Renderable * r = RenderablePoint::create(points, trans, true);
+    //Renderable * r = RenderablePoint::create(points, trans, true);
+    Renderable * r = RenderablePolygon::create(points, trans, true);
+
+    r->setShader(ColorDistanceShader::getDefaultInstance());
 
     canvas->addRenderable(r);
     

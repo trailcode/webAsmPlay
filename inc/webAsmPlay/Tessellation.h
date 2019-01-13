@@ -70,8 +70,6 @@ private:
     double height;
     double minHeight;
 
-private:
-
     Tessellation(const size_t symbologyID,
                  const double height,
                  const double minHeight);

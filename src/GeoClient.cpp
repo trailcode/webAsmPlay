@@ -27,6 +27,8 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/fetch.h>
+#else
+#include <curl/curl.h>
 #endif
 
 #include <algorithm>
@@ -401,7 +403,7 @@ void GeoClient::onMessage(const string & data)
 
             const uint32_t numGeoms = getUint32(ptr);
 
-            NumGeomsRequests::const_iterator i = numGeomsRequests.find(requestID);
+            const auto i = numGeomsRequests.find(requestID);
 
             unique_ptr<GeoRequestGetNumGeoms> request(i->second);
 
@@ -416,7 +418,7 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = getUint32(++ptr);
 
-            GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
+            const auto i = getAllGeometriesRequests.find(requestID);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
@@ -431,7 +433,7 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = getUint32(++ptr);;
 
-            GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
+            const auto i = getAllGeometriesRequests.find(requestID);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
@@ -446,7 +448,7 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = getUint32(++ptr);;
 
-            GetAllGeometriesRequests::const_iterator i = getAllGeometriesRequests.find(requestID);
+            const auto i = getAllGeometriesRequests.find(requestID);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
@@ -463,7 +465,7 @@ void GeoClient::onMessage(const string & data)
 
             const AABB2D & bounds = *(AABB2D *)ptr;
 
-            LayerBoundsRequests::const_iterator i = layerBoundsRequests.find(requestID);
+            const auto i = layerBoundsRequests.find(requestID);
 
             unique_ptr<GeoRequestLayerBounds> request(i->second);
 
@@ -612,6 +614,41 @@ namespace
 #endif
 }
 
+namespace
+{
+	// Define our struct for accepting LCs output
+	struct BufferStruct // TODO code dupilcation
+	{
+		char * buffer;
+		size_t size;
+	};
+
+	// This is the function we pass to LC, which writes the output to a BufferStruct
+	static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) // TODO code dupilcation
+	{
+		size_t realsize = size * nmemb;
+
+		struct BufferStruct * mem = (struct BufferStruct *) data;
+
+		mem->buffer = (char *)realloc(mem->buffer, mem->size + realsize + 1);
+
+		if (mem->buffer)
+		{
+			memcpy(&(mem->buffer[mem->size]), ptr, realsize);
+			mem->size += realsize;
+			mem->buffer[mem->size] = 0;
+		}
+
+		return realsize;
+	}
+
+#ifndef __EMSCRIPTEN__
+
+	CURL * myHandle = NULL; // TODO code dup
+
+#endif
+}
+
 void GeoClient::loadGeometry(const string fileName)
 {
     dmess("GeoClient::loadGeometry " << this);
@@ -630,13 +667,49 @@ void GeoClient::loadGeometry(const string fileName)
 
 #else
 
+	if (!fileName.rfind("http", 1))
+	{
+		dmess("Here!");
+
+		CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
+		struct BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
+		output->buffer = NULL;
+		output->size = 0;
+
+		if (!myHandle) { myHandle = curl_easy_init(); }
+
+		/* Notice the lack of major error checking, for brevity */
+
+		curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
+		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)output); // Passing our BufferStruct to LC
+
+		curl_easy_setopt(myHandle, CURLOPT_URL, fileName.c_str());
+		result = curl_easy_perform(myHandle);
+		dmess("result " << result << " myHandle " << myHandle);
+
+		addGeometry(output->buffer);
+
+		GUI::progress("", 1.0);
+
+		if (output->buffer)
+		{
+			free(output->buffer);
+			//output.buffer = 0;
+			//output.size = 0;
+		}
+
+		delete output;
+
+		return;
+	}
+
     FILE * fp = fopen(fileName.c_str(), "rb");
 
     if(!fp)
     {
         dmess("Error! Could not open: " << fileName);
 
-        return;
+		abort();
     }
 
     fseek(fp, 0, SEEK_END); // seek to end of file
@@ -658,7 +731,14 @@ void GeoClient::loadGeometry(const string fileName)
 #endif
 }
 
-void GeoClient::addBingMap() { getCanvas()->addRenderable(RenderableBingMap::create(getBounds(), trans)) ;}
+void GeoClient::addBingMap(bool enabled)
+{
+    auto r = RenderableBingMap::create(getBounds(), trans);
+
+    r->setRenderFill(enabled);
+
+    getCanvas()->addRenderable(r);
+}
 
 AABB2D GeoClient::getBounds() const { return bounds ;}
 

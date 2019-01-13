@@ -122,8 +122,6 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
     ZombiePlugin::setNetwork(network);
 
-    OpenSteer::setAnnotationOn();
-
 #ifndef __EMSCRIPTEN__
 
     openSteerThread = new thread([]()
