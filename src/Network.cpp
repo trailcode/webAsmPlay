@@ -415,6 +415,8 @@ vector<dvec2> Network::getRandomPath()
 {
     unique_ptr<vector<Coordinate> > coords = NULL;
 
+    dmess("edges " << edges.size());
+
     for(; !coords ;)
     {
         Edge * A = edges[rand() % edges.size()];

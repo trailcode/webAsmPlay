@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
 set(default_build_type "Release")
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 #set(EMCC_DEBUG 1)
 
 if(MSVC_VERSION)
@@ -242,10 +242,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
                                 -s SDL2_IMAGE_FORMATS='[\"png\"]' \
                                 -s DISABLE_EXCEPTION_CATCHING=0 \
                                 -s FETCH=1 \
+                                -s DEMANGLE_SUPPORT=1 \
                                 --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/ \
                                 --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/config@/")
 
     #-s DEMANGLE_SUPPORT=1 \
+    #-s ASSERTIONS=2 \
     #set (CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-s DEMANGLE_SUPPORT=1")
 
     add_definitions(-D__EMSCRIPTEN__)

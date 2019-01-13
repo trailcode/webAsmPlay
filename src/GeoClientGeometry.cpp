@@ -42,6 +42,7 @@
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/GUI/GUI.h>
+#include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/GeoClient.h>
 
 using namespace std;
@@ -49,7 +50,6 @@ using namespace std::chrono;
 using namespace glm;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
-
 
 void GeoClient::addGeometry(const char * data)
 {
@@ -62,7 +62,7 @@ void GeoClient::addGeometry(const char * data)
     const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
 
     trans = translate(  s,
-                        dvec3((get<2>(bounds) + get<0>(bounds)) * -0.5,
+                        dvec3(  (get<2>(bounds) + get<0>(bounds)) * -0.5,
                                 (get<3>(bounds) + get<1>(bounds)) * -0.5,
                                 0.0));
     
@@ -71,6 +71,8 @@ void GeoClient::addGeometry(const char * data)
     createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
     createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
     createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
+
+    OpenSteerGlue::init(canvas, getNetwork());
 }
 
 namespace
@@ -245,6 +247,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     }
     
     GUI::progress("Linestring index:", 1.0);
+
+    dmess("edges " << edges.size());
 
     network->setEdges(edges);
 

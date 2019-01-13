@@ -159,6 +159,7 @@ int main(int, char**)
 
         glfwDestroyWindow(window);
         glfwTerminate();
+        
     #endif
 
     GUI::shutdown();

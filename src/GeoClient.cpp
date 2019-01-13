@@ -642,7 +642,11 @@ namespace
 		return realsize;
 	}
 
+#ifndef __EMSCRIPTEN__
+
 	CURL * myHandle = NULL; // TODO code dup
+
+#endif
 }
 
 void GeoClient::loadGeometry(const string fileName)

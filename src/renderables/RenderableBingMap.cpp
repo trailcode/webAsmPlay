@@ -62,6 +62,8 @@ namespace
     mutex loaderMutex;
     mutex uploaderMutex;
 
+    unordered_map<int, CURL *> curlHandles;
+
 #endif
 
     //const size_t levelOfDetail = 19;
@@ -98,44 +100,22 @@ namespace
 
     bool contextCreated = false;
 
-    //CURL * myHandle = NULL;
-    unordered_map<int, CURL *> curlHandles;
-
     class BingTile
     {
     public:
 
         BingTile(const string & quadKey, Renderable * r) : quadKey(quadKey), r(r)
         {
-            loaderPool.push([this](int ID)
-            {
-                /*
-                {
-                    lock_guard<mutex> _(loaderMutex);
+#ifndef __EMSCRIPTEN__
 
-                    // They seem to be ordered. Do this once.
-                    if(createdContexts.find(ID) == createdContexts.end())
-                    {
-                        // TODO Create a openGL context class;
-                        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+            loaderPool.push([this](int ID) { fetchTile(ID) ;});
 
-                        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
-                        glfwMakeContextCurrent(threadWin);
-
-                        createdContexts.insert(ID);
-                    }
-                }
-                */
-
-                fetchTile(ID);
-            });
-            
+#endif
         }
 
         ~BingTile()
         {
-
+            // TODO cleanup
         }
 
         void fetchTile(const int ID)

@@ -26,11 +26,12 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/fetch.h>
+#else
+#include <ctpl.h>
 #endif
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
-#include <ctpl.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>
@@ -54,7 +55,6 @@
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/OpenSteerCanvas.h>
-#include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -112,7 +112,11 @@ namespace
 
     list<Updatable> updatables;
 
+#ifndef __EMSCRIPTEN__
+
     ctpl::thread_pool pool(1);
+
+#endif
 }
 
 void errorCallback(int error, const char* description)
@@ -604,9 +608,6 @@ void GUI::createWorld()
         client->loadGeometry("data.geo");
 
         client->addBingMap(renderSettingsRenderBingMaps);
-
-        OpenSteerGlue::init(canvas, client->getNetwork());
-
     //});
 }
 

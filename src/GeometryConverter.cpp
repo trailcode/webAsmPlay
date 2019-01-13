@@ -158,15 +158,10 @@ AttributedGeometry GeometryConverter::getGeosPoint(const char *& point)
 {
     Attributes * attrs = new Attributes(point);
 
-    dmess("Herea " << attrs->toString());
-
     const double x = getDouble(point);
     const double y = getDouble(point);
 
-    dmess("Here " << x << " " << y);
-
     return AttributedGeometry(attrs,
-                              //GeometryFactory::getDefaultInstance()->createPoint(Coordinate(getDouble(point), getDouble(point))));
                               GeometryFactory::getDefaultInstance()->createPoint(Coordinate(x, y)));
 }
 
