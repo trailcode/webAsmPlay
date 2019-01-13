@@ -598,8 +598,8 @@ void GUI::createWorld()
 
         client = new GeoClient(canvas);
 
-        client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
-        //client->loadGeometry("data.geo");
+        //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
+        client->loadGeometry("data.geo");
 
         client->addBingMap(renderSettingsRenderBingMaps);
 
