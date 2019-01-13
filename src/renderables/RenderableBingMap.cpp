@@ -36,6 +36,7 @@
 #endif
 #include <mutex>
 #include <unordered_set>
+#include <unordered_map>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/Textures.h>
@@ -54,7 +55,7 @@ namespace
 {
 #ifndef __EMSCRIPTEN__
 
-    ctpl::thread_pool loaderPool(1);
+    ctpl::thread_pool loaderPool(16);
 
     ctpl::thread_pool uploaderPool(1);
 
@@ -63,9 +64,9 @@ namespace
 
 #endif
 
-    const size_t levelOfDetail = 19;
+    //const size_t levelOfDetail = 19;
     //const size_t levelOfDetail = 18;
-    //const size_t levelOfDetail = 17;
+    const size_t levelOfDetail = 17;
 
     // Define our struct for accepting LCs output
     struct BufferStruct // TODO code dupilcation
@@ -97,7 +98,8 @@ namespace
 
     bool contextCreated = false;
 
-    CURL * myHandle = NULL;
+    //CURL * myHandle = NULL;
+    unordered_map<int, CURL *> curlHandles;
 
     class BingTile
     {
@@ -126,7 +128,7 @@ namespace
                 }
                 */
 
-                fetchTile();
+                fetchTile(ID);
             });
             
         }
@@ -136,11 +138,11 @@ namespace
 
         }
 
-        void fetchTile()
+        void fetchTile(const int ID)
         {
 #ifndef __EMSCRIPTEN__
 
-            string tileCachePath = "./tiles/" + quadKey + ".jpg";
+            const string tileCachePath = "./tiles/" + quadKey + ".jpg";
 
 #ifdef WIN32
 			if (false)
@@ -169,13 +171,25 @@ namespace
             {
                 //return;
 
-                //CURL * myHandle;
+                CURL * myHandle = NULL;
+
+                {
+                    lock_guard<mutex> _(loaderMutex);
+
+                    if(curlHandles.find(ID) == curlHandles.end())
+                    {
+                        curlHandles[ID] = myHandle = curl_easy_init();
+                    }
+
+                    myHandle = curlHandles[ID];
+                }
+
                 CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
                 struct BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
                 output->buffer = NULL;
                 output->size = 0;
 
-                if(!myHandle) { myHandle = curl_easy_init() ;}
+                //if(!myHandle) { myHandle = curl_easy_init() ;}
 
                 /* Notice the lack of major error checking, for brevity */
 
@@ -188,10 +202,10 @@ namespace
 
                 curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
                 result = curl_easy_perform( myHandle );
-                dmess("result " << result << " myHandle " << myHandle);
+                //dmess("result " << result << " myHandle " << myHandle);
                 //curl_easy_cleanup( myHandle );
 
-                uploaderPool.push([this, output](int ID)
+                uploaderPool.push([this, output, tileCachePath](int ID)
                 {
                     if(!contextCreated)
                     {
@@ -209,17 +223,14 @@ namespace
 
                     //dmess("textureID " << textureID);
 
-                    /*
-                    FILE * fp;
-                    
-                    fp = fopen(tileCachePath.c_str(), "wb");
-                    //if( !fp )
-                    //dmess("output.size " << output.size);
-                    //return;
-                    //fprintf(fp, output.buffer );
-                    fwrite(output.buffer, sizeof(char), output.size, fp);
-                    fclose( fp );
-                    */
+                    if(access(tileCachePath.c_str(), F_OK) == -1)
+                    {
+                        FILE * fp = fopen(tileCachePath.c_str(), "wb");
+                        
+                        fwrite(output->buffer, sizeof(char), output->size, fp);
+
+                        fclose(fp);
+                    }
 
                     if( output->buffer )
                     {
@@ -250,7 +261,7 @@ namespace
 
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds)
 {
-    return;
+    //return;
     
     minTile = latLongToTile(dvec2(get<1>(bounds), get<0>(bounds)), levelOfDetail);
 
