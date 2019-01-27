@@ -12,6 +12,7 @@
           width: 100vw;
           height: 100vh;
           display: block;
+          background-color: #000;
       }
       .spinner {
         height: 30px;
@@ -92,6 +93,7 @@
               alert('WebGL context lost. Click to Reload the page.');
               window.location.reload();
           }, false);
+          //gl = canvas.getContext("webgl", { premultipliedAlpha: false });
           return canvas;
         })(),
         setStatus: function(text) {

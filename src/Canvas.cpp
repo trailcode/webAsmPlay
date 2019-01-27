@@ -140,11 +140,13 @@ bool Canvas::preRender()
 
     if(useFrameBuffer)
     {
-        frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, size);
+        //frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, size);
+        frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, frameBufferSize);
 
         frameBuffer->bind();
     
-        GL_CHECK(glViewport(0, 0, size.x, size.y));
+        //GL_CHECK(glViewport(0, 0, size.x, size.y));
+        GL_CHECK(glViewport(0, 0, frameBufferSize.x, frameBufferSize.y));
     }
 
     if(skyBox) { skyBox->render(this) ;}
