@@ -80,6 +80,7 @@ void GUI::cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 {
     for(auto c : auxCanvases) { c->onMousePosition(window, vec2(xpos, ypos)) ;}
 
+    //canvas->onMousePosition(window, vec2(xpos / 2, ypos / 2));
     canvas->onMousePosition(window, vec2(xpos, ypos));
 
     refresh();
@@ -87,6 +88,8 @@ void GUI::cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 
 void GUI::scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 {
+    //dmess("scrollCallback " << xoffset << " " << yoffset);
+
     for(auto c : auxCanvases) { c->onMouseScroll(window, vec2(xoffset, yoffset)) ;}
 
     if(!GImGui->IO.WantCaptureMouse) { canvas->onMouseScroll(window, vec2(xoffset, yoffset)) ;}
@@ -120,21 +123,28 @@ void GUI::charCallback(GLFWwindow * window, unsigned int c)
 
 void GUI::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-    dmess("GUI::framebufferSizeCallback " << width << " " << height);
 
+    //*
     int fbWidth, fbHeight;
 
     glfwGetFramebufferSize(mainWindow, &fbWidth, &fbHeight); // TODO Perhaps original passed in? 
 
+    dmess("GUI::framebufferSizeCallback " << width << " " << height << " fbWidth " << fbWidth << " fbHeight " << fbHeight);
+
+    //canvas->setFrameBufferSize(ivec2(fbWidth * 2, fbHeight * 2));
     canvas->setFrameBufferSize(ivec2(fbWidth, fbHeight));
 
     // Need to use this to get true size because of retina displays.
     glfwGetWindowSize(window, &width, &height);
-
+    
     canvas->setArea(ivec2(0,0), ivec2(width, height));
+    //canvas->setArea(ivec2(0,0), ivec2(fbWidth * 2, fbWidth * 2));
+    //canvas->setArea(ivec2(0,0), ivec2(fbWidth / 2, fbWidth / 2));
+    //*/
 
     refresh();
 }
+
 
 void GUI::windowFocusCallback(GLFWwindow* window, int focused)
 {

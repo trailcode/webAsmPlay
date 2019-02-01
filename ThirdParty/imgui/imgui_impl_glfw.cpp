@@ -30,7 +30,7 @@
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
-
+#include <webAsmPlay/Debug.h>
 // GLFW
 #include <GLFW/glfw3.h>
 #ifdef _WIN32
@@ -250,7 +250,10 @@ void ImGui_ImplGlfw_NewFrame()
     int w, h;
     int display_w, display_h;
     glfwGetWindowSize(g_Window, &w, &h);
+    //w /= 2;
+    //h /= 2;
     glfwGetFramebufferSize(g_Window, &display_w, &display_h);
+    //dmess("here " << w << " " << h << " " << display_w << " " << display_h);
     io.DisplaySize = ImVec2((float)w, (float)h);
     io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
 

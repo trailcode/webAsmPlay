@@ -646,21 +646,13 @@ var LibraryGL = {
       }
 
       var exts = GLctx.getSupportedExtensions();
-      console.log("------------");
-      console.log(exts);
-      console.log("------------");
       if (exts && exts.length > 0) {
         GLctx.getSupportedExtensions().forEach(function(ext) {
           if (automaticallyEnabledExtensions.indexOf(ext) != -1) {
-            var r = GLctx.getExtension(ext); // Calling .getExtension enables that extension permanently, no need to store the return value to be enabled.
-            console.log('Enabeling: ', ext, r);
+            GLctx.getExtension(ext); // Calling .getExtension enables that extension permanently, no need to store the return value to be enabled.
           }
         });
       }
-
-      var ex = GLctx.getExtension("WEBGL_color_buffer_float");
-      console.log(ex);
-      
     },
 
     // In WebGL, uniforms in a shader program are accessed through an opaque object type 'WebGLUniformLocation'.
@@ -7628,7 +7620,7 @@ keys(LibraryGL).forEach(function(x) {
       fixed = fixed.substr(0, 9) + '_' + y + fixed.substr(9);
       LibraryGL[x] = eval('(function() { return ' + fixed + ' })()');
     }
-    return dep; 
+    return dep;
   });
   // copy it
   copyLibEntry(y, x);
