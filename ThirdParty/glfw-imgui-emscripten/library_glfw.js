@@ -513,8 +513,10 @@ var LibraryGLFW = {
 
     onCanvasResize: function(_width, _height) {
       if (!GLFW.active) return;
-        var width = _width * 2;
-        var height = _height * 2;
+      var win = GLFW.WindowFromId(GLFW.active.id);
+      var scale = Module.devicePixelRatio;
+      var width = _width * 2;
+      var height = _height * 2;
       var resizeNeeded = true;
 
 #if 1

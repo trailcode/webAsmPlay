@@ -440,7 +440,7 @@ void GUI::mainLoop(GLFWwindow * window)
     
     // Rendering
     int screenWidth, screenHeight;
-
+    
     glfwGetFramebufferSize(mainWindow, &screenWidth, &screenHeight);
     //glfwGetWindowSize(mainWindow, &screenWidth, &screenHeight);
 
