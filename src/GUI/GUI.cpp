@@ -289,12 +289,12 @@ void GUI::showMainToolBar()
     if (pressed>=0) fprintf(stderr,"Toolbar1: pressed:%d\n",pressed);
     switch(pressed)
     {
-        case 0: mode = NORMAL_MODE; break;
-        case 1: mode = PICK_MODE_LINESTRING; break;
-        case 2: mode = PICK_MODE_POLYGON_SINGLE; break;
-        case 3: mode = PICK_MODE_POLYGON_MULTIPLE; break;
-        case 4: mode = SET_PATH_START_POINT; break;
-        case 5: mode = FIND_PATH; break;
+        case 0: mode = NORMAL_MODE;                 break;
+        case 1: mode = PICK_MODE_LINESTRING;        break;
+        case 2: mode = PICK_MODE_POLYGON_SINGLE;    break;
+        case 3: mode = PICK_MODE_POLYGON_MULTIPLE;  break;
+        case 4: mode = SET_PATH_START_POINT;        break;
+        case 5: mode = FIND_PATH;                   break;
     }
 }
 
@@ -440,8 +440,9 @@ void GUI::mainLoop(GLFWwindow * window)
     
     // Rendering
     int screenWidth, screenHeight;
-
+    
     glfwGetFramebufferSize(mainWindow, &screenWidth, &screenHeight);
+    //glfwGetWindowSize(mainWindow, &screenWidth, &screenHeight);
 
     GL_CHECK(glViewport(0, 0, screenWidth, screenHeight));
     
@@ -534,10 +535,13 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     
     // Define the viewport dimensions
     static int width, height;
-    
-    glfwGetWindowSize(mainWindow, &width, &height);
+    int fbWidth, fbHeight;
 
-    GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
+    glfwGetWindowSize(mainWindow, &width, &height);
+    glfwGetFramebufferSize(mainWindow, &fbWidth, &fbHeight);
+
+    //GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
+    GL_CHECK(glViewport(0, 0, fbWidth, fbHeight)); // TODO needed?
 
     // TODO make these plugins!
     ColorDistanceShader       ::ensureShader();
@@ -550,10 +554,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     canvas = new Canvas(false);
 
     canvas->setArea(ivec2(0,0), ivec2(width, height));
-
-    int fbWidth, fbHeight;
-
-    glfwGetFramebufferSize(mainWindow, &fbWidth, &fbHeight);
+    //canvas->setArea(ivec2(0,0), ivec2(fbWidth, fbWidth));
 
     canvas->setFrameBufferSize(ivec2(fbWidth, fbHeight));
 
