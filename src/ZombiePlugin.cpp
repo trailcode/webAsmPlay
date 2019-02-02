@@ -35,14 +35,16 @@
 
 using namespace OpenSteer;
 
+#ifdef __EMSCRIPTEN__
+    int gPedestrianStartCount = 1500;
+#else
+    int gPedestrianStartCount = 3500;
+    //int const gPedestrianStartCount = 1;
+#endif
+
 namespace
 {
-#ifdef __EMSCRIPTEN__
-    int const gPedestrianStartCount = 1;
-#else
-    //int const gPedestrianStartCount = 3500;
-    int const gPedestrianStartCount = 1;
-#endif
+
     bool gUseDirectedPathFollowing = true;  // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
 
@@ -95,6 +97,19 @@ void ZombiePlugin::open()
 
 void ZombiePlugin::update(const float currentTime, const float elapsedTime)
 {
+    for(size_t i = 0; i < 10; ++i)
+    {
+        if(crowd.size() > gPedestrianStartCount)
+        {
+            removePedestrianFromCrowd();
+        }
+        else if(crowd.size() < gPedestrianStartCount)
+        {
+            addPedestrianToCrowd();
+        }
+        else { break ;}
+    }
+
     // update each Pedestrian
     for (iterator i = crowd.begin(); i != crowd.end(); i++)
     {
