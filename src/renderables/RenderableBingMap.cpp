@@ -202,8 +202,11 @@ namespace
                     textureID = Textures::createFromJpeg(output->buffer, output->size);
 
                     //dmess("textureID " << textureID);
-
+#ifdef WIN32
+					if(false)
+#else
                     if(access(tileCachePath.c_str(), F_OK) == -1)
+#endif
                     {
                         FILE * fp = fopen(tileCachePath.c_str(), "wb");
                         
