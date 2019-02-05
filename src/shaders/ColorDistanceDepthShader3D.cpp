@@ -27,7 +27,6 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
@@ -255,9 +254,9 @@ void ColorDistanceDepthShader3D::ensureShader()
 
             position_in_view_space = MV * vert;
 
-            glPos = MVP * vert;
+            gl_Position = MVP * vert;
 
-            //glPos = gl_Position;
+            glPos = gl_Position;
 
             vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
             vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
@@ -376,6 +375,8 @@ void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutlin
     shaderProgramDepth->setUniform (viewDepth,                canvas->getViewRef());
     shaderProgramDepth->setUniform (projectionDepth,          canvas->getProjectionRef());
 }
+
+#include <webAsmPlay/FrameBuffer.h>
 
 void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutline)
 {
