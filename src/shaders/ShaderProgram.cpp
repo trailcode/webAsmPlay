@@ -221,7 +221,7 @@ GLint ShaderProgram::getAttributeLoc(const string & name) const
         return -1;
     }
 
-    return i->second;
+    return i->second; 
 }
 
 void ShaderProgram::setUniform (const GLint location, const mat4   & value) const { GL_CHECK(glUniformMatrix4fv(location, 1, false, value_ptr(value))) ;}
