@@ -248,16 +248,12 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage) con
 
     if(!isMulti)
     {
-        shader->setVertexArrayFormat(ArrayFormat(2, 2 * sizeof(GLfloat), 0));
-
         shader->bind(canvas, true, renderStage);
 
         GL_CHECK(glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL));
     }
     else
     {
-        shader->setVertexArrayFormat(ArrayFormat(3, 3 * sizeof(GLfloat), 0));
-
         shader->bind(canvas, true, renderStage);
 
         GL_CHECK(glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, NULL));

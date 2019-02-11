@@ -89,19 +89,5 @@ void ColorVertexShader::bind(Canvas     * canvas,
 {
     shaderProgram->bind();
 
-    ShaderProgram::enableVertexAttribArray( vertInAttrLoc,
-                                            vertexFormat.size,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            vertexFormat.stride,
-                                            vertexFormat.pointer);
-
-    ShaderProgram::enableVertexAttribArray( vertColorInAttrLoc,
-                                            colorFormat.size,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            colorFormat.stride,
-                                            colorFormat.pointer);
-
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }

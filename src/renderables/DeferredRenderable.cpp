@@ -90,9 +90,6 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
     GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
 
-    //shader->setVertexArrayFormat(ArrayFormat(3, 7 * sizeof(GLfloat), 0));
-    //shader->setColorArrayFormat (ArrayFormat(4, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT))));
-
     // TODO use VertexArrayObject
 
     const size_t sizeVertex = 3;
@@ -223,9 +220,6 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage) const
     canvas->pushModel(rotate(canvas->getModelRef(), radians(-90.0), dvec3(1, 0, 0)));
 
     shader->bind(canvas, false, renderStage);
-
-    shader->setVertexArrayFormat(ArrayFormat(3, 7 * sizeof(GLfloat), 0));
-    shader->setColorArrayFormat (ArrayFormat(4, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT))));
 
     GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
 

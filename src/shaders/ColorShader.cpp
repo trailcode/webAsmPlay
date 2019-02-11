@@ -98,13 +98,6 @@ void ColorShader::bind( Canvas     * canvas,
 {
     shaderProgram->bind();
 
-    ShaderProgram::enableVertexAttribArray( vertInAttrLoc,
-                                            vertexFormat.size,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            vertexFormat.stride,
-                                            vertexFormat.pointer);
-
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 
     if(isOutline) { shaderProgram->setUniform(colorInUniformLoc, outlineColor) ;}

@@ -66,6 +66,7 @@
     #define GL_CHECK(stmt) stmt
 #endif
 
+// TODO remove?
 struct ArrayFormat
 {
     ArrayFormat() {}
