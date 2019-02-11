@@ -47,7 +47,7 @@ void ColorShader::ensureShader()
 
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
-        in vec3 vertIn;
+        layout(location = 0) in vec3 vertIn;
         out vec4 vertexColor;
         uniform mat4 MVP;
         uniform vec4 colorIn;

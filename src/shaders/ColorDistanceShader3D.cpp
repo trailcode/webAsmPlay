@@ -65,13 +65,13 @@ namespace
 void ColorDistanceShader3D::ensureShader()
 {
     // Shader sources
-    const GLchar* vertexSourceFill = R"glsl(#version 150 core
+    const GLchar* vertexSourceFill = R"glsl(#version 330 core
 
         uniform sampler2D tex; // TODO why does the ordering matter here? Something must not be correct.
 
-        in vec3  vertIn;
-        in vec3  normalIn;
-        in float vertColorIn;
+        layout(location = 0) in vec3  vertIn;
+        layout(location = 1) in float vertColorIn;
+        layout(location = 2) in vec3  normalIn;
         
         uniform mat4   model;
         uniform mat4   view;
@@ -104,7 +104,7 @@ void ColorDistanceShader3D::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSourceFill = R"glsl(#version 150 core
+    const GLchar* fragmentSourceFill = R"glsl(#version 330 core
         
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
@@ -155,11 +155,11 @@ void ColorDistanceShader3D::ensureShader()
                                                            {"heightMultiplier",     heightMultiplierFill    },
                                                            {"lightPos",             lightPosUniformFill     }}));
 
-    const GLchar* vertexSourceOutline = R"glsl(#version 150 core
+    const GLchar* vertexSourceOutline = R"glsl(#version 330 core
         uniform sampler2D tex;
 
-        in vec3  vertIn;
-        in float vertColorIn;
+        layout(location = 0) in vec3  vertIn;
+        layout(location = 1) in float vertColorIn;
         
         uniform mat4  MVP;
         uniform mat4  MV;
@@ -183,7 +183,7 @@ void ColorDistanceShader3D::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSourceOutline = R"glsl(#version 150 core
+    const GLchar* fragmentSourceOutline = R"glsl(#version 330 core
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;

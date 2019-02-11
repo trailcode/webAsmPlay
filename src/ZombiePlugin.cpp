@@ -38,8 +38,8 @@ using namespace OpenSteer;
 #ifdef __EMSCRIPTEN__
     int gPedestrianStartCount = 1500;
 #else
-    int gPedestrianStartCount = 3500;
-    //int const gPedestrianStartCount = 1;
+    //int gPedestrianStartCount = 3500;
+    int gPedestrianStartCount = 1;
 #endif
 
 namespace

@@ -49,8 +49,8 @@ void TextureShader::ensureShader()
 
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
-        in vec3 vertIn;
-        in vec2 vertUV_In;
+        layout(location = 0) in vec3 vertIn;
+        layout(location = 3) in vec2 vertUV_In;
         out vec2 UV;
         uniform mat4 MVP;
         

@@ -54,11 +54,11 @@ void ColorDistanceShader::ensureShader()
     dmess("ColorDistanceShader::ensureShader");
 
     // Shader sources
-    const GLchar* vertexSource = R"glsl(#version 150 core
+    const GLchar* vertexSource = R"glsl(#version 330 core
         uniform sampler2D tex;
 
-        in vec2  vertIn;
-        in float vertColorIn;
+        layout(location = 0) in vec2  vertIn;
+        layout(location = 1) in float vertColorIn;
         
         uniform mat4 MVP;
         uniform mat4 MV;
@@ -82,7 +82,7 @@ void ColorDistanceShader::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSource = R"glsl(#version 150 core
+    const GLchar* fragmentSource = R"glsl(#version 330 core
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;

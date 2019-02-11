@@ -66,9 +66,9 @@ namespace
 
 #endif
 
-    const size_t levelOfDetail = 19;
+    //const size_t levelOfDetail = 19;
     //const size_t levelOfDetail = 18;
-    //const size_t levelOfDetail = 17;
+    const size_t levelOfDetail = 17;
 
     // Define our struct for accepting LCs output
     struct BufferStruct // TODO code dupilcation
