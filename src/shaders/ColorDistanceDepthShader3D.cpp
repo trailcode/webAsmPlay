@@ -27,7 +27,6 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
@@ -79,9 +78,9 @@ namespace
 
 void ColorDistanceDepthShader3D::ensureShader()
 {
-    const GLchar* vertexSourceDepth = R"glsl(#version 150 core
+    const GLchar* vertexSourceDepth = R"glsl(#version 330 core
 
-        in vec3  vertIn;
+        layout(location = 0) in vec3 vertIn;
         
         uniform mat4   model;
         uniform mat4   view;
@@ -100,7 +99,7 @@ void ColorDistanceDepthShader3D::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSourceDepth = R"glsl(#version 150 core
+    const GLchar* fragmentSourceDepth = R"glsl(#version 330 core
         in  vec4 glPos;
         out vec4 outColor;
 
@@ -120,11 +119,11 @@ void ColorDistanceDepthShader3D::ensureShader()
                                                            {"heightMultiplier",     heightMultiplierDepth }}));
 
     // Shader sources
-    const GLchar* vertexSourceFill = R"glsl(#version 150 core
+    const GLchar* vertexSourceFill = R"glsl(#version 330 core
 
-        in vec3  vertIn;
-        in vec3  normalIn;
-        in float vertColorIn;
+        layout(location = 0) in vec3  vertIn;
+        layout(location = 1) in float vertColorIn;
+        layout(location = 2) in vec3  normalIn;
         
         uniform mat4      model;
         uniform mat4      view;
@@ -161,7 +160,7 @@ void ColorDistanceDepthShader3D::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSourceFill = R"glsl(#version 150 core
+    const GLchar* fragmentSourceFill = R"glsl(#version 330 core
         uniform sampler2D depthTex;
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
@@ -233,10 +232,10 @@ void ColorDistanceDepthShader3D::ensureShader()
                                                            {"width",                widthUniformFill        },
                                                            {"height",               heightUniformFill       }}));
 
-    const GLchar* vertexSourceOutline = R"glsl(#version 150 core
+    const GLchar* vertexSourceOutline = R"glsl(#version 330 core
 
-        in vec3  vertIn;
-        in float vertColorIn;
+        layout(location = 0) in vec3  vertIn;
+        layout(location = 1) in float vertColorIn;
         
         uniform mat4      MVP;
         uniform mat4      MV;
@@ -255,16 +254,16 @@ void ColorDistanceDepthShader3D::ensureShader()
 
             position_in_view_space = MV * vert;
 
-            glPos = MVP * vert;
+            gl_Position = MVP * vert;
 
-            //glPos = gl_Position;
+            glPos = gl_Position;
 
             vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
             vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
         }
     )glsl";
 
-    const GLchar* fragmentSourceOutline = R"glsl(#version 150 core
+    const GLchar* fragmentSourceOutline = R"glsl(#version 330 core
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
@@ -364,18 +363,22 @@ void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutlin
 
     GL_CHECK(glEnable(GL_DEPTH_TEST));
 
+    /*
     ShaderProgram::enableVertexAttribArray( vertInAttrDepth,
                                             vertexFormat.size,
                                             GL_FLOAT,
                                             GL_FALSE,
                                             vertexFormat.stride,
                                             vertexFormat.pointer);
+                                            */
 
     shaderProgramDepth->setUniformf(heightMultiplierDepth,    heightMultiplier);
     shaderProgramDepth->setUniform (modelDepth,               canvas->getModelRef());
     shaderProgramDepth->setUniform (viewDepth,                canvas->getViewRef());
     shaderProgramDepth->setUniform (projectionDepth,          canvas->getProjectionRef());
 }
+
+#include <webAsmPlay/FrameBuffer.h>
 
 void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutline)
 {
@@ -399,12 +402,14 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
     {
         shaderProgramFill->bind();
         
+        /*
         ShaderProgram::enableVertexAttribArray( vertInAttrFill,
                                                 vertexFormat.size,
                                                 GL_FLOAT,
                                                 GL_FALSE,
                                                 vertexFormat.stride,
                                                 vertexFormat.pointer);
+                                                */
 
         ShaderProgram::enableVertexAttribArray( normalInAttrFill,
                                                 normalFormat.size,
@@ -435,7 +440,7 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
     else
     {
         shaderProgramOutline->bind();
-
+        
         ShaderProgram::enableVertexAttribArray( vertInAttrOutline,
                                                 vertexFormat.size,
                                                 GL_FLOAT,

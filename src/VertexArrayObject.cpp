@@ -248,6 +248,31 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
     const size_t totalSize = (sizeVertex + sizeColor + sizeNormal + sizeUV) * sizeof(GLfloat);
 
+    GL_CHECK(glEnableVertexAttribArray(0));
+
+    GL_CHECK(glVertexAttribPointer(0, sizeVertex, GL_FLOAT, GL_FALSE, totalSize, 0));
+
+    if(sizeColor)
+    {
+        GL_CHECK(glEnableVertexAttribArray(1));
+
+        GL_CHECK(glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex + sizeNormal) * sizeof(GLfloat))));
+    }
+
+    if(sizeNormal)
+    {
+        GL_CHECK(glEnableVertexAttribArray(2));
+
+        GL_CHECK(glVertexAttribPointer(2, sizeNormal, GL_FLOAT, GL_FALSE, totalSize, (void *)(sizeVertex * sizeof(GLfloat))));
+    }
+
+    if(sizeUV)
+    {
+        GL_CHECK(glEnableVertexAttribArray(3));
+
+        GL_CHECK(glVertexAttribPointer(3, sizeUV, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex + sizeNormal + sizeColor) * sizeof(GLfloat))));
+    }
+
     ArrayFormat vertexFormat(sizeVertex, totalSize, 0);
     ArrayFormat normalFormat(sizeNormal, totalSize, (void *)(sizeVertex * sizeof(GLfloat)));
     ArrayFormat colorFormat (sizeColor,  totalSize, (void *)((sizeVertex + sizeNormal) * sizeof(GLfloat)));
@@ -308,6 +333,7 @@ void VertexArrayObject::bind(Shader * shader) const
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
 
+    /*
     shader->setVertexArrayFormat(vertexFormat);
 
     if(colorFormat.size)
@@ -324,6 +350,7 @@ void VertexArrayObject::bind(Shader * shader) const
     {
         shader->setUV_ArrayFormat(uvFormat);
     }
+    //*/
 }
 
 void VertexArrayObject::bindTriangles() const

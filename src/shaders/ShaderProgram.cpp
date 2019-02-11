@@ -191,9 +191,9 @@ void ShaderProgram::enableVertexAttribArray(const GLint       vertexLoc,
                                             const GLvoid    * pointer)
 {
     // Specify the layout of the vertex data
-    GL_CHECK(glEnableVertexAttribArray(vertexLoc));
+    //GL_CHECK(glEnableVertexAttribArray(vertexLoc));
 
-    GL_CHECK(glVertexAttribPointer(vertexLoc, size, type, normalized, stride, pointer));
+    //GL_CHECK(glVertexAttribPointer(vertexLoc, size, type, normalized, stride, pointer));
 }
 
 GLint ShaderProgram::getUniformLoc(const string & name) const

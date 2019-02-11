@@ -202,6 +202,31 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
     GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * verts.size(), &verts[0], GL_STATIC_DRAW));
 
+    // TODO use the VertexArrayObject
+
+    if(!isMulti)
+    {
+        //shader->setVertexArrayFormat(ArrayFormat(2, 2 * sizeof(GLfloat), 0));
+
+        const size_t totalSize = 2 * sizeof(GLfloat);
+
+        GL_CHECK(glEnableVertexAttribArray(0));
+
+        GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, totalSize, 0));
+    }
+    else
+    {
+        const size_t totalSize = (2 + 1) * sizeof(GLfloat);
+
+        GL_CHECK(glEnableVertexAttribArray(0));
+
+        GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, totalSize, 0));
+
+        GL_CHECK(glEnableVertexAttribArray(1));
+
+        GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, totalSize, (void *)((2) * sizeof(GLfloat))));
+    }
+
     return new RenderableLineString(vao,
                                     ebo,
                                     vbo,
