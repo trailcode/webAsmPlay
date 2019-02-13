@@ -88,6 +88,7 @@ string GeoServer::addGeoFile(const string & geomFile)
     else if(ext == ".shp") { addGdalSupportedFile(geomFile) ;}
 #endif
     else if(ext == ".geo") { _addGeoFile         (geomFile) ;}
+    else if(ext == ".las" || ext == ".laz") { addLasFile(geomFile) ;}
     else
     {
         cout << "Error! Unsupported file: " << geomFile << endl;
@@ -369,6 +370,12 @@ string GeoServer::_addGeoFile(const string & geoFile)
     fclose(fp);
 
     return geoFile;
+}
+
+string GeoServer::addLasFile(const string & lasFile)
+{
+
+    return lasFile;
 }
 
 // Define a callback to handle incoming messages
