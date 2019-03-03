@@ -49,8 +49,8 @@ void TextureShader::ensureShader()
 
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
-        in vec3 vertIn;
-        in vec2 vertUV_In;
+        layout(location = 0) in vec3 vertIn;
+        layout(location = 3) in vec2 vertUV_In;
         out vec2 UV;
         uniform mat4 MVP;
         
@@ -105,20 +105,6 @@ void TextureShader::bind(   Canvas     * canvas,
                             const size_t renderingStage)
 {
     shaderProgram->bind();
-
-    ShaderProgram::enableVertexAttribArray( vertInAttrLoc,
-                                            vertexFormat.size,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            vertexFormat.stride,
-                                            vertexFormat.pointer);
-
-    ShaderProgram::enableVertexAttribArray( vertUV_InAttrLoc,
-                                            uvFormat.size,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            uvFormat.stride,
-                                            uvFormat.pointer);
 
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
 

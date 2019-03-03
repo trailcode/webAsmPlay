@@ -39,6 +39,8 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "")
       # append_compiler_flag("-O3")
 endif()
 
+file(GLOB LAStoolSrc "ThirdParty/LAStools/*.cpp")
+
 file(GLOB geosSrc   "ThirdParty/geos/src/util/*.cpp"
                     "ThirdParty/geos/src/geom/*.cpp"
                     "ThirdParty/geos/src/index/bintree/*.cpp"
@@ -145,6 +147,7 @@ file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
                             "src/shaders/ColorVertexShader.cpp"
                             "src/shaders/ColorSymbology.cpp"
                             "src/shaders/TextureShader.cpp"
+                            "src/shaders/TileBoundaryShader.cpp"
                             "src/Camera.cpp"
                             "src/Debug.cpp"
                             "src/TrackBallInteractor.cpp"
@@ -187,9 +190,10 @@ file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
 
 file(GLOB geoServer_SRC     "GeoServer/src/*.cpp"
                             "GeoServer/include/geoServer/*.h"
+                            ${LAStoolSrc}
                             #"src/Network.cpp"
                             )
-
+                            
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
     include_directories(ThirdParty/imgui/glfw/include)
@@ -400,7 +404,8 @@ else()
 
 	#project(geoServer)
 
-	add_executable(geoServer ${geoServer_SRC} "ThirdParty/imgui/glad/glad.c")
+    add_executable(geoServer ${geoServer_SRC} "ThirdParty/imgui/glad/glad.c")
+    target_include_directories(geoServer PRIVATE ${LAStoolSrc})
 	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
 	target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
 	#target_include_directories(geoServer PRIVATE ${GDAL_INCLUDE_DIR})

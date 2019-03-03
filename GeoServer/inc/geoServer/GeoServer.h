@@ -67,6 +67,8 @@ private:
 
     std::string _addGeoFile(const std::string & geoFile);
 
+    std::string addLasFile(const std::string & lasFile);
+
     std::vector<std::string> serializedPolygons;
     std::vector<std::string> serializedLineStrings;
     std::vector<std::string> serializedPoints;

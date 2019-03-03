@@ -47,7 +47,7 @@ void ColorShader::ensureShader()
 
     // Shader sources
     const GLchar* vertexSource = R"glsl(#version 330 core
-        in vec3 vertIn;
+        layout(location = 0) in vec3 vertIn;
         out vec4 vertexColor;
         uniform mat4 MVP;
         uniform vec4 colorIn;
@@ -97,13 +97,6 @@ void ColorShader::bind( Canvas     * canvas,
                         const size_t renderingStage)
 {
     shaderProgram->bind();
-
-    ShaderProgram::enableVertexAttribArray( vertInAttrLoc,
-                                            vertexFormat.size,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            vertexFormat.stride,
-                                            vertexFormat.pointer);
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 

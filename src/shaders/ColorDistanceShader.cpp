@@ -54,11 +54,11 @@ void ColorDistanceShader::ensureShader()
     dmess("ColorDistanceShader::ensureShader");
 
     // Shader sources
-    const GLchar* vertexSource = R"glsl(#version 150 core
+    const GLchar* vertexSource = R"glsl(#version 330 core
         uniform sampler2D tex;
 
-        in vec2  vertIn;
-        in float vertColorIn;
+        layout(location = 0) in vec2  vertIn;
+        layout(location = 1) in float vertColorIn;
         
         uniform mat4 MVP;
         uniform mat4 MV;
@@ -82,7 +82,7 @@ void ColorDistanceShader::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSource = R"glsl(#version 150 core
+    const GLchar* fragmentSource = R"glsl(#version 330 core
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
@@ -140,20 +140,6 @@ void ColorDistanceShader::bind(Canvas     * canvas,
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorSymbology->getTextureID()));
 
     shaderProgram->bind();
-
-    ShaderProgram::enableVertexAttribArray( vertInAttrLoc,
-                                            vertexFormat.size,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            vertexFormat.stride,
-                                            vertexFormat.pointer);
-
-    ShaderProgram::enableVertexAttribArray( vertColorInAttrLoc,
-                                            colorFormat.size,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            colorFormat.stride,
-                                            colorFormat.pointer);
 
     shaderProgram->setUniform(MV_Loc,  canvas->getMV_Ref());
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());

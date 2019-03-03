@@ -36,6 +36,8 @@ float GUI::openSteerCameraDist = 0.4;
 
 bool gotoNextZombie = false; // TODO find a better way!
 
+extern int gPedestrianStartCount;
+
 void GUI::openSteerPanel()
 {
     if(!showOpenSteerPanel) { return ;}
@@ -46,7 +48,7 @@ void GUI::openSteerPanel()
 
         if(ImGui::SliderInt("Zombies", &lines, 1, 3000))
         {
-
+            gPedestrianStartCount = lines;
         }
 
         ImGui::SliderFloat("", &openSteerCameraDist, 0.007f, 1.5f, "Camera dist: %.3f");

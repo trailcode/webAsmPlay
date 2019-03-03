@@ -78,9 +78,9 @@ namespace
 
 void ColorDistanceDepthShader3D::ensureShader()
 {
-    const GLchar* vertexSourceDepth = R"glsl(#version 150 core
+    const GLchar* vertexSourceDepth = R"glsl(#version 330 core
 
-        in vec3  vertIn;
+        layout(location = 0) in vec3 vertIn;
         
         uniform mat4   model;
         uniform mat4   view;
@@ -99,7 +99,7 @@ void ColorDistanceDepthShader3D::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSourceDepth = R"glsl(#version 150 core
+    const GLchar* fragmentSourceDepth = R"glsl(#version 330 core
         in  vec4 glPos;
         out vec4 outColor;
 
@@ -119,11 +119,11 @@ void ColorDistanceDepthShader3D::ensureShader()
                                                            {"heightMultiplier",     heightMultiplierDepth }}));
 
     // Shader sources
-    const GLchar* vertexSourceFill = R"glsl(#version 150 core
+    const GLchar* vertexSourceFill = R"glsl(#version 330 core
 
-        in vec3  vertIn;
-        in vec3  normalIn;
-        in float vertColorIn;
+        layout(location = 0) in vec3  vertIn;
+        layout(location = 1) in float vertColorIn;
+        layout(location = 2) in vec3  normalIn;
         
         uniform mat4      model;
         uniform mat4      view;
@@ -160,7 +160,7 @@ void ColorDistanceDepthShader3D::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSourceFill = R"glsl(#version 150 core
+    const GLchar* fragmentSourceFill = R"glsl(#version 330 core
         uniform sampler2D depthTex;
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
@@ -232,10 +232,10 @@ void ColorDistanceDepthShader3D::ensureShader()
                                                            {"width",                widthUniformFill        },
                                                            {"height",               heightUniformFill       }}));
 
-    const GLchar* vertexSourceOutline = R"glsl(#version 150 core
+    const GLchar* vertexSourceOutline = R"glsl(#version 330 core
 
-        in vec3  vertIn;
-        in float vertColorIn;
+        layout(location = 0) in vec3  vertIn;
+        layout(location = 1) in float vertColorIn;
         
         uniform mat4      MVP;
         uniform mat4      MV;
@@ -263,7 +263,7 @@ void ColorDistanceDepthShader3D::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSourceOutline = R"glsl(#version 150 core
+    const GLchar* fragmentSourceOutline = R"glsl(#version 330 core
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
@@ -363,12 +363,14 @@ void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutlin
 
     GL_CHECK(glEnable(GL_DEPTH_TEST));
 
+    /*
     ShaderProgram::enableVertexAttribArray( vertInAttrDepth,
                                             vertexFormat.size,
                                             GL_FLOAT,
                                             GL_FALSE,
                                             vertexFormat.stride,
                                             vertexFormat.pointer);
+                                            */
 
     shaderProgramDepth->setUniformf(heightMultiplierDepth,    heightMultiplier);
     shaderProgramDepth->setUniform (modelDepth,               canvas->getModelRef());
@@ -400,27 +402,6 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
     {
         shaderProgramFill->bind();
         
-        ShaderProgram::enableVertexAttribArray( vertInAttrFill,
-                                                vertexFormat.size,
-                                                GL_FLOAT,
-                                                GL_FALSE,
-                                                vertexFormat.stride,
-                                                vertexFormat.pointer);
-
-        ShaderProgram::enableVertexAttribArray( normalInAttrFill,
-                                                normalFormat.size,
-                                                GL_FLOAT,
-                                                GL_FALSE,
-                                                normalFormat.stride,
-                                                normalFormat.pointer);
-
-        ShaderProgram::enableVertexAttribArray( vertColorInAttrFill,
-                                                colorFormat.size,
-                                                GL_FLOAT,
-                                                GL_FALSE,
-                                                colorFormat.stride,
-                                                colorFormat.pointer);
-
         shaderProgramFill->setUniformi(texUniformFill,          0);
         shaderProgramFill->setUniformi(depthTexUniformFill,     1);
         shaderProgramFill->setUniformf(widthUniformFill,        canvas->frameBufferSize.x);
@@ -436,35 +417,17 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
     else
     {
         shaderProgramOutline->bind();
-
-        ShaderProgram::enableVertexAttribArray( vertInAttrOutline,
-                                                vertexFormat.size,
-                                                GL_FLOAT,
-                                                GL_FALSE,
-                                                vertexFormat.stride,
-                                                vertexFormat.pointer);
-
-        ShaderProgram::enableVertexAttribArray( vertColorInAttrOutline,
-                                                colorFormat.size,
-                                                GL_FLOAT,
-                                                GL_FALSE,
-                                                colorFormat.stride,
-                                                colorFormat.pointer);
-
-        //shaderProgramOutline->colorLookupOffsetOutline;
-        shaderProgramOutline->setUniformf(heightMultiplierOutline,    heightMultiplier);
-        shaderProgramOutline->setUniformi(depthTexUniformOutline,          1);
-        shaderProgramOutline->setUniformf(widthUniformOutline,          canvas->frameBufferSize.x);
-        shaderProgramOutline->setUniformf(heightUniformOutline,          canvas->frameBufferSize.y);
-        shaderProgramOutline->setUniform(MV_Outline, canvas->getMV_Ref());
-        shaderProgramOutline->setUniform(MVP_Outline, canvas->getMVP_Ref());
-        shaderProgramOutline->setUniformi(texUniformOutline, 0);
+        
+        shaderProgramOutline->setUniformf(heightMultiplierOutline,  heightMultiplier);
+        shaderProgramOutline->setUniformi(depthTexUniformOutline,   1);
+        shaderProgramOutline->setUniformf(widthUniformOutline,      canvas->frameBufferSize.x);
+        shaderProgramOutline->setUniformf(heightUniformOutline,     canvas->frameBufferSize.y);
+        shaderProgramOutline->setUniform(MV_Outline,                canvas->getMV_Ref());
+        shaderProgramOutline->setUniform(MVP_Outline,               canvas->getMVP_Ref());
+        shaderProgramOutline->setUniformi(texUniformOutline,        0);
 
         shaderProgramOutline->setUniformf(colorLookupOffsetOutline, 1.0f);
     }
-
-    //if(isOutline) { shaderProgramFill->setUniformf(colorLookupOffsetFill, 1.0f) ;}
-    //else          { shaderProgramFill->setUniformf(colorLookupOffsetFill, 0.0f) ;}
 }
 
 bool ColorDistanceDepthShader3D::shouldRender(const bool isOutline, const size_t renderingStage) const

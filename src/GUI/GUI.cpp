@@ -47,6 +47,7 @@
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/TextureShader.h>
+#include <webAsmPlay/shaders/TileBoundaryShader.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/SkyBox.h>
@@ -422,6 +423,7 @@ void GUI::mainLoop(GLFWwindow * window)
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
         window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
         window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+        
     }
 
     opt_flags |= ImGuiDockNodeFlags_PassthruDockspace;
@@ -440,7 +442,7 @@ void GUI::mainLoop(GLFWwindow * window)
     
     // Rendering
     int screenWidth, screenHeight;
-    
+
     glfwGetFramebufferSize(mainWindow, &screenWidth, &screenHeight);
     //glfwGetWindowSize(mainWindow, &screenWidth, &screenHeight);
 
@@ -550,6 +552,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     ColorShader               ::ensureShader();
     ColorVertexShader         ::ensureShader();
     TextureShader             ::ensureShader();
+    TileBoundaryShader        ::ensureShader();
     
     canvas = new Canvas(false);
 

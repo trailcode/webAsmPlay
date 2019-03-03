@@ -39,11 +39,6 @@ public:
 
     virtual void bind(Canvas * canvas, const bool isOutline, const size_t renderingStage) = 0;
 
-    void setVertexArrayFormat(const ArrayFormat & vertexFormat = ArrayFormat());
-    void setNormalArrayFormat(const ArrayFormat & normalFormat = ArrayFormat());
-    void setColorArrayFormat (const ArrayFormat & colorFormat  = ArrayFormat());
-    void setUV_ArrayFormat   (const ArrayFormat & uvFormat     = ArrayFormat());
-
     std::string getName() const;
 
     virtual size_t getNumRenderingStages() const;
@@ -61,11 +56,6 @@ protected:
 
     const std::string shaderName;
 
-    ArrayFormat vertexFormat;
-    ArrayFormat colorFormat;
-    ArrayFormat normalFormat;
-    ArrayFormat uvFormat;
-    
     ColorSymbology * colorSymbology = NULL;
 };
 

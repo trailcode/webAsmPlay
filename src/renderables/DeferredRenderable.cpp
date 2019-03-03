@@ -90,6 +90,21 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
     GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
 
+    // TODO use VertexArrayObject
+
+    const size_t sizeVertex = 3;
+    const size_t sizeColor = 4;
+
+    const size_t totalSize = (sizeVertex + sizeColor) * sizeof(GLfloat);
+
+    GL_CHECK(glEnableVertexAttribArray(0));
+
+    GL_CHECK(glVertexAttribPointer(0, sizeVertex, GL_FLOAT, GL_FALSE, totalSize, 0));
+
+    GL_CHECK(glEnableVertexAttribArray(1));
+
+    GL_CHECK(glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex) * sizeof(GLfloat))));
+
     DeferredRenderable * ret = new DeferredRenderable(vao, ebo, ebo2, vbo, triangleIndices.size(), lineIndices.size());
 
     vertsAndColors .clear();
@@ -205,9 +220,6 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage) const
     canvas->pushModel(rotate(canvas->getModelRef(), radians(-90.0), dvec3(1, 0, 0)));
 
     shader->bind(canvas, false, renderStage);
-
-    shader->setVertexArrayFormat(ArrayFormat(3, 7 * sizeof(GLfloat), 0));
-    shader->setColorArrayFormat (ArrayFormat(4, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT))));
 
     GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
 

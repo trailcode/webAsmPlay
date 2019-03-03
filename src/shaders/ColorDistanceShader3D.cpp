@@ -65,13 +65,13 @@ namespace
 void ColorDistanceShader3D::ensureShader()
 {
     // Shader sources
-    const GLchar* vertexSourceFill = R"glsl(#version 150 core
+    const GLchar* vertexSourceFill = R"glsl(#version 330 core
 
         uniform sampler2D tex; // TODO why does the ordering matter here? Something must not be correct.
 
-        in vec3  vertIn;
-        in vec3  normalIn;
-        in float vertColorIn;
+        layout(location = 0) in vec3  vertIn;
+        layout(location = 1) in float vertColorIn;
+        layout(location = 2) in vec3  normalIn;
         
         uniform mat4   model;
         uniform mat4   view;
@@ -104,7 +104,7 @@ void ColorDistanceShader3D::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSourceFill = R"glsl(#version 150 core
+    const GLchar* fragmentSourceFill = R"glsl(#version 330 core
         
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
@@ -155,11 +155,11 @@ void ColorDistanceShader3D::ensureShader()
                                                            {"heightMultiplier",     heightMultiplierFill    },
                                                            {"lightPos",             lightPosUniformFill     }}));
 
-    const GLchar* vertexSourceOutline = R"glsl(#version 150 core
+    const GLchar* vertexSourceOutline = R"glsl(#version 330 core
         uniform sampler2D tex;
 
-        in vec3  vertIn;
-        in float vertColorIn;
+        layout(location = 0) in vec3  vertIn;
+        layout(location = 1) in float vertColorIn;
         
         uniform mat4  MVP;
         uniform mat4  MV;
@@ -183,7 +183,7 @@ void ColorDistanceShader3D::ensureShader()
         }
     )glsl";
 
-    const GLchar* fragmentSourceOutline = R"glsl(#version 150 core
+    const GLchar* fragmentSourceOutline = R"glsl(#version 330 core
         in vec4 vertexColorNear;
         in vec4 vertexColorFar;
         in vec4 position_in_view_space;
@@ -244,59 +244,22 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
     {
         shaderProgramFill->bind();
 
-        ShaderProgram::enableVertexAttribArray( vertInAttrFill,
-                                                vertexFormat.size,
-                                                GL_FLOAT,
-                                                GL_FALSE,
-                                                vertexFormat.stride,
-                                                vertexFormat.pointer);
-
-        ShaderProgram::enableVertexAttribArray( normalInAttrFill,
-                                                normalFormat.size,
-                                                GL_FLOAT,
-                                                GL_FALSE,
-                                                normalFormat.stride,
-                                                normalFormat.pointer);
-
-        ShaderProgram::enableVertexAttribArray( vertColorInAttrFill,
-                                                colorFormat.size,
-                                                GL_FLOAT,
-                                                GL_FALSE,
-                                                colorFormat.stride,
-                                                colorFormat.pointer);
-
         shaderProgramFill->setUniformi(texUniformFill,          0);
         shaderProgramFill->setUniformf(heightMultiplierFill,    heightMultiplier);
         shaderProgramFill->setUniform (modelFill,               canvas->getModelRef());
         shaderProgramFill->setUniform (viewFill,                canvas->getViewRef());
         shaderProgramFill->setUniform (projectionFill,          canvas->getProjectionRef());
         shaderProgramFill->setUniform (lightPosUniformFill,     lightPos);
-
-        shaderProgramFill->setUniformf(colorLookupOffsetFill, 0.0f);
+        shaderProgramFill->setUniformf(colorLookupOffsetFill,   0.0f);
     }
     else
     {
         shaderProgramOutline->bind();
 
-        ShaderProgram::enableVertexAttribArray( vertInAttrOutline,
-                                                vertexFormat.size,
-                                                GL_FLOAT,
-                                                GL_FALSE,
-                                                vertexFormat.stride,
-                                                vertexFormat.pointer);
-
-        ShaderProgram::enableVertexAttribArray( vertColorInAttrOutline,
-                                                colorFormat.size,
-                                                GL_FLOAT,
-                                                GL_FALSE,
-                                                colorFormat.stride,
-                                                colorFormat.pointer);
-
         shaderProgramOutline->setUniformf(heightMultiplierOutline,  heightMultiplier);
         shaderProgramOutline->setUniform(MV_Outline,                canvas->getMV_Ref());
         shaderProgramOutline->setUniform(MVP_Outline,               canvas->getMVP_Ref());
         shaderProgramOutline->setUniformi(texUniformOutline,        0);
-
         shaderProgramOutline->setUniformf(colorLookupOffsetOutline, 1.0f);
     }
 }
