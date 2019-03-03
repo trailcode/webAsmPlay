@@ -24,4 +24,14 @@
   \copyright 2019
 */
 
+#include <lasreader.hpp>
+#include <geoServer/PointCloud.h>
 #include <geoServer/LAS_Reader.h>
+
+using namespace std;
+
+PointCloud * LAS_Reader::readPointCloud(const string lasFile)
+{
+
+    return NULL;
+}

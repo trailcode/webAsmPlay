@@ -405,7 +405,7 @@ else()
 	#project(geoServer)
 
     add_executable(geoServer ${geoServer_SRC} "ThirdParty/imgui/glad/glad.c")
-    target_include_directories(geoServer PRIVATE ${LAStoolSrc})
+    target_include_directories(geoServer PRIVATE "ThirdParty/LAStools")
 	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
 	target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
 	#target_include_directories(geoServer PRIVATE ${GDAL_INCLUDE_DIR})
