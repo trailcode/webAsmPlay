@@ -384,6 +384,55 @@ else()
 
 	    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc /std:c++latest /MP")
 
+        get_filename_component(BOOST_FILESYSTEM_BASE_NAME_RELEASE ${Boost_FILESYSTEM_LIBRARY_RELEASE} NAME_WE)
+        get_filename_component(BOOST_FILESYSTEM_BASE_NAME_DEBUG ${Boost_FILESYSTEM_LIBRARY_DEBUG} NAME_WE)
+        
+        get_filename_component(BOOST_FILESYSTEM_PATH_RELEASE ${Boost_FILESYSTEM_LIBRARY_RELEASE} PATH)
+        get_filename_component(BOOST_FILESYSTEM_PATH_DEBUG ${Boost_FILESYSTEM_LIBRARY_DEBUG} PATH)
+        
+        string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME_RELEASE} 3 -1 BOOST_FILESYSTEM_BASE_NAME_RELEASE2) # Strip lib chars at beginning
+        string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME_DEBUG} 3 -1 BOOST_FILESYSTEM_BASE_NAME_DEBUG2) # Strip lib chars at beginning
+        
+        get_filename_component(SDL2_IMAGE_LIBRARY_PATH ${SDL2_IMAGE_LIBRARY} DIRECTORY)
+        get_filename_component(SDL2MAIN_LIBRARY_PATH ${SDL2MAIN_LIBRARY} DIRECTORY)
+
+        get_filename_component(CURL_LIBRARIES_PATH ${CURL_LIBRARIES} DIRECTORY)
+        get_filename_component(EXPAT_LIBRARY_PATH ${EXPAT_LIBRARY} DIRECTORY)
+
+        #install(FILES	${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll
+                        #${BOOST_SYSTEM_PATH}/${BOOST_SYSTEM_BASE_NAME2}.dll
+                        #"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+                        #"${SDL2MAIN_LIBRARY_PATH}/SDL2.dll"
+        #DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release
+        #CONFIGURATIONS Release 
+        #RelWithDebInfo
+        #)
+
+        set(DLLS_RELEASE	"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll"
+                            "${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+                            "${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
+                            "${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
+                            "${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
+
+        set(DLLS_DEBUG		"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG2}.dll"
+                            "${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+                            "${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
+                            "${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
+                            "${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
+
+        foreach(dll ${DLLS_RELEASE})
+            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
+        endforeach(dll)
+
+        foreach(dll ${DLLS_DEBUG})
+            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+        endforeach(dll)
+
+        #get_filename_component(UTF_BASE_NAME_DEBUG ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG} NAME_WE)
+        #install(FILES ${UTF_PATH}/${UTF_BASE_NAME_DEBUG}.dll
+        #  DESTINATION ../bin
+        #  CONFIGURATIONS Debug
+        #)
 	endif()
 
     #add_executable(webAsmPlay ${sources} "ThirdParty/imgui/gl3w/GL/gl3w.c")
@@ -411,55 +460,7 @@ else()
 
 	#add_subdirectory(GeoServer)
 
-	get_filename_component(BOOST_FILESYSTEM_BASE_NAME_RELEASE ${Boost_FILESYSTEM_LIBRARY_RELEASE} NAME_WE)
-	get_filename_component(BOOST_FILESYSTEM_BASE_NAME_DEBUG ${Boost_FILESYSTEM_LIBRARY_DEBUG} NAME_WE)
 	
-	get_filename_component(BOOST_FILESYSTEM_PATH_RELEASE ${Boost_FILESYSTEM_LIBRARY_RELEASE} PATH)
-	get_filename_component(BOOST_FILESYSTEM_PATH_DEBUG ${Boost_FILESYSTEM_LIBRARY_DEBUG} PATH)
-	
-	string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME_RELEASE} 3 -1 BOOST_FILESYSTEM_BASE_NAME_RELEASE2) # Strip lib chars at beginning
-	string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME_DEBUG} 3 -1 BOOST_FILESYSTEM_BASE_NAME_DEBUG2) # Strip lib chars at beginning
-	
-	get_filename_component(SDL2_IMAGE_LIBRARY_PATH ${SDL2_IMAGE_LIBRARY} DIRECTORY)
-	get_filename_component(SDL2MAIN_LIBRARY_PATH ${SDL2MAIN_LIBRARY} DIRECTORY)
-
-    get_filename_component(CURL_LIBRARIES_PATH ${CURL_LIBRARIES} DIRECTORY)
-	get_filename_component(EXPAT_LIBRARY_PATH ${EXPAT_LIBRARY} DIRECTORY)
-
-	#install(FILES	${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll
-					#${BOOST_SYSTEM_PATH}/${BOOST_SYSTEM_BASE_NAME2}.dll
-					#"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
-					#"${SDL2MAIN_LIBRARY_PATH}/SDL2.dll"
-	  #DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release
-	  #CONFIGURATIONS Release 
-	  #RelWithDebInfo
-	#)
-
-	set(DLLS_RELEASE	"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll"
-						"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
-						"${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
-						"${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
-						"${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
-
-	set(DLLS_DEBUG		"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG2}.dll"
-						"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
-						"${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
-						"${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
-						"${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
-
-	foreach(dll ${DLLS_RELEASE})
-		add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
-	endforeach(dll)
-
-	foreach(dll ${DLLS_DEBUG})
-		add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Debug")
-	endforeach(dll)
-
-	#get_filename_component(UTF_BASE_NAME_DEBUG ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG} NAME_WE)
-	#install(FILES ${UTF_PATH}/${UTF_BASE_NAME_DEBUG}.dll
-	#  DESTINATION ../bin
-	#  CONFIGURATIONS Debug
-	#)
 
 endif()
 
