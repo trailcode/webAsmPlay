@@ -45,6 +45,8 @@ if (WIN32)
             "${PROJECT_SOURCE_DIR}/extern/glew/include"
         DOC "The directory where GL/glew.h resides" )
 
+    message("============== " ${GLEW_INCLUDE_DIR})
+
     if ("${CMAKE_GENERATOR}" MATCHES "[Ww]in64")
         set(ARCH x64)
     else()
@@ -56,6 +58,7 @@ if (WIN32)
             glew GLEW glew32s glew32
         HINTS
             "${GLEW_LOCATION}/lib"
+            "${GLEW_LOCATION}/lib/Release/x64"
             "$ENV{GLEW_LOCATION}/lib"
         PATHS
             "$ENV{PROGRAMFILES}/GLEW/lib"

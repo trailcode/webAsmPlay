@@ -7,20 +7,20 @@ set(CMAKE_BUILD_TYPE Release)
 
 if(MSVC_VERSION)
 
-    set(BOOST_ROOT "C:/boost_1_68_0")
-    set(SDL2_PATH "C:/tp/SDL2-2.0.9")
+    set(BOOST_ROOT "C:/tp/boost_1_69_0")
+    set(SDL2_PATH "C:/tp/SDL-2.0.9")
     set(SDL2_IMAGE_PATH "C:/tp/SDL2_image-2.0.4")
     set(GLEW_LOCATION "C:/tp/glew-2.1.0")
     set(GLFW_ROOT_DIR "C:/tp/glfw-3.2.1")
-    set(GEOS_ROOT "C:/tp/geos-3.7.0")
+    #set(GEOS_ROOT "C:/tp/geos-3.7.0")
     #set(GEOS_LIBRARY "C:/tp/geos_Release_3_5_0_x64/lib/geos_i.lib")
     #set(GEOS_INCLUDE_DIR "C:/tp/geos_Release_3_5_0_x64/include")
-    set(PC_EXPAT_INCLUDE_DIRS "C:/tp/expat_Release_2_1_0_x64/include")
-    set(PC_EXPAT_LIBRARY_DIRS "C:/tp/expat_Release_2_1_0_x64/lib")
+    set(PC_EXPAT_INCLUDE_DIRS "C:/tp/expat-2.2.6/include")
+    set(PC_EXPAT_LIBRARY_DIRS "C:/tp/expat-2.2.6/lib")
     set(GDAL_LIBRARY "C:/tp/gdal_Release_2_3_2_x64/lib/gdal_i.lib")
     set(GDAL_INCLUDE_DIR "C:/tp/gdal_Release_2_3_2_x64/include")
-	set(CURL_INCLUDE_DIR "C:/tp/curl_Release_7_31_0_x64/include")
-	set(CURL_LIBRARY "C:/tp/curl_Release_7_31_0_x64/lib/libcurl.lib")
+	set(CURL_INCLUDE_DIR "C:/tp/curl-7.64.0/include")
+	set(CURL_LIBRARY "C:/tp/curl-7.64.0/lib/libcurl_imp.lib")
 
 endif()
 
@@ -190,7 +190,7 @@ file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
 
 file(GLOB geoServer_SRC     "GeoServer/src/*.cpp"
                             "GeoServer/include/geoServer/*.h"
-                            ${LAStoolSrc}
+                            #${LAStoolSrc}
                             #"src/Network.cpp"
                             )
                             
@@ -282,7 +282,6 @@ else()
     find_package(Boost COMPONENTS filesystem random REQUIRED)
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
-	#find_package(GLEW REQUIRED)
 	find_package(GLEW REQUIRED)
     find_package(curl REQUIRED)
 
@@ -291,15 +290,12 @@ else()
     include_directories(${Boost_INCLUDE_DIRS})
     include_directories(${SDL2_INCLUDE_DIR})
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
-	#include_directories(${GLFW3_INCLUDE_PATH})
 	include_directories(${GLFW3_INCLUDE_PATH})
     include_directories(ThirdParty/ctpl)
-	#include_directories(ThirdParty/imgui/gl3w)
     include_directories(./)
     
     link_libraries(${GLEW_LIBRARIES})
     link_libraries(${CURL_LIBRARIES})
-    #link_libraries(glfw)
 	message(${GLFW3_LIBRARY})
 	link_libraries(${GLFW3_LIBRARY})
     link_libraries(${SDL2_IMAGE_LIBRARY})
@@ -307,7 +303,6 @@ else()
     link_libraries(${SDL2_LIBRARY})
 	set(Boost_USE_STATIC_LIBS ON)
     link_libraries(${Boost_LIBRARIES})
-	#link_libraries(${Boost_LIBRARY})
 	link_libraries(${OPENGL_gl_LIBRARY})
 	
 	link_directories(${Boost_LIBRARY_DIRS})
@@ -385,9 +380,9 @@ else()
 
 	if(MSVC_VERSION)
 
-	message("Compiler is MSVC")
+	    message("Compiler is MSVC")
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc /std:c++latest /MP")
+	    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc /std:c++latest /MP")
 
 	endif()
 
@@ -416,7 +411,55 @@ else()
 
 	#add_subdirectory(GeoServer)
 
+	get_filename_component(BOOST_FILESYSTEM_BASE_NAME_RELEASE ${Boost_FILESYSTEM_LIBRARY_RELEASE} NAME_WE)
+	get_filename_component(BOOST_FILESYSTEM_BASE_NAME_DEBUG ${Boost_FILESYSTEM_LIBRARY_DEBUG} NAME_WE)
 	
+	get_filename_component(BOOST_FILESYSTEM_PATH_RELEASE ${Boost_FILESYSTEM_LIBRARY_RELEASE} PATH)
+	get_filename_component(BOOST_FILESYSTEM_PATH_DEBUG ${Boost_FILESYSTEM_LIBRARY_DEBUG} PATH)
+	
+	string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME_RELEASE} 3 -1 BOOST_FILESYSTEM_BASE_NAME_RELEASE2) # Strip lib chars at beginning
+	string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME_DEBUG} 3 -1 BOOST_FILESYSTEM_BASE_NAME_DEBUG2) # Strip lib chars at beginning
+	
+	get_filename_component(SDL2_IMAGE_LIBRARY_PATH ${SDL2_IMAGE_LIBRARY} DIRECTORY)
+	get_filename_component(SDL2MAIN_LIBRARY_PATH ${SDL2MAIN_LIBRARY} DIRECTORY)
+
+    get_filename_component(CURL_LIBRARIES_PATH ${CURL_LIBRARIES} DIRECTORY)
+	get_filename_component(EXPAT_LIBRARY_PATH ${EXPAT_LIBRARY} DIRECTORY)
+
+	#install(FILES	${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll
+					#${BOOST_SYSTEM_PATH}/${BOOST_SYSTEM_BASE_NAME2}.dll
+					#"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+					#"${SDL2MAIN_LIBRARY_PATH}/SDL2.dll"
+	  #DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release
+	  #CONFIGURATIONS Release 
+	  #RelWithDebInfo
+	#)
+
+	set(DLLS_RELEASE	"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+						"${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
+						"${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
+						"${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
+
+	set(DLLS_DEBUG		"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG2}.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+						"${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
+						"${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
+						"${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
+
+	foreach(dll ${DLLS_RELEASE})
+		add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
+	endforeach(dll)
+
+	foreach(dll ${DLLS_DEBUG})
+		add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+	endforeach(dll)
+
+	#get_filename_component(UTF_BASE_NAME_DEBUG ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG} NAME_WE)
+	#install(FILES ${UTF_PATH}/${UTF_BASE_NAME_DEBUG}.dll
+	#  DESTINATION ../bin
+	#  CONFIGURATIONS Debug
+	#)
 
 endif()
 
