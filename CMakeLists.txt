@@ -450,7 +450,34 @@ else()
 
 	#add_subdirectory(GeoServer)
 
-	
+	get_filename_component(BOOST_FILESYSTEM_BASE_NAME ${Boost_FILESYSTEM_LIBRARY_RELEASE} NAME_WE)
+	get_filename_component(BOOST_SYSTEM_BASE_NAME ${Boost_SYSTEM_LIBRARY_RELEASE} NAME_WE)
+
+	get_filename_component(BOOST_FILESYSTEM_PATH ${Boost_FILESYSTEM_LIBRARY_RELEASE} PATH)
+	get_filename_component(BOOST_SYSTEM_PATH ${Boost_SYSTEM_LIBRARY_RELEASE} PATH)
+
+	string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME} 3 -1 BOOST_FILESYSTEM_BASE_NAME2) # Strip lib chars at beginning
+	string(SUBSTRING ${BOOST_SYSTEM_BASE_NAME} 3 -1 BOOST_SYSTEM_BASE_NAME2) # Strip lib chars at beginning
+
+	get_filename_component(SDL2_IMAGE_LIBRARY_PATH ${SDL2_IMAGE_LIBRARY} DIRECTORY)
+	get_filename_component(SDL2MAIN_LIBRARY_PATH ${SDL2MAIN_LIBRARY} DIRECTORY)
+
+	message("----------------- " ${SDL2_IMAGE_LIBRARY_PATH})
+
+	install(FILES	${BOOST_FILESYSTEM_PATH}/${BOOST_FILESYSTEM_BASE_NAME2}.dll
+					${BOOST_SYSTEM_PATH}/${BOOST_SYSTEM_BASE_NAME2}.dll
+					"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+					"${SDL2MAIN_LIBRARY_PATH}/SDL2.dll"
+	  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release
+	  CONFIGURATIONS Release 
+	  #RelWithDebInfo
+	)
+
+	#get_filename_component(UTF_BASE_NAME_DEBUG ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG} NAME_WE)
+	#install(FILES ${UTF_PATH}/${UTF_BASE_NAME_DEBUG}.dll
+	#  DESTINATION ../bin
+	#  CONFIGURATIONS Debug
+	#)
 
 endif()
 
