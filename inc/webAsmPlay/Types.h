@@ -28,6 +28,7 @@
 #define __WEB_ASM_PLAY_TYPES_H__
 
 #include <functional>
+#include <string>
 #include <tuple>
 #include <vector>
 #include <memory>
