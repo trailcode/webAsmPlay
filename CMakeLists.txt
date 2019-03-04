@@ -428,7 +428,7 @@ else()
 	get_filename_component(SDL2_IMAGE_LIBRARY_PATH ${SDL2_IMAGE_LIBRARY} DIRECTORY)
 	get_filename_component(SDL2MAIN_LIBRARY_PATH ${SDL2MAIN_LIBRARY} DIRECTORY)
 
-	message("----------------- " ${SDL2_IMAGE_LIBRARY_PATH})
+	message("----------------- " ${CURL_LIBRARIES})
 
 	install(FILES	${BOOST_FILESYSTEM_PATH}/${BOOST_FILESYSTEM_BASE_NAME2}.dll
 					${BOOST_SYSTEM_PATH}/${BOOST_SYSTEM_BASE_NAME2}.dll
