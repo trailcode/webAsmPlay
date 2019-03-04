@@ -68,7 +68,8 @@ namespace
 
     //const size_t levelOfDetail = 19;
     //const size_t levelOfDetail = 18;
-    const size_t levelOfDetail = 17;
+    //const size_t levelOfDetail = 17;
+    const size_t levelOfDetail = 15;
 
     // Define our struct for accepting LCs output
     struct BufferStruct // TODO code dupilcation
@@ -250,14 +251,14 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 
     maxTile = latLongToTile(dvec2(get<3>(bounds), get<2>(bounds)), levelOfDetail);
 
-    int tmp = minTile.y;
+    int tmp = minTile.y;  
     minTile.y = maxTile.y;
     maxTile.y = tmp;
 
     dmess("minTile " << minTile.x << " " << minTile.y);
 
     for(int x = minTile.x; x <= maxTile.x; ++x)
-    for(int y = minTile.y; y <= maxTile.y; ++y)
+    for(int y = minTile.y; y     <= maxTile.y; ++y)
     {
         dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 0), levelOfDetail);
         dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 1), levelOfDetail);

@@ -24,7 +24,15 @@
   \copyright 2019
 */
 
+#include <string>
+
+class PointCloud;
+
 class LAS_Reader
 {
 public:
+
+    static PointCloud * readPointCloud(const std::string lasFile);
+
+private:
 };
