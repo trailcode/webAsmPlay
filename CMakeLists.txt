@@ -113,25 +113,14 @@ file(GLOB opensteerSrc  "ThirdParty/opensteer/src/Clock.cpp"
                         "ThirdParty/opensteer/plugins/OneTurning.cpp"
                         "ThirdParty/opensteer/plugins/Pedestrian.cpp"
                         "ThirdParty/opensteer/plugins/PedestriansWalkingAnEight.cpp"
-                        "ThirdParty/opensteer/plugins/Soccer.cpp"
-                        )
-
-file(GLOB tceGeom_SRC       "./tceGeom/src/*.cpp")
-file(GLOB tceOpenSteer_SRC  "./tceOpenSteer/src/*.cpp")
-file(GLOB tceCore_SRC       "./tceCore/inc/tceCore/*.cpp")
-file(GLOB tceRender_SRC     "./tceRender/src/*.cpp")
+                        "ThirdParty/opensteer/plugins/Soccer.cpp")
 
 file(GLOB simpleJSON_SRC "ThirdParty/SimpleJSON/src/*.cpp")
 
 file(GLOB imguiSrc  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
 
 file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
-                            "src/*.cpp"
-                            #"src/Main.cpp"
-                            ${tceGeom_SRC}
-                            ${tceCore_SRC}
-                            ${tceOpenSteer_SRC}
-                            ${tceRender_SRC})
+                            "src/*.cpp")
 
 file(GLOB webAsmPlayShaders_SRC "src/shaders/*.cpp"
 								"inc/webAsmPlay/shaders/*.h")
@@ -376,6 +365,9 @@ else()
 	if(MSVC_VERSION)
 
 	    message("Compiler is MSVC")
+
+		# Tell MSVC to execute in the build directory of the current configuration.
+		set_property(TARGET webAsmPlay PROPERTY VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR})
 
 	    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc /std:c++latest /MP")
 

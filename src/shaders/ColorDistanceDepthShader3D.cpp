@@ -210,7 +210,7 @@ void ColorDistanceDepthShader3D::ensureShader()
             vec3 result = diffuse * vec3(objectColor);
             if(distance(result, vec3(0,0,0)) < 0.0001)
             {
-                //discard;
+                discard;
             }
             outColor = vec4(result, objectColor.w);
         }

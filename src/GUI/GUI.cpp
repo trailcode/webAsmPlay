@@ -595,8 +595,7 @@ void GUI::createWorld()
     if(renderSettingsRenderSkyBox) { canvas->setSkyBox(skyBox) ;} // TODO create check render functor
     else                           { canvas->setSkyBox(NULL)   ;}
 
-    //pool.push([](int ID)
-    //{
+    //pool.push([](int ID) {
         // TODO Create a openGL context class;
 		/*
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -604,7 +603,7 @@ void GUI::createWorld()
         GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
 
         glfwMakeContextCurrent(threadWin);
-		*/
+		//*/
 
         client = new GeoClient(canvas);
 
