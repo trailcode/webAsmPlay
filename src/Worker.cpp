@@ -24,6 +24,8 @@
   \copyright 2018
 */
 
+#ifdef __EMSCRIPTEN__
+
 #include <iostream>
 #include <emscripten/emscripten.h>
 
@@ -43,3 +45,5 @@ extern "C"
         emscripten_worker_respond(0, 0);
     }
 }
+
+#endif

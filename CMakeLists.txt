@@ -5,6 +5,8 @@ set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_BUILD_TYPE Debug)
 #set(EMCC_DEBUG 1)
 
+set(USE_FOLDERS ON)
+
 if(MSVC_VERSION)
 
     set(BOOST_ROOT "C:/tp/boost_1_69_0")
@@ -124,76 +126,40 @@ file(GLOB simpleJSON_SRC "ThirdParty/SimpleJSON/src/*.cpp")
 file(GLOB imguiSrc  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
 
 file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
-                            "inc/webAsmPlay/GUI/*.h"
-                            "inc/webAsmPlay/renderables/*.h"
-                            "inc/webAsmPlay/shaders/*.h"
-                            "src/GUI/GUI.cpp"
-                            "src/GUI/GeosTestPanel.cpp"
-                            "src/GUI/RenderSettingsPanel.cpp"
-                            "src/GUI/GUI_Settings_Panel.cpp"
-                            "src/GUI/GUI_Persistence.cpp"
-                            "src/GUI/SymbologyPanel.cpp"
-                            "src/GUI/InputEvents.cpp"
-                            "src/GUI/OpenSteerTestPanel.cpp"
-                            "src/GUI/OpenSteerPanel.cpp"
-                            "src/GUI/cameraInfoPanel.cpp"
-                            "src/GUI/BingTileSystemPanel.cpp"
-                            "src/shaders/Shader.cpp"
-                            "src/shaders/ShaderProgram.cpp"
-                            "src/shaders/ColorShader.cpp"
-                            "src/shaders/ColorDistanceShader.cpp"
-                            "src/shaders/ColorDistanceShader3D.cpp"
-                            "src/shaders/ColorDistanceDepthShader3D.cpp"
-                            "src/shaders/ColorVertexShader.cpp"
-                            "src/shaders/ColorSymbology.cpp"
-                            "src/shaders/TextureShader.cpp"
-                            "src/shaders/TileBoundaryShader.cpp"
-                            "src/Camera.cpp"
-                            "src/Debug.cpp"
-                            "src/TrackBallInteractor.cpp"
-                            "src/renderables/Renderable.cpp"
-                            "src/renderables/RenderableLineString.cpp"
-                            "src/renderables/RenderablePolygon.cpp"
-                            "src/renderables/RenderablePoint.cpp"
-                            "src/renderables/RenderableMesh.cpp"
-                            "src/renderables/RenderableBingMap.cpp"
-                            "src/renderables/DeferredRenderable.cpp"
-                            "src/GeosUtil.cpp"
-                            "src/Util.cpp"
-                            "src/FrameBuffer.cpp"
-                            "src/Canvas.cpp"
-                            "src/GeoClient.cpp"
-                            "src/GeoClientGeometry.cpp"
-                            "src/GeoClientRequest.cpp"
-                            "src/GeoClientPicking.cpp"
-                            "src/GeosTestCanvas.cpp"
-                            "src/SkyBox.cpp"
-                            "src/Textures.cpp"
-                            "src/GridPlane.cpp"
-                            "src/K2DTree.cpp"
-                            "src/GeometryConverter.cpp"
-                            "src/Attributes.cpp"
-                            "src/Relation.cpp"
-                            "src/Tessellation.cpp"
-                            "src/VertexArrayObject.cpp"
-                            "src/OpenSteerGlue.cpp"
-                            "src/OpenSteerCanvas.cpp"
-                            "src/Zombie.cpp"
-                            "src/ZombiePlugin.cpp"
-                            "src/Network.cpp"
-                            "src/BingTileSystem.cpp"
+                            "src/*.cpp"
                             #"src/Main.cpp"
                             ${tceGeom_SRC}
                             ${tceCore_SRC}
                             ${tceOpenSteer_SRC}
                             ${tceRender_SRC})
 
+file(GLOB webAsmPlayShaders_SRC "src/shaders/*.cpp"
+								"inc/webAsmPlay/shaders/*.h")
+
+file(GLOB webAsmPlayRenderables_SRC "src/renderables/*.cpp"
+									"inc/webAsmPlay/renderables/*.h")
+
+file(GLOB webAsmPlayGUI_SRC			"src/GUI/*.cpp"
+									"inc/webAsmPlay/GUI/*.h")
+
 file(GLOB geoServer_SRC     "GeoServer/src/*.cpp"
-                            "GeoServer/include/geoServer/*.h"
+                            "GeoServer/inc/geoServer/*.h"
                             #${LAStoolSrc}
                             #"src/Network.cpp"
                             )
-                            
+                  
+file(GLOB sources   ${webAsmPlay_SRC}
+					${webAsmPlayShaders_SRC}
+					${webAsmPlayRenderables_SRC}
+					${webAsmPlayGUI_SRC}
+                    ${geosSrc}
+                    ${GLUTesselatorSrc}
+                    ${simpleJSON_SRC}
+                    ${opensteerSrc}
+					${imguiSrc}
+                    "ThirdParty/imgui/glad/glad.c"
+                    )
+				  
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
     include_directories(ThirdParty/imgui/glfw/include)
@@ -301,7 +267,7 @@ else()
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
     link_libraries(${SDL2_LIBRARY})
-	set(Boost_USE_STATIC_LIBS ON)
+	#set(Boost_USE_STATIC_LIBS ON)
     link_libraries(${Boost_LIBRARIES})
 	link_libraries(${OPENGL_gl_LIBRARY})
 	
@@ -369,15 +335,6 @@ else()
 
 endif()
 
-file(GLOB sources   ${webAsmPlay_SRC}
-                    ${geosSrc}
-                    ${GLUTesselatorSrc}
-                    ${simpleJSON_SRC}
-                    ${opensteerSrc}
-					${imguiSrc}
-                    "ThirdParty/imgui/glad/glad.c"
-                    )
-
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
     add_executable(webAsmPlay ${sources} "src/Main.cpp")
@@ -390,63 +347,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 else()
 
     #set(CMAKE_CXX_FLAGS "-fsanitize=address -O1 -fno-omit-frame-pointer -g")
-
-	if(MSVC_VERSION)
-
-	    message("Compiler is MSVC")
-
-	    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc /std:c++latest /MP")
-
-        get_filename_component(BOOST_FILESYSTEM_BASE_NAME_RELEASE ${Boost_FILESYSTEM_LIBRARY_RELEASE} NAME_WE)
-        get_filename_component(BOOST_FILESYSTEM_BASE_NAME_DEBUG ${Boost_FILESYSTEM_LIBRARY_DEBUG} NAME_WE)
-        
-        get_filename_component(BOOST_FILESYSTEM_PATH_RELEASE ${Boost_FILESYSTEM_LIBRARY_RELEASE} PATH)
-        get_filename_component(BOOST_FILESYSTEM_PATH_DEBUG ${Boost_FILESYSTEM_LIBRARY_DEBUG} PATH)
-        
-        string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME_RELEASE} 3 -1 BOOST_FILESYSTEM_BASE_NAME_RELEASE2) # Strip lib chars at beginning
-        string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME_DEBUG} 3 -1 BOOST_FILESYSTEM_BASE_NAME_DEBUG2) # Strip lib chars at beginning
-        
-        get_filename_component(SDL2_IMAGE_LIBRARY_PATH ${SDL2_IMAGE_LIBRARY} DIRECTORY)
-        get_filename_component(SDL2MAIN_LIBRARY_PATH ${SDL2MAIN_LIBRARY} DIRECTORY)
-
-        get_filename_component(CURL_LIBRARIES_PATH ${CURL_LIBRARIES} DIRECTORY)
-        get_filename_component(EXPAT_LIBRARY_PATH ${EXPAT_LIBRARY} DIRECTORY)
-
-        #install(FILES	${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll
-                        #${BOOST_SYSTEM_PATH}/${BOOST_SYSTEM_BASE_NAME2}.dll
-                        #"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
-                        #"${SDL2MAIN_LIBRARY_PATH}/SDL2.dll"
-        #DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release
-        #CONFIGURATIONS Release 
-        #RelWithDebInfo
-        #)
-
-        set(DLLS_RELEASE	"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll"
-                            "${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
-                            "${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
-                            "${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
-                            "${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
-
-        set(DLLS_DEBUG		"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG2}.dll"
-                            "${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
-                            "${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
-                            "${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
-                            "${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
-
-        foreach(dll ${DLLS_RELEASE})
-            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
-        endforeach(dll)
-
-        foreach(dll ${DLLS_DEBUG})
-            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Debug")
-        endforeach(dll)
-
-        #get_filename_component(UTF_BASE_NAME_DEBUG ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG} NAME_WE)
-        #install(FILES ${UTF_PATH}/${UTF_BASE_NAME_DEBUG}.dll
-        #  DESTINATION ../bin
-        #  CONFIGURATIONS Debug
-        #)
-	endif()
 
     #add_executable(webAsmPlay ${sources} "ThirdParty/imgui/gl3w/GL/gl3w.c")
 	add_library(libWebAsmPlay STATIC ${sources})
@@ -473,16 +373,82 @@ else()
 
 	#add_subdirectory(GeoServer)
 
-	
+	if(MSVC_VERSION)
+
+	    message("Compiler is MSVC")
+
+	    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc /std:c++latest /MP")
+
+        get_filename_component(BOOST_FILESYSTEM_BASE_NAME_RELEASE ${Boost_FILESYSTEM_LIBRARY_RELEASE} NAME_WE)
+        get_filename_component(BOOST_FILESYSTEM_BASE_NAME_DEBUG ${Boost_FILESYSTEM_LIBRARY_DEBUG} NAME_WE)
+        
+        get_filename_component(BOOST_FILESYSTEM_PATH_RELEASE ${Boost_FILESYSTEM_LIBRARY_RELEASE} PATH)
+        get_filename_component(BOOST_FILESYSTEM_PATH_DEBUG ${Boost_FILESYSTEM_LIBRARY_DEBUG} PATH)
+        
+        string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME_RELEASE} 3 -1 BOOST_FILESYSTEM_BASE_NAME_RELEASE2) # Strip lib chars at beginning
+        string(SUBSTRING ${BOOST_FILESYSTEM_BASE_NAME_DEBUG} 3 -1 BOOST_FILESYSTEM_BASE_NAME_DEBUG2) # Strip lib chars at beginning
+        
+        get_filename_component(SDL2_IMAGE_LIBRARY_PATH ${SDL2_IMAGE_LIBRARY} DIRECTORY)
+        get_filename_component(SDL2MAIN_LIBRARY_PATH ${SDL2MAIN_LIBRARY} DIRECTORY)
+
+        get_filename_component(CURL_LIBRARIES_PATH ${CURL_LIBRARIES} DIRECTORY)
+
+		message("==================================== " ${BOOST_FILESYSTEM_BASE_NAME_RELEASE})
+
+        get_filename_component(EXPAT_LIBRARY_PATH ${EXPAT_LIBRARY} DIRECTORY)
+
+        #install(FILES	${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll
+                        #${BOOST_SYSTEM_PATH}/${BOOST_SYSTEM_BASE_NAME2}.dll
+                        #"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+                        #"${SDL2MAIN_LIBRARY_PATH}/SDL2.dll"
+        #DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release
+        #CONFIGURATIONS Release 
+        #RelWithDebInfo
+        #)
+
+        set(DLLS_RELEASE	
+							#"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll"
+							"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE}.dll"
+                            "${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+                            "${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
+                            "${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
+                            "${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
+
+        set(DLLS_DEBUG		#"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG2}.dll"
+							"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG}.dll"
+                            "${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+                            "${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
+                            "${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
+                            "${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
+
+        foreach(dll ${DLLS_RELEASE})
+            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
+        endforeach(dll)
+
+        foreach(dll ${DLLS_DEBUG})
+            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+        endforeach(dll)
+
+        #get_filename_component(UTF_BASE_NAME_DEBUG ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG} NAME_WE)
+        #install(FILES ${UTF_PATH}/${UTF_BASE_NAME_DEBUG}.dll
+        #  DESTINATION ../bin
+        #  CONFIGURATIONS Debug
+        #)
+	endif()
 
 endif()
 
-source_group("webAsmPlay" FILES ${webAsmPlay_SRC})
-source_group("OpenSteer" FILES ${opensteerSrc})
-source_group("imgui" FILES ${imguiSrc})
-source_group("simpleJSON" FILES ${simpleJSON_SRC})
-source_group("GLUTesselator" FILES ${GLUTesselatorSrc})
-source_group("Geos" FILES ${geosSrc})
+source_group("OpenSteer"				FILES ${opensteerSrc})
+source_group("imgui"					FILES ${imguiSrc})
+source_group("simpleJSON"				FILES ${simpleJSON_SRC})
+source_group("GLUTesselator"			FILES ${GLUTesselatorSrc})
+source_group("Geos"						FILES ${geosSrc})
+source_group("webAsmPlay"				FILES ${webAsmPlay_SRC})
+source_group("webAsmPlay\\shaders"      FILES ${webAsmPlayShaders_SRC})
+source_group("webAsmPlay\\renderables"  FILES ${webAsmPlayRenderables_SRC})
+source_group("webAsmPlay\\GUI"			FILES ${webAsmPlayGUI_SRC})
+
+
 
 
 
