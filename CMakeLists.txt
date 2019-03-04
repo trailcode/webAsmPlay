@@ -307,6 +307,8 @@ else()
 	
 	link_directories(${Boost_LIBRARY_DIRS})
 
+	message("=================== " ${CMAKE_CURRENT_BINARY_DIR})
+
     set(ASSET_FILES     back.png
                         bot.png
                         front.png
@@ -322,17 +324,28 @@ else()
                         if_Info_131908.png
                         )
 
+	
     foreach(assetFile ${ASSET_FILES})
-        ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}"
-                COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}"
-                "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}"
-                DEPENDS   "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}"
-                )
-        list(APPEND assetFileDest "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}")
+		if(MSVC_VERSION)
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
 
+			list(APPEND assetFileDestRelease "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}")
+			list(APPEND assetFileDestDebug "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}")
+			
+		else()
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			list(APPEND assetFileDest "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}")
+			
+		endif()
     endforeach(assetFile)
-
-    ADD_CUSTOM_TARGET(assets ALL DEPENDS ${assetFileDest})
+	
+	if(MSVC_VERSION)
+		ADD_CUSTOM_TARGET(assetsRelease ALL DEPENDS ${assetFileDestRelease})
+		ADD_CUSTOM_TARGET(assetsDebug ALL DEPENDS ${assetFileDestDebug})
+	else()
+		ADD_CUSTOM_TARGET(assets ALL DEPENDS ${assetFileDest})
+	endif()
 
     set(config_files imgui.ini config.json)
 
@@ -437,12 +450,22 @@ else()
 
 	set(DLLS_RELEASE	"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll"
 						"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/libpng16-16.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/libjpeg-9.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/libtiff-5.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/libwebp-7.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/zlib1.dll"
 						"${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
 						"${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
 						"${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
 
 	set(DLLS_DEBUG		"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG2}.dll"
 						"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/libpng16-16.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/libjpeg-9.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/libtiff-5.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/libwebp-7.dll"
+						"${SDL2_IMAGE_LIBRARY_PATH}/zlib1.dll"
 						"${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
 						"${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
 						"${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
