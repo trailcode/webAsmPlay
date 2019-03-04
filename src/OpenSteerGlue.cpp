@@ -95,6 +95,8 @@ namespace
 
     void updateOpenSteer()
     {
+		return;
+
         if(gotoNextZombie)
         {
             dmess("gotoNextZombie");
@@ -121,6 +123,8 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
     dmess("OpenSteerGlue::init");
 
     ZombiePlugin::setNetwork(network);
+
+	return;
 
 #ifndef __EMSCRIPTEN__
 

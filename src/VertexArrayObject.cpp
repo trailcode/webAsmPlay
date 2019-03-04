@@ -172,7 +172,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             const vec3 p3(B, tess->minHeight);
             const vec3 p4(A, tess->minHeight);
 
-            const vec3 normal = normalize(triangleNormal(p1, p2, p3));
+            //const vec3 normal = normalize(triangleNormal(p1, p2, p3));
+			const vec3 normal = -normalize(triangleNormal(p1, p2, p3)); // Why is this backwards on different system? Winding wrong.
 
             addVert<USE_SYMBOLOGY_ID>(verts, p1, normal, symbologyWallID_value);
             addVert<USE_SYMBOLOGY_ID>(verts, p2, normal, symbologyWallID_value);
