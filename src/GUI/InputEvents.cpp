@@ -129,14 +129,14 @@ void GUI::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 
     glfwGetFramebufferSize(mainWindow, &fbWidth, &fbHeight); // TODO Perhaps original passed in? 
 
-    dmess("GUI::framebufferSizeCallback " << width << " " << height << " fbWidth " << fbWidth << " fbHeight " << fbHeight);
-
     //canvas->setFrameBufferSize(ivec2(fbWidth * 2, fbHeight * 2));
     canvas->setFrameBufferSize(ivec2(fbWidth, fbHeight));
 
     // Need to use this to get true size because of retina displays.
     glfwGetWindowSize(window, &width, &height);
-    
+
+	dmess("GUI::framebufferSizeCallback " << width << " " << height << " fbWidth " << fbWidth << " fbHeight " << fbHeight);
+
     canvas->setArea(ivec2(0,0), ivec2(width, height));
     //canvas->setArea(ivec2(0,0), ivec2(fbWidth * 2, fbWidth * 2));
     //canvas->setArea(ivec2(0,0), ivec2(fbWidth / 2, fbWidth / 2));

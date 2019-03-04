@@ -542,6 +542,8 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     glfwGetWindowSize(mainWindow, &width, &height);
     glfwGetFramebufferSize(mainWindow, &fbWidth, &fbHeight);
 
+	dmess("width " << width << " height " << height << " fbWidth " << fbWidth << " fbHeight " << fbHeight);
+
     //GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
     GL_CHECK(glViewport(0, 0, fbWidth, fbHeight)); // TODO needed?
 

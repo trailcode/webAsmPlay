@@ -94,7 +94,7 @@ Textures::~Textures()
 GLuint Textures::load(const string & filename)
 {
     SDL_Surface * img = IMG_Load(filename.c_str());
-
+	
 	if(!img)
 	{
 		dmess("Error! could not load: " << filename);

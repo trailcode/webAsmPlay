@@ -231,6 +231,10 @@ string GeoServer::addOsmFile(const string & osmFile)
             if(i.first) { serializedPoints.push_back(GeometryConverter::convert(AttributedPoint(i.first, point))) ;}
             else        { ++numEmptyPoints ;}
         }
+        else
+        {
+            dmess("Unknown type! " << i.second->getGeometryType());
+        }
 
         /*
         const Envelope * extent = i.second->getEnvelopeInternal();
@@ -247,11 +251,14 @@ string GeoServer::addOsmFile(const string & osmFile)
         //unique_ptr<CoordinateSequence>(i.second->getCoordinates())->toVector();
     }
 
-    //discoverTopologicalRelations(polygons);
+    dmess("numPolygons " << polygons.size());
 
-    //breakLineStrings(lineStrings);
+    discoverTopologicalRelations(polygons);
+
+    breakLineStrings(lineStrings);
 
     //createNavigationPaths(lineStrings);
+
 
     for(const AttributedPoligonalArea & g : polygons)    { serializedPolygons   .push_back(GeometryConverter::convert(g)) ;}
     for(const AttributedLineString    & l : lineStrings) { serializedLineStrings.push_back(GeometryConverter::convert(l)) ;}

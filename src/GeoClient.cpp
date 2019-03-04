@@ -669,8 +669,6 @@ void GeoClient::loadGeometry(const string fileName)
 
 	if (!fileName.rfind("http", 1))
 	{
-		dmess("Here!");
-
 		CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
 		struct BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
 		output->buffer = NULL;
@@ -685,8 +683,7 @@ void GeoClient::loadGeometry(const string fileName)
 
 		curl_easy_setopt(myHandle, CURLOPT_URL, fileName.c_str());
 		result = curl_easy_perform(myHandle);
-		dmess("result " << result << " myHandle " << myHandle);
-
+		
 		addGeometry(output->buffer);
 
 		GUI::progress("", 1.0);
