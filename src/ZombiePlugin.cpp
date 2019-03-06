@@ -38,7 +38,7 @@ using namespace OpenSteer;
 #ifdef __EMSCRIPTEN__
     int gPedestrianStartCount = 1500;
 #else
-    int gPedestrianStartCount = 3500;
+    int gPedestrianStartCount = 500;
     //int gPedestrianStartCount = 1;
 #endif
 
@@ -74,7 +74,7 @@ void ZombiePlugin::open()
     population = 0;
     for (int i = 0; i < gPedestrianStartCount; i++)
     {
-        if(true || !(i % 300)) { dmess("Add Pedestrian " << i << " of " << gPedestrianStartCount) ;}
+        if(!(i % 300)) { dmess("Add Pedestrian " << i << " of " << gPedestrianStartCount) ;}
 
         addPedestrianToCrowd ();
     }
@@ -309,7 +309,8 @@ void ZombiePlugin::removePedestrianFromCrowd()
     {
         // save pointer to last pedestrian, then remove it from the crowd
         const Zombie * pedestrian = crowd.back();
-        crowd.pop_back();
+        //crowd.pop_back();
+		crowd.resize(crowd.size() - 1);
         population--;
 
         // if it is OpenSteerDemo's selected vehicle, unselect it

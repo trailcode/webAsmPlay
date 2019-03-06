@@ -217,8 +217,10 @@ namespace {
 
 
 void 
-OpenSteer::warnIfInUpdatePhase2 (const char* name)
+OpenSteer::warnIfInUpdatePhase2 (const char* name) // TODO remove this
 {
+	return;
+
     std::ostringstream message;
     message << "use annotation (during simulation update, do not call ";
     message << name;
@@ -957,6 +959,8 @@ namespace {
 
         static void drawAll (void)
         {
+			return; // TODO Fix this
+
             // draw all deferred lines
             for (DeferredLines::iterator i = lines.begin();
                  i < lines.end();
