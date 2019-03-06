@@ -294,10 +294,12 @@ else()
     foreach(assetFile ${ASSET_FILES})
 		if(MSVC_VERSION)
 			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
 			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
 
-			list(APPEND assetFileDestRelease "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}")
-			list(APPEND assetFileDestDebug "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}")
+			list(APPEND assetFileDestRelease		"${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}")
+			list(APPEND assetFileDestRelWithDebInfo "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}")
+			list(APPEND assetFileDestDebug			"${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}")
 			
 		else()
 			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
@@ -307,8 +309,9 @@ else()
     endforeach(assetFile)
 	
 	if(MSVC_VERSION)
-		ADD_CUSTOM_TARGET(assetsRelease ALL DEPENDS ${assetFileDestRelease})
-		ADD_CUSTOM_TARGET(assetsDebug ALL DEPENDS ${assetFileDestDebug})
+		ADD_CUSTOM_TARGET(assetsRelease			ALL DEPENDS ${assetFileDestRelease})
+		ADD_CUSTOM_TARGET(assetsRelWithDebInfo	ALL DEPENDS ${assetFileDestRelWithDebInfo})
+		ADD_CUSTOM_TARGET(assetsDebug			ALL DEPENDS ${assetFileDestDebug})
 	else()
 		ADD_CUSTOM_TARGET(assets ALL DEPENDS ${assetFileDest})
 	endif()
@@ -398,8 +401,6 @@ else()
         get_filename_component(SDL2MAIN_LIBRARY_PATH ${SDL2MAIN_LIBRARY} DIRECTORY)
 
         get_filename_component(CURL_LIBRARIES_PATH ${CURL_LIBRARIES} DIRECTORY)
-
-		message("==================================== " ${BOOST_FILESYSTEM_BASE_NAME_RELEASE})
 
         get_filename_component(EXPAT_LIBRARY_PATH ${EXPAT_LIBRARY} DIRECTORY)
 
