@@ -144,8 +144,12 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
 	GLFWwindow* threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
 
+	OpenSteerDemo::initialize();
+
     openSteerThread = new thread([threadWin]()
     {
+		return;
+
         glfwMakeContextCurrent(threadWin);
 
 		/*
@@ -170,7 +174,7 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
         dmess("Start OpenSteerDemo::initialize()");
 
-        OpenSteerDemo::initialize();
+        //OpenSteerDemo::initialize();
 
         dmess("Done OpenSteerDemo::initialize()");
 
@@ -185,14 +189,19 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
 #endif
 
+	//OpenSteerDemo::initialize();
+
+
     dmess("Done OpenSteer::OpenSteerDemo::initialize();");
 
     GUI::addUpdatable([canvas]()
     {
+		//return;
+
         lock_guard<mutex> _(openSteerMutex);
 
-#ifdef __EMSCRIPTEN__
-//#if 1
+//#ifdef __EMSCRIPTEN__
+#if 1
 
         updateOpenSteer();
 
@@ -204,7 +213,15 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
 		OpenSteerDemo::redraw();
 
-		openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans));
+		//openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans));
+
+		//*
+		if (!openSteerGeom) { openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans)); }
+		else
+		{
+			((DeferredRenderable*)openSteerGeom.get())->setFromQueued(geomTrans);
+		}
+		//*/
 
         if(GUI::getCameraMode() == GUI::CAMERA_FOLLOW_ENTITY)
         {
@@ -225,6 +242,11 @@ const dmat4 & OpenSteerGlue::getGeomInverseTrans()  { return geomInverseTrans ;}
 
 PolylineSegmentedPathwaySingleRadius * OpenSteerGlue::getPath(const vector<dvec2> & path)
 {
+	if (path.size() < 3)
+	{
+		dmess("Error!!!");
+	}
+
     //const float pathRadius = 2.0;
     const float pathRadius = 1.0;
 
@@ -240,7 +262,7 @@ PolylineSegmentedPathwaySingleRadius * OpenSteerGlue::getPath(const vector<dvec2
         
         if(seen.find(pos) != seen.end())
         {
-            dmess("Seen!");
+            //dmess("Seen!");
 
             continue;
         }
@@ -250,6 +272,11 @@ PolylineSegmentedPathwaySingleRadius * OpenSteerGlue::getPath(const vector<dvec2
         // TODO Where is this * 10 coming from?
         points.push_back(Vec3(pos.x * 10.0, 0, pos.y * 10.0));
     }
+
+	if (points.size() < 3)
+	{
+		dmess("Error!!!");
+	}
 
     return new PolylineSegmentedPathwaySingleRadius(points.size(),
                                                     &points[0],

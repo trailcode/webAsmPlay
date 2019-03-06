@@ -57,6 +57,8 @@ public:
 
     void render(Canvas * canvas, const size_t renderStage = 0) const override;
 
+	void setFromQueued(const glm::dmat4 & trans = glm::dmat4(1.0));
+
 private:
 
     DeferredRenderable( const GLuint & vao,
@@ -70,8 +72,8 @@ private:
     const GLuint ebo;
     const GLuint ebo2;
     const GLuint vbo;
-    const GLuint numTriIndices;
-    const GLuint numLineIndices;
+    GLuint		 numTriIndices;
+    GLuint		 numLineIndices;
 };
 
 #endif // __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__

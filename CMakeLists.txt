@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
 set(default_build_type "Release")
 set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
-#set(EMCC_DEBUG 1)
 
 set(USE_FOLDERS ON)
 
@@ -15,9 +13,6 @@ if(MSVC_VERSION)
     set(GLEW_LOCATION "C:/tp/glew-2.1.0")
     set(GLFW_ROOT_DIR "C:/tp/glfw-3.2.1")
 	set(TBB_ROOT_DIR "C:/tp/tbb2019_20190206oss")
-    #set(GEOS_ROOT "C:/tp/geos-3.7.0")
-    #set(GEOS_LIBRARY "C:/tp/geos_Release_3_5_0_x64/lib/geos_i.lib")
-    #set(GEOS_INCLUDE_DIR "C:/tp/geos_Release_3_5_0_x64/include")
     set(PC_EXPAT_INCLUDE_DIRS "C:/tp/expat-2.2.6/include")
     set(PC_EXPAT_LIBRARY_DIRS "C:/tp/expat-2.2.6/lib")
     set(GDAL_LIBRARY "C:/tp/gdal_Release_2_3_2_x64/lib/gdal_i.lib")
@@ -267,7 +262,7 @@ else()
     link_libraries(${SDL2_LIBRARY})
 	link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG} optimized ${TBB_tbb_LIBRARY_RELEASE})
 	#set(Boost_USE_STATIC_LIBS ON)
-    link_libraries(${Boost_LIBRARIES})
+    #link_libraries(${Boost_LIBRARIES})
 	link_libraries(${OPENGL_gl_LIBRARY})
 	link_libraries(${GLEW_LIBRARY})
 	
@@ -351,33 +346,23 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
 else()
 
-    #set(CMAKE_CXX_FLAGS "-fsanitize=address -O1 -fno-omit-frame-pointer -g")
-
-    #add_executable(webAsmPlay ${sources} "ThirdParty/imgui/gl3w/GL/gl3w.c")
 	add_library(libWebAsmPlay STATIC ${sources})
-	#add_executable(webAsmPlay ${webAsmPlay_SRC} ${opensteerSrc} ${imguiSrc} "ThirdParty/imgui/gl3w/GL/gl3w.c")
-
+	
 	add_executable(webAsmPlay "src/Main.cpp")
 	target_link_libraries(webAsmPlay libWebAsmPlay)
 
 	find_package(expat REQUIRED)
 	find_package(Boost COMPONENTS filesystem REQUIRED)
-	#find_package(gdal REQUIRED)
-
-	#project(geoServer)
-
-    #add_executable(geoServer ${geoServer_SRC} "ThirdParty/imgui/glad/glad.c")
+	
 	add_executable(geoServer ${geoServer_SRC})
-    target_include_directories(geoServer PRIVATE "ThirdParty/LAStools")
+    
+	target_include_directories(geoServer PRIVATE "ThirdParty/LAStools")
 	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
 	target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
-	#target_include_directories(geoServer PRIVATE ${GDAL_INCLUDE_DIR})
-	target_link_libraries(geoServer libWebAsmPlay)
-	#target_link_libraries(geoServer ${GDAL_LIBRARY})
-	target_link_libraries(geoServer ${Boost_LIBRARIES})
-	target_link_libraries(geoServer ${EXPAT_LIBRARIES})
 
-	#add_subdirectory(GeoServer)
+	target_link_libraries(geoServer libWebAsmPlay)
+	#target_link_libraries(geoServer ${Boost_LIBRARIES})
+	target_link_libraries(geoServer ${EXPAT_LIBRARIES})
 
 	if(MSVC_VERSION)
 
@@ -417,6 +402,11 @@ else()
 							#"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll"
 							"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE}.dll"
                             "${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+							"${SDL2_IMAGE_LIBRARY_PATH}/zlib1.dll"
+							"${SDL2_IMAGE_LIBRARY_PATH}/libwebp-7.dll"
+							"${SDL2_IMAGE_LIBRARY_PATH}/libtiff-5.dll"
+							"${SDL2_IMAGE_LIBRARY_PATH}/libpng16-16.dll"
+							"${SDL2_IMAGE_LIBRARY_PATH}/libjpeg-9.dll"
                             "${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
                             "${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
                             "${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
@@ -424,6 +414,11 @@ else()
         set(DLLS_DEBUG		#"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG2}.dll"
 							"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG}.dll"
                             "${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
+							"${SDL2_IMAGE_LIBRARY_PATH}/zlib1.dll"
+							"${SDL2_IMAGE_LIBRARY_PATH}/libwebp-7.dll"
+							"${SDL2_IMAGE_LIBRARY_PATH}/libtiff-5.dll"
+							"${SDL2_IMAGE_LIBRARY_PATH}/libpng16-16.dll"
+							"${SDL2_IMAGE_LIBRARY_PATH}/libjpeg-9.dll"
                             "${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
                             "${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
                             "${EXPAT_LIBRARY_PATH}/../bin/expat.dll")

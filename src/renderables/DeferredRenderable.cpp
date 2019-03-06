@@ -116,6 +116,48 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
     return ret;
 }
 
+void DeferredRenderable::setFromQueued(const glm::dmat4& trans)
+{
+	for (size_t i = 0; i < vertsAndColors.size(); i += 7)
+	{
+		const vec3 pos(trans * dvec4(*(vec3*)& vertsAndColors[i], 1.0));
+
+		memcpy(&vertsAndColors[i], &pos, sizeof(vec3));
+	}
+
+	GL_CHECK(glBindVertexArray(vao));
+
+	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+
+	GL_CHECK(glBufferData(GL_ARRAY_BUFFER, vertsAndColors.size() * sizeof(GLfloat), &vertsAndColors[0], GL_DYNAMIC_DRAW));
+
+	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
+	GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * triangleIndices.size(), &triangleIndices[0], GL_DYNAMIC_DRAW));
+
+	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
+	GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_DYNAMIC_DRAW));
+
+	const size_t sizeVertex = 3;
+	const size_t sizeColor = 4;
+
+	const size_t totalSize = (sizeVertex + sizeColor) * sizeof(GLfloat);
+
+	GL_CHECK(glEnableVertexAttribArray(0));
+
+	GL_CHECK(glVertexAttribPointer(0, sizeVertex, GL_FLOAT, GL_FALSE, totalSize, 0));
+
+	GL_CHECK(glEnableVertexAttribArray(1));
+
+	GL_CHECK(glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void*)((sizeVertex) * sizeof(GLfloat))));
+
+	numTriIndices	= triangleIndices.size();
+	numLineIndices	= lineIndices.size();
+
+	vertsAndColors.clear();
+	triangleIndices.clear();
+	lineIndices.clear();
+}
+
 DeferredRenderable::DeferredRenderable( const GLuint & vao,
                                         const GLuint & ebo,
                                         const GLuint & ebo2,

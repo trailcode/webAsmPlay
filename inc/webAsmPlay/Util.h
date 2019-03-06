@@ -197,5 +197,6 @@ inline void append2ui(std::vector<uint32_t> & data, const uint32_t A, const uint
     data.push_back(B);
 }
 
+bool fileExists(const std::string& fileName);
 
 #endif // __WEB_ASM_PLAY_UTIL_H__
