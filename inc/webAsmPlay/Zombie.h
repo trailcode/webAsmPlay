@@ -27,6 +27,10 @@
 #ifndef __WEB_ASM_PLAY_ZOMBIE_H__
 #define __WEB_ASM_PLAY_ZOMBIE_H__
 
+#ifndef __EMSCRIPTEN__
+#include <tbb/concurrent_vector.h>
+#endif
+
 #include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/Proximity.h>
 
@@ -41,7 +45,15 @@ class Zombie : public OpenSteer::SimpleVehicle
 {
 public:
 
+#ifdef __EMSCRIPTEN__
+
     typedef std::vector<Zombie *> groupType;
+
+#else
+
+	typedef tbb::concurrent_vector<Zombie*> groupType;
+
+#endif
 
     typedef OpenSteer::AbstractProximityDatabase        <OpenSteer::AbstractVehicle *> ProximityDatabase;
     typedef OpenSteer::AbstractTokenForProximityDatabase<OpenSteer::AbstractVehicle *> ProximityToken;

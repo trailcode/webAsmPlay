@@ -61,6 +61,8 @@ namespace
 
 DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
 {
+	if (!vertsAndColors.size()) { return NULL; }
+
     GLuint vao  = 0;
     GLuint ebo  = 0;
     GLuint ebo2 = 0;

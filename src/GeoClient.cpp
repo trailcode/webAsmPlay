@@ -124,7 +124,14 @@ void GeoClient::ensureClient()
 
         glfwMakeContextCurrent(threadWin);
 
-        //gl3wInit();
+		/*
+		if (gl3wInit())
+		{
+			dmess("Error creating openGL context!");
+
+			exit(-1);
+		}
+		*/
 
         _client->run();
 

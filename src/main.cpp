@@ -71,9 +71,12 @@ int main(int, char**)
     //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
@@ -86,7 +89,21 @@ int main(int, char**)
 
 #ifndef __EMSCRIPTEN__
 	// Initialize OpenGL loader
-	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	//gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	/*
+	if (gl3wInit())
+	{
+		dmess("failed to initialize OpenGL\n");
+		exit(-1);
+	}
+	*/
+
+	if (glewInit())
+	{
+		dmess("failed to initialize OpenGL\n");
+
+		exit(-1);
+	}
 	
     curl_global_init( CURL_GLOBAL_ALL );
 

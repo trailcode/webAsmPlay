@@ -95,7 +95,7 @@ namespace
 
     void updateOpenSteer()
     {
-		return;
+		//return;
 
         if(gotoNextZombie)
         {
@@ -108,6 +108,13 @@ namespace
 
         OpenSteerDemo::updateSimulation();
 
+		//lock_guard<mutex> _(openSteerMutex);
+
+		//updateOpenSteerCamera();
+
+		//OpenSteerDemo::redraw();
+
+		/*
         lock_guard<mutex> _(openSteerMutex);
 
         updateOpenSteerCamera();
@@ -115,6 +122,7 @@ namespace
         OpenSteerDemo::redraw();
 
         openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans));
+		*/
     }
 }
 
@@ -124,19 +132,41 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
     ZombiePlugin::setNetwork(network);
 
-	return;
+	//return;
 
 #ifndef __EMSCRIPTEN__
+//#if 0
 
-    openSteerThread = new thread([]()
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+	GLFWwindow* threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
+    openSteerThread = new thread([threadWin]()
     {
-        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-
-        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
         glfwMakeContextCurrent(threadWin);
 
+		/*
+		if (glewInit())
+		{
+			dmess("failed to initialize OpenGL\n");
+
+			exit(-1);
+		}
+		*/
+
         //gl3wInit();
+		/*
+		if (gl3wInit())
+		{
+			dmess("failed to initialize OpenGL\n");
+
+			exit(-1);
+		}
+		//*/
+		//gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
         dmess("Start OpenSteerDemo::initialize()");
 
@@ -162,10 +192,20 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
         lock_guard<mutex> _(openSteerMutex);
 
 #ifdef __EMSCRIPTEN__
+//#if 1
 
         updateOpenSteer();
 
 #endif
+
+		//lock_guard<mutex> _(openSteerMutex);
+
+		updateOpenSteerCamera();
+
+		OpenSteerDemo::redraw();
+
+		openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans));
+
         if(GUI::getCameraMode() == GUI::CAMERA_FOLLOW_ENTITY)
         {
             // TODO this will be one frame behind!

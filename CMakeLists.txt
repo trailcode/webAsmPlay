@@ -14,6 +14,7 @@ if(MSVC_VERSION)
     set(SDL2_IMAGE_PATH "C:/tp/SDL2_image-2.0.4")
     set(GLEW_LOCATION "C:/tp/glew-2.1.0")
     set(GLFW_ROOT_DIR "C:/tp/glfw-3.2.1")
+	set(TBB_ROOT_DIR "C:/tp/tbb2019_20190206oss")
     #set(GEOS_ROOT "C:/tp/geos-3.7.0")
     #set(GEOS_LIBRARY "C:/tp/geos_Release_3_5_0_x64/lib/geos_i.lib")
     #set(GEOS_INCLUDE_DIR "C:/tp/geos_Release_3_5_0_x64/include")
@@ -119,6 +120,8 @@ file(GLOB simpleJSON_SRC "ThirdParty/SimpleJSON/src/*.cpp")
 
 file(GLOB imguiSrc  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
 
+file(GLOB gl3wSrc  "ThirdParty/gl3w/src/gl3w.c" "ThirdParty/sl3w/inc/GL/*.h" "ThirdParty/sl3w/inc/KHR/*.h")
+
 file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
                             "src/*.cpp")
 
@@ -146,7 +149,8 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     ${simpleJSON_SRC}
                     ${opensteerSrc}
 					${imguiSrc}
-                    "ThirdParty/imgui/glad/glad.c"
+					${gl3wSrc}
+                    #"ThirdParty/imgui/glad/glad.c"
                     )
 				  
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
@@ -239,6 +243,9 @@ else()
     find_package(SDL2_image REQUIRED)
 	find_package(GLEW REQUIRED)
     find_package(curl REQUIRED)
+	find_package(TBB REQUIRED)
+
+	#add_definitions(-DGLEW_STATIC)
 
 	include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${CURL_INCLUDE_DIR})
@@ -246,19 +253,23 @@ else()
     include_directories(${SDL2_INCLUDE_DIR})
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 	include_directories(${GLFW3_INCLUDE_PATH})
+	include_directories(${TBB_INCLUDE_DIRS})
     include_directories(ThirdParty/ctpl)
+	include_directories(ThirdParty/gl3w/inc)
     include_directories(./)
     
-    link_libraries(${GLEW_LIBRARIES})
+    #link_libraries(${GLEW_LIBRARIES})
     link_libraries(${CURL_LIBRARIES})
 	message(${GLFW3_LIBRARY})
 	link_libraries(${GLFW3_LIBRARY})
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
     link_libraries(${SDL2_LIBRARY})
+	link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG} optimized ${TBB_tbb_LIBRARY_RELEASE})
 	#set(Boost_USE_STATIC_LIBS ON)
     link_libraries(${Boost_LIBRARIES})
 	link_libraries(${OPENGL_gl_LIBRARY})
+	link_libraries(${GLEW_LIBRARY})
 	
 	link_directories(${Boost_LIBRARY_DIRS})
 
@@ -320,7 +331,9 @@ else()
 	    SET(CMAKE_CXX_LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
 	endif()
 
-	add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+	#add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+	#add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
+	add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLEW)
 
 endif()
 
@@ -350,7 +363,8 @@ else()
 
 	#project(geoServer)
 
-    add_executable(geoServer ${geoServer_SRC} "ThirdParty/imgui/glad/glad.c")
+    #add_executable(geoServer ${geoServer_SRC} "ThirdParty/imgui/glad/glad.c")
+	add_executable(geoServer ${geoServer_SRC})
     target_include_directories(geoServer PRIVATE "ThirdParty/LAStools")
 	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
 	target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
@@ -415,6 +429,10 @@ else()
 
         foreach(dll ${DLLS_RELEASE})
             add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
+        endforeach(dll)
+
+		foreach(dll ${DLLS_RELEASE})
+            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
         endforeach(dll)
 
         foreach(dll ${DLLS_DEBUG})
