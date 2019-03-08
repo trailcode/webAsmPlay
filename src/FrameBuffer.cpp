@@ -79,14 +79,11 @@ FrameBuffer * FrameBuffer::create(const ivec2 & bufferSize)
 
 FrameBuffer * FrameBuffer::ensureFrameBuffer(FrameBuffer *& currBuffer, const ivec2 & bufferSize)
 {
-    if(!currBuffer || bufferSize != currBuffer->getBufferSize())
-    {
-        delete currBuffer;
+    if(currBuffer && bufferSize == currBuffer->getBufferSize()) { return currBuffer ;}
+	
+	delete currBuffer;
 
-        return create(bufferSize);
-    }
-
-    return currBuffer;
+    return currBuffer = create(bufferSize);
 }
 
 FrameBuffer::FrameBuffer(   const GLuint   framebuffer,

@@ -316,7 +316,7 @@ namespace
 {
     void _saveData(FILE * fp, const vector<string> & data)
     {
-        const uint32_t num = data.size();
+        const uint32_t num = (uint32_t)data.size();
 
         fwrite(&num, sizeof(uint32_t), 1, fp);
 
@@ -356,13 +356,6 @@ namespace
 string GeoServer::saveGeoFile(const string & fileName)
 {
     FILE * fp = fopen(fileName.c_str(), "wb");
-
-	dmess("save");
-
-	dmess("boundsMinX " << boundsMinX);
-	dmess("boundsMinY " << boundsMinY);
-	dmess("boundsMaxX " << boundsMaxX);
-	dmess("boundsMaxY " << boundsMaxY);
 
     fwrite(&boundsMinX, sizeof(double), 1, fp);
     fwrite(&boundsMinY, sizeof(double), 1, fp);

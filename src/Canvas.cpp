@@ -85,7 +85,7 @@ ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
 {
     //if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, fbSize) ;}
 
-    auxFrameBuffer = FrameBuffer::ensureFrameBuffer(auxFrameBuffer, fbSize);
+    FrameBuffer::ensureFrameBuffer(auxFrameBuffer, fbSize);
 
     return frameBufferSize = fbSize;
 }
@@ -140,12 +140,8 @@ bool Canvas::preRender()
 
     if(useFrameBuffer)
     {
-        //frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, size);
-        frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, frameBufferSize);
+        FrameBuffer::ensureFrameBuffer(frameBuffer, frameBufferSize)->bind();
 
-        frameBuffer->bind();
-    
-        //GL_CHECK(glViewport(0, 0, size.x, size.y));
         GL_CHECK(glViewport(0, 0, frameBufferSize.x, frameBufferSize.y));
     }
 
@@ -197,8 +193,7 @@ GLuint Canvas::render()
     for(const auto r : lineStrings)         { r->render(this, 0) ;}
     for(const auto r : points)              { r->render(this, 0) ;}
     for(const auto r : deferredRenderables) { r->render(this, 0) ;} 
-    //for(const auto r : meshes)              { r->render(this) ;}
-
+    
     ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
     ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
 

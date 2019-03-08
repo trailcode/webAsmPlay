@@ -99,7 +99,8 @@ inline uint32_t appendUint32(char *& dataStream, const uint32_t value)
     return value;
 }
 
-inline void appendUint32s(char *& dataStream, const uint32_t A, const uint32_t B, const uint32_t C)
+template<typename T>
+inline void appendUint32s(char *& dataStream, const T A, const T B, const T C)
 {
     appendUint32(dataStream, A);
     appendUint32(dataStream, B);

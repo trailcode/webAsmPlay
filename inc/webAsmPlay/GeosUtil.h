@@ -124,8 +124,8 @@ namespace geosUtil
 
     inline geos::geom::Coordinate append2f(float *& dataStream, const geos::geom::Coordinate & v)
     {
-        *dataStream = v.x; ++dataStream;
-        *dataStream = v.y; ++dataStream;
+        *dataStream = (float)v.x; ++dataStream;
+        *dataStream = (float)v.y; ++dataStream;
 
         return v;
     }

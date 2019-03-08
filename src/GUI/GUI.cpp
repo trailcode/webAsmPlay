@@ -48,6 +48,7 @@
 #include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/TileBoundaryShader.h>
+#include <webAsmPlay/shaders/TextureLookupShader.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/SkyBox.h>
@@ -555,6 +556,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     ColorVertexShader         ::ensureShader();
     TextureShader             ::ensureShader();
     TileBoundaryShader        ::ensureShader();
+	TextureLookupShader		  ::ensureShader();
     
     canvas = new Canvas(false);
 

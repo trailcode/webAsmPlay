@@ -169,7 +169,7 @@ void GeoClient::getNumPolygons(const function<void (const size_t)> & callback)
 
     data[0] = GeoServerBase::GET_NUM_POLYGONS_REQUEST;
 
-    *(uint32_t *)&data[1] = request->ID;
+    *(uint32_t *)&data[1] = (uint32_t)request->ID;
 
     client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
@@ -200,7 +200,7 @@ void GeoClient::getNumPolylines(const function<void (const size_t)> & callback)
 
     data[0] = GeoServerBase::GET_NUM_POLYLINES_REQUEST;
 
-    *(uint32_t *)&data[1] = request->ID;
+    *(uint32_t *)&data[1] = (uint32_t)request->ID;
 
     client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
@@ -233,7 +233,7 @@ void GeoClient::getNumPoints(const function<void (const size_t)> & callback)
 
     data[0] = GeoServerBase::GET_NUM_POINTS_REQUEST;
 
-    *(uint32_t *)&data[1] = request->ID;
+    *(uint32_t *)&data[1] = (uint32_t)request->ID;
 
     client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
@@ -266,7 +266,7 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 
     data[0] = GeoServerBase::GET_LAYER_BOUNDS_REQUEST;
 
-    *(uint32_t *)&data[1] = request->ID;
+    *(uint32_t *)&data[1] = (uint32_t)request->ID;
 
     client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 

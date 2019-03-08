@@ -126,6 +126,8 @@ namespace
             // TODO cleanup
         }
 
+		void render(Canvas * canvas) const { r->render(canvas) ;}
+
         void fetchTile(const int ID)
         {
 #ifndef __EMSCRIPTEN__
@@ -317,7 +319,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 {
     if(!getRenderFill()) { return ;}
 
-	//textureBuffer = FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->frameBufferSize);
+	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
 
     for(const auto r : tiles)
     {
@@ -325,6 +327,6 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
         TextureShader::getDefaultInstance()->setTextureID(r->textureID);
 		
-        r->r->render(canvas, 0);
+        r->render(canvas);
     }
 }
