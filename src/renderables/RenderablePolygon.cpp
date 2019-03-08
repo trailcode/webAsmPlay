@@ -70,8 +70,8 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
 
     if(get<0>(boxUV) != get<2>(boxUV))
     {
-        const dvec2 min = trans * dvec4(get<0>(boxUV), get<1>(boxUV), 0, 1);
-        const dvec2 max = trans * dvec4(get<2>(boxUV), get<3>(boxUV), 0, 1);
+		const dvec2 min = trans * dvec4(get<0>(boxUV), get<1>(boxUV), 0, 1);
+		const dvec2 max = trans * dvec4(get<2>(boxUV), get<3>(boxUV), 0, 1);
 
 		VertexArrayObject * vao = VertexArrayObject::create(tesselations, AABB2D(min.x, min.y, max.x, max.y));
 

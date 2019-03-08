@@ -148,7 +148,7 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
     openSteerThread = new thread([threadWin]()
     {
-		return;
+		//return;
 
         glfwMakeContextCurrent(threadWin);
 
@@ -200,8 +200,8 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
         lock_guard<mutex> _(openSteerMutex);
 
-//#ifdef __EMSCRIPTEN__
-#if 1
+#ifdef __EMSCRIPTEN__
+//#if 1
 
         updateOpenSteer();
 

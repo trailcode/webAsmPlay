@@ -42,11 +42,13 @@ void GUI::bingTileSystemPanel()
 
     pos = client->getInverseTrans() * pos;
 
+	/*
     double tmp = pos.x;
     pos.x = pos.y;
     pos.y = tmp;
+	*/
 
-    const size_t zoomLevel = 19;
+    const size_t zoomLevel = 15;
 
     ivec2 pix = latLongToPixel(pos, zoomLevel);
 
@@ -61,10 +63,13 @@ void GUI::bingTileSystemPanel()
 
     ImGui::Begin("Bing Tile System", &showBingTileSystemPanel);
 
-    ImGui::Text(("    pos: " + toStr(vec2(pos))).c_str());
-    ImGui::Text(("    pix: " + toStr(pix)).c_str());
-    ImGui::Text(("   tile: " + toStr(tile)).c_str());
-    ImGui::Text(("quadKey: " + quadKey).c_str());
+	ImGui::Text(("Local pos: " + toStr(vec2(canvas->getCursorPosWC()))).c_str());
+    ImGui::Text(("      pos: " + toStr(vec2(pos))).c_str());
+    ImGui::Text(("      pix: " + toStr(pix)).c_str());
+    ImGui::Text(("     tile: " + toStr(tile)).c_str());
+    ImGui::Text(("  quadKey: " + quadKey).c_str());
+
+	//dmess("quadKey " << quadKey);
 
     ImGui::End();
 }

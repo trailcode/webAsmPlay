@@ -58,7 +58,7 @@ VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellation
     return _create< false, // 3D extrude
                     false, // Use symbology ID
                     true   // Use UV coords
-                > (tessellations, boxUV);
+					> (tessellations, boxUV);
 }
 
 namespace
@@ -124,13 +124,15 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             if(USE_UV_COORDS)
             {
-                const dvec2 min(get<0>(boxUV), get<1>(boxUV));
+				const dvec2 min(get<0>(boxUV), get<1>(boxUV));
                 const dvec2 max(get<2>(boxUV), get<3>(boxUV));
 
                 const dvec2 uv = (P - min) / (max - min);
 
-                verts.push_back(uv.x);
-                verts.push_back(uv.y);
+				//dmess("uv " << uv.x << " " << uv.y);
+
+                verts.push_back(uv.y); // TODO WTF?
+                verts.push_back(1 - uv.x);
             }
         }
 

@@ -279,11 +279,25 @@ string GeoServer::addOsmFile(const string & osmFile)
         mapData.boundsMinY != 0.0 &&
         mapData.boundsMaxY != 0.0)
     {
+		dmess("Here!");
+
         boundsMinX = mapData.boundsMinX;
         boundsMaxX = mapData.boundsMaxX;
         boundsMinY = mapData.boundsMinY;
         boundsMaxY = mapData.boundsMaxY;
+
+		dmess("boundsMinX " << boundsMinX);
+		dmess("boundsMaxX " << boundsMaxX);
+		dmess("boundsMinY " << boundsMinY);
+		dmess("boundsMaxY " << boundsMaxY);
     }
+
+	/*
+	boundsMinX = mapData.boundsMinX;
+	boundsMaxX = mapData.boundsMaxX;
+	boundsMinY = mapData.boundsMinY;
+	boundsMaxY = mapData.boundsMaxY;
+	*/
 
     const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
 
@@ -342,6 +356,13 @@ namespace
 string GeoServer::saveGeoFile(const string & fileName)
 {
     FILE * fp = fopen(fileName.c_str(), "wb");
+
+	dmess("save");
+
+	dmess("boundsMinX " << boundsMinX);
+	dmess("boundsMinY " << boundsMinY);
+	dmess("boundsMaxX " << boundsMaxX);
+	dmess("boundsMaxY " << boundsMaxY);
 
     fwrite(&boundsMinX, sizeof(double), 1, fp);
     fwrite(&boundsMinY, sizeof(double), 1, fp);

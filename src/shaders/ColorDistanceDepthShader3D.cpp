@@ -290,6 +290,7 @@ void ColorDistanceDepthShader3D::ensureShader()
                 float v = abs(t.x - glPos.w);
 
                 if(v <= 0.0001) { return false ;}
+				//if(v <= 0.001) { return false ;}
             }
 
             return true;

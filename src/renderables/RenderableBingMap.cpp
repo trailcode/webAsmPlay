@@ -34,9 +34,11 @@
 #else
 #include <unistd.h>
 #endif
+#include <algorithm>
 #include <mutex>
 #include <unordered_set>
 #include <unordered_map>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/Textures.h>
@@ -55,7 +57,7 @@ namespace
 {
 #ifndef __EMSCRIPTEN__
 
-    ctpl::thread_pool loaderPool(16);
+    ctpl::thread_pool loaderPool(1);
 
     ctpl::thread_pool uploaderPool(1);
 
@@ -68,8 +70,8 @@ namespace
 
     //const size_t levelOfDetail = 19;
     //const size_t levelOfDetail = 18;
-    //const size_t levelOfDetail = 17;
-    const size_t levelOfDetail = 15;
+    const size_t levelOfDetail = 17;
+    //const size_t levelOfDetail = 15;
 
     // Define our struct for accepting LCs output
     struct BufferStruct // TODO code dupilcation
@@ -100,6 +102,9 @@ namespace
     unordered_set<int> createdContexts;
 
     bool contextCreated = false;
+	bool contextSet = false;
+
+	static GLFWwindow * threadWin = NULL;
 
     class BingTile
     {
@@ -125,14 +130,25 @@ namespace
 
             const string tileCachePath = "./tiles/" + quadKey + ".jpg";
 
-#ifdef WIN32
-			if (false)
-#else
-            if(access(tileCachePath.c_str(), F_OK) != -1)
-#endif
+			if(false && fileExists(tileCachePath))
             {
+				if(!contextCreated)
+				{
+					// TODO Create a openGL context class;
+					glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+					threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
+					//glfwMakeContextCurrent(threadWin);
+
+					contextCreated = true;
+				}
+
                 uploaderPool.push([this, tileCachePath](int ID)
                 {
+					glfwMakeContextCurrent(threadWin);
+
+					/*
                     if(!contextCreated)
                     {
                         // TODO Create a openGL context class;
@@ -144,6 +160,7 @@ namespace
 
                         contextCreated = true;
                     }
+					*/
 
                     textureID = Textures::load(tileCachePath);
                 });
@@ -163,7 +180,18 @@ namespace
                     }
 
                     myHandle = curlHandles[ID];
+
+					dmess("myHandle " << myHandle);
+
+					if (!myHandle)
+					{
+						dmess("Error!");
+
+						abort();
+					}
                 }
+
+				//dmess("Start!");
 
                 CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
                 struct BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
@@ -181,13 +209,32 @@ namespace
                                     quadKey +
                                     "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
 
+				//dmess("url " << url);
+
                 curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
                 result = curl_easy_perform( myHandle );
                 //dmess("result " << result << " myHandle " << myHandle);
                 //curl_easy_cleanup( myHandle );
 
+				if (!output->buffer)
+				{
+					dmess("Error!");
+
+					abort();
+				}
+
+				//static GLFWwindow * threadWin = NULL;
+
                 uploaderPool.push([this, output, tileCachePath](int ID)
                 {
+					if(!contextSet)
+					{ 
+						glfwMakeContextCurrent(threadWin);
+
+						contextSet = true;
+					}
+
+					/*
                     if(!contextCreated)
                     {
                         // TODO Create a openGL context class;
@@ -199,21 +246,24 @@ namespace
 
                         contextCreated = true;
                     }
+					*/
 
                     textureID = Textures::createFromJpeg(output->buffer, output->size);
 
-                    //dmess("textureID " << textureID);
-#ifdef WIN32
-					if(false)
-#else
-                    if(access(tileCachePath.c_str(), F_OK) == -1)
-#endif
+                    if(!fileExists(tileCachePath))
                     {
                         FILE * fp = fopen(tileCachePath.c_str(), "wb");
                         
-                        fwrite(output->buffer, sizeof(char), output->size, fp);
+						if(fp)
+						{
+							fwrite(output->buffer, sizeof(char), output->size, fp);
 
-                        fclose(fp);
+							fclose(fp);
+						}
+						else
+						{
+							dmess("Warn could not write file: " << tileCachePath);
+						}
                     }
 
                     if( output->buffer )
@@ -245,31 +295,56 @@ namespace
 
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds)
 {
-    return;
-    
-    minTile = latLongToTile(dvec2(get<1>(bounds), get<0>(bounds)), levelOfDetail);
+	//return;
 
-    maxTile = latLongToTile(dvec2(get<3>(bounds), get<2>(bounds)), levelOfDetail);
+	if(!contextCreated)
+	{
+		// TODO Create a openGL context class;
+		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 
-    int tmp = minTile.y;  
-    minTile.y = maxTile.y;
-    maxTile.y = tmp;
+		threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
+		//glfwMakeContextCurrent(threadWin);
+
+		contextCreated = true;
+	}
+
+    minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), levelOfDetail);
+    maxTile = latLongToTile(dvec2(get<2>(bounds), get<3>(bounds)), levelOfDetail);
+
+	if(minTile.x > maxTile.x)
+	{
+		int tmp = minTile.x;  
+		minTile.x = maxTile.x;
+		maxTile.x = tmp;
+	}
+
+	/*
+	if(minTile.y > maxTile.y)
+	{
+		int tmp = minTile.y;  
+		minTile.y = maxTile.y;
+		maxTile.y = tmp;
+	}
+	*/
 
     dmess("minTile " << minTile.x << " " << minTile.y);
 
     for(int x = minTile.x; x <= maxTile.x; ++x)
-    for(int y = minTile.y; y     <= maxTile.y; ++y)
+    for(int y = minTile.y; y <= maxTile.y; ++y)
     {
-        dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 0), levelOfDetail);
-        dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 1), levelOfDetail);
+        dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 1), levelOfDetail);
+        dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 0), levelOfDetail);
 
         string quadKey = tileToQuadKey(ivec2(x, y), levelOfDetail);
 
         //dmess("quadKey " << quadKey);
 
-        double tmp = tMin.x; tMin.x = tMin.y; tMin.y = tmp;
+		double tmp;
 
-        tmp = tMax.x; tMax.x = tMax.y; tMax.y = tmp;
+        //double tmp = tMin.x; tMin.x = tMin.y; tMin.y = tmp;
+
+        //tmp = tMax.x; tMax.x = tMax.y; tMax.y = tmp;
 
         Renderable * r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
 
@@ -301,7 +376,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
         if(!r->textureID) { continue ;}
 
         TextureShader::getDefaultInstance()->setTextureID(r->textureID);
-
+		
         r->r->render(canvas, 0);
     }
 }
