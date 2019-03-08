@@ -40,7 +40,9 @@
 #include <unordered_map>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/BingTileSystem.h>
+#include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -68,9 +70,9 @@ namespace
 
 #endif
 
-    //const size_t levelOfDetail = 19;
+    const size_t levelOfDetail = 19;
     //const size_t levelOfDetail = 18;
-    const size_t levelOfDetail = 17;
+    //const size_t levelOfDetail = 17;
     //const size_t levelOfDetail = 15;
 
     // Define our struct for accepting LCs output
@@ -130,37 +132,16 @@ namespace
 
             const string tileCachePath = "./tiles/" + quadKey + ".jpg";
 
-			if(false && fileExists(tileCachePath))
+			if(fileExists(tileCachePath))
             {
-				if(!contextCreated)
-				{
-					// TODO Create a openGL context class;
-					glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-
-					threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
-					//glfwMakeContextCurrent(threadWin);
-
-					contextCreated = true;
-				}
-
                 uploaderPool.push([this, tileCachePath](int ID)
                 {
-					glfwMakeContextCurrent(threadWin);
+					if(!contextSet)
+					{ 
+						glfwMakeContextCurrent(threadWin);
 
-					/*
-                    if(!contextCreated)
-                    {
-                        // TODO Create a openGL context class;
-                        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-
-                        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
-                        glfwMakeContextCurrent(threadWin);
-
-                        contextCreated = true;
-                    }
-					*/
+						contextSet = true;
+					}
 
                     textureID = Textures::load(tileCachePath);
                 });
@@ -180,8 +161,6 @@ namespace
                     }
 
                     myHandle = curlHandles[ID];
-
-					dmess("myHandle " << myHandle);
 
 					if (!myHandle)
 					{
@@ -234,20 +213,6 @@ namespace
 						contextSet = true;
 					}
 
-					/*
-                    if(!contextCreated)
-                    {
-                        // TODO Create a openGL context class;
-                        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-
-                        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
-                        glfwMakeContextCurrent(threadWin);
-
-                        contextCreated = true;
-                    }
-					*/
-
                     textureID = Textures::createFromJpeg(output->buffer, output->size);
 
                     if(!fileExists(tileCachePath))
@@ -291,6 +256,8 @@ namespace
     };
 
     vector<BingTile *> tiles;
+
+	FrameBuffer * textureBuffer = NULL;
 }
 
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds)
@@ -304,8 +271,6 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 
 		threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
 
-		//glfwMakeContextCurrent(threadWin);
-
 		contextCreated = true;
 	}
 
@@ -314,37 +279,18 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 
 	if(minTile.x > maxTile.x)
 	{
-		int tmp = minTile.x;  
+		int tmp = minTile.x;  // TODO does this happen anymore?
 		minTile.x = maxTile.x;
 		maxTile.x = tmp;
 	}
 
-	/*
-	if(minTile.y > maxTile.y)
-	{
-		int tmp = minTile.y;  
-		minTile.y = maxTile.y;
-		maxTile.y = tmp;
-	}
-	*/
-
-    dmess("minTile " << minTile.x << " " << minTile.y);
-
     for(int x = minTile.x; x <= maxTile.x; ++x)
     for(int y = minTile.y; y <= maxTile.y; ++y)
     {
-        dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 1), levelOfDetail);
-        dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 0), levelOfDetail);
+        const dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 1), levelOfDetail);
+        const dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 0), levelOfDetail);
 
-        string quadKey = tileToQuadKey(ivec2(x, y), levelOfDetail);
-
-        //dmess("quadKey " << quadKey);
-
-		double tmp;
-
-        //double tmp = tMin.x; tMin.x = tMin.y; tMin.y = tmp;
-
-        //tmp = tMax.x; tMax.x = tMax.y; tMax.y = tmp;
+        const string quadKey = tileToQuadKey(ivec2(x, y), levelOfDetail);
 
         Renderable * r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
 
@@ -370,6 +316,8 @@ Renderable * RenderableBingMap::create(const AABB2D & bounds, const dmat4 & tran
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 {
     if(!getRenderFill()) { return ;}
+
+	//textureBuffer = FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->frameBufferSize);
 
     for(const auto r : tiles)
     {

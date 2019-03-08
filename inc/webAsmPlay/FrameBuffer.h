@@ -36,7 +36,7 @@ public:
 
     static FrameBuffer * create(const glm::ivec2 & bufferSize);
 
-    static FrameBuffer * ensureFrameBuffer(FrameBuffer * currBuffer, const glm::ivec2 & bufferSize);
+    static FrameBuffer * ensureFrameBuffer(FrameBuffer *& currBuffer, const glm::ivec2 & bufferSize);
 
     ~FrameBuffer();
 

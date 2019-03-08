@@ -131,7 +131,7 @@ GLuint Textures::load(const string & filename)
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
-
+	GL_CHECK(glFlush());
 
     //SDL_FreeSurface(img);
 
@@ -140,8 +140,6 @@ GLuint Textures::load(const string & filename)
 
 GLuint Textures::loadCube(const vector<string> & files)
 {
-    dmess("loadCube " << files.size());
-    
     if(files.size() != 6)
     {
         dmess("Error, cube texture incorrect number of files!")
@@ -185,6 +183,8 @@ GLuint Textures::loadCube(const vector<string> & files)
     GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, zpos->w, zpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zpos->pixels));
     GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, zneg->w, zneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zneg->pixels));
     
+	GL_CHECK(glFlush());
+
     /*
     SDL_FreeSurface(xpos); // TODO Causes crashing. MUst not be the correct way to free memory.
     SDL_FreeSurface(xneg);
@@ -252,6 +252,8 @@ GLuint Textures::createFromJpeg(const char * data, const size_t size)
     /* Linear Filtering */
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+
+	GL_CHECK(glFlush());
 
     SDL_FreeSurface(img);
 

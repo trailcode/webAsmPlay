@@ -421,6 +421,8 @@ dvec3 Canvas::getCursorPosWC() const { return cursorPosWC ;}
 
 Renderable * Canvas::getCursor() const { return cursor ;}
 
+FrameBuffer * Canvas::getAuxFrameBuffer() const { return auxFrameBuffer ;}
+
 #ifdef __EMSCRIPTEN__
 
 EMSCRIPTEN_BINDINGS(CanvasBindings)

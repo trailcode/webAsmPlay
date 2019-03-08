@@ -392,7 +392,7 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
 
     GL_CHECK(glActiveTexture(GL_TEXTURE1));
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, canvas->auxFrameBuffer->getTextureID()));
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, canvas->getAuxFrameBuffer()->getTextureID()));
 
     GL_CHECK(glEnable(GL_BLEND));
 
@@ -406,15 +406,14 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
         
         shaderProgramFill->setUniformi(texUniformFill,          0);
         shaderProgramFill->setUniformi(depthTexUniformFill,     1);
-        shaderProgramFill->setUniformf(widthUniformFill,        canvas->frameBufferSize.x);
-        shaderProgramFill->setUniformf(heightUniformFill,       canvas->frameBufferSize.y);
+        shaderProgramFill->setUniformf(widthUniformFill,        canvas->getFrameBufferSize().x);
+        shaderProgramFill->setUniformf(heightUniformFill,       canvas->getFrameBufferSize().y);
         shaderProgramFill->setUniformf(heightMultiplierFill,    heightMultiplier);
         shaderProgramFill->setUniform (modelFill,               canvas->getModelRef());
         shaderProgramFill->setUniform (viewFill,                canvas->getViewRef());
         shaderProgramFill->setUniform (projectionFill,          canvas->getProjectionRef());
         shaderProgramFill->setUniform (lightPosUniformFill,     lightPos);
-
-        shaderProgramFill->setUniformf(colorLookupOffsetFill, 0.0f);
+        shaderProgramFill->setUniformf(colorLookupOffsetFill,	0.0f);
     }
     else
     {
@@ -422,12 +421,11 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
         
         shaderProgramOutline->setUniformf(heightMultiplierOutline,  heightMultiplier);
         shaderProgramOutline->setUniformi(depthTexUniformOutline,   1);
-        shaderProgramOutline->setUniformf(widthUniformOutline,      canvas->frameBufferSize.x);
-        shaderProgramOutline->setUniformf(heightUniformOutline,     canvas->frameBufferSize.y);
+        shaderProgramOutline->setUniformf(widthUniformOutline,      canvas->getFrameBufferSize().x);
+        shaderProgramOutline->setUniformf(heightUniformOutline,     canvas->getFrameBufferSize().y);
         shaderProgramOutline->setUniform(MV_Outline,                canvas->getMV_Ref());
         shaderProgramOutline->setUniform(MVP_Outline,               canvas->getMVP_Ref());
         shaderProgramOutline->setUniformi(texUniformOutline,        0);
-
         shaderProgramOutline->setUniformf(colorLookupOffsetOutline, 1.0f);
     }
 }

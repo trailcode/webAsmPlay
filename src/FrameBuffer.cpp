@@ -77,7 +77,7 @@ FrameBuffer * FrameBuffer::create(const ivec2 & bufferSize)
                             bufferSize);
 }
 
-FrameBuffer * FrameBuffer::ensureFrameBuffer(FrameBuffer * currBuffer, const ivec2 & bufferSize)
+FrameBuffer * FrameBuffer::ensureFrameBuffer(FrameBuffer *& currBuffer, const ivec2 & bufferSize)
 {
     if(!currBuffer || bufferSize != currBuffer->getBufferSize())
     {

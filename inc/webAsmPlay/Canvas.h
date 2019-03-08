@@ -123,7 +123,9 @@ public:
 
     glm::dvec2 renderCursor(const glm::dvec2 & pos);
 
-//protected:
+	FrameBuffer * getAuxFrameBuffer() const;
+
+protected:
 
     bool preRender();
 
@@ -134,7 +136,7 @@ public:
 
     glm::ivec2 frameBufferSize = glm::ivec2(1,1);
 
-//private:
+private:
 
     Renderable * addRenderable(std::list<Renderable *> & container, Renderable * renderiable);
 
