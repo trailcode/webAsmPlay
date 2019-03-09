@@ -5,10 +5,33 @@ set(CMAKE_BUILD_TYPE Release)
 
 set(USE_FOLDERS ON)
 
+set(Boost_USE_STATIC_LIBS        OFF)
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+
 if(MSVC_VERSION)
 
+	find_program(NUGET nuget)
+	if(NOT NUGET)
+	  message(FATAL "Cannot find nuget command line tool.\nInstall it with e.g. choco install nuget.commandline")
+	else()
+	  execute_process(COMMAND ${NUGET} install sdl2 -Version 2.0.5)
+	  execute_process(COMMAND ${NUGET} install boost_filesystem-vc141 -Version 1.69.0.0)
+	  execute_process(COMMAND ${NUGET} install boost_random-vc141 -Version 1.69.0.0)
+	endif()
+
+	#list(APPEND CMAKE_PREFIX_PATH ${webAsmPlay_BINARY_DIR}/boost_filesystem-vc141.1.69.0.0 ${webAsmPlay_BINARY_DIR}/boost_random-vc141.1.69.0.0)
+	set(Boost_LIBRARY_DIRS ${webAsmPlay_BINARY_DIR}/boost_filesystem-vc141.1.69.0.0/lib/native ${webAsmPlay_BINARY_DIR}/boost_random-vc141.1.69.0.0/lib/native)
+	#list(APPEND CMAKE_PREFIX_PATH ${webAsmPlay_BINARY_DIR}/boost_random-vc141.1.69.0.0/lib/native)
+
     set(BOOST_ROOT "C:/tp/boost_1_69_0")
-    set(SDL2_PATH "C:/tp/SDL-2.0.9")
+	set(BOOST_INCLUDEDIR ${webAsmPlay_BINARY_DIR}/boost.1.69.0.0/lib/native/include)
+	#set(BOOST_LIBRARYDIR ${webAsmPlay_BINARY_DIR}/boost_filesystem-vc141.1.69.0.0/lib/native ${webAsmPlay_BINARY_DIR}/boost_random-vc141.1.69.0.0/lib/native)
+	#set(BOOST_ROOT "C:/boost_1_68_0")
+    #set(SDL2_PATH "C:/tp/SDL-2.0.9")
+	set(SDL2_PATH "${webAsmPlay_BINARY_DIR}/sdl2.2.0.5/build/native")
+	#message("================================ ""${webAsmPlay_BINARY_DIR}/sdl2.2.0.5/build/native/lib/x64/dynamic")
+	#set(SDL2_SEARCH_PATHS "${webAsmPlay_BINARY_DIR}/sdl2.2.0.5/build/native")
     set(SDL2_IMAGE_PATH "C:/tp/SDL2_image-2.0.4")
     set(GLEW_LOCATION "C:/tp/glew-2.1.0")
     set(GLFW_ROOT_DIR "C:/tp/glfw-3.2.1")
@@ -17,8 +40,10 @@ if(MSVC_VERSION)
     set(PC_EXPAT_LIBRARY_DIRS "C:/tp/expat-2.2.6/lib")
     set(GDAL_LIBRARY "C:/tp/gdal_Release_2_3_2_x64/lib/gdal_i.lib")
     set(GDAL_INCLUDE_DIR "C:/tp/gdal_Release_2_3_2_x64/include")
-	set(CURL_INCLUDE_DIR "C:/tp/curl-7.64.0/include")
-	set(CURL_LIBRARY "C:/tp/curl-7.64.0/lib/libcurl_imp.lib")
+	#set(CURL_INCLUDE_DIR "C:/tp/curl-7.64.0/include")
+	#set(CURL_LIBRARY "C:/tp/curl-7.64.0/lib/libcurl_imp.lib")
+	set(CURL_INCLUDE_DIR "C:/tp/curl_Release_7_31_0_x64/include")
+	set(CURL_LIBRARY "C:/tp/curl_Release_7_31_0_x64/lib/libcurl.lib")
 
 endif()
 
@@ -401,7 +426,7 @@ else()
 
         set(DLLS_RELEASE	
 							#"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll"
-							"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE}.dll"
+							#"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE}.dll"
                             "${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
 							"${SDL2_IMAGE_LIBRARY_PATH}/zlib1.dll"
 							"${SDL2_IMAGE_LIBRARY_PATH}/libwebp-7.dll"
@@ -413,7 +438,7 @@ else()
                             "${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
 
         set(DLLS_DEBUG		#"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG2}.dll"
-							"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG}.dll"
+							#"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG}.dll"
                             "${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
 							"${SDL2_IMAGE_LIBRARY_PATH}/zlib1.dll"
 							"${SDL2_IMAGE_LIBRARY_PATH}/libwebp-7.dll"
