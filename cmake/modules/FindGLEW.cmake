@@ -65,6 +65,7 @@ if (WIN32)
             "${PROJECT_SOURCE_DIR}/extern/glew/bin"
             "${PROJECT_SOURCE_DIR}/extern/glew/lib"
         PATH_SUFFIXES
+            x64/dynamic
             Release/${ARCH}
         DOC "The GLEW library")
 endif ()

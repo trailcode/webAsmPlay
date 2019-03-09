@@ -143,7 +143,10 @@ if(NOT TBB_FOUND)
     endif()
 
     # Add the library path search suffix for the VC independent version of TBB
-    list(APPEND TBB_LIB_PATH_SUFFIX "lib/${TBB_ARCHITECTURE}/vc_mt")
+    list(APPEND TBB_LIB_PATH_SUFFIX "lib/${TBB_ARCHITECTURE}/vc_mt"
+                                "lib/x64/Debug"
+                                "lib/x64/Release"
+    )
 
   elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # OS X
