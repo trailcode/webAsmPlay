@@ -49,6 +49,7 @@ does not fully support c++ 17. On windows it is recommened to use scoop (https:/
 * Glfw3: https://www.glfw.org/
 * Glew: http://glew.sourceforge.net/
 * Boost: https://www.boost.org/
+	* b2 threading=multi address-model=64 variant=release,debug link=static,shared
 * Websocketpp: https://www.zaphoyd.com/websocketpp
 * Gdal: https://www.gdal.org/ [[Must be built with Geos]]  For Windows: http://www.gisinternals.com
 * Geos https://trac.osgeo.org/geos

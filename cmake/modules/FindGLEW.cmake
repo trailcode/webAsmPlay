@@ -55,7 +55,7 @@ if (WIN32)
 
     find_library(GLEW_LIBRARY
         NAMES
-            glew GLEW glew32s glew32
+            glew GLEW glew32
         HINTS
             "${GLEW_LOCATION}/lib"
             "${GLEW_LOCATION}/lib/Release/x64"
