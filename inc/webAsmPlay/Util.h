@@ -90,32 +90,6 @@ inline uint32_t getUint32(const char *& dataStream)
     return ret;
 }
 
-inline uint32_t appendUint32(char *& dataStream, const uint32_t value)
-{
-    *(uint32_t *)dataStream = value;
-
-    dataStream += sizeof(uint32_t);
-
-    return value;
-}
-
-template<typename T>
-inline void appendUint32s(char *& dataStream, const T A, const T B, const T C)
-{
-    appendUint32(dataStream, A);
-    appendUint32(dataStream, B);
-    appendUint32(dataStream, C);
-}
-
-inline char * appendChar(std::vector<char> & data, const char value)
-{
-    char * ret = &data[0];
-
-    *ret = value;
-
-    return ret + 1;
-}
-
 inline double getDouble(const char *& dataStream)
 {
     const double ret = *(double *)dataStream; dataStream += sizeof(double);
@@ -192,10 +166,38 @@ inline glm::dvec4 append2d(std::vector<double> & data, const glm::dvec4 & value)
     return value;
 }
 
-inline void append2ui(std::vector<uint32_t> & data, const uint32_t A, const uint32_t B)
+template<typename T>
+inline void append2ui(std::vector<uint32_t> & data, const T A, const T B)
 {
-    data.push_back(A);
-    data.push_back(B);
+    data.push_back((uint32_t)A);
+    data.push_back((uint32_t)B);
+}
+
+template<typename T>
+inline uint32_t appendUint32(char *& dataStream, const T value)
+{
+	*(uint32_t *)dataStream = (uint32_t)value;
+
+	dataStream += sizeof(uint32_t);
+
+	return value;
+}
+
+template<typename T>
+inline void appendUint32s(char *& dataStream, const T A, const T B, const T C)
+{
+	appendUint32(dataStream, A);
+	appendUint32(dataStream, B);
+	appendUint32(dataStream, C);
+}
+
+inline char * appendChar(std::vector<char> & data, const char value)
+{
+	char * ret = &data[0];
+
+	*ret = value;
+
+	return ret + 1;
 }
 
 bool fileExists(const std::string& fileName);

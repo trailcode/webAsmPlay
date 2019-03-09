@@ -65,7 +65,7 @@ private:
     RenderableLineString(   const GLuint      vao,
                             const GLuint      ebo,
                             const GLuint      vbo,
-                            const GLuint      numElements,
+                            const size_t      numElements,
                             const bool        isMulti);
 
     static Renderable * create( const FloatVec   & verts,
@@ -75,7 +75,7 @@ private:
     const GLuint vao;
     const GLuint ebo;
     const GLuint vbo;
-    const GLuint numElements;
+    const size_t numElements;
 };
 
 #endif // __WEB_ASM_PLAY_RENDERABLE_LINE_STRING_2D_H__

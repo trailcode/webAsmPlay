@@ -256,7 +256,7 @@ MapData OSM_Reader::import(const string & fileName)
                     
                 default:
 
-                    dmess("Implement me! [" << member->type << "]");
+                    //dmess("Implement me! [" << member->type << "]");
 
                     break;
             }

@@ -71,7 +71,7 @@ void GeometryConverter::convert(const geom::Polygon * poly, const Attributes * a
 
     convert(poly->getExteriorRing(), data);
 
-    const uint32_t numInteriorRings = poly->getNumInteriorRing();
+    const uint32_t numInteriorRings = (uint32_t)poly->getNumInteriorRing();
 
     data.write((const char *)&numInteriorRings, sizeof(uint32_t));
 
@@ -82,7 +82,7 @@ void GeometryConverter::convert(const LineString * lineString, stringstream & da
 {
     const vector<Coordinate> & coords = *lineString->getCoordinatesRO()->toVector();
 
-    const uint32_t numVerts = coords.size();
+    const uint32_t numVerts = (uint32_t)coords.size();
 
     data.write((const char *)&numVerts, sizeof(uint32_t));
 
@@ -215,7 +215,7 @@ vector<AttributedGeometry> GeometryConverter::getGeosPoints(const char *& points
 
 void GeometryConverter::convert(const vector<dvec2> & points, stringstream & data)
 {
-    const uint32_t numPoints = points.size();
+    const uint32_t numPoints = (uint32_t)points.size();
 
     data.write((const char *)&numPoints, sizeof(uint32_t));
 

@@ -39,7 +39,7 @@ using namespace geosUtil;
 RenderableLineString::RenderableLineString( const GLuint  vao,
                                             const GLuint  ebo,
                                             const GLuint  vbo,
-                                            const GLuint  numElements,
+                                            const size_t  numElements,
                                             const bool    isMulti) :    Renderable(  isMulti,
                                                                                      false,
                                                                                      GUI::renderSettingsRenderPolygonOutlines),
@@ -91,7 +91,7 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
         {
             append2f(vertsPtr, coords[i]);
 
-            indices[i] = i;
+            indices[i] = (uint32_t)i;
         }
     }
     else
@@ -102,7 +102,7 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
 
             //append(vertsPtr, 0);
 
-            indices[i] = i;
+            indices[i] = (uint32_t)i;
         }
     }
 
@@ -137,23 +137,18 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
         if(showProgress) { doProgress("(3/6) Creating geometry:", i, lineStrings.size(), startTime) ;}
 
         const Geometry  * geom        = get<0>(lineStrings[i]);
-        const float       symbologyID = (float(get<1>(lineStrings[i]) * 4) + 0.5) / 32.0;
+        const float       symbologyID = (float(get<1>(lineStrings[i]) * 4) + 0.5f) / 32.0f;
 
         const vector<Coordinate> & coords = *dynamic_cast<const LineString *>(geom)->getCoordinatesRO()->toVector();
 
-        if(trans == dmat4(1.0))
-        {
-            dmess("Fix!");
-
-            abort();
-        }
+		if(trans == dmat4(1.0)) { dmessError("Implement!") ;}
         else
         {
             append2f(vertsPtr, trans * dvec4(coords[0].x, coords[0].y, 0, 1));
 
             append(vertsPtr, symbologyID);
             
-            indices.push_back(index++);
+            indices.push_back((uint32_t)index++);
 
             for(size_t i = 1; i < coords.size() - 1; ++i)
             {
@@ -161,8 +156,8 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
                 
                 append(vertsPtr, symbologyID);
 
-                indices.push_back(index);
-                indices.push_back(index);
+                indices.push_back((uint32_t)index);
+                indices.push_back((uint32_t)index);
                 
                 ++index;
             }
@@ -171,7 +166,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
 
             append(vertsPtr, symbologyID);
 
-            indices.push_back(index++);
+            indices.push_back((uint32_t)index++);
         }
     }
 

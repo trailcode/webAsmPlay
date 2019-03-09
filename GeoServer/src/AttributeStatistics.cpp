@@ -49,6 +49,7 @@ void AttributeStatistics::addLineStrings(const vector<AttributedLineString> & li
         for(const auto & i : attrs->strings) { lineStringAttrStats[i.first].insert(i.second) ;}
     }
 
+	/*
     dmess("lineStringAttrStats " << lineStringAttrStats.size());
 
     for(const auto & i : lineStringAttrStats)
@@ -57,4 +58,5 @@ void AttributeStatistics::addLineStrings(const vector<AttributedLineString> & li
 
         for(const auto & j : i.second) { cout << "    " << j << endl ;}
     }
+	*/
 }

@@ -48,7 +48,7 @@ void GUI::openSteerTestPanel()
 
         openSteerCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
-        ImGui::GetWindowDrawList()->AddImage((void *)openSteerCanvas->render(),
+        ImGui::GetWindowDrawList()->AddImage((void *)(size_t)openSteerCanvas->render(),
                                             pos,
                                             ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
                                             ImVec2(0, 1),

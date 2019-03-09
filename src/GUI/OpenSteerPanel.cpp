@@ -32,7 +32,7 @@
 
 using namespace OpenSteer;
 
-float GUI::openSteerCameraDist = 0.4;
+float GUI::openSteerCameraDist = 0.4f;
 
 bool gotoNextZombie = false; // TODO find a better way!
 

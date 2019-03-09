@@ -41,15 +41,20 @@ namespace
 
 void TextureLookupShader::ensureShader()
 {
-	const GLchar* vertexSource = R"glsl(#version 330 core
+	const GLchar * vertexSource = R"glsl(#version 330 core
 
 	)glsl";
 
-	const GLchar* fragmentSource = R"glsl(#version 330 core
+	const GLchar * geometrySource = R"glsl(#version 330 core
+
+	)glsl";
+
+	const GLchar * fragmentSource = R"glsl(#version 330 core
 
 	)glsl";
 
 	program = ShaderProgram::create(vertexSource,
+									geometrySource,
                                     fragmentSource,
                                     Variables({{"vertIn",      vertInAttr}}),
                                     Variables({{"model",       model     },
