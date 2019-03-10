@@ -42,4 +42,6 @@ extern void (*debugLoggerFunc)(const std::string & file, const size_t line, cons
     } \
 } \
 
+#define dmessError(a) dmess(a); abort();
+
 #endif

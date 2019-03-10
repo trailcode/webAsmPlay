@@ -29,11 +29,6 @@
     #include <ctpl.h>
 #endif
 
-#ifdef WIN32
-
-#else
-#include <unistd.h>
-#endif
 #include <algorithm>
 #include <mutex>
 #include <unordered_set>
@@ -164,12 +159,7 @@ namespace
 
                     myHandle = curlHandles[ID];
 
-					if (!myHandle)
-					{
-						dmess("Error!");
-
-						abort();
-					}
+					if (!myHandle) { dmessError("Could not create CURL handle!") ;}
                 }
 
 				//dmess("Start!");

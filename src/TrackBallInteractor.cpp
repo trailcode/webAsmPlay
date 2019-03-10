@@ -45,8 +45,8 @@ namespace rsmz
 
     char TrackBallInteractor::clickQuadrant(float x, float y)
     {
-        float halfw = .5 * mWidth;
-        float halfh = .5 * mHeight;
+        float halfw = .5f * mWidth;
+        float halfh = .5f * mHeight;
 
         if (x > halfw) {
             // Opengl image coordinates origin is upperleft.

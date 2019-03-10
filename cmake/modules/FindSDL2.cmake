@@ -87,7 +87,8 @@ FIND_PATH(SDL2_INCLUDE_DIR SDL.h
 )
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8) 
-	set(PATH_SUFFIXES lib64 lib/x64 lib)
+	
+	set(PATH_SUFFIXES lib64 lib/x64 lib/x64/dynamic lib)
 else() 
 	set(PATH_SUFFIXES lib/x86 lib)
 endif() 

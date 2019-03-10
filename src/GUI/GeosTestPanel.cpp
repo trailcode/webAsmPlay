@@ -45,15 +45,15 @@ void GUI::geosTestPanel()
 
         geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
-        ImGui::GetWindowDrawList()->AddImage(   (void *)geosTestCanvas->render(),
+        ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)geosTestCanvas->render(),
                                                 pos,
                                                 ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
                                                 ImVec2(0, 1),
                                                 ImVec2(1, 0));
         
-        static float buffer1 = 0.1;
-        static float buffer2 = 0.02;
-        static float buffer3 = 0.22;
+        static float buffer1 = 0.1f;
+        static float buffer2 = 0.02f;
+        static float buffer3 = 0.22f;
 
         ImGui::SliderFloat("buffer1", &buffer1, 0.0f, 0.3f, "buffer1 = %.3f");
         ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");

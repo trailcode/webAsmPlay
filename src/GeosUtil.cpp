@@ -174,7 +174,7 @@ dvec2 geosUtil::__(const Coordinate & point) { return dvec2(point.x, point.y) ;}
 Coordinate ___(const dvec2 & point) { return Coordinate(point.x, point.y) ;}
 
 dvec2 geosUtil::getStartPoint(const LineString * ls) { return __(ls->getCoordinateN(0)) ;}
-dvec2 geosUtil::getEndPoint  (const LineString * ls) { return __(ls->getCoordinateN(ls->getNumPoints() - 1)) ;}
+dvec2 geosUtil::getEndPoint  (const LineString * ls) { return __(ls->getCoordinateN(int(ls->getNumPoints() - 1))) ;}
 
 void geosUtil::transformInPlace(vector<Coordinate> & points, const dmat4 & trans)
 {

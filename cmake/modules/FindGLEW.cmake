@@ -55,7 +55,7 @@ if (WIN32)
 
     find_library(GLEW_LIBRARY
         NAMES
-            glew GLEW glew32s glew32
+            glew GLEW glew32
         HINTS
             "${GLEW_LOCATION}/lib"
             "${GLEW_LOCATION}/lib/Release/x64"
@@ -65,6 +65,7 @@ if (WIN32)
             "${PROJECT_SOURCE_DIR}/extern/glew/bin"
             "${PROJECT_SOURCE_DIR}/extern/glew/lib"
         PATH_SUFFIXES
+            x64/dynamic
             Release/${ARCH}
         DOC "The GLEW library")
 endif ()

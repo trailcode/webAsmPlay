@@ -77,8 +77,7 @@ private:
     Tessellation(const Tessellation &)              = delete;
     Tessellation(Tessellation &&)                   = delete;
     Tessellation & operator=(const Tessellation &)  = delete;
-    Tessellation & operator=(Tessellation &)        = delete;
-    
+    //Tessellation & operator=(Tessellation &)        = delete;
 };
 
 typedef Tessellation::Tessellations Tessellations;

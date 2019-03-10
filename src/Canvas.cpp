@@ -78,7 +78,7 @@ void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
     this->upperLeft = upperLeft;
     this->size      = size;
 
-    trackBallInteractor->setScreenSize(size.x, size.y);
+    trackBallInteractor->setScreenSize((float)size.x, (float)size.y);
 }
 
 ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)

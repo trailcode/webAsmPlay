@@ -74,7 +74,7 @@ protected:
     Renderable(const Renderable &)              = delete;
     Renderable(      Renderable &&)             = delete;
     Renderable & operator=(const Renderable &)  = delete;
-    Renderable & operator=(      Renderable &)  = delete;
+    //Renderable & operator=(      Renderable &)  = delete;
 
     std::vector<OnDelete> onDeleteCallbacks;
 
