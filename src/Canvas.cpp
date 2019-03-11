@@ -306,6 +306,7 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
     {
         case GLFW_KEY_LEFT_SHIFT:
         case GLFW_KEY_LEFT_ALT:
+		case GLFW_KEY_LEFT_CONTROL:
 
             trackBallInteractor->setLeftClicked(action);
 
@@ -324,8 +325,9 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
 
     switch(key)
     {
-        case GLFW_KEY_LEFT_SHIFT: trackBallInteractor->setMotionLeftClick(ARC); break;
-        case GLFW_KEY_LEFT_ALT:   trackBallInteractor->setMotionLeftClick(PAN); break;
+        case GLFW_KEY_LEFT_SHIFT:	trackBallInteractor->setMotionLeftClick(ARC);  break;
+        case GLFW_KEY_LEFT_ALT:		trackBallInteractor->setMotionLeftClick(PAN);  break;
+		case GLFW_KEY_LEFT_CONTROL: trackBallInteractor->setMotionLeftClick(ZOOM); break;
     }
 }
 
