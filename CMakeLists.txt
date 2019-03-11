@@ -418,9 +418,24 @@ else()
         #)
 
 
-        #set(DLLS_RELEASE	
+        set(DLLS_RELEASE	
 							#"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll"
 							#"${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE}.dll"
+							${webAsmPlay_BINARY_DIR}/thirdParty/unofficial-flayan-glew.redist.2.1.0/build/native/bin/x64/dynamic/glew32.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/sdl2.new.redist.2.0.8/build/native/bin/x64/SDL2.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/libjpeg-9.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/libpng16-16.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/libtiff-5.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/libwebp-7.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/SDL2_image.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/zlib1.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/glfw.3.2.1.5/build/native/bin/dynamic/v140/x64/glfw3.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Release/tbb.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/expat.redist.2.1.0.11/build/native/bin/v110/x64/Release/dynamic/utf8/libexpat.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/curl.redist.7.30.0.2/build/native/bin/v110/x64/Release/dynamic/libcurl.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/libssh2.redist.1.4.3.1/build/native/bin/v110/x64/Release/dynamic/cdecl/libssh2.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/openssl.redist.1.0.1.25/build/native/bin/v120/x64/Release/dynamic/libeay32.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/openssl.redist.1.0.1.25/build/native/bin/v120/x64/Release/dynamic/ssleay32.dll
                             #"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
 							#"${SDL2_IMAGE_LIBRARY_PATH}/zlib1.dll"
 							#"${SDL2_IMAGE_LIBRARY_PATH}/libwebp-7.dll"
@@ -430,6 +445,7 @@ else()
                             #"${SDL2MAIN_LIBRARY_PATH}/../bin/SDL2.dll"
                             #"${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
                             #"${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
+							)
 
         #set(DLLS_DEBUG		#"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG2}.dll"
 							#"${BOOST_FILESYSTEM_PATH_DEBUG}/${BOOST_FILESYSTEM_BASE_NAME_DEBUG}.dll"
@@ -443,9 +459,11 @@ else()
                             #"${CURL_LIBRARIES_PATH}/../bin/libcurl.dll"
                             #"${EXPAT_LIBRARY_PATH}/../bin/expat.dll")
 
-        #foreach(dll ${DLLS_RELEASE})
-        #    add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
-        #endforeach(dll)
+        foreach(dll ${DLLS_RELEASE})
+            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
+			add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
+			add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel")
+        endforeach(dll)
 		#
 		#foreach(dll ${DLLS_RELEASE})
         #    add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")

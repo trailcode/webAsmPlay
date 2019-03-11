@@ -34,7 +34,7 @@
 #include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>
 #include <geos/geom/GeometryFactory.h>
-#include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Relation.h>
 #include <geoServer/DataModelOSM.h>
