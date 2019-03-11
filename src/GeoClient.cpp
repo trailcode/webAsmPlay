@@ -36,11 +36,11 @@
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/GeometryConverter.h>
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeoClientRequest.h>
+#include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/geom/GeometryConverter.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>

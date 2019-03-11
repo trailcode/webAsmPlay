@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_ZOMBIE_H__
-#define __WEB_ASM_PLAY_ZOMBIE_H__
+#pragma once
 
 #ifndef __EMSCRIPTEN__
 #include <tbb/concurrent_vector.h>
@@ -103,5 +101,3 @@ public:
 
 private:
 };
-
-#endif // __WEB_ASM_PLAY_ZOMBIE_H__

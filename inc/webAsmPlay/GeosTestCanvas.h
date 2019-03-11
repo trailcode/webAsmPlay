@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_GEOS_TEST_CANVAS_H__
-#define __WEB_ASM_PLAY_GEOS_TEST_CANVAS_H__
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -50,5 +48,3 @@ private:
     float buffer2;
     float buffer3;
 };
-
-#endif // 

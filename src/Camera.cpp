@@ -3,7 +3,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Debug.h>
-#include <tceGeom/vec3.h>
 
 using namespace std;
 
@@ -36,7 +35,7 @@ namespace rsmz
 
     glm::vec3 Camera::getEye() const
     {
-        return mEye;
+        return mEye; 
     }
 
     const glm::mat4 & Camera::getMatrixConstRef() const

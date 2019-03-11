@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_COLOR_SHADER_H__
-#define __WEB_ASM_PLAY_COLOR_SHADER_H__
+#pragma once
 
 #include <glm/vec4.hpp>
 #include <webAsmPlay/shaders/Shader.h>
@@ -52,4 +50,3 @@ private:
 
 };
 
-#endif // __WEB_ASM_PLAY_COLOR_SHADER_H__

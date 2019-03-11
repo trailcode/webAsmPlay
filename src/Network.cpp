@@ -34,7 +34,7 @@
 #include <geos/geom/GeometryFactory.h>
 #include <geos/simplify/DouglasPeuckerLineSimplifier.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
-#include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/Util.h>

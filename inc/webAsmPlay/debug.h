@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __POINT_CLOUD_DEMO_DEBUG_H__
-#define __POINT_CLOUD_DEMO_DEBUG_H__
+#pragma once
 
 #include <iostream>
 #include <sstream>
@@ -43,5 +41,3 @@ extern void (*debugLoggerFunc)(const std::string & file, const size_t line, cons
 } \
 
 #define dmessError(a) dmess(a); abort();
-
-#endif

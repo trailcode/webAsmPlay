@@ -40,10 +40,10 @@
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/shaders/TextureShader.h>
+#include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/GUI/GUI.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
-
-#include <webAsmPlay/GeosUtil.h>
 
 using namespace std;
 using namespace glm;
@@ -54,7 +54,7 @@ namespace
 {
 #ifndef __EMSCRIPTEN__
 
-    ctpl::thread_pool loaderPool(1);
+    ctpl::thread_pool loaderPool(16);
 
     ctpl::thread_pool uploaderPool(1);
 
@@ -65,9 +65,9 @@ namespace
 
 #endif
 
-    const size_t levelOfDetail = 19;
+    //const size_t levelOfDetail = 19;
     //const size_t levelOfDetail = 18;
-    //const size_t levelOfDetail = 17;
+    const size_t levelOfDetail = 17;
     //const size_t levelOfDetail = 15;
 
     // Define our struct for accepting LCs output
@@ -176,9 +176,15 @@ namespace
                 curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
                 curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)output); // Passing our BufferStruct to LC
 
+				/*
                 const string url =  "https://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
                                     quadKey +
                                     "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
+									*/
+
+				const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
+									quadKey +
+									"?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
 
 				//dmess("url " << url);
 
@@ -191,7 +197,9 @@ namespace
 				{
 					dmess("Error!");
 
-					abort();
+					return;
+
+					//abort();
 				}
 
 				//static GLFWwindow * threadWin = NULL;
@@ -252,8 +260,38 @@ namespace
 	FrameBuffer * textureBuffer = NULL;
 }
 
-RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds)
+void RenderableBingMap::getStartLevel()
 {
+	for (int i = 0; i < 24; ++i)
+	{
+		const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), i);
+		const ivec2 maxTile = latLongToTile(dvec2(get<2>(bounds), get<3>(bounds)), i);
+
+		dmess(i << " minTile " << minTile.x << " " << minTile.y << " " << maxTile.x << " " << maxTile.y);
+
+		//if(minTile.x == maxTile.x && minTile.y == maxTile.y)
+		if(minTile == maxTile)
+		{
+			dmess("     ddd ");
+
+			continue;
+		}
+
+		startLevel = i - 1;
+
+		//startLevel = i;
+
+		break;
+	}
+
+	dmess("startLevel " << startLevel);
+
+	//startLevel = 14;
+}
+
+RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds), trans(trans)
+{
+	getStartLevel();
 	//return;
 
 	if(!contextCreated)
@@ -279,8 +317,15 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
     for(int x = minTile.x; x <= maxTile.x; ++x)
     for(int y = minTile.y; y <= maxTile.y; ++y)
     {
+		//*
         const dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 1), levelOfDetail);
         const dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 0), levelOfDetail);
+		//*/
+
+		/*
+		const dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 0), levelOfDetail);
+		const dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 1), levelOfDetail);
+		*/
 
         const string quadKey = tileToQuadKey(ivec2(x, y), levelOfDetail);
 
@@ -319,4 +364,20 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 		
         r->render(canvas);
     }
+
+	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
+
+	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), startLevel);
+	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), startLevel);
+
+	Renderable * r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
+
+	r->setShader(ColorShader::getDefaultInstance());
+
+	r->setRenderFill(false);
+	r->setRenderOutline(true);
+
+	r->render(canvas);
+
+	delete r;
 }

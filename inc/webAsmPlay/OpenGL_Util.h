@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_OPEN_GL_UTIL_H__
-#define __WEB_ASM_PLAY_OPEN_GL_UTIL_H__
+#pragma once
 
 #ifdef __EMSCRIPTEN__
 
@@ -81,5 +79,3 @@ struct ArrayFormat
     GLsizei         stride  = 0;
     const GLvoid  * pointer = 0;
 };
-
-#endif // __WEB_ASM_PLAY_OPEN_GL_UTIL_H__

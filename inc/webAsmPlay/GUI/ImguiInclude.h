@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_IMGUI_INCLUDES_H__
-#define __WEB_ASM_PLAY_IMGUI_INCLUDES_H__
+#pragma once
 
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
@@ -89,5 +87,3 @@
 #endif
 
 #include <imgui_internal.h>
-
-#endif // __WEB_ASM_PLAY_IMGUI_INCLUDES_H__

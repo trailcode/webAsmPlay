@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_UTIL_H__
-#define __WEB_ASM_PLAY_UTIL_H__
+#pragma once
 
 #ifdef OPENGL_CALL_CHECKING
 
@@ -201,5 +199,3 @@ inline char * appendChar(std::vector<char> & data, const char value)
 }
 
 bool fileExists(const std::string& fileName);
-
-#endif // __WEB_ASM_PLAY_UTIL_H__

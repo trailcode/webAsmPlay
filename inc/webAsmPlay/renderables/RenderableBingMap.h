@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__
-#define __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__
+#pragma once
 
 #include <webAsmPlay/renderables/Renderable.h>
 
@@ -42,10 +40,14 @@ private:
     RenderableBingMap(const AABB2D & bounds, const glm::dmat4 & trans);
     ~RenderableBingMap();
 
+	void getStartLevel();
+
     const AABB2D bounds;
 
     glm::ivec2 minTile;
     glm::ivec2 maxTile;
-};
 
-#endif // __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__
+	size_t startLevel = 0;
+
+	const glm::dmat4 trans;
+};

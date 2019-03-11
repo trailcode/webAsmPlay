@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_COLOR_SYMBOLOGY_H__
-#define __WEB_ASM_PLAY_COLOR_SYMBOLOGY_H__
+#pragma once
 
 #include <glm/vec4.hpp>
 #include <JSONValue.h>
@@ -64,5 +62,3 @@ private:
 
     bool colorTextureDirty = true;
 };
-
-#endif // __WEB_ASM_PLAY_COLOR_SYMBOLOGY_H__

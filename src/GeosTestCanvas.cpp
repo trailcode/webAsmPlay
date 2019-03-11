@@ -28,7 +28,7 @@
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/GeosTestCanvas.h>

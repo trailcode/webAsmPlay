@@ -30,7 +30,6 @@
 #include <ctpl.h>
 #include <glm/vec2.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-//#include <boost/histogram.hpp>
 #include <boost/filesystem.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
@@ -42,7 +41,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Attributes.h>
-#include <webAsmPlay/GeometryConverter.h>
+#include <webAsmPlay/geom/GeometryConverter.h>
 #include <geoServer/OSM_Reader.h>
 #include <geoServer/Topology.h>
 #include <geoServer/GeoServer.h>
@@ -58,7 +57,6 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 using namespace boost;
-//using namespace boost::histogram;
 using namespace geos::io;
 using namespace geos::geom;
 using namespace topology;

@@ -34,8 +34,8 @@
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/prep/PreparedLineString.h>
 #include <geos/index/quadtree/Quadtree.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/Attributes.h>
-#include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Util.h>
 #include <geoServer/Topology.h>
 

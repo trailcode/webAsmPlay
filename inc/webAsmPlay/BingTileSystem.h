@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_BING_TILE_SYSTEM_H__
-#define __WEB_ASM_PLAY_BING_TILE_SYSTEM_H__
+#pragma once
 
 #include <string>
 #include <utility>
@@ -57,5 +55,3 @@ namespace bingTileSystem
 
     std::pair<size_t, glm::ivec2> quadKeyToTile(const std::string & quadKey);
 }
-
-#endif // __WEB_ASM_PLAY_BING_TILE_SYSTEM_H__

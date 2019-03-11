@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_RENDERABLE_LINE_STRING_2D_H__
-#define __WEB_ASM_PLAY_RENDERABLE_LINE_STRING_2D_H__
+#pragma once
 
 #include <geos/geom/Coordinate.h>
 #include <webAsmPlay/OpenGL_Util.h>
@@ -77,5 +75,3 @@ private:
     const GLuint vbo;
     const size_t numElements;
 };
-
-#endif // __WEB_ASM_PLAY_RENDERABLE_LINE_STRING_2D_H__

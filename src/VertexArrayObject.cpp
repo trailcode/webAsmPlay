@@ -131,8 +131,20 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
 				//dmess("uv " << uv.x << " " << uv.y);
 
+				/*
+				verts.push_back(1 - uv.x); // TODO WTF?
+				verts.push_back(uv.y);
+				*/
+
+				//*
                 verts.push_back(uv.y); // TODO WTF?
                 verts.push_back(1 - uv.x);
+				//*/
+
+				/*
+				verts.push_back(uv.x); // TODO WTF?
+				verts.push_back(uv.y);
+				*/
             }
         }
 
@@ -182,16 +194,16 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             addVert<USE_SYMBOLOGY_ID>(verts, p3, normal, symbologyWallID_value);
             addVert<USE_SYMBOLOGY_ID>(verts, p4, normal, symbologyWallID_value);
 
-            triangleIndices.push_back(offset + 0);
-            triangleIndices.push_back(offset + 1);
-            triangleIndices.push_back(offset + 2);
+            triangleIndices.push_back((uint32_t)offset + 0);
+            triangleIndices.push_back((uint32_t)offset + 1);
+            triangleIndices.push_back((uint32_t)offset + 2);
 
-            triangleIndices.push_back(offset + 2);
-            triangleIndices.push_back(offset + 3);
-            triangleIndices.push_back(offset);
+            triangleIndices.push_back((uint32_t)offset + 2);
+            triangleIndices.push_back((uint32_t)offset + 3);
+            triangleIndices.push_back((uint32_t)offset);
 
-            lineIndices.push_back(offset + 0);
-            lineIndices.push_back(offset + 3);
+            lineIndices.push_back((uint32_t)offset + 0);
+            lineIndices.push_back((uint32_t)offset + 3);
 
             offset += 4;
         }

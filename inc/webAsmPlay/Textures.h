@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_TEXTURES_H__
-#define __WEB_ASM_PLAY_TEXTURES_H__
+#pragma once
 
 #include <vector>
 #include <string>
@@ -54,5 +52,3 @@ private:
     ~Textures();
 
 };
-
-#endif // __WEB_ASM_PLAY_TEXTURES_H__

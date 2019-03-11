@@ -23,12 +23,10 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_VERTEX_ARRAY_OBJECT_H__
-#define __WEB_ASM_PLAY_VERTEX_ARRAY_OBJECT_H__
+#pragma once
 
 #include <webAsmPlay/OpenGL_Util.h>
-#include <webAsmPlay/Tessellation.h>
+#include <webAsmPlay/geom/Tessellation.h>
 
 class Shader;
 
@@ -92,5 +90,3 @@ private:
     const ArrayFormat normalFormat;
     const ArrayFormat uvFormat;
 };
-
-#endif // __WEB_ASM_PLAY_VERTEX_ARRAY_OBJECT_H__

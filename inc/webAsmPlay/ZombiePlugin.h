@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_ZOMBIE_PLUGIN_H__
-#define __WEB_ASM_PLAY_ZOMBIE_PLUGIN_H__
+#pragma once
 
 #include <OpenSteer/PlugIn.h>
 #include <OpenSteer/Proximity.h>
@@ -96,4 +94,3 @@ private:
 
 };
 
-#endif // __WEB_ASM_PLAY_ZOMBIE_PLUGIN_H__

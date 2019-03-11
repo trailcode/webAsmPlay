@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_RENDERABLE_POINT_H__
-#define __WEB_ASM_PLAY_RENDERABLE_POINT_H__
+#pragma once
 
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/renderables/Renderable.h>
@@ -67,5 +65,3 @@ private:
     const GLuint ebo;
     const GLuint vbo;
 };
-
-#endif // __WEB_ASM_PLAY_RENDERABLE_POINT_H__

@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2019
 */
-
-#ifndef __WEB_ASM_PLAY_TILE_BOUNDARY_SHADER_H__
-#define __WEB_ASM_PLAY_TILE_BOUNDARY_SHADER_H__
+#pragma once
 
 #include <webAsmPlay/shaders/Shader.h>
 
@@ -47,5 +45,3 @@ public:
 private:
 
 };
-
-#endif // __WEB_ASM_PLAY_TILE_BOUNDARY_SHADER_H__
