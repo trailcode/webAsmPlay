@@ -67,11 +67,6 @@ else()
   message(" * C++ compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
-if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-      # Default to -O3 when no build type is specified.
-      # append_compiler_flag("-O3")
-endif()
-
 file(GLOB LAStoolSrc "ThirdParty/LAStools/*.cpp")
 
 file(GLOB geosSrc   "ThirdParty/geos/src/util/*.cpp"

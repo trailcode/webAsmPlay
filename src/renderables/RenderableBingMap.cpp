@@ -352,9 +352,6 @@ Renderable * RenderableBingMap::create(const AABB2D & bounds, const dmat4 & tran
 
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 {
-	//const dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 1), levelOfDetail);
-	//const dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 0), levelOfDetail);
-
     if(!getRenderFill()) { return ;}
 
 	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
@@ -365,10 +362,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
         TextureShader::getDefaultInstance()->setTextureID(r->textureID);
 		
-        //r->render(canvas);
+        r->render(canvas);
     }
-
-	
 
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
 
