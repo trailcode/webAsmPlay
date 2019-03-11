@@ -33,9 +33,11 @@
 #include <mutex>
 #include <unordered_set>
 #include <unordered_map>
+#include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/Camera.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>
@@ -43,6 +45,7 @@
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/geom/Frustum.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 
 using namespace std;
@@ -350,6 +353,87 @@ Renderable * RenderableBingMap::create(const AABB2D & bounds, const dmat4 & tran
     return new RenderableBingMap(bounds, trans);
 }
 
+void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, const dvec2 & tMax) const
+{
+	const dvec3 center = dvec4(((tMin + tMax) * 0.5), 0.0, 1.0);
+
+	const dvec3 P1 = dvec4(tMin.x, tMax.y, 0, 1);
+	const dvec3 P2 = dvec4(tMax.x, tMax.y, 0, 1);
+	const dvec3 P3 = dvec4(tMax.x, tMin.y, 0, 1);
+	const dvec3 P4 = dvec4(tMin.x, tMin.y, 0, 1);
+
+	const dvec3 transCenter = trans * dvec4(center, 1.0);
+
+	const dvec3 transP1 = trans * dvec4(P1, 1);
+	const dvec3 transP2 = trans * dvec4(P2, 1);
+	const dvec3 transP3 = trans * dvec4(P3, 1);
+	const dvec3 transP4 = trans * dvec4(P4, 1);
+
+	const ivec2 fbSize = canvas->getFrameBufferSize();
+
+	const dvec4 viewport(0.0, 0.0, fbSize.x, fbSize.y);
+
+	// https://stackoverflow.com/questions/35261192/how-to-use-glmproject-to-get-the-coordinates-of-a-point-in-world-space
+
+	const dvec3 screenCenter = project(transCenter, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
+
+	const dvec3 screenP1 = project(transP1, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
+	const dvec3 screenP2 = project(transP2, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
+	const dvec3 screenP3 = project(transP3, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
+	const dvec3 screenP4 = project(transP4, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
+
+	const double tileSize = 256.0;
+
+	const double D1 = distance(screenP1, screenP2);
+	const double D2 = distance(screenP2, screenP3);
+	const double D3 = distance(screenP3, screenP4);
+	const double D4 = distance(screenP4, screenP1);
+
+	if (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize)
+	{
+		/*
+		P1,							dvec2(center.x, tMax.y),	dvec2(tMax.x, tMax.y)
+		dvec2(tMin.x, center.y),	dvec2(center.x, center.y),	dvec2(tMax.x, center.y)
+		P4,							dvec2(center.x, tMin.y),	P3
+		*/
+
+		/*
+		dvec2(tMin.x, tMax.y),		dvec2(center.x, tMax.y),	dvec2(tMax.x, tMax.y)
+		dvec2(tMin.x, center.y),	dvec2(center.x, center.y),	dvec2(tMax.x, center.y)
+		dvec2(tMin.x, tMin.y),		dvec2(center.x, tMin.y),	dvec2(tMax.x, tMin.y)
+		*/
+
+		//dvec2(tMin.x, center.y), dvec2(center.x, tMax.y)
+		//dvec2(center.x, center.y), dvec2(tMax.x, tMax.y)
+		//dvec2(tMin.x, tMin.y), dvec2(center.x, center.y)
+		//dvec2(center.x, tMin.y), dvec2(tMax.x, center.y)
+
+		getTilesToRender(canvas, dvec2(tMin.x, center.y), dvec2(center.x, tMax.y));
+		getTilesToRender(canvas, dvec2(center.x, center.y), dvec2(tMax.x, tMax.y));
+		getTilesToRender(canvas, dvec2(tMin.x, tMin.y), dvec2(center.x, center.y));
+		getTilesToRender(canvas, dvec2(center.x, tMin.y), dvec2(tMax.x, center.y));
+
+		return;
+	}
+
+	dmess("screenPos " << screenCenter << " center " << center << " D1 " << D1 << " D2 " << D2 << " D3 " << D3 << " D4 " << D4);
+
+	const dvec3 cameraPos = canvas->getCamera()->getCenter();
+
+	//dmess("P1 " << frustum.getPlane(0).classifyPoint(P1) << " " << distance(cameraPos, P1));
+
+	Renderable * r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
+
+	r->setShader(ColorShader::getDefaultInstance());
+
+	r->setRenderFill(false);
+	r->setRenderOutline(true);
+
+	r->render(canvas);
+
+	delete r;
+}
+
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 {
     if(!getRenderFill()) { return ;}
@@ -365,19 +449,14 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
         r->render(canvas);
     }
 
+	Frustum frustum(canvas->getMVP_Ref());
+
+	size_t startLevel = 12;
+
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
 
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), startLevel);
 	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), startLevel);
 
-	Renderable * r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
-
-	r->setShader(ColorShader::getDefaultInstance());
-
-	r->setRenderFill(false);
-	r->setRenderOutline(true);
-
-	r->render(canvas);
-
-	delete r;
+	getTilesToRender(canvas, tMin, tMax);
 }

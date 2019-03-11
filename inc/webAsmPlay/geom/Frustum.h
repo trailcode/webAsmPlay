@@ -49,6 +49,8 @@ public:
 
 	bool AABBInFrustum(const AABB3D & AABB) const;
 
+	const Plane & getPlane(const size_t index) const;
+
 protected:
 
     Plane planes[6];

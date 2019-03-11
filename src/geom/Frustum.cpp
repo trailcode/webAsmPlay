@@ -83,4 +83,6 @@ bool Frustum::AABBInFrustum(const AABB3D & AABB) const
 	return true;
 }
 
+const Plane & Frustum::getPlane(const size_t index) const { return planes[index] ;}
+
 

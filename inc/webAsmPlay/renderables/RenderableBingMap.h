@@ -42,6 +42,8 @@ private:
 
 	void getStartLevel();
 
+	void getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax) const;
+
     const AABB2D bounds;
 
     glm::ivec2 minTile;

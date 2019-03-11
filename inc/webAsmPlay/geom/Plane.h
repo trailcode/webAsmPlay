@@ -130,7 +130,7 @@ struct Plane
     * plane, or in front of the plane. The corresponding values SIDE_ON, 
     * SIDE_BACK, or SIDE_FRONT is returned. 
     */
-    int classifyPoint (const glm::dvec3 & point)
+    int classifyPoint (const glm::dvec3 & point) const
     {
 		//valueType dot = point.dot(normal) - dist;
 		const double dot = glm::dot(normal, point) + dist;
