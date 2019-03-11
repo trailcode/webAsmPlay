@@ -42,10 +42,16 @@ private:
     RenderableBingMap(const AABB2D & bounds, const glm::dmat4 & trans);
     ~RenderableBingMap();
 
+	void getStartLevel();
+
     const AABB2D bounds;
 
     glm::ivec2 minTile;
     glm::ivec2 maxTile;
+
+	size_t startLevel = 0;
+
+	const glm::dmat4 trans;
 };
 
 #endif // __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__

@@ -131,8 +131,20 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
 				//dmess("uv " << uv.x << " " << uv.y);
 
+				/*
+				verts.push_back(1 - uv.x); // TODO WTF?
+				verts.push_back(uv.y);
+				*/
+
+				//*
                 verts.push_back(uv.y); // TODO WTF?
                 verts.push_back(1 - uv.x);
+				//*/
+
+				/*
+				verts.push_back(uv.x); // TODO WTF?
+				verts.push_back(uv.y);
+				*/
             }
         }
 

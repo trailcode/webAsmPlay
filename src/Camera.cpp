@@ -3,7 +3,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Debug.h>
-#include <tceGeom/vec3.h>
 
 using namespace std;
 

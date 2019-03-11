@@ -5,8 +5,8 @@ set(CMAKE_BUILD_TYPE Release)
 
 set(USE_FOLDERS ON)
 
-set(Boost_USE_STATIC_LIBS        OFF)
-set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_LIBS       OFF)
+set(Boost_USE_MULTITHREADED     ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
 if(MSVC_VERSION)
