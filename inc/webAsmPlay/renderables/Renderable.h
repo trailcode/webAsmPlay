@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY__GEOS_RENDERABLE_H__
-#define __WEB_ASM_PLAY__GEOS_RENDERABLE_H__
+#pragma once
 
 #include <functional>
 #include <glm/mat4x4.hpp>
@@ -86,4 +84,3 @@ protected:
     bool renderOutline;
 };
 
-#endif // __WEB_ASM_PLAY__GEOS_RENDERABLE_H__

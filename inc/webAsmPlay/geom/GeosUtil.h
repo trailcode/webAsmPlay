@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_GEOS_UTIL_H__
-#define __WEB_ASM_PLAY_GEOS_UTIL_H__
+#pragma once
 
 #include <vector>
 #include <memory>
@@ -138,5 +136,3 @@ namespace geosUtil
         return v;
     }
 };
-
-#endif

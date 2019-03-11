@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_FRAME_BUFFER_H__
-#define __WEB_ASM_PLAY_FRAME_BUFFER_H__
+#pragma once
 
 #include <glm/vec2.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
@@ -62,5 +60,3 @@ private:
 
     GLint prevFB = 0;
 };
-
-#endif // __WEB_ASM_PLAY_FRAME_BUFFER_H__

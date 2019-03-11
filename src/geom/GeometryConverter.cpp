@@ -31,7 +31,7 @@
 #include <geos/geom/GeometryFactory.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Attributes.h>
-#include <webAsmPlay/GeometryConverter.h>
+#include <webAsmPlay/geom/GeometryConverter.h>
 
 using namespace std;
 using namespace glm;

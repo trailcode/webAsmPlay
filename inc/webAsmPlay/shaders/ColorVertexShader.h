@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_COLOR_VERTEX_SHADER_H__
-#define __WEB_ASM_PLAY_COLOR_VERTEX_SHADER_H__
+#pragma once
 
 #include <webAsmPlay/shaders/Shader.h>
 
@@ -46,5 +44,3 @@ private:
     ColorVertexShader();
     ~ColorVertexShader();
 };
-
-#endif // __WEB_ASM_PLAY_COLOR_VERTEX_SHADER_H__

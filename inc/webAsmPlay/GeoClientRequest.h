@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_GEO_CLIENT_REQUEST_H__
-#define __WEB_ASM_PLAY_GEO_CLIENT_REQUEST_H__
+#pragma once
 
 #include <functional>
 #include <webAsmPlay/Types.h>
@@ -99,5 +97,3 @@ private:
 
     const size_t ID;
 };
-
-#endif // __WEB_ASM_PLAY_GEO_CLIENT_REQUEST_H__

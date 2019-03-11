@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_GUI_H__
-#define __WEB_ASM_PLAY_GUI_H__
+#pragma once
 
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Types.h>
@@ -153,5 +151,3 @@ private:
     
     static bool shuttingDown;
 };
-
-#endif // __WEB_ASM_PLAY_GUI_H__

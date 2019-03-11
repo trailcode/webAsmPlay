@@ -35,7 +35,7 @@ namespace rsmz
 
     glm::vec3 Camera::getEye() const
     {
-        return mEye;
+        return mEye; 
     }
 
     const glm::mat4 & Camera::getMatrixConstRef() const

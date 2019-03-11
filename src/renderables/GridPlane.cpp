@@ -27,7 +27,7 @@
 #include <glm/gtx/transform.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/Shader.h>
-#include <webAsmPlay/GridPlane.h>
+#include <webAsmPlay/renderables/GridPlane.h>
 
 #ifdef WORKING
 

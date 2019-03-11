@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_ATTRIBUTES_H__
-#define __WEB_ASM_PLAY_ATTRIBUTES_H__
+#pragma once
 
 #include <string>
 #include <ostream>
@@ -69,5 +67,3 @@ public:
 
     std::vector<std::unique_ptr<Relation> > relations;
 };
-
-#endif // __WEB_ASM_PLAY_ATTRIBUTES_H__

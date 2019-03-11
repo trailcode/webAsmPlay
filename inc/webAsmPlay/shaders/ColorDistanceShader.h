@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
-#define __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__
+#pragma once
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
@@ -49,5 +47,3 @@ public:
 
 private:
 };
-
-#endif // __WEB_ASM_PLAY_COLOR_DISTANCE_SHADER_H__

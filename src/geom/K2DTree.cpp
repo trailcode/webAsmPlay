@@ -24,36 +24,5 @@
   \copyright 2018
 */
 
-#ifndef __WEB_ASM_PLAY_SKY_BOX_H__
-#define __WEB_ASM_PLAY_SKY_BOX_H__
+#include <webAsmPlay/geom/K2DTree.h>
 
-#include <vector>
-#include <glm/mat4x4.hpp>
-#include <webAsmPlay/OpenGL_Util.h>
-
-class Canvas;
-
-class SkyBox
-{
-public:
-
-    SkyBox();
-
-    virtual ~SkyBox();
-
-    void render(Canvas * canvas);
-
-    static std::vector<SkyBox *> getInstances();
-
-private:
-
-    static void ensureShader();
-
-    GLuint texID;
-    GLuint vbo;
-    GLuint vao;
-
-    glm::mat4 model;
-};
-
-#endif // __WEB_ASM_PLAY_SKY_BOX_H__

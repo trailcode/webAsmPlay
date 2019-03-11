@@ -25,7 +25,7 @@
 */
 
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
@@ -245,13 +245,13 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage) con
     {
         shader->bind(canvas, true, renderStage);
 
-        GL_CHECK(glDrawElements(GL_LINE_STRIP, numElements, GL_UNSIGNED_INT, NULL));
+        GL_CHECK(glDrawElements(GL_LINE_STRIP, (GLsizei)numElements, GL_UNSIGNED_INT, NULL));
     }
     else
     {
         shader->bind(canvas, true, renderStage);
 
-        GL_CHECK(glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, NULL));
+        GL_CHECK(glDrawElements(GL_LINES, (GLsizei)numElements, GL_UNSIGNED_INT, NULL));
     }
 
     GL_CHECK(glBindVertexArray(0));

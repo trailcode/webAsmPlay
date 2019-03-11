@@ -40,6 +40,12 @@
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/Textures.h>
+#include <webAsmPlay/GeoClient.h>
+#include <webAsmPlay/GeosTestCanvas.h>
+#include <webAsmPlay/OpenSteerCanvas.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
@@ -49,15 +55,9 @@
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/TileBoundaryShader.h>
 #include <webAsmPlay/shaders/TextureLookupShader.h>
-#include <webAsmPlay/FrameBuffer.h>
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/SkyBox.h>
-#include <webAsmPlay/Textures.h>
-#include <webAsmPlay/GridPlane.h>
-#include <webAsmPlay/GeoClient.h>
-#include <webAsmPlay/GeosTestCanvas.h>
-#include <webAsmPlay/OpenSteerCanvas.h>
-#include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/renderables/SkyBox.h>
+#include <webAsmPlay/renderables/GridPlane.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 // .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.

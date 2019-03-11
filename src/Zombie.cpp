@@ -27,8 +27,12 @@
 #include <OpenSteer/OpenSteerDemo.h>
 #include <OpenSteer/Draw.h>
 #include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
+#include <webAsmPlay/renderables/Renderable.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/Network.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/Zombie.h>
 
 using namespace OpenSteer;
@@ -40,11 +44,6 @@ namespace
     bool gUseDirectedPathFollowing = true; // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
 }
-
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/renderables/Renderable.h>
-#include <webAsmPlay/Util.h>
-#include <webAsmPlay/GeosUtil.h>
 
 extern Canvas * theCanvas;
 

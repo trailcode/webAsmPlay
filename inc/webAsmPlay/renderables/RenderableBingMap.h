@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__
-#define __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__
+#pragma once
 
 #include <webAsmPlay/renderables/Renderable.h>
 
@@ -53,5 +51,3 @@ private:
 
 	const glm::dmat4 trans;
 };
-
-#endif // __WEB_ASM_PLAY_RENDERABLE_BING_MAP_H__

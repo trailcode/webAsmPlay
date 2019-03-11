@@ -23,12 +23,9 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_NETWORK_H__
-#define __WEB_ASM_PLAY_NETWORK_H__
+#pragma once
 
 #include <memory>
-//#include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
 #include <geos/geom/Coordinate.h>
@@ -105,5 +102,3 @@ private:
 
     glm::dmat4 trans;
 };
-
-#endif // __WEB_ASM_PLAY_NETWORK_H__

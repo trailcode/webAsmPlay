@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_SHADER_PROGRAM_H__
-#define __WEB_ASM_PLAY_SHADER_PROGRAM_H__
+#pragma once
 
 #include <unordered_map>
 #include <glm/vec4.hpp>
@@ -85,5 +83,3 @@ private:
     std::unordered_map<std::string, GLint> uniforms;
     std::unordered_map<std::string, GLint> attributes;
 };
-
-#endif // __WEB_ASM_PLAY_SHADER_PROGRAM_H__

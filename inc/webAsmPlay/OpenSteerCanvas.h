@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_OPEN_STEER_CANVAS_H__
-#define __WEB_ASM_PLAY_OPEN_STEER_CANVAS_H__
+#pragma once
 
 #include <webAsmPlay/Canvas.h>
 
@@ -46,5 +44,3 @@ public:
 
 private:
 };
-
-#endif // __WEB_ASM_PLAY_OPEN_STEER_CANVAS_H__

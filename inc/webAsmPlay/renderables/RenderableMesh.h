@@ -23,11 +23,9 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
+#pragma once
 
-#ifndef __WEB_ASM_PLAY_RENDERABLE_MESH_H__
-#define __WEB_ASM_PLAY_RENDERABLE_MESH_H__
-
-#include <webAsmPlay/Tessellation.h>
+#include <webAsmPlay/geom/Tessellation.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
 class VertexArrayObject;
@@ -52,5 +50,3 @@ private:
 
     VertexArrayObject * vertexArrayObject;
 };
-
-#endif // __WEB_ASM_PLAY_RENDERABLE_MESH_H__

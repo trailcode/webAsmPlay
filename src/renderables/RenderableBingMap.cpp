@@ -42,9 +42,8 @@
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/GUI/GUI.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
-
-#include <webAsmPlay/GeosUtil.h>
 
 using namespace std;
 using namespace glm;

@@ -25,7 +25,7 @@
 */
 
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/GeometryConverter.h>
+#include <webAsmPlay/geom/GeometryConverter.h>
 #include <webAsmPlay/Network.h>
 #include <geoServer/GeoServer.h>
 

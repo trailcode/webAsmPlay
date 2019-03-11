@@ -29,18 +29,18 @@
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/TrackBallInteractor.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderableMesh.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
+#include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
-#include <webAsmPlay/SkyBox.h>
 #include <webAsmPlay/Canvas.h>
 
 using namespace std;

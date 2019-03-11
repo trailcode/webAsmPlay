@@ -32,7 +32,7 @@
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/operation/union/CascadedPolygonUnion.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/GeosUtil.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 
 using namespace std;
 using namespace glm;

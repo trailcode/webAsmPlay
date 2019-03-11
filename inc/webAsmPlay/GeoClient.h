@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_GEO_CLIENT_H__
-#define __WEB_ASM_PLAY_GEO_CLIENT_H__
+#pragma once
 
 #ifndef __EMSCRIPTEN__
 #include <websocketpp/config/asio_no_tls_client.hpp>
@@ -145,5 +143,4 @@ private:
     AABB2D bounds;
 };
 
-#endif // __WEB_ASM_PLAY_GEO_CLIENT_H__
 

@@ -30,10 +30,10 @@
 #endif
 #include <glm/gtx/transform.hpp>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/SkyBox.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/renderables/SkyBox.h>
 
 using namespace std;
 using namespace glm;

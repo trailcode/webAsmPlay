@@ -23,6 +23,29 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
+#pragma once
 
-#include <webAsmPlay/K2DTree.h>
+#include <webAsmPlay/renderables/Renderable.h>
 
+#ifdef WORKING
+
+class GridPlane : public Renderable
+{
+public:
+
+    GridPlane();
+    virtual ~GridPlane();
+
+    void render(const glm::mat4 & MVP) const;
+
+    static void ensureShader();
+
+private:
+
+    GLuint vbo;
+    GLuint vao;
+
+    glm::mat4 model;
+};
+
+#endif // WORKING

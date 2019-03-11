@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef WEBASMPLAY_K2D_TREE_H
-#define WEBASMPLAY_K2D_TREE_H
+#pragma once
 
 class K2D_Tree
 {
@@ -33,4 +31,3 @@ public:
 private:
 };
 
-#endif //WEBASMPLAY_K2D_TREE_H

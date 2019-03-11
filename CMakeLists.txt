@@ -146,33 +146,21 @@ file(GLOB opensteerSrc  "ThirdParty/opensteer/src/Clock.cpp"
                         "ThirdParty/opensteer/plugins/PedestriansWalkingAnEight.cpp"
                         "ThirdParty/opensteer/plugins/Soccer.cpp")
 
-file(GLOB simpleJSON_SRC "ThirdParty/SimpleJSON/src/*.cpp")
 
-file(GLOB imguiSrc  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
-
-file(GLOB gl3wSrc  "ThirdParty/gl3w/src/gl3w.c" "ThirdParty/sl3w/inc/GL/*.h" "ThirdParty/sl3w/inc/KHR/*.h")
-
-file(GLOB webAsmPlay_SRC    "inc/webAsmPlay/*.h"
-                            "src/*.cpp")
-
-file(GLOB webAsmPlayShaders_SRC "src/shaders/*.cpp"
-								"inc/webAsmPlay/shaders/*.h")
-
-file(GLOB webAsmPlayRenderables_SRC "src/renderables/*.cpp"
-									"inc/webAsmPlay/renderables/*.h")
-
-file(GLOB webAsmPlayGUI_SRC			"src/GUI/*.cpp"
-									"inc/webAsmPlay/GUI/*.h")
-
-file(GLOB geoServer_SRC     "GeoServer/src/*.cpp"
-                            "GeoServer/inc/geoServer/*.h"
-                            #${LAStoolSrc}
-                            #"src/Network.cpp"
-                            )
+file(GLOB simpleJSON_SRC            "ThirdParty/SimpleJSON/src/*.cpp")
+file(GLOB imguiSrc                  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
+file(GLOB gl3wSrc                   "ThirdParty/gl3w/src/gl3w.c" "ThirdParty/sl3w/inc/GL/*.h" "ThirdParty/sl3w/inc/KHR/*.h")
+file(GLOB webAsmPlay_SRC            "inc/webAsmPlay/*.h" "src/*.cpp")
+file(GLOB webAsmPlayShaders_SRC     "src/shaders/*.cpp" "inc/webAsmPlay/shaders/*.h")
+file(GLOB webAsmPlayRenderables_SRC "src/renderables/*.cpp" "inc/webAsmPlay/renderables/*.h")
+file(GLOB webAsmPlayGeom_SRC        "src/geom/*.cpp" "inc/webAsmPlay/geom/*.h")
+file(GLOB webAsmPlayGUI_SRC	        "src/GUI/*.cpp""inc/webAsmPlay/GUI/*.h")
+file(GLOB geoServer_SRC             "GeoServer/src/*.cpp" "GeoServer/inc/geoServer/*.h")
                   
 file(GLOB sources   ${webAsmPlay_SRC}
 					${webAsmPlayShaders_SRC}
-					${webAsmPlayRenderables_SRC}
+                    ${webAsmPlayRenderables_SRC}
+                    ${webAsmPlayGeom_SRC}
 					${webAsmPlayGUI_SRC}
                     ${geosSrc}
                     ${GLUTesselatorSrc}
@@ -493,6 +481,7 @@ source_group("Geos"						FILES ${geosSrc})
 source_group("webAsmPlay"				FILES ${webAsmPlay_SRC})
 source_group("webAsmPlay\\shaders"      FILES ${webAsmPlayShaders_SRC})
 source_group("webAsmPlay\\renderables"  FILES ${webAsmPlayRenderables_SRC})
+source_group("webAsmPlay\\geom"         FILES ${webAsmPlayGeom_SRC})
 source_group("webAsmPlay\\GUI"			FILES ${webAsmPlayGUI_SRC})
 
 

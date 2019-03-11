@@ -23,12 +23,10 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_RENDERABLE_POLYGON2D_H__
-#define __WEB_ASM_PLAY_RENDERABLE_POLYGON2D_H__
+#pragma once
 
 #include <webAsmPlay/OpenGL_Util.h>
-#include <webAsmPlay/Tessellation.h>
+#include <webAsmPlay/geom/Tessellation.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
 namespace geos
@@ -71,4 +69,3 @@ private:
     VertexArrayObject * vertexArrayObject;
 }; 
 
-#endif // __WEB_ASM_PLAY_RENDERABLE_POLYGON2D_H__

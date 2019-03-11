@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_COLOR_DISTANCE_DEPTH_SHADER_3D_H__
-#define __WEB_ASM_PLAY_COLOR_DISTANCE_DEPTH_SHADER_3D_H__
+#pragma once
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
@@ -65,5 +63,3 @@ private:
 
     glm::vec3 lightPos;
 };
-
-#endif // __WEB_ASM_PLAY_COLOR_DISTANCE_DEPTH_SHADER_3D_H__

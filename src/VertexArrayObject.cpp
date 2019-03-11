@@ -194,16 +194,16 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             addVert<USE_SYMBOLOGY_ID>(verts, p3, normal, symbologyWallID_value);
             addVert<USE_SYMBOLOGY_ID>(verts, p4, normal, symbologyWallID_value);
 
-            triangleIndices.push_back(offset + 0);
-            triangleIndices.push_back(offset + 1);
-            triangleIndices.push_back(offset + 2);
+            triangleIndices.push_back((uint32_t)offset + 0);
+            triangleIndices.push_back((uint32_t)offset + 1);
+            triangleIndices.push_back((uint32_t)offset + 2);
 
-            triangleIndices.push_back(offset + 2);
-            triangleIndices.push_back(offset + 3);
-            triangleIndices.push_back(offset);
+            triangleIndices.push_back((uint32_t)offset + 2);
+            triangleIndices.push_back((uint32_t)offset + 3);
+            triangleIndices.push_back((uint32_t)offset);
 
-            lineIndices.push_back(offset + 0);
-            lineIndices.push_back(offset + 3);
+            lineIndices.push_back((uint32_t)offset + 0);
+            lineIndices.push_back((uint32_t)offset + 3);
 
             offset += 4;
         }

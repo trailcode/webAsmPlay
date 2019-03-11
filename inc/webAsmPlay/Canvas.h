@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_CANVAS_H__
-#define __WEB_ASM_PLAY_CANVAS_H__
+#pragma once
 
 #include <list>
 #include <vector>
@@ -186,5 +184,3 @@ private:
 
     FrameBuffer * auxFrameBuffer = NULL;
 };
-
-#endif // __WEB_ASM_PLAY_CANVAS_H__

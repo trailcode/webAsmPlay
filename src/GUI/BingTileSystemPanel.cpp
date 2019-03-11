@@ -23,12 +23,14 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
+#pragma warning( push )
+#pragma warning( disable : 4005)
+#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
-#include <webAsmPlay/GUI/GUI.h>
+#pragma warning( pop ) 
 
 using namespace std;
 using namespace glm;

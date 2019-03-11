@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_TESSELLATION_H__
-#define __WEB_ASM_PLAY_TESSELLATION_H__
+#pragma once
 
 #include <memory>
 #include <glm/mat4x4.hpp>
@@ -81,5 +79,3 @@ private:
 };
 
 typedef Tessellation::Tessellations Tessellations;
-
-#endif // __WEB_ASM_PLAY_TESSELLATION_H__

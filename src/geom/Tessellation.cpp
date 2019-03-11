@@ -35,8 +35,8 @@
 #include <geos/geom/MultiPolygon.h>
 #include <GLU/tessellate.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/GeosUtil.h>
-#include <webAsmPlay/Tessellation.h>
+#include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/geom/Tessellation.h>
 
 using namespace std;
 using namespace glm;

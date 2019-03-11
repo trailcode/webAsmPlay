@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
-#define __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__
+#pragma once
 
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
@@ -75,5 +73,3 @@ private:
     GLuint		 numTriIndices;
     GLuint		 numLineIndices;
 };
-
-#endif // __WEB_ASM_PLAY__DEFERRED_RENDERABLE_H__

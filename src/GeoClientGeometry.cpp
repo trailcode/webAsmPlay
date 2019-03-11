@@ -31,10 +31,10 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/GeometryConverter.h>
 #include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/geom/GeometryConverter.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableMesh.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>

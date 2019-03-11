@@ -32,8 +32,8 @@
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/renderables/Renderable.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/Attributes.h>
-#include <webAsmPlay/GeosUtil.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeoClient.h>

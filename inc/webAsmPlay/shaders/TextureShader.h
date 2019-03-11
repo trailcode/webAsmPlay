@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_TEXTURE_SHADER_H__
-#define __WEB_ASM_PLAY_TEXTURE_SHADER_H__
+#pragma once
 
 #include <webAsmPlay/shaders/Shader.h>
 
@@ -50,5 +48,3 @@ private:
 
     GLuint textureID = 0;
 };
-
-#endif // __WEB_ASM_PLAY_TEXTURE_SHADER_H__
