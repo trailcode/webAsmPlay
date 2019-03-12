@@ -380,7 +380,7 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 	const dvec3 screenCenter = project(transCenter, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
 
-	dmess("screenCenter " << screenCenter);
+	//dmess("screenCenter " << screenCenter);
 
 	const dvec3 screenP1 = project(transP1, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
 	const dvec3 screenP2 = project(transP2, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
@@ -406,6 +406,19 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 		const dvec3 subPointsTrans[] = {	/* 0 */trans * dvec4(tMin.x, tMax.y,   0, 1), /* 1 */trans * dvec4(center.x, tMax.y,   0, 1), /* 2 */trans * dvec4(tMax.x, tMax.y,   0, 1),
 											/* 3 */trans * dvec4(tMin.x, center.y, 0, 1), /* 4 */trans * dvec4(center.x, center.y, 0, 1), /* 5 */trans * dvec4(tMax.x, center.y, 0, 1),
 											/* 6 */trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */trans * dvec4(tMax.x, tMin.y,   0, 1)};
+
+		dvec3 screenPoints[6];
+
+		for(size_t i = 0; i < 6; ++i)
+		{
+			screenPoints[i] = project(subPointsTrans[i], canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
+
+			dvec4 p = canvas->getMVP_Ref() * dvec4(subPointsTrans[i], 1.0);
+
+			//dmess("screen " << i << " " << screenPoints[i]);
+			dmess("screen " << i << " " << p);
+		}
+		
 
 		// TODO try projecting into a different space and doing a simpler check.
 
