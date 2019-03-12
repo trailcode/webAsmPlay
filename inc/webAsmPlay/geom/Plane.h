@@ -73,7 +73,7 @@ struct Plane
 
 		//compute the lenght of the vector
 		const double l = glm::length(normal);
-
+		
 		// normalize the vector
 		normal = glm::dvec3(a/l,b/l,c/l);
 
@@ -133,11 +133,19 @@ struct Plane
     int classifyPoint (const glm::dvec3 & point) const
     {
 		//valueType dot = point.dot(normal) - dist;
+		/*
 		const double dot = glm::dot(normal, point) + dist;
 
 		     if (dot < -ON_EPSILON) { return SIDE_FRONT ;}
 		else if (dot > ON_EPSILON)  { return SIDE_BACK  ;}
 
+		return SIDE_ON;
+		*/
+
+		//float d;
+		const double d = normal.x*point.x + normal.y*point.y + normal.z*point.z + dist;
+		if (d < 0) return SIDE_BACK;
+		if (d > 0) return SIDE_FRONT;
 		return SIDE_ON;
     }
 

@@ -380,6 +380,8 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 	const dvec3 screenCenter = project(transCenter, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
 
+	dmess("screenCenter " << screenCenter);
+
 	const dvec3 screenP1 = project(transP1, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
 	const dvec3 screenP2 = project(transP2, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
 	const dvec3 screenP3 = project(transP3, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
@@ -392,36 +394,39 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	const double D3 = distance(screenP3, screenP4);
 	const double D4 = distance(screenP4, screenP1);
 
-	if (level < 19 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
+	const Frustum * frust = canvas->getCameraFrustum();
+
+	//if (level < 23 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
+	if (level < 12 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	{
-		/*
-		P1,							dvec2(center.x, tMax.y),	dvec2(tMax.x, tMax.y)
-		dvec2(tMin.x, center.y),	dvec2(center.x, center.y),	dvec2(tMax.x, center.y)
-		P4,							dvec2(center.x, tMin.y),	P3
-		*/
+		const dvec3 subPoints[] = {	/* 0 */dvec3(tMin.x, tMax.y,	0),		/* 1 */dvec3(center.x, tMax.y,   0), /* 2 */dvec3(tMax.x, tMax.y,   0),
+									/* 3 */dvec3(tMin.x, center.y,  0),		/* 4 */dvec3(center.x, center.y, 0), /* 5 */dvec3(tMax.x, center.y, 0),
+									/* 6 */dvec3(tMin.x, tMin.y,	0),		/* 7 */dvec3(center.x, tMin.y,   0), /* 8 */dvec3(tMax.x, tMin.y,   0)};
 
-		/*
-		dvec2(tMin.x, tMax.y),		dvec2(center.x, tMax.y),	dvec2(tMax.x, tMax.y)
-		dvec2(tMin.x, center.y),	dvec2(center.x, center.y),	dvec2(tMax.x, center.y)
-		dvec2(tMin.x, tMin.y),		dvec2(center.x, tMin.y),	dvec2(tMax.x, tMin.y)
-		*/
+		const dvec3 subPointsTrans[] = {	/* 0 */trans * dvec4(tMin.x, tMax.y,   0, 1), /* 1 */trans * dvec4(center.x, tMax.y,   0, 1), /* 2 */trans * dvec4(tMax.x, tMax.y,   0, 1),
+											/* 3 */trans * dvec4(tMin.x, center.y, 0, 1), /* 4 */trans * dvec4(center.x, center.y, 0, 1), /* 5 */trans * dvec4(tMax.x, center.y, 0, 1),
+											/* 6 */trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */trans * dvec4(tMax.x, tMin.y,   0, 1)};
 
-		//dvec2(tMin.x, center.y), dvec2(center.x, tMax.y)
-		//dvec2(center.x, center.y), dvec2(tMax.x, tMax.y)
-		//dvec2(tMin.x, tMin.y), dvec2(center.x, center.y)
-		//dvec2(center.x, tMin.y), dvec2(tMax.x, center.y)
+		// TODO try projecting into a different space and doing a simpler check.
 
-		const dvec3 subPoints[] = {	dvec3(tMin.x, tMax.y,	0),	dvec3(center.x, tMax.y,   0), dvec3(tMax.x, tMax.y,   0),
-									dvec3(tMin.x, center.y, 0),	dvec3(center.x, center.y, 0), dvec3(tMax.x, center.y, 0),
-									dvec3(tMin.x, tMin.y,	0),	dvec3(center.x, tMin.y,   0), dvec3(tMax.x, tMin.y,   0)};
+		const bool e01 = frust->intersectsEdge(subPointsTrans[0], subPointsTrans[1]);
+		const bool e12 = frust->intersectsEdge(subPointsTrans[1], subPointsTrans[2]);
+		const bool e34 = frust->intersectsEdge(subPointsTrans[3], subPointsTrans[4]);
+		const bool e45 = frust->intersectsEdge(subPointsTrans[4], subPointsTrans[5]);
+		const bool e67 = frust->intersectsEdge(subPointsTrans[6], subPointsTrans[7]);
+		const bool e78 = frust->intersectsEdge(subPointsTrans[7], subPointsTrans[8]);
+		const bool e03 = frust->intersectsEdge(subPointsTrans[0], subPointsTrans[3]);
+		const bool e14 = frust->intersectsEdge(subPointsTrans[1], subPointsTrans[4]);
+		const bool e25 = frust->intersectsEdge(subPointsTrans[2], subPointsTrans[5]);
+		const bool e36 = frust->intersectsEdge(subPointsTrans[3], subPointsTrans[6]);
+		const bool e47 = frust->intersectsEdge(subPointsTrans[4], subPointsTrans[7]);
+		const bool e58 = frust->intersectsEdge(subPointsTrans[5], subPointsTrans[8]);
 
-		const Frustum * frust = canvas->getCameraFrustum();
-
-		if(frust->containsA_Point(subPoints[0], subPoints[1], subPoints[3], subPoints[4])) { getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;} else { ++culled ;}
-		if(frust->containsA_Point(subPoints[1], subPoints[2], subPoints[4], subPoints[5])) { getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;} else { ++culled ;}
-		if(frust->containsA_Point(subPoints[3], subPoints[4], subPoints[6], subPoints[7])) { getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;} else { ++culled ;}
-		if(frust->containsA_Point(subPoints[4], subPoints[5], subPoints[7], subPoints[8])) { getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;} else { ++culled ;}
-
+		if(e01 || e14 || e34 || e03) { getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;} else { ++culled ;}
+		if(e12 || e25 || e45 || e14) { getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;} else { ++culled ;}
+		if(e34 || e47 || e67 || e36) { getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;} else { ++culled ;}
+		if(e45 || e58 || e78 || e47) { getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;} else { ++culled ;}
+			
 		return;
 	}
 
@@ -435,7 +440,10 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 	r->setShader(ColorShader::getDefaultInstance());
 
-	r->setRenderFill(false);
+	//ColorShader::getDefaultInstance()->
+
+	r->setRenderFill(true);
+	//r->setRenderFill(false);
 	r->setRenderOutline(true);
 
 	r->render(canvas);

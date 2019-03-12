@@ -55,6 +55,10 @@ public:
 
 	bool containsA_Point(const glm::dvec3 & P1, const glm::dvec3 & P2, const glm::dvec3 & P3, const glm::dvec3 & P4) const;
 
+	int frustumAABBIntersect(const AABB3D & AABB) const;
+
+	bool intersectsEdge(const glm::dvec3 & P1, const glm::dvec3 & P2) const;
+
 protected:
 
     Plane planes[6];
