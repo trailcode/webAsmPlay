@@ -27,6 +27,8 @@
 
 #include <webAsmPlay/renderables/Renderable.h>
 
+class Frustum;
+
 class RenderableBingMap : public Renderable
 {
 public:
@@ -42,7 +44,7 @@ private:
 
 	void getStartLevel();
 
-	void getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax) const;
+	void getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level) const;
 
     const AABB2D bounds;
 

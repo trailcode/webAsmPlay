@@ -70,8 +70,8 @@ namespace
 
     //const size_t levelOfDetail = 19;
     //const size_t levelOfDetail = 18;
-    const size_t levelOfDetail = 17;
-    //const size_t levelOfDetail = 15;
+    //const size_t levelOfDetail = 17;
+    const size_t levelOfDetail = 15;
 
     // Define our struct for accepting LCs output
     struct BufferStruct // TODO code dupilcation
@@ -353,7 +353,10 @@ Renderable * RenderableBingMap::create(const AABB2D & bounds, const dmat4 & tran
     return new RenderableBingMap(bounds, trans);
 }
 
-void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, const dvec2 & tMax) const
+size_t culled = 0;
+size_t rendered = 0;
+
+void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, const dvec2 & tMax, const size_t level) const
 {
 	const dvec3 center = dvec4(((tMin + tMax) * 0.5), 0.0, 1.0);
 
@@ -389,7 +392,7 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	const double D3 = distance(screenP3, screenP4);
 	const double D4 = distance(screenP4, screenP1);
 
-	if (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize)
+	if (level < 19 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	{
 		/*
 		P1,							dvec2(center.x, tMax.y),	dvec2(tMax.x, tMax.y)
@@ -408,15 +411,21 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 		//dvec2(tMin.x, tMin.y), dvec2(center.x, center.y)
 		//dvec2(center.x, tMin.y), dvec2(tMax.x, center.y)
 
-		getTilesToRender(canvas, dvec2(tMin.x, center.y), dvec2(center.x, tMax.y));
-		getTilesToRender(canvas, dvec2(center.x, center.y), dvec2(tMax.x, tMax.y));
-		getTilesToRender(canvas, dvec2(tMin.x, tMin.y), dvec2(center.x, center.y));
-		getTilesToRender(canvas, dvec2(center.x, tMin.y), dvec2(tMax.x, center.y));
+		const dvec3 subPoints[] = {	dvec3(tMin.x, tMax.y,	0),	dvec3(center.x, tMax.y,   0), dvec3(tMax.x, tMax.y,   0),
+									dvec3(tMin.x, center.y, 0),	dvec3(center.x, center.y, 0), dvec3(tMax.x, center.y, 0),
+									dvec3(tMin.x, tMin.y,	0),	dvec3(center.x, tMin.y,   0), dvec3(tMax.x, tMin.y,   0)};
+
+		const Frustum * frust = canvas->getCameraFrustum();
+
+		if(frust->containsA_Point(subPoints[0], subPoints[1], subPoints[3], subPoints[4])) { getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;} else { ++culled ;}
+		if(frust->containsA_Point(subPoints[1], subPoints[2], subPoints[4], subPoints[5])) { getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;} else { ++culled ;}
+		if(frust->containsA_Point(subPoints[3], subPoints[4], subPoints[6], subPoints[7])) { getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;} else { ++culled ;}
+		if(frust->containsA_Point(subPoints[4], subPoints[5], subPoints[7], subPoints[8])) { getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;} else { ++culled ;}
 
 		return;
 	}
 
-	dmess("screenPos " << screenCenter << " center " << center << " D1 " << D1 << " D2 " << D2 << " D3 " << D3 << " D4 " << D4);
+	//dmess("screenPos " << screenCenter << " center " << center << " D1 " << D1 << " D2 " << D2 << " D3 " << D3 << " D4 " << D4);
 
 	const dvec3 cameraPos = canvas->getCamera()->getCenter();
 
@@ -432,6 +441,8 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	r->render(canvas);
 
 	delete r;
+
+	++rendered;
 }
 
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
@@ -449,14 +460,19 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
         r->render(canvas);
     }
 
-	Frustum frustum(canvas->getMVP_Ref());
+	//Frustum frustum(canvas->getMVP_Ref());
 
-	size_t startLevel = 12;
+	size_t startLevel = 11;
 
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
 
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), startLevel);
 	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), startLevel);
 
-	getTilesToRender(canvas, tMin, tMax);
+	culled = 0;
+	rendered = 0;
+
+	getTilesToRender(canvas, tMin, tMax, startLevel);
+
+	dmess("rendered " << rendered << " culled " << culled);
 }

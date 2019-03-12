@@ -83,6 +83,25 @@ bool Frustum::AABBInFrustum(const AABB3D & AABB) const
 	return true;
 }
 
+bool Frustum::containsPoint(const dvec3 & P) const
+{
+	for (size_t i = 0; i < 6; ++i)
+	{
+		if(planes[i].classifyPoint(P) == Plane::SIDE_BACK) { return false ;}
+	}
+
+	return true;
+}
+
+
+bool Frustum::containsA_Point(const dvec3 & P1, const dvec3 & P2, const dvec3 & P3, const dvec3 & P4) const
+{
+	return	containsPoint(P1) ||
+			containsPoint(P2) ||
+			containsPoint(P3) ||
+			containsPoint(P4);
+}
+
 const Plane & Frustum::getPlane(const size_t index) const { return planes[index] ;}
 
 

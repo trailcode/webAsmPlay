@@ -38,6 +38,7 @@
 class FrameBuffer;
 class Renderable;
 class SkyBox;
+class Frustum;
 
 namespace rsmz
 {
@@ -76,6 +77,8 @@ public:
     virtual void onChar(GLFWwindow * window, const size_t c);
 
     rsmz::Camera * getCamera() const;
+
+	const Frustum * getCameraFrustum() const;
 
     rsmz::TrackBallInteractor * getTrackBallInteractor() const;
 
@@ -183,4 +186,6 @@ private:
     Renderable * cursor = NULL;
 
     FrameBuffer * auxFrameBuffer = NULL;
+
+	Frustum * frustum = NULL;
 };

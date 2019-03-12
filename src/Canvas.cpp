@@ -32,6 +32,7 @@
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/geom/Frustum.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderableMesh.h>
@@ -58,9 +59,10 @@ namespace
 }
 
 Canvas::Canvas( const bool   useFrameBuffer,
-                const vec4 & clearColor) :  useFrameBuffer     (useFrameBuffer),
-                                            clearColor         (clearColor),
-                                            trackBallInteractor(new TrackBallInteractor())
+                const vec4 & clearColor) :  useFrameBuffer		(useFrameBuffer),
+                                            clearColor			(clearColor),
+                                            trackBallInteractor	(new TrackBallInteractor()),
+											frustum				(new Frustum())
 {
     instances.push_back(this);
 }
@@ -69,7 +71,7 @@ Canvas::~Canvas()
 {
     delete trackBallInteractor;
     delete frameBuffer;
-
+	delete frustum;
     // TODO remove from instances!
 }
 
@@ -106,6 +108,8 @@ void Canvas::popMVP()
     currMVP = stackMVP.top();
 
     stackMVP.pop();
+
+	frustum->set(currMVP.MVP);
 }
 
 extern vec4 lookat;
@@ -118,6 +122,8 @@ void Canvas::updateMVP()
     currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.0001, 30.0);
     currMVP.MV          = currMVP.view * currMVP.model;
     currMVP.MVP         = currMVP.projection * currMVP.MV;
+
+	frustum->set(currMVP.MVP);
 }
 
 bool Canvas::preRender()
@@ -391,6 +397,8 @@ const list<Renderable *> & Canvas::getRastersRef()              const { return r
 vec4 Canvas::setClearColor(const vec4 & clearColor) { return this->clearColor = clearColor ;}
 
 Camera * Canvas::getCamera() const { return trackBallInteractor->getCamera() ;}
+
+const Frustum * Canvas::getCameraFrustum() const { return frustum ;}
 
 TrackBallInteractor * Canvas::getTrackBallInteractor() const { return trackBallInteractor ;}
 

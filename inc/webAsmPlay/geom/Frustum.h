@@ -51,6 +51,10 @@ public:
 
 	const Plane & getPlane(const size_t index) const;
 
+	bool containsPoint(const glm::dvec3 & P) const;
+
+	bool containsA_Point(const glm::dvec3 & P1, const glm::dvec3 & P2, const glm::dvec3 & P3, const glm::dvec3 & P4) const;
+
 protected:
 
     Plane planes[6];
