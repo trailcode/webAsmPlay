@@ -143,6 +143,19 @@ bool Frustum::intersectsEdge(const dvec3& P1, const dvec3& P2) const
 	//return c == 2;
 }
 
+bool Frustum::intersects(const dvec3& P1, const dvec3& P2, const dvec3& P3, const dvec3& P4) const
+{
+	for (size_t i = 0; i < 6; ++i)
+	{
+		if(	planes[i].classifyPoint(P1) == Plane::SIDE_BACK &&
+			planes[i].classifyPoint(P2) == Plane::SIDE_BACK &&
+			planes[i].classifyPoint(P3) == Plane::SIDE_BACK &&
+			planes[i].classifyPoint(P4) == Plane::SIDE_BACK) { return false ;}
+	}
+
+	return true;
+}
+
 //int frustumAABBIntersect(const AABB3D & AABB) const
 
 bool Frustum::containsPoint(const dvec3 & P) const

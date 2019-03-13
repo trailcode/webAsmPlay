@@ -31,6 +31,7 @@
 
 #include <algorithm>
 #include <mutex>
+#include <functional>
 #include <unordered_set>
 #include <unordered_map>
 #include <glm/gtc/matrix_transform.hpp>
@@ -106,6 +107,132 @@ namespace
 
 	static GLFWwindow * threadWin = NULL;
 
+	typedef pair<const char *, const size_t> TileBuffer;
+
+	TileBuffer downloadTile(const int ID, const string & quadKey)
+	{
+		CURL * myHandle = NULL;
+
+		{
+			lock_guard<mutex> _(loaderMutex);
+
+			if(curlHandles.find(ID) == curlHandles.end())
+			{
+				curlHandles[ID] = myHandle = curl_easy_init();
+			}
+
+			myHandle = curlHandles[ID];
+
+			if (!myHandle) { dmessError("Could not create CURL handle!") ;}
+		}
+
+		//dmess("Start!");
+
+		CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
+		struct BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
+		output->buffer = NULL;
+		output->size = 0;
+
+		//if(!myHandle) { myHandle = curl_easy_init() ;}
+
+		/* Notice the lack of major error checking, for brevity */
+
+		curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
+		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)output); // Passing our BufferStruct to LC
+
+																	   /*
+																	   const string url =  "https://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
+																	   quadKey +
+																	   "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
+																	   */
+
+		const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
+			quadKey +
+			"?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
+
+		//dmess("url " << url);
+
+		curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
+		result = curl_easy_perform( myHandle );
+		//dmess("result " << result << " myHandle " << myHandle);
+		//curl_easy_cleanup( myHandle );
+
+		const char * ret = output->buffer;
+
+		const size_t size = output->size;
+
+		if (!ret)
+		{
+			dmess("Error!");
+		}
+
+		delete output;
+
+		return TileBuffer(ret, size);
+	}
+
+	void fetchTile(const int ID, GLuint * textureID, const string & quadKey)
+	{
+#ifndef __EMSCRIPTEN__
+
+		const string tileCachePath = "./tiles/" + quadKey + ".jpg";
+
+		if(fileExists(tileCachePath))
+		{
+			uploaderPool.push([textureID, tileCachePath](int ID)
+			{
+				if(!contextSet)
+				{ 
+					glfwMakeContextCurrent(threadWin);
+
+					contextSet = true;
+				}
+
+				*textureID = Textures::load(tileCachePath);
+			});
+		}
+		else
+		{
+			TileBuffer tileBuffer = downloadTile(ID, quadKey);
+
+			uploaderPool.push([textureID, tileBuffer, tileCachePath](int ID)
+			{
+				if(!contextSet)
+				{ 
+					glfwMakeContextCurrent(threadWin);
+
+					contextSet = true;
+				}
+
+				*textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
+
+				if(!fileExists(tileCachePath))
+				{
+					FILE * fp = fopen(tileCachePath.c_str(), "wb");
+
+					if(fp)
+					{
+						fwrite(get<0>(tileBuffer), sizeof(char), get<1>(tileBuffer), fp);
+
+						fclose(fp);
+					}
+					else
+					{
+						dmess("Warn could not write file: " << tileCachePath);
+					}
+				}
+
+				if( get<0>(tileBuffer) )
+				{
+					free ( (void *)get<0>(tileBuffer) );
+				}
+			});
+		}
+
+		//dmess("done " << quadKey);
+#endif
+	}
+
     class BingTile
     {
     public:
@@ -114,7 +241,7 @@ namespace
         {
 #ifndef __EMSCRIPTEN__
 
-            loaderPool.push([this](int ID) { fetchTile(ID) ;});
+            loaderPool.push([this, quadKey](int ID) { fetchTile(ID, &textureID, quadKey) ;});
 
 #endif
         }
@@ -125,129 +252,6 @@ namespace
         }
 
 		void render(Canvas * canvas) const { r->render(canvas) ;}
-
-        void fetchTile(const int ID)
-        {
-#ifndef __EMSCRIPTEN__
-
-            const string tileCachePath = "./tiles/" + quadKey + ".jpg";
-
-			if(fileExists(tileCachePath))
-            {
-                uploaderPool.push([this, tileCachePath](int ID)
-                {
-					if(!contextSet)
-					{ 
-						glfwMakeContextCurrent(threadWin);
-
-						contextSet = true;
-					}
-
-                    textureID = Textures::load(tileCachePath);
-                });
-            }
-            else
-            {
-                //return;
-
-                CURL * myHandle = NULL;
-
-                {
-                    lock_guard<mutex> _(loaderMutex);
-
-                    if(curlHandles.find(ID) == curlHandles.end())
-                    {
-                        curlHandles[ID] = myHandle = curl_easy_init();
-                    }
-
-                    myHandle = curlHandles[ID];
-
-					if (!myHandle) { dmessError("Could not create CURL handle!") ;}
-                }
-
-				//dmess("Start!");
-
-                CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
-                struct BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
-                output->buffer = NULL;
-                output->size = 0;
-
-                //if(!myHandle) { myHandle = curl_easy_init() ;}
-
-                /* Notice the lack of major error checking, for brevity */
-
-                curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
-                curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)output); // Passing our BufferStruct to LC
-
-				/*
-                const string url =  "https://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
-                                    quadKey +
-                                    "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
-									*/
-
-				const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
-									quadKey +
-									"?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
-
-				//dmess("url " << url);
-
-                curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
-                result = curl_easy_perform( myHandle );
-                //dmess("result " << result << " myHandle " << myHandle);
-                //curl_easy_cleanup( myHandle );
-
-				if (!output->buffer)
-				{
-					dmess("Error!");
-
-					return;
-
-					//abort();
-				}
-
-				//static GLFWwindow * threadWin = NULL;
-
-                uploaderPool.push([this, output, tileCachePath](int ID)
-                {
-					if(!contextSet)
-					{ 
-						glfwMakeContextCurrent(threadWin);
-
-						contextSet = true;
-					}
-
-                    textureID = Textures::createFromJpeg(output->buffer, output->size);
-
-                    if(!fileExists(tileCachePath))
-                    {
-                        FILE * fp = fopen(tileCachePath.c_str(), "wb");
-                        
-						if(fp)
-						{
-							fwrite(output->buffer, sizeof(char), output->size, fp);
-
-							fclose(fp);
-						}
-						else
-						{
-							dmess("Warn could not write file: " << tileCachePath);
-						}
-                    }
-
-                    if( output->buffer )
-                    {
-                        free ( output->buffer );
-                        //output.buffer = 0;
-                        //output.size = 0;
-                    }
-
-                    delete output;
-                });
-            }
-
-            //dmess("done " << quadKey);
-#endif
-        }
 
         const string quadKey;
 
@@ -261,6 +265,131 @@ namespace
     vector<BingTile *> tiles;
 
 	FrameBuffer * textureBuffer = NULL;
+
+	class Tile
+	{
+	public:
+
+		Tile(const dvec2 & center, const size_t level) : center(center), level(level)
+		{
+			
+		}
+
+		const dvec2 center;
+		const size_t level;
+
+		// TODO skip loading if no longer needed
+
+		bool loading = false;
+
+		Renderable * r = NULL;
+
+		GLuint textureID = 0;
+	};
+
+	void fetchTile(const int ID, Tile * tile)
+	{
+		//dmess("fetchTile " << tile);
+
+		const string quadKey = tileToQuadKey(latLongToTile(tile->center, tile->level), tile->level);
+
+		const string tileCachePath = "./tiles/" + quadKey + ".jpg";
+
+		if(fileExists(tileCachePath))
+		{
+			uploaderPool.push([tile, tileCachePath](int ID)
+			{
+				if(!contextSet)
+				{ 
+					glfwMakeContextCurrent(threadWin);
+
+					contextSet = true;
+				}
+
+				tile->textureID = Textures::load(tileCachePath);
+			});
+		}
+		else
+		{
+			TileBuffer tileBuffer = downloadTile(ID, quadKey);
+
+			if (!get<0>(tileBuffer))
+			{
+				dmess("Error! No buffer!");
+
+				return;
+			}
+
+			uploaderPool.push([tile, tileBuffer, tileCachePath](int ID)
+			{
+				if(!contextSet)
+				{ 
+					glfwMakeContextCurrent(threadWin);
+
+					contextSet = true;
+				}
+
+				tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
+
+				//dmess("tile->textureID " << tile->textureID);
+
+				FILE * fp = fopen(tileCachePath.c_str(), "wb");
+
+				if(fp)
+				{
+					fwrite(get<0>(tileBuffer), sizeof(char), get<1>(tileBuffer), fp);
+
+					fclose(fp);
+				}
+				else
+				{
+					dmess("Warn could not write file: " << tileCachePath);
+				}
+				
+				if( get<0>(tileBuffer) )
+				{
+					free ( (void *)get<0>(tileBuffer) );
+				}
+			});
+		}
+	}
+
+	unordered_map<string, Tile *> currTileSet;
+
+	Tile * getTile(const dvec2 & center, const size_t level)
+	{
+		char buf[1024];
+
+		sprintf(buf, "%f %f %i", center.x, center.y, level);
+
+		unordered_map<string, Tile *>::const_iterator i = currTileSet.find(buf);
+
+		Tile * tile;
+
+		if (i != currTileSet.end())
+		{
+			tile = i->second;
+		}
+		else
+		{
+			tile = new Tile(center, level);
+
+			currTileSet[buf] = tile;
+		}
+
+		/*
+		switch (tile->state)
+		{
+		case Tile::UNLOADED:
+			break;
+		case Tile:
+		}
+		*/
+
+		return tile;
+	}
+
+	vector<Tile *> tiles2;
 }
 
 void RenderableBingMap::getStartLevel()
@@ -396,8 +525,8 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 	const Frustum * frust = canvas->getCameraFrustum();
 
-	//if (level < 23 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
-	if (level < 12 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
+	if (level < 23 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
+	//if (level < 12 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	{
 		const dvec3 subPoints[] = {	/* 0 */dvec3(tMin.x, tMax.y,	0),		/* 1 */dvec3(center.x, tMax.y,   0), /* 2 */dvec3(tMax.x, tMax.y,   0),
 									/* 3 */dvec3(tMin.x, center.y,  0),		/* 4 */dvec3(center.x, center.y, 0), /* 5 */dvec3(tMax.x, center.y, 0),
@@ -407,6 +536,7 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 											/* 3 */trans * dvec4(tMin.x, center.y, 0, 1), /* 4 */trans * dvec4(center.x, center.y, 0, 1), /* 5 */trans * dvec4(tMax.x, center.y, 0, 1),
 											/* 6 */trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */trans * dvec4(tMax.x, tMin.y,   0, 1)};
 
+		/*
 		dvec3 screenPoints[6];
 
 		for(size_t i = 0; i < 6; ++i)
@@ -418,33 +548,22 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 			//dmess("screen " << i << " " << screenPoints[i]);
 			dmess("screen " << i << " " << p);
 		}
+		*/
 		
-
+		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;} else { ++culled ;}
+		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;} else { ++culled ;}
+		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;} else { ++culled ;}
+		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;} else { ++culled ;}
 		// TODO try projecting into a different space and doing a simpler check.
 
-		const bool e01 = frust->intersectsEdge(subPointsTrans[0], subPointsTrans[1]);
-		const bool e12 = frust->intersectsEdge(subPointsTrans[1], subPointsTrans[2]);
-		const bool e34 = frust->intersectsEdge(subPointsTrans[3], subPointsTrans[4]);
-		const bool e45 = frust->intersectsEdge(subPointsTrans[4], subPointsTrans[5]);
-		const bool e67 = frust->intersectsEdge(subPointsTrans[6], subPointsTrans[7]);
-		const bool e78 = frust->intersectsEdge(subPointsTrans[7], subPointsTrans[8]);
-		const bool e03 = frust->intersectsEdge(subPointsTrans[0], subPointsTrans[3]);
-		const bool e14 = frust->intersectsEdge(subPointsTrans[1], subPointsTrans[4]);
-		const bool e25 = frust->intersectsEdge(subPointsTrans[2], subPointsTrans[5]);
-		const bool e36 = frust->intersectsEdge(subPointsTrans[3], subPointsTrans[6]);
-		const bool e47 = frust->intersectsEdge(subPointsTrans[4], subPointsTrans[7]);
-		const bool e58 = frust->intersectsEdge(subPointsTrans[5], subPointsTrans[8]);
-
-		if(e01 || e14 || e34 || e03) { getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;} else { ++culled ;}
-		if(e12 || e25 || e45 || e14) { getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;} else { ++culled ;}
-		if(e34 || e47 || e67 || e36) { getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;} else { ++culled ;}
-		if(e45 || e58 || e78 || e47) { getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;} else { ++culled ;}
-			
 		return;
 	}
 
 	//dmess("screenPos " << screenCenter << " center " << center << " D1 " << D1 << " D2 " << D2 << " D3 " << D3 << " D4 " << D4);
 
+	tiles2.push_back(getTile(center, level));
+
+	/*
 	const dvec3 cameraPos = canvas->getCamera()->getCenter();
 
 	//dmess("P1 " << frustum.getPlane(0).classifyPoint(P1) << " " << distance(cameraPos, P1));
@@ -464,6 +583,7 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	delete r;
 
 	++rendered;
+	*/
 }
 
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
@@ -493,7 +613,53 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 	culled = 0;
 	rendered = 0;
 
+	tiles2.clear();
+
 	getTilesToRender(canvas, tMin, tMax, startLevel);
 
-	dmess("rendered " << rendered << " culled " << culled);
+	sort(tiles2.begin(), tiles2.end(), [](const Tile * A, const Tile * B)
+	{
+		return A->level < B->level;
+	});
+
+	for (auto i : tiles2)
+	{
+		if (i->textureID)
+		{
+			if(!i->r)
+			{
+				const ivec2 iTile = latLongToTile(i->center, i->level);
+
+				const dvec2 tMin = tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), i->level);
+				const dvec2 tMax = tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), i->level);
+				//*/
+
+				/*
+				const dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 0), levelOfDetail);
+				const dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 1), levelOfDetail);
+				*/
+
+				//const string quadKey = tileToQuadKey(ivec2(x, y), levelOfDetail);
+
+				i->r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
+
+				i->r->setShader(TextureShader::getDefaultInstance());
+
+				i->r->setRenderOutline (false);
+				i->r->setRenderFill    (true);
+			}
+
+			TextureShader::getDefaultInstance()->setTextureID(i->textureID);
+
+			i->r->render(canvas);
+		}
+		else if (!i->loading)
+		{
+			i->loading = true;
+
+			loaderPool.push([i](int ID) { fetchTile(ID, i) ;});
+		}
+	}
+
+	//dmess("rendered " << rendered << " culled " << culled);
 }
