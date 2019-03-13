@@ -421,7 +421,7 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	//dmess("screenPos " << screenCenter << " center " << center << " D1 " << D1 << " D2 " << D2 << " D3 " << D3 << " D4 " << D4);
 
 	tiles2.push_back(getTile(center, level));
-
+	 
 	/*
 	const dvec3 cameraPos = canvas->getCamera()->getCenter();
 

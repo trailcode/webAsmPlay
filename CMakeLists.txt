@@ -307,24 +307,29 @@ else()
 	
     foreach(assetFile ${ASSET_FILES})
 		if(MSVC_VERSION)
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}"	DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
 
 			list(APPEND assetFileDestRelease		"${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}")
 			list(APPEND assetFileDestRelWithDebInfo "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}")
+			list(APPEND assetFileDestMinSizeRel		"${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}")
 			list(APPEND assetFileDestDebug			"${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}")
 			
 		else()
+
 			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
 			list(APPEND assetFileDest "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}")
 			
 		endif()
+
     endforeach(assetFile)
 	
 	if(MSVC_VERSION)
 		ADD_CUSTOM_TARGET(assetsRelease			ALL DEPENDS ${assetFileDestRelease})
 		ADD_CUSTOM_TARGET(assetsRelWithDebInfo	ALL DEPENDS ${assetFileDestRelWithDebInfo})
+		ADD_CUSTOM_TARGET(assetsMinSizeRel		ALL DEPENDS ${assetFileDestMinSizeRel})
 		ADD_CUSTOM_TARGET(assetsDebug			ALL DEPENDS ${assetFileDestDebug})
 	else()
 		ADD_CUSTOM_TARGET(assets ALL DEPENDS ${assetFileDest})
@@ -333,16 +338,41 @@ else()
     set(config_files imgui.ini config.json)
 
     foreach(configFile ${config_files})
-        ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${configFile}"
-                COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}"
-                "${CMAKE_CURRENT_BINARY_DIR}/${configFile}"
-                DEPENDS   "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}"
-                )
-        list(APPEND configFileDest "${CMAKE_CURRENT_BINARY_DIR}/${configFile}")
+
+		if(MSVC_VERSION)
+
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+
+			list(APPEND configFileDestRelease			"${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}")
+			list(APPEND configFileDestRelWithDebInfo	"${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}")
+			list(APPEND configFileDestMinSizeRel		"${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}")
+			list(APPEND configFileDestDebug				"${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}")
+
+		else()
+
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+
+			list(APPEND configFileDest "${CMAKE_CURRENT_BINARY_DIR}/${configFile}")
+
+		endif()
 
     endforeach(configFile)
 
-    ADD_CUSTOM_TARGET(configs ALL DEPENDS ${configFileDest})
+	if(MSVC_VERSION)
+
+		ADD_CUSTOM_TARGET(configsRelease		ALL DEPENDS ${configFileDestRelease})
+		ADD_CUSTOM_TARGET(configsRelWithDebInfo ALL DEPENDS ${configFileDestRelWithDebInfo})
+		ADD_CUSTOM_TARGET(configsMinSizeRel		ALL DEPENDS ${configFileDestMinSizeRel})
+		ADD_CUSTOM_TARGET(configsDebug			ALL DEPENDS ${configFileDestDebug})
+
+	else()
+
+		ADD_CUSTOM_TARGET(configs ALL DEPENDS ${configFileDest})
+
+	endif()
 
     if(APPLE)
 	    SET(CMAKE_CXX_LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
@@ -436,6 +466,7 @@ else()
 							${webAsmPlay_BINARY_DIR}/thirdParty/libssh2.redist.1.4.3.1/build/native/bin/v110/x64/Release/dynamic/cdecl/libssh2.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/openssl.redist.1.0.1.25/build/native/bin/v120/x64/Release/dynamic/libeay32.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/openssl.redist.1.0.1.25/build/native/bin/v120/x64/Release/dynamic/ssleay32.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8/lib/native/v140/windesktop/msvcstl/dyn/rt-dyn/x64/MinSizeRel/zlib.dll
                             #"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
 							#"${SDL2_IMAGE_LIBRARY_PATH}/zlib1.dll"
 							#"${SDL2_IMAGE_LIBRARY_PATH}/libwebp-7.dll"
