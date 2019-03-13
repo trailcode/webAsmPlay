@@ -171,99 +171,6 @@ namespace
 		return TileBuffer(ret, size);
 	}
 
-	void fetchTile(const int ID, GLuint * textureID, const string & quadKey)
-	{
-#ifndef __EMSCRIPTEN__
-
-		const string tileCachePath = "./tiles/" + quadKey + ".jpg";
-
-		if(fileExists(tileCachePath))
-		{
-			uploaderPool.push([textureID, tileCachePath](int ID)
-			{
-				if(!contextSet)
-				{ 
-					glfwMakeContextCurrent(threadWin);
-
-					contextSet = true;
-				}
-
-				*textureID = Textures::load(tileCachePath);
-			});
-		}
-		else
-		{
-			TileBuffer tileBuffer = downloadTile(ID, quadKey);
-
-			uploaderPool.push([textureID, tileBuffer, tileCachePath](int ID)
-			{
-				if(!contextSet)
-				{ 
-					glfwMakeContextCurrent(threadWin);
-
-					contextSet = true;
-				}
-
-				*textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
-
-				if(!fileExists(tileCachePath))
-				{
-					FILE * fp = fopen(tileCachePath.c_str(), "wb");
-
-					if(fp)
-					{
-						fwrite(get<0>(tileBuffer), sizeof(char), get<1>(tileBuffer), fp);
-
-						fclose(fp);
-					}
-					else
-					{
-						dmess("Warn could not write file: " << tileCachePath);
-					}
-				}
-
-				if( get<0>(tileBuffer) )
-				{
-					free ( (void *)get<0>(tileBuffer) );
-				}
-			});
-		}
-
-		//dmess("done " << quadKey);
-#endif
-	}
-
-    class BingTile
-    {
-    public:
-
-        BingTile(const string & quadKey, Renderable * r) : quadKey(quadKey), r(r)
-        {
-#ifndef __EMSCRIPTEN__
-
-            loaderPool.push([this, quadKey](int ID) { fetchTile(ID, &textureID, quadKey) ;});
-
-#endif
-        }
-
-        ~BingTile()
-        {
-            // TODO cleanup
-        }
-
-		void render(Canvas * canvas) const { r->render(canvas) ;}
-
-        const string quadKey;
-
-        Renderable * r = NULL;
-
-        GLuint textureID = 0;
-
-    private:
-    };
-
-    vector<BingTile *> tiles;
-
 	FrameBuffer * textureBuffer = NULL;
 
 	class Tile
@@ -280,7 +187,7 @@ namespace
 
 		// TODO skip loading if no longer needed
 
-		bool loading = false;
+		atomic_bool loading = false;
 
 		Renderable * r = NULL;
 
@@ -415,7 +322,7 @@ void RenderableBingMap::getStartLevel()
 
 		break;
 	}
-
+	
 	dmess("startLevel " << startLevel);
 
 	//startLevel = 14;
@@ -435,41 +342,6 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 
 		contextCreated = true;
 	}
-
-    minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), levelOfDetail);
-    maxTile = latLongToTile(dvec2(get<2>(bounds), get<3>(bounds)), levelOfDetail);
-
-	if(minTile.x > maxTile.x)
-	{
-		int tmp = minTile.x;  // TODO does this happen anymore?
-		minTile.x = maxTile.x;
-		maxTile.x = tmp;
-	}
-
-    for(int x = minTile.x; x <= maxTile.x; ++x)
-    for(int y = minTile.y; y <= maxTile.y; ++y)
-    {
-		//*
-        const dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 1), levelOfDetail);
-        const dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 0), levelOfDetail);
-		//*/
-
-		/*
-		const dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 0), levelOfDetail);
-		const dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 1), levelOfDetail);
-		*/
-
-        const string quadKey = tileToQuadKey(ivec2(x, y), levelOfDetail);
-
-        Renderable * r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
-
-        r->setShader(TextureShader::getDefaultInstance());
-
-        r->setRenderOutline (false);
-        r->setRenderFill    (true);
-
-        tiles.push_back(new BingTile(quadKey, r));
-    }
 }
 
 RenderableBingMap::~RenderableBingMap()
@@ -525,7 +397,7 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 	const Frustum * frust = canvas->getCameraFrustum();
 
-	if (level < 23 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
+	if (level < 22 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	//if (level < 12 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	{
 		const dvec3 subPoints[] = {	/* 0 */dvec3(tMin.x, tMax.y,	0),		/* 1 */dvec3(center.x, tMax.y,   0), /* 2 */dvec3(tMax.x, tMax.y,   0),
@@ -536,19 +408,6 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 											/* 3 */trans * dvec4(tMin.x, center.y, 0, 1), /* 4 */trans * dvec4(center.x, center.y, 0, 1), /* 5 */trans * dvec4(tMax.x, center.y, 0, 1),
 											/* 6 */trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */trans * dvec4(tMax.x, tMin.y,   0, 1)};
 
-		/*
-		dvec3 screenPoints[6];
-
-		for(size_t i = 0; i < 6; ++i)
-		{
-			screenPoints[i] = project(subPointsTrans[i], canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
-
-			dvec4 p = canvas->getMVP_Ref() * dvec4(subPointsTrans[i], 1.0);
-
-			//dmess("screen " << i << " " << screenPoints[i]);
-			dmess("screen " << i << " " << p);
-		}
-		*/
 		
 		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;} else { ++culled ;}
 		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;} else { ++culled ;}
@@ -592,6 +451,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
 
+	/*
     for(const auto r : tiles)
     {
         if(!r->textureID) { continue ;}
@@ -600,10 +460,11 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 		
         r->render(canvas);
     }
+	*/
 
 	//Frustum frustum(canvas->getMVP_Ref());
 
-	size_t startLevel = 11;
+	//size_t startLevel = 11;
 
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
 
