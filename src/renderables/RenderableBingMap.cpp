@@ -126,8 +126,6 @@ namespace
 			if (!myHandle) { dmessError("Could not create CURL handle!") ;}
 		}
 
-		//dmess("Start!");
-
 		CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
 		struct BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
 		output->buffer = NULL;
@@ -140,15 +138,7 @@ namespace
 		curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
 		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)output); // Passing our BufferStruct to LC
 
-																	   /*
-																	   const string url =  "https://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
-																	   quadKey +
-																	   "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
-																	   */
-
-		const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + 
-			quadKey +
-			"?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
+		const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
 
 		//dmess("url " << url);
 
@@ -161,10 +151,7 @@ namespace
 
 		const size_t size = output->size;
 
-		if (!ret)
-		{
-			dmess("Error!");
-		}
+		//if (!ret) { dmess("Error!") ;} // It will retry later
 
 		delete output;
 
@@ -177,13 +164,10 @@ namespace
 	{
 	public:
 
-		Tile(const dvec2 & center, const size_t level) : center(center), level(level)
-		{
-			
-		}
+		Tile(const dvec2 & center, const size_t level) : center(center), level(level) {}
 
-		const dvec2 center;
-		const size_t level;
+		const dvec2		center;
+		const size_t	level;
 
 		// TODO skip loading if no longer needed
 
@@ -271,32 +255,12 @@ namespace
 
 		unordered_map<string, Tile *>::const_iterator i = currTileSet.find(buf);
 
-		Tile * tile;
-
-		if (i != currTileSet.end())
-		{
-			tile = i->second;
-		}
-		else
-		{
-			tile = new Tile(center, level);
-
-			currTileSet[buf] = tile;
-		}
-
-		/*
-		switch (tile->state)
-		{
-		case Tile::UNLOADED:
-			break;
-		case Tile:
-		}
-		*/
-
-		return tile;
+		if (i != currTileSet.end()) { return i->second ;}
+	
+		return currTileSet[buf] = new Tile(center, level);
 	}
 
-	vector<Tile *> tiles2;
+	vector<Tile *> tiles;
 }
 
 void RenderableBingMap::getStartLevel()
@@ -306,27 +270,15 @@ void RenderableBingMap::getStartLevel()
 		const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), i);
 		const ivec2 maxTile = latLongToTile(dvec2(get<2>(bounds), get<3>(bounds)), i);
 
-		dmess(i << " minTile " << minTile.x << " " << minTile.y << " " << maxTile.x << " " << maxTile.y);
-
-		//if(minTile.x == maxTile.x && minTile.y == maxTile.y)
-		if(minTile == maxTile)
-		{
-			dmess("     ddd ");
-
-			continue;
-		}
+		if(minTile == maxTile) { continue ;}
 
 		startLevel = i - 1;
 
-		//startLevel = i;
-
 		break;
 	}
-	
-	dmess("startLevel " << startLevel);
-
-	//startLevel = 14;
 }
+
+Renderable * RenderableBingMap::create(const AABB2D & bounds, const dmat4 & trans) { return new RenderableBingMap(bounds, trans) ;}
 
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds), trans(trans)
 {
@@ -349,14 +301,6 @@ RenderableBingMap::~RenderableBingMap()
 
 }
 
-Renderable * RenderableBingMap::create(const AABB2D & bounds, const dmat4 & trans)
-{
-    return new RenderableBingMap(bounds, trans);
-}
-
-size_t culled = 0;
-size_t rendered = 0;
-
 void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, const dvec2 & tMax, const size_t level) const
 {
 	const dvec3 center = dvec4(((tMin + tMax) * 0.5), 0.0, 1.0);
@@ -376,12 +320,6 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	const ivec2 fbSize = canvas->getFrameBufferSize();
 
 	const dvec4 viewport(0.0, 0.0, fbSize.x, fbSize.y);
-
-	// https://stackoverflow.com/questions/35261192/how-to-use-glmproject-to-get-the-coordinates-of-a-point-in-world-space
-
-	const dvec3 screenCenter = project(transCenter, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
-
-	//dmess("screenCenter " << screenCenter);
 
 	const dvec3 screenP1 = project(transP1, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
 	const dvec3 screenP2 = project(transP2, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
@@ -409,40 +347,16 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 											/* 6 */trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */trans * dvec4(tMax.x, tMin.y,   0, 1)};
 
 		
-		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;} else { ++culled ;}
-		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;} else { ++culled ;}
-		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;} else { ++culled ;}
-		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;} else { ++culled ;}
+		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
+		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;}
+		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;}
+		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;}
 		// TODO try projecting into a different space and doing a simpler check.
 
 		return;
 	}
 
-	//dmess("screenPos " << screenCenter << " center " << center << " D1 " << D1 << " D2 " << D2 << " D3 " << D3 << " D4 " << D4);
-
-	tiles2.push_back(getTile(center, level));
-	 
-	/*
-	const dvec3 cameraPos = canvas->getCamera()->getCenter();
-
-	//dmess("P1 " << frustum.getPlane(0).classifyPoint(P1) << " " << distance(cameraPos, P1));
-
-	Renderable * r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
-
-	r->setShader(ColorShader::getDefaultInstance());
-
-	//ColorShader::getDefaultInstance()->
-
-	r->setRenderFill(true);
-	//r->setRenderFill(false);
-	r->setRenderOutline(true);
-
-	r->render(canvas);
-
-	delete r;
-
-	++rendered;
-	*/
+	tiles.push_back(getTile(center, level));
 }
 
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
@@ -451,39 +365,18 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
 
-	/*
-    for(const auto r : tiles)
-    {
-        if(!r->textureID) { continue ;}
-
-        TextureShader::getDefaultInstance()->setTextureID(r->textureID);
-		
-        r->render(canvas);
-    }
-	*/
-
-	//Frustum frustum(canvas->getMVP_Ref());
-
-	//size_t startLevel = 11;
-
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
 
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), startLevel);
 	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), startLevel);
 
-	culled = 0;
-	rendered = 0;
-
-	tiles2.clear();
+	tiles.clear();
 
 	getTilesToRender(canvas, tMin, tMax, startLevel);
 
-	sort(tiles2.begin(), tiles2.end(), [](const Tile * A, const Tile * B)
-	{
-		return A->level < B->level;
-	});
+	sort(tiles.begin(), tiles.end(), [](const Tile * A, const Tile * B) { return A->level < B->level ;});
 
-	for (auto i : tiles2)
+	for (auto i : tiles)
 	{
 		if (i->textureID)
 		{
@@ -493,15 +386,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 				const dvec2 tMin = tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), i->level);
 				const dvec2 tMax = tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), i->level);
-				//*/
-
-				/*
-				const dvec2 tMin = tileToLatLong(ivec2(x + 0, y + 0), levelOfDetail);
-				const dvec2 tMax = tileToLatLong(ivec2(x + 1, y + 1), levelOfDetail);
-				*/
-
-				//const string quadKey = tileToQuadKey(ivec2(x, y), levelOfDetail);
-
+				
 				i->r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
 
 				i->r->setShader(TextureShader::getDefaultInstance());
@@ -521,6 +406,4 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 			loaderPool.push([i](int ID) { fetchTile(ID, i) ;});
 		}
 	}
-
-	//dmess("rendered " << rendered << " culled " << culled);
 }
