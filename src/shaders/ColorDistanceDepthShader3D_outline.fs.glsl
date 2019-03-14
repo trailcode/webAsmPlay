@@ -21,54 +21,55 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
+#version 330 core
+in vec4 vertexColorNear;
+in vec4 vertexColorFar;
+in vec4 position_in_view_space;
+in vec4 glPos;
 
-namespace
+out vec4 outColor;
+
+uniform float     width;
+uniform float     height;
+uniform sampler2D depthTex;
+
+bool canDiscard()
 {
-	ShaderProgram		* program			= NULL;
-	TextureLookupShader * defaultInstance	= NULL;
+	float posX = gl_FragCoord.x / width;
+	float posY = gl_FragCoord.y / height;
+	float deltaX = 1.0f / width;
+	float deltaY = 1.0f / height;
+	for(float x = -1.0f; x < 2.0f; x += 1.0f) 
+		for(float y = -1.0f; y < 2.0f; y += 1.0f)
+		{
+			vec4 t = texture(depthTex, vec2(posX + x * deltaX, posY + y * deltaY));
 
-	GLint vertInAttr;
-	GLint model;
-	GLint view;
-	GLint projection;
+			float v = abs(t.x - glPos.w);
+
+			if(v <= 0.0001) { return false ;}
+			//if(v <= 0.001) { return false ;}
+		}
+
+	return true;
 }
 
-void TextureLookupShader::ensureShader()
+void main()
 {
-	if(program) { return ;}
+	if(canDiscard()) { discard ;}
 
-	program = ShaderProgram::create("TextureLookupShader.vs.glsl",
-                                    "TextureLookupShader.fs.glsl",
-									"TextureLookupShader.gs.glsl",
-                                    Variables({{"vertIn",      vertInAttr}}),
-                                    Variables({{"model",       model     },
-                                                {"view",       view      },
-												{"projection", projection}}));
+	float minDist = 0.0;
+	float maxDist = 5.0;
 
-	defaultInstance = new TextureLookupShader();
-}
+	// computes the distance between the fragment position 
+	// and the origin (4th coordinate should always be 1 
+	// for points). The origin in view space is actually 
+	// the camera position.
+	float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
 
-TextureLookupShader* TextureLookupShader::getDefaultInstance() { return defaultInstance ;}
+	dist = min(maxDist, dist) / maxDist;
 
-TextureLookupShader::TextureLookupShader() : Shader("TextureLookupShader")
-{
-
-}
-
-TextureLookupShader::~TextureLookupShader()
-{
-
-}
-
-void TextureLookupShader::bind( Canvas     * canvas,
-								const bool   isOutline,
-								const size_t renderingStage)
-{
-
+	outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
 }

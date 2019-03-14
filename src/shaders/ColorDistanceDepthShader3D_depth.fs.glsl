@@ -21,54 +21,16 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
+#version 330 core
 
-namespace
+in  vec4 glPos;
+out vec4 outColor;
+
+void main()
 {
-	ShaderProgram		* program			= NULL;
-	TextureLookupShader * defaultInstance	= NULL;
-
-	GLint vertInAttr;
-	GLint model;
-	GLint view;
-	GLint projection;
-}
-
-void TextureLookupShader::ensureShader()
-{
-	if(program) { return ;}
-
-	program = ShaderProgram::create("TextureLookupShader.vs.glsl",
-                                    "TextureLookupShader.fs.glsl",
-									"TextureLookupShader.gs.glsl",
-                                    Variables({{"vertIn",      vertInAttr}}),
-                                    Variables({{"model",       model     },
-                                                {"view",       view      },
-												{"projection", projection}}));
-
-	defaultInstance = new TextureLookupShader();
-}
-
-TextureLookupShader* TextureLookupShader::getDefaultInstance() { return defaultInstance ;}
-
-TextureLookupShader::TextureLookupShader() : Shader("TextureLookupShader")
-{
-
-}
-
-TextureLookupShader::~TextureLookupShader()
-{
-
-}
-
-void TextureLookupShader::bind( Canvas     * canvas,
-								const bool   isOutline,
-								const size_t renderingStage)
-{
-
+	//outColor = vec4(1,1,1,1);
+	outColor = vec4(glPos.w, glPos.w, glPos.w, 1);
 }

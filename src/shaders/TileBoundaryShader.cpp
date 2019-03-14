@@ -49,42 +49,10 @@ void TileBoundaryShader::ensureShader()
 {
     if(shaderProgram) { return ;}
 
-    // Shader sources
-    const GLchar* vertexSource = R"glsl(#version 330 core
-        in vec3 vertIn;
-        uniform mat4 MVP;
-        
-        void main()
-        {
-            gl_Position = MVP * vec4(vertIn.xyz, 1);
-        }
-    )glsl";
-
-    const GLchar * geometrySource = R"glsl(#version 330 core
-        in vec3 vertIn;
-        uniform mat4 MVP;
-        
-        void main()
-        {
-            gl_Position = MVP * vec4(vertIn.xyz, 1);
-        }
-    )glsl";
-
-    const GLchar* fragmentSource = R"glsl(#version 330 core
-        out vec4 outColor;
-        uniform sampler2D tex;
-
-        void main()
-        {
-            outColor = vec4(1,1,1,1);
-        }
-    )glsl";
-
-    shaderProgram = ShaderProgram::create(  vertexSource,
-                                            fragmentSource,
-                                            geometrySource,
-                                            Variables({{"vertIn",       vertInAttrLoc}
-                                                       }),
+    shaderProgram = ShaderProgram::create(  "TileBoundaryShader.vs.glsl",
+                                            "TileBoundaryShader.fs.glsl",
+                                            "TileBoundaryShader.gs.glsl",
+                                            Variables({{"vertIn",       vertInAttrLoc}}),
                                             Variables({{"MVP",          MVP_Loc}}));
 
     defaultInstance = new TileBoundaryShader();

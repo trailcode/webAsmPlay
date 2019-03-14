@@ -51,73 +51,18 @@ namespace
 
 void ColorDistanceShader::ensureShader()
 {
-    dmess("ColorDistanceShader::ensureShader");
+	if(shaderProgram) { return ;}
 
-    // Shader sources
-    const GLchar* vertexSource = R"glsl(#version 330 core
-        uniform sampler2D tex;
-
-        layout(location = 0) in vec2  vertIn;
-        layout(location = 1) in float vertColorIn;
-        
-        uniform mat4 MVP;
-        uniform mat4 MV;
-        uniform float colorLookupOffset;
-        
-        out vec4 vertexColorNear;
-        out vec4 vertexColorFar;
-        out vec4 position_in_view_space;
-
-        void main()
-        {
-            vec4 vert = vec4(vertIn.xy, 0, 1);
-            //vec4 vert = vec4(vertIn.xyz, 1);
-
-            position_in_view_space = MV * vert;
-
-            gl_Position = MVP * vert;
-
-            vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
-            vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
-        }
-    )glsl";
-
-    const GLchar* fragmentSource = R"glsl(#version 330 core
-        in vec4 vertexColorNear;
-        in vec4 vertexColorFar;
-        in vec4 position_in_view_space;
-
-        out vec4 outColor;
-
-        void main()
-        {
-            float minDist = 0.0;
-            float maxDist = 5.0;
-
-            // computes the distance between the fragment position 
-            // and the origin (4th coordinate should always be 1 
-            // for points). The origin in view space is actually 
-            // the camera position.
-            float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
-            
-            dist = min(maxDist, dist) / maxDist;
-
-            outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
-        }
-    )glsl";
-
-    shaderProgram = ShaderProgram::create(  vertexSource,
-                                            fragmentSource,
-                                            Variables({{"vertIn",            vertInAttrLoc},
-                                                       {"vertColorIn",       vertColorInAttrLoc}}),
-                                            Variables({{"MV",                MV_Loc},
-                                                       {"MVP",               MVP_Loc},
-                                                       {"tex",               texUniformLoc},
-                                                       {"colorLookupOffset", colorLookupOffsetLoc}}));
+    shaderProgram = ShaderProgram::create(  "ColorDistanceShader.vs.glsl",
+                                            "ColorDistanceShader.fs.glsl",
+                                            Variables({{"vertIn",            vertInAttrLoc			},
+                                                       {"vertColorIn",       vertColorInAttrLoc		}}),
+                                            Variables({{"MV",                MV_Loc					},
+                                                       {"MVP",               MVP_Loc				},
+                                                       {"tex",               texUniformLoc			},
+                                                       {"colorLookupOffset", colorLookupOffsetLoc	}}));
 
     defaultInstance = new ColorDistanceShader();
-
-    dmess("Done ColorDistanceShader::ensureShader");
 }
 
 ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader")

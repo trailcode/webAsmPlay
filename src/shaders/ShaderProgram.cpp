@@ -30,25 +30,31 @@
 using namespace std;
 using namespace glm;
 
-ShaderProgram * ShaderProgram::create(const GLchar    * vertexSource,
-                                      const GLchar    * fragmentSource,
-                                      const Variables & attributes,
-                                      const Variables & uniforms)
+ShaderProgram * ShaderProgram::create(	const string    & vertexSourceFile,
+										const string    & fragmentSourceFile,
+										const Variables & attributes,
+										const Variables & uniforms)
 {
-    return create(vertexSource, fragmentSource, NULL, attributes, uniforms);
+    return create(vertexSourceFile, fragmentSourceFile, "", attributes, uniforms);
 }
 
-ShaderProgram * ShaderProgram::create(const GLchar    * vertexSource,
-                                      const GLchar    * fragmentSource,
-                                      const GLchar    * geometrySource,
-                                      const Variables & attributes,
-                                      const Variables & uniforms)
+ShaderProgram * ShaderProgram::create(	const string	& vertexSourceFile,
+										const string    & fragmentSourceFile,
+										const string	& geometrySourceFile,
+										const Variables & attributes,
+										const Variables & uniforms)
 {
     GLuint shaderProgram = 0;
     GLint  success       = 0;
 
     // Create and compile the vertex shader
     const GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	
+	const string _vertexSource		= readFile(vertexSourceFile);
+	const string _fragmentSource	= readFile(fragmentSourceFile);
+
+	const GLchar * vertexSource		= _vertexSource.c_str();
+	const GLchar * fragmentSource	= _fragmentSource.c_str();
 
     GL_CHECK(glShaderSource(vertexShader, 1, &vertexSource, NULL));
 
@@ -87,13 +93,11 @@ ShaderProgram * ShaderProgram::create(const GLchar    * vertexSource,
 
     GLuint geometryShader = 0;
 
-    if(geometrySource)
+    if(geometrySourceFile != "")
     {
         #ifdef __EMSCRIPTEN__
 
-            dmess("Error: WebGL does not support geometry shaders :(");
-
-            abort();
+            dmessError("Error: WebGL does not support geometry shaders :(");
 
         #endif
 
@@ -101,6 +105,10 @@ ShaderProgram * ShaderProgram::create(const GLchar    * vertexSource,
 
         geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
 
+		const string _geometrySource  = readFile(geometrySourceFile);
+
+		const GLchar * geometrySource = _geometrySource.c_str();
+		
         GL_CHECK(glShaderSource(geometryShader, 1, &geometrySource, NULL));
 
         GL_CHECK(glCompileShader(geometryShader));
@@ -123,7 +131,7 @@ ShaderProgram * ShaderProgram::create(const GLchar    * vertexSource,
 
     GL_CHECK(glAttachShader(shaderProgram, vertexShader));
 
-    if(geometrySource) { GL_CHECK(glAttachShader(shaderProgram, geometryShader)) ;}
+    if(geometrySourceFile != "") { GL_CHECK(glAttachShader(shaderProgram, geometryShader)) ;}
 
     GL_CHECK(glAttachShader(shaderProgram, fragmentShader));
 

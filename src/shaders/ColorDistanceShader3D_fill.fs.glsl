@@ -21,54 +21,42 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
+#version 330 core
 
-namespace
+in vec4 vertexColorNear;
+in vec4 vertexColorFar;
+in vec4 position_in_view_space;
+in vec3 normal; 
+in vec3 fragPos;
+uniform vec3 lightPos;
+
+out vec4 outColor;
+
+void main()
 {
-	ShaderProgram		* program			= NULL;
-	TextureLookupShader * defaultInstance	= NULL;
+	float minDist = 0.0;
+	float maxDist = 5.0;
+	vec3 lightColor = vec3(1,1,1);
+	//vec3 objectColor = vec3(1,1,0);
+	vec3 viewPos = vec3(0,0,0);
 
-	GLint vertInAttr;
-	GLint model;
-	GLint view;
-	GLint projection;
-}
+	// computes the distance between the fragment position 
+	// and the origin (4th coordinate should always be 1 
+	// for points). The origin in view space is actually 
+	// the camera position.
+	float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
 
-void TextureLookupShader::ensureShader()
-{
-	if(program) { return ;}
+	dist = min(maxDist, dist) / maxDist;
 
-	program = ShaderProgram::create("TextureLookupShader.vs.glsl",
-                                    "TextureLookupShader.fs.glsl",
-									"TextureLookupShader.gs.glsl",
-                                    Variables({{"vertIn",      vertInAttr}}),
-                                    Variables({{"model",       model     },
-                                                {"view",       view      },
-												{"projection", projection}}));
+	vec4 objectColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
 
-	defaultInstance = new TextureLookupShader();
-}
+	vec3 lightDir = normalize(lightPos - fragPos);
 
-TextureLookupShader* TextureLookupShader::getDefaultInstance() { return defaultInstance ;}
-
-TextureLookupShader::TextureLookupShader() : Shader("TextureLookupShader")
-{
-
-}
-
-TextureLookupShader::~TextureLookupShader()
-{
-
-}
-
-void TextureLookupShader::bind( Canvas     * canvas,
-								const bool   isOutline,
-								const size_t renderingStage)
-{
-
+	float diff = max(dot(normal, lightDir), 0.0);
+	vec3 diffuse = diff * lightColor;
+	vec3 result = diffuse * vec3(objectColor);
+	outColor = vec4(result, objectColor.w);
 }

@@ -38,18 +38,17 @@ class ShaderProgram
 {
 public:
 
-    static ShaderProgram * create(const GLchar    * vertexSource,
-                                  const GLchar    * fragmentSource,
-                                  const GLchar    * geometrySource   = NULL,
-                                  const Variables & attributes       = Variables(),
-                                  const Variables & uniforms         = Variables());
+    static ShaderProgram * create(const std::string & vertexSourceFile,
+                                  const std::string & fragmentSourceFile,
+                                  const std::string & geometrySourceFile,
+                                  const Variables	& attributes       = Variables(),
+                                  const Variables	& uniforms         = Variables());
 
-    static ShaderProgram * create(const GLchar    * vertexSource,
-                                  const GLchar    * fragmentSource,
-                                  const Variables & attributes,
-                                  const Variables & uniforms = Variables());
-                                  
-
+    static ShaderProgram * create(	const std::string & vertexSourceFile,
+									const std::string & fragmentSourceFile,
+									const Variables   & attributes,
+									const Variables   & uniforms = Variables());
+    
     void bind();
 
     GLuint getProgramHandle() const;

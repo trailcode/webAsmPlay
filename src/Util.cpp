@@ -135,3 +135,12 @@ bool fileExists(const string & fileName)
 
 #endif
 }
+
+string readFile(const string fileName)
+{
+	ifstream t(fileName);
+
+	if (!t.is_open()) { dmessError("Error could not open file: " << fileName) ;}
+
+	return string((std::istreambuf_iterator<char>(t)), istreambuf_iterator<char>());
+}

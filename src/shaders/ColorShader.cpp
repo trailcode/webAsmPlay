@@ -45,32 +45,8 @@ void ColorShader::ensureShader()
 {
     if(shaderProgram) { return ;}
 
-    // Shader sources
-    const GLchar* vertexSource = R"glsl(#version 330 core
-        layout(location = 0) in vec3 vertIn;
-        out vec4 vertexColor;
-        uniform mat4 MVP;
-        uniform vec4 colorIn;
-
-        void main()
-        {
-            gl_Position = MVP * vec4(vertIn.xyz, 1);
-            vertexColor = colorIn;
-        }
-    )glsl";
-
-    const GLchar* fragmentSource = R"glsl(#version 330 core
-        out vec4 outColor;
-        in vec4 vertexColor;
-
-        void main()
-        {
-            outColor = vertexColor;
-        }
-    )glsl";
-
-    shaderProgram = ShaderProgram::create(  vertexSource,
-                                            fragmentSource,
+    shaderProgram = ShaderProgram::create(  "ColorShader.vs.glsl",
+                                            "ColorShader.fs.glsl",
                                             Variables({{"vertIn",   vertInAttrLoc}}),
                                             Variables({{"MVP",      MVP_Loc},
                                                        {"colorIn",  colorInUniformLoc}}));

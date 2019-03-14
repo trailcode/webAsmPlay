@@ -57,40 +57,11 @@ void SkyBox::ensureShader()
 {
     if(skyboxShader) { return ;}
 
-    // Shader sources
-    const GLchar* vertexSource = R"glsl(#version 330 core
-        in vec3 vertIn;
-        uniform mat4 MVP; 
-        out vec3 texcoords;
-        
-        void main()
-        {
-            texcoords = vertIn;
-
-            gl_Position = MVP * vec4(vertIn, 1.0);
-        }
-    )glsl";
-
-    const GLchar* fragmentSource = R"glsl(#version 330 core
-        in vec3 texcoords;
-        uniform samplerCube cubeTexture;
-        out vec4 frag_colour;
-        
-        void main()
-        {
-            frag_colour = texture(cubeTexture, texcoords);
-        }
-    )glsl";
-
-    skyboxShader = ShaderProgram::create(vertexSource,
-                                         fragmentSource,
+    skyboxShader = ShaderProgram::create("SkyBoxShader.vs.glsl",
+                                         "SkyBoxShader.fs.glsl",
                                          Variables({{"vertIn",      vertInLoc}}),
                                          Variables({{"MVP",         MVP_Loc},
                                                     {"cubeTexture", cubeTextureLoc}}));
-
-    dmess("vertInLoc " << vertInLoc);
-    dmess("MVP_Loc " << MVP_Loc);
-    dmess("cubeTextureLoc " << cubeTextureLoc);
 }
 
 SkyBox::SkyBox()

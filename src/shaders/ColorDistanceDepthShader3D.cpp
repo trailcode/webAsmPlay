@@ -78,245 +78,34 @@ namespace
 
 void ColorDistanceDepthShader3D::ensureShader()
 {
-    const GLchar* vertexSourceDepth = R"glsl(#version 330 core
+	if(defaultInstance) { return ;}
 
-        layout(location = 0) in vec3 vertIn;
-        
-        uniform mat4   model;
-        uniform mat4   view;
-        uniform mat4   projection;
-        uniform float  heightMultiplier;
+    shaderProgramDepth = ShaderProgram::create(		"ColorDistanceDepthShader3D_depth.vs.glsl",
+													"ColorDistanceDepthShader3D_depth.fs.glsl",
+													Variables({{"vertIn",               vertInAttrDepth			}}),
+													Variables({{"model",                modelDepth				},
+													           {"view",                 viewDepth				},
+													           {"projection",           projectionDepth			},
+													           {"heightMultiplier",     heightMultiplierDepth	}}));
 
-        out vec4 glPos;
+    shaderProgramFill = ShaderProgram::create(		"ColorDistanceDepthShader3D_fill.vs.glsl",
+													"ColorDistanceDepthShader3D_fill.fs.glsl",
+													Variables({{"vertIn",               vertInAttrFill			},
+													           {"vertColorIn",          vertColorInAttrFill		},
+													           {"normalIn",             normalInAttrFill		}}),
+													Variables({{"tex",                  texUniformFill			},
+													           {"depthTex",             depthTexUniformFill		},
+													           {"model",                modelFill				},
+													           {"view",                 viewFill				},
+													           {"projection",           projectionFill			},
+													           {"colorLookupOffset",    colorLookupOffsetFill	},
+													           {"heightMultiplier",     heightMultiplierFill	},
+													           {"lightPos",             lightPosUniformFill		},
+													           {"width",                widthUniformFill		},
+													           {"height",               heightUniformFill		}}));
 
-        void main()
-        {
-            vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
-
-            gl_Position = projection * view * model * vert;
-
-            glPos = gl_Position;
-        }
-    )glsl";
-
-    const GLchar* fragmentSourceDepth = R"glsl(#version 330 core
-        in  vec4 glPos;
-        out vec4 outColor;
-
-        void main()
-        {
-            //outColor = vec4(1,1,1,1);
-            outColor = vec4(glPos.w, glPos.w, glPos.w, 1);
-        }
-    )glsl";
-
-    shaderProgramDepth = ShaderProgram::create( vertexSourceDepth,
-                                                fragmentSourceDepth,
-                                                Variables({{"vertIn",               vertInAttrDepth       }}),
-                                                Variables({{"model",                modelDepth            },
-                                                           {"view",                 viewDepth             },
-                                                           {"projection",           projectionDepth       },
-                                                           {"heightMultiplier",     heightMultiplierDepth }}));
-
-    // Shader sources
-    const GLchar* vertexSourceFill = R"glsl(#version 330 core
-
-        layout(location = 0) in vec3  vertIn;
-        layout(location = 1) in float vertColorIn;
-        layout(location = 2) in vec3  normalIn;
-        
-        uniform mat4      model;
-        uniform mat4      view;
-        uniform mat4      projection;
-        uniform float     colorLookupOffset;
-        uniform float     heightMultiplier;
-        uniform sampler2D tex;
-        
-        out vec4 vertexColorNear;
-        out vec4 vertexColorFar;
-        out vec4 position_in_view_space;
-        out vec3 normal;
-        out vec3 fragPos;
-        out vec4 glPos;
-
-        void main()
-        {
-            vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
-
-            fragPos = vec3(model * vert);
-
-            mat4 MV = view * model;
-
-            position_in_view_space = MV * vert;
-
-            gl_Position = projection * MV * vert;
-
-            glPos = gl_Position; // TODO just use gl_Position?
-
-            vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
-            vertexColorFar  = texture(tex, vec2(vertColorIn + (2.0 + colorLookupOffset) / 32.0, 0.5));
-
-            normal = mat3(transpose(inverse(model))) * normalIn;
-        }
-    )glsl";
-
-    const GLchar* fragmentSourceFill = R"glsl(#version 330 core
-        uniform sampler2D depthTex;
-        in vec4 vertexColorNear;
-        in vec4 vertexColorFar;
-        in vec4 position_in_view_space;
-        in vec3 normal; 
-        in vec3 fragPos;
-        in vec4 glPos;
-
-        uniform vec3      lightPos;
-        uniform float     width;
-        uniform float     height;
-        
-        
-        out vec4 outColor;
-
-        void main()
-        {
-            vec4 t = texture(depthTex, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height));
-
-            float v = abs(t.x - glPos.w);
-
-            if(v > 0.0001)
-            {
-                discard;
-            }
-
-            float minDist = 0.0;
-            float maxDist = 5.0;
-            vec3 lightColor = vec3(1,1,1);
-            //vec3 objectColor = vec3(1,1,0);
-            vec3 viewPos = vec3(0,0,0);
-
-            // computes the distance between the fragment position 
-            // and the origin (4th coordinate should always be 1 
-            // for points). The origin in view space is actually 
-            // the camera position.
-            float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
-            
-            dist = min(maxDist, dist) / maxDist;
-
-            vec4 objectColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
-
-            vec3 lightDir = normalize(lightPos - fragPos);
-
-            float diff = max(dot(normal, lightDir), 0.0);
-            vec3 diffuse = diff * lightColor;
-            vec3 result = diffuse * vec3(objectColor);
-            if(distance(result, vec3(0,0,0)) < 0.0001)
-			//if(distance(result, vec3(0,0,0)) > 0.0001)
-            {
-                //discard;
-            }
-            outColor = vec4(result, objectColor.w);
-        }
-    )glsl";
-
-    shaderProgramFill = ShaderProgram::create(  vertexSourceFill,
-                                                fragmentSourceFill,
-                                                Variables({{"vertIn",               vertInAttrFill          },
-                                                           {"vertColorIn",          vertColorInAttrFill     },
-                                                           {"normalIn",             normalInAttrFill        }}),
-                                                Variables({{"tex",                  texUniformFill          },
-                                                           {"depthTex",             depthTexUniformFill     },
-                                                           {"model",                modelFill               },
-                                                           {"view",                 viewFill                },
-                                                           {"projection",           projectionFill          },
-                                                           {"colorLookupOffset",    colorLookupOffsetFill   },
-                                                           {"heightMultiplier",     heightMultiplierFill    },
-                                                           {"lightPos",             lightPosUniformFill     },
-                                                           {"width",                widthUniformFill        },
-                                                           {"height",               heightUniformFill       }}));
-
-    const GLchar* vertexSourceOutline = R"glsl(#version 330 core
-
-        layout(location = 0) in vec3  vertIn;
-        layout(location = 1) in float vertColorIn;
-        
-        uniform mat4      MVP;
-        uniform mat4      MV;
-        uniform float     colorLookupOffset;
-        uniform float     heightMultiplier;
-        uniform sampler2D tex; // TODO Rename, and the one above
-
-        out vec4 vertexColorNear;
-        out vec4 vertexColorFar;
-        out vec4 position_in_view_space;
-        out vec4 glPos;
-
-        void main()
-        {
-            vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
-
-            position_in_view_space = MV * vert;
-
-            gl_Position = MVP * vert;
-
-            glPos = gl_Position;
-
-            vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
-            vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
-        }
-    )glsl";
-
-    const GLchar* fragmentSourceOutline = R"glsl(#version 330 core
-        in vec4 vertexColorNear;
-        in vec4 vertexColorFar;
-        in vec4 position_in_view_space;
-        in vec4 glPos;
-
-        out vec4 outColor;
-
-        uniform float     width;
-        uniform float     height;
-        uniform sampler2D depthTex;
-
-        bool canDiscard()
-        {
-            float posX = gl_FragCoord.x / width;
-            float posY = gl_FragCoord.y / height;
-            float deltaX = 1.0f / width;
-            float deltaY = 1.0f / height;
-            for(float x = -1.0f; x < 2.0f; x += 1.0f) 
-            for(float y = -1.0f; y < 2.0f; y += 1.0f)
-            {
-                vec4 t = texture(depthTex, vec2(posX + x * deltaX, posY + y * deltaY));
-
-                float v = abs(t.x - glPos.w);
-
-                if(v <= 0.0001) { return false ;}
-				//if(v <= 0.001) { return false ;}
-            }
-
-            return true;
-        }
-
-        void main()
-        {
-            if(canDiscard()) { discard ;}
-
-            float minDist = 0.0;
-            float maxDist = 5.0;
-
-            // computes the distance between the fragment position 
-            // and the origin (4th coordinate should always be 1 
-            // for points). The origin in view space is actually 
-            // the camera position.
-            float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
-            
-            dist = min(maxDist, dist) / maxDist;
-
-            outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
-        }
-    )glsl";
-
-    shaderProgramOutline = ShaderProgram::create(   vertexSourceOutline,
-                                                    fragmentSourceOutline,
+    shaderProgramOutline = ShaderProgram::create(   "ColorDistanceDepthShader3D_outline.vs.glsl",
+                                                    "ColorDistanceDepthShader3D_outline.fs.glsl",
                                                     Variables({{"vertIn",            vertInAttrOutline          },
                                                                {"vertColorIn",       vertColorInAttrOutline     }}),
                                                     Variables({{"MV",                MV_Outline                 },

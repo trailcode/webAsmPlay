@@ -199,3 +199,5 @@ inline char * appendChar(std::vector<char> & data, const char value)
 }
 
 bool fileExists(const std::string& fileName);
+
+std::string readFile(const std::string fileName);

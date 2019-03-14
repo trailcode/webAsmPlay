@@ -47,43 +47,13 @@ void TextureShader::ensureShader()
 {
     if(shaderProgram) { return ;}
 
-    // Shader sources
-    const GLchar* vertexSource = R"glsl(#version 330 core
-        layout(location = 0) in vec3 vertIn;
-        layout(location = 3) in vec2 vertUV_In;
-        out vec2 UV;
-        uniform mat4 MVP;
-        
-        void main()
-        {
-            gl_Position = MVP * vec4(vertIn.xyz, 1);
-
-            UV = vertUV_In;
-        }
-    )glsl";
-
-    const GLchar* fragmentSource = R"glsl(#version 330 core
-        out vec4 outColor;
-        in vec2 UV;
-        uniform sampler2D tex;
-
-        void main()
-        {
-            outColor = texture( tex, UV );
-            
-            outColor.a = 1.0;
-        }
-    )glsl";
-
-    shaderProgram = ShaderProgram::create(  vertexSource,
-                                            fragmentSource,
+    shaderProgram = ShaderProgram::create(  "TextureShader.vs.glsl",
+                                            "TextureShader.fs.glsl",
                                             Variables({{"vertIn",       vertInAttrLoc},
                                                        {"vertUV_In",    vertUV_InAttrLoc}
                                                        }),
                                             Variables({{"MVP",          MVP_Loc},
                                                        {"tex",          texLoc}}));
-
-    dmess("shaderProgram " << shaderProgram);
 
     defaultInstance = new TextureShader();
 }

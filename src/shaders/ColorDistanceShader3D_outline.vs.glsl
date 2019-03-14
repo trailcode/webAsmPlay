@@ -21,54 +21,32 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
+#version 330 core
+uniform sampler2D tex;
 
-namespace
+layout(location = 0) in vec3  vertIn;
+layout(location = 1) in float vertColorIn;
+
+uniform mat4  MVP;
+uniform mat4  MV;
+uniform float colorLookupOffset;
+uniform float heightMultiplier;
+
+out vec4 vertexColorNear;
+out vec4 vertexColorFar;
+out vec4 position_in_view_space;
+
+void main()
 {
-	ShaderProgram		* program			= NULL;
-	TextureLookupShader * defaultInstance	= NULL;
+	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
 
-	GLint vertInAttr;
-	GLint model;
-	GLint view;
-	GLint projection;
-}
+	position_in_view_space = MV * vert;
 
-void TextureLookupShader::ensureShader()
-{
-	if(program) { return ;}
+	gl_Position = MVP * vert;
 
-	program = ShaderProgram::create("TextureLookupShader.vs.glsl",
-                                    "TextureLookupShader.fs.glsl",
-									"TextureLookupShader.gs.glsl",
-                                    Variables({{"vertIn",      vertInAttr}}),
-                                    Variables({{"model",       model     },
-                                                {"view",       view      },
-												{"projection", projection}}));
-
-	defaultInstance = new TextureLookupShader();
-}
-
-TextureLookupShader* TextureLookupShader::getDefaultInstance() { return defaultInstance ;}
-
-TextureLookupShader::TextureLookupShader() : Shader("TextureLookupShader")
-{
-
-}
-
-TextureLookupShader::~TextureLookupShader()
-{
-
-}
-
-void TextureLookupShader::bind( Canvas     * canvas,
-								const bool   isOutline,
-								const size_t renderingStage)
-{
-
+	vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
+	vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
 }

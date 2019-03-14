@@ -64,86 +64,8 @@ namespace
 
 void ColorDistanceShader3D::ensureShader()
 {
-    // Shader sources
-    const GLchar* vertexSourceFill = R"glsl(#version 330 core
-
-        uniform sampler2D tex; // TODO why does the ordering matter here? Something must not be correct.
-
-        layout(location = 0) in vec3  vertIn;
-        layout(location = 1) in float vertColorIn;
-        layout(location = 2) in vec3  normalIn;
-        
-        uniform mat4   model;
-        uniform mat4   view;
-        uniform mat4   projection;
-        uniform float  colorLookupOffset;
-        uniform float  heightMultiplier;
-        
-        out vec4 vertexColorNear;
-        out vec4 vertexColorFar;
-        out vec4 position_in_view_space;
-        out vec3 normal;
-        out vec3 fragPos;
-
-        void main()
-        {
-            vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
-
-            fragPos = vec3(model * vert);
-
-            mat4 MV = view * model;
-
-            position_in_view_space = MV * vert;
-
-            gl_Position = projection * MV * vert;
-
-            vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
-            vertexColorFar  = texture(tex, vec2(vertColorIn + (2.0 + colorLookupOffset) / 32.0, 0.5));
-
-            normal = mat3(transpose(inverse(model))) * normalIn;
-        }
-    )glsl";
-
-    const GLchar* fragmentSourceFill = R"glsl(#version 330 core
-        
-        in vec4 vertexColorNear;
-        in vec4 vertexColorFar;
-        in vec4 position_in_view_space;
-        in vec3 normal; 
-        in vec3 fragPos;
-        uniform vec3 lightPos;
-        
-        out vec4 outColor;
-
-        void main()
-        {
-            float minDist = 0.0;
-            float maxDist = 5.0;
-            vec3 lightColor = vec3(1,1,1);
-            //vec3 objectColor = vec3(1,1,0);
-            vec3 viewPos = vec3(0,0,0);
-
-            // computes the distance between the fragment position 
-            // and the origin (4th coordinate should always be 1 
-            // for points). The origin in view space is actually 
-            // the camera position.
-            float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
-            
-            dist = min(maxDist, dist) / maxDist;
-
-            vec4 objectColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
-
-            vec3 lightDir = normalize(lightPos - fragPos);
-
-            float diff = max(dot(normal, lightDir), 0.0);
-            vec3 diffuse = diff * lightColor;
-            vec3 result = diffuse * vec3(objectColor);
-            outColor = vec4(result, objectColor.w);
-        }
-    )glsl";
-
-    shaderProgramFill = ShaderProgram::create(  vertexSourceFill,
-                                                fragmentSourceFill,
+    shaderProgramFill = ShaderProgram::create(  "ColorDistanceShader3D_fill.vs.glsl",
+                                                "ColorDistanceShader3D_fill.fs.glsl",
                                                 Variables({{"vertIn",               vertInAttrFill          },
                                                            {"vertColorIn",          vertColorInAttrFill     },
                                                            {"normalIn",             normalInAttrFill        }}),
@@ -155,61 +77,8 @@ void ColorDistanceShader3D::ensureShader()
                                                            {"heightMultiplier",     heightMultiplierFill    },
                                                            {"lightPos",             lightPosUniformFill     }}));
 
-    const GLchar* vertexSourceOutline = R"glsl(#version 330 core
-        uniform sampler2D tex;
-
-        layout(location = 0) in vec3  vertIn;
-        layout(location = 1) in float vertColorIn;
-        
-        uniform mat4  MVP;
-        uniform mat4  MV;
-        uniform float colorLookupOffset;
-        uniform float heightMultiplier;
-        
-        out vec4 vertexColorNear;
-        out vec4 vertexColorFar;
-        out vec4 position_in_view_space;
-
-        void main()
-        {
-            vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
-
-            position_in_view_space = MV * vert;
-
-            gl_Position = MVP * vert;
-
-            vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
-            vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
-        }
-    )glsl";
-
-    const GLchar* fragmentSourceOutline = R"glsl(#version 330 core
-        in vec4 vertexColorNear;
-        in vec4 vertexColorFar;
-        in vec4 position_in_view_space;
-
-        out vec4 outColor;
-
-        void main()
-        {
-            float minDist = 0.0;
-            float maxDist = 5.0;
-
-            // computes the distance between the fragment position 
-            // and the origin (4th coordinate should always be 1 
-            // for points). The origin in view space is actually 
-            // the camera position.
-            float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
-            
-            dist = min(maxDist, dist) / maxDist;
-
-            outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
-            //outColor = vec4(1,1,1,1);
-        }
-    )glsl";
-
-    shaderProgramOutline = ShaderProgram::create(   vertexSourceOutline,
-                                                    fragmentSourceOutline,
+    shaderProgramOutline = ShaderProgram::create(   "ColorDistanceShader3D_outline.vs.glsl",
+                                                    "ColorDistanceShader3D_outline.fs.glsl",
                                                     Variables({{"vertIn",            vertInAttrOutline          },
                                                                {"vertColorIn",       vertColorInAttrOutline     }}),
                                                     Variables({{"MV",                MV_Outline                 },

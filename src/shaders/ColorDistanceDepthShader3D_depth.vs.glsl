@@ -21,54 +21,25 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
+#version 330 core
 
-namespace
+layout(location = 0) in vec3 vertIn;
+
+uniform mat4   model;
+uniform mat4   view;
+uniform mat4   projection;
+uniform float  heightMultiplier;
+
+out vec4 glPos;
+
+void main()
 {
-	ShaderProgram		* program			= NULL;
-	TextureLookupShader * defaultInstance	= NULL;
+	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
 
-	GLint vertInAttr;
-	GLint model;
-	GLint view;
-	GLint projection;
-}
+	gl_Position = projection * view * model * vert;
 
-void TextureLookupShader::ensureShader()
-{
-	if(program) { return ;}
-
-	program = ShaderProgram::create("TextureLookupShader.vs.glsl",
-                                    "TextureLookupShader.fs.glsl",
-									"TextureLookupShader.gs.glsl",
-                                    Variables({{"vertIn",      vertInAttr}}),
-                                    Variables({{"model",       model     },
-                                                {"view",       view      },
-												{"projection", projection}}));
-
-	defaultInstance = new TextureLookupShader();
-}
-
-TextureLookupShader* TextureLookupShader::getDefaultInstance() { return defaultInstance ;}
-
-TextureLookupShader::TextureLookupShader() : Shader("TextureLookupShader")
-{
-
-}
-
-TextureLookupShader::~TextureLookupShader()
-{
-
-}
-
-void TextureLookupShader::bind( Canvas     * canvas,
-								const bool   isOutline,
-								const size_t renderingStage)
-{
-
+	glPos = gl_Position;
 }
