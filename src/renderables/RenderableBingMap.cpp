@@ -171,7 +171,7 @@ namespace
 
 		// TODO skip loading if no longer needed
 
-		atomic_bool loading = false;
+		atomic_bool loading = {false};
 
 		Renderable * r = NULL;
 
