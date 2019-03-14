@@ -39,15 +39,37 @@ using namespace glm;
 using namespace geos;
 using namespace geos::geom;
 
-Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons,
-                                     const dmat4                      & trans,
-                                     const bool                         showProgress)
+Renderable * RenderableMesh::create(	const ColoredExtrudedGeometryVec & polygons,
+										const dmat4                      & trans,
+										const bool                         showProgress)
 {
-    time_point<system_clock> startTime;
-    
-    if(showProgress) { startTime = system_clock::now() ;}
+	return create(getTesselations(	polygons,
+									trans,
+									showProgress));
+}
 
-    Tessellations tessellations;
+Tessellations RenderableMesh::getTesselations(	const ColoredExtrudedGeometryVec & polygons,
+												const dmat4                      & trans,
+												const bool                         showProgress)
+{
+	Tessellations tessellations;
+
+	getTesselations(tessellations,
+					polygons,
+					trans,
+					showProgress);
+
+	return tessellations;
+}
+
+void RenderableMesh::getTesselations(	Tessellations					 & tessellations,
+										const ColoredExtrudedGeometryVec & polygons,
+										const dmat4                      & trans,
+										const bool                         showProgress)
+{
+	time_point<system_clock> startTime;
+
+	if(showProgress) { startTime = system_clock::now() ;}
 
     for(size_t i = 0; i < polygons.size(); ++i)
     {
@@ -86,14 +108,10 @@ Renderable * RenderableMesh::create( const ColoredExtrudedGeometryVec & polygons
         }
     }
 
-    Renderable * ret = createFromTessellations(tessellations);
-
     if(showProgress) { GUI::progress("", 1.0) ;}
-
-    return ret;
 }
 
-Renderable * RenderableMesh::createFromTessellations(const Tessellations & tessellations)
+Renderable * RenderableMesh::create(const Tessellations & tessellations)
 {
     VertexArrayObject * vao = VertexArrayObject::create(tessellations);
 

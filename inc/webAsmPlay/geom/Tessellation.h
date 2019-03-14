@@ -33,13 +33,15 @@ class Tessellation
 {
 public:
 
-    typedef std::vector<std::unique_ptr<const Tessellation> > Tessellations;
+	typedef std::unique_ptr<const Tessellation> ConstPtr;
 
-    static std::unique_ptr<const Tessellation> tessellatePolygon(const geos::geom::Polygon * poly,
-                                                                 const glm::dmat4          & trans,
-                                                                 const size_t                symbologyID = 0,
-                                                                 const double                height      = 0.0,
-                                                                 const double                minHeight   = 0.0);
+    typedef std::vector<ConstPtr> Tessellations;
+
+    static ConstPtr tessellatePolygon(	const geos::geom::Polygon * poly,
+                                                    const glm::dmat4          & trans,
+                                                    const size_t                symbologyID = 0,
+                                                    const double                height      = 0.0,
+                                                    const double                minHeight   = 0.0);
 
     static void tessellateMultiPolygon( const geos::geom::MultiPolygon  * multiPoly,
                                         const glm::dmat4                & trans,
@@ -79,3 +81,5 @@ private:
 };
 
 typedef Tessellation::Tessellations Tessellations;
+typedef Tessellation::ConstPtr		TessellationConstPtr;
+

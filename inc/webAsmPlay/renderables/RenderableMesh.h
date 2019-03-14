@@ -25,6 +25,7 @@
 */
 #pragma once
 
+#include <memory>
 #include <webAsmPlay/geom/Tessellation.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
@@ -40,11 +41,20 @@ public:
                                 const glm::dmat4                 & trans        = glm::mat4(1.0),
                                 const bool                         showProgress = false);
 
+	static Renderable * create(	const Tessellations				 & tessellations);
+
+	static void getTesselations(Tessellations					 & tessellations,
+								const ColoredExtrudedGeometryVec & polygons,
+								const glm::dmat4                 & trans        = glm::mat4(1.0),
+								const bool                         showProgress = false);
+
+	static Tessellations getTesselations(	const ColoredExtrudedGeometryVec & polygons,
+											const glm::dmat4                 & trans        = glm::mat4(1.0),
+											const bool                         showProgress = false);
+
     void render(Canvas * canvas, const size_t renderStage = 0) const override;
 
 private:
-
-    static Renderable * createFromTessellations(const Tessellations & tessellations);
 
     RenderableMesh(VertexArrayObject * vertexArrayObject);
 

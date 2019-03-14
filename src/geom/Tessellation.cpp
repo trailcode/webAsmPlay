@@ -55,11 +55,11 @@ Tessellation::~Tessellation()
     free(triangleIndices);
 }
 
-unique_ptr<const Tessellation> Tessellation::tessellatePolygon( const Polygon * poly,
-                                                                const dmat4   & trans,
-                                                                const size_t    symbologyID,
-                                                                const double    height,
-                                                                const double    minHeight)
+Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
+														const dmat4   & trans,
+														const size_t    symbologyID,
+														const double    height,
+														const double    minHeight)
 {
     Tessellation * ret = new Tessellation(symbologyID, height, minHeight);
 

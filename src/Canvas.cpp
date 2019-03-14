@@ -31,6 +31,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/TrackBallInteractor.h>
+#include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/Frustum.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
@@ -40,6 +41,7 @@
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 #include <webAsmPlay/renderables/SkyBox.h>
+#include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/Canvas.h>
@@ -164,9 +166,6 @@ bool Canvas::preRender()
 
     return true;
 }
-
-#include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorSymbology.h>
 
 GLuint Canvas::render()
 {

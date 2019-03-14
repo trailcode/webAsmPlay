@@ -25,8 +25,8 @@
 */
 
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 

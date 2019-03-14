@@ -32,6 +32,14 @@
 #include <memory>
 #include <glm/vec2.hpp>
 
+#ifndef __EMSCRIPTEN__
+
+#include <tbb/concurrent_queue.h>
+
+typedef tbb::concurrent_queue<std::function<void ()>> EventQueue;
+
+#endif
+
 class Attributes;
 class Edge;
 class Renderable;

@@ -33,7 +33,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/Camera.h>
-#include <webAsmPlay/shaders/ColorSymbology.h>
+#include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>

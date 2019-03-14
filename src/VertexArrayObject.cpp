@@ -221,9 +221,6 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     GLuint ebo2 = 0;
     GLuint vbo  = 0;
     
-    GL_CHECK(glGenVertexArrays(1, &vao));
-    GL_CHECK(glBindVertexArray(    vao));
-
     GL_CHECK(glGenBuffers(1, &vbo));
     GL_CHECK(glGenBuffers(1, &ebo));
     GL_CHECK(glGenBuffers(1, &ebo2));
@@ -237,6 +234,9 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
     GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
+
+	GL_CHECK(glGenVertexArrays(1, &vao));
+	GL_CHECK(glBindVertexArray(    vao));
 
     //IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS
 
@@ -347,25 +347,6 @@ void VertexArrayObject::bind(Shader * shader) const
     GL_CHECK(glBindVertexArray(vao));
     
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
-
-    /*
-    shader->setVertexArrayFormat(vertexFormat);
-
-    if(colorFormat.size)
-    {
-        shader->setColorArrayFormat(colorFormat);
-    }
-
-    if(normalFormat.size)
-    {
-        shader->setNormalArrayFormat(normalFormat);
-    }
-
-    if(uvFormat.size)
-    {
-        shader->setUV_ArrayFormat(uvFormat);
-    }
-    //*/
 }
 
 void VertexArrayObject::bindTriangles() const

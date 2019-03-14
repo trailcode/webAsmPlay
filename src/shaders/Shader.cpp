@@ -24,7 +24,7 @@
   \copyright 2018
 */
 
-#include <webAsmPlay/shaders/ColorSymbology.h>
+#include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/Shader.h>
 

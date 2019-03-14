@@ -46,12 +46,12 @@
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/OpenSteerCanvas.h>
+#include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
-#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/TileBoundaryShader.h>
 #include <webAsmPlay/shaders/TextureLookupShader.h>
@@ -97,6 +97,7 @@ int               GUI::cameraMode      = GUI::CAMERA_TRACK_BALL;
 bool              GUI::shuttingDown    = false;
 GeoClient       * GUI::client          = NULL;
 vector<Canvas *>  GUI::auxCanvases;
+EventQueue		  GUI::eventQueue;
 
 namespace
 {
@@ -407,6 +408,10 @@ void GUI::mainLoop(GLFWwindow * window)
     ImGui::NewFrame();
 #endif
 
+	function<void ()> callback;
+
+	if (eventQueue.try_pop(callback)) { callback() ;}
+
     static bool opt_fullscreen_persistant = true;
     static ImGuiDockNodeFlags opt_flags = ImGuiDockNodeFlags_None;
     bool opt_fullscreen = opt_fullscreen_persistant;
@@ -618,3 +623,4 @@ void GUI::createWorld()
     //});
 }
 
+void GUI::guiASync(function<void()> & callback) { eventQueue.push(callback) ;}

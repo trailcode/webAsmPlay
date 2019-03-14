@@ -92,6 +92,8 @@ public:
 
     static void createWorld();
 
+	static void guiASync(std::function<void ()> & callback);
+
 private:
 
     GUI() {}
@@ -150,4 +152,6 @@ private:
     static int cameraMode;
     
     static bool shuttingDown;
+
+	static EventQueue eventQueue;
 };
