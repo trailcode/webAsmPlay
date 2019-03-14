@@ -9,6 +9,8 @@ set(Boost_USE_STATIC_LIBS       OFF)
 set(Boost_USE_MULTITHREADED     ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
+set(EXPAT_INSTALL "/usr/local/Cellar/expat/2.2.6")
+
 if(MSVC_VERSION)
 
 	find_program(NUGET nuget)
@@ -140,7 +142,7 @@ file(GLOB opensteerSrc  "ThirdParty/opensteer/src/Clock.cpp"
 
 file(GLOB simpleJSON_SRC            "ThirdParty/SimpleJSON/src/*.cpp")
 file(GLOB imguiSrc                  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
-file(GLOB gl3wSrc                   "ThirdParty/gl3w/src/gl3w.c" "ThirdParty/sl3w/inc/GL/*.h" "ThirdParty/sl3w/inc/KHR/*.h")
+#file(GLOB gl3wSrc                   "ThirdParty/gl3w/src/gl3w.c" "ThirdParty/sl3w/inc/GL/*.h" "ThirdParty/sl3w/inc/KHR/*.h")
 file(GLOB webAsmPlay_SRC            "inc/webAsmPlay/*.h" "src/*.cpp")
 file(GLOB webAsmPlayShaders_SRC     "src/shaders/*.cpp" "inc/webAsmPlay/shaders/*.h")
 file(GLOB webAsmPlayShadersGLSL_SRC "src/shaders/*.glsl")
@@ -160,7 +162,7 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     ${simpleJSON_SRC}
                     ${opensteerSrc}
 					${imguiSrc}
-					${gl3wSrc}
+					#${gl3wSrc}
                     #"ThirdParty/imgui/glad/glad.c"
                     )
 				  
@@ -263,7 +265,7 @@ else()
 	include_directories(${GLFW3_INCLUDE_PATH})
 	include_directories(${TBB_INCLUDE_DIRS})
     include_directories(ThirdParty/ctpl)
-	include_directories(ThirdParty/gl3w/inc)
+	#include_directories(ThirdParty/gl3w/inc)
     include_directories(./)
     
 	link_libraries(debug ${CURL_LIBRARY_DEBUG} optimized ${CURL_LIBRARY_RELEASE})
@@ -272,10 +274,19 @@ else()
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
     link_libraries(${SDL2_LIBRARY})
-	link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG} optimized ${TBB_tbb_LIBRARY_RELEASE})
 	link_libraries(${OPENGL_gl_LIBRARY})
 	link_libraries(${GLEW_LIBRARY})
-	
+    
+    if(MSVC_VERSION)
+
+        link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG} optimized ${TBB_tbb_LIBRARY_RELEASE})
+
+    else()
+
+        link_libraries(${TBB_tbb_LIBRARY_RELEASE})
+
+    endif()
+    
 	link_directories(${Boost_LIBRARY_DIRS})
 
     set(ASSET_FILES     back.png
@@ -415,8 +426,8 @@ else()
 	add_executable(webAsmPlay "src/Main.cpp")
 	target_link_libraries(webAsmPlay libWebAsmPlay)
 
-	find_package(expat REQUIRED)
-	find_package(Boost COMPONENTS filesystem REQUIRED)
+	find_package(Expat REQUIRED)
+	find_package(Boost COMPONENTS filesystem system REQUIRED)
 	
 	add_executable(geoServer ${geoServer_SRC})
     
@@ -425,7 +436,9 @@ else()
 	target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
 
 	target_link_libraries(geoServer libWebAsmPlay)
-	target_link_libraries(geoServer ${EXPAT_LIBRARIES})
+    target_link_libraries(geoServer ${EXPAT_LIBRARIES}
+                            debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE}
+                            debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
 
 	if(MSVC_VERSION)
 
