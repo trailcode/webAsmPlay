@@ -141,12 +141,12 @@ file(GLOB opensteerSrc  "ThirdParty/opensteer/src/Clock.cpp"
                         "ThirdParty/opensteer/plugins/PedestriansWalkingAnEight.cpp"
                         "ThirdParty/opensteer/plugins/Soccer.cpp")
 
-
 file(GLOB simpleJSON_SRC            "ThirdParty/SimpleJSON/src/*.cpp")
 file(GLOB imguiSrc                  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
 file(GLOB gl3wSrc                   "ThirdParty/gl3w/src/gl3w.c" "ThirdParty/sl3w/inc/GL/*.h" "ThirdParty/sl3w/inc/KHR/*.h")
 file(GLOB webAsmPlay_SRC            "inc/webAsmPlay/*.h" "src/*.cpp")
 file(GLOB webAsmPlayShaders_SRC     "src/shaders/*.cpp" "inc/webAsmPlay/shaders/*.h")
+file(GLOB webAsmPlayShadersGLSL_SRC "src/shaders/*.glsl")
 file(GLOB webAsmPlayRenderables_SRC "src/renderables/*.cpp" "inc/webAsmPlay/renderables/*.h")
 file(GLOB webAsmPlayGeom_SRC        "src/geom/*.cpp" "inc/webAsmPlay/geom/*.h")
 file(GLOB webAsmPlayGUI_SRC	        "src/GUI/*.cpp""inc/webAsmPlay/GUI/*.h")
@@ -255,10 +255,7 @@ else()
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
 	find_package(GLEW REQUIRED)
-    #find_package(curl REQUIRED)
 	find_package(TBB REQUIRED)
-
-	#add_definitions(-DGLEW_STATIC)
 
 	include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${CURL_INCLUDE_DIR})
@@ -271,8 +268,6 @@ else()
 	include_directories(ThirdParty/gl3w/inc)
     include_directories(./)
     
-    #link_libraries(${GLEW_LIBRARIES})
-    #link_libraries(${CURL_LIBRARIES})
 	link_libraries(debug ${CURL_LIBRARY_DEBUG} optimized ${CURL_LIBRARY_RELEASE})
 	message(${GLFW3_LIBRARY})
 	link_libraries(${GLFW3_LIBRARY})
@@ -280,14 +275,10 @@ else()
     link_libraries(${SDL2_LIBRARIES})
     link_libraries(${SDL2_LIBRARY})
 	link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG} optimized ${TBB_tbb_LIBRARY_RELEASE})
-	#set(Boost_USE_STATIC_LIBS ON)
-    #link_libraries(${Boost_LIBRARIES})
 	link_libraries(${OPENGL_gl_LIBRARY})
 	link_libraries(${GLEW_LIBRARY})
 	
 	link_directories(${Boost_LIBRARY_DIRS})
-
-	message("=================== " ${CMAKE_CURRENT_BINARY_DIR})
 
     set(ASSET_FILES     back.png
                         bot.png
@@ -326,15 +317,6 @@ else()
 
     endforeach(assetFile)
 	
-	if(MSVC_VERSION)
-		ADD_CUSTOM_TARGET(assetsRelease			ALL DEPENDS ${assetFileDestRelease})
-		ADD_CUSTOM_TARGET(assetsRelWithDebInfo	ALL DEPENDS ${assetFileDestRelWithDebInfo})
-		ADD_CUSTOM_TARGET(assetsMinSizeRel		ALL DEPENDS ${assetFileDestMinSizeRel})
-		ADD_CUSTOM_TARGET(assetsDebug			ALL DEPENDS ${assetFileDestDebug})
-	else()
-		ADD_CUSTOM_TARGET(assets ALL DEPENDS ${assetFileDest})
-	endif()
-
     set(config_files imgui.ini config.json)
 
     foreach(configFile ${config_files})
@@ -361,16 +343,52 @@ else()
 
     endforeach(configFile)
 
+	foreach(shaderFilePath ${webAsmPlayShadersGLSL_SRC})
+
+		get_filename_component(shaderFile ${shaderFilePath} NAME)
+
+		if(MSVC_VERSION)
+
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			DEPENDS "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	DEPENDS "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		DEPENDS "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"				DEPENDS "${shaderFilePath}")
+
+			list(APPEND shaderFileDestRelease			"${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}")
+			list(APPEND shaderFileDestRelWithDebInfo	"${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}")
+			list(APPEND shaderFileDestMinSizeRel		"${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}")
+			list(APPEND shaderFileDestDebug				"${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}")
+
+		else()
+
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" DEPENDS "${shaderFilePath}")
+
+			list(APPEND shaderFileDest "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}")
+
+		endif()
+
+    endforeach(shaderFile)
+
 	if(MSVC_VERSION)
 
+		ADD_CUSTOM_TARGET(assetsRelease			ALL DEPENDS ${assetFileDestRelease})
+		ADD_CUSTOM_TARGET(assetsRelWithDebInfo	ALL DEPENDS ${assetFileDestRelWithDebInfo})
+		ADD_CUSTOM_TARGET(assetsMinSizeRel		ALL DEPENDS ${assetFileDestMinSizeRel})
+		ADD_CUSTOM_TARGET(assetsDebug			ALL DEPENDS ${assetFileDestDebug})
 		ADD_CUSTOM_TARGET(configsRelease		ALL DEPENDS ${configFileDestRelease})
 		ADD_CUSTOM_TARGET(configsRelWithDebInfo ALL DEPENDS ${configFileDestRelWithDebInfo})
 		ADD_CUSTOM_TARGET(configsMinSizeRel		ALL DEPENDS ${configFileDestMinSizeRel})
 		ADD_CUSTOM_TARGET(configsDebug			ALL DEPENDS ${configFileDestDebug})
+		ADD_CUSTOM_TARGET(shadersRelease		ALL DEPENDS ${shaderFileDestRelease})
+		ADD_CUSTOM_TARGET(shadersRelWithDebInfo	ALL DEPENDS ${shaderFileDestRelWithDebInfo})
+		ADD_CUSTOM_TARGET(shadersMinSizeRel		ALL DEPENDS ${shaderFileDestMinSizeRel})
+		ADD_CUSTOM_TARGET(shadersDebug			ALL DEPENDS ${shaderFileDestDebug})
 
 	else()
 
 		ADD_CUSTOM_TARGET(configs ALL DEPENDS ${configFileDest})
+		ADD_CUSTOM_TARGET(assets ALL DEPENDS ${assetFileDest})
+		ADD_CUSTOM_TARGET(shaders ALL DEPENDS ${shaderFileDest})
 
 	endif()
 
