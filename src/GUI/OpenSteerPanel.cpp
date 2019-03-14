@@ -46,7 +46,7 @@ void GUI::openSteerPanel()
 
         static int lines = 1000;
 
-        if(ImGui::SliderInt("Zombies", &lines, 1, 3000))
+        if(ImGui::SliderInt("Zombies", &lines, 1, 6000))
         {
             gPedestrianStartCount = lines;
         }

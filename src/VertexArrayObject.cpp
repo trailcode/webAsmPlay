@@ -251,15 +251,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
         sizeNormal = 3;
     }
 
-    if(USE_SYMBOLOGY_ID)
-    {
-        sizeColor = 1;
-    }
-
-    if(USE_UV_COORDS)
-    {
-        sizeUV = 2;
-    }
+    if(USE_SYMBOLOGY_ID) { sizeColor = 1 ;}
+    if(USE_UV_COORDS)	 { sizeUV	 = 2 ;}
 
     const size_t totalSize = (sizeVertex + sizeColor + sizeNormal + sizeUV) * sizeof(GLfloat);
 
