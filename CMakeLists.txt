@@ -23,13 +23,15 @@ if(MSVC_VERSION)
 	  execute_process(COMMAND ${NUGET} install boost_random-vc141		-Version 1.69.0.0	-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install boost_date_time-vc141	-Version 1.69.0.0	-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install boost_regex-vc141		-Version 1.69.0.0	-o thirdParty)
-	  execute_process(COMMAND ${NUGET} install curl						-Version 7.30.0.2	-o thirdParty)
+	  execute_process(COMMAND ${NUGET} install boost_system-vc141		-Version 1.69.0.0	-o thirdParty)
+	  execute_process(COMMAND ${NUGET} install curl-vc141-dynamic-x86_64 -Version 7.59.0	-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install glfw						-Version 3.2.1.5	-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install unofficial-flayan-glew	-Version 2.1.0		-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install tbb_oss					-Version 9.107.0	-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install expat					-Version 2.1.0.11	-o thirdParty)
 
 	  file(GLOB boost_files ${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc141.1.69.0.0/lib/native/*
+							${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc141.1.69.0.0/lib/native/*
 							${webAsmPlay_BINARY_DIR}/thirdParty/boost_random-vc141.1.69.0.0/lib/native/*
 							${webAsmPlay_BINARY_DIR}/thirdParty/boost_date_time-vc141.1.69.0.0/lib/native/*
 							${webAsmPlay_BINARY_DIR}/thirdParty/boost_regex-vc141.1.69.0.0/lib/native/*)
@@ -50,9 +52,10 @@ if(MSVC_VERSION)
 	set(TBB_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.9.107.0.0/build/native)
 	set(EXPAT_INCLUDE_SEARCH_DIRS		${webAsmPlay_BINARY_DIR}/thirdParty/expat.2.1.0.11/build/native/include)
     set(EXPAT_LIB_SEARCH_DIRS			${webAsmPlay_BINARY_DIR}/thirdParty/expat.2.1.0.11/build/native/lib/v110/x64)
-	set(CURL_INCLUDE_DIR				${webAsmPlay_BINARY_DIR}/thirdParty/curl.7.30.0.2/build/native/include)
-	set(CURL_LIBRARY_RELEASE			${webAsmPlay_BINARY_DIR}/thirdParty/curl.7.30.0.2/build/native/lib/v110/x64/Release/dynamic/libcurl.lib)
-	set(CURL_LIBRARY_DEBUG				${webAsmPlay_BINARY_DIR}/thirdParty/curl.7.30.0.2/build/native/lib/v110/x64/Debug/dynamic/libcurl.lib)
+	set(CURL_INCLUDE_DIR				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/include)
+	set(CURL_LIBRARY_RELEASE			${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl.lib)
+	set(CURL_LIBRARY_DEBUG				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl_debug.lib)
+
 
 endif()
 
@@ -173,6 +176,7 @@ if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
 endif()
 
+
 include_directories(ThirdParty)
 include_directories(ThirdParty/GLUTesselator/include)
 include_directories(ThirdParty/geos/include)
@@ -192,6 +196,7 @@ add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
 
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 add_definitions(-DGLM_FORCE_RADIANS)
+#add_definitions(-DCURL_STATICLIB)
 
 #add_definitions(-DIMGUI_API)
 
@@ -438,7 +443,8 @@ else()
 	target_link_libraries(geoServer libWebAsmPlay)
     target_link_libraries(geoServer ${EXPAT_LIBRARIES}
                             debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE}
-                            debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
+                            debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
+							)
 
 	if(MSVC_VERSION)
 
@@ -449,8 +455,7 @@ else()
 
 	    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc /std:c++latest /MP")
 
-        #install(FILES	${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILESYSTEM_BASE_NAME_RELEASE2}.dll
-                        #${BOOST_SYSTEM_PATH}/${BOOST_SYSTEM_BASE_NAME2}.dll
+        #install(FILES	${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILE AME2}.dll
                         #"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
                         #"${SDL2MAIN_LIBRARY_PATH}/SDL2.dll"
         #DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release
@@ -466,33 +471,27 @@ else()
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/libwebp-7.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/SDL2_image.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/zlib1.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/glfw.3.2.1.5/build/native/bin/dynamic/v140/x64/glfw3.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8/lib/native/v140/windesktop/msvcstl/dyn/rt-dyn/x64/MinSizeRel/zlib.dll)
+							${webAsmPlay_BINARY_DIR}/thirdParty/glfw.3.2.1.5/build/native/bin/dynamic/v140/x64/glfw3.dll)
 
         set(DLLS_RELEASE	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Release/tbb.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/expat.redist.2.1.0.11/build/native/bin/v110/x64/Release/dynamic/utf8/libexpat.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/curl.redist.7.30.0.2/build/native/bin/v110/x64/Release/dynamic/libcurl.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/libssh2.redist.1.4.3.1/build/native/bin/v110/x64/Release/dynamic/cdecl/libssh2.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/openssl.redist.1.0.1.25/build/native/bin/v120/x64/Release/dynamic/libeay32.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/openssl.redist.1.0.1.25/build/native/bin/v120/x64/Release/dynamic/ssleay32.dll)
+							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl.dll)
 
 		set(DLLS_DEBUG	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Debug/tbb_debug.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/expat.redist.2.1.0.11/build/native/bin/v110/x64/Debug/dynamic/utf8/libexpat.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/curl.redist.7.30.0.2/build/native/bin/v110/x64/Debug/dynamic/libcurl.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/libssh2.redist.1.4.3.1/build/native/bin/v110/x64/Debug/dynamic/cdecl/libssh2.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/openssl.redist.1.0.1.25/build/native/bin/v120/x64/Debug/dynamic/libeay32.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/openssl.redist.1.0.1.25/build/native/bin/v120/x64/Debug/dynamic/ssleay32.dll)
+							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl_debug.dll)
+
 
         foreach(dll ${DLLS_RELEASE} ${DLLS_COMMON})
-            #add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
-			#add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
-			#add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel")
+            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
+			add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
+			add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel")
         endforeach(dll)
 		
         foreach(dll ${DLLS_DEBUG} ${DLLS_COMMON})
-            #add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Debug")
         endforeach(dll)
 
 
