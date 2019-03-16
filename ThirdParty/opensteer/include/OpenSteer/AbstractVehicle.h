@@ -42,10 +42,8 @@
 
 #include "OpenSteer/LocalSpace.h"
 
-
 // STL vector containers
 #include <vector>
-
 
 // ----------------------------------------------------------------------------
 
@@ -72,7 +70,8 @@ namespace OpenSteer {
         virtual float setSpeed (float) = 0;
 
         // groups of (pointers to) abstract vehicles, and iterators over them
-        typedef std::vector<AbstractVehicle*> group;
+		typedef std::vector<AbstractVehicle*> group;
+
         typedef group::const_iterator iterator;    
 
         // predict position of this vehicle at some time in the future

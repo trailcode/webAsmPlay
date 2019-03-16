@@ -44,6 +44,7 @@
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/ColorShader.h>
+#include <webAsmPlay/shaders/TextureLookupShader.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/Frustum.h>
@@ -251,7 +252,7 @@ namespace
 	{
 		char buf[1024];
 
-		sprintf(buf, "%f %f %i", center.x, center.y, level);
+		sprintf(buf, "%f %f %zi", center.x, center.y, level);
 
 		unordered_map<string, Tile *>::const_iterator i = currTileSet.find(buf);
 
@@ -365,6 +366,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
 
+	//textureBuffer->bind();
+
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
 
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), startLevel);
@@ -393,6 +396,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 				i->r->setShader(TextureShader::getDefaultInstance());
 
+				//i->r->setShader(TextureLookupShader::getDefaultInstance());
+
 				i->r->setRenderOutline (false);
 				i->r->setRenderFill    (true);
 			}
@@ -408,4 +413,6 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 			loaderPool.push([i](int ID) { fetchTile(ID, i) ;});
 		}
 	}
+
+	//textureBuffer->unbind();
 }

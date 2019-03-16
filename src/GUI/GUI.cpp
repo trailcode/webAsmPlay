@@ -620,6 +620,7 @@ void GUI::createWorld()
 	// TODO Create a openGL context class;
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 
+	// TODO abstract this
 	GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
 
 	client = new GeoClient(canvas);

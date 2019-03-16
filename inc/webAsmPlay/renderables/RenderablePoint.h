@@ -54,14 +54,16 @@ public:
 
     void render(Canvas * canvas, const size_t renderStage = 0) const override;
 
+	void ensureVAO();
+
 private:
 
-    RenderablePoint(const GLuint vao,
-                    const GLuint ebo,
+    RenderablePoint(const GLuint ebo,
                     const GLuint vbo,
                     const bool   isMulti);
 
-    const GLuint vao;
+    GLuint vao = 0;
+
     const GLuint ebo;
     const GLuint vbo;
 };

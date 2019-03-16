@@ -53,15 +53,15 @@ Renderable * RenderablePoint::create(const dvec3 & _pos,
 
     const GLuint indices[] = {0,1,2,3};
 
-    GLuint vao = 0;
+    //GLuint vao = 0;
     GLuint ebo = 0;
     GLuint vbo = 0;
 
-    GL_CHECK(glGenVertexArrays(1, &vao));
+    //GL_CHECK(glGenVertexArrays(1, &vao));
     GL_CHECK(glGenBuffers     (1, &ebo));
     GL_CHECK(glGenBuffers     (1, &vbo));
 
-    GL_CHECK(glBindVertexArray(vao));
+    //GL_CHECK(glBindVertexArray(vao));
 
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
     GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW));
@@ -69,7 +69,7 @@ Renderable * RenderablePoint::create(const dvec3 & _pos,
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
     GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
 
-    return new RenderablePoint(vao, ebo, vbo, false);
+    return new RenderablePoint(ebo, vbo, false);
 }
 
 Renderable * RenderablePoint::create(const ConstGeosGeomVec & points,
@@ -100,13 +100,11 @@ void RenderablePoint::render(Canvas * canvas, const size_t renderStage) const
     GL_CHECK(glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL));
 }
 
-RenderablePoint::RenderablePoint(   const GLuint      vao,
-                                    const GLuint      ebo,
+RenderablePoint::RenderablePoint(   const GLuint      ebo,
                                     const GLuint      vbo,
                                     const bool        isMulti) : Renderable(isMulti,
                                                                             false,
                                                                             false),
-                                                                 vao       (vao),
                                                                  ebo       (ebo),
                                                                  vbo       (vbo)
 {
@@ -117,4 +115,13 @@ RenderablePoint::~RenderablePoint()
 {
     GL_CHECK(glDeleteVertexArrays(1, &vao));
     GL_CHECK(glDeleteBuffers     (1, &vbo));
+}
+
+void RenderablePoint::ensureVAO()
+{
+	GL_CHECK(glGenVertexArrays(1, &vao));
+
+	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+
+
 }

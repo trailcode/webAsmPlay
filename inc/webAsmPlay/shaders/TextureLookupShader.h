@@ -40,8 +40,12 @@ public:
 				const bool   isOutline,
 				const size_t renderingStage = 0) override;
 
+	GLuint64 setTextureHandle(const GLuint64 & handle);
+
 private:
 
 	TextureLookupShader();
 	~TextureLookupShader();
+
+	GLuint64 texHandle = 0;
 };

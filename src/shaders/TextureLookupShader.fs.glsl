@@ -23,3 +23,13 @@
 \email trailcode@gmail.com
 \copyright 2019
 */
+
+#version 330 core
+out vec4 outColor;
+in vec4 vertexColor;
+
+void main()
+{
+	outColor = vertexColor;
+	//outColor = vec4(1,1,1,1);
+}

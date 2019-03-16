@@ -178,7 +178,7 @@ inline uint32_t appendUint32(char *& dataStream, const T value)
 
 	dataStream += sizeof(uint32_t);
 
-	return value;
+	return (uint32_t)value;
 }
 
 template<typename T>

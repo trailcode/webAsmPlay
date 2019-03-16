@@ -23,3 +23,21 @@
 \email trailcode@gmail.com
 \copyright 2019
 */
+
+#version 330 core
+
+layout(location = 0) in vec3 vertIn;
+layout(location = 3) in vec2 vertUV_In;
+
+out vec4 vertexColor;
+out vec2 UV;
+
+uniform mat4 MVP;
+uniform vec4 colorIn;
+
+void main()
+{
+	gl_Position = MVP * vec4(vertIn.xyz, 1);
+	vertexColor = colorIn;
+	UV = vertUV_In;
+}

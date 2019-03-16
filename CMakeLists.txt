@@ -165,6 +165,7 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     ${simpleJSON_SRC}
                     ${opensteerSrc}
 					${imguiSrc}
+					readme.md
 					#${gl3wSrc}
                     #"ThirdParty/imgui/glad/glad.c"
                     )

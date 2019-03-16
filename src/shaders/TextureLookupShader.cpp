@@ -30,26 +30,22 @@
 
 namespace
 {
-	ShaderProgram		* program			= NULL;
+	ShaderProgram		* shaderProgram		= NULL;
 	TextureLookupShader * defaultInstance	= NULL;
 
 	GLint vertInAttr;
-	GLint model;
-	GLint view;
-	GLint projection;
+	GLint MVP_Loc;
 }
 
 void TextureLookupShader::ensureShader()
 {
-	if(program) { return ;}
+	if(shaderProgram) { return ;}
 
-	program = ShaderProgram::create("TextureLookupShader.vs.glsl",
-                                    "TextureLookupShader.fs.glsl",
-									"TextureLookupShader.gs.glsl",
-                                    Variables({{"vertIn",      vertInAttr}}),
-                                    Variables({{"model",       model     },
-                                                {"view",       view      },
-												{"projection", projection}}));
+	shaderProgram = ShaderProgram::create(	"TextureLookupShader.vs.glsl",
+											"TextureLookupShader.fs.glsl",
+											"TextureLookupShader.gs.glsl",
+											Variables({{"vertIn",      vertInAttr}}),
+											Variables({{"MVP",       MVP_Loc     }}));
 
 	defaultInstance = new TextureLookupShader();
 }
@@ -70,5 +66,12 @@ void TextureLookupShader::bind( Canvas     * canvas,
 								const bool   isOutline,
 								const size_t renderingStage)
 {
+	shaderProgram->bind();
 
+	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+}
+
+GLuint64 TextureLookupShader::setTextureHandle(const GLuint64& handle)
+{
+	return texHandle = handle;
 }

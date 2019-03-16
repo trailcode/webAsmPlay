@@ -161,7 +161,7 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(cons
 
 string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 {
-    Renderable * renderiable;
+    Renderable * renderable;
     Attributes * attrs;
 
     switch(mode)
@@ -177,6 +177,8 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
             if(!edge) { break ;}
 
+			edge->getRenderable()->ensureVAO();
+
             edge->getRenderable()->render(canvas);
 
             canvas->renderCursor(trans * dvec4(pointOnEdge, 0, 1));
@@ -185,14 +187,16 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
         }
         case GUI::PICK_MODE_POLYGON_SINGLE:
         {
-            tie(renderiable, attrs) = pickPolygonRenderable(canvas->getCursorPosWC());
+            tie(renderable, attrs) = pickPolygonRenderable(canvas->getCursorPosWC());
 
-            if(!renderiable) { return "" ;}
+            if(!renderable) { return "" ;}
             
             glDisable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
 
-            renderiable->render(canvas);
+			renderable->ensureVAO();
+
+			renderable->render(canvas);
 
             return attrs->toString();
         }
@@ -202,9 +206,11 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
             if(!picked.size()) { return "" ;}
             
-            tie(renderiable, attrs) = picked[0];
+            tie(renderable, attrs) = picked[0];
 
-            renderiable->render(canvas);
+			renderable->ensureVAO();
+
+			renderable->render(canvas);
 
             string attrsStr = attrs->toString();
 

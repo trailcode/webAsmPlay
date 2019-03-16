@@ -103,6 +103,8 @@ namespace
 
             gotoNextZombie = false;
 
+			lock_guard<mutex> _(openSteerMutex);
+
             OpenSteerDemo::selectNextVehicle();
         }
 

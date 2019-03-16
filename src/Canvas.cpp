@@ -209,9 +209,15 @@ GLuint Canvas::render()
 
 dvec2 Canvas::renderCursor(const dvec2 & pos)
 {
-    if(!cursor) { cursor = RenderablePoint::create(vec3(0,0,0)) ;}
+    if(!cursor)
+	{
+		cursor = RenderablePoint::create(vec3(0,0,0));
+
+		cursor->ensureVAO();
+	}
 
     pushModel(translate(dmat4(1.0), dvec3(pos, 0.0)));
+	//pushModel(translate(dmat4(1.0), dvec3(0,0, 0.0)));
 
     cursor->render(this, 0);
 

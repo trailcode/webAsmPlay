@@ -51,6 +51,8 @@ public:
 
 	typedef tbb::concurrent_vector<Zombie*> groupType;
 
+	//typedef std::vector<Zombie *> groupType;
+
 #endif
 
     typedef OpenSteer::AbstractProximityDatabase        <OpenSteer::AbstractVehicle *> ProximityDatabase;
