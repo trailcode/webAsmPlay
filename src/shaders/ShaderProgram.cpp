@@ -24,11 +24,26 @@
   \copyright 2018
 */
 
+#include <algorithm>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 
 using namespace std;
 using namespace glm;
+
+bool invalidChar (char c) 
+{  
+	//return !isprint( static_cast<unsigned char>( c ) );
+	return !(c>=0 && c <128);   
+} 
+string stripUnicode(string str) 
+{ 
+	//return str;
+
+	str.erase(remove_if(str.begin(),str.end(), invalidChar), str.end());  
+
+	return str;
+}
 
 ShaderProgram * ShaderProgram::create(	const string    & vertexSourceFile,
 										const string    & fragmentSourceFile,
@@ -50,8 +65,10 @@ ShaderProgram * ShaderProgram::create(	const string	& vertexSourceFile,
     // Create and compile the vertex shader
     const GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	
-	const string _vertexSource		= readFile(vertexSourceFile);
-	const string _fragmentSource	= readFile(fragmentSourceFile);
+	const string _vertexSource		= stripUnicode(readFile(vertexSourceFile));
+	const string _fragmentSource	= stripUnicode(readFile(fragmentSourceFile));
+
+	dmess("_vertexSource " << _vertexSource);
 
 	const GLchar * vertexSource		= _vertexSource.c_str();
 	const GLchar * fragmentSource	= _fragmentSource.c_str();
@@ -68,7 +85,9 @@ ShaderProgram * ShaderProgram::create(	const string	& vertexSourceFile,
     {
         GL_CHECK(glGetShaderInfoLog(vertexShader, 512, NULL, infoLog));
 
-        dmess("ERROR::SHADER::VERTEX::COMPILATION_FAILED: " << infoLog);
+        dmess("ERROR::SHADER::VERTEX::COMPILATION_FAILED: " << vertexSourceFile);
+
+		dmess("   " << infoLog);
 
         return NULL;
     }
@@ -86,7 +105,9 @@ ShaderProgram * ShaderProgram::create(	const string	& vertexSourceFile,
     {
         GL_CHECK(glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog));
 
-        dmess("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED: " << infoLog);
+        dmess("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED: " << fragmentSourceFile);
+		
+		dmess("   " << infoLog);
 
         return NULL;
     }
@@ -105,7 +126,7 @@ ShaderProgram * ShaderProgram::create(	const string	& vertexSourceFile,
 
         geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
 
-		const string _geometrySource  = readFile(geometrySourceFile);
+		const string _geometrySource  = stripUnicode(readFile(geometrySourceFile));
 
 		const GLchar * geometrySource = _geometrySource.c_str();
 		
@@ -119,7 +140,9 @@ ShaderProgram * ShaderProgram::create(	const string	& vertexSourceFile,
         {
             GL_CHECK(glGetShaderInfoLog(geometryShader, 512, NULL, infoLog));
 
-            dmess("ERROR::SHADER::GEOMETRY::COMPILATION_FAILED: " << infoLog);
+            dmess("ERROR::SHADER::GEOMETRY::COMPILATION_FAILED: " << geometrySourceFile);
+
+			dmess("   " << infoLog);
 
             return NULL;
         }
