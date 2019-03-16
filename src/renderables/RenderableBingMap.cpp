@@ -389,6 +389,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 				
 				i->r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
 
+				i->r->ensureVAO();
+
 				i->r->setShader(TextureShader::getDefaultInstance());
 
 				i->r->setRenderOutline (false);

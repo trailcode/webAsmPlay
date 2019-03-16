@@ -64,18 +64,4 @@
     #define GL_CHECK(stmt) stmt
 #endif
 
-// TODO remove?
-struct ArrayFormat
-{
-    ArrayFormat() {}
 
-    ArrayFormat(const GLint     size,
-                const GLsizei   stride,
-                const GLvoid  * pointer) :  size    (size),
-                                            stride  (stride),
-                                            pointer (pointer) {}
-
-    GLint           size    = 2;
-    GLsizei         stride  = 0;
-    const GLvoid  * pointer = 0;
-};

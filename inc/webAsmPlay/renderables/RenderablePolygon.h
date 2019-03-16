@@ -62,6 +62,8 @@ public:
 
     void render(Canvas * canvas, const size_t renderStage = 0) const override;
 
+	void ensureVAO();
+
 private:
 
     RenderablePolygon(VertexArrayObject * vertexArrayObject);

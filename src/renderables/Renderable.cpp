@@ -104,3 +104,8 @@ bool Renderable::getRenderOutline() const { return renderOutline ;}
 
 bool Renderable::setRenderFill   (const bool render) { return renderFill    = render ;}
 bool Renderable::setRenderOutline(const bool render) { return renderOutline = render ;}
+
+void Renderable::ensureVAO()
+{
+	dmess("Implement me!");
+}

@@ -63,6 +63,8 @@ public:
     bool setRenderFill(const bool render);
     bool setRenderOutline(const bool render);
 
+	virtual void ensureVAO();
+
 protected:
 
     Renderable( const bool isMulti          = false,

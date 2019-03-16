@@ -182,7 +182,12 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         r->setRenderFill    (GUI::renderSettingsFillPolygons);
         r->setRenderOutline (GUI::renderSettingsRenderPolygonOutlines);
 
-        canvas->addRenderable(r);
+		GUI::guiASync([this, r]()
+		{
+			r->ensureVAO();
+
+			canvas->addRenderable(r);
+		});
     }
 
     if((r = RenderableMesh::create(polygons3D, trans, true)))
@@ -192,7 +197,12 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         r->setRenderFill    (GUI::renderSettingsFillMeshes);
         r->setRenderOutline (GUI::renderSettingsRenderMeshOutlines);
 
-        canvas->addRenderable(r);
+		GUI::guiASync([this, r]()
+		{
+			r->ensureVAO();
+
+			canvas->addRenderable(r);
+		});
     }
     
     dmess("End base geom");
@@ -262,7 +272,12 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     r->setRenderOutline(GUI::renderSettingsRenderLinearFeatures);
 
-    canvas->addRenderable(r);
+	GUI::guiASync([this, r]()
+	{
+		r->ensureVAO();
+
+		canvas->addRenderable(r);
+	});
     
     dmess("Done creating renderable.");
 
@@ -310,7 +325,13 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 
-    canvas->addRenderable(r);
+	GUI::guiASync([this, r]()
+	{
+		r->ensureVAO();
+
+		canvas->addRenderable(r);
+
+	});
     
     dmess("Done creating renderable.");
 

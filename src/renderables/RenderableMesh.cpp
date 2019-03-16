@@ -159,3 +159,8 @@ void RenderableMesh::render(Canvas * canvas, const size_t renderStage) const
         vertexArrayObject->drawLines();
     }
 }
+
+void RenderableMesh::ensureVAO()
+{
+	vertexArrayObject->ensureVAO();
+}

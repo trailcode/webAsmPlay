@@ -36,7 +36,13 @@
 
 #include <tbb/concurrent_queue.h>
 
-typedef tbb::concurrent_queue<std::function<void ()>> EventQueue;
+//typedef tbb::concurrent_queue<std::function<void ()>> EventQueue;
+//mutable 
+//typedef boost::lockfree::queue<std::function<void(int id)> *> EventQueue;
+//#include <boost/lockfree/queue.hpp>
+//typedef boost::lockfree::queue<std::function<void()> *> EventQueue;
+
+typedef tbb::concurrent_queue<std::function<void()> *> EventQueue;
 
 #endif
 

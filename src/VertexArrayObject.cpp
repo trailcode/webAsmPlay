@@ -216,7 +216,6 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 		return NULL;
 	}
 
-    GLuint vao  = 0;
     GLuint ebo  = 0;
     GLuint ebo2 = 0;
     GLuint vbo  = 0;
@@ -235,9 +234,6 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
     GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
 
-	GL_CHECK(glGenVertexArrays(1, &vao));
-	GL_CHECK(glBindVertexArray(    vao));
-
     //IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS
 
     size_t sizeVertex = 2;
@@ -254,75 +250,40 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     if(USE_SYMBOLOGY_ID) { sizeColor = 1 ;}
     if(USE_UV_COORDS)	 { sizeUV	 = 2 ;}
 
-    const size_t totalSize = (sizeVertex + sizeColor + sizeNormal + sizeUV) * sizeof(GLfloat);
-
-    GL_CHECK(glEnableVertexAttribArray(0));
-
-    GL_CHECK(glVertexAttribPointer(0, sizeVertex, GL_FLOAT, GL_FALSE, totalSize, 0));
-
-    if(sizeColor)
-    {
-        GL_CHECK(glEnableVertexAttribArray(1));
-
-        GL_CHECK(glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex + sizeNormal) * sizeof(GLfloat))));
-    }
-
-    if(sizeNormal)
-    {
-        GL_CHECK(glEnableVertexAttribArray(2));
-
-        GL_CHECK(glVertexAttribPointer(2, sizeNormal, GL_FLOAT, GL_FALSE, totalSize, (void *)(sizeVertex * sizeof(GLfloat))));
-    }
-
-    if(sizeUV)
-    {
-        GL_CHECK(glEnableVertexAttribArray(3));
-
-        GL_CHECK(glVertexAttribPointer(3, sizeUV, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex + sizeNormal + sizeColor) * sizeof(GLfloat))));
-    }
-
-    ArrayFormat vertexFormat(sizeVertex, totalSize, 0);
-    ArrayFormat normalFormat(sizeNormal, totalSize, (void *)(sizeVertex * sizeof(GLfloat)));
-    ArrayFormat colorFormat (sizeColor,  totalSize, (void *)((sizeVertex + sizeNormal) * sizeof(GLfloat)));
-    ArrayFormat uvFormat    (sizeUV,     totalSize, (void *)((sizeVertex + sizeNormal + sizeColor) * sizeof(GLfloat)));
-
-    return new VertexArrayObject(vao,
-                                 ebo,
-                                 ebo2,
-                                 vbo,
-                                 triangleIndices.size(),
-                                 counterVertIndices,
-                                 lineIndices.size(),
-                                 tessellations.size() > 1,
-                                 vertexFormat,
-                                 colorFormat,
-                                 normalFormat,
-                                 uvFormat);
+    return new VertexArrayObject(	ebo,
+									ebo2,
+									vbo,
+									triangleIndices.size(),
+									counterVertIndices,
+									lineIndices.size(),
+									tessellations.size() > 1,
+									sizeVertex,
+									sizeNormal,
+									sizeColor,
+									sizeUV);
 }
 
-VertexArrayObject::VertexArrayObject(   const GLuint        vao,
-                                        const GLuint        ebo,
+VertexArrayObject::VertexArrayObject(   const GLuint        ebo,
                                         const GLuint        ebo2,
                                         const GLuint        vbo,
                                         const GLuint        numTrianglesIndices,
                                         const Uint32Vec   & counterVertIndices,
                                         const size_t        numContourLines,
                                         const bool          isMulti,
-                                        const ArrayFormat & vertexFormat,
-                                        const ArrayFormat & colorFormat,
-                                        const ArrayFormat & normalFormat,
-                                        const ArrayFormat & uvFormat) : vao                (vao),
-                                                                        ebo                (ebo),
+										const size_t		sizeVertex,
+										const size_t		sizeNormal,
+										const size_t		sizeColor,
+										const size_t		sizeUV) :	ebo                (ebo),
                                                                         ebo2               (ebo2),
                                                                         vbo                (vbo),
                                                                         numTrianglesIndices(numTrianglesIndices),
                                                                         counterVertIndices (counterVertIndices),
                                                                         numContourLines    (numContourLines),
                                                                         _isMulti           (isMulti),
-                                                                        vertexFormat       (vertexFormat),
-                                                                        colorFormat        (colorFormat),
-                                                                        normalFormat       (normalFormat),
-                                                                        uvFormat           (uvFormat)
+																		sizeVertex		   (sizeVertex),
+																		sizeNormal		   (sizeNormal),
+																		sizeColor		   (sizeColor),
+																		sizeUV			   (sizeUV)
 {
 
 }
@@ -363,3 +324,44 @@ void VertexArrayObject::drawLines() const
 }
 
 bool VertexArrayObject::isMulti() const { return _isMulti ;}
+
+void VertexArrayObject::ensureVAO()
+{
+	if(vao) { return ;}
+
+	GL_CHECK(glGenVertexArrays(1, &vao));
+	GL_CHECK(glBindVertexArray(    vao));
+
+	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+	//GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
+	//GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
+
+	const size_t totalSize = (sizeVertex + sizeColor + sizeNormal + sizeUV) * sizeof(GLfloat);
+
+	GL_CHECK(glEnableVertexAttribArray(0));
+
+	GL_CHECK(glVertexAttribPointer(0, sizeVertex, GL_FLOAT, GL_FALSE, totalSize, 0));
+
+	if(sizeColor)
+	{
+		GL_CHECK(glEnableVertexAttribArray(1));
+
+		GL_CHECK(glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex + sizeNormal) * sizeof(GLfloat))));
+	}
+
+	if(sizeNormal)
+	{
+		GL_CHECK(glEnableVertexAttribArray(2));
+
+		GL_CHECK(glVertexAttribPointer(2, sizeNormal, GL_FLOAT, GL_FALSE, totalSize, (void *)(sizeVertex * sizeof(GLfloat))));
+	}
+
+	if(sizeUV)
+	{
+		GL_CHECK(glEnableVertexAttribArray(3));
+
+		GL_CHECK(glVertexAttribPointer(3, sizeUV, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex + sizeNormal + sizeColor) * sizeof(GLfloat))));
+	}
+
+	GL_CHECK(glBindVertexArray(0));
+}

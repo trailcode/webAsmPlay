@@ -58,10 +58,11 @@ public:
 
     static void ensureShaders();
 
+	void ensureVAO();
+
 private:
 
-    RenderableLineString(   const GLuint      vao,
-                            const GLuint      ebo,
+    RenderableLineString(   const GLuint      ebo,
                             const GLuint      vbo,
                             const size_t      numElements,
                             const bool        isMulti);
@@ -70,7 +71,8 @@ private:
                                 const Uint32Vec  & indices,
                                 const bool         isMulti);
 
-    const GLuint vao;
+    GLuint vao = 0;
+
     const GLuint ebo;
     const GLuint vbo;
     const size_t numElements;

@@ -52,30 +52,31 @@ public:
 
     bool isMulti() const;
 
+	void ensureVAO();
+
 private:
 
     template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS>
     static VertexArrayObject * _create(const Tessellations & tessellations, const AABB2D & boxUV);
 
-    VertexArrayObject(  const GLuint        vao,
-                        const GLuint        ebo,
+    VertexArrayObject(  const GLuint        ebo,
                         const GLuint        ebo2,
                         const GLuint        vbo,
                         const GLuint        numTrianglesIndices,
                         const Uint32Vec   & counterVertIndices,
                         const size_t        numContourLines,
                         const bool          isMulti,
-                        const ArrayFormat & vertexFormat,
-                        const ArrayFormat & colorFormat,
-                        const ArrayFormat & normalFormat,
-                        const ArrayFormat & uvFormat);
+						const size_t		sizeVertex,
+						const size_t		sizeNormal,
+						const size_t		sizeColor,
+						const size_t		sizeUV);
 
     VertexArrayObject(const VertexArrayObject &)              = delete;
     VertexArrayObject(VertexArrayObject &&)                   = delete;
     VertexArrayObject & operator=(const VertexArrayObject &)  = delete;
     VertexArrayObject & operator=(VertexArrayObject &)        = delete;
 
-    const GLuint    vao                 = 0;
+		  GLuint    vao                 = 0;
     const GLuint    ebo                 = 0;
     const GLuint    ebo2                = 0;
     const GLuint    vbo                 = 0;
@@ -85,8 +86,8 @@ private:
 
     const Uint32Vec counterVertIndices;
 
-    const ArrayFormat vertexFormat;
-    const ArrayFormat colorFormat;
-    const ArrayFormat normalFormat;
-    const ArrayFormat uvFormat;
+	const size_t sizeVertex;
+	const size_t sizeNormal;
+	const size_t sizeColor;
+	const size_t sizeUV;
 };

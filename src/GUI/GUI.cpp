@@ -392,6 +392,18 @@ void GUI::attributePanel(const string & attrsStr)
 
 #include <webAsmPlay/FrameBuffer.h>
 
+void GUI::doQueue()
+{
+	function<void()> * _f = nullptr;
+
+	if (eventQueue.try_pop(_f))
+	{
+		(*_f)();
+		
+		delete _f;
+	}
+}
+
 void GUI::mainLoop(GLFWwindow * window)
 {
     if(!Buf) {  Buf = new ImGuiTextBuffer() ;}
@@ -407,10 +419,6 @@ void GUI::mainLoop(GLFWwindow * window)
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 #endif
-
-	function<void ()> callback;
-
-	if (eventQueue.try_pop(callback)) { callback() ;}
 
     static bool opt_fullscreen_persistant = true;
     static ImGuiDockNodeFlags opt_flags = ImGuiDockNodeFlags_None;
@@ -511,6 +519,8 @@ void GUI::mainLoop(GLFWwindow * window)
     refresh();
 
 #endif
+
+	
 }
 
 char GUI::getMode() { return mode ;}
@@ -595,6 +605,11 @@ void GUI::shutdown()
 
 bool GUI::isShuttingDown() { return shuttingDown ;}
 
+namespace
+{
+	bool contextSet = false;
+}
+
 void GUI::createWorld()
 {
     skyBox = new SkyBox();
@@ -602,7 +617,14 @@ void GUI::createWorld()
     if(renderSettingsRenderSkyBox) { canvas->setSkyBox(skyBox) ;} // TODO create check render functor
     else                           { canvas->setSkyBox(NULL)   ;}
 
-    //pool.push([](int ID) {
+	// TODO Create a openGL context class;
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+	GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
+	client = new GeoClient(canvas);
+
+    pool.push([threadWin](int ID) {
         // TODO Create a openGL context class;
 		/*
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -612,15 +634,22 @@ void GUI::createWorld()
         glfwMakeContextCurrent(threadWin);
 		//*/
 
-        client = new GeoClient(canvas);
+		glfwMakeContextCurrent(threadWin);
+
+        //client = new GeoClient(canvas);
 
         //return;
 
         //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
         client->loadGeometry("data.geo");
 
-        client->addBingMap(renderSettingsRenderBingMaps);
-    //});
+		guiASync([]() // TODO try to remove!
+		{
+			client->addBingMap(renderSettingsRenderBingMaps);
+		});
+    });
+
+	//client->addBingMap(renderSettingsRenderBingMaps);
 }
 
-void GUI::guiASync(function<void()> & callback) { eventQueue.push(callback) ;}
+//void GUI::guiASync(function<void()> & callback) { eventQueue.push(callback) ;}

@@ -25,6 +25,7 @@
 */
 #pragma once
 
+#include <future>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Types.h>
 
@@ -92,7 +93,23 @@ public:
 
     static void createWorld();
 
-	static void guiASync(std::function<void ()> & callback);
+	//static void guiASync(std::function<void ()> & callback);
+
+	template<typename F>
+	static auto guiASync(F && f) ->std::future<decltype(f())> {
+		auto pck = std::make_shared<std::packaged_task<decltype(f())()>>(std::forward<F>(f));
+
+		auto _f = new std::function<void()>([pck]() {
+			(*pck)();
+		});
+		//this->q.push(_f);
+
+		eventQueue.push(_f);
+
+		return pck->get_future();
+	}
+
+	static void doQueue();
 
 private:
 

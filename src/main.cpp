@@ -171,6 +171,8 @@ int main(int, char**)
             
             glfwPollEvents();
             //glfwWaitEvents();
+			
+			GUI::doQueue();
 
             // Start the Dear ImGui frame
             ImGui_ImplOpenGL3_NewFrame();

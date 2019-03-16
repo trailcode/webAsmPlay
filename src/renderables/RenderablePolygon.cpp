@@ -181,3 +181,8 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage) const
         vertexArrayObject->drawLines();
     }
 }
+
+void RenderablePolygon::ensureVAO()
+{
+	vertexArrayObject->ensureVAO();
+}
