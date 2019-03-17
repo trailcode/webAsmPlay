@@ -68,8 +68,6 @@ ShaderProgram * ShaderProgram::create(	const string	& vertexSourceFile,
 	const string _vertexSource		= stripUnicode(readFile(vertexSourceFile));
 	const string _fragmentSource	= stripUnicode(readFile(fragmentSourceFile));
 
-	dmess("_vertexSource " << _vertexSource);
-
 	const GLchar * vertexSource		= _vertexSource.c_str();
 	const GLchar * fragmentSource	= _fragmentSource.c_str();
 

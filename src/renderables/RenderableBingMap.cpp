@@ -70,6 +70,37 @@ namespace
 
 #endif
 
+	enum
+	{
+		NUM_TEXTURES        = 2048,
+		TEXTURE_LEVELS      = 5,
+		TEXTURE_SIZE        = (1 << (TEXTURE_LEVELS - 1))
+	};
+
+	struct
+	{
+		GLint   mv_matrix;
+		GLint   vp_matrix;
+	} uniforms;
+
+	struct
+	{
+		GLuint      name;
+		GLuint64    handle;
+	} textures[4096];
+
+	struct
+	{
+		GLuint      transformBuffer;
+		GLuint      textureHandleBuffer;
+	} buffers;
+
+	GLuint64 * pHandles = NULL;
+
+	mutex textureMutex;
+
+	size_t currTexture = 0;
+
     //const size_t levelOfDetail = 19;
     //const size_t levelOfDetail = 18;
     //const size_t levelOfDetail = 17;
@@ -177,11 +208,26 @@ namespace
 		Renderable * r = NULL;
 
 		GLuint textureID = 0;
+
+		GLuint64    handle = 0;
 	};
+
+	unordered_set<Tile *> loadingTiles;
 
 	void fetchTile(const int ID, Tile * tile)
 	{
 		//dmess("fetchTile " << tile);
+
+		/*
+		if (loadingTiles.find(tile) != loadingTiles.end())
+		{
+			dmess("Second load!");
+
+			return;
+		}
+
+		loadingTiles.insert(tile);
+		*/
 
 		const string quadKey = tileToQuadKey(latLongToTile(tile->center, tile->level), tile->level);
 
@@ -198,7 +244,28 @@ namespace
 					contextSet = true;
 				}
 
-				tile->textureID = Textures::load(tileCachePath);
+				GUI::guiASync([tile, tileCachePath]()
+				{
+					//textureMutex.lock();
+
+					textures[currTexture].name = tile->textureID = Textures::load(tileCachePath);
+
+					tile->handle = textures[currTexture].handle = glGetTextureHandleARB(textures[currTexture].name);
+
+					//dmess("tile->handle =  " << tile->handle);
+
+					glMakeTextureHandleResidentARB(textures[currTexture].handle);
+
+					//glBindTexture(GL_TEXTURE_2D, 0);
+
+					//pHandles[currTexture * 2] = textures[currTexture].handle;
+
+					++currTexture;
+
+					//dmess("currTexture " << currTexture);
+
+					//textureMutex.unlock();
+				});
 			});
 		}
 		else
@@ -221,10 +288,32 @@ namespace
 					contextSet = true;
 				}
 
-				tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
+				GUI::guiASync([tile, tileBuffer]()
+				{
+					//textureMutex.lock();
+
+					textures[currTexture].name = tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
+
+					tile->handle = textures[currTexture].handle = glGetTextureHandleARB(textures[currTexture].name);
+
+					//dmess("tile->handle =  " << tile->handle);
+
+					glMakeTextureHandleResidentARB(textures[currTexture].handle);
+
+					//pHandles[currTexture * 2] = textures[currTexture].handle;
+
+					//glBindTexture(GL_TEXTURE_2D, 0);
+
+					++currTexture;
+
+					//dmess("currTexture " << currTexture);
+
+					//textureMutex.unlock();
+				});
 
 				//dmess("tile->textureID " << tile->textureID);
 
+				/*
 				FILE * fp = fopen(tileCachePath.c_str(), "wb");
 
 				if(fp)
@@ -242,6 +331,7 @@ namespace
 				{
 					free ( (void *)get<0>(tileBuffer) );
 				}
+				*/
 			});
 		}
 	}
@@ -295,6 +385,17 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 
 		contextCreated = true;
 	}
+
+	glGenBuffers(1, &buffers.textureHandleBuffer);
+	glBindBuffer(GL_UNIFORM_BUFFER, buffers.textureHandleBuffer);
+
+	glBufferStorage(GL_UNIFORM_BUFFER,
+		NUM_TEXTURES * sizeof(GLuint64) * 2,
+		nullptr,
+		GL_MAP_WRITE_BIT);
+
+	//pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, NUM_TEXTURES * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+	//pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, NUM_TEXTURES * sizeof(GLuint64), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 }
 
 RenderableBingMap::~RenderableBingMap()
@@ -366,6 +467,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
 
+	glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
+
 	//textureBuffer->bind();
 
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
@@ -378,6 +481,10 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 	getTilesToRender(canvas, tMin, tMax, startLevel);
 
 	sort(tiles.begin(), tiles.end(), [](const Tile * A, const Tile * B) { return A->level < B->level ;});
+
+	size_t numRendered = 0;
+
+	vector<Tile *> toRender;
 
 	for (auto i : tiles)
 	{
@@ -402,17 +509,60 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 				i->r->setRenderFill    (true);
 			}
 
-			TextureShader::getDefaultInstance()->setTextureID(i->textureID);
+			//TextureShader::getDefaultInstance()->setTextureID(i->textureID);
 
-			i->r->render(canvas);
+			//TextureShader::getDefaultInstance()->setTextureHandle(i->handle);
+
+			//i->r->render(canvas);
+
+			toRender.push_back(i);
+
+			++numRendered;
 		}
 		else if (!i->loading)
 		{
+			if (loadingTiles.find(i) != loadingTiles.end())
+			{
+				dmess("Second load!");
+
+				continue;
+			}
+
+			loadingTiles.insert(i);
+
 			i->loading = true;
 
 			loaderPool.push([i](int ID) { fetchTile(ID, i) ;});
 		}
 	}
+
+	//glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
+
+	pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, NUM_TEXTURES * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+	for(size_t i = 0; i < toRender.size(); ++i)
+	{
+		Tile * t = toRender[i];
+
+		pHandles[i * 2] = t->handle;
+	}
+
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+	//dmess("toRender " << toRender.size());
+
+	//TextureShader::getDefaultInstance()->bind(canvas, false, 0);
+
+	for(size_t i = 0; i < toRender.size(); ++i)
+	{
+		Tile * t = toRender[i];
+
+		TextureShader::getDefaultInstance()->setTextureID2(i);
+
+		t->r->render(canvas);
+	}
+
+	//dmess("loadingTiles " << loadingTiles.size() << " " << numRendered);
 
 	//textureBuffer->unbind();
 }

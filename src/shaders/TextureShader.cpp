@@ -39,6 +39,7 @@ namespace
 
     GLint MVP_Loc;
     GLint texLoc;
+	GLint texID_Loc;
 }
 
 TextureShader * TextureShader::getDefaultInstance() { return defaultInstance ;}
@@ -53,7 +54,8 @@ void TextureShader::ensureShader()
                                                        {"vertUV_In",    vertUV_InAttrLoc}
                                                        }),
                                             Variables({{"MVP",          MVP_Loc},
-                                                       {"tex",          texLoc}}));
+                                                       {"tex",          texLoc},
+													   {"texID",		texID_Loc}}));
 
     defaultInstance = new TextureShader();
 }
@@ -68,7 +70,19 @@ TextureShader::~TextureShader()
 
 }
 
-GLuint TextureShader::setTextureID(const GLuint textureID) { return this->textureID = textureID ;}
+GLuint TextureShader::setTextureID(const GLuint textureID)
+{
+	//shaderProgram->setUniformi(texID_Loc, textureID);
+
+	return this->textureID = textureID;
+}
+
+GLuint TextureShader::setTextureID2(const GLuint textureID2)
+{
+	return this->textureID2 = textureID2;
+}
+
+GLuint64 TextureShader::setTextureHandle(const GLuint64 & handle) { return this->handle = handle ;}
 
 void TextureShader::bind(   Canvas     * canvas,
                             const bool   isOutline,
@@ -76,11 +90,17 @@ void TextureShader::bind(   Canvas     * canvas,
 {
     shaderProgram->bind();
 
-    GL_CHECK(glActiveTexture(GL_TEXTURE0));
+    //GL_CHECK(glActiveTexture(GL_TEXTURE0));
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, textureID));
+    //GL_CHECK(glBindTexture(GL_TEXTURE_2D, textureID));
 
-    shaderProgram->setUniformi(texLoc, 0);
+	//dmess("texID_Loc " << texID_Loc);
+
+	//glProgramUniformHandleui64ARB(shaderProgram->getProgramHandle(), texID_Loc, handle);
+	//glUniformHandleui64ARB(texID_Loc, handle);
+
+    //shaderProgram->setUniformi(texLoc, 0);
+	shaderProgram->setUniformi(texID_Loc, textureID2);
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }

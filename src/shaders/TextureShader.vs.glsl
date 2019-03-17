@@ -24,10 +24,13 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 440 core
+
 layout(location = 0) in vec3 vertIn;
 layout(location = 3) in vec2 vertUV_In;
+
 out vec2 UV;
+
 uniform mat4 MVP;
 
 void main()

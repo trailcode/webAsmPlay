@@ -106,6 +106,8 @@ GLuint Textures::load(const string & filename)
 
     GL_CHECK(glGenTextures(1, &texture));
 
+	glActiveTexture(GL_TEXTURE0); // NEEDED?
+
     /* Typical Texture Generation Using Data From The Bitmap */
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, texture));
 
@@ -130,6 +132,8 @@ GLuint Textures::load(const string & filename)
 
     //GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     //GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Needed?
 
 	GL_CHECK(glFlush());
 
@@ -246,6 +250,8 @@ GLuint Textures::createFromJpeg(const char * data, const size_t size)
 
     GL_CHECK(glGenTextures(1, &texture));
 
+	glActiveTexture(GL_TEXTURE0); // NEEDED?
+
     /* Typical Texture Generation Using Data From The Bitmap */
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, texture));
 
@@ -260,6 +266,8 @@ GLuint Textures::createFromJpeg(const char * data, const size_t size)
 
 	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
 	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 	GL_CHECK(glFlush());
 

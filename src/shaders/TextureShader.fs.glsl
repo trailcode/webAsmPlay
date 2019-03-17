@@ -24,14 +24,47 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 440 core
+
+#extension GL_ARB_bindless_texture : require
+
 out vec4 outColor;
 in vec2 UV;
 uniform sampler2D tex;
+//in uint texID;
+//uniform uvec2 texID;
+//uniform sampler2D  texID;
+uniform int texID;
+// Texture block
+/*
+layout (binding = 6, std140) uniform TEXTURE_BLOCK
+{
+	sampler2D      texa[1024];
+};
+*/
+
+layout (binding = 6, std140) uniform TEXTURE_BLOCK
+{
+	sampler2D      texa[2048];
+};
+
+/*
+layout(binding = 0) uniform material
+{
+	uvec2 Diffuse;
+
+} Material;
+*/
 
 void main()
 {
-	outColor = texture( tex, UV );
+	//outColor = texture( tex, UV );
+	outColor = texture( texa[texID], UV );
+	//outColor = texture(sampler2D(Material.Diffuse), UV);
+	//outColor = texture(sampler2D(texID), UV);
+	//outColor = texture(texID, UV);
+
+	//outColor.r = 0.5;
 
 	outColor.a = 1.0;
 }
