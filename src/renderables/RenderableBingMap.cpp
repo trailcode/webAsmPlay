@@ -73,21 +73,7 @@ namespace
 	enum
 	{
 		NUM_TEXTURES        = 2048,
-		TEXTURE_LEVELS      = 5,
-		TEXTURE_SIZE        = (1 << (TEXTURE_LEVELS - 1))
 	};
-
-	struct
-	{
-		GLint   mv_matrix;
-		GLint   vp_matrix;
-	} uniforms;
-
-	struct
-	{
-		GLuint      name;
-		GLuint64    handle;
-	} textures[4096];
 
 	struct
 	{
@@ -95,16 +81,7 @@ namespace
 		GLuint      textureHandleBuffer;
 	} buffers;
 
-	GLuint64 * pHandles = NULL;
-
-	mutex textureMutex;
-
-	size_t currTexture = 0;
-
-    //const size_t levelOfDetail = 19;
-    //const size_t levelOfDetail = 18;
-    //const size_t levelOfDetail = 17;
-    const size_t levelOfDetail = 15;
+	//GLuint64 * pHandles = NULL;
 
     // Define our struct for accepting LCs output
     struct BufferStruct // TODO code dupilcation
@@ -210,6 +187,8 @@ namespace
 		GLuint textureID = 0;
 
 		GLuint64    handle = 0;
+
+		bool textureResident = false;
 	};
 
 	unordered_set<Tile *> loadingTiles;
@@ -244,28 +223,9 @@ namespace
 					contextSet = true;
 				}
 
-				GUI::guiASync([tile, tileCachePath]()
-				{
-					//textureMutex.lock();
+				tile->textureID = Textures::load(tileCachePath);
 
-					textures[currTexture].name = tile->textureID = Textures::load(tileCachePath);
-
-					tile->handle = textures[currTexture].handle = glGetTextureHandleARB(textures[currTexture].name);
-
-					//dmess("tile->handle =  " << tile->handle);
-
-					glMakeTextureHandleResidentARB(textures[currTexture].handle);
-
-					//glBindTexture(GL_TEXTURE_2D, 0);
-
-					//pHandles[currTexture * 2] = textures[currTexture].handle;
-
-					++currTexture;
-
-					//dmess("currTexture " << currTexture);
-
-					//textureMutex.unlock();
-				});
+				tile->handle = glGetTextureHandleARB(tile->textureID);
 			});
 		}
 		else
@@ -288,32 +248,10 @@ namespace
 					contextSet = true;
 				}
 
-				GUI::guiASync([tile, tileBuffer]()
-				{
-					//textureMutex.lock();
+				tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
 
-					textures[currTexture].name = tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
+				tile->handle = glGetTextureHandleARB(tile->textureID);
 
-					tile->handle = textures[currTexture].handle = glGetTextureHandleARB(textures[currTexture].name);
-
-					//dmess("tile->handle =  " << tile->handle);
-
-					glMakeTextureHandleResidentARB(textures[currTexture].handle);
-
-					//pHandles[currTexture * 2] = textures[currTexture].handle;
-
-					//glBindTexture(GL_TEXTURE_2D, 0);
-
-					++currTexture;
-
-					//dmess("currTexture " << currTexture);
-
-					//textureMutex.unlock();
-				});
-
-				//dmess("tile->textureID " << tile->textureID);
-
-				/*
 				FILE * fp = fopen(tileCachePath.c_str(), "wb");
 
 				if(fp)
@@ -331,7 +269,6 @@ namespace
 				{
 					free ( (void *)get<0>(tileBuffer) );
 				}
-				*/
 			});
 		}
 	}
@@ -437,7 +374,7 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 	const Frustum * frust = canvas->getCameraFrustum();
 
-	if (level < 22 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
+	if (level < 23 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	//if (level < 12 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	{
 		const dvec3 subPoints[] = {	/* 0 */dvec3(tMin.x, tMax.y,	0),		/* 1 */dvec3(center.x, tMax.y,   0), /* 2 */dvec3(tMax.x, tMax.y,   0),
@@ -466,8 +403,6 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
     if(!getRenderFill()) { return ;}
 
 	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
-
-	glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
 
 	//textureBuffer->bind();
 
@@ -503,17 +438,9 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 				i->r->setShader(TextureShader::getDefaultInstance());
 
-				//i->r->setShader(TextureLookupShader::getDefaultInstance());
-
 				i->r->setRenderOutline (false);
 				i->r->setRenderFill    (true);
 			}
-
-			//TextureShader::getDefaultInstance()->setTextureID(i->textureID);
-
-			//TextureShader::getDefaultInstance()->setTextureHandle(i->handle);
-
-			//i->r->render(canvas);
 
 			toRender.push_back(i);
 
@@ -536,22 +463,25 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 		}
 	}
 
-	//glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
 
-	pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, NUM_TEXTURES * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+	GLuint64 * pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0,  toRender.size() * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 	for(size_t i = 0; i < toRender.size(); ++i)
 	{
 		Tile * t = toRender[i];
 
-		pHandles[i * 2] = t->handle;
+		if(!t->textureResident)
+		{ 
+			glMakeTextureHandleResidentARB(t->handle);
+
+			t->textureResident = true;
+		}
+
+		pHandles[i * 2] = t->handle;		
 	}
 
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
-
-	//dmess("toRender " << toRender.size());
-
-	//TextureShader::getDefaultInstance()->bind(canvas, false, 0);
 
 	for(size_t i = 0; i < toRender.size(); ++i)
 	{
@@ -561,8 +491,4 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 		t->r->render(canvas);
 	}
-
-	//dmess("loadingTiles " << loadingTiles.size() << " " << numRendered);
-
-	//textureBuffer->unbind();
 }
