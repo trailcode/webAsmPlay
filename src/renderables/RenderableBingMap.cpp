@@ -56,10 +56,10 @@ using namespace glm;
 using namespace geosUtil;
 using namespace bingTileSystem;
 
-atomic<size_t> RenderableBingMap::numTiles			= 0;
-atomic<size_t> RenderableBingMap::numLoading		= 0;
-atomic<size_t> RenderableBingMap::numDownloading	= 0;
-atomic<size_t> RenderableBingMap::numUploading		= 0;
+atomic<size_t> RenderableBingMap::numTiles			= {0};
+atomic<size_t> RenderableBingMap::numLoading		= {0};
+atomic<size_t> RenderableBingMap::numDownloading	= {0};
+atomic<size_t> RenderableBingMap::numUploading		= {0};
 
 size_t RenderableBingMap::numRendered = 0;
 
