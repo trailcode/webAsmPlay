@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-set(default_build_type "Release")
-set(CMAKE_BUILD_TYPE Debug)
+#set(default_build_type "Release")
+#set(CMAKE_BUILD_TYPE Debug)
 
 set(USE_FOLDERS ON)
 
@@ -285,9 +285,9 @@ else()
     include_directories(./)
     
     link_libraries(debug ${CURL_LIBRARY_DEBUG} optimized ${CURL_LIBRARY_RELEASE})
-    link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
-    link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG} optimized ${Boost_RANDOM_LIBRARY_RELEASE})
-    link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
+    #link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
+    #link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG} optimized ${Boost_RANDOM_LIBRARY_RELEASE})
+    #link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
 	link_libraries(${GLFW3_LIBRARY})
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
@@ -441,10 +441,12 @@ else()
 	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
 	#target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
 
+
 	target_link_libraries(geoServer libWebAsmPlay)
     target_link_libraries(geoServer ${EXPAT_LIBRARIES}
-                            debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE}
-                            debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
+                            #debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE}
+                            #debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
+							)
 
 	if(MSVC_VERSION)
 

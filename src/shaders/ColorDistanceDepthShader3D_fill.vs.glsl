@@ -35,14 +35,20 @@ uniform mat4      view;
 uniform mat4      projection;
 uniform float     colorLookupOffset;
 uniform float     heightMultiplier;
-uniform sampler2D tex;
+uniform sampler2D colorLookupTexture;
+//uniform sampler2D topDownTexture;
 
 out vec4 vertexColorNear;
 out vec4 vertexColorFar;
 out vec4 position_in_view_space;
 out vec3 normal;
 out vec3 fragPos;
+//noperspective out vec4 glPos;
 out vec4 glPos;
+//varying vec4 glPos;
+out vec4 pos2D;
+out vec4 fake_frag_coord;
+//out vec4 texColor;
 
 void main()
 {
@@ -56,10 +62,30 @@ void main()
 
 	gl_Position = projection * MV * vert;
 
+	//pos2D = projection * MV * vert;
+
 	glPos = gl_Position; // TODO just use gl_Position?
 
-	vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
-	vertexColorFar  = texture(tex, vec2(vertColorIn + (2.0 + colorLookupOffset) / 32.0, 0.5));
+	vertexColorNear = texture(colorLookupTexture, vec2(vertColorIn +        colorLookupOffset  / 32.0, 0.5));
+	vertexColorFar  = texture(colorLookupTexture, vec2(vertColorIn + (2.0 + colorLookupOffset) / 32.0, 0.5));
 
 	normal = mat3(transpose(inverse(model))) * normalIn;
+
+	// Vertex in clip-space
+	//fake_frag_coord  = gl_Position; // (MVP * inPosition);     // Range:   [-w,w]^4
+	fake_frag_coord  = projection * MV * vec4(vert.xy, 0, 1);
+
+													// Vertex in NDC-space
+	fake_frag_coord.xyz /= fake_frag_coord.w;       // Rescale: [-1,1]^3
+	fake_frag_coord.w    = 1.0 / fake_frag_coord.w; // Invert W
+
+													// Vertex in window-space
+	fake_frag_coord.xyz *= vec3 (0.5) + vec3 (0.5); // Rescale: [0,1]^3
+	//fake_frag_coord.xy  *= window;                  // Scale and Bias for Viewport
+
+													// Assume depth range: [0,1] --> No need to adjust fake_frag_coord.z
+
+	//texColor = texture(topDownTexture, vec2(glPos.x, glPos.y));
+
+
 }

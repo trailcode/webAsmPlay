@@ -399,13 +399,28 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	tiles.push_back(getTile(center, level));
 }
 
+extern GLuint theTex;
+
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 {
     if(!getRenderFill()) { return ;}
 
-	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
+	/*
+	FrameBuffer::ensureFrameBuffer(	textureBuffer,
+									canvas->getFrameBufferSize(),
+									GL_RGB32UI,
+									GL_RGB,
+									GL_UNSIGNED_INT);
+									*/
 
-	//textureBuffer->bind();
+	FrameBuffer::ensureFrameBuffer(	textureBuffer,
+									canvas->getFrameBufferSize());
+
+	textureBuffer->bind();
+	
+	theTex = textureBuffer->getTextureID();
+
+	dmess("theTex " << theTex);
 
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
 
@@ -497,4 +512,6 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 	}
 
 	RenderableBingMap::numRendered = toRender.size();
+
+	textureBuffer->unbind();
 }
