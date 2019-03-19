@@ -32,11 +32,11 @@ layout(location = 0) in vec3  vertIn;
 layout(location = 1) in float vertColorIn;
 layout(location = 2) in vec3  normalIn;
 
-uniform mat4   model;
-uniform mat4   view;
-uniform mat4   projection;
-uniform float  colorLookupOffset;
-uniform float  heightMultiplier;
+uniform mat4	model;
+uniform mat4	view;
+uniform mat4	projection;
+uniform float	colorLookupOffset;
+uniform float	heightMultiplier;
 
 out vec4 vertexColorNear;
 out vec4 vertexColorFar;

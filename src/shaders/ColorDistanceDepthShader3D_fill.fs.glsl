@@ -32,10 +32,7 @@ in vec4 position_in_view_space;
 in vec3 normal; 
 in vec3 fragPos;
 in vec4 glPos;
-//varying vec4 glPos;
-smooth in vec4 pos2D;
-in vec4 fake_frag_coord;
-//in vec4 texColor;
+in vec4 fragCoord2D;
 
 uniform vec3      lightPos;
 uniform float     width;
@@ -83,36 +80,10 @@ void main()
 	}
 	outColor = vec4(result, objectColor.w);
 
-	//fake_frag_coord.xy *= vec2(width, height);
-
-	//vec4 texColor = texture(topDownTexture, vec2(fake_frag_coord.x, fake_frag_coord.y));
-
-	//outColor = texColor;
-
-	//vec4 texColor = texture(topDownTexture, vec2(((pos2D.x + 10) * 0.5) / 10.0, ((pos2D.y + 10) * 0.5) / 10.0));
-
-	/*
-	if ((fake_frag_coord.x + 1.0) * 0.5 < 0)
+	if(dot(normal, vec3(0,0,1)) > 0.001)
 	{
-		outColor = vec4(1,0,0,1);
-	}
-	else if((fake_frag_coord.x + 1.0) * 0.5 > 0.9)
-	{
-		outColor = vec4(0,1,0,1);
-	}
-	else
-	{
-		outColor = vec4(0,0,1,1);
-	}
-	*/
+		vec4 texColor = vec4(texture(topDownTexture, fragCoord2D.xy).xyz, 0);
 
-	vec4 texColor = texture(topDownTexture, vec2((fake_frag_coord.x + 1.0) * 0.5, (fake_frag_coord.y + 1.0) * 0.5));
-
-	outColor = texColor;
-
-	//outColor = vec4(((glPos.x + 1) * 0.5), (glPos.y + 1) * 0.5, (glPos.z + 1) * 0.5, 1);
-	//outColor = vec4(((position_in_view_space.x + 1) * 0.5), (position_in_view_space.y + 1) * 0.5, (position_in_view_space.z + 1) * 0.5, 1);
-	//outColor = vec4(((glPos.x + 1)), (glPos.y + 1), (glPos.z + 1), 1);
-	//outColor = vec4(gl_FragCoord.x / width, gl_FragCoord.y / height, 0, 1);
-	//outColor = vec4(fake_frag_coord.x + 0.5, fake_frag_coord.y, fake_frag_coord.z, 1);
+		outColor += texColor;
+	}
 }

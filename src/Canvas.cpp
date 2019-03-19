@@ -122,6 +122,7 @@ void Canvas::updateMVP()
 {
     currMVP.view        = trackBallInteractor->getCamera()->getMatrix();
     currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.0001, 30.0);
+	//currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.000001, 30.0);
     currMVP.MV          = currMVP.view * currMVP.model;
     currMVP.MVP         = currMVP.projection * currMVP.MV;
 

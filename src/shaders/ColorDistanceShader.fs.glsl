@@ -28,6 +28,9 @@
 in vec4 vertexColorNear;
 in vec4 vertexColorFar;
 in vec4 position_in_view_space;
+noperspective in vec4 fragCoord2D;
+
+uniform sampler2D topDownTexture;
 
 out vec4 outColor;
 
@@ -45,4 +48,8 @@ void main()
 	dist = min(maxDist, dist) / maxDist;
 
 	outColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
+
+	vec4 texColor = vec4(texture(topDownTexture, fragCoord2D.xy).xyz, 0);
+
+	outColor += texColor;
 }

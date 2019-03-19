@@ -420,7 +420,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 	
 	theTex = textureBuffer->getTextureID();
 
-	dmess("theTex " << theTex);
+	//dmess("theTex " << theTex);
 
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
 

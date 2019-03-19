@@ -47,6 +47,7 @@ namespace
     GLint MV_Loc;
     GLint MVP_Loc;
     GLint texUniformLoc;
+	GLint topDownTextureUniform;
 }
 
 void ColorDistanceShader::ensureShader()
@@ -55,12 +56,13 @@ void ColorDistanceShader::ensureShader()
 
     shaderProgram = ShaderProgram::create(  "ColorDistanceShader.vs.glsl",
                                             "ColorDistanceShader.fs.glsl",
-                                            Variables({{"vertIn",            vertInAttrLoc			},
-                                                       {"vertColorIn",       vertColorInAttrLoc		}}),
-                                            Variables({{"MV",                MV_Loc					},
-                                                       {"MVP",               MVP_Loc				},
-                                                       {"tex",               texUniformLoc			},
-                                                       {"colorLookupOffset", colorLookupOffsetLoc	}}));
+                                            Variables({	{"vertIn",				vertInAttrLoc			},
+														{"vertColorIn",			vertColorInAttrLoc		}}),
+                                            Variables({	{"MV",					MV_Loc					},
+														{"MVP",					MVP_Loc					},
+														{"tex",					texUniformLoc			},
+														{"topDownTexture",		topDownTextureUniform	},
+														{"colorLookupOffset",	colorLookupOffsetLoc	}}));
 
     defaultInstance = new ColorDistanceShader();
 }
@@ -76,6 +78,8 @@ ColorDistanceShader::~ColorDistanceShader()
 
 ColorDistanceShader * ColorDistanceShader::getDefaultInstance() { return defaultInstance ;}
 
+extern GLuint theTex;
+
 void ColorDistanceShader::bind(Canvas     * canvas,
                                const bool   isOutline,
                                const size_t renderingStage)
@@ -84,12 +88,17 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorSymbology->getTextureID()));
 
+	GL_CHECK(glActiveTexture(GL_TEXTURE1));
+
+	GL_CHECK(glBindTexture(GL_TEXTURE_2D, theTex));
+
     shaderProgram->bind();
 
     shaderProgram->setUniform(MV_Loc,  canvas->getMV_Ref());
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 
-    shaderProgram->setUniformi(texUniformLoc, 0);
+    shaderProgram->setUniformi(texUniformLoc,			0);
+	shaderProgram->setUniformi(topDownTextureUniform,	1);
 
     if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 2.0f) ;}
     else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}
