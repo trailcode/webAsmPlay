@@ -25,6 +25,7 @@
 */
 
 #version 330 core
+
 in vec4 vertexColorNear;
 in vec4 vertexColorFar;
 in vec4 position_in_view_space;
@@ -40,18 +41,20 @@ bool canDiscard()
 {
 	float posX = gl_FragCoord.x / width;
 	float posY = gl_FragCoord.y / height;
+
 	float deltaX = 1.0f / width;
 	float deltaY = 1.0f / height;
+
 	for(float x = -1.0f; x < 2.0f; x += 1.0f) 
-		for(float y = -1.0f; y < 2.0f; y += 1.0f)
-		{
-			vec4 t = texture(depthTex, vec2(posX + x * deltaX, posY + y * deltaY));
+	for(float y = -1.0f; y < 2.0f; y += 1.0f)
+	{
+		vec4 t = texture(depthTex, vec2(posX + x * deltaX, posY + y * deltaY));
 
-			float v = abs(t.x - glPos.w);
+		float v = abs(t.x - glPos.w);
 
-			if(v <= 0.0001) { return false ;}
-			//if(v <= 0.001) { return false ;}
-		}
+		if(v <= 0.0001) { return false ;}
+		//if(v <= 0.001) { return false ;}
+	}
 
 	return true;
 }

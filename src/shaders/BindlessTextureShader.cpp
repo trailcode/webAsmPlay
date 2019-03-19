@@ -21,36 +21,66 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2019
+\copyright 2018
 */
 
-#version 330 core
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/shaders/BindlessTextureShader.h>
 
-layout(location = 0) in vec3  vertIn;
-layout(location = 1) in float vertColorIn;
-
-uniform mat4      MVP;
-uniform mat4      MV;
-uniform float     colorLookupOffset;
-uniform float     heightMultiplier;
-uniform sampler2D tex;
-
-out vec4 vertexColorNear;
-out vec4 vertexColorFar;
-out vec4 position_in_view_space;
-out vec4 glPos;
-
-void main()
+namespace
 {
-	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
+	ShaderProgram			* shaderProgram   = NULL;
+	BindlessTextureShader	* defaultInstance = NULL;
 
-	position_in_view_space = MV * vert;
+	GLint vertInAttrLoc;
+	GLint vertUV_InAttrLoc;
 
-	gl_Position = MVP * vert;
-
-	glPos = gl_Position;
-
-	vertexColorNear = texture(tex, vec2(vertColorIn +        colorLookupOffset  / 32.0, 0.5));
-	vertexColorFar  = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
+	GLint MVP_Loc;
+	GLint texLoc;
+	GLint texID_Loc;
 }
 
+BindlessTextureShader* BindlessTextureShader::getDefaultInstance() { return defaultInstance ;}
+
+void BindlessTextureShader::ensureShader()
+{
+	if(shaderProgram) { return ;}
+
+	shaderProgram = ShaderProgram::create(  "TextureShader.vs.glsl",
+											"TextureShader.fs.glsl",
+											Variables({{"vertIn",       vertInAttrLoc},
+													   {"vertUV_In",    vertUV_InAttrLoc}
+													  }),
+											Variables({{"MVP",          MVP_Loc},
+													   {"tex",          texLoc},
+													   {"texID",		texID_Loc}}));
+
+	defaultInstance = new BindlessTextureShader();
+}
+
+void BindlessTextureShader::bind(	Canvas		* canvas,
+									const bool    isOutline,
+									const size_t  renderingStage)
+{
+	shaderProgram->bind();
+
+	shaderProgram->setUniformi(texID_Loc, textureSlot);
+
+	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+}
+
+BindlessTextureShader::BindlessTextureShader() : Shader("BindlessTextureShader")
+{
+
+}
+
+BindlessTextureShader::~BindlessTextureShader()
+{
+
+}
+
+GLuint BindlessTextureShader::setTextureSlot(const GLuint textureSlot)
+{
+	return this->textureSlot = textureSlot;
+}

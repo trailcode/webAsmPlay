@@ -43,6 +43,7 @@
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/shaders/TextureShader.h>
+#include <webAsmPlay/shaders/BindlessTextureShader.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/TextureLookupShader.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -54,6 +55,13 @@ using namespace std;
 using namespace glm;
 using namespace geosUtil;
 using namespace bingTileSystem;
+
+atomic<size_t> RenderableBingMap::numTiles			= 0;
+atomic<size_t> RenderableBingMap::numLoading		= 0;
+atomic<size_t> RenderableBingMap::numDownloading	= 0;
+atomic<size_t> RenderableBingMap::numUploading		= 0;
+
+size_t RenderableBingMap::numRendered = 0;
 
 namespace
 {
@@ -72,12 +80,12 @@ namespace
 
 	enum
 	{
-		NUM_TEXTURES        = 2048,
+		NUM_TEXTURES  = 2048,
 	};
 
 	struct
 	{
-		GLuint      transformBuffer;
+		//GLuint      transformBuffer;
 		GLuint      textureHandleBuffer;
 	} buffers;
 
@@ -191,29 +199,16 @@ namespace
 		bool textureResident = false;
 	};
 
-	unordered_set<Tile *> loadingTiles;
-
 	void fetchTile(const int ID, Tile * tile)
 	{
-		//dmess("fetchTile " << tile);
-
-		/*
-		if (loadingTiles.find(tile) != loadingTiles.end())
-		{
-			dmess("Second load!");
-
-			return;
-		}
-
-		loadingTiles.insert(tile);
-		*/
-
 		const string quadKey = tileToQuadKey(latLongToTile(tile->center, tile->level), tile->level);
 
 		const string tileCachePath = "./tiles/" + quadKey + ".jpg";
 
 		if(fileExists(tileCachePath))
 		{
+			++RenderableBingMap::numUploading;
+
 			uploaderPool.push([tile, tileCachePath](int ID)
 			{
 				if(!contextSet)
@@ -226,6 +221,12 @@ namespace
 				tile->textureID = Textures::load(tileCachePath);
 
 				tile->handle = glGetTextureHandleARB(tile->textureID);
+
+				++RenderableBingMap::numTiles;
+
+				--RenderableBingMap::numLoading;
+
+				--RenderableBingMap::numUploading;
 			});
 		}
 		else
@@ -239,6 +240,8 @@ namespace
 				return;
 			}
 
+			++RenderableBingMap::numUploading;
+
 			uploaderPool.push([tile, tileBuffer, tileCachePath](int ID)
 			{
 				if(!contextSet)
@@ -251,6 +254,10 @@ namespace
 				tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
 
 				tile->handle = glGetTextureHandleARB(tile->textureID);
+
+				++RenderableBingMap::numTiles;
+
+				--RenderableBingMap::numUploading;
 
 				FILE * fp = fopen(tileCachePath.c_str(), "wb");
 
@@ -323,16 +330,10 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 		contextCreated = true;
 	}
 
-	glGenBuffers(1, &buffers.textureHandleBuffer);
-	glBindBuffer(GL_UNIFORM_BUFFER, buffers.textureHandleBuffer);
+	glGenBuffers(1,					&buffers.textureHandleBuffer);
+	glBindBuffer(GL_UNIFORM_BUFFER,  buffers.textureHandleBuffer);
 
-	glBufferStorage(GL_UNIFORM_BUFFER,
-		NUM_TEXTURES * sizeof(GLuint64) * 2,
-		nullptr,
-		GL_MAP_WRITE_BIT);
-
-	//pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, NUM_TEXTURES * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-	//pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, NUM_TEXTURES * sizeof(GLuint64), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+	glBufferStorage(GL_UNIFORM_BUFFER, NUM_TEXTURES * sizeof(GLuint64) * 2, nullptr, GL_MAP_WRITE_BIT);
 }
 
 RenderableBingMap::~RenderableBingMap()
@@ -421,6 +422,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	vector<Tile *> toRender;
 
+	const bool useBindlessTextures = true;
+
 	for (auto i : tiles)
 	{
 		if (i->textureID)
@@ -436,7 +439,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 				i->r->ensureVAO();
 
-				i->r->setShader(TextureShader::getDefaultInstance());
+				if(useBindlessTextures) { i->r->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
+				else					{ i->r->setShader(TextureShader			::getDefaultInstance()) ;}
 
 				i->r->setRenderOutline (false);
 				i->r->setRenderFill    (true);
@@ -448,47 +452,49 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 		}
 		else if (!i->loading)
 		{
-			if (loadingTiles.find(i) != loadingTiles.end())
-			{
-				dmess("Second load!");
-
-				continue;
-			}
-
-			loadingTiles.insert(i);
-
 			i->loading = true;
 
 			loaderPool.push([i](int ID) { fetchTile(ID, i) ;});
+
+			++numLoading;
 		}
 	}
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
-
-	GLuint64 * pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0,  toRender.size() * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
-	for(size_t i = 0; i < toRender.size(); ++i)
+	if(useBindlessTextures)
 	{
-		Tile * t = toRender[i];
+		glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
 
-		if(!t->textureResident)
-		{ 
-			glMakeTextureHandleResidentARB(t->handle);
+		GLuint64 * pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0,  toRender.size() * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-			t->textureResident = true;
+		for(size_t i = 0; i < toRender.size(); ++i)
+		{
+			Tile * t = toRender[i];
+
+			if(!t->textureResident)
+			{ 
+				glMakeTextureHandleResidentARB(t->handle);
+
+				t->textureResident = true;
+			}
+
+			pHandles[i * 2] = t->handle;		
 		}
 
-		pHandles[i * 2] = t->handle;		
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+		for(size_t i = 0; i < toRender.size(); ++i)
+		{
+			Tile * t = toRender[i];
+
+			BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
+
+			t->r->render(canvas);
+		}
 	}
-
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
-
-	for(size_t i = 0; i < toRender.size(); ++i)
+	else
 	{
-		Tile * t = toRender[i];
 
-		TextureShader::getDefaultInstance()->setTextureID2(i);
-
-		t->r->render(canvas);
 	}
+
+	RenderableBingMap::numRendered = toRender.size();
 }

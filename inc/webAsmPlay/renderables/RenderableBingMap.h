@@ -25,6 +25,7 @@
 */
 #pragma once
 
+#include <atomic>
 #include <webAsmPlay/renderables/Renderable.h>
 
 class Frustum;
@@ -36,6 +37,16 @@ public:
     static Renderable * create(const AABB2D & bounds, const glm::dmat4 & trans = glm::dmat4(1.0));
 
     void render(Canvas * canvas, const size_t renderStage = 0) const override;
+
+	static std::atomic<size_t> numTiles;
+
+	static std::atomic<size_t> numLoading;
+
+	static std::atomic<size_t> numDownloading;
+
+	static std::atomic<size_t> numUploading;
+
+	static size_t numRendered;
 
 private:
 

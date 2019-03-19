@@ -24,33 +24,47 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 440 core
 
-layout(location = 0) in vec3  vertIn;
-layout(location = 1) in float vertColorIn;
+#extension GL_ARB_bindless_texture : require
 
-uniform mat4      MVP;
-uniform mat4      MV;
-uniform float     colorLookupOffset;
-uniform float     heightMultiplier;
+out vec4 outColor;
+in vec2 UV;
 uniform sampler2D tex;
+//in uint texID;
+//uniform uvec2 texID;
+//uniform sampler2D  texID;
+uniform int texID;
+// Texture block
+/*
+layout (binding = 6, std140) uniform TEXTURE_BLOCK
+{
+sampler2D      texa[1024];
+};
+*/
 
-out vec4 vertexColorNear;
-out vec4 vertexColorFar;
-out vec4 position_in_view_space;
-out vec4 glPos;
+layout (binding = 6, std140) uniform TEXTURE_BLOCK
+{
+	sampler2D      texa[2048];
+};
+
+/*
+layout(binding = 0) uniform material
+{
+uvec2 Diffuse;
+
+} Material;
+*/
 
 void main()
 {
-	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
+	//outColor = texture( tex, UV );
+	outColor = texture( texa[texID], UV );
+	//outColor = texture(sampler2D(Material.Diffuse), UV);
+	//outColor = texture(sampler2D(texID), UV);
+	//outColor = texture(texID, UV);
 
-	position_in_view_space = MV * vert;
+	//outColor.r = 0.5;
 
-	gl_Position = MVP * vert;
-
-	glPos = gl_Position;
-
-	vertexColorNear = texture(tex, vec2(vertColorIn +        colorLookupOffset  / 32.0, 0.5));
-	vertexColorFar  = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
+	outColor.a = 1.0;
 }
-

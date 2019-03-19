@@ -25,9 +25,6 @@
 */
 #pragma once
 
-#include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
-#include <JSON.h>
 #include <webAsmPlay/shaders/Shader.h>
 
 class ColorDistanceShader : public Shader

@@ -30,6 +30,7 @@
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
+#include <webAsmPlay/renderables/RenderableBingMap.h>
 #pragma warning( pop ) 
 
 using namespace std;
@@ -52,26 +53,31 @@ void GUI::bingTileSystemPanel()
 
     const size_t zoomLevel = 15;
 
-    ivec2 pix = latLongToPixel(pos, zoomLevel);
+	const ivec2 pix = latLongToPixel(pos, zoomLevel);
 
-    dvec2 pos2 = pixelToLatLong(pix, zoomLevel);
+	const dvec2 pos2 = pixelToLatLong(pix, zoomLevel);
 
-    ivec2 tile = pixelToTile(pix);
+	const ivec2 tile = pixelToTile(pix);
 
-    string quadKey = tileToQuadKey(tile, zoomLevel);
+    const string quadKey = tileToQuadKey(tile, zoomLevel);
 
-    //dmess("pix " << pos.x << " " << pos.y << " " << pix.x << " " << pix.y << " " << pos2.x << " " << pos2.y);
-    //dmess("quadKey " << quadKey);
+	const size_t numTiles		= RenderableBingMap::numTiles;
+	const size_t numLoading		= RenderableBingMap::numLoading;
+	const size_t numDownloading = RenderableBingMap::numDownloading;
+	const size_t numUploading	= RenderableBingMap::numUploading;
 
     ImGui::Begin("Bing Tile System", &showBingTileSystemPanel);
 
-	ImGui::Text(("Local pos: " + toStr(vec2(canvas->getCursorPosWC()))).c_str());
-    ImGui::Text(("      pos: " + toStr(vec2(pos))).c_str());
-    ImGui::Text(("      pix: " + toStr(pix)).c_str());
-    ImGui::Text(("     tile: " + toStr(tile)).c_str());
-    ImGui::Text(("  quadKey: " + quadKey).c_str());
-
-	//dmess("quadKey " << quadKey);
+	ImGui::Text(("      Local pos: " + toStr(vec2(canvas->getCursorPosWC()))).c_str());
+    ImGui::Text(("            pos: " + toStr(vec2(pos))).c_str());
+    ImGui::Text(("            pix: " + toStr(pix)).c_str());
+    ImGui::Text(("           tile: " + toStr(tile)).c_str());
+    ImGui::Text(("        quadKey: " + quadKey).c_str());
+	ImGui::Text(("      num tiles: " + to_string(numTiles)).c_str());
+	ImGui::Text(("    num loading: " + to_string(numLoading)).c_str());
+	ImGui::Text(("num downloading: " + to_string(numDownloading)).c_str());
+	ImGui::Text(("  num uploading: " + to_string(numUploading)).c_str());
+	ImGui::Text(("   num rendered: " + to_string(RenderableBingMap::numRendered)).c_str());
 
     ImGui::End();
 }

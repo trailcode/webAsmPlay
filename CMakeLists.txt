@@ -253,6 +253,13 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
     ADD_CUSTOM_TARGET(web ALL DEPENDS ${webfile_dest})
 
+	add_executable(webAsmPlay ${sources} "src/Main.cpp")
+    
+    add_executable(worker "src/Worker.cpp")
+
+    set_target_properties(worker PROPERTIES LINK_FLAGS "-s EXPORTED_FUNCTIONS=\"['_one']\" -s BUILD_AS_WORKER=1")
+
+
 else()
 
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
@@ -281,7 +288,6 @@ else()
     link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
     link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG} optimized ${Boost_RANDOM_LIBRARY_RELEASE})
     link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
-	message(${GLFW3_LIBRARY})
 	link_libraries(${GLFW3_LIBRARY})
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
@@ -421,37 +427,24 @@ else()
 	#add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 	add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLEW)
 
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
-
-    add_executable(webAsmPlay ${sources} "src/Main.cpp")
-    
-    add_executable(worker "src/Worker.cpp")
-
-    set_target_properties(worker PROPERTIES LINK_FLAGS "-s EXPORTED_FUNCTIONS=\"['_one']\" -s BUILD_AS_WORKER=1")
-
-else()
-
 	add_library(libWebAsmPlay STATIC ${sources})
 	
 	add_executable(webAsmPlay "src/Main.cpp")
 	target_link_libraries(webAsmPlay libWebAsmPlay)
 
 	find_package(Expat REQUIRED)
-	find_package(Boost COMPONENTS filesystem system REQUIRED)
+	#find_package(Boost COMPONENTS filesystem system REQUIRED)
 	
 	add_executable(geoServer ${geoServer_SRC})
     
 	target_include_directories(geoServer PRIVATE "ThirdParty/LAStools")
 	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
-	target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
+	#target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
 
 	target_link_libraries(geoServer libWebAsmPlay)
     target_link_libraries(geoServer ${EXPAT_LIBRARIES}
                             debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE}
-                            debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
-							)
+                            debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
 
 	if(MSVC_VERSION)
 

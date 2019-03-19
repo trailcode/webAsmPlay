@@ -24,33 +24,18 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 440 core
 
-layout(location = 0) in vec3  vertIn;
-layout(location = 1) in float vertColorIn;
+layout(location = 0) in vec3 vertIn;
+layout(location = 3) in vec2 vertUV_In;
 
-uniform mat4      MVP;
-uniform mat4      MV;
-uniform float     colorLookupOffset;
-uniform float     heightMultiplier;
-uniform sampler2D tex;
+out vec2 UV;
 
-out vec4 vertexColorNear;
-out vec4 vertexColorFar;
-out vec4 position_in_view_space;
-out vec4 glPos;
+uniform mat4 MVP;
 
 void main()
 {
-	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
+	gl_Position = MVP * vec4(vertIn.xyz, 1);
 
-	position_in_view_space = MV * vert;
-
-	gl_Position = MVP * vert;
-
-	glPos = gl_Position;
-
-	vertexColorNear = texture(tex, vec2(vertColorIn +        colorLookupOffset  / 32.0, 0.5));
-	vertexColorFar  = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
+	UV = vertUV_In;
 }
-

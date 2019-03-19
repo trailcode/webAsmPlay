@@ -55,6 +55,7 @@
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/TileBoundaryShader.h>
 #include <webAsmPlay/shaders/TextureLookupShader.h>
+#include <webAsmPlay/shaders/BindlessTextureShader.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/renderables/GridPlane.h>
 #include <webAsmPlay/geom/GeosUtil.h>
@@ -572,6 +573,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     TextureShader             ::ensureShader();
     TileBoundaryShader        ::ensureShader();
 	TextureLookupShader		  ::ensureShader();
+	BindlessTextureShader	  ::ensureShader();
     
     canvas = new Canvas(false);
 

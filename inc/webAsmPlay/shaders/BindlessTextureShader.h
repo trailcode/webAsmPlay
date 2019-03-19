@@ -21,36 +21,30 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2019
+\copyright 2018
 */
+#pragma once
 
-#version 330 core
+#include <webAsmPlay/shaders/Shader.h>
 
-layout(location = 0) in vec3  vertIn;
-layout(location = 1) in float vertColorIn;
-
-uniform mat4      MVP;
-uniform mat4      MV;
-uniform float     colorLookupOffset;
-uniform float     heightMultiplier;
-uniform sampler2D tex;
-
-out vec4 vertexColorNear;
-out vec4 vertexColorFar;
-out vec4 position_in_view_space;
-out vec4 glPos;
-
-void main()
+class BindlessTextureShader : public Shader
 {
-	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
+public:
 
-	position_in_view_space = MV * vert;
+	static BindlessTextureShader * getDefaultInstance();
 
-	gl_Position = MVP * vert;
+	static void ensureShader();
 
-	glPos = gl_Position;
+	void bind(	Canvas     * canvas,
+				const bool   isOutline,
+				const size_t renderingStage = 0) override;
 
-	vertexColorNear = texture(tex, vec2(vertColorIn +        colorLookupOffset  / 32.0, 0.5));
-	vertexColorFar  = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
-}
+	BindlessTextureShader();
+	~BindlessTextureShader();
 
+	GLuint setTextureSlot(const GLuint textureSlot);
+
+private:
+
+	GLuint textureSlot = 0;
+};

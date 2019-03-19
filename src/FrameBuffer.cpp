@@ -29,7 +29,7 @@
 
 using namespace glm;
 
-FrameBuffer * FrameBuffer::create(const ivec2 & bufferSize)
+FrameBuffer * FrameBuffer::create(const ivec2 & bufferSize, const GLint internalformat, const GLenum format, const GLenum type)
 {
     GLuint framebuffer          = 0;
     GLuint textureColorbuffer   = 0;
@@ -41,15 +41,8 @@ FrameBuffer * FrameBuffer::create(const ivec2 & bufferSize)
     // create a color attachment texture
     GL_CHECK(glGenTextures(1, &textureColorbuffer));
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, textureColorbuffer));
-    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferSize.x, bufferSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
-    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferSize.x, bufferSize.y, 0, GL_RGBA, GL_FLOAT, NULL));
-    GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, bufferSize.x, bufferSize.y, 0, GL_RGBA, GL_FLOAT, NULL));
-    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, bufferSize.x, bufferSize.y, 0, GL_LUMINANCE, GL_FLOAT, NULL));
-    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferSize.x, bufferSize.y, 0, GL_RGBA, GL_UNSIGNED_   INT, NULL));
-    //GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, bufferSize.x, bufferSize.y, 0, GL_RGB, GL_HALF_FLOAT, NULL));
-    //GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    //GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-
+    GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, internalformat, bufferSize.x, bufferSize.y, 0, format, type, NULL));
+    
 	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
@@ -59,9 +52,7 @@ FrameBuffer * FrameBuffer::create(const ivec2 & bufferSize)
     GL_CHECK(glGenRenderbuffers(1, &rbo));
     GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, rbo));
     GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, bufferSize.x, bufferSize.y)); // use a single renderbuffer object for both a depth AND stencil buffer.
-    //GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, bufferSize.x, bufferSize.y)); // use a single renderbuffer object for both a depth AND stencil buffer.
     GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo)); // now actually attach it
-    //GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo)); // now actually attach it
 
     // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)

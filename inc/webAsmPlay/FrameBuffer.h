@@ -23,6 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
+
 #pragma once
 
 #include <glm/vec2.hpp>
@@ -32,7 +33,7 @@ class FrameBuffer
 {
 public:
 
-    static FrameBuffer * create(const glm::ivec2 & bufferSize);
+    static FrameBuffer * create(const glm::ivec2 & bufferSize, const GLint internalformat = GL_RGBA32F, const GLenum format = GL_RGBA, const GLenum type = GL_FLOAT);
 
     static FrameBuffer * ensureFrameBuffer(FrameBuffer *& currBuffer, const glm::ivec2 & bufferSize);
 

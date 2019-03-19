@@ -28,6 +28,7 @@
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/ColorSymbology.h>
+#include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 
@@ -154,22 +155,11 @@ void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutlin
 
     GL_CHECK(glEnable(GL_DEPTH_TEST));
 
-    /*
-    ShaderProgram::enableVertexAttribArray( vertInAttrDepth,
-                                            vertexFormat.size,
-                                            GL_FLOAT,
-                                            GL_FALSE,
-                                            vertexFormat.stride,
-                                            vertexFormat.pointer);
-                                            */
-
     shaderProgramDepth->setUniformf(heightMultiplierDepth,    heightMultiplier);
     shaderProgramDepth->setUniform (modelDepth,               canvas->getModelRef());
     shaderProgramDepth->setUniform (viewDepth,                canvas->getViewRef());
     shaderProgramDepth->setUniform (projectionDepth,          canvas->getProjectionRef());
 }
-
-#include <webAsmPlay/FrameBuffer.h>
 
 void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutline)
 {
@@ -212,8 +202,8 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
         shaderProgramOutline->setUniformi(depthTexUniformOutline,   1);
         shaderProgramOutline->setUniformf(widthUniformOutline,      canvas->getFrameBufferSize().x);
         shaderProgramOutline->setUniformf(heightUniformOutline,     canvas->getFrameBufferSize().y);
-        shaderProgramOutline->setUniform(MV_Outline,                canvas->getMV_Ref());
-        shaderProgramOutline->setUniform(MVP_Outline,               canvas->getMVP_Ref());
+        shaderProgramOutline->setUniform (MV_Outline,               canvas->getMV_Ref());
+        shaderProgramOutline->setUniform (MVP_Outline,              canvas->getMVP_Ref());
         shaderProgramOutline->setUniformi(texUniformOutline,        0);
         shaderProgramOutline->setUniformf(colorLookupOffsetOutline, 1.0f);
     }
