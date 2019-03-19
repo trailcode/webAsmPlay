@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
 set(default_build_type "Release")
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 set(USE_FOLDERS ON)
 
@@ -56,7 +56,9 @@ if(MSVC_VERSION)
 	set(CURL_LIBRARY_RELEASE			${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl.lib)
 	set(CURL_LIBRARY_DEBUG				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl_debug.lib)
 
-
+else()
+    set(CURL_LIBRARY_RELEASE ${CURL_LIBRARY})
+    set(CURL_LIBRARY_DEBUG ${CURL_LIBRARY})
 endif()
 
 #set (CMAKE_CXX_STANDARD 17)
@@ -261,7 +263,8 @@ else()
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
 	find_package(GLEW REQUIRED)
-	find_package(TBB REQUIRED)
+    find_package(TBB REQUIRED)
+    find_package(curl REQUIRED)
 
 	include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${CURL_INCLUDE_DIR})
@@ -274,7 +277,10 @@ else()
 	#include_directories(ThirdParty/gl3w/inc)
     include_directories(./)
     
-	link_libraries(debug ${CURL_LIBRARY_DEBUG} optimized ${CURL_LIBRARY_RELEASE})
+    link_libraries(debug ${CURL_LIBRARY_DEBUG} optimized ${CURL_LIBRARY_RELEASE})
+    link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
+    link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG} optimized ${Boost_RANDOM_LIBRARY_RELEASE})
+    link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
 	message(${GLFW3_LIBRARY})
 	link_libraries(${GLFW3_LIBRARY})
     link_libraries(${SDL2_IMAGE_LIBRARY})
