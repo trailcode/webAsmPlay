@@ -33,9 +33,16 @@ class FrameBuffer
 {
 public:
 
-    static FrameBuffer * create(const glm::ivec2 & bufferSize, const GLint internalformat = GL_RGBA32F, const GLenum format = GL_RGBA, const GLenum type = GL_FLOAT);
+    static FrameBuffer * create(const glm::ivec2 & bufferSize,
+								const GLint		   internalformat	= GL_RGBA32F,
+								const GLenum	   format			= GL_RGBA,
+								const GLenum	   type				= GL_FLOAT);
 
-    static FrameBuffer * ensureFrameBuffer(FrameBuffer *& currBuffer, const glm::ivec2 & bufferSize);
+    static FrameBuffer * ensureFrameBuffer(	FrameBuffer		*& currBuffer,
+											const glm::ivec2 & bufferSize,
+											const GLint		   internalformat	= GL_RGBA32F,
+											const GLenum	   format			= GL_RGBA,
+											const GLenum	   type				= GL_FLOAT);
 
     ~FrameBuffer();
 
@@ -51,7 +58,10 @@ private:
     FrameBuffer(const GLuint       framebuffer,
                 const GLuint       textureColorbuffer,
                 const GLuint       rbo,
-                const glm::ivec2 & bufferSize);
+                const glm::ivec2 & bufferSize,
+				const GLint		   internalformat,
+				const GLenum	   format,
+				const GLenum	   type);
 
     const GLuint framebuffer;
     const GLuint textureColorbuffer;
@@ -60,4 +70,8 @@ private:
     const glm::ivec2 bufferSize;
 
     GLint prevFB = 0;
+
+	const GLint	 internalformat;
+	const GLenum format;
+	const GLenum type;
 };

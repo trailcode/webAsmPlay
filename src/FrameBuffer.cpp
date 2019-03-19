@@ -69,12 +69,23 @@ FrameBuffer * FrameBuffer::create(const ivec2 & bufferSize, const GLint internal
     return new FrameBuffer( framebuffer,
                             textureColorbuffer,
                             rbo,
-                            bufferSize);
+                            bufferSize,
+							internalformat,
+							format,
+							type);
 }
 
-FrameBuffer * FrameBuffer::ensureFrameBuffer(FrameBuffer *& currBuffer, const ivec2 & bufferSize)
+FrameBuffer * FrameBuffer::ensureFrameBuffer(	FrameBuffer *& currBuffer,
+												const ivec2  & bufferSize,
+												const GLint    internalformat,
+												const GLenum   format,
+												const GLenum   type)
 {
-    if(currBuffer && bufferSize == currBuffer->getBufferSize()) { return currBuffer ;}
+    if(	currBuffer													&&
+		bufferSize					== currBuffer->getBufferSize()	&&
+		currBuffer->internalformat	== internalformat				&&
+		currBuffer->format			== format						&&
+		currBuffer->type			== type) { return currBuffer ;}
 	
 	delete currBuffer;
 
@@ -84,10 +95,16 @@ FrameBuffer * FrameBuffer::ensureFrameBuffer(FrameBuffer *& currBuffer, const iv
 FrameBuffer::FrameBuffer(   const GLuint   framebuffer,
                             const GLuint   textureColorbuffer,
                             const GLuint   rbo,
-                            const ivec2  & bufferSize) : framebuffer         (framebuffer),
-                                                         textureColorbuffer  (textureColorbuffer),
-                                                         rbo                 (rbo),
-                                                         bufferSize          (bufferSize)
+                            const ivec2  & bufferSize,
+							const GLint	   internalformat,
+							const GLenum   format,
+							const GLenum   type) :  framebuffer         (framebuffer),
+                                                    textureColorbuffer  (textureColorbuffer),
+                                                    rbo                 (rbo),
+                                                    bufferSize          (bufferSize),
+													internalformat		(internalformat),
+													format				(format),
+													type				(type)
 {
 }
 
@@ -106,14 +123,9 @@ void FrameBuffer::bind()
 {
     GL_CHECK(glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &prevFB));
 
-    //dmess("prevFB " << prevFB << " framebuffer " << framebuffer);
-
     GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
-
-    //GL_CHECK(glViewport(0, 0, bufferSize.x, bufferSize.y));
 }
 
 void FrameBuffer::unbind() { GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, prevFB)) ;}
-//void FrameBuffer::unbind() { GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 1)) ;}
 
 GLuint FrameBuffer::getTextureID() const { return textureColorbuffer ;}
