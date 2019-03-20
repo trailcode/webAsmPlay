@@ -92,14 +92,14 @@ namespace
 	//GLuint64 * pHandles = NULL;
 
     // Define our struct for accepting LCs output
-    struct BufferStruct // TODO code dupilcation
+    struct BufferStruct // TODO code duplication
     {
         char * buffer;
         size_t size;
     };
 
     // This is the function we pass to LC, which writes the output to a BufferStruct
-    static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) // TODO code dupilcation
+    static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) // TODO code duplication
     {
         size_t realsize = size * nmemb;
 
@@ -437,7 +437,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	vector<Tile *> toRender;
 
-	const bool useBindlessTextures = true;
+	const bool useBindlessTextures = false;
 
 	for (auto i : tiles)
 	{
@@ -508,7 +508,12 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 	}
 	else
 	{
-
+        for(auto tile : toRender)
+        {
+            TextureShader::getDefaultInstance()->setTextureID(tile->textureID);
+            
+            tile->r->render(canvas);
+        }
 	}
 
 	RenderableBingMap::numRendered = toRender.size();
