@@ -43,15 +43,8 @@ public:
               const size_t renderingStage = 0) override;
 
     GLuint setTextureID(const GLuint textureID);
-	GLuint setTextureID2(const GLuint textureID2);
-
-	GLuint64 setTextureHandle(const GLuint64 & handle);
-
+	
 private:
 
     GLuint textureID = 0;
-
-	GLuint textureID2 = 0;
-
-	GLuint64 handle = 0;
 };
