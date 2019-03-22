@@ -30,7 +30,7 @@
 
 out vec4 outColor;
 in vec2 UV;
-uniform sampler2D tex;
+//uniform sampler2D tex;
 //in uint texID;
 //uniform uvec2 texID;
 //uniform sampler2D  texID;

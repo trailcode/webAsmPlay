@@ -425,6 +425,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	textureBuffer->bind();
 	
+	//GL_CHECK(glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
 	theTex = textureBuffer->getTextureID();
 
 	//dmess("theTex " << theTex);
@@ -444,7 +446,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	vector<Tile *> toRender;
 
-	const bool useBindlessTextures = false;
+	const bool useBindlessTextures = true;
 
 	for (auto i : tiles)
 	{
