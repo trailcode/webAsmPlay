@@ -159,6 +159,13 @@ namespace
 
 		//dmess("url " << url);
 
+		// http://ecn.{subdomain}.tiles.virtualearth.net/tiles/hs0203232101212100{faceId}{tileId}?g=6617&key={BingMapsKey}
+															   //0231010301213112
+															   //0231010301210232
+															   //0201012211200132
+		
+		//dmess("url " << url);
+
 		curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
 		result = curl_easy_perform( myHandle );
 		//dmess("result " << result << " myHandle " << myHandle);
