@@ -285,9 +285,15 @@ else()
     include_directories(./)
     
     link_libraries(debug ${CURL_LIBRARY_DEBUG} optimized ${CURL_LIBRARY_RELEASE})
-    #link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
-    #link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG} optimized ${Boost_RANDOM_LIBRARY_RELEASE})
-    #link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
+
+    if(APPLE) # TODO Try to remove.
+
+        link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
+        link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG} optimized ${Boost_RANDOM_LIBRARY_RELEASE})
+        link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
+
+    endif()
+
 	link_libraries(${GLFW3_LIBRARY})
     link_libraries(${SDL2_IMAGE_LIBRARY})
     link_libraries(${SDL2_LIBRARIES})
