@@ -34,7 +34,7 @@ uniform sampler2D tex;
 //in uint texID;
 //uniform uvec2 texID;
 //uniform sampler2D  texID;
-uniform int texID;
+//uniform int texID;
 // Texture block
 /*
 layout (binding = 6, std140) uniform TEXTURE_BLOCK
@@ -43,10 +43,12 @@ layout (binding = 6, std140) uniform TEXTURE_BLOCK
 };
 */
 
+/*
 layout (binding = 6, std140) uniform TEXTURE_BLOCK
 {
 	sampler2D      texa[2048];
 };
+*/
 
 /*
 layout(binding = 0) uniform material
@@ -58,8 +60,8 @@ layout(binding = 0) uniform material
 
 void main()
 {
-	//outColor = texture( tex, UV );
-	outColor = texture( texa[texID], UV );
+	outColor = texture( tex, UV );
+	//outColor = texture( texa[texID], UV );
 	//outColor = texture(sampler2D(Material.Diffuse), UV);
 	//outColor = texture(sampler2D(texID), UV);
 	//outColor = texture(texID, UV);

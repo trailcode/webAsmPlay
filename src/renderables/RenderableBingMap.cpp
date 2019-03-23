@@ -437,7 +437,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	vector<Tile *> toRender;
 
-	const bool useBindlessTextures = true;
+	const bool useBindlessTextures = false;
 
 	for (auto i : tiles)
 	{
@@ -500,6 +500,9 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 		for(size_t i = 0; i < toRender.size(); ++i)
 		{
 			Tile * t = toRender[i];
+
+			if(useBindlessTextures) { t->r->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
+			else					{ t->r->setShader(TextureShader			::getDefaultInstance()) ;}
 
 			BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
 

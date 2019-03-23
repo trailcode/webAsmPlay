@@ -47,8 +47,8 @@ void BindlessTextureShader::ensureShader()
 {
 	if(shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  "TextureShader.vs.glsl",
-											"TextureShader.fs.glsl",
+	shaderProgram = ShaderProgram::create(  "BindlessTextureShader.vs.glsl",
+											"BindlessTextureShader.fs.glsl",
 											Variables({{"vertIn",       vertInAttrLoc},
 													   {"vertUV_In",    vertUV_InAttrLoc}
 													  }),
