@@ -51,7 +51,7 @@ void GUI::bingTileSystemPanel()
     pos.y = tmp;
 	*/
 
-    const size_t zoomLevel = 15;
+    const size_t zoomLevel = 16;
 
 	const ivec2 pix = latLongToPixel(pos, zoomLevel);
 
@@ -60,6 +60,9 @@ void GUI::bingTileSystemPanel()
 	const ivec2 tile = pixelToTile(pix);
 
     const string quadKey = tileToQuadKey(tile, zoomLevel);
+
+	//dmess("quadKey " << quadKey);
+	//dmess("pos " << pos);
 
 	const size_t numTiles		= RenderableBingMap::numTiles;
 	const size_t numLoading		= RenderableBingMap::numLoading;

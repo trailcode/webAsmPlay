@@ -37,7 +37,7 @@ namespace
 	GLint vertUV_InAttrLoc;
 
 	GLint MVP_Loc;
-	GLint texLoc;
+	//GLint texLoc;
 	GLint texID_Loc;
 }
 
@@ -53,7 +53,7 @@ void BindlessTextureShader::ensureShader()
 													   {"vertUV_In",    vertUV_InAttrLoc}
 													  }),
 											Variables({{"MVP",          MVP_Loc},
-													   {"tex",          texLoc},
+													   //{"tex",          texLoc},
 													   {"texID",		texID_Loc}}));
 
 	defaultInstance = new BindlessTextureShader();

@@ -92,14 +92,14 @@ namespace
 	//GLuint64 * pHandles = NULL;
 
     // Define our struct for accepting LCs output
-    struct BufferStruct // TODO code dupilcation
+    struct BufferStruct // TODO code duplication
     {
         char * buffer;
         size_t size;
     };
 
     // This is the function we pass to LC, which writes the output to a BufferStruct
-    static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) // TODO code dupilcation
+    static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) // TODO code duplication
     {
         size_t realsize = size * nmemb;
 
@@ -157,6 +157,13 @@ namespace
 
 		const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
 
+		//dmess("url " << url);
+
+		// http://ecn.{subdomain}.tiles.virtualearth.net/tiles/hs0203232101212100{faceId}{tileId}?g=6617&key={BingMapsKey}
+															   //0231010301213112
+															   //0231010301210232
+															   //0201012211200132
+		
 		//dmess("url " << url);
 
 		curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
@@ -418,6 +425,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	textureBuffer->bind();
 	
+	//GL_CHECK(glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
 	theTex = textureBuffer->getTextureID();
 
 	//dmess("theTex " << theTex);
@@ -511,7 +520,12 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 	}
 	else
 	{
-
+        for(auto tile : toRender)
+        {
+            TextureShader::getDefaultInstance()->setTextureID(tile->textureID);
+            
+            tile->r->render(canvas);
+        }
 	}
 
 	RenderableBingMap::numRendered = toRender.size();

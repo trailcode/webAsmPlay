@@ -24,9 +24,7 @@
 \copyright 2019
 */
 
-#version 440 core
-
-#extension GL_ARB_bindless_texture : require
+#version 330 core
 
 out vec4 outColor;
 in vec2 UV;

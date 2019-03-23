@@ -43,7 +43,7 @@ out vec4 position_in_view_space;
 out vec3 normal;
 out vec3 fragPos;
 out vec4 glPos;
-out vec4 fragCoord2D;
+noperspective out vec4 fragCoord2D;
 
 void main()
 {
