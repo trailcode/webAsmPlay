@@ -48,8 +48,8 @@ void main()
 
 	gl_Position = MVP * vert;
 
-	vertexColorNear = texture(tex, vec2(vertColorIn + colorLookupOffset / 32.0, 0.5));
-	vertexColorFar = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
+	vertexColorNear = texture(tex, vec2(vertColorIn +		 colorLookupOffset  / 32.0, 0.5));
+	vertexColorFar = texture(tex,  vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
 
 	fragCoord2D  = MVP * vec4(vert.xy, 0, 1);
 
@@ -58,7 +58,7 @@ void main()
 	fragCoord2D.w    = 1.0 / fragCoord2D.w; // Invert W
 
 											// Vertex in window-space
-	fragCoord2D.xyz *= vec3 (0.5) + vec3 (0.5); // Rescale: [0,1]^3
+	fragCoord2D.xyz *= vec3(0.5) + vec3(0.5); // Rescale: [0,1]^3
 
 	fragCoord2D.xyz += vec3(1);
 

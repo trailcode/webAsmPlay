@@ -81,7 +81,14 @@ int main(int, char**)
 #endif
 
     // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+    //GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+	//GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+
+	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+	dmess("mode->width " << mode->width << " mode->height " << mode->height);
+
+	GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "My Title", glfwGetPrimaryMonitor(), NULL);
     //GLFWwindow* window = glfwCreateWindow(640, 480, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
     if (window == NULL)
         return 1;

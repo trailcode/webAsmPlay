@@ -43,7 +43,8 @@ out vec4 position_in_view_space;
 out vec3 normal;
 out vec3 fragPos;
 out vec4 glPos;
-noperspective out vec4 fragCoord2D;
+//noperspective out vec4 fragCoord2D;
+out vec4 fragCoord2D;
 
 void main()
 {
@@ -72,7 +73,7 @@ void main()
 	fragCoord2D.w    = 1.0 / fragCoord2D.w; // Invert W
 
 													// Vertex in window-space
-	fragCoord2D.xyz *= vec3 (0.5) + vec3 (0.5); // Rescale: [0,1]^3
+	fragCoord2D.xyz *= vec3(0.5) + vec3(0.5); // Rescale: [0,1]^3
 
 	fragCoord2D.xyz += vec3(1);
 
