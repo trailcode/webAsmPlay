@@ -303,6 +303,8 @@ namespace
 	}
 
 	vector<Tile *> tiles;
+
+    const bool useBindlessTextures = false;
 }
 
 void RenderableBingMap::getStartLevel()
@@ -337,10 +339,13 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 		contextCreated = true;
 	}
 
-	glGenBuffers(1,					&buffers.textureHandleBuffer);
-	glBindBuffer(GL_UNIFORM_BUFFER,  buffers.textureHandleBuffer);
+    if(useBindlessTextures)
+    {
+        glGenBuffers(1,					&buffers.textureHandleBuffer);
+        glBindBuffer(GL_UNIFORM_BUFFER,  buffers.textureHandleBuffer);
 
-	glBufferStorage(GL_UNIFORM_BUFFER, NUM_TEXTURES * sizeof(GLuint64) * 2, nullptr, GL_MAP_WRITE_BIT);
+        glBufferStorage(GL_UNIFORM_BUFFER, NUM_TEXTURES * sizeof(GLuint64) * 2, nullptr, GL_MAP_WRITE_BIT);
+    }
 }
 
 RenderableBingMap::~RenderableBingMap()
@@ -445,8 +450,6 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 	size_t numRendered = 0;
 
 	vector<Tile *> toRender;
-
-	const bool useBindlessTextures = false;
 
 	for (auto i : tiles)
 	{
