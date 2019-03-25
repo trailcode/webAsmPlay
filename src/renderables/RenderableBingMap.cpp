@@ -118,13 +118,6 @@ namespace
         return realsize;
     }
 
-    unordered_set<int> createdContexts;
-
-    bool contextCreated = false;
-	bool contextSet = false;
-
-	static GLFWwindow * threadWin = NULL;
-
 	typedef pair<const char *, const size_t> TileBuffer;
 
 	TileBuffer downloadTile(const int ID, const string & quadKey)
@@ -221,19 +214,6 @@ namespace
 			{
 				OpenGL::ensureSharedContext();
 
-				/*
-				if(!contextSet)
-				{ 
-					glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-
-					threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
-					glfwMakeContextCurrent(threadWin);
-
-					contextSet = true;
-				}
-				*/
-
 				tile->textureID = Textures::load(tileCachePath);
 
 				tile->handle = glGetTextureHandleARB(tile->textureID);
@@ -261,19 +241,6 @@ namespace
 			uploaderPool.push([tile, tileBuffer, tileCachePath](int ID)
 			{
 				OpenGL::ensureSharedContext();
-
-				/*
-				if(!contextSet)
-				{ 
-					glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-
-					threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
-					glfwMakeContextCurrent(threadWin);
-
-					contextSet = true;
-				}
-				*/
 
 				tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
 
@@ -342,18 +309,7 @@ Renderable * RenderableBingMap::create(const AABB2D & bounds, const dmat4 & tran
 RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds), trans(trans)
 {
 	getStartLevel();
-	//return;
-
-	if(!contextCreated)
-	{
-		// TODO Create a openGL context class;
-		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-
-		threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
-		contextCreated = true;
-	}
-
+	
 	glGenBuffers(1,					&buffers.textureHandleBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER,  buffers.textureHandleBuffer);
 

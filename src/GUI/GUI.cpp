@@ -47,6 +47,7 @@
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/OpenSteerCanvas.h>
 #include <webAsmPlay/ColorSymbology.h>
+#include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
@@ -621,29 +622,11 @@ void GUI::createWorld()
     if(renderSettingsRenderSkyBox) { canvas->setSkyBox(skyBox) ;} // TODO create check render functor
     else                           { canvas->setSkyBox(NULL)   ;}
 
-	// TODO Create a openGL context class;
-	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+    pool.push([](int ID) {
+        
+		OpenGL::ensureSharedContext();
 
-	// TODO abstract this
-	GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
-	client = new GeoClient(canvas);
-
-    pool.push([threadWin](int ID) {
-        // TODO Create a openGL context class;
-		/*
-        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-
-        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
-        glfwMakeContextCurrent(threadWin);
-		//*/
-
-		glfwMakeContextCurrent(threadWin);
-
-        //client = new GeoClient(canvas);
-
-        //return;
+		client = new GeoClient(canvas);
 
         //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
         client->loadGeometry("data.geo");

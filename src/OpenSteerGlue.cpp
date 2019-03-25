@@ -144,41 +144,11 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 
-	GLFWwindow* threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
 	OpenSteerDemo::initialize();
 
-    openSteerThread = new thread([threadWin]()
+    openSteerThread = new thread([]()
     {
-		//return;
-
-        glfwMakeContextCurrent(threadWin);
-
-		/*
-		if (glewInit())
-		{
-			dmess("failed to initialize OpenGL\n");
-
-			exit(-1);
-		}
-		*/
-
-        //gl3wInit();
-		/*
-		if (gl3wInit())
-		{
-			dmess("failed to initialize OpenGL\n");
-
-			exit(-1);
-		}
-		//*/
-		//gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
-        dmess("Start OpenSteerDemo::initialize()");
-
-        //OpenSteerDemo::initialize();
-
-        dmess("Done OpenSteerDemo::initialize()");
+		
 
         for(; !GUI::isShuttingDown() ;) { updateOpenSteer() ;}
 
