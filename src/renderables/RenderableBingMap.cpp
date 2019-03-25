@@ -42,6 +42,7 @@
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>
+#include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
 #include <webAsmPlay/shaders/ColorShader.h>
@@ -218,12 +219,20 @@ namespace
 
 			uploaderPool.push([tile, tileCachePath](int ID)
 			{
+				OpenGL::ensureSharedContext();
+
+				/*
 				if(!contextSet)
 				{ 
+					glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+					threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
 					glfwMakeContextCurrent(threadWin);
 
 					contextSet = true;
 				}
+				*/
 
 				tile->textureID = Textures::load(tileCachePath);
 
@@ -251,12 +260,20 @@ namespace
 
 			uploaderPool.push([tile, tileBuffer, tileCachePath](int ID)
 			{
+				OpenGL::ensureSharedContext();
+
+				/*
 				if(!contextSet)
 				{ 
+					glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+					threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
+
 					glfwMakeContextCurrent(threadWin);
 
 					contextSet = true;
 				}
+				*/
 
 				tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
 

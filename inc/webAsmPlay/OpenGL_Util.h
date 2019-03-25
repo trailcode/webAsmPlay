@@ -64,4 +64,17 @@
     #define GL_CHECK(stmt) stmt
 #endif
 
+class OpenGL
+{
+public:
+
+	static void initSharedContexts();
+
+	static void ensureSharedContext();
+
+private:
+
+	OpenGL() {}
+	~OpenGL() {}
+};
 

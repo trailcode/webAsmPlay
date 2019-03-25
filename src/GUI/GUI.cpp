@@ -575,6 +575,8 @@ void GUI::initOpenGL() // TODO, need some code refactor here
 	TextureLookupShader		  ::ensureShader();
 	BindlessTextureShader	  ::ensureShader();
     
+	OpenGL::initSharedContexts();
+
     canvas = new Canvas(false);
 
     canvas->setArea(ivec2(0,0), ivec2(width, height));
