@@ -94,7 +94,9 @@ public:
 
     std::string doPicking(const char mode, const glm::dvec4 & pos) const;
 
-    void addGeometry(const char * data);
+    void createWorld(const char * data);
+
+	void addGeometry(const char * data);
 
     Network * getNetwork() const;
 

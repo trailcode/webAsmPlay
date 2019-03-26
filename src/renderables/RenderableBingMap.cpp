@@ -54,6 +54,7 @@
 
 using namespace std;
 using namespace glm;
+using namespace ctpl;
 using namespace geosUtil;
 using namespace bingTileSystem;
 
@@ -68,9 +69,9 @@ namespace
 {
 #ifndef __EMSCRIPTEN__
 
-    ctpl::thread_pool loaderPool(16);
+    thread_pool loaderPool(16);
 
-    ctpl::thread_pool uploaderPool(1);
+    thread_pool uploaderPool(1);
 
     mutex loaderMutex;
     mutex uploaderMutex;

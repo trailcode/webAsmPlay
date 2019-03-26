@@ -25,6 +25,7 @@
   \copyright 2018
 */
 
+#include <ctpl/ctpl.h>
 #include <geos/geom/LineString.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/index/quadtree/Quadtree.h>
@@ -48,12 +49,13 @@
 using namespace std;
 using namespace std::chrono;
 using namespace glm;
+using namespace ctpl;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
 
-void GeoClient::addGeometry(const char * data)
+void GeoClient::createWorld(const char * data)
 {
-    dmess("GeoClient::addGeometry");
+    dmess("GeoClient::createWorld");
 
     GUI::progress("Polygon index:", 0.0f);
 
@@ -68,11 +70,18 @@ void GeoClient::addGeometry(const char * data)
     
     inverseTrans = inverse(trans);
 
-    createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
-    createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
-    createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
+	GUI::guiASync([this]() { addBingMap(GUI::renderSettingsRenderBingMaps) ;});
 
-    OpenSteerGlue::init(canvas, getNetwork());
+	addGeometry(data);
+}
+
+void GeoClient::addGeometry(const char* data)
+{
+	createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
+	createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
+	createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
+
+	OpenSteerGlue::init(canvas, getNetwork());
 }
 
 namespace
@@ -94,6 +103,8 @@ namespace
 
         return make_pair(height, minHeight);
     }
+
+	thread_pool indexerPool(1);
 }
 
 void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms)
@@ -104,26 +115,31 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     auto startTime = system_clock::now();
 
-    for(size_t i = 0; i < geoms.size(); ++i)
-    {
-        doProgress("(5/6) Indexing polygons:", i, geoms.size(), startTime);
+	indexerPool.push([this, &geoms](int ID)
+	{
+		OpenGL::ensureSharedContext();
 
-        Attributes     * attrs;
-        const Geometry * g;
+		for(size_t i = 0; i < geoms.size(); ++i)
+		{
+			//doProgress("(5/6) Indexing polygons:", i, geoms.size(), startTime);
+
+			Attributes     * attrs;
+			const Geometry * g;
         
-        tie(attrs, g) = geoms[i];
+			tie(attrs, g) = geoms[i];
 
-        Renderable * r = Renderable::create(g, trans);
+			Renderable * r = Renderable::create(g, trans);
         
-        if(!r) { continue ;}
+			if(!r) { continue ;}
         
-        r->setRenderFill   (true);
-        r->setRenderOutline(true);
+			r->setRenderFill   (true);
+			r->setRenderOutline(true);
 
-        tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
+			tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
 
-        quadTreePolygons->insert(g->getEnvelopeInternal(), data);
-    }
+			quadTreePolygons->insert(g->getEnvelopeInternal(), data);
+		}
+	});
 
     GUI::progress("", 1.0f);
 
@@ -205,6 +221,8 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 		});
     }
     
+	indexerPool.stop(true);
+
     dmess("End base geom");
 }
 
@@ -218,49 +236,49 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     vector<Edge *> edges;
 
-    for(size_t i = 0; i < geoms.size(); ++i)
-    {
-        doProgress("(2/6) Indexing linestrings:", i, geoms.size(), startTime);
+	for(size_t i = 0; i < geoms.size(); ++i)
+	{
+		//doProgress("(2/6) Indexing linestrings:", i, geoms.size(), startTime);
 
-        Attributes     * attrs   = geoms[i].first;
-        const Geometry * geom    = geoms[i].second;
-        GLuint           colorID = 0;
+		Attributes     * attrs   = geoms[i].first;
+		const Geometry * geom    = geoms[i].second;
+		GLuint           colorID = 0;
 
-        // TODO Code dup!
+		// TODO Code dup!
 
-             if(attrs->hasStringKeyValue("highway", "motorway"))     { colorID = 1 ;}
-        else if(attrs->hasStringKeyValue("highway", "trunk"))        { colorID = 2 ;}
-        else if(attrs->hasStringKeyValue("highway", "primary"))      { colorID = 3 ;}
-        else if(attrs->hasStringKeyValue("highway", "secondary"))    { colorID = 4 ;}
-        else if(attrs->hasStringKeyValue("highway", "tertiary"))     { colorID = 5 ;}
-        else if(attrs->hasStringKeyValue("highway", "unclassified")) { colorID = 6 ;}
-        else if(attrs->hasStringKeyValue("highway", "residential"))  { colorID = 7 ;}
-        else if(attrs->hasStringKeyValue("highway", "service"))      { colorID = 8 ;}
-        else if(attrs->hasStringKey     ("highway"))                 { colorID = 9 ;}
+				if(attrs->hasStringKeyValue("highway", "motorway"))     { colorID = 1 ;}
+		else if(attrs->hasStringKeyValue("highway", "trunk"))        { colorID = 2 ;}
+		else if(attrs->hasStringKeyValue("highway", "primary"))      { colorID = 3 ;}
+		else if(attrs->hasStringKeyValue("highway", "secondary"))    { colorID = 4 ;}
+		else if(attrs->hasStringKeyValue("highway", "tertiary"))     { colorID = 5 ;}
+		else if(attrs->hasStringKeyValue("highway", "unclassified")) { colorID = 6 ;}
+		else if(attrs->hasStringKeyValue("highway", "residential"))  { colorID = 7 ;}
+		else if(attrs->hasStringKeyValue("highway", "service"))      { colorID = 8 ;}
+		else if(attrs->hasStringKey     ("highway"))                 { colorID = 9 ;}
 
-        unique_ptr<Geometry> buffered(geom->buffer(0.00001, 3));
+		unique_ptr<Geometry> buffered(geom->buffer(0.00001, 3));
 
-        Renderable * r = Renderable::create(buffered.get(), trans);
+		Renderable * r = Renderable::create(buffered.get(), trans);
         
-        if(!r) { continue ;}
+		if(!r) { continue ;}
         
-        r->setRenderFill   (true);
-        r->setRenderOutline(true);
+		r->setRenderFill   (true);
+		r->setRenderOutline(true);
 
-        Edge * edge = new Edge(r, dynamic_cast<const LineString *>(geom), attrs);
+		Edge * edge = new Edge(r, dynamic_cast<const LineString *>(geom), attrs);
 
-        edges.push_back(edge);
+		edges.push_back(edge);
 
-        quadTreeLineStrings->insert(geom->getEnvelopeInternal(), edge);
+		quadTreeLineStrings->insert(geom->getEnvelopeInternal(), edge);
 
-        polylines.push_back(make_pair(geom, colorID));
-    }
-    
+		polylines.push_back(make_pair(geom, colorID));
+	}
+
+	dmess("edges " << edges.size());
+
+	network->setEdges(edges);
+	
     GUI::progress("Linestring index:", 1.0);
-
-    dmess("edges " << edges.size());
-
-    network->setEdges(edges);
 
     //OpenSteerGlue::init(canvas, network);
 

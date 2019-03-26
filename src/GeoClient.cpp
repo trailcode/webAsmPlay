@@ -600,7 +600,7 @@ namespace
 
     void downloadSucceeded(emscripten_fetch_t *fetch)
     {
-        ((GeoClient *)fetch->userData)->addGeometry(fetch->data);
+        ((GeoClient *)fetch->userData)->createWorld(fetch->data);
 
         // The data is now available at fetch->data[0] through fetch->data[fetch->numBytes-1];
         emscripten_fetch_close(fetch); // Free data associated with the fetch.
@@ -691,7 +691,7 @@ void GeoClient::loadGeometry(const string fileName)
 		curl_easy_setopt(myHandle, CURLOPT_URL, fileName.c_str());
 		result = curl_easy_perform(myHandle);
 		
-		addGeometry(output->buffer);
+		createWorld(output->buffer);
 
 		GUI::progress("", 1.0);
 
@@ -728,7 +728,7 @@ void GeoClient::loadGeometry(const string fileName)
 
     fclose(fp);
 
-    addGeometry(&data[0]);
+	createWorld(&data[0]);
 
     GUI::progress("", 1.0);
 

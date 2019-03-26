@@ -633,8 +633,9 @@ void GUI::createWorld()
 
 		guiASync([]() // TODO try to remove!
 		{
-			client->addBingMap(renderSettingsRenderBingMaps);
+			//client->addBingMap(renderSettingsRenderBingMaps);
 		});
+
     });
 
 	//client->addBingMap(renderSettingsRenderBingMaps);
