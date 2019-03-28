@@ -47,13 +47,12 @@ void TextureShader::ensureShader()
 {
     if(shaderProgram) { return ;}
 
-    shaderProgram = ShaderProgram::create(  "TextureShader.vs.glsl",
-                                            "TextureShader.fs.glsl",
-                                            Variables({{"vertIn",       vertInAttrLoc},
-                                                       {"vertUV_In",    vertUV_InAttrLoc}
-                                                       }),
-                                            Variables({{"MVP",          MVP_Loc},
-                                                       {"tex",          texLoc}}));
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"TextureShader.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"TextureShader.fs.glsl"	}}),
+                                            Variables({	{"vertIn",				vertInAttrLoc			},
+														{"vertUV_In",			vertUV_InAttrLoc		}}),
+                                            Variables({	{"MVP",					MVP_Loc					},
+														{"tex",					texLoc					}}));
 
     defaultInstance = new TextureShader();
 }

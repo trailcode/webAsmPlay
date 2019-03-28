@@ -64,28 +64,28 @@ namespace
 
 void ColorDistanceShader3D::ensureShader()
 {
-    shaderProgramFill = ShaderProgram::create(  "ColorDistanceShader3D_fill.vs.glsl",
-                                                "ColorDistanceShader3D_fill.fs.glsl",
-                                                Variables({{"vertIn",               vertInAttrFill          },
-                                                           {"vertColorIn",          vertColorInAttrFill     },
-                                                           {"normalIn",             normalInAttrFill        }}),
-                                                Variables({{"tex",                  texUniformFill          },
-                                                           {"model",                modelFill               },
-                                                           {"view",                 viewFill                },
-                                                           {"projection",           projectionFill          },
-                                                           {"colorLookupOffset",    colorLookupOffsetFill   },
-                                                           {"heightMultiplier",     heightMultiplierFill    },
-                                                           {"lightPos",             lightPosUniformFill     }}));
+	shaderProgramFill = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader3D_fill.vs.glsl"	},
+																{GL_FRAGMENT_SHADER,	"ColorDistanceShader3D_fill.fs.glsl"	}}),
+													Variables({	{"vertIn",               vertInAttrFill							},
+																{"vertColorIn",          vertColorInAttrFill					},
+																{"normalIn",             normalInAttrFill						}}),
+													Variables({	{"tex",                  texUniformFill							},
+																{"model",                modelFill								},
+																{"view",                 viewFill								},
+																{"projection",           projectionFill							},
+																{"colorLookupOffset",    colorLookupOffsetFill					},
+																{"heightMultiplier",     heightMultiplierFill					},
+																{"lightPos",             lightPosUniformFill					}}));
 
-    shaderProgramOutline = ShaderProgram::create(   "ColorDistanceShader3D_outline.vs.glsl",
-                                                    "ColorDistanceShader3D_outline.fs.glsl",
-                                                    Variables({{"vertIn",            vertInAttrOutline          },
-                                                               {"vertColorIn",       vertColorInAttrOutline     }}),
-                                                    Variables({{"MV",                MV_Outline                 },
-                                                               {"MVP",               MVP_Outline                },
-                                                               {"tex",               texUniformOutline          },
-                                                               {"colorLookupOffset", colorLookupOffsetOutline   },
-                                                               {"heightMultiplier",  heightMultiplierOutline    }}));
+	shaderProgramOutline = ShaderProgram::create(   GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader3D_outline.vs.glsl"	},
+																{GL_FRAGMENT_SHADER,	"ColorDistanceShader3D_outline.fs.glsl"	}}),
+                                                    Variables({	{"vertIn",				vertInAttrOutline						},
+																{"vertColorIn",			vertColorInAttrOutline					}}),
+                                                    Variables({	{"MV",					MV_Outline								},
+																{"MVP",					MVP_Outline								},
+																{"tex",					texUniformOutline						},
+																{"colorLookupOffset",	colorLookupOffsetOutline				},
+																{"heightMultiplier",	heightMultiplierOutline					}}));
 
     defaultInstance = new ColorDistanceShader3D();
 }

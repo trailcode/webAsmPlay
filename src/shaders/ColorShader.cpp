@@ -45,11 +45,11 @@ void ColorShader::ensureShader()
 {
     if(shaderProgram) { return ;}
 
-    shaderProgram = ShaderProgram::create(  "ColorShader.vs.glsl",
-                                            "ColorShader.fs.glsl",
-                                            Variables({{"vertIn",   vertInAttrLoc}}),
-                                            Variables({{"MVP",      MVP_Loc},
-                                                       {"colorIn",  colorInUniformLoc}}));
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorShader.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"ColorShader.fs.glsl"	}}),
+                                            Variables({	{"vertIn",				vertInAttrLoc			}}),
+                                            Variables({	{"MVP",					MVP_Loc					},
+														{"colorIn",				colorInUniformLoc		}}));
 
     defaultInstance = new ColorShader();
 }

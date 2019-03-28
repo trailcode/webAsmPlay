@@ -44,27 +44,9 @@ public:
                                   const Variables	& attributes = Variables(),
                                   const Variables	& uniforms   = Variables());
 
-    static ShaderProgram * create(const std::string & vertexSourceFile,
-                                  const std::string & fragmentSourceFile,
-                                  const std::string & geometrySourceFile,
-                                  const Variables	& attributes       = Variables(),
-                                  const Variables	& uniforms         = Variables());
-
-    static ShaderProgram * create(	const std::string & vertexSourceFile,
-									const std::string & fragmentSourceFile,
-									const Variables   & attributes,
-									const Variables   & uniforms = Variables());
-    
     void bind();
 
     GLuint getProgramHandle() const;
-
-    static void enableVertexAttribArray(const GLint       vertexLoc,
-                                        const GLint       size        = 2,
-                                        const GLenum      type        = GL_FLOAT,
-                                        const GLboolean   normalized  = GL_FALSE,
-                                        const GLsizei     stride      = 0,
-                                        const GLvoid    * pointer     = NULL);
 
     GLint getUniformLoc  (const std::string & name) const;
     GLint getAttributeLoc(const std::string & name) const;

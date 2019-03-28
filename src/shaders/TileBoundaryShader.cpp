@@ -49,11 +49,11 @@ void TileBoundaryShader::ensureShader()
 {
     if(shaderProgram) { return ;}
 
-    shaderProgram = ShaderProgram::create(  "TileBoundaryShader.vs.glsl",
-                                            "TileBoundaryShader.fs.glsl",
-                                            "TileBoundaryShader.gs.glsl",
-                                            Variables({{"vertIn",       vertInAttrLoc}}),
-                                            Variables({{"MVP",          MVP_Loc}}));
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"TileBoundaryShader.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"TileBoundaryShader.fs.glsl"	},
+														{GL_GEOMETRY_SHADER,	"TileBoundaryShader.gs.glsl"	}}),
+                                            Variables({	{"vertIn",				vertInAttrLoc					}}),
+                                            Variables({	{"MVP",					MVP_Loc							}}));
 
     defaultInstance = new TileBoundaryShader();
 }

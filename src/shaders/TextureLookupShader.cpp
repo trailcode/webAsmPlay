@@ -41,11 +41,11 @@ void TextureLookupShader::ensureShader()
 {
 	if(shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(	"TextureLookupShader.vs.glsl",
-											"TextureLookupShader.fs.glsl",
-											"TextureLookupShader.gs.glsl",
-											Variables({{"vertIn",      vertInAttr}}),
-											Variables({{"MVP",       MVP_Loc     }}));
+	shaderProgram = ShaderProgram::create(	GLSL({		{GL_VERTEX_SHADER,		"TextureLookupShader.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"TextureLookupShader.fs.glsl"	},
+														{GL_GEOMETRY_SHADER,	"TextureLookupShader.gs.glsl"	}}),
+											Variables({	{"vertIn",				vertInAttr						}}),
+											Variables({	{"MVP",					MVP_Loc							}}));
 
 	defaultInstance = new TextureLookupShader();
 }

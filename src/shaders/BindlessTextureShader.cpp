@@ -47,14 +47,12 @@ void BindlessTextureShader::ensureShader()
 {
 	if(shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  "BindlessTextureShader.vs.glsl",
-											"BindlessTextureShader.fs.glsl",
-											Variables({{"vertIn",       vertInAttrLoc},
-													   {"vertUV_In",    vertUV_InAttrLoc}
-													  }),
-											Variables({{"MVP",          MVP_Loc},
-													   //{"tex",          texLoc},
-													   {"texID",		texID_Loc}}));
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"BindlessTextureShader.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"BindlessTextureShader.fs.glsl"	}}),
+											Variables({	{"vertIn",				vertInAttrLoc					},
+														{"vertUV_In",			vertUV_InAttrLoc				}}),
+											Variables({	{"MVP",					MVP_Loc							},
+														{"texID",				texID_Loc						}}));
 
 	defaultInstance = new BindlessTextureShader();
 }

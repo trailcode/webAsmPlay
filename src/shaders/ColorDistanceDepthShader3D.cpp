@@ -82,52 +82,43 @@ void ColorDistanceDepthShader3D::ensureShader()
 {
 	if(defaultInstance) { return ;}
 
-	shaderProgramDepth = ShaderProgram::create(		GLSL({{GL_VERTEX_SHADER, "ColorDistanceDepthShader3D_depth.vs.glsl"}, {GL_FRAGMENT_SHADER, "ColorDistanceDepthShader3D_depth.fs.glsl"}}),
-													Variables({	{"vertIn",					vertInAttrDepth					}}),
-													Variables({	{"model",					modelDepth						},
-																{"view",					viewDepth						},
-																{"projection",				projectionDepth					},
-																{"heightMultiplier",		heightMultiplierDepth			}}));
+	shaderProgramDepth = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_depth.vs.glsl"		},
+																{GL_FRAGMENT_SHADER,		"ColorDistanceDepthShader3D_depth.fs.glsl"		}}),
+													Variables({	{"vertIn",					vertInAttrDepth									}}),
+													Variables({	{"model",					modelDepth										},
+																{"view",					viewDepth										},
+																{"projection",				projectionDepth									},
+																{"heightMultiplier",		heightMultiplierDepth							}}));
 
-	/*
-    shaderProgramDepth = ShaderProgram::create(		"ColorDistanceDepthShader3D_depth.vs.glsl",
-													"ColorDistanceDepthShader3D_depth.fs.glsl",
-													Variables({	{"vertIn",					vertInAttrDepth					}}),
-													Variables({	{"model",					modelDepth						},
-																{"view",					viewDepth						},
-																{"projection",				projectionDepth					},
-																{"heightMultiplier",		heightMultiplierDepth			}}));
-																*/
+	shaderProgramFill = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_fill.vs.glsl"		},
+																{GL_FRAGMENT_SHADER,		"ColorDistanceDepthShader3D_fill.fs.glsl"		}}),
+													Variables({	{"vertIn",					vertInAttrFill									},
+																{"vertColorIn",				vertColorInAttrFill								},
+																{"normalIn",				normalInAttrFill								}}),
+													Variables({	{"colorLookupTexture",		colorLookupTextureUniformFill					},
+																{"topDownTexture",			topDownTextureUniformFill						},
+																{"depthTex",				depthTexUniformFill								},
+																{"model",					modelFill										},
+																{"view",					viewFill										},
+																{"projection",				projectionFill									},
+																{"colorLookupOffset",		colorLookupOffsetFill							},
+																{"heightMultiplier",		heightMultiplierFill							},
+																{"lightPos",				lightPosUniformFill								},
+																{"width",					widthUniformFill								},
+																{"height",					heightUniformFill								}}));
 
-    shaderProgramFill = ShaderProgram::create(		"ColorDistanceDepthShader3D_fill.vs.glsl",
-													"ColorDistanceDepthShader3D_fill.fs.glsl",
-													Variables({	{"vertIn",					vertInAttrFill					},
-																{"vertColorIn",				vertColorInAttrFill				},
-																{"normalIn",				normalInAttrFill				}}),
-													Variables({	{"colorLookupTexture",		colorLookupTextureUniformFill	},
-																{"topDownTexture",			topDownTextureUniformFill		},
-																{"depthTex",				depthTexUniformFill				},
-																{"model",					modelFill						},
-																{"view",					viewFill						},
-																{"projection",				projectionFill					},
-																{"colorLookupOffset",		colorLookupOffsetFill			},
-																{"heightMultiplier",		heightMultiplierFill			},
-																{"lightPos",				lightPosUniformFill				},
-																{"width",					widthUniformFill				},
-																{"height",					heightUniformFill				}}));
-
-    shaderProgramOutline = ShaderProgram::create(   "ColorDistanceDepthShader3D_outline.vs.glsl",
-                                                    "ColorDistanceDepthShader3D_outline.fs.glsl",
-                                                    Variables({	{"vertIn",					vertInAttrOutline				},
-																{"vertColorIn",				vertColorInAttrOutline			}}),
-                                                    Variables({	{"MV",						MV_Outline						},
-																{"MVP",						MVP_Outline						},
-																{"tex",						texUniformOutline				},
-																{"depthTex",				depthTexUniformOutline			},
-																{"colorLookupOffset",		colorLookupOffsetOutline		},
-																{"heightMultiplier",		heightMultiplierOutline			},
-																{"width",					widthUniformOutline				},
-																{"height",					heightUniformOutline			}
+	shaderProgramOutline = ShaderProgram::create(   GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_outline.vs.glsl"	},
+																{GL_FRAGMENT_SHADER,		"ColorDistanceDepthShader3D_outline.fs.glsl"	}}),
+                                                    Variables({	{"vertIn",					vertInAttrOutline								},
+																{"vertColorIn",				vertColorInAttrOutline							}}),
+                                                    Variables({	{"MV",						MV_Outline										},
+																{"MVP",						MVP_Outline										},
+																{"tex",						texUniformOutline								},
+																{"depthTex",				depthTexUniformOutline							},
+																{"colorLookupOffset",		colorLookupOffsetOutline						},
+																{"heightMultiplier",		heightMultiplierOutline							},
+																{"width",					widthUniformOutline								},
+																{"height",					heightUniformOutline							}
 																}));
 
     defaultInstance = new ColorDistanceDepthShader3D();

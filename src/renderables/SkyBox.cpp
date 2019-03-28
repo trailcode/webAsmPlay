@@ -57,11 +57,11 @@ void SkyBox::ensureShader()
 {
     if(skyboxShader) { return ;}
 
-    skyboxShader = ShaderProgram::create("SkyBoxShader.vs.glsl",
-                                         "SkyBoxShader.fs.glsl",
-                                         Variables({{"vertIn",      vertInLoc}}),
-                                         Variables({{"MVP",         MVP_Loc},
-                                                    {"cubeTexture", cubeTextureLoc}}));
+	skyboxShader = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"SkyBoxShader.vs.glsl"	},
+													{GL_FRAGMENT_SHADER,	"SkyBoxShader.fs.glsl"	}}),
+                                         Variables({{"vertIn",				vertInLoc				}}),
+                                         Variables({{"MVP",					MVP_Loc					},
+                                                    {"cubeTexture",			cubeTextureLoc			}}));
 }
 
 SkyBox::SkyBox()
@@ -167,8 +167,6 @@ void SkyBox::render(Canvas * canvas)
 
     skyboxShader->setUniform (MVP_Loc,        mat4(canvas->getProjectionRef()) * centeredView * model);
     skyboxShader->setUniformi(cubeTextureLoc, 0);
-
-    skyboxShader->enableVertexAttribArray(vertInLoc, 3);
 
     GL_CHECK(glDepthMask(GL_FALSE));
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
