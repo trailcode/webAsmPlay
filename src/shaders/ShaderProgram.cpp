@@ -53,6 +53,90 @@ ShaderProgram * ShaderProgram::create(	const string    & vertexSourceFile,
     return create(vertexSourceFile, fragmentSourceFile, "", attributes, uniforms);
 }
 
+namespace
+{
+	bool compile(const pair<size_t, const string> & typeAndFile, const GLuint program)
+	{
+		GLint success = 0;
+
+		const string   _source = stripUnicode(readFile(get<1>(typeAndFile)));
+
+		const GLchar * source  = _source.c_str();
+
+		const GLuint shader = glCreateShader(get<0>(typeAndFile));
+
+		GL_CHECK(glShaderSource(shader, 1, &source, NULL));
+
+		GL_CHECK(glCompileShader(shader));
+    
+		GL_CHECK(glGetShaderiv(shader, GL_COMPILE_STATUS, &success));
+
+		GLchar infoLog[2048];
+
+		if (!success) 
+		{
+			GL_CHECK(glGetShaderInfoLog(shader, 2048, NULL, infoLog));
+
+			dmess("GLSL compilation failed: " << _source);
+
+			dmess("   " << infoLog);
+
+			return false;
+		}
+
+		GL_CHECK(glAttachShader(program, shader));
+	}
+}
+
+ShaderProgram * ShaderProgram::create(const GLSL & programs, const Variables& attributes, const Variables& uniforms)
+{
+	GLint  success       = 0;
+	GLuint shaderProgram = glCreateProgram();
+
+	for(const auto & i : programs)
+	{
+		if(!compile(i, shaderProgram)) { return nullptr ;}
+	}
+
+	GL_CHECK(glLinkProgram (shaderProgram));
+    GL_CHECK(glUseProgram  (shaderProgram));
+
+	unordered_map<string, GLint> uniformMap;
+    unordered_map<string, GLint> attributeMap;
+
+    for(const auto & variable : attributes)
+    {
+        variable.second = glGetAttribLocation(shaderProgram, variable.first.c_str());
+
+        if(variable.second == -1)
+        {
+            dmess("Warning could not find shader attribute: " << variable.first << " Check it is being used in shader.");
+
+            continue;
+        }
+
+        attributeMap[variable.first] = variable.second;
+    }
+
+    for(const auto & variable : uniforms)
+    {
+        variable.second = glGetUniformLocation(shaderProgram, variable.first.c_str());
+
+        if(variable.second == -1)
+        {
+            dmess("Warning could not find shader uniform: " << variable.first << " Check it is being used in shader.");
+
+            continue;
+        }
+
+        uniformMap[variable.first] = variable.second;
+    }
+
+    return new ShaderProgram(shaderProgram,
+                             uniformMap,
+                             attributeMap);
+}
+
 ShaderProgram * ShaderProgram::create(	const string	& vertexSourceFile,
 										const string    & fragmentSourceFile,
 										const string	& geometrySourceFile,

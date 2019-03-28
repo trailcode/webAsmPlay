@@ -246,7 +246,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
 		// TODO Code dup!
 
-				if(attrs->hasStringKeyValue("highway", "motorway"))     { colorID = 1 ;}
+			 if(attrs->hasStringKeyValue("highway", "motorway"))     { colorID = 1 ;}
 		else if(attrs->hasStringKeyValue("highway", "trunk"))        { colorID = 2 ;}
 		else if(attrs->hasStringKeyValue("highway", "primary"))      { colorID = 3 ;}
 		else if(attrs->hasStringKeyValue("highway", "secondary"))    { colorID = 4 ;}

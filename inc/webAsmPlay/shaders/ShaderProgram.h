@@ -32,11 +32,17 @@
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/Types.h>
 
-typedef std::vector<std::pair<std::string, GLint &> > Variables;
+typedef std::vector<std::pair<std::string, GLint &>> Variables;
+
+typedef std::vector<std::pair<size_t, const std::string>> GLSL;
 
 class ShaderProgram
 {
 public:
+
+	static ShaderProgram * create(const GLSL		& programs,
+                                  const Variables	& attributes = Variables(),
+                                  const Variables	& uniforms   = Variables());
 
     static ShaderProgram * create(const std::string & vertexSourceFile,
                                   const std::string & fragmentSourceFile,

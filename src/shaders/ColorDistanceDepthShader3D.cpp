@@ -82,6 +82,14 @@ void ColorDistanceDepthShader3D::ensureShader()
 {
 	if(defaultInstance) { return ;}
 
+	shaderProgramDepth = ShaderProgram::create(		GLSL({{GL_VERTEX_SHADER, "ColorDistanceDepthShader3D_depth.vs.glsl"}, {GL_FRAGMENT_SHADER, "ColorDistanceDepthShader3D_depth.fs.glsl"}}),
+													Variables({	{"vertIn",					vertInAttrDepth					}}),
+													Variables({	{"model",					modelDepth						},
+																{"view",					viewDepth						},
+																{"projection",				projectionDepth					},
+																{"heightMultiplier",		heightMultiplierDepth			}}));
+
+	/*
     shaderProgramDepth = ShaderProgram::create(		"ColorDistanceDepthShader3D_depth.vs.glsl",
 													"ColorDistanceDepthShader3D_depth.fs.glsl",
 													Variables({	{"vertIn",					vertInAttrDepth					}}),
@@ -89,6 +97,7 @@ void ColorDistanceDepthShader3D::ensureShader()
 																{"view",					viewDepth						},
 																{"projection",				projectionDepth					},
 																{"heightMultiplier",		heightMultiplierDepth			}}));
+																*/
 
     shaderProgramFill = ShaderProgram::create(		"ColorDistanceDepthShader3D_fill.vs.glsl",
 													"ColorDistanceDepthShader3D_fill.fs.glsl",

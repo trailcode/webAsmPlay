@@ -119,11 +119,15 @@ FrameBuffer::~FrameBuffer()
 
 ivec2 FrameBuffer::getBufferSize() const { return bufferSize ;}
 
-void FrameBuffer::bind()
+void FrameBuffer::bind(const bool clear)
 {
     GL_CHECK(glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &prevFB));
 
     GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
+
+	if(!clear) { return ;}
+
+	GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
 void FrameBuffer::unbind() { GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, prevFB)) ;}

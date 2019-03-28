@@ -48,7 +48,7 @@ public:
 
     glm::ivec2 getBufferSize() const;
 
-    void bind();
+    void bind(const bool clear = true);
     void unbind();
 
     GLuint getTextureID() const;

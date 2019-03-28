@@ -143,6 +143,8 @@ void RenderableMesh::render(Canvas * canvas, const size_t renderStage) const
     vertexArrayObject->bind(shader);
     vertexArrayObject->bindTriangles();
 
+	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
     if(getRenderFill() && shader->shouldRender(false, renderStage))
     {
         shader->bind(canvas, false, renderStage);
@@ -158,6 +160,8 @@ void RenderableMesh::render(Canvas * canvas, const size_t renderStage) const
         
         vertexArrayObject->drawLines();
     }
+
+	//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 }
 
 void RenderableMesh::ensureVAO()
