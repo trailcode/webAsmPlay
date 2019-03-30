@@ -660,8 +660,8 @@ OpenSteer::OpenSteerDemo::circleHighlightVehicleUtility (const AbstractVehicle& 
 
 
 void 
-OpenSteer::OpenSteerDemo::drawBoxHighlightOnVehicle (const AbstractVehicle& v,
-                                               const Color& color)
+OpenSteer::OpenSteerDemo::drawBoxHighlightOnVehicle (   const AbstractVehicle& v,
+                                                        const Color& color)
 {
     if (&v)
     {
