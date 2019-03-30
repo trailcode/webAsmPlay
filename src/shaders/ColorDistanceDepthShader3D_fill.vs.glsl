@@ -35,6 +35,8 @@ uniform mat4      view;
 uniform mat4      projection;
 uniform float     colorLookupOffset;
 uniform float     heightMultiplier;
+uniform float     width;
+uniform float     height;
 uniform sampler2D colorLookupTexture;
 
 out vec4 vertexColorNear;
@@ -43,12 +45,15 @@ out vec4 position_in_view_space;
 out vec3 normal;
 out vec3 fragPos;
 out vec4 glPos;
-//noperspective out vec4 fragCoord2D;
-out vec4 fragCoord2D;
+noperspective out vec2 viewportPixelCoord;
+noperspective out vec4 fragCoord2D;
+//flat out vec4 fragCoord2D;
+//out vec4 fragCoord2D;
 
 void main()
 {
 	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
+	//vec4 vert = vec4(vertIn.xy, 0, 1);
 
 	fragPos = vec3(model * vert);
 

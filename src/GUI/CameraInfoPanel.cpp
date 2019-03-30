@@ -30,6 +30,8 @@
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 
+using namespace glm;
+
 void GUI::cameraInfoPanel()
 {
     if(!showCameraInfoPanel) { return ;}
@@ -52,6 +54,11 @@ void GUI::cameraInfoPanel()
     {
         ImGui::Text(toStr(canvas->getMVP_Ref()).c_str());
     }
+
+	if(ImGui::CollapsingHeader("Cursor Position", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Text(("Local pos: " + toStr(vec3(canvas->getCursorPosWC()))).c_str());
+	}
 
     ImGui::End();
 }

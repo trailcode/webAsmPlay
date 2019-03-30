@@ -59,6 +59,9 @@ namespace
     GLint modelFill;
     GLint viewFill;
     GLint projectionFill;
+	GLint invPersMatrixFill;
+	GLint invViewMatrixFiLL;
+	GLint MVP_Fill;
     GLint colorLookupTextureUniformFill;
 	GLint topDownTextureUniformFill;
     GLint depthTexUniformFill;
@@ -101,6 +104,9 @@ void ColorDistanceDepthShader3D::ensureShader()
 																{"model",					modelFill										},
 																{"view",					viewFill										},
 																{"projection",				projectionFill									},
+																{"invPersMatrix",			invPersMatrixFill								},
+																{"invViewMatrix",			invViewMatrixFiLL								},
+														{"MVP", MVP_Fill},
 																{"colorLookupOffset",		colorLookupOffsetFill							},
 																{"heightMultiplier",		heightMultiplierFill							},
 																{"lightPos",				lightPosUniformFill								},
@@ -200,6 +206,11 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
         shaderProgramFill->setUniform (modelFill,						canvas->getModelRef());
         shaderProgramFill->setUniform (viewFill,						canvas->getViewRef());
         shaderProgramFill->setUniform (projectionFill,					canvas->getProjectionRef());
+
+		shaderProgramFill->setUniform(invPersMatrixFill,  inverse(canvas->getProjectionRef()));
+		shaderProgramFill->setUniform(invViewMatrixFiLL,	inverse(canvas->getViewRef()));
+		shaderProgramFill->setUniform(MVP_Fill, canvas->getMVP_Ref());
+
         shaderProgramFill->setUniform (lightPosUniformFill,				lightPos);
         shaderProgramFill->setUniformf(colorLookupOffsetFill,			0.0f);
     }

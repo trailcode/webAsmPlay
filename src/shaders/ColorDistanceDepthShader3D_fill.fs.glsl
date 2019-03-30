@@ -33,11 +33,15 @@ in vec3 normal;
 in vec3 fragPos;
 in vec4 glPos;
 in vec4 fragCoord2D;
+in vec2 viewportPixelCoord;
 
 uniform vec3      lightPos;
 uniform float     width;
 uniform float     height;
 uniform sampler2D topDownTexture;
+uniform mat4 MVP;
+uniform mat4 invPersMatrix;
+uniform mat4 invViewMatrix;
 
 out vec4 outColor;
 
@@ -80,10 +84,39 @@ void main()
 	}
 	outColor = vec4(result, objectColor.w);
 
+	//*
+	// From: https://www.khronos.org/opengl/wiki/Compute_eye_space_from_window_space
+	vec4 viewport = vec4(0,0,width,height);
+	vec4 ndcPos;
+	ndcPos.xy = ((2.0 * gl_FragCoord.xy) - (2.0 * viewport.xy)) / (viewport.zw) - 1;
+	ndcPos.z = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far) / (gl_DepthRange.far - gl_DepthRange.near);
+	ndcPos.w = 1.0;
+	vec4 clipPos = ndcPos / gl_FragCoord.w;
+	vec4 eyePos = invPersMatrix * clipPos; // This is eye space, we need world space.
+	vec4 worldPos = invViewMatrix * eyePos;// World space
+
+	worldPos.z = 0;
+
+	vec4 p = MVP * worldPos;
+	p.xyz /= p.w;       // Rescale: [-1,1]^3
+	p.w    = 1.0 / p.w; // Invert W
+
+													// Vertex in window-space
+	p.xyz *= vec3(0.5) + vec3(0.5); // Rescale: [0,1]^3
+
+	p.xyz += vec3(1);
+
+	p.xyz *= vec3(0.5);
+	//*/
+	
 	if(dot(normal, vec3(0,0,1)) > 0.001)
 	{
-		vec4 texColor = vec4(texture(topDownTexture, fragCoord2D.xy).xyz, 0);
-
+		vec4 texColor = vec4(texture(topDownTexture, p.xy).xyz, 0);
+		//vec4 texColor = vec4(texture(topDownTexture, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height)).xyz, 0);
+		
 		outColor += texColor;
 	}
+
+	//outColor = vec4(vec3(abs(eyePos.y)), 1);
+	//outColor = vec4(vec3(abs(worldPos.z)), 1);
 }
