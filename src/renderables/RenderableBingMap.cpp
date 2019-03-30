@@ -420,7 +420,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	vector<Tile *> toRender;
 
-	const bool useBindlessTextures = true;
+	const bool useBindlessTextures = false;
 
 	for (auto i : tiles)
 	{
