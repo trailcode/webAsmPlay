@@ -34,6 +34,7 @@
 #include <functional>
 #include <unordered_set>
 #include <unordered_map>
+#include <SDL_image.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
@@ -62,6 +63,7 @@ atomic<size_t> RenderableBingMap::numTiles			= {0};
 atomic<size_t> RenderableBingMap::numLoading		= {0};
 atomic<size_t> RenderableBingMap::numDownloading	= {0};
 atomic<size_t> RenderableBingMap::numUploading		= {0};
+atomic<size_t> RenderableBingMap::numWriting		= {0};
 
 size_t RenderableBingMap::numRendered = 0;
 
@@ -69,9 +71,9 @@ namespace
 {
 #ifndef __EMSCRIPTEN__
 
-    thread_pool loaderPool(16);
-
+    thread_pool loaderPool	(16);
     thread_pool uploaderPool(1);
+	thread_pool writerPool	(1);
 
     mutex loaderMutex;
     mutex uploaderMutex;
@@ -224,7 +226,9 @@ namespace
 		{
 			++RenderableBingMap::numUploading;
 
-			uploaderPool.push([tile, tileCachePath](int ID)
+			SDL_Surface * img = IMG_Load(tileCachePath.c_str());
+
+			uploaderPool.push([tile, img](int ID)
 			{
 				if (!tile->stillNeeded)
 				{
@@ -232,17 +236,16 @@ namespace
 
 					--RenderableBingMap::numLoading;
 
+					SDL_FreeSurface(img);
+
 					return;
 				}
 
 				OpenGL::ensureSharedContext();
 
-				tile->textureID = Textures::load(tileCachePath);
+				tile->textureID = Textures::load(img);
 
-				if (!tile->textureID)
-				{
-					dmess("No texture!");
-				}
+				SDL_FreeSurface(img);
 
 				if(useBindlessTextures) { tile->handle = glGetTextureHandleARB(tile->textureID) ;}
 
@@ -285,11 +288,6 @@ namespace
 
 				tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
 
-				if (!tile->textureID)
-				{
-					dmess("No texture!");
-				}
-
 				if(useBindlessTextures) { tile->handle = glGetTextureHandleARB(tile->textureID) ;}
 
 				++RenderableBingMap::numTiles;
@@ -298,23 +296,30 @@ namespace
 
 				--RenderableBingMap::numLoading;
 
-				FILE * fp = fopen(tileCachePath.c_str(), "wb");
+				++RenderableBingMap::numWriting;
 
-				if(fp)
+				writerPool.push([tileCachePath, tileBuffer](int ID)
 				{
-					fwrite(get<0>(tileBuffer), sizeof(char), get<1>(tileBuffer), fp);
+					FILE * fp = fopen(tileCachePath.c_str(), "wb");
 
-					fclose(fp);
-				}
-				else
-				{
-					dmess("Warn could not write file: " << tileCachePath);
-				}
+					if(fp)
+					{
+						fwrite(get<0>(tileBuffer), sizeof(char), get<1>(tileBuffer), fp);
+
+						fclose(fp);
+					}
+					else
+					{
+						dmess("Warn could not write file: " << tileCachePath);
+					}
 				
-				if( get<0>(tileBuffer) )
-				{
-					free ( (void *)get<0>(tileBuffer) );
-				}
+					if( get<0>(tileBuffer) )
+					{
+						free ( (void *)get<0>(tileBuffer) );
+					}
+				});
+
+				--RenderableBingMap::numWriting;
 			});
 		}
 	}
@@ -446,21 +451,12 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	textureBuffer->bind();
 	
-	//GL_CHECK(glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
 	theTex = textureBuffer->getTextureID();
-
-	//dmess("theTex " << theTex);
 
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
 
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), startLevel);
 	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), startLevel);
-
-	for (auto i : tiles)
-	{
-		//i->stillNeeded = false;
-	}
 
 	vector<Tile *> prevTiles = tiles;
 
@@ -470,10 +466,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	unordered_set<Tile *> tileSet(tiles.begin(), tiles.end());
 
-	for (auto i : tiles)
-	{
-		i->stillNeeded = true;
-	}
+	for (auto i : tiles) { i->stillNeeded = true ;}
 
 	for (auto i : prevTiles)
 	{

@@ -30,6 +30,8 @@
 #include <glm/vec4.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 
+struct SDL_Surface;
+
 class Textures
 {
 public:
@@ -37,6 +39,8 @@ public:
     static Textures * getInstance();
 
     static GLuint load(const std::string & filename);
+
+	static GLuint load(const SDL_Surface * img);
 
     static GLuint loadCube(const std::vector<std::string> & files);
 

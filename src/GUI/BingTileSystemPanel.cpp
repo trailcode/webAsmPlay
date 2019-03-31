@@ -68,6 +68,7 @@ void GUI::bingTileSystemPanel()
 	const size_t numLoading		= RenderableBingMap::numLoading;
 	const size_t numDownloading = RenderableBingMap::numDownloading;
 	const size_t numUploading	= RenderableBingMap::numUploading;
+	const size_t numWriting		= RenderableBingMap::numWriting;
 
     ImGui::Begin("Bing Tile System", &showBingTileSystemPanel);
 
@@ -80,6 +81,7 @@ void GUI::bingTileSystemPanel()
 	ImGui::Text(("    num loading: " + to_string(numLoading)).c_str());
 	ImGui::Text(("num downloading: " + to_string(numDownloading)).c_str());
 	ImGui::Text(("  num uploading: " + to_string(numUploading)).c_str());
+	ImGui::Text(("    num writing: " + to_string(numWriting)).c_str());
 	ImGui::Text(("   num rendered: " + to_string(RenderableBingMap::numRendered)).c_str());
 
     ImGui::End();

@@ -102,7 +102,16 @@ GLuint Textures::load(const string & filename)
 		return 0;
 	}
 
-    GLuint texture;
+    const GLuint texture = load(img);
+
+    SDL_FreeSurface(img);
+
+    return texture;
+}
+
+GLuint Textures::load(const SDL_Surface* img)
+{
+	GLuint texture;
 
     GL_CHECK(glGenTextures(1, &texture));
 
@@ -113,10 +122,7 @@ GLuint Textures::load(const string & filename)
 
     int mode = GL_RGB;
 
-    if(img->format->BytesPerPixel == 4)
-    {
-        mode = GL_RGBA;
-    }
+    if(img->format->BytesPerPixel == 4) { mode = GL_RGBA ;}
 
     /* Generate The Texture */
     GL_CHECK(glTexImage2D(  GL_TEXTURE_2D, 0, mode, img->w,
@@ -136,8 +142,6 @@ GLuint Textures::load(const string & filename)
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Needed?
 
 	GL_CHECK(glFlush());
-
-    //SDL_FreeSurface(img);
 
     return texture;
 }
