@@ -25,23 +25,22 @@
 */
 
 #version 330 core
-uniform sampler2D depthTex;
+
 in vec4 vertexColorNear;
 in vec4 vertexColorFar;
 in vec4 position_in_view_space;
 in vec3 normal; 
 in vec3 fragPos;
 in vec4 glPos;
-in vec4 fragCoord2D;
-in vec2 viewportPixelCoord;
 
-uniform vec3      lightPos;
-uniform float     width;
-uniform float     height;
-uniform sampler2D topDownTexture;
-uniform mat4 MVP;
-uniform mat4 invPersMatrix;
-uniform mat4 invViewMatrix;
+uniform vec3		lightPos;
+uniform float		width;
+uniform float		height;
+uniform sampler2D	topDownTexture;
+uniform sampler2D	depthTex;
+uniform mat4		MVP;
+uniform mat4		invPersMatrix;
+uniform mat4		invViewMatrix;
 
 out vec4 outColor;
 
@@ -59,7 +58,6 @@ void main()
 	float minDist = 0.0;
 	float maxDist = 5.0;
 	vec3 lightColor = vec3(1,1,1);
-	//vec3 objectColor = vec3(1,1,0);
 	vec3 viewPos = vec3(0,0,0);
 
 	// computes the distance between the fragment position 
@@ -84,7 +82,6 @@ void main()
 	}
 	outColor = vec4(result, objectColor.w);
 
-	//*
 	// From: https://www.khronos.org/opengl/wiki/Compute_eye_space_from_window_space
 	vec4 viewport = vec4(0,0,width,height);
 	vec4 ndcPos;
@@ -100,23 +97,17 @@ void main()
 	vec4 p = MVP * worldPos;
 	p.xyz /= p.w;       // Rescale: [-1,1]^3
 	p.w    = 1.0 / p.w; // Invert W
-
-													// Vertex in window-space
-	p.xyz *= vec3(0.5) + vec3(0.5); // Rescale: [0,1]^3
+													
+	p.xyz *= vec3(0.5) + vec3(0.5); // Rescale: [0,1]^3 // Vertex in window-space
 
 	p.xyz += vec3(1);
 
 	p.xyz *= vec3(0.5);
-	//*/
 	
 	if(dot(normal, vec3(0,0,1)) > 0.001)
 	{
 		vec4 texColor = vec4(texture(topDownTexture, p.xy).xyz, 0);
-		//vec4 texColor = vec4(texture(topDownTexture, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height)).xyz, 0);
 		
 		outColor += texColor;
 	}
-
-	//outColor = vec4(vec3(abs(eyePos.y)), 1);
-	//outColor = vec4(vec3(abs(worldPos.z)), 1);
 }

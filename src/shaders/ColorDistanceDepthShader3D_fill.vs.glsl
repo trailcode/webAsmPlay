@@ -45,15 +45,14 @@ out vec4 position_in_view_space;
 out vec3 normal;
 out vec3 fragPos;
 out vec4 glPos;
-noperspective out vec2 viewportPixelCoord;
-noperspective out vec4 fragCoord2D;
+//noperspective out vec2 viewportPixelCoord;
+//noperspective out vec4 fragCoord2D;
 //flat out vec4 fragCoord2D;
 //out vec4 fragCoord2D;
 
 void main()
 {
 	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
-	//vec4 vert = vec4(vertIn.xy, 0, 1);
 
 	fragPos = vec3(model * vert);
 
@@ -70,7 +69,7 @@ void main()
 
 	normal = mat3(transpose(inverse(model))) * normalIn;
 
-	
+	/*
 	fragCoord2D  = projection * MV * vec4(vert.xy, 0, 1);
 
 											// Vertex in NDC-space
@@ -83,4 +82,5 @@ void main()
 	fragCoord2D.xyz += vec3(1);
 
 	fragCoord2D.xyz *= vec3(0.5);
+	*/
 }

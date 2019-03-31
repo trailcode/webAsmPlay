@@ -82,7 +82,8 @@ namespace
 
 	enum
 	{
-		NUM_TEXTURES  = 2048,
+		//NUM_TEXTURES  = 2048,
+		NUM_TEXTURES  = 4096,
 	};
 
 	struct
@@ -179,6 +180,8 @@ namespace
 
 	FrameBuffer * textureBuffer = NULL;
 
+	const bool useBindlessTextures = false;
+
 	class Tile
 	{
 	public:
@@ -188,13 +191,14 @@ namespace
 		const dvec2		center;
 		const size_t	level;
 
-		// TODO skip loading if no longer needed
-
 		atomic_bool loading = {false};
+
+		atomic_bool stillNeeded = {true};
 
 		Renderable * r = NULL;
 
-		GLuint textureID = 0;
+		//GLuint textureID = 0;
+		atomic_uint textureID = {0};
 
 		GLuint64    handle = 0;
 
@@ -203,6 +207,15 @@ namespace
 
 	void fetchTile(const int ID, Tile * tile)
 	{
+		if (!tile->stillNeeded)
+		{
+			//dmess("Skip here!");
+
+			--RenderableBingMap::numLoading;
+
+			return;
+		}
+
 		const string quadKey = tileToQuadKey(latLongToTile(tile->center, tile->level), tile->level);
 
 		const string tileCachePath = "./tiles/" + quadKey + ".jpg";
@@ -213,11 +226,25 @@ namespace
 
 			uploaderPool.push([tile, tileCachePath](int ID)
 			{
+				if (!tile->stillNeeded)
+				{
+					--RenderableBingMap::numUploading;
+
+					--RenderableBingMap::numLoading;
+
+					return;
+				}
+
 				OpenGL::ensureSharedContext();
 
 				tile->textureID = Textures::load(tileCachePath);
 
-				tile->handle = glGetTextureHandleARB(tile->textureID);
+				if (!tile->textureID)
+				{
+					dmess("No texture!");
+				}
+
+				if(useBindlessTextures) { tile->handle = glGetTextureHandleARB(tile->textureID) ;}
 
 				++RenderableBingMap::numTiles;
 
@@ -234,6 +261,8 @@ namespace
 			{
 				dmess("Error! No buffer!");
 
+				--RenderableBingMap::numLoading;
+
 				return;
 			}
 
@@ -241,15 +270,33 @@ namespace
 
 			uploaderPool.push([tile, tileBuffer, tileCachePath](int ID)
 			{
+				if (!tile->stillNeeded)
+				{
+					//dmess("Skip here!");
+
+					--RenderableBingMap::numUploading;
+
+					--RenderableBingMap::numLoading;
+
+					return;
+				}
+
 				OpenGL::ensureSharedContext();
 
 				tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
 
-				tile->handle = glGetTextureHandleARB(tile->textureID);
+				if (!tile->textureID)
+				{
+					dmess("No texture!");
+				}
+
+				if(useBindlessTextures) { tile->handle = glGetTextureHandleARB(tile->textureID) ;}
 
 				++RenderableBingMap::numTiles;
 
 				--RenderableBingMap::numUploading;
+
+				--RenderableBingMap::numLoading;
 
 				FILE * fp = fopen(tileCachePath.c_str(), "wb");
 
@@ -410,17 +457,39 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), startLevel);
 	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), startLevel);
 
+	for (auto i : tiles)
+	{
+		//i->stillNeeded = false;
+	}
+
+	vector<Tile *> prevTiles = tiles;
+
 	tiles.clear();
 
 	getTilesToRender(canvas, tMin, tMax, startLevel);
+
+	unordered_set<Tile *> tileSet(tiles.begin(), tiles.end());
+
+	for (auto i : tiles)
+	{
+		i->stillNeeded = true;
+	}
+
+	for (auto i : prevTiles)
+	{
+		if(tileSet.find(i) == tileSet.end())
+		{
+			i->loading = false;
+
+			i->stillNeeded = false;
+		}
+	}
 
 	sort(tiles.begin(), tiles.end(), [](const Tile * A, const Tile * B) { return A->level < B->level ;});
 
 	size_t numRendered = 0;
 
 	vector<Tile *> toRender;
-
-	const bool useBindlessTextures = true;
 
 	for (auto i : tiles)
 	{
