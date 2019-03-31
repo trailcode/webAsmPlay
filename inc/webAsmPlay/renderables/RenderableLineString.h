@@ -58,7 +58,7 @@ public:
 
     static void ensureShaders();
 
-	void ensureVAO();
+	void ensureVAO() override;
 
 private:
 

@@ -38,8 +38,6 @@ namespace
 {
 	const size_t numOpenGL_Contexts = 10;
 	
-	//vector<GLFWwindow *> contextWindows;
-
 	concurrent_queue<GLFWwindow *> contextWindows;
 
 	unordered_set<thread::id> setContextes;
