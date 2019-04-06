@@ -126,6 +126,9 @@ public:
 
 	FrameBuffer * getAuxFrameBuffer() const;
 
+	double getPerspectiveFOV() const;
+	double setPerspectiveFOV(const double FOV);
+
 protected:
 
     bool preRender();
@@ -188,4 +191,6 @@ private:
     FrameBuffer * auxFrameBuffer = NULL;
 
 	Frustum * frustum = NULL;
+
+	double perspectiveFOV = 45.0;
 };

@@ -1,4 +1,4 @@
-/**
+﻿/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -21,31 +21,11 @@
 
   \author Matthew Tang
   \email trailcode@gmail.com
-  \copyright 2018
+  \copyright 2019
 */
-#pragma once
 
-#include <webAsmPlay/renderables/Renderable.h>
+#include <webAsmPlay/RasterTile.h>
 
-#ifdef WORKING
+using namespace glm;
 
-class GridPlane : public Renderable
-{
-public:
-
-    GridPlane();
-    virtual ~GridPlane();
-
-    void render(const glm::mat4 & MVP) const;
-
-    static void ensureShader();
-
-private:
-
-    GLuint vbo;
-    GLuint vao;
-
-    glm::mat4 model;
-};
-
-#endif // WORKING
+RasterTile::RasterTile(const dvec2& center, const size_t level) : center(center), level(level) {}

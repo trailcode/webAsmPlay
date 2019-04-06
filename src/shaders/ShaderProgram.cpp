@@ -42,7 +42,7 @@ namespace
 		return str;
 	}
 
-	bool compile(const pair<size_t, const string> & typeAndFile, const GLuint program)
+	bool compile(const pair<GLenum, const string> & typeAndFile, const GLuint program)
 	{
 		GLint success = 0;
 

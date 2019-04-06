@@ -26,9 +26,12 @@
 #pragma once
 
 #include <atomic>
+#include <unordered_map>
 #include <webAsmPlay/renderables/Renderable.h>
 
 class Frustum;
+
+class RasterTile;
 
 class RenderableBingMap : public Renderable
 {
@@ -36,7 +39,7 @@ public:
 
     static Renderable * create(const AABB2D & bounds, const glm::dmat4 & trans = glm::dmat4(1.0));
 
-    void render(Canvas * canvas, const size_t renderStage = 0) const override;
+    void render(Canvas * canvas, const size_t renderStage = 0) override;
 
 	static std::atomic<size_t> numTiles;
 	static std::atomic<size_t> numLoading;
@@ -53,14 +56,20 @@ private:
 
 	void getStartLevel();
 
-	void getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level) const;
+	void getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level);
+
+	RasterTile* getTile(const glm::dvec2& center, const size_t level);
+
+	std::unordered_map<std::string, RasterTile*> currTileSet;
 
     const AABB2D bounds;
+
+	size_t startLevel = 0;
 
     glm::ivec2 minTile;
     glm::ivec2 maxTile;
 
-	size_t startLevel = 0;
-
 	const glm::dmat4 trans;
+
+	std::vector<RasterTile*> tiles;
 };

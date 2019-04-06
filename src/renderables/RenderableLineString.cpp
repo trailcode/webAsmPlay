@@ -231,17 +231,17 @@ void RenderableLineString::ensureVAO()
 	}
 }
 
-void RenderableLineString::render(Canvas * canvas, const size_t renderStage) const
+void RenderableLineString::render(Canvas * canvas, const size_t renderStage)
 {
     if(!shader->shouldRender(true, renderStage)) { return ;}
 
     if(!getRenderOutline()) { return ;}
 
     GL_CHECK(glBindVertexArray(                    vao));
-    //GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    
     GL_CHECK(glDisable(GL_DEPTH_TEST));
+
+	GL_CHECK(glLineWidth(GUI::lineWidthRender));
 
     if(!isMulti)
     {

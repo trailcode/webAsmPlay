@@ -153,7 +153,7 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
     return ret;
 }
 
-void RenderablePolygon::render(Canvas * canvas, const size_t renderStage) const
+void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
 {
     vertexArrayObject->bind(shader);
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -21,53 +21,35 @@
 
   \author Matthew Tang
   \email trailcode@gmail.com
-  \copyright 2018
+  \copyright 2019
 */
+
 #pragma once
 
+#include <atomic>
+#include <glm/vec2.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
-#include <webAsmPlay/geom/Tessellation.h>
-#include <webAsmPlay/renderables/Renderable.h>
 
-namespace geos
-{
-    namespace geom
-    {
-        class Polygon;
-        class MultiPolygon;
-    }
-}
+class Renderable;
 
-class VertexArrayObject;
-
-class RenderablePolygon : public Renderable
+class RasterTile
 {
 public:
 
-    ~RenderablePolygon();
+	RasterTile(const glm::dvec2& center, const size_t level);
 
-    static Renderable * create( const geos::geom::Polygon       * poly,
-                                const glm::dmat4                & trans         = glm::dmat4(1.0),
-                                const size_t                      symbologyID   = 0,
-                                const AABB2D                    & boxUV         = AABB2D());
+	const glm::dvec2	center;
+	const size_t		level;
 
-    static Renderable * create( const geos::geom::MultiPolygon  * multyPoly,
-                                const glm::dmat4                & trans         = glm::dmat4(1.0),
-                                const size_t                      symbologyID   = 0,
-                                const AABB2D                    & boxUV         = AABB2D());
+	std::atomic_bool loading = { false };
 
-    static Renderable * create( const ColoredGeometryVec        & polygons,
-                                const glm::dmat4                & trans         = glm::mat4(1.0),
-                                const bool                        showProgress  = false);
+	std::atomic_bool stillNeeded = { true };
 
-    void render(Canvas * canvas, const size_t renderStage = 0) override;
+	Renderable* r = NULL;
 
-	void ensureVAO() override;
+	std::atomic_uint textureID = { 0 };
 
-private:
+	GLuint64    handle = 0;
 
-    RenderablePolygon(VertexArrayObject * vertexArrayObject);
-
-    VertexArrayObject * vertexArrayObject;
-}; 
-
+	bool textureResident = false;
+};

@@ -138,7 +138,7 @@ RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderab
 
 }
 
-void RenderableMesh::render(Canvas * canvas, const size_t renderStage) const
+void RenderableMesh::render(Canvas * canvas, const size_t renderStage)
 {
     vertexArrayObject->bind(shader);
     vertexArrayObject->bindTriangles();

@@ -44,6 +44,7 @@
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/OpenGL_Util.h>
+#include <webAsmPlay/RasterTile.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
 #include <webAsmPlay/shaders/ColorShader.h>
@@ -165,15 +166,18 @@ namespace
 		//dmess("url " << url);
 
 		curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
-		result = curl_easy_perform( myHandle );
-		//dmess("result " << result << " myHandle " << myHandle);
+
+		if (result = curl_easy_perform(myHandle))
+		{
+			dmess("result " << result << " myHandle " << myHandle);
+		}
 		//curl_easy_cleanup( myHandle );
 
 		const char * ret = output->buffer;
 
 		const size_t size = output->size;
 
-		//if (!ret) { dmess("Error!") ;} // It will retry later
+		if (!ret) { dmess("Error!") ;} // It will retry later
 
 		delete output;
 
@@ -182,32 +186,9 @@ namespace
 
 	FrameBuffer * textureBuffer = NULL;
 
-	const bool useBindlessTextures = false;
+	const bool useBindlessTextures = true;
 
-	class Tile
-	{
-	public:
-
-		Tile(const dvec2 & center, const size_t level) : center(center), level(level) {}
-
-		const dvec2		center;
-		const size_t	level;
-
-		atomic_bool loading = {false};
-
-		atomic_bool stillNeeded = {true};
-
-		Renderable * r = NULL;
-
-		//GLuint textureID = 0;
-		atomic_uint textureID = {0};
-
-		GLuint64    handle = 0;
-
-		bool textureResident = false;
-	};
-
-	void fetchTile(const int ID, Tile * tile)
+	void fetchTile(const int ID, RasterTile * tile)
 	{
 		if (!tile->stillNeeded)
 		{
@@ -323,23 +304,6 @@ namespace
 			});
 		}
 	}
-
-	unordered_map<string, Tile *> currTileSet;
-
-	Tile * getTile(const dvec2 & center, const size_t level)
-	{
-		char buf[1024];
-
-		sprintf(buf, "%f %f %zi", center.x, center.y, level);
-
-		unordered_map<string, Tile *>::const_iterator i = currTileSet.find(buf);
-
-		if (i != currTileSet.end()) { return i->second ;}
-	
-		return currTileSet[buf] = new Tile(center, level);
-	}
-
-	vector<Tile *> tiles;
 }
 
 void RenderableBingMap::getStartLevel()
@@ -363,10 +327,13 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 {
 	getStartLevel();
 	
-	glGenBuffers(1,					&buffers.textureHandleBuffer);
-	glBindBuffer(GL_UNIFORM_BUFFER,  buffers.textureHandleBuffer);
+	if (useBindlessTextures)
+	{
+		glGenBuffers(1, &buffers.textureHandleBuffer);
+		glBindBuffer(GL_UNIFORM_BUFFER, buffers.textureHandleBuffer);
 
-	glBufferStorage(GL_UNIFORM_BUFFER, NUM_TEXTURES * sizeof(GLuint64) * 2, nullptr, GL_MAP_WRITE_BIT);
+		glBufferStorage(GL_UNIFORM_BUFFER, NUM_TEXTURES * sizeof(GLuint64) * 2, nullptr, GL_MAP_WRITE_BIT);
+	}
 }
 
 RenderableBingMap::~RenderableBingMap()
@@ -374,7 +341,7 @@ RenderableBingMap::~RenderableBingMap()
 
 }
 
-void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, const dvec2 & tMax, const size_t level) const
+void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, const dvec2 & tMax, const size_t level)
 {
 	const dvec3 center = dvec4(((tMin + tMax) * 0.5), 0.0, 1.0);
 
@@ -434,20 +401,11 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 extern GLuint theTex;
 
-void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
+void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 {
     if(!getRenderFill()) { return ;}
 
-	/*
-	FrameBuffer::ensureFrameBuffer(	textureBuffer,
-									canvas->getFrameBufferSize(),
-									GL_RGB32UI,
-									GL_RGB,
-									GL_UNSIGNED_INT);
-									*/
-
-	FrameBuffer::ensureFrameBuffer(	textureBuffer,
-									canvas->getFrameBufferSize());
+	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
 
 	textureBuffer->bind();
 	
@@ -458,13 +416,13 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), startLevel);
 	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), startLevel);
 
-	vector<Tile *> prevTiles = tiles;
+	vector<RasterTile *> prevTiles = tiles;
 
 	tiles.clear();
 
 	getTilesToRender(canvas, tMin, tMax, startLevel);
 
-	unordered_set<Tile *> tileSet(tiles.begin(), tiles.end());
+	unordered_set<RasterTile*> tileSet(tiles.begin(), tiles.end());
 
 	for (auto i : tiles) { i->stillNeeded = true ;}
 
@@ -478,11 +436,11 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 		}
 	}
 
-	sort(tiles.begin(), tiles.end(), [](const Tile * A, const Tile * B) { return A->level < B->level ;});
+	sort(tiles.begin(), tiles.end(), [](const RasterTile * A, const RasterTile * B) { return A->level < B->level ;});
 
 	size_t numRendered = 0;
 
-	vector<Tile *> toRender;
+	vector<RasterTile*> toRender;
 
 	for (auto i : tiles)
 	{
@@ -528,7 +486,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 		for(size_t i = 0; i < toRender.size(); ++i)
 		{
-			Tile * t = toRender[i];
+			RasterTile* t = toRender[i];
 
 			if(!t->textureResident)
 			{ 
@@ -544,7 +502,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 		for(size_t i = 0; i < toRender.size(); ++i)
 		{
-			Tile * t = toRender[i];
+			RasterTile* t = toRender[i];
 
 			if(useBindlessTextures) { t->r->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
 			else					{ t->r->setShader(TextureShader			::getDefaultInstance()) ;}
@@ -568,3 +526,25 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage) const
 
 	textureBuffer->unbind();
 }
+
+RasterTile * RenderableBingMap::getTile(const dvec2& center, const size_t level)
+{
+	char buf[1024];
+
+	sprintf(buf, "%f %f %zi", center.x, center.y, level);
+
+	unordered_map<string, RasterTile*>::const_iterator i = currTileSet.find(buf);
+
+	if (i != currTileSet.end()) { return i->second; }
+
+	return currTileSet[buf] = new RasterTile(center, level);
+}
+
+/*
+RenderableBingMap::Tile* RenderableBingMap::Tile::getParentTile() const
+{
+	if (level - 1 <= startLevel) { return NULL; }
+
+	return getTile(center, level - 1);
+}
+*/

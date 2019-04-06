@@ -27,6 +27,8 @@
 #include <memory>
 #include <list>
 #include <algorithm>
+#include <tbb/parallel_for.h>
+#include <tbb/concurrent_unordered_map.h>
 #include <geos/geom/Point.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryCollection.h>
@@ -42,6 +44,7 @@
 #include <geoServer/AttributeStatistics.h> // TODO does not belong here
 
 using namespace std;
+using namespace tbb;
 using namespace glm;
 using namespace geos::geom;
 using namespace geos::geom::prep;
@@ -279,115 +282,156 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
 
     size_t maxNumSplits = 5;
 
-    size_t counter = 0;
+    //size_t counter = 0;
+	std::atomic<size_t> counter = {0};
 
-    for(auto ls : myLineStrings)
-    {
-        if(!(counter % 300)) { dmess("myLineStrings " << myLineStrings.size() << " " << counter) ;}
+	concurrent_unordered_map<LineString *, const LineString *> toSplit;
 
-        counter++;
+    //for(auto ls : myLineStrings)
+	parallel_for( blocked_range<size_t>(0, myLineStrings.size(), 10), [=, &counter, &tree, &toSplit](const blocked_range<size_t>& r)
+	{
+		for(size_t i=r.begin(); i!=r.end(); ++i)
+		{
+			MyLineString * ls = myLineStrings[i];
 
-        //if(counter > 2500) { break ;}
-        //if(counter > 1000) { break ;}
+			//if(!(counter % 3000)) { dmess("myLineStrings " << myLineStrings.size() << " " << counter) ;}
 
-        if(!ls->getLS()) { continue ;}
+			//counter++;
 
-        //*
-        if(ls->splits.size()) { continue ;}
+			if(!ls->getLS()) { continue ;}
 
-        if(ls->splits.size() > maxNumSplits)
-        {
-            //dmess("skip here!");
+			vector< void * > query;
 
-            continue;
-        }
-        //*/
+			tree.query(ls->getLS()->getEnvelopeInternal(), query);
 
-        vector< void * > query;
+			auto curr    = ls->getLS();
+			auto currPLS = ls->getPLS();
 
-        tree.query(ls->getLS()->getEnvelopeInternal(), query);
+			bool didSplit = false;
+			bool didSkip  = false;
 
-        //dmess("query " << query.size());
+			for(auto _B : query)
+			{
+				MyLineString * B = (MyLineString *)_B;
 
-        //vector<MyLineString *> intersecting;
-
-        auto curr    = ls->getLS();
-        auto currPLS = ls->getPLS();
-
-        //unique_ptr<LineString> currExtended(extendEnds(curr));
-
-        bool didSplit = false;
-        bool didSkip  = false;
-
-        for(auto _B : query)
-        {
-            MyLineString * B = (MyLineString *)_B;
-
-            if(B->getLS() == curr) { continue ;}
+				if(B->getLS() == curr) { continue ;}
             
-            //if(false && B->splits.size() > maxNumSplits)
-            if(B->splits.size() > maxNumSplits)
-            {
-                didSkip = true;
+				if(B->splits.size())
+				{
+					/*
+					auto it = B->splits.begin();
 
-                continue;
-            }
+					while (it != B->splits.end())
+					{
+						if(endPointsTouch2D(*it, curr))
+						{
+							++it;
+
+							continue;
+						}
+
+						if(currPLS->intersects(*it))
+						{
+							didSplit |= doSplitting(B, *it, curr);
+
+							it = B->splits.erase(it);
+						}
+						else { ++it ;}
+					}
+					*/
+
+					for (auto subLineString : B->splits)
+					{
+						if (toSplit.find(subLineString) != toSplit.end())
+						{
+							//dmess("Here!");
+
+							continue;
+						}
+
+						if(endPointsTouch2D(subLineString, curr))
+						{
+							continue;
+						}
+
+						if(!currPLS->intersects(subLineString)) { continue ;}
+
+						toSplit[subLineString] = curr;
+					}
+
+					continue;
+				}
+
+				if(!B->getLS()) { continue ;}
+
+				if(endPointsTouch2D(B->getLS(), curr)) { continue ;}
+
+				if(!currPLS->intersects(B->getLS())) { continue ;}
+
+				didSplit |= doSplitting(B, B->getLS(), curr);
+
+				/*
+				if(B->splits.size() > maxNumSplits)
+				{
+					didSkip = true;
+
+					continue;
+				}
             
-            if(B->splits.size())
-            {
-                auto it = B->splits.begin();
+				if(B->splits.size())
+				{
+					auto it = B->splits.begin();
 
-                //bool gotIntersect = false;
+					while (it != B->splits.end())
+					{
+						if(endPointsTouch2D(*it, curr))
+						{
+							++it;
 
-                while (it != B->splits.end())
-                {
-                    if(endPointsTouch2D(*it, curr))
-                    {
-                        ++it;
+							continue;
+						}
 
-                        continue;
-                    }
+						if(currPLS->intersects(*it))
+						{
+							didSplit |= doSplitting(B, *it, curr);
 
-                    //if(intersects(*it, currExtended.get()))
-                    //if(intersects(*it, curr))
-                    if(currPLS->intersects(*it))
-                    {
-                        //didSplit |= doSplitting(B, *it, currExtended);
-                        didSplit |= doSplitting(B, *it, curr);
+							it = B->splits.erase(it);
+						}
+						else { ++it ;}
+					}
 
-                        //gotIntersect = true;
+					continue;
+				}
 
-                        it = B->splits.erase(it);
-                    }
-                    else { ++it ;}
-                }
+				if(!B->getLS()) { continue ;}
 
-                //if(gotIntersect) { intersecting.push_back(B) ;}
+				if(endPointsTouch2D(B->getLS(), curr)) { continue ;}
 
-                continue;
-            }
+				if(!currPLS->intersects(B->getLS())) { continue ;}
 
-            if(!B->getLS()) { continue ;}
-
-            if(endPointsTouch2D(B->getLS(), curr)) { continue ;}
-
-            //if(!intersects(B->getLS(), currExtended.get())) { continue ;}
-            //if(!intersects(B->getLS(), curr)) { continue ;}
-            if(!currPLS->intersects(B->getLS())) { continue ;}
-
-            //intersecting.push_back(B);
-
-            //didSplit |= doSplitting(B, B->getLS(), currExtended);
-            didSplit |= doSplitting(B, B->getLS(), curr);
-        }
+				didSplit |= doSplitting(B, B->getLS(), curr);
+				*/
+			}
         
-        if(!didSplit && !didSkip)
-        {
-            //dmess("Done!");
+			if(!didSplit && !didSkip) { ls->noSplits = true ;}
+		}
+    });
 
-            ls->noSplits = true;
-        }
-    }
+	dmess("toSplit " << toSplit.size());
+
+	vector<std::pair<LineString *, const LineString *>> _toSplit;
+
+	for (const auto& i : toSplit) { _toSplit.push_back(make_pair(i.first, i.second)) ;}
+
+	parallel_for(blocked_range<size_t>(0, _toSplit.size(), 10), [=, &counter, &tree](const blocked_range<size_t>& r)
+	{
+		for(size_t i=r.begin(); i!=r.end(); ++i)
+		{
+
+		}
+	});
+
+	exit(0);
 
     for(auto ls : myLineStrings)
     {

@@ -62,6 +62,8 @@ bool GUI::renderSettingsRenderLinearFeatures   = true;
 bool GUI::renderSettingsRenderSkyBox           = true;
 bool GUI::renderSettingsRenderBingMaps         = true;
 
+float GUI::lineWidthRender = 1.0;
+
 void GUI::loadState()
 {
     dmess("GUI::loadState");

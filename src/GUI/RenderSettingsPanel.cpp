@@ -129,6 +129,20 @@ void GUI::renderSettingsPanel()
             for(auto i : canvas->getMeshesRef()) { i->setShader(shaderMap[meshShader]) ;}
         }
 
+		if(ImGui::SliderFloat("LineWidth", &lineWidthRender, 0.0f, 5.0f, "Line width: %.3f"))
+        {
+			dmess("lineWidthRender " << lineWidthRender);
+		}
+
+		if(canvas)
+		{
+			float perspectiveFOV = canvas->getPerspectiveFOV();
+
+			if(ImGui::SliderFloat("FOV", &perspectiveFOV, 30.0f, 50.0f, "%.3f")) // TODO Why does this not work?
+			{
+				canvas->setPerspectiveFOV(perspectiveFOV);
+			}
+		}
         //ImGui::SameLine(); ShowHelpMarker("Refer to the \"Combo\" section below for an explanation of the full BeginCombo/EndCombo API, and demonstration of various flags.\n");
 
     ImGui::End();

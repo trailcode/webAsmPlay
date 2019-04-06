@@ -102,6 +102,15 @@ wstring stringToWstring(const string& t_str)
     return converter.from_bytes(t_str);
 }
 
+string wstringToString(const wstring& t_str)
+{
+	//setup converter
+	using convert_type = codecvt_utf8<wchar_t>;
+	wstring_convert<convert_type, wchar_t> converter;
+
+	//use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
+	return converter.to_bytes(t_str);
+}
 
 void doProgress( const string             & message,
                  const size_t               i,

@@ -122,7 +122,7 @@ void Canvas::updateMVP()
 {
     currMVP.view        = trackBallInteractor->getCamera()->getMatrix();
 	//currMVP.view = glm::lookAt( glm::vec3( 0.f, 0.f, 2.0f ),glm::vec3( 0.f, 0.f, 0.f ),glm::vec3( 0.0f, 1.0f, 0.0f ) ); 
-    currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.0001, 30.0);
+    currMVP.projection  = perspective(perspectiveFOV, double(size.x) / double(size.y), 0.0001, 30.0);
 	//currMVP.projection  = perspective(180.0, double(size.x) / double(size.y), 0.0001, 30.0);
 	//currMVP.projection  = glm::frustum(-10, 10, -10, 10, 0, 30);
 	//currMVP.projection  = dmat4(1);
@@ -444,6 +444,9 @@ dvec3 Canvas::getCursorPosWC() const { return cursorPosWC ;}
 Renderable * Canvas::getCursor() const { return cursor ;}
 
 FrameBuffer * Canvas::getAuxFrameBuffer() const { return auxFrameBuffer ;}
+
+double Canvas::getPerspectiveFOV() const { return perspectiveFOV ;}
+double Canvas::setPerspectiveFOV(const double FOV) { return perspectiveFOV = FOV ;}
 
 #ifdef __EMSCRIPTEN__
 

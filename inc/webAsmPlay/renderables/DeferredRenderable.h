@@ -53,7 +53,7 @@ public:
                         const glm::vec3 & B,
                         const glm::vec4 & color);
 
-    void render(Canvas * canvas, const size_t renderStage = 0) const override;
+    void render(Canvas * canvas, const size_t renderStage = 0) override;
 
 	void setFromQueued(const glm::dmat4 & trans = glm::dmat4(1.0));
 

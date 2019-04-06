@@ -75,6 +75,8 @@ static glm::vec4 __(const OpenSteer::Color & v) { return glm::vec4(v.r(), v.g(),
 
 std::wstring stringToWstring(const std::string& t_str);
 
+std::string wstringToString(const std::wstring& t_str);
+
 void doProgress(const std::string                                    & message,
                 const size_t                                         i,
                 const size_t                                         num,

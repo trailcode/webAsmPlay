@@ -52,7 +52,7 @@ public:
 											const glm::dmat4                 & trans        = glm::mat4(1.0),
 											const bool                         showProgress = false);
 
-    void render(Canvas * canvas, const size_t renderStage = 0) const override;
+    void render(Canvas * canvas, const size_t renderStage = 0) override;
 
 	void ensureVAO() override;
 

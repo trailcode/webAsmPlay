@@ -250,7 +250,7 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
     triangleIndices.push_back(index + 5);
 }
 
-void DeferredRenderable::render(Canvas * canvas, const size_t renderStage) const
+void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)
 {
     if(!shader->shouldRender(false, renderStage)) { return ;}
 
