@@ -186,7 +186,7 @@ namespace
 
 	FrameBuffer * textureBuffer = NULL;
 
-	const bool useBindlessTextures = true;
+	const bool useBindlessTextures = false;
 
 	void fetchTile(const int ID, RasterTile * tile)
 	{
@@ -396,7 +396,9 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 		return;
 	}
 
-	tiles.push_back(getTile(center, level));
+	RasterTile * tile = RasterTile::getTile(center, level);
+
+	tiles.push_back(tile);
 }
 
 extern GLuint theTex;
@@ -434,6 +436,41 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 			i->stillNeeded = false;
 		}
+	}
+
+	unordered_set<RasterTile*> fallBackTiles;
+
+	for (const auto tile : tiles)
+	{
+		if (tile->textureID) { continue; }
+
+		RasterTile* currTile = tile;
+
+		//dmess("currTile->level " << currTile->level);
+
+		int c = 0;
+		for (int parentLevel = currTile->level - 1; parentLevel >= startLevel; --parentLevel)
+		{
+			//if (++c > 2) { break; }
+
+			currTile = currTile->getParentTile();
+
+			//dmess("currTile " << currTile);
+
+			if (currTile->textureID)
+			{
+				fallBackTiles.insert(currTile);
+
+				break;
+			}
+		}
+	}
+
+	//if(fallBackTiles.size()) dmess("fallBackTiles " << fallBackTiles.size());
+
+	for (const auto tile : fallBackTiles)
+	{
+		if (tileSet.find(tile) == tileSet.end()) { tiles.push_back(tile); }
 	}
 
 	sort(tiles.begin(), tiles.end(), [](const RasterTile * A, const RasterTile * B) { return A->level < B->level ;});
@@ -527,24 +564,3 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 	textureBuffer->unbind();
 }
 
-RasterTile * RenderableBingMap::getTile(const dvec2& center, const size_t level)
-{
-	char buf[1024];
-
-	sprintf(buf, "%f %f %zi", center.x, center.y, level);
-
-	unordered_map<string, RasterTile*>::const_iterator i = currTileSet.find(buf);
-
-	if (i != currTileSet.end()) { return i->second; }
-
-	return currTileSet[buf] = new RasterTile(center, level);
-}
-
-/*
-RenderableBingMap::Tile* RenderableBingMap::Tile::getParentTile() const
-{
-	if (level - 1 <= startLevel) { return NULL; }
-
-	return getTile(center, level - 1);
-}
-*/

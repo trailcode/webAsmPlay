@@ -24,8 +24,36 @@
   \copyright 2019
 */
 
+#include <unordered_map>
+#include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/RasterTile.h>
 
+using namespace std;
 using namespace glm;
+using namespace bingTileSystem;
 
-RasterTile::RasterTile(const dvec2& center, const size_t level) : center(center), level(level) {}
+namespace
+{
+	unordered_map<string, RasterTile*> currTileSet;
+}
+
+RasterTile::RasterTile(const dvec2& center, const size_t level) : center(center), level(level)
+{
+	
+}
+
+RasterTile* RasterTile::getTile(const dvec2& center, const size_t level)
+{
+	const string quadKey = tileToQuadKey(latLongToTile(center, level), level);
+
+	unordered_map<string, RasterTile*>::const_iterator i = currTileSet.find(quadKey);
+
+	if (i != currTileSet.end()) { return i->second; }
+
+	return currTileSet[quadKey] = new RasterTile(center, level);
+}
+
+RasterTile* RasterTile::getParentTile() const
+{
+	return getTile(center, level - 1);
+}

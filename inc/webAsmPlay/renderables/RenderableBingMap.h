@@ -26,7 +26,6 @@
 #pragma once
 
 #include <atomic>
-#include <unordered_map>
 #include <webAsmPlay/renderables/Renderable.h>
 
 class Frustum;
@@ -57,10 +56,6 @@ private:
 	void getStartLevel();
 
 	void getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level);
-
-	RasterTile* getTile(const glm::dvec2& center, const size_t level);
-
-	std::unordered_map<std::string, RasterTile*> currTileSet;
 
     const AABB2D bounds;
 

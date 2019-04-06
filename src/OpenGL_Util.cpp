@@ -43,7 +43,7 @@ namespace
 	unordered_set<thread::id> setContextes;
 }
 
-void OpenGL::initSharedContexts()
+void OpenGL::init()
 {
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 
@@ -51,6 +51,8 @@ void OpenGL::initSharedContexts()
 	{
 		contextWindows.push(glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow()));
 	}
+
+
 }
 
 void OpenGL::ensureSharedContext()

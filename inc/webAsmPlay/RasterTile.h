@@ -38,6 +38,10 @@ public:
 
 	RasterTile(const glm::dvec2& center, const size_t level);
 
+	static RasterTile* getTile(const glm::dvec2& center, const size_t level);
+
+	RasterTile* getParentTile() const;
+
 	const glm::dvec2	center;
 	const size_t		level;
 

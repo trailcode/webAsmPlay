@@ -58,7 +58,6 @@
 #include <webAsmPlay/shaders/TextureLookupShader.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
 #include <webAsmPlay/renderables/SkyBox.h>
-#include <webAsmPlay/renderables/GridPlane.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -576,7 +575,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
 	TextureLookupShader		  ::ensureShader();
 	BindlessTextureShader	  ::ensureShader();
     
-	OpenGL::initSharedContexts();
+	OpenGL::init();
 
     canvas = new Canvas(false);
 

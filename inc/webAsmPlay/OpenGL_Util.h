@@ -68,7 +68,7 @@ class OpenGL
 {
 public:
 
-	static void initSharedContexts();
+	static void init();
 
 	static void ensureSharedContext();
 
