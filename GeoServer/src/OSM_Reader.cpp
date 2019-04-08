@@ -293,20 +293,32 @@ MapData OSM_Reader::import(const string & fileName)
         const uint64_t   id  = i.first;
         OSM_Way        * way = i.second;
 
-        if(way && way->geom)
-        {
-            Geometry * geom = bounds->intersection(way->geom.get());
+		try
+		{
+			if (way && way->geom)
+			{
+				Geometry* geom = bounds->intersection(way->geom.get());
 
-            if(!geom) { continue ;}
+				if (!geom)
+				{
+					dmess("!geom");
 
-            Attributes * attrs = way->attrs.release();
+					continue;
+				}
 
-            ret.geometry.push_back(AttributedGeometry(attrs, geom)); // TODO not safe!
-        }
-        else
-        {
-            //dmess("!way->geom");
-        }
+				Attributes* attrs = way->attrs.release();
+
+				ret.geometry.push_back(AttributedGeometry(attrs, geom)); // TODO not safe!
+			}
+			else
+			{
+				//dmess("!way->geom");
+			}
+		}
+		catch (...)
+		{
+			dmess("Here!");
+		}
     }
 
     dmess("Nodes " << nodes.size());

@@ -177,7 +177,10 @@ namespace
 
 		const size_t size = output->size;
 
-		if (!ret) { dmess("Error!") ;} // It will retry later
+		if (!ret)
+		{
+			//dmess("Error!");
+		} // It will retry later
 
 		delete output;
 
@@ -209,6 +212,8 @@ namespace
 
 			SDL_Surface * img = IMG_Load(tileCachePath.c_str());
 
+			if (!img) { goto download; }
+
 			uploaderPool.push([tile, img](int ID)
 			{
 				if (!tile->stillNeeded)
@@ -218,7 +223,7 @@ namespace
 					--RenderableBingMap::numLoading;
 
 					SDL_FreeSurface(img);
-
+					 
 					return;
 				}
 
@@ -239,11 +244,13 @@ namespace
 		}
 		else
 		{
+		download:
+
 			TileBuffer tileBuffer = downloadTile(ID, quadKey);
 
 			if (!get<0>(tileBuffer))
 			{
-				dmess("Error! No buffer!");
+				//dmess("Error! No buffer!");
 
 				--RenderableBingMap::numLoading;
 

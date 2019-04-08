@@ -252,6 +252,7 @@ namespace
     }
 }
 
+#ifdef WORKING
 vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & lineStrings, vector<AttributedLineString> & nonSplitting)
 {
     dmess("start topology::breakLineStrings " << lineStrings.size() << " MyLineString " << counterMyLineString);
@@ -445,6 +446,161 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString> & li
     dmess("end topology::breakLineStrings " << ret.size() << " nonSplitting " << nonSplitting.size() << " num splits: " << numSplits);
 
     return ret;
+}
+#endif
+
+vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString>& lineStrings, vector<AttributedLineString>& nonSplitting)
+{
+	dmess("start topology::breakLineStrings " << lineStrings.size() << " MyLineString " << counterMyLineString);
+
+	vector<AttributedLineString> ret;
+
+	Quadtree tree;
+
+	vector<MyLineString*> myLineStrings;
+
+	for (auto& ls : lineStrings)
+	{
+		MyLineString* myLS = new MyLineString(&ls);
+
+		tree.insert(get<1>(ls)->getEnvelopeInternal(), (void*)myLS);
+
+		myLineStrings.push_back(myLS);
+	}
+
+	sort(myLineStrings.begin(), myLineStrings.end(), [](const MyLineString * lhs, const MyLineString * rhs)
+	{
+		return lhs->length < rhs->length;
+	});
+
+	dmess("Tree depth " << tree.depth());
+
+	numSplits = 0;
+
+	size_t maxNumSplits = 5;
+
+	size_t counter = 0;
+
+	for (auto ls : myLineStrings)
+	{
+		if (!(counter % 300)) { dmess("myLineStrings " << myLineStrings.size() << " " << counter); }
+
+		counter++;
+
+		//if(counter > 2500) { break ;}
+		//if(counter > 1000) { break ;}
+
+		if (!ls->getLS()) { continue; }
+
+		//*
+		if (ls->splits.size()) { continue; }
+
+		if (ls->splits.size() > maxNumSplits)
+		{
+			//dmess("skip here!");
+
+			continue;
+		}
+		//*/
+
+		vector< void* > query;
+
+		tree.query(ls->getLS()->getEnvelopeInternal(), query);
+
+		//dmess("query " << query.size());
+
+		//vector<MyLineString *> intersecting;
+
+		auto curr = ls->getLS();
+		auto currPLS = ls->getPLS();
+
+		//unique_ptr<LineString> currExtended(extendEnds(curr));
+
+		bool didSplit = false;
+		bool didSkip = false;
+
+		for (auto _B : query)
+		{
+			MyLineString* B = (MyLineString*)_B;
+
+			if (B->getLS() == curr) { continue; }
+
+			//if(false && B->splits.size() > maxNumSplits)
+			if (B->splits.size() > maxNumSplits)
+			{
+				didSkip = true;
+
+				continue;
+			}
+
+			if (B->splits.size())
+			{
+				auto it = B->splits.begin();
+
+				//bool gotIntersect = false;
+
+				while (it != B->splits.end())
+				{
+					if (endPointsTouch2D(*it, curr))
+					{
+						++it;
+
+						continue;
+					}
+
+					//if(intersects(*it, currExtended.get()))
+					//if(intersects(*it, curr))
+					if (currPLS->intersects(*it))
+					{
+						//didSplit |= doSplitting(B, *it, currExtended);
+						didSplit |= doSplitting(B, *it, curr);
+
+						//gotIntersect = true;
+
+						it = B->splits.erase(it);
+					}
+					else { ++it; }
+				}
+
+				//if(gotIntersect) { intersecting.push_back(B) ;}
+
+				continue;
+			}
+
+			if (!B->getLS()) { continue; }
+
+			if (endPointsTouch2D(B->getLS(), curr)) { continue; }
+
+			//if(!intersects(B->getLS(), currExtended.get())) { continue ;}
+			//if(!intersects(B->getLS(), curr)) { continue ;}
+			if (!currPLS->intersects(B->getLS())) { continue; }
+
+			//intersecting.push_back(B);
+
+			//didSplit |= doSplitting(B, B->getLS(), currExtended);
+			didSplit |= doSplitting(B, B->getLS(), curr);
+		}
+
+		if (!didSplit && !didSkip)
+		{
+			//dmess("Done!");
+
+			ls->noSplits = true;
+		}
+	}
+
+	for (auto ls : myLineStrings)
+	{
+		if (ls->noSplits) { ls->save(nonSplitting); }
+
+		else { ls->save(ret); }
+
+		delete ls;
+	}
+
+	dmess("end topology::breakLineStrings " << ret.size() << " nonSplitting " << nonSplitting.size() << " num splits: " << numSplits);
+
+	return ret;
 }
 
 void topology::breakLineStrings(vector<AttributedLineString> & lineStrings)

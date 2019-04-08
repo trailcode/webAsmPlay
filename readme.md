@@ -54,6 +54,7 @@ does not fully support c++ 17. On windows it is recommended to use scoop (https:
 * Geos: https://trac.osgeo.org/geos
 * SDL2_image: https://www.libsdl.org/
 * Intel TBB: https://www.threadingbuildingblocks.org/
+* Visual C++ Redistributable for Visual Studio 2012 Update 4: https://www.microsoft.com/en-us/download/details.aspx?id=30679
 
 ### Sources
 
