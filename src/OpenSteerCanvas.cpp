@@ -84,7 +84,7 @@ void OpenSteerCanvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
     g_openSteerWindowWidth  = (float)size.x;
     g_openSteerWindowHeight = (float)size.y;
 
-    if(size != this->size)
+    if(size != m_size)
     {
         dmess("Resize!");
     }

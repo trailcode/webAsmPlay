@@ -33,17 +33,13 @@ class ColorSymbology
 {
 public:
 
-    //static void ensureInstance();
-
     static ColorSymbology * getInstance(const std::string & name);
-
-    //static ColorSymbology * createInstance(const std::string name);
 
     GLuint getTextureID();
 
-    glm::vec4 setColor(const size_t index, const glm::vec4 & color);
-    glm::vec4 getColor(const size_t index);
-    glm::vec4 & getColorRef(const size_t index);
+    glm::vec4 setColor		(const size_t index, const glm::vec4 & color);
+    glm::vec4 getColor		(const size_t index);
+    glm::vec4 & getColorRef	(const size_t index);
 
     void loadState(const JSONObject & dataStore);
 
@@ -54,11 +50,11 @@ private:
     ColorSymbology(const std::string & name);
     ~ColorSymbology();
 
-    const std::string name;
+    const std::string m_name;
 
-    GLuint colorTexture = 0;
+    GLuint m_colorTexture = 0;
 
-    glm::vec4 colors[32];
+    glm::vec4 m_colors[32];
 
-    bool colorTextureDirty = true;
+    bool m_colorTextureDirty = true;
 };

@@ -20,127 +20,127 @@ namespace rsmz
 
     const glm::vec3 & Camera::getCenterConstRef() const
     {
-        return mCenter;
+        return m_center;
     }
 
     glm::vec3 Camera::getCenter() const
     {
-        return mCenter;
+        return m_center;
     }
 
     const glm::vec3 & Camera::getEyeConstRef() const
     {
-        return mEye;
+        return m_eye;
     }
 
     glm::vec3 Camera::getEye() const
     {
-        return mEye; 
+        return m_eye; 
     }
 
     const glm::mat4 & Camera::getMatrixConstRef() const
     {
-        return mMatrix;
+        return m_matrix;
     }
 
     glm::mat4 Camera::getMatrix() const
     {
-        return mMatrix;
+        return m_matrix;
     }
 
     void Camera::setMatrix(const glm::mat4 & MVP)
     {
         cout << "Does not seem to work" << endl;
 
-        mMatrix = MVP;
+        m_matrix = MVP;
     }
 
     const float* Camera::getMatrixFlatPtr() const
     {
-        return glm::value_ptr(mMatrix);
+        return glm::value_ptr(m_matrix);
     }
 
     vector<float> Camera::getMatrixFlat() const
     {
         vector<float> ret(16);
 
-        memcpy(&ret[0], glm::value_ptr(mMatrix), sizeof(float) * 16);
+        memcpy(&ret[0], glm::value_ptr(m_matrix), sizeof(float) * 16);
 
         return ret;
     }
 
     const glm::vec3 & Camera::getUpConstRef() const
     {
-        return mUp;
+        return m_up;
     }
 
     glm::vec3 Camera::getUp() const
     {
-        return mUp;
+        return m_up;
     }
 
     void Camera::reset()
     {
         dmess("Camera::reset");
 
-        mEye.x = 0.f;
-        mEye.y = 0.f;
-        mEye.z = 1.f;
-        mCenter.x = 0.f;
-        mCenter.y = 0.f;
-        mCenter.z = 0.f;
-        mUp.x = 0.f;
-        mUp.y = 1.f;
-        mUp.z = 0.f;
+        m_eye.x = 0.f;
+        m_eye.y = 0.f;
+        m_eye.z = 1.f;
+        m_center.x = 0.f;
+        m_center.y = 0.f;
+        m_center.z = 0.f;
+        m_up.x = 0.f;
+        m_up.y = 1.f;
+        m_up.z = 0.f;
 
         update();
     }
 
     void Camera::setEye(float x, float y, float z)
     {
-        mEye.x = x;
-        mEye.y = y;
-        mEye.z = z;
+        m_eye.x = x;
+        m_eye.y = y;
+        m_eye.z = z;
     }
 
     void Camera::setEye(const glm::vec3 & e)
     {
-        mEye = e;
+        m_eye = e;
     }
 
     void Camera::setCenter(float x, float y, float z)
     {
-        mCenter.x = x;
-        mCenter.y = y;
-        mCenter.z = z;
+        m_center.x = x;
+        m_center.y = y;
+        m_center.z = z;
 
-        mCenter.z = 0; // TODO This is a hack
+        m_center.z = 0; // TODO This is a hack
     }
 
     void Camera::setCenter(const glm::vec3 & c)
     {
-        mCenter = c;
+        m_center = c;
 
-        mCenter.z = 0; // TODO This is a hack
+        m_center.z = 0; // TODO This is a hack
     }
 
     void Camera::setUp(float x, float y, float z)
     {
-        mUp.x = x;
-        mUp.y = y;
-        mUp.z = z;
+        m_up.x = x;
+        m_up.y = y;
+        m_up.z = z;
     }
 
     void Camera::setUp(const glm::vec3 & u)
     {
-        mUp = u;
+        m_up = u;
     }
 
     void Camera::update()
     {
         //dmess("Camera::update mEye: " << mEye << " mCenter: " << mCenter << " mUp: " << mUp << " " << glm::length(mUp));
 
-        mMatrix = glm::lookAt(mEye, mCenter, mUp);
+        m_matrix = glm::lookAt(m_eye, m_center, m_up);
     }
 
 } // end namespace rsmz

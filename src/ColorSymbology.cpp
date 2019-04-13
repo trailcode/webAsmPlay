@@ -41,15 +41,6 @@ namespace
     unordered_map<string, ColorSymbology *> instances;
 }
 
-/*
-void ColorSymbology::ensureInstance()
-{
-    if(!instance) { instance = new ColorSymbology() ;}
-}
-*/
-
-//ColorSymbology * ColorSymbology::getDefaultInstance() { return instance ;}
-
 ColorSymbology * ColorSymbology::getInstance(const string & name)
 {
     unordered_map<string, ColorSymbology *>::const_iterator i = instances.find(name);
@@ -59,20 +50,20 @@ ColorSymbology * ColorSymbology::getInstance(const string & name)
     return instances[name] = new ColorSymbology(name);
 }
 
-ColorSymbology::ColorSymbology(const string & name) : name(name)
+ColorSymbology::ColorSymbology(const string & name) : m_name(name)
 {
-    colors[0] = vec4(1,0,0,1);
-    colors[1] = vec4(1,1,0,1);
-    colors[2] = vec4(1,0,1,1);
-    colors[3] = vec4(0,1,0,1);
-    colors[4] = vec4(0,1,1,1);
-    colors[5] = vec4(0,0,1,1);
-    colors[6] = vec4(1,0,0,1);
-    colors[7] = vec4(1,0,0,1);
+    m_colors[0] = vec4(1,0,0,1);
+    m_colors[1] = vec4(1,1,0,1);
+    m_colors[2] = vec4(1,0,1,1);
+    m_colors[3] = vec4(0,1,0,1);
+    m_colors[4] = vec4(0,1,1,1);
+    m_colors[5] = vec4(0,0,1,1);
+    m_colors[6] = vec4(1,0,0,1);
+    m_colors[7] = vec4(1,0,0,1);
 
-    for(size_t i = 8; i < 32; ++i) { colors[i] = vec4(1,1,0,1) ;}
+    for(size_t i = 8; i < 32; ++i) { m_colors[i] = vec4(1,1,0,1) ;}
 
-    colorTexture = Textures::create(colors, 32);
+    m_colorTexture = Textures::create(m_colors, 32);
 }
 
 ColorSymbology::~ColorSymbology()
@@ -82,25 +73,25 @@ ColorSymbology::~ColorSymbology()
 
 GLuint ColorSymbology::getTextureID()
 {
-    if(!colorTextureDirty) { return colorTexture ;}
+    if(!m_colorTextureDirty) { return m_colorTexture ;}
     
-    Textures::set1D(colorTexture, colors, 32);
+    Textures::set1D(m_colorTexture, m_colors, 32);
 
-    colorTextureDirty = false;
+    m_colorTextureDirty = false;
 
-    return colorTexture;
+    return m_colorTexture;
 }
 
 vec4 ColorSymbology::setColor(const size_t index, const vec4 & color)
 {
-    colorTextureDirty = true;
+    m_colorTextureDirty = true;
 
-    return colors[index] = color;
+    return m_colors[index] = color;
 }
 
-vec4 ColorSymbology::getColor(const size_t index) { return colors[index] ;}
+vec4 ColorSymbology::getColor(const size_t index) { return m_colors[index] ;}
 
-vec4 & ColorSymbology::getColorRef(const size_t index) { return colors[index] ;}
+vec4 & ColorSymbology::getColorRef(const size_t index) { return m_colors[index] ;}
 
 void ColorSymbology::loadState(const JSONObject & dataStore)
 {
@@ -115,12 +106,12 @@ void ColorSymbology::loadState(const JSONObject & dataStore)
 
     for(size_t i = 0; i < 32; ++i)  
     {
-        sprintf(buf, "ColorSymbology_%s_attributeColor_%i", name.c_str(), (int)i);
+        sprintf(buf, "ColorSymbology_%s_attributeColor_%i", m_name.c_str(), (int)i);
 
-        setVec4(stringToWstring(buf), colors[i]);
+        setVec4(stringToWstring(buf), m_colors[i]);
     }
 
-    colorTextureDirty = true;
+    m_colorTextureDirty = true;
 }
 
 void ColorSymbology::saveState(JSONObject & dataStore)
@@ -129,8 +120,8 @@ void ColorSymbology::saveState(JSONObject & dataStore)
 
     for(size_t i = 0; i < 32; ++i)
     {
-        sprintf(buf, "ColorSymbology_%s_attributeColor_%i", name.c_str(), (int)i);
+        sprintf(buf, "ColorSymbology_%s_attributeColor_%i", m_name.c_str(), (int)i);
 
-        dataStore[stringToWstring(buf)] = new JSONValue(colors[i]);
+        dataStore[stringToWstring(buf)] = new JSONValue(m_colors[i]);
     }
 }

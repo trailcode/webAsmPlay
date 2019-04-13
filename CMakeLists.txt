@@ -27,7 +27,6 @@ if(MSVC_VERSION)
 	  execute_process(COMMAND ${NUGET} install curl-vc141-dynamic-x86_64	-Version 7.59.0		-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install glfw							-Version 3.2.1.5	-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install unofficial-flayan-glew		-Version 2.1.0		-o thirdParty)
-      #execute_process(COMMAND ${NUGET} install tbb							-Version 4.2.3.1	-o thirdParty)
       execute_process(COMMAND ${NUGET} install tbb_oss						-Version 9.107.0	-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install expat.v140					-Version 2.2.6		-o thirdParty)
 
@@ -151,7 +150,6 @@ file(GLOB opensteerSrc  "ThirdParty/opensteer/src/Clock.cpp"
 
 file(GLOB simpleJSON_SRC            "ThirdParty/SimpleJSON/src/*.cpp")
 file(GLOB imguiSrc                  "ThirdParty/imgui/*.cpp" "ThirdParty/imgui/*.h")
-#file(GLOB gl3wSrc                   "ThirdParty/gl3w/src/gl3w.c" "ThirdParty/sl3w/inc/GL/*.h" "ThirdParty/sl3w/inc/KHR/*.h")
 file(GLOB webAsmPlay_SRC            "inc/webAsmPlay/*.h" "src/*.cpp")
 file(GLOB webAsmPlayShaders_SRC     "src/shaders/*.cpp" "inc/webAsmPlay/shaders/*.h")
 file(GLOB webAsmPlayShadersGLSL_SRC "src/shaders/*.glsl")
@@ -172,8 +170,6 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     ${opensteerSrc}
 					${imguiSrc}
 					readme.md
-					#${gl3wSrc}
-                    #"ThirdParty/imgui/glad/glad.c"
                     )
 				  
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
@@ -203,9 +199,6 @@ add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
 
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 add_definitions(-DGLM_FORCE_RADIANS)
-#add_definitions(-DCURL_STATICLIB)
-
-#add_definitions(-DIMGUI_API)
 
 set(sourcePath ${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")
@@ -276,6 +269,7 @@ else()
 	find_package(GLEW REQUIRED)
     find_package(TBB REQUIRED)
     find_package(curl REQUIRED)
+	find_package(Expat REQUIRED)
 
 	include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${CURL_INCLUDE_DIR})
@@ -285,7 +279,6 @@ else()
 	include_directories(${GLFW3_INCLUDE_PATH})
 	include_directories(${TBB_INCLUDE_DIRS})
     include_directories(ThirdParty/ctpl)
-	#include_directories(ThirdParty/gl3w/inc)
     include_directories(./)
     
     link_libraries(debug ${CURL_LIBRARY_DEBUG} optimized ${CURL_LIBRARY_RELEASE})
@@ -308,13 +301,8 @@ else()
     
     if(MSVC_VERSION)
 
-        #link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG} optimized ${TBB_tbb_LIBRARY_RELEASE})
-
-    else()
-
-        #link_libraries(${TBB_tbb_LIBRARY_RELEASE})
-        link_libraries(debug ${CURL_LIBRARY_DEBUG} optimized ${CURL_LIBRARY_RELEASE})
-        link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG} optimized ${TBB_tbb_LIBRARY_RELEASE})
+        link_libraries(debug ${CURL_LIBRARY_DEBUG}		optimized ${CURL_LIBRARY_RELEASE})
+        link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG}	optimized ${TBB_tbb_LIBRARY_RELEASE})
 
     else()
 
@@ -337,12 +325,12 @@ else()
                         ypos.png
                         zneg.png
                         zpos.png
-                        if_Info_131908.png
-                        )
-
+                        if_Info_131908.png)
 	
     foreach(assetFile ${ASSET_FILES})
+
 		if(MSVC_VERSION)
+
 			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
 			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}"	DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
 			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
@@ -356,6 +344,7 @@ else()
 		else()
 
 			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+
 			list(APPEND assetFileDest "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}")
 			
 		endif()
@@ -441,8 +430,6 @@ else()
 	    SET(CMAKE_CXX_LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
 	endif()
 
-	#add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
-	#add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 	add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLEW)
 
 	add_library(libWebAsmPlay STATIC ${sources})
@@ -450,9 +437,6 @@ else()
 	add_executable(webAsmPlay "src/Main.cpp")
 	target_link_libraries(webAsmPlay libWebAsmPlay)
 
-	find_package(Expat REQUIRED)
-	#find_package(Boost COMPONENTS filesystem system REQUIRED)
-	
 	add_executable(geoServer ${geoServer_SRC})
     
 	target_include_directories(geoServer PRIVATE "ThirdParty/LAStools")

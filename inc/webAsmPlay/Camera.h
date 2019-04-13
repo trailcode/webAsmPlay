@@ -57,10 +57,10 @@ namespace rsmz
         void update();
 
     private:
-        glm::vec3 mCenter;
-        glm::vec3 mEye;
-        glm::mat4 mMatrix;
-        glm::vec3 mUp;
+        glm::vec3 m_center;
+        glm::vec3 m_eye;
+        glm::mat4 m_matrix;
+        glm::vec3 m_up;
     };
 
 } // end namespace rsmz

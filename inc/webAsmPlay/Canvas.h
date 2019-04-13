@@ -30,7 +30,6 @@
 #include <stack>
 #include <mutex>
 #include <glm/vec2.hpp>
-#include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
@@ -135,10 +134,10 @@ protected:
 
     GLuint postRender();
 
-    glm::ivec2 upperLeft;
-    glm::ivec2 size = glm::ivec2(1,1);
+    glm::ivec2 m_upperLeft;
+    glm::ivec2 m_size = glm::ivec2(1,1);
 
-    glm::ivec2 frameBufferSize = glm::ivec2(1,1);
+    glm::ivec2 m_frameBufferSize = glm::ivec2(1,1);
 
 private:
 
@@ -146,51 +145,51 @@ private:
 
     void updateMVP();
 
-    rsmz::TrackBallInteractor * trackBallInteractor = NULL;
+    rsmz::TrackBallInteractor * m_trackBallInteractor = NULL;
 
-    FrameBuffer * frameBuffer = NULL;
+    FrameBuffer * m_frameBuffer = NULL;
 
-    bool wantMouseCapture = true;
+    bool m_wantMouseCapture = true;
 
-    glm::ivec2 lastShiftKeyDownMousePos;
+    glm::ivec2 m_lastShiftKeyDownMousePos;
 
-    std::list<Renderable *> points;
-    std::list<Renderable *> lineStrings;
-    std::list<Renderable *> polygons;
-    std::list<Renderable *> meshes;
-    std::list<Renderable *> deferredRenderables;
-    std::list<Renderable *> rasters;
+    std::list<Renderable *> m_points;
+    std::list<Renderable *> m_lineStrings;
+    std::list<Renderable *> m_polygons;
+    std::list<Renderable *> m_meshes;
+    std::list<Renderable *> m_deferredRenderables;
+    std::list<Renderable *> m_rasters;
 
-    const bool useFrameBuffer;
+    const bool m_useFrameBuffer;
 
-    glm::vec4 clearColor;
+    glm::vec4 m_clearColor;
 
     struct MVP
     {
-        glm::dmat4 view;
-        glm::dmat4 model         = glm::dmat4(1.0);
-        glm::dmat4 projection;
-        glm::dmat4 MV;
-        glm::dmat4 MVP;
+		glm::dmat4 m_model	= glm::dmat4(1.0);
+        glm::dmat4 m_view;
+        glm::dmat4 m_projection;
+        glm::dmat4 m_MV;
+        glm::dmat4 m_MVP;
     };
 
-    MVP currMVP;
+    MVP m_currMVP;
 
-    std::stack<MVP> stackMVP;
+    std::stack<MVP> m_stackMVP;
     
-    glm::dvec3 cursorPosWC;
+    glm::dvec3 m_cursorPosWC;
 
-    SkyBox * skyBox = NULL;
+    SkyBox * m_skyBox = NULL;
 
-    bool enabled = true;
+    bool m_enabled = true;
 
-    std::mutex renderiablesMutex;
+    std::mutex m_renderiablesMutex;
 
-    Renderable * cursor = NULL;
+    Renderable * m_cursor = NULL;
 
-    FrameBuffer * auxFrameBuffer = NULL;
+    FrameBuffer * m_auxFrameBuffer = NULL;
 
-	Frustum * frustum = NULL;
+	Frustum * m_frustum = NULL;
 
-	double perspectiveFOV = 45.0;
+	double m_perspectiveFOV = 45.0;
 };

@@ -61,57 +61,57 @@ namespace
 }
 
 Canvas::Canvas( const bool   useFrameBuffer,
-                const vec4 & clearColor) :  useFrameBuffer		(useFrameBuffer),
-                                            clearColor			(clearColor),
-                                            trackBallInteractor	(new TrackBallInteractor()),
-											frustum				(new Frustum())
+                const vec4 & clearColor) :  m_useFrameBuffer		(useFrameBuffer),
+                                            m_clearColor			(clearColor),
+                                            m_trackBallInteractor	(new TrackBallInteractor()),
+											m_frustum				(new Frustum())
 {
     instances.push_back(this);
 }
 
 Canvas::~Canvas()
 {
-    delete trackBallInteractor;
-    delete frameBuffer;
-	delete frustum;
+    delete m_trackBallInteractor;
+    delete m_frameBuffer;
+	delete m_frustum;
     // TODO remove from instances!
 }
 
 void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
 {
-    this->upperLeft = upperLeft;
-    this->size      = size;
+    m_upperLeft = upperLeft;
+    m_size      = size;
 
-    trackBallInteractor->setScreenSize((float)size.x, (float)size.y);
+    m_trackBallInteractor->setScreenSize((float)size.x, (float)size.y);
 }
 
 ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
 {
     //if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, fbSize) ;}
 
-    FrameBuffer::ensureFrameBuffer(auxFrameBuffer, fbSize);
+    FrameBuffer::ensureFrameBuffer(m_auxFrameBuffer, fbSize);
 
-    return frameBufferSize = fbSize;
+    return m_frameBufferSize = fbSize;
 }
 
-ivec2 Canvas::getFrameBufferSize() const { return frameBufferSize ;}
+ivec2 Canvas::getFrameBufferSize() const { return m_frameBufferSize ;}
 
 void Canvas::pushModel(const dmat4 & model)
 {
-    stackMVP.push(currMVP);
+    m_stackMVP.push(m_currMVP);
 
-    currMVP.model = model;
+    m_currMVP.m_model = model;
 
     updateMVP();
 }
 
 void Canvas::popMVP()
 {
-    currMVP = stackMVP.top();
+    m_currMVP = m_stackMVP.top();
 
-    stackMVP.pop();
+    m_stackMVP.pop();
 
-	frustum->set(currMVP.MVP);
+	m_frustum->set(m_currMVP.m_MVP);
 }
 
 extern vec4 lookat;
@@ -120,9 +120,9 @@ extern vec4 up;
 
 void Canvas::updateMVP()
 {
-    currMVP.view        = trackBallInteractor->getCamera()->getMatrix();
+    m_currMVP.m_view        = m_trackBallInteractor->getCamera()->getMatrix();
 	//currMVP.view = glm::lookAt( glm::vec3( 0.f, 0.f, 2.0f ),glm::vec3( 0.f, 0.f, 0.f ),glm::vec3( 0.0f, 1.0f, 0.0f ) ); 
-    currMVP.projection  = perspective(perspectiveFOV, double(size.x) / double(size.y), 0.0001, 30.0);
+    m_currMVP.m_projection  = perspective(m_perspectiveFOV, double(m_size.x) / double(m_size.y), 0.0001, 30.0);
 	//currMVP.projection  = perspective(180.0, double(size.x) / double(size.y), 0.0001, 30.0);
 	//currMVP.projection  = glm::frustum(-10, 10, -10, 10, 0, 30);
 	//currMVP.projection  = dmat4(1);
@@ -134,42 +134,42 @@ void Canvas::updateMVP()
 	//currMVP.projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
     //currMVP.view = glm::lookAt(trackBallInteractor->getCamera()->getEye(), trackBallInteractor->getCamera()->getCenter(), glm::vec3(0.0, 1.0, 0.0));
 	
-	currMVP.MV          = currMVP.view * currMVP.model;
-    currMVP.MVP         = currMVP.projection * currMVP.MV;
+	m_currMVP.m_MV		= m_currMVP.m_view			* m_currMVP.m_model;
+    m_currMVP.m_MVP		= m_currMVP.m_projection	* m_currMVP.m_MV;
 
-	frustum->set(currMVP.MVP);
+	m_frustum->set(m_currMVP.m_MVP);
 }
 
 bool Canvas::preRender()
 {
-    if(!enabled) { return false ;}
+    if(!m_enabled) { return false ;}
 
-    if(!size.x || !size.y)
+    if(!m_size.x || !m_size.y)
     {
         dmess("Error canvas size is not valid!");
 
         return false;
     }
 
-    Camera * camera = trackBallInteractor->getCamera();
+    Camera * camera = m_trackBallInteractor->getCamera();
 
     updateMVP();
 
     ColorDistanceShader3D     ::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
     ColorDistanceDepthShader3D::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
 
-    if(useFrameBuffer)
+    if(m_useFrameBuffer)
     {
-        FrameBuffer::ensureFrameBuffer(frameBuffer, frameBufferSize)->bind();
+        FrameBuffer::ensureFrameBuffer(m_frameBuffer, m_frameBufferSize)->bind();
 
-        GL_CHECK(glViewport(0, 0, frameBufferSize.x, frameBufferSize.y));
+        GL_CHECK(glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y));
     }
 
-    if(skyBox) { skyBox->render(this) ;}
+    if(m_skyBox) { m_skyBox->render(this) ;}
 
     else
     {
-        GL_CHECK(glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w));
+        GL_CHECK(glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w));
 
         GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
     }
@@ -183,55 +183,55 @@ GLuint Canvas::render()
 {
     if(!preRender()) { return 0 ;}
 
-    lock_guard<mutex> _(renderiablesMutex);
+    lock_guard<mutex> _(m_renderiablesMutex);
 
-    if(auxFrameBuffer)
+    if(m_auxFrameBuffer)
     {
-        auxFrameBuffer->bind();
+        m_auxFrameBuffer->bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        for(const auto r : meshes) { r->render(this, 1) ;}
+        for(const auto r : m_meshes) { r->render(this, 1) ;}
 
         glFlush();
 
-        auxFrameBuffer->unbind();
+        m_auxFrameBuffer->unbind();
     }
 
-    for(const auto r : rasters) { r->render(this, 0) ;}
+    for(const auto r : m_rasters) { r->render(this, 0) ;}
 
     // TODO try to refactor this. Who owns the symbology?
     ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
 
-    for(const auto r : polygons)            { r->render(this, 0) ;}
+    for(const auto r : m_polygons)            { r->render(this, 0) ;}
 
     ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultLinear"));
 
-    for(const auto r : lineStrings)         { r->render(this, 0) ;}
-    for(const auto r : points)              { r->render(this, 0) ;}
-    for(const auto r : deferredRenderables) { r->render(this, 0) ;} 
+    for(const auto r : m_lineStrings)         { r->render(this, 0) ;}
+    for(const auto r : m_points)              { r->render(this, 0) ;}
+    for(const auto r : m_deferredRenderables) { r->render(this, 0) ;} 
     
     ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
     ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
 
-    for(const auto r : meshes)              { r->render(this, 0) ;}
+    for(const auto r : m_meshes)              { r->render(this, 0) ;}
 
     return postRender();
 }
 
 dvec2 Canvas::renderCursor(const dvec2 & pos)
 {
-    if(!cursor)
+    if(!m_cursor)
 	{
-		cursor = RenderablePoint::create(vec3(0,0,0));
+		m_cursor = RenderablePoint::create(vec3(0,0,0));
 
-		cursor->ensureVAO();
+		m_cursor->ensureVAO();
 	}
 
     pushModel(translate(dmat4(1.0), dvec3(pos, 0.0)));
 	//pushModel(translate(dmat4(1.0), dvec3(0,0, 0.0)));
 
-    cursor->render(this, 0);
+    m_cursor->render(this, 0);
 
     popMVP();
     
@@ -240,9 +240,9 @@ dvec2 Canvas::renderCursor(const dvec2 & pos)
 
 GLuint Canvas::postRender()
 {
-    renderCursor(cursorPosWC);
+    renderCursor(m_cursorPosWC);
 
-    if(useFrameBuffer) { return frameBuffer->getTextureID() ;}
+    if(m_useFrameBuffer) { return m_frameBuffer->getTextureID() ;}
 
     return 0;
 }
@@ -250,40 +250,37 @@ GLuint Canvas::postRender()
 
 GLuint Canvas::getTextureID() const
 {
-    if(!frameBuffer)
+    if(!m_frameBuffer)
     {
         dmess("Error no frameBuffer!");
 
         return 0;
     }
 
-    return frameBuffer->getTextureID();
+    return m_frameBuffer->getTextureID();
 }
 
-bool Canvas::setWantMouseCapture(const bool wantMouseCapture)
-{
-    return this->wantMouseCapture = wantMouseCapture;
-}
+bool Canvas::setWantMouseCapture(const bool wantMouseCapture) { return m_wantMouseCapture = wantMouseCapture ;}
 
 void Canvas::onMouseButton(GLFWwindow * window, const int button, const int action, const int mods)
 {
-    if(!enabled) { return ;}
+    if(!m_enabled) { return ;}
 }
 
 void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
 {
-    if(!enabled) { return ;}
+    if(!m_enabled) { return ;}
 
-    const vec2 pos = mousePos - vec2(upperLeft);
+    const vec2 pos = mousePos - vec2(m_upperLeft);
 
-    trackBallInteractor->setClickPoint(pos.x, pos.y);
-    trackBallInteractor->update();
+    m_trackBallInteractor->setClickPoint(pos.x, pos.y);
+    m_trackBallInteractor->update();
 
     // From: http://antongerdelan.net/opengl/raycasting.html
-    const vec4 rayClip = vec4(  (2.0f * pos.x) / size.x - 1.0f,
-                                1.0f - (2.0f * pos.y) / size.y, -1.0, 1.0);
+    const vec4 rayClip = vec4(		   (2.0f * pos.x) / m_size.x - 1.0f,
+                                1.0f - (2.0f * pos.y) / m_size.y, -1.0, 1.0);
 
-    dvec4 rayEye = inverse(currMVP.projection) * rayClip;
+    dvec4 rayEye = inverse(m_currMVP.m_projection) * rayClip;
     
     rayEye = dvec4(rayEye.x, rayEye.y, -1.0, 0.0);
     
@@ -295,35 +292,35 @@ void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
 
     const double t = -dot(eye, n) / dot(rayWor, n);
 
-    cursorPosWC = eye + rayWor * t;
+    m_cursorPosWC = eye + rayWor * t;
 }
 
 void Canvas::onMouseScroll(GLFWwindow * window, const vec2 & mouseScroll)
 {
-    if(!enabled || !wantMouseCapture) { return ;}
+    if(!m_enabled || !m_wantMouseCapture) { return ;}
 
     int state = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
 
     if (state == GLFW_PRESS)
     {
         // TODO This is not working correctly
-        lastShiftKeyDownMousePos += ivec2(mouseScroll.x, 0);
+        m_lastShiftKeyDownMousePos += ivec2(mouseScroll.x, 0);
 
-        trackBallInteractor->setClickPoint(lastShiftKeyDownMousePos.x % size.x, lastShiftKeyDownMousePos.y % size.y);
-        trackBallInteractor->update();
+        m_trackBallInteractor->setClickPoint(m_lastShiftKeyDownMousePos.x % m_size.x, m_lastShiftKeyDownMousePos.y % m_size.y);
+        m_trackBallInteractor->update();
 
         return;
     }
 
     //trackBallInteractor->setSpeed(fabs(mouseScroll.y) * 0.1);
 
-    trackBallInteractor->setScrollDirection(mouseScroll.y > 0);
-    trackBallInteractor->update();
+    m_trackBallInteractor->setScrollDirection(mouseScroll.y > 0);
+    m_trackBallInteractor->update();
 }
 
 void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods)
 {
-    if(!enabled || !wantMouseCapture) { return ;}
+    if(!m_enabled || !m_wantMouseCapture) { return ;}
 
     switch(key)
     {
@@ -331,14 +328,14 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
         case GLFW_KEY_LEFT_ALT:
 		case GLFW_KEY_LEFT_CONTROL:
 
-            trackBallInteractor->setLeftClicked(action);
+            m_trackBallInteractor->setLeftClicked(action);
 
             if(action)
             {
                 double xPos;
                 double yPos;
                 glfwGetCursorPos(window, &xPos, &yPos);
-                lastShiftKeyDownMousePos = ivec2(xPos, yPos);
+                m_lastShiftKeyDownMousePos = ivec2(xPos, yPos);
 
                 //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
             }
@@ -348,25 +345,25 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
 
     switch(key)
     {
-        case GLFW_KEY_LEFT_SHIFT:	trackBallInteractor->setMotionLeftClick(ARC);  break;
-        case GLFW_KEY_LEFT_ALT:		trackBallInteractor->setMotionLeftClick(PAN);  break;
-		case GLFW_KEY_LEFT_CONTROL: trackBallInteractor->setMotionLeftClick(ZOOM); break;
+        case GLFW_KEY_LEFT_SHIFT:	m_trackBallInteractor->setMotionLeftClick(ARC);  break;
+        case GLFW_KEY_LEFT_ALT:		m_trackBallInteractor->setMotionLeftClick(PAN);  break;
+		case GLFW_KEY_LEFT_CONTROL: m_trackBallInteractor->setMotionLeftClick(ZOOM); break;
     }
 }
 
 void Canvas::onChar(GLFWwindow * window, const size_t c)
 {
-    if(!enabled) { return ;}
+    if(!m_enabled) { return ;}
 }
 
 Renderable * Canvas::addRenderable(Renderable * renderiable)
 {
-    if(dynamic_cast<DeferredRenderable   *>(renderiable)) { return addRenderable(deferredRenderables, renderiable) ;}
-    if(dynamic_cast<RenderableLineString *>(renderiable)) { return addRenderable(lineStrings,         renderiable) ;}
-    if(dynamic_cast<RenderablePolygon    *>(renderiable)) { return addRenderable(polygons,            renderiable) ;}
-    if(dynamic_cast<RenderablePoint      *>(renderiable)) { return addRenderable(points,              renderiable) ;}
-    if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderable(meshes,              renderiable) ;}
-    if(dynamic_cast<RenderableBingMap    *>(renderiable)) { return addRenderable(rasters,             renderiable) ;}
+    if(dynamic_cast<DeferredRenderable   *>(renderiable)) { return addRenderable(m_deferredRenderables, renderiable) ;}
+    if(dynamic_cast<RenderableLineString *>(renderiable)) { return addRenderable(m_lineStrings,         renderiable) ;}
+    if(dynamic_cast<RenderablePolygon    *>(renderiable)) { return addRenderable(m_polygons,            renderiable) ;}
+    if(dynamic_cast<RenderablePoint      *>(renderiable)) { return addRenderable(m_points,              renderiable) ;}
+    if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderable(m_meshes,              renderiable) ;}
+    if(dynamic_cast<RenderableBingMap    *>(renderiable)) { return addRenderable(m_rasters,             renderiable) ;}
 
     dmess("Error! Implement!");
     
@@ -377,13 +374,13 @@ Renderable * Canvas::addRenderable(Renderable * renderiable)
 
 Renderable * Canvas::addRenderable(list<Renderable *> & container, Renderable * renderiable)
 {   
-    lock_guard<mutex> _(renderiablesMutex);
+    lock_guard<mutex> _(m_renderiablesMutex);
 
     container.push_back(renderiable);
 
     renderiable->addOnDeleteCallback([this, &container](Renderable * r)
     {
-        lock_guard<mutex> _(renderiablesMutex);
+        lock_guard<mutex> _(m_renderiablesMutex);
 
         container.remove(r);
     });
@@ -395,58 +392,58 @@ vector<Renderable *> Canvas::getRenderiables() const
 {
     vector<Renderable *> ret;
 
-    ret.insert(ret.end(), points.begin(),       points.end());
-    ret.insert(ret.end(), lineStrings.begin(),  lineStrings.end());
-    ret.insert(ret.end(), polygons.begin(),     polygons.end());
-    ret.insert(ret.end(), meshes.begin(),       meshes.end());
-    ret.insert(ret.end(), rasters.begin(),      rasters.end());
+    ret.insert(ret.end(), m_points.begin(),       m_points.end());
+    ret.insert(ret.end(), m_lineStrings.begin(),  m_lineStrings.end());
+    ret.insert(ret.end(), m_polygons.begin(),     m_polygons.end());
+    ret.insert(ret.end(), m_meshes.begin(),       m_meshes.end());
+    ret.insert(ret.end(), m_rasters.begin(),      m_rasters.end());
 
     return ret;
 }
 
-const list<Renderable *> & Canvas::getPointsRef()               const { return points               ;}
-const list<Renderable *> & Canvas::getLineStringsRef()          const { return lineStrings          ;}
-const list<Renderable *> & Canvas::getPolygonsRef()             const { return polygons             ;}
-const list<Renderable *> & Canvas::getMeshesRef()               const { return meshes               ;}
-const list<Renderable *> & Canvas::getDeferredRenderablesRef()  const { return deferredRenderables  ;}
-const list<Renderable *> & Canvas::getRastersRef()              const { return rasters              ;}
+const list<Renderable *> & Canvas::getPointsRef()               const { return m_points               ;}
+const list<Renderable *> & Canvas::getLineStringsRef()          const { return m_lineStrings          ;}
+const list<Renderable *> & Canvas::getPolygonsRef()             const { return m_polygons             ;}
+const list<Renderable *> & Canvas::getMeshesRef()               const { return m_meshes               ;}
+const list<Renderable *> & Canvas::getDeferredRenderablesRef()  const { return m_deferredRenderables  ;}
+const list<Renderable *> & Canvas::getRastersRef()              const { return m_rasters              ;}
 
-vec4 Canvas::setClearColor(const vec4 & clearColor) { return this->clearColor = clearColor ;}
+vec4 Canvas::setClearColor(const vec4 & clearColor) { return this->m_clearColor = clearColor ;}
 
-Camera * Canvas::getCamera() const { return trackBallInteractor->getCamera() ;}
+Camera * Canvas::getCamera() const { return m_trackBallInteractor->getCamera() ;}
 
-const Frustum * Canvas::getCameraFrustum() const { return frustum ;}
+const Frustum * Canvas::getCameraFrustum() const { return m_frustum ;}
 
-TrackBallInteractor * Canvas::getTrackBallInteractor() const { return trackBallInteractor ;}
+TrackBallInteractor * Canvas::getTrackBallInteractor() const { return m_trackBallInteractor ;}
 
-dmat4 Canvas::getView()                  const { return currMVP.view       ;}
-dmat4 Canvas::getModel()                 const { return currMVP.model      ;}
-dmat4 Canvas::getProjection()            const { return currMVP.projection ;}
-dmat4 Canvas::getMVP()                   const { return currMVP.MVP        ;}
-dmat4 Canvas::getMV()                    const { return currMVP.MV         ;}
+dmat4 Canvas::getView()								const	{ return m_currMVP.m_view		;}
+dmat4 Canvas::getModel()							const	{ return m_currMVP.m_model		;}
+dmat4 Canvas::getProjection()						const	{ return m_currMVP.m_projection	;}
+dmat4 Canvas::getMVP()								const	{ return m_currMVP.m_MVP		;}
+dmat4 Canvas::getMV()								const	{ return m_currMVP.m_MV			;}
 
-const dmat4 & Canvas::getViewRef()       const { return currMVP.view       ;}
-const dmat4 & Canvas::getModelRef()      const { return currMVP.model      ;}
-const dmat4 & Canvas::getProjectionRef() const { return currMVP.projection ;}
-const dmat4 & Canvas::getMVP_Ref()       const { return currMVP.MVP        ;}
-const dmat4 & Canvas::getMV_Ref()        const { return currMVP.MV         ;}
+const dmat4 & Canvas::getViewRef()					const	{ return m_currMVP.m_view		;}
+const dmat4 & Canvas::getModelRef()					const	{ return m_currMVP.m_model		;}
+const dmat4 & Canvas::getProjectionRef()			const	{ return m_currMVP.m_projection	;}
+const dmat4 & Canvas::getMVP_Ref()					const	{ return m_currMVP.m_MVP		;}
+const dmat4 & Canvas::getMV_Ref()					const	{ return m_currMVP.m_MV			;}
 
-SkyBox * Canvas::setSkyBox(SkyBox * skyBox) { return this->skyBox = skyBox ;}
-SkyBox * Canvas::getSkyBox() const          { return skyBox ;}
+SkyBox * Canvas::setSkyBox(SkyBox * skyBox)					{ return m_skyBox = skyBox		;}
+SkyBox * Canvas::getSkyBox()						const	{ return m_skyBox				;}
 
-vector<Canvas *> Canvas::getInstances() { return instances ;}
+bool Canvas::setEnabled(const bool enabled)					{ return m_enabled = enabled	;}
+bool Canvas::getEnabled()							const	{ return m_enabled				;}
 
-bool Canvas::setEnabled(const bool enabled) { return this->enabled = enabled ;}
-bool Canvas::getEnabled() const             { return enabled ;}
+double Canvas::getPerspectiveFOV()					const	{ return m_perspectiveFOV		;}
+double Canvas::setPerspectiveFOV(const double FOV)			{ return m_perspectiveFOV = FOV ;}
 
-dvec3 Canvas::getCursorPosWC() const { return cursorPosWC ;}
+vector<Canvas *> Canvas::getInstances()						{ return instances ;}
 
-Renderable * Canvas::getCursor() const { return cursor ;}
+dvec3 Canvas::getCursorPosWC()						const	{ return m_cursorPosWC ;}
 
-FrameBuffer * Canvas::getAuxFrameBuffer() const { return auxFrameBuffer ;}
+Renderable * Canvas::getCursor()					const	{ return m_cursor ;}
 
-double Canvas::getPerspectiveFOV() const { return perspectiveFOV ;}
-double Canvas::setPerspectiveFOV(const double FOV) { return perspectiveFOV = FOV ;}
+FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
 
 #ifdef __EMSCRIPTEN__
 
