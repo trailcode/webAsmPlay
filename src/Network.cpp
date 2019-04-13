@@ -48,18 +48,18 @@ using namespace geosUtil;
 
 Edge::Edge( Renderable       * renderable,
             const LineString * geom,
-            Attributes       * attributes) : renderable (renderable),
-                                             geom       (geom),
-                                             attributes (attributes),
-                                             start      (getStartPoint(geom)),
-                                             end        (getEndPoint(geom))
+            Attributes       * attributes) : m_renderable	(renderable),
+                                             m_geom			(geom),
+                                             m_attributes	(attributes),
+                                             m_start		(getStartPoint(geom)),
+                                             m_end			(getEndPoint  (geom))
 {
-    weight = geom->getLength() * 1000000 + 1;
+    m_weight = geom->getLength() * 1000000 + 1;
 }
 
-Renderable       * Edge::getRenderable() const { return renderable ;}
-const LineString * Edge::getGeometry()   const { return geom       ;}
-Attributes       * Edge::getAttributes() const { return attributes ;}
+Renderable       * Edge::getRenderable() const { return m_renderable ;}
+const LineString * Edge::getGeometry()   const { return m_geom       ;}
+Attributes       * Edge::getAttributes() const { return m_attributes ;}
 
 #define INF 0x3f3f3f3f // TODO use numeric_limits!
 
@@ -111,9 +111,9 @@ namespace
     vector<Path>   Q;
 }
 
-Network::Network(GeoClient * client) : client(client) {}
+Network::Network(GeoClient * client) : m_client(client) {}
 
-Network::Network(const vector<AttributedLineString> & lineStrings, const dmat4 & trans) : trans(trans)
+Network::Network(const vector<AttributedLineString> & lineStrings, const dmat4 & trans) : m_trans(trans)
 {
     setEdges(lineStrings);
 }
@@ -128,8 +128,8 @@ void Network::setEdges(const Edges & _edges)
 
     for(const auto & edge : edges)
     {
-        edgeMap[edge->start].push_back(edge);
-        edgeMap[edge->end  ].push_back(edge);
+        edgeMap[edge->m_start].push_back(edge);
+        edgeMap[edge->m_end  ].push_back(edge);
     }
 
     nodes.resize(edgeMap.size());
@@ -152,8 +152,8 @@ void Network::setEdges(const Edges & _edges)
 
         for(const auto & j : i.second)
         {
-            if(currPos == j->start) { neighbors.push_back(NodeEdge(nodeMap[j->end],   j)) ;}
-            else                    { neighbors.push_back(NodeEdge(nodeMap[j->start], j)) ;}
+            if(currPos == j->m_start) { neighbors.push_back(NodeEdge(nodeMap[j->m_end],   j)) ;}
+            else                    { neighbors.push_back(NodeEdge(nodeMap[j->m_start], j)) ;}
         }
     }
 
@@ -181,9 +181,9 @@ void Network::setStartEdge(const PointOnEdge & start)
 
     startPoint = start;
 
-    startRenderable = unique_ptr<Renderable>(RenderablePoint::create(vec3(get<0>(start), 0), client->getTrans()));
+    startRenderable = unique_ptr<Renderable>(RenderablePoint::create(vec3(get<0>(start), 0), m_client->getTrans()));
 
-    client->getCanvas()->addRenderable(startRenderable.get());
+    m_client->getCanvas()->addRenderable(startRenderable.get());
 }
 
 void Network::findPath(const PointOnEdge & end)
@@ -196,14 +196,14 @@ void Network::findPath(const PointOnEdge & end)
 
     Geometry::Ptr buffered(path->buffer(0.00005, 3));
 
-    pathAnnotation = unique_ptr<Renderable>(Renderable::create(buffered, client->getTrans()));
+    pathAnnotation = unique_ptr<Renderable>(Renderable::create(buffered, m_client->getTrans()));
 
     pathAnnotation->setRenderFill(true);
     pathAnnotation->setRenderOutline(true);
 
 	pathAnnotation->ensureVAO();
 
-    client->getCanvas()->addRenderable(pathAnnotation.get());
+    m_client->getCanvas()->addRenderable(pathAnnotation.get());
 }
 
 class nodeTotalGreater
@@ -268,7 +268,7 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
     priority_queue<Path, vector<Path> , PathCmp> pq(PathCmp(), Q);
     //pq.clear();
 
-    const size_t startIndex = nodeMap[start.second->start];
+    const size_t startIndex = nodeMap[start.second->m_start];
 
     // TODO, try to only reset the ones which have been modified.
     for(size_t i = 0; i < nodes.size(); ++i)
@@ -368,15 +368,15 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
         const vector<Coordinate> * points = A->getGeometry()->getCoordinatesRO()->toVector();
 
-        if(A->end == B->start || A->end == B->end)
+        if(A->m_end == B->m_start || A->m_end == B->m_end)
         {
-            lastPoint = A->end;
+            lastPoint = A->m_end;
 
             coords->insert(coords->end(), points->begin(), points->end());
         }
         else
         {
-            lastPoint = A->start;
+            lastPoint = A->m_start;
 
             coords->insert(coords->end(), points->rbegin(), points->rend());
         }
@@ -387,17 +387,17 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
             
             const vector<Coordinate> * points = A->getGeometry()->getCoordinatesRO()->toVector();
 
-            if(lastPoint == A->start)
+            if(lastPoint == A->m_start)
             {
                 coords->insert(coords->end(), points->begin(), points->end());
 
-                lastPoint = A->end;
+                lastPoint = A->m_end;
             }
             else
             {
                 coords->insert(coords->end(), points->rbegin(), points->rend());
 
-                lastPoint = A->start;
+                lastPoint = A->m_start;
             }
         }
 
@@ -422,12 +422,12 @@ vector<dvec2> Network::getRandomPath()
         Edge * A = edges[rand() % edges.size()];
         Edge * B = edges[rand() % edges.size()];
 
-        coords = unique_ptr<vector<Coordinate> >(findPath(PointOnEdge(A->start, A), PointOnEdge(B->end, B)));
+        coords = unique_ptr<vector<Coordinate> >(findPath(PointOnEdge(A->m_start, A), PointOnEdge(B->m_end, B)));
     }
 
-    if(client) { trans = client->getTrans() ;}
+    if(m_client) { m_trans = m_client->getTrans() ;}
 
-    transformInPlace(*coords, trans);
+    transformInPlace(*coords, m_trans);
 
     return __(DouglasPeuckerLineSimplifier::simplify(*coords, 0.000001));
 }

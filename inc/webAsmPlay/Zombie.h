@@ -90,16 +90,16 @@ public:
 
     void newPD(ProximityDatabase & pd);
 
-    ProximityToken * proximityToken;
+    ProximityToken * m_proximityToken;
 
-    static OpenSteer::AVGroup neighbors;
+    static OpenSteer::AVGroup s_neighbors;
 
-    OpenSteer::PolylineSegmentedPathwaySingleRadius * path;
+    OpenSteer::PolylineSegmentedPathwaySingleRadius * m_path;
 
-    int pathDirection;
+    int m_pathDirection;
 
-    OpenSteer::Vec3 endPoint0;
-    OpenSteer::Vec3 endPoint1;
+    OpenSteer::Vec3 m_endPoint0;
+    OpenSteer::Vec3 m_endPoint1;
 
 private:
 };

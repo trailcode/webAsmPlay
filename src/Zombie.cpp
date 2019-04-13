@@ -37,7 +37,7 @@
 
 using namespace OpenSteer;
 
-AVGroup Zombie::neighbors;
+AVGroup Zombie::s_neighbors;
 
 namespace
 {
@@ -50,11 +50,11 @@ extern Canvas * theCanvas;
 Zombie::Zombie(ProximityDatabase & pd, Network * network)
 {
     // allocate a token for this boid in the proximity database
-    proximityToken = NULL;
+    m_proximityToken = NULL;
 
     newPD (pd);
 
-    path = OpenSteerGlue::getPath(network->getRandomPath());
+    m_path = OpenSteerGlue::getPath(network->getRandomPath());
 
     // reset Pedestrian state
     reset ();
@@ -63,7 +63,7 @@ Zombie::Zombie(ProximityDatabase & pd, Network * network)
 Zombie::~Zombie()
 {
     // delete this boid's token in the proximity database
-    delete proximityToken;
+    delete m_proximityToken;
 }
 
 void Zombie::reset()
@@ -84,27 +84,27 @@ void Zombie::reset()
     // set the path for this Pedestrian to follow
     //path = getTestPath ();
 
-    endPoint0 = path->point(0);
-    endPoint1 = path->point(path->pointCount() - 1);
+    m_endPoint0 = m_path->point(0);
+    m_endPoint1 = m_path->point(m_path->pointCount() - 1);
 
     // set initial position
     // (random point on path + random horizontal offset)
-    const float d = path->length() * frandom01();
-    const float r = path->radius();
+    const float d = m_path->length() * frandom01();
+    const float r = m_path->radius();
     const Vec3 randomOffset = randomVectorOnUnitRadiusXZDisk () * r;
-    setPosition (path->mapPathDistanceToPoint (d) + randomOffset);
+    setPosition (m_path->mapPathDistanceToPoint (d) + randomOffset);
 
     // randomize 2D heading
     randomizeHeadingOnXZPlane ();
 
     // pick a random direction for path following (upstream or downstream)
-    pathDirection = (frandom01() > 0.5) ? -1 : +1;
+    m_pathDirection = (frandom01() > 0.5) ? -1 : +1;
 
     // trail parameters: 3 seconds with 60 points along the trail
     setTrailParameters (3, 60);
 
     // notify proximity database that our position has changed
-    proximityToken->updateForNewPosition (position());
+    m_proximityToken->updateForNewPosition (position());
 }
 
 /*
@@ -123,16 +123,16 @@ void Zombie::update(const float currentTime, const float elapsedTime)
     if (gUseDirectedPathFollowing)
     {
         const Color darkRed (0.7f, 0, 0);
-        float const pathRadius = path->radius();
+        float const pathRadius = m_path->radius();
         
-        if (Vec3::distance (position(), endPoint0) < pathRadius )
+        if (Vec3::distance (position(), m_endPoint0) < pathRadius )
         {
-            pathDirection = +1;
+            m_pathDirection = +1;
             //annotationXZCircle (pathRadius, endPoint0, darkRed, 20);
         }
-        if (Vec3::distance (position(), endPoint1) < pathRadius )
+        if (Vec3::distance (position(), m_endPoint1) < pathRadius )
         {
-            pathDirection = -1;
+            m_pathDirection = -1;
             //annotationXZCircle (pathRadius, endPoint1, darkRed, 20);
         }
     }
@@ -142,7 +142,7 @@ void Zombie::update(const float currentTime, const float elapsedTime)
     recordTrailVertex (currentTime, position());
 
     // notify proximity database that our position has changed
-    proximityToken->updateForNewPosition (position());
+    m_proximityToken->updateForNewPosition (position());
 }
 
 Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
@@ -184,12 +184,12 @@ Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
         // (radius is largest distance between vehicles traveling head-on
         // where a collision is possible within caLeadTime seconds.)
         const float maxRadius = caLeadTime * maxSpeed() * 2;
-        neighbors.clear();
-        proximityToken->findNeighbors (position(), maxRadius, neighbors);
+        s_neighbors.clear();
+        m_proximityToken->findNeighbors (position(), maxRadius, s_neighbors);
         //dmess("neighbors " << neighbors.size())
         if (true || leakThrough < frandom01())
         {
-            collisionAvoidance = steerToAvoidNeighbors (caLeadTime, neighbors) * 10.0;
+            collisionAvoidance = steerToAvoidNeighbors (caLeadTime, s_neighbors) * 10.0;
         }
 
         // if collision avoidance is needed, do it
@@ -209,8 +209,8 @@ Vec3 Zombie::determineCombinedSteering(const float elapsedTime)
             const float pfLeadTime = 3;
             const Vec3 pathFollow =
                 (gUseDirectedPathFollowing ?
-                    steerToFollowPath (pathDirection, pfLeadTime, *path) :
-                    steerToStayOnPath (pfLeadTime, *path));
+                    steerToFollowPath (m_pathDirection, pfLeadTime, *m_path) :
+                    steerToStayOnPath (pfLeadTime, *m_path));
 
             // add in to steeringForce
             steeringForce += pathFollow * 0.5;
@@ -307,9 +307,9 @@ void Zombie::annotateAvoidObstacle(const float minDistanceToCollision)
 void Zombie::newPD(ProximityDatabase& pd)
 {
     // delete this boid's token in the old proximity database
-    delete proximityToken;
+    delete m_proximityToken;
 
     // allocate a token for this boid in the proximity database
-    proximityToken = pd.allocateToken (this);
+    m_proximityToken = pd.allocateToken (this);
 }
 

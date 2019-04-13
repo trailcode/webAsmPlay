@@ -42,9 +42,9 @@ public:
 
 private:
 
-    std::vector<std::unique_ptr<Renderable> > geoms;
+    std::vector<std::unique_ptr<Renderable> > m_geoms;
 
-    float buffer1;
-    float buffer2;
-    float buffer3;
+    float m_buffer1;
+    float m_buffer2;
+    float m_buffer3;
 };

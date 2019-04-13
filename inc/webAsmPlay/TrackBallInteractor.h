@@ -94,31 +94,31 @@ namespace rsmz
         void updateCameraEyeUp(bool eye, bool up);
 
     private:
-        Camera *mCamera;
-        CameraMotionType mCameraMotionLeftClick;
-        CameraMotionType mCameraMotionMiddleClick;
-        CameraMotionType mCameraMotionRightClick;
-        CameraMotionType mCameraMotionScroll;
-        glm::vec2 mClickPoint;
-        float mHeight;
-        bool mIsDragging;
-        bool mIsLeftClick;
-        bool mIsMiddleClick;
-        bool mIsRightClick;
-        bool mIsScrolling;
-        float mPanScale;
-        glm::vec2 mPrevClickPoint;
-        float mRollScale;
-        float mRollSum;
-        glm::quat mRotation;
-        glm::quat mRotationSum;
-        float mSpeed;
-        glm::vec3 mStartVector;
-        glm::vec3 mStopVector;
-        float mTranslateLength;
-        float mWidth;
-        float mZoomSum;
-        float mZoomScale;
+        Camera *m_Camera;
+        CameraMotionType m_CameraMotionLeftClick;
+        CameraMotionType m_CameraMotionMiddleClick;
+        CameraMotionType m_CameraMotionRightClick;
+        CameraMotionType m_CameraMotionScroll;
+        glm::vec2 m_ClickPoint;
+        float m_Height;
+        bool m_IsDragging;
+        bool m_IsLeftClick;
+        bool m_IsMiddleClick;
+        bool m_IsRightClick;
+        bool m_IsScrolling;
+        float m_PanScale;
+        glm::vec2 m_PrevClickPoint;
+        float m_RollScale;
+        float m_RollSum;
+        glm::quat m_Rotation;
+        glm::quat m_RotationSum;
+        float m_Speed;
+        glm::vec3 m_StartVector;
+        glm::vec3 m_StopVector;
+        float m_TranslateLength;
+        float m_Width;
+        float m_ZoomSum;
+        float m_ZoomScale;
 
     }; // end class TrackBallInteractor
 

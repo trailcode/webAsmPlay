@@ -42,18 +42,18 @@ public:
 
 	RasterTile* getParentTile() const;
 
-	const glm::dvec2	center;
-	const size_t		level;
+	const glm::dvec2	m_center;
+	const size_t		m_level;
 
-	std::atomic_bool loading = { false };
+	std::atomic_bool m_loading = { false };
 
-	std::atomic_bool stillNeeded = { true };
+	std::atomic_bool m_stillNeeded = { true };
 
-	Renderable* r = NULL;
+	Renderable* m_renderable = NULL;
 
-	std::atomic_uint textureID = { 0 };
+	std::atomic_uint m_textureID = { 0 };
 
-	GLuint64    handle = 0;
+	GLuint64 m_handle = 0;
 
-	bool textureResident = false;
+	bool m_textureResident = false;
 };

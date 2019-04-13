@@ -63,7 +63,6 @@ private:
                         const GLuint        ebo2,
                         const GLuint        vbo,
                         const GLuint        numTrianglesIndices,
-                        const Uint32Vec   & counterVertIndices,
                         const size_t        numContourLines,
                         const bool          isMulti,
 						const size_t		sizeVertex,
@@ -75,18 +74,16 @@ private:
     VertexArrayObject(VertexArrayObject &&)                   = delete;
     VertexArrayObject & operator=(const VertexArrayObject &)  = delete;
     
-		  GLuint    vao                 = 0;
-    const GLuint    ebo                 = 0;
-    const GLuint    ebo2                = 0;
-    const GLuint    vbo                 = 0;
-    const GLuint    numTrianglesIndices = 0;
-    const size_t    numContourLines     = 0;
-    const bool      _isMulti            = false;
+		  GLuint    m_vao                 = 0;
+    const GLuint    m_ebo                 = 0;
+    const GLuint    m_ebo2                = 0;
+    const GLuint    m_vbo                 = 0;
+    const GLuint    m_numTrianglesIndices = 0;
+    const size_t    m_numContourLines     = 0;
+    const bool      m_isMulti             = false;
 
-    const Uint32Vec counterVertIndices;
-
-	const size_t sizeVertex;
-	const size_t sizeNormal;
-	const size_t sizeColor;
-	const size_t sizeUV;
+	const size_t m_sizeVertex;
+	const size_t m_sizeNormal;
+	const size_t m_sizeColor;
+	const size_t m_sizeUV;
 };

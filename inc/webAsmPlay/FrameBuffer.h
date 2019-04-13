@@ -63,15 +63,15 @@ private:
 				const GLenum	   format,
 				const GLenum	   type);
 
-    const GLuint framebuffer;
-    const GLuint textureColorbuffer;
-    const GLuint rbo;
+    const GLuint m_framebuffer;
+    const GLuint m_textureColorbuffer;
+    const GLuint m_rbo;
 
-    const glm::ivec2 bufferSize;
+    const glm::ivec2 m_bufferSize;
 
-    GLint prevFB = 0;
+    GLint m_prevFB = 0;
 
-	const GLint	 internalformat;
-	const GLenum format;
-	const GLenum type;
+	const GLint	 m_internalformat;
+	const GLenum m_format;
+	const GLenum m_type;
 };

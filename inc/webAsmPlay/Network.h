@@ -25,10 +25,9 @@
 */
 #pragma once
 
-#include <memory>
 #include <glm/mat4x4.hpp>
-#include <webAsmPlay/Types.h>
 #include <geos/geom/Coordinate.h>
+#include <webAsmPlay/Types.h>
 
 namespace geos
 {
@@ -54,22 +53,18 @@ public:
 
     Attributes * getAttributes() const;
 
-    std::vector<Edge *> neighbors;
-    
-    //bool visited = false;
+    const glm::dvec2 m_start;
+    const glm::dvec2 m_end;
 
-    const glm::dvec2 start;
-    const glm::dvec2 end;
-
-    inline double getWeight() const { return weight ;}
+    inline double getWeight() const { return m_weight ;}
 
 private:
 
-    Renderable                   * renderable;
-    const geos::geom::LineString * geom;
-    Attributes                   * attributes;
+    Renderable                   * m_renderable;
+    const geos::geom::LineString * m_geom;
+    Attributes                   * m_attributes;
 
-    int weight;
+    int m_weight;
 };
 
 class Network
@@ -96,9 +91,7 @@ public:
 
 private:
 
-    Renderable * startPosRenderable = NULL;
+    GeoClient * m_client = NULL;
 
-    GeoClient * client = NULL;
-
-    glm::dmat4 trans;
+    glm::dmat4 m_trans;
 };

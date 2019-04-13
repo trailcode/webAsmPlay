@@ -50,13 +50,13 @@ using namespace geosUtil;
 
 PointOnEdge GeoClient::pickLineStringRenderable(const vec3 & _pos) const
 {
-    const vec4 pos = inverseTrans * vec4(_pos, 1.0);
+    const vec4 pos = m_inverseTrans * vec4(_pos, 1.0);
     
     vector<void *> query;
     
     const Envelope bounds(pos.x, pos.x, pos.y, pos.y);
     
-    quadTreeLineStrings->query(&bounds, query);
+    m_quadTreeLineStrings->query(&bounds, query);
     
     double minDist = numeric_limits<double>::max();
 
@@ -88,13 +88,13 @@ PointOnEdge GeoClient::pickLineStringRenderable(const vec3 & _pos) const
 
 pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _pos) const
 {
-    const vec4 pos = inverseTrans * vec4(_pos, 1.0);
+    const vec4 pos = m_inverseTrans * vec4(_pos, 1.0);
     
     vector< void * > query;
     
     const Envelope bounds(pos.x, pos.x, pos.y, pos.y);
     
-    quadTreePolygons->query(&bounds, query);
+    m_quadTreePolygons->query(&bounds, query);
     
     // TODO, there might be a method accepting a Coordinate
     Point * p = scopedGeosGeometry(GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y)));
@@ -126,13 +126,13 @@ pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _
 
 vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(const vec3 & _pos) const
 {
-    const vec4 pos = inverseTrans * vec4(_pos, 1.0);
+    const vec4 pos = m_inverseTrans * vec4(_pos, 1.0);
     
     vector< void * > query;
     
     const Envelope bounds(pos.x, pos.x, pos.y, pos.y);
     
-    quadTreePolygons->query(&bounds, query);
+    m_quadTreePolygons->query(&bounds, query);
     
     Point * p = scopedGeosGeometry(GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y)));
 
@@ -173,21 +173,21 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
             Edge * edge;
             dvec2  pointOnEdge;
 
-            tie(pointOnEdge, edge) = pickLineStringRenderable(canvas->getCursorPosWC());
+            tie(pointOnEdge, edge) = pickLineStringRenderable(m_canvas->getCursorPosWC());
 
             if(!edge) { break ;}
 
 			edge->getRenderable()->ensureVAO();
 
-            edge->getRenderable()->render(canvas);
+            edge->getRenderable()->render(m_canvas);
 
-            canvas->renderCursor(trans * dvec4(pointOnEdge, 0, 1));
+            m_canvas->renderCursor(m_trans * dvec4(pointOnEdge, 0, 1));
 
             return edge->getAttributes()->toString();
         }
         case GUI::PICK_MODE_POLYGON_SINGLE:
         {
-            tie(renderable, attrs) = pickPolygonRenderable(canvas->getCursorPosWC());
+            tie(renderable, attrs) = pickPolygonRenderable(m_canvas->getCursorPosWC());
 
             if(!renderable) { return "" ;}
             
@@ -196,13 +196,13 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
 			renderable->ensureVAO();
 
-			renderable->render(canvas);
+			renderable->render(m_canvas);
 
             return attrs->toString();
         }
         case GUI::PICK_MODE_POLYGON_MULTIPLE:
         {
-            vector<pair<Renderable *, Attributes *> > picked = pickPolygonRenderables(canvas->getCursorPosWC());
+            vector<pair<Renderable *, Attributes *> > picked = pickPolygonRenderables(m_canvas->getCursorPosWC());
 
             if(!picked.size()) { return "" ;}
             
@@ -210,7 +210,7 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
 			renderable->ensureVAO();
 
-			renderable->render(canvas);
+			renderable->render(m_canvas);
 
             string attrsStr = attrs->toString();
 

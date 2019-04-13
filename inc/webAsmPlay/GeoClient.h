@@ -31,8 +31,6 @@
 #include <thread>
 #endif
 
-#include <string>
-#include <functional>
 #include <unordered_map>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
@@ -113,15 +111,15 @@ private:
     // pull out the type of messages sent by our config
     typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
+	typedef websocketpp::client<websocketpp::config::asio_client> Client;
+
     static void on_message(GeoClient * client, websocketpp::connection_hdl hdl, message_ptr msg);
-
-    typedef websocketpp::client<websocketpp::config::asio_client> Client;
     
-    Client::connection_ptr con;
+    Client::connection_ptr m_con;
 
-    Client * client = NULL;
+    Client * m_client = NULL;
 
-    std::thread * clientThread = NULL;
+    std::thread * m_clientThread = NULL;
 
 #endif
 
@@ -131,18 +129,18 @@ private:
 
     void ensureClient();
 
-    geos::index::quadtree::Quadtree * quadTreePolygons;
-    geos::index::quadtree::Quadtree * quadTreeLineStrings;
-    geos::index::quadtree::Quadtree * quadTreePoints;
+    geos::index::quadtree::Quadtree * m_quadTreePolygons;
+    geos::index::quadtree::Quadtree * m_quadTreeLineStrings;
+    geos::index::quadtree::Quadtree * m_quadTreePoints;
     
-    glm::dmat4 trans;
-    glm::dmat4 inverseTrans;
+    glm::dmat4 m_trans;
+    glm::dmat4 m_inverseTrans;
 
-    Canvas * canvas;
+    Canvas * m_canvas;
 
-    Network * network;
+    Network * m_network;
 
-    AABB2D bounds;
+    AABB2D m_bounds;
 };
 
 

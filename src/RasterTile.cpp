@@ -37,7 +37,7 @@ namespace
 	unordered_map<string, RasterTile*> currTileSet;
 }
 
-RasterTile::RasterTile(const dvec2& center, const size_t level) : center(center), level(level)
+RasterTile::RasterTile(const dvec2& center, const size_t level) : m_center(center), m_level(level)
 {
 	
 }
@@ -55,5 +55,5 @@ RasterTile* RasterTile::getTile(const dvec2& center, const size_t level)
 
 RasterTile* RasterTile::getParentTile() const
 {
-	return getTile(center, level - 1);
+	return getTile(m_center, m_level - 1);
 }

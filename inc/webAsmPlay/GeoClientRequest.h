@@ -25,7 +25,6 @@
 */
 #pragma once
 
-#include <functional>
 #include <webAsmPlay/Types.h>
 
 class GeoClient;
@@ -48,9 +47,9 @@ private:
 
     friend class GeoClient;
 
-    const std::function<void (const size_t)> callback;
+    const std::function<void (const size_t)> m_callback;
 
-    const size_t ID;
+    const size_t m_ID;
 };
 
 class GeoRequestLayerBounds
@@ -63,9 +62,9 @@ private:
 
     friend class GeoClient;
 
-    const std::function<void (const AABB2D &)> callback;
+    const std::function<void (const AABB2D &)> m_callback;
 
-    const size_t ID;
+    const size_t m_ID;
 };
 
 class GeoRequestGeometry
@@ -78,9 +77,9 @@ private:
 
     friend class GeoClient;
 
-    const std::function<void (geos::geom::Geometry *)> callback;
+    const std::function<void (geos::geom::Geometry *)> m_callback;
 
-    const size_t ID;
+    const size_t m_ID;
 };
 
 class GetRequestGetAllGeometries
@@ -93,7 +92,7 @@ private:
 
     friend class GeoClient;
 
-    const std::function<void (std::vector<AttributedGeometry> geoms)> callback;
+    const std::function<void (std::vector<AttributedGeometry> geoms)> m_callback;
 
-    const size_t ID;
+    const size_t m_ID;
 };

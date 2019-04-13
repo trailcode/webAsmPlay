@@ -35,5 +35,5 @@ public:
     ~Relation();
 
 //private:
-    Attributes * attributes;
+    Attributes * m_attributes;
 };

@@ -59,16 +59,16 @@ void GeoClient::createWorld(const char * data)
 
     GUI::progress("Polygon index:", 0.0f);
 
-    bounds = *(AABB2D *)data; data += sizeof(double) * 4;
+    m_bounds = *(AABB2D *)data; data += sizeof(double) * 4;
 
     const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
 
-    trans = translate(  s,
-                        dvec3(  (get<2>(bounds) + get<0>(bounds)) * -0.5,
-                                (get<3>(bounds) + get<1>(bounds)) * -0.5,
+    m_trans = translate(s,
+                        dvec3(  (get<2>(m_bounds) + get<0>(m_bounds)) * -0.5,
+                                (get<3>(m_bounds) + get<1>(m_bounds)) * -0.5,
                                 0.0));
     
-    inverseTrans = inverse(trans);
+    m_inverseTrans = inverse(m_trans);
 
 	GUI::guiASync([this]() { addBingMap(GUI::renderSettingsRenderBingMaps) ;});
 
@@ -81,7 +81,7 @@ void GeoClient::addGeometry(const char* data)
 	createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
 	createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
 
-	OpenSteerGlue::init(canvas, getNetwork());
+	OpenSteerGlue::init(m_canvas, getNetwork());
 }
 
 namespace
@@ -128,7 +128,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         
 			tie(attrs, g) = geoms[i];
 
-			Renderable * r = Renderable::create(g, trans);
+			Renderable * r = Renderable::create(g, m_trans);
         
 			if(!r) { continue ;}
         
@@ -137,13 +137,13 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
 			tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
 
-			quadTreePolygons->insert(g->getEnvelopeInternal(), data);
+			m_quadTreePolygons->insert(g->getEnvelopeInternal(), data);
 		}
 	});
 
     GUI::progress("", 1.0f);
 
-    dmess("quadTree " << quadTreePolygons->depth() << " " << geoms.size());
+    dmess("quadTree " << m_quadTreePolygons->depth() << " " << geoms.size());
     
     dmess("Start base geom...");
 
@@ -191,7 +191,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     Renderable * r;
 
-    if((r = RenderablePolygon::create(polygons, trans, true)))
+    if((r = RenderablePolygon::create(polygons, m_trans, true)))
     {
         r->setShader(ColorDistanceShader::getDefaultInstance());
 
@@ -202,11 +202,11 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 		{
 			r->ensureVAO();
 
-			canvas->addRenderable(r);
+			m_canvas->addRenderable(r);
 		});
     }
 
-    if((r = RenderableMesh::create(polygons3D, trans, true)))
+    if((r = RenderableMesh::create(polygons3D, m_trans, true)))
     {
         r->setShader(ColorDistanceDepthShader3D::getDefaultInstance());
 
@@ -217,7 +217,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 		{
 			r->ensureVAO();
 
-			canvas->addRenderable(r);
+			m_canvas->addRenderable(r);
 		});
     }
     
@@ -258,7 +258,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
 		unique_ptr<Geometry> buffered(geom->buffer(0.00001, 3));
 
-		Renderable * r = Renderable::create(buffered.get(), trans);
+		Renderable * r = Renderable::create(buffered.get(), m_trans);
         
 		if(!r) { continue ;}
         
@@ -269,22 +269,22 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
 		edges.push_back(edge);
 
-		quadTreeLineStrings->insert(geom->getEnvelopeInternal(), edge);
+		m_quadTreeLineStrings->insert(geom->getEnvelopeInternal(), edge);
 
 		polylines.push_back(make_pair(geom, colorID));
 	}
 
 	dmess("edges " << edges.size());
 
-	network->setEdges(edges);
+	m_network->setEdges(edges);
 	
     GUI::progress("Linestring index:", 1.0);
 
     //OpenSteerGlue::init(canvas, network);
 
-    dmess("linestring quadTree " << quadTreeLineStrings->depth() << " " << geoms.size());
+    dmess("linestring quadTree " << m_quadTreeLineStrings->depth() << " " << geoms.size());
 
-    Renderable * r = RenderableLineString::create(polylines, trans, true);
+    Renderable * r = RenderableLineString::create(polylines, m_trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 
@@ -294,7 +294,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 	{
 		r->ensureVAO();
 
-		canvas->addRenderable(r);
+		m_canvas->addRenderable(r);
 	});
     
     dmess("Done creating renderable.");
@@ -322,13 +322,13 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
         Attributes     * attrs = geoms[i].first;
         const Geometry * geom  = geoms[i].second;
         
-        Renderable * r = Renderable::create(geom, trans);
+        Renderable * r = Renderable::create(geom, m_trans);
         
         if(!r) { dmess("!r"); continue ;}
         
         tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, geom, attrs);
 
-        quadTreePoints->insert(geom->getEnvelopeInternal(), data);
+        m_quadTreePoints->insert(geom->getEnvelopeInternal(), data);
 
         points.push_back(ColoredGeometry(geom->buffer(0.0001), 1));
         //points.push_back(geom);
@@ -336,10 +336,9 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
     
     GUI::progress("", 1.0);
 
-    dmess("Points quadTree " << quadTreePoints->depth() << " " << geoms.size());
+    dmess("Points quadTree " << m_quadTreePoints->depth() << " " << geoms.size());
 
-    //Renderable * r = RenderablePoint::create(points, trans, true);
-    Renderable * r = RenderablePolygon::create(points, trans, true);
+    Renderable * r = RenderablePolygon::create(points, m_trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 
@@ -347,8 +346,7 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 	{
 		r->ensureVAO();
 
-		canvas->addRenderable(r);
-
+		m_canvas->addRenderable(r);
 	});
     
     dmess("Done creating renderable.");

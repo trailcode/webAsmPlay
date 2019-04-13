@@ -67,11 +67,11 @@ void ZombiePlugin::open()
     dmess("ZombiePlugin::open");
 
     // make the database used to accelerate proximity queries
-    cyclePD = -1;
+    m_cyclePD = -1;
     nextPD ();
 
     // create the specified number of Pedestrians
-    population = 0;
+    m_population = 0;
     for (int i = 0; i < gPedestrianStartCount; i++)
     {
         if(!(i % 300)) { dmess("Add Pedestrian " << i << " of " << gPedestrianStartCount) ;}
@@ -80,7 +80,7 @@ void ZombiePlugin::open()
     }
 
     // initialize camera and selectedVehicle
-    Zombie& firstPedestrian = **crowd.begin();
+    Zombie& firstPedestrian = **m_crowd.begin();
 
     float distance = 10 * 1.0;
     float elevation = 8 * 1.0;
@@ -99,11 +99,11 @@ void ZombiePlugin::update(const float currentTime, const float elapsedTime)
 {
     for(size_t i = 0; i < 10; ++i)
     {
-        if(crowd.size() > gPedestrianStartCount)
+        if(m_crowd.size() > gPedestrianStartCount)
         {
             removePedestrianFromCrowd();
         }
-        else if(crowd.size() < gPedestrianStartCount)
+        else if(m_crowd.size() < gPedestrianStartCount)
         {
             addPedestrianToCrowd();
         }
@@ -111,7 +111,7 @@ void ZombiePlugin::update(const float currentTime, const float elapsedTime)
     }
 
     // update each Pedestrian
-    for (iterator i = crowd.begin(); i != crowd.end(); i++)
+    for (iterator i = m_crowd.begin(); i != m_crowd.end(); i++)
     {
         (**i).update (currentTime, elapsedTime);
     }
@@ -134,11 +134,11 @@ void ZombiePlugin::redraw(const float currentTime, const float elapsedTime)
     OpenSteerDemo::updateCamera (currentTime, elapsedTime, selected);
 
     // draw "ground plane"
-    if (OpenSteerDemo::selectedVehicle) gridCenter = selected.position();
+    if (OpenSteerDemo::selectedVehicle) m_gridCenter = selected.position();
     //OpenSteerDemo::gridUtility (gridCenter);
 
     // draw and annotate each Pedestrian
-    for (iterator i = crowd.begin(); i != crowd.end(); i++) (**i).draw (); 
+    for (iterator i = m_crowd.begin(); i != m_crowd.end(); i++) (**i).draw (); 
 
     // draw the path they follow and obstacles they avoid
     drawPathAndObstacles ();
@@ -171,9 +171,9 @@ void ZombiePlugin::redraw(const float currentTime, const float elapsedTime)
 
     // display status in the upper left corner of the window
     std::ostringstream status;
-    status << "[F1/F2] Crowd size: " << population;
+    status << "[F1/F2] Crowd size: " << m_population;
     status << "\n[F3] PD type: ";
-    switch (cyclePD)
+    switch (m_cyclePD)
     {
     case 0: status << "LQ bin lattice"; break;
     case 1: status << "brute force";    break;
@@ -198,7 +198,7 @@ void ZombiePlugin::serialNumberAnnotationUtility(const AbstractVehicle & selecte
     // screen position when it is near the selected vehicle or mouse.
     if (&selected && &nearMouse && OpenSteer::annotationIsOn())
     {
-        for (iterator i = crowd.begin(); i != crowd.end(); i++)
+        for (iterator i = m_crowd.begin(); i != m_crowd.end(); i++)
         {
             AbstractVehicle* vehicle = *i;
             const float nearDistance = 6;
@@ -263,13 +263,13 @@ void ZombiePlugin::drawPathAndObstacles()
 void ZombiePlugin::close()
 {
     // delete all Pedestrians
-    while (population > 0) removePedestrianFromCrowd ();
+    while (m_population > 0) removePedestrianFromCrowd ();
 }
 
 void ZombiePlugin::reset()
 {
     // reset each Pedestrian
-    for (iterator i = crowd.begin(); i != crowd.end(); i++) (**i).reset ();
+    for (iterator i = m_crowd.begin(); i != m_crowd.end(); i++) (**i).reset ();
 
     // reset camera position
     OpenSteerDemo::position2dCamera (*OpenSteerDemo::selectedVehicle);
@@ -297,21 +297,21 @@ void ZombiePlugin::printMiniHelpForFunctionKeys()
 
 void ZombiePlugin::addPedestrianToCrowd()
 {
-    population++;
-    Zombie * pedestrian = new Zombie(*pd, getNetwork());
-    crowd.push_back (pedestrian);
-    if (population == 1) OpenSteerDemo::selectedVehicle = pedestrian;
+    m_population++;
+    Zombie * pedestrian = new Zombie(*m_pd, getNetwork());
+    m_crowd.push_back (pedestrian);
+    if (m_population == 1) OpenSteerDemo::selectedVehicle = pedestrian;
 }
 
 void ZombiePlugin::removePedestrianFromCrowd()
 {
-    if (population > 0)
+    if (m_population > 0)
     {
         // save pointer to last pedestrian, then remove it from the crowd
-        const Zombie * pedestrian = crowd.back();
+        const Zombie * pedestrian = m_crowd.back();
         //crowd.pop_back();
-		crowd.resize(crowd.size() - 1);
-        population--;
+		m_crowd.resize(m_crowd.size() - 1);
+        m_population--;
 
         // if it is OpenSteerDemo's selected vehicle, unselect it
         if (pedestrian == OpenSteerDemo::selectedVehicle)
@@ -325,11 +325,11 @@ void ZombiePlugin::removePedestrianFromCrowd()
 void ZombiePlugin::nextPD()
 {
     // save pointer to old PD
-    ProximityDatabase* oldPD = pd;
+    ProximityDatabase* oldPD = m_pd;
 
     // allocate new PD
     const int totalPD = 2;
-    switch (cyclePD = (cyclePD + 1) % totalPD)
+    switch (m_cyclePD = (m_cyclePD + 1) % totalPD)
     {
     case 0:
         {
@@ -340,25 +340,25 @@ void ZombiePlugin::nextPD()
             const Vec3 dimensions (diameter, diameter, diameter);
             typedef LQProximityDatabase2D<AbstractVehicle*> LQPDAV;
             //typedef LQProximityDatabase<AbstractVehicle*> LQPDAV;
-            pd = new LQPDAV (center, dimensions, divisions);
+            m_pd = new LQPDAV (center, dimensions, divisions);
             break;
         }
     case 1:
         {
             abort();
-            pd = new BruteForceProximityDatabase<AbstractVehicle*> ();
+            m_pd = new BruteForceProximityDatabase<AbstractVehicle*> ();
             break;
         }
     }
 
     // switch each boid to new PD
-    for (iterator i=crowd.begin(); i!=crowd.end(); i++) (**i).newPD(*pd);
+    for (iterator i=m_crowd.begin(); i!=m_crowd.end(); i++) (**i).newPD(*m_pd);
 
     // delete old PD (if any)
     delete oldPD;
 }
 
-const AVGroup & ZombiePlugin::allVehicles() { return (const AVGroup&) crowd ;}
+const AVGroup & ZombiePlugin::allVehicles() { return (const AVGroup&) m_crowd ;}
 
 Network * ZombiePlugin::setNetwork(Network * _network) { return network = _network ;}
 

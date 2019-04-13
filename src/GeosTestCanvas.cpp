@@ -38,9 +38,9 @@ using namespace glm;
 using namespace geos::geom;
 using namespace geosUtil;
 
-GeosTestCanvas::GeosTestCanvas() :  buffer1(-1),
-                                    buffer2(-1),
-                                    buffer3(-1)
+GeosTestCanvas::GeosTestCanvas() :  m_buffer1(-1),
+                                    m_buffer2(-1),
+                                    m_buffer3(-1)
 {
     
 }
@@ -54,15 +54,15 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
                                         const float buffer2,
                                         const float buffer3)
 {
-    if( this->buffer1 == buffer1 &&
-        this->buffer2 == buffer2 &&
-        this->buffer3 == buffer3) { return ;}
+    if( this->m_buffer1 == buffer1 &&
+        this->m_buffer2 == buffer2 &&
+        this->m_buffer3 == buffer3) { return ;}
 
-    this->buffer1 = buffer1;
-    this->buffer2 = buffer2;
-    this->buffer3 = buffer3;
+    this->m_buffer1 = buffer1;
+    this->m_buffer2 = buffer2;
+    this->m_buffer3 = buffer3;
 
-    geoms.clear();
+    m_geoms.clear();
 
     Geometry::Ptr shape = makeBox(-0.5,-0.5,0.5,0.5);
 
@@ -82,7 +82,7 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
     
     addRenderable(geom1);
 
-    geoms.push_back(unique_ptr<Renderable>(geom1));
+    m_geoms.push_back(unique_ptr<Renderable>(geom1));
 
     for(const LineString * ring : getExternalRings(shape))
     {
@@ -99,7 +99,7 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
             addRenderable(geom);
 
-            geoms.push_back(unique_ptr<Renderable>(geom));
+            m_geoms.push_back(unique_ptr<Renderable>(geom));
         }
         //*/
     }

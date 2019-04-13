@@ -78,17 +78,17 @@ public:
     static Network * setNetwork(Network * network);
     static Network * getNetwork();
 
-    Zombie::groupType crowd;
+    Zombie::groupType m_crowd;
 
     typedef Zombie::groupType::const_iterator iterator;
 
-    OpenSteer::Vec3 gridCenter;
+    OpenSteer::Vec3 m_gridCenter;
 
-    ProximityDatabase * pd;
+    ProximityDatabase * m_pd;
 
-    int population;
+    int m_population;
 
-    int cyclePD;
+    int m_cyclePD;
 
 private:
 

@@ -70,13 +70,13 @@ namespace
     GetAllGeometriesRequests    getAllGeometriesRequests;
 }
 
-GeoClient::GeoClient(Canvas * canvas) : canvas(canvas)
+GeoClient::GeoClient(Canvas * canvas) : m_canvas(canvas)
 {
 
-    quadTreePolygons    = new Quadtree();
-    quadTreeLineStrings = new Quadtree();
-    quadTreePoints      = new Quadtree();
-    network             = new Network(this);
+    m_quadTreePolygons		= new Quadtree();
+    m_quadTreeLineStrings	= new Quadtree();
+    m_quadTreePoints		= new Quadtree();
+    m_network				= new Network(this);
 }
 
 GeoClient::~GeoClient()
@@ -88,54 +88,35 @@ void GeoClient::ensureClient()
 {
 #ifndef __EMSCRIPTEN__
     
-    if(client) { return ;}
+    if(m_client) { return ;}
 
-    client = new Client;
+    m_client = new Client;
 
     // We expect there to be a lot of errors, so suppress them
-    client->clear_access_channels(websocketpp::log::alevel::all);
-    client->clear_error_channels (websocketpp::log::elevel::all);
+    m_client->clear_access_channels(websocketpp::log::alevel::all);
+    m_client->clear_error_channels (websocketpp::log::elevel::all);
    
     // Initialize ASIO
-    client->init_asio();
+    m_client->init_asio();
 
-    client->set_open_handler   (bind(&on_open,    this, placeholders::_1));
-    client->set_message_handler(bind(&on_message, this, placeholders::_1, placeholders::_2));
+    m_client->set_open_handler   (bind(&on_open,    this, placeholders::_1));
+    m_client->set_message_handler(bind(&on_message, this, placeholders::_1, placeholders::_2));
 
     websocketpp::lib::error_code ec;
 
     std::string uri = "ws://localhost:9002";
 
-    con = client->get_connection(uri, ec);
+    m_con = m_client->get_connection(uri, ec);
 
-    client->connect(con);
+    m_client->connect(m_con);
 
     cout << "Done connect!" << endl;
 
-    Client * _client = client;
-
-    dmess("_client " << _client);
-
-    clientThread = new thread([_client]()
+    m_clientThread = new thread([this]()
     {
-        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+		OpenGL::ensureSharedContext();
 
-        GLFWwindow * threadWin = glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow());
-
-        glfwMakeContextCurrent(threadWin);
-
-		/*
-		if (gl3wInit())
-		{
-			dmess("Error creating openGL context!");
-
-			exit(-1);
-		}
-		*/
-
-        _client->run();
-
-        // TODO cleanup threadWin!
+        m_client->run();
     });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(150)); // TODO Find a better way
@@ -149,7 +130,7 @@ void GeoClient::getNumPolygons(const function<void (const size_t)> & callback)
 
     GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
 
-    numGeomsRequests[request->ID] = request;
+    numGeomsRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -169,9 +150,9 @@ void GeoClient::getNumPolygons(const function<void (const size_t)> & callback)
 
     data[0] = GeoServerBase::GET_NUM_POLYGONS_REQUEST;
 
-    *(uint32_t *)&data[1] = (uint32_t)request->ID;
+    *(uint32_t *)&data[1] = (uint32_t)request->m_ID;
 
-    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+    m_client->send(m_con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
 #endif
 }
@@ -180,7 +161,7 @@ void GeoClient::getNumPolylines(const function<void (const size_t)> & callback)
 {
     GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
 
-    numGeomsRequests[request->ID] = request;
+    numGeomsRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -200,9 +181,9 @@ void GeoClient::getNumPolylines(const function<void (const size_t)> & callback)
 
     data[0] = GeoServerBase::GET_NUM_POLYLINES_REQUEST;
 
-    *(uint32_t *)&data[1] = (uint32_t)request->ID;
+    *(uint32_t *)&data[1] = (uint32_t)request->m_ID;
 
-    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+    m_client->send(m_con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
 #endif
 }
@@ -213,7 +194,7 @@ void GeoClient::getNumPoints(const function<void (const size_t)> & callback)
 
     GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
 
-    numGeomsRequests[request->ID] = request;
+    numGeomsRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -233,9 +214,9 @@ void GeoClient::getNumPoints(const function<void (const size_t)> & callback)
 
     data[0] = GeoServerBase::GET_NUM_POINTS_REQUEST;
 
-    *(uint32_t *)&data[1] = (uint32_t)request->ID;
+    *(uint32_t *)&data[1] = (uint32_t)request->m_ID;
 
-    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+    m_client->send(m_con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
 #endif
 }
@@ -246,7 +227,7 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 
     GeoRequestLayerBounds * request = new GeoRequestLayerBounds(callback);
 
-    layerBoundsRequests[request->ID] = request;
+    layerBoundsRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -266,9 +247,9 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 
     data[0] = GeoServerBase::GET_LAYER_BOUNDS_REQUEST;
 
-    *(uint32_t *)&data[1] = (uint32_t)request->ID;
+    *(uint32_t *)&data[1] = (uint32_t)request->m_ID;
 
-    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+    m_client->send(m_con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
 #endif
 }
@@ -281,7 +262,7 @@ void GeoClient::getPolygons(const size_t                                      st
 
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
-    getAllGeometriesRequests[request->ID] = request;
+    getAllGeometriesRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -307,9 +288,9 @@ void GeoClient::getPolygons(const size_t                                      st
 
     char * ptr = appendChar(data, GeoServerBase::GET_POLYGONS_REQUEST);
 
-    appendUint32s(ptr, request->ID, startIndex, numPolys);
+    appendUint32s(ptr, request->m_ID, startIndex, numPolys);
 
-    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+    m_client->send(m_con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
 #endif
 }
@@ -322,7 +303,7 @@ void GeoClient::getPolylines(const size_t                                     st
 
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
-    getAllGeometriesRequests[request->ID] = request;
+    getAllGeometriesRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -348,9 +329,9 @@ void GeoClient::getPolylines(const size_t                                     st
 
     char * ptr = appendChar(data, GeoServerBase::GET_POLYLINES_REQUEST);
 
-    appendUint32s(ptr, request->ID, startIndex, numPolylines);
+    appendUint32s(ptr, request->m_ID, startIndex, numPolylines);
 
-    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+    m_client->send(m_con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
 #endif
 }
@@ -363,7 +344,7 @@ void GeoClient::getPoints(const size_t                              startIndex,
 
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
-    getAllGeometriesRequests[request->ID] = request;
+    getAllGeometriesRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -389,9 +370,9 @@ void GeoClient::getPoints(const size_t                              startIndex,
 
     char * ptr = appendChar(data, GeoServerBase::GET_POINTS_REQUEST);
 
-    appendUint32s(ptr, request->ID, startIndex, numPoints);
+    appendUint32s(ptr, request->m_ID, startIndex, numPoints);
 
-    client->send(con, &data[0], data.size(), websocketpp::frame::opcode::binary);
+    m_client->send(m_con, &data[0], data.size(), websocketpp::frame::opcode::binary);
 
 #endif
 }
@@ -414,7 +395,7 @@ void GeoClient::onMessage(const string & data)
 
             unique_ptr<GeoRequestGetNumGeoms> request(i->second);
 
-            request->callback(numGeoms);
+            request->m_callback(numGeoms);
 
             numGeomsRequests.erase(i);
 
@@ -429,7 +410,7 @@ void GeoClient::onMessage(const string & data)
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
-            request->callback(GeometryConverter::getGeosPolygons(ptr));
+            request->m_callback(GeometryConverter::getGeosPolygons(ptr));
 
             getAllGeometriesRequests.erase(i);
 
@@ -444,7 +425,7 @@ void GeoClient::onMessage(const string & data)
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
-            request->callback(GeometryConverter::getGeosLineStrings(ptr));
+            request->m_callback(GeometryConverter::getGeosLineStrings(ptr));
 
             getAllGeometriesRequests.erase(i);
 
@@ -459,7 +440,7 @@ void GeoClient::onMessage(const string & data)
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
-            request->callback(GeometryConverter::getGeosPoints(ptr));
+            request->m_callback(GeometryConverter::getGeosPoints(ptr));
 
             getAllGeometriesRequests.erase(i);
 
@@ -476,7 +457,7 @@ void GeoClient::onMessage(const string & data)
 
             unique_ptr<GeoRequestLayerBounds> request(i->second);
 
-            request->callback(bounds);
+            request->m_callback(bounds);
 
             layerBoundsRequests.erase(i);
 
@@ -491,18 +472,18 @@ void GeoClient::loadGeoServerGeometry()
 
     ensureClient();
 
-    for(auto renderiable : canvas->getRenderiables()) { delete renderiable ;}
+    for(auto renderiable : m_canvas->getRenderiables()) { delete renderiable ;}
 
     getLayerBounds([this](const AABB2D & bounds)
     {
         const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
 
-        trans = translate(  s,
+        m_trans = translate(s,
                             dvec3((get<2>(bounds) + get<0>(bounds)) * -0.5,
                                   (get<3>(bounds) + get<1>(bounds)) * -0.5,
                                   0.0));
         
-        inverseTrans = inverse(trans);
+        m_inverseTrans = inverse(m_trans);
 
         getNumPoints([this](const size_t numPoints)
         {
@@ -737,22 +718,18 @@ void GeoClient::loadGeometry(const string fileName)
 
 void GeoClient::addBingMap(bool enabled)
 {
-    auto r = RenderableBingMap::create(getBounds(), trans);
+    auto r = RenderableBingMap::create(getBounds(), m_trans);
 
     r->setRenderFill(enabled);
 
     getCanvas()->addRenderable(r);
 }
 
-AABB2D GeoClient::getBounds() const { return bounds ;}
-
-dmat4 GeoClient::getTrans() const { return trans ;}
-
-dmat4 GeoClient::getInverseTrans() const { return inverseTrans ;}
-
-Network * GeoClient::getNetwork() const { return network ;}
-
-Canvas * GeoClient::getCanvas() const { return canvas ;}
+AABB2D		GeoClient::getBounds()			const { return m_bounds			;}
+dmat4		GeoClient::getTrans()			const { return m_trans			;}
+dmat4		GeoClient::getInverseTrans()	const { return m_inverseTrans	;}
+Network*	GeoClient::getNetwork()			const { return m_network		;}
+Canvas*		GeoClient::getCanvas()			const { return m_canvas			;}
 
 #ifndef __EMSCRIPTEN__
 
@@ -763,7 +740,7 @@ void GeoClient::on_open(GeoClient * client, websocketpp::connection_hdl hdl)
 
 void GeoClient::on_message(GeoClient * client, websocketpp::connection_hdl hdl, message_ptr msg)
 {
-    Client::connection_ptr con = client->client->get_con_from_hdl(hdl);
+    Client::connection_ptr con = client->m_client->get_con_from_hdl(hdl);
 
     onMessage(msg->get_payload());
 }

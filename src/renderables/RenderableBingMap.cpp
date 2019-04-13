@@ -192,7 +192,7 @@ namespace
 
 	void fetchTile(const int ID, RasterTile * tile)
 	{
-		if (!tile->stillNeeded)
+		if (!tile->m_stillNeeded)
 		{
 			//dmess("Skip here!");
 
@@ -201,7 +201,7 @@ namespace
 			return;
 		}
 
-		const string quadKey = tileToQuadKey(latLongToTile(tile->center, tile->level), tile->level);
+		const string quadKey = tileToQuadKey(latLongToTile(tile->m_center, tile->m_level), tile->m_level);
 
 		const string tileCachePath = "./tiles/" + quadKey + ".jpg";
 
@@ -215,7 +215,7 @@ namespace
 
 			uploaderPool.push([tile, img](int ID)
 			{
-				if (!tile->stillNeeded)
+				if (!tile->m_stillNeeded)
 				{
 					--RenderableBingMap::s_numUploading;
 
@@ -228,11 +228,11 @@ namespace
 
 				OpenGL::ensureSharedContext();
 
-				tile->textureID = Textures::load(img);
+				tile->m_textureID = Textures::load(img);
 
 				SDL_FreeSurface(img);
 
-				if(useBindlessTextures) { tile->handle = glGetTextureHandleARB(tile->textureID) ;}
+				if(useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
 
 				++RenderableBingMap::s_numTiles;
 
@@ -260,7 +260,7 @@ namespace
 
 			uploaderPool.push([tile, tileBuffer, tileCachePath](int ID)
 			{
-				if (!tile->stillNeeded)
+				if (!tile->m_stillNeeded)
 				{
 					//dmess("Skip here!");
 
@@ -273,9 +273,9 @@ namespace
 
 				OpenGL::ensureSharedContext();
 
-				tile->textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
+				tile->m_textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
 
-				if(useBindlessTextures) { tile->handle = glGetTextureHandleARB(tile->textureID) ;}
+				if(useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
 
 				++RenderableBingMap::s_numTiles;
 
@@ -432,15 +432,15 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	unordered_set<RasterTile*> tileSet(m_tiles.begin(), m_tiles.end());
 
-	for (auto i : m_tiles) { i->stillNeeded = true ;}
+	for (auto i : m_tiles) { i->m_stillNeeded = true ;}
 
 	for (auto i : prevTiles)
 	{
 		if(tileSet.find(i) == tileSet.end())
 		{
-			i->loading = false;
+			i->m_loading = false;
 
-			i->stillNeeded = false;
+			i->m_stillNeeded = false;
 		}
 	}
 
@@ -448,14 +448,14 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	for (const auto tile : m_tiles)
 	{
-		if (tile->textureID) { continue; }
+		if (tile->m_textureID) { continue; }
 
 		RasterTile* currTile = tile;
 
 		//dmess("currTile->level " << currTile->level);
 
 		int c = 0;
-		for (int parentLevel = int(currTile->level) - 1; parentLevel >= m_startLevel; --parentLevel)
+		for (int parentLevel = int(currTile->m_level) - 1; parentLevel >= m_startLevel; --parentLevel)
 		{
 			//if (++c > 2) { break; }
 
@@ -463,7 +463,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 			//dmess("currTile " << currTile);
 
-			if (currTile->textureID)
+			if (currTile->m_textureID)
 			{
 				fallBackTiles.insert(currTile);
 
@@ -479,7 +479,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 		if (tileSet.find(tile) == tileSet.end()) { m_tiles.push_back(tile); }
 	}
 
-	sort(m_tiles.begin(), m_tiles.end(), [](const RasterTile * A, const RasterTile * B) { return A->level < B->level ;});
+	sort(m_tiles.begin(), m_tiles.end(), [](const RasterTile * A, const RasterTile * B) { return A->m_level < B->m_level ;});
 
 	size_t numRendered = 0;
 
@@ -487,33 +487,33 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	for (auto i : m_tiles)
 	{
-		if (i->textureID)
+		if (i->m_textureID)
 		{
-			if(!i->r)
+			if(!i->m_renderable)
 			{
-				const ivec2 iTile = latLongToTile(i->center, i->level);
+				const ivec2 iTile = latLongToTile(i->m_center, i->m_level);
 
-				const dvec2 tMin = tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), i->level);
-				const dvec2 tMax = tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), i->level);
+				const dvec2 tMin = tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), i->m_level);
+				const dvec2 tMax = tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), i->m_level);
 				
-				i->r = Renderable::create(makeBox(tMin, tMax), m_trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
+				i->m_renderable = Renderable::create(makeBox(tMin, tMax), m_trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
 
-				i->r->ensureVAO();
+				i->m_renderable->ensureVAO();
 
-				if(useBindlessTextures) { i->r->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
-				else					{ i->r->setShader(TextureShader			::getDefaultInstance()) ;}
+				if(useBindlessTextures) { i->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
+				else					{ i->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
 
-				i->r->setRenderOutline (false);
-				i->r->setRenderFill    (true);
+				i->m_renderable->setRenderOutline (false);
+				i->m_renderable->setRenderFill    (true);
 			}
 
 			toRender.push_back(i);
 
 			++numRendered;
 		}
-		else if (!i->loading)
+		else if (!i->m_loading)
 		{
-			i->loading = true;
+			i->m_loading = true;
 
 			loaderPool.push([i](int ID) { fetchTile(ID, i) ;});
 
@@ -531,14 +531,14 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 		{
 			RasterTile* t = toRender[i];
 
-			if(!t->textureResident)
+			if(!t->m_textureResident)
 			{ 
-				glMakeTextureHandleResidentARB(t->handle);
+				glMakeTextureHandleResidentARB(t->m_handle);
 
-				t->textureResident = true;
+				t->m_textureResident = true;
 			}
 
-			pHandles[i * 2] = t->handle;		
+			pHandles[i * 2] = t->m_handle;		
 		}
 
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
@@ -547,21 +547,21 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 		{
 			RasterTile* t = toRender[i];
 
-			if(useBindlessTextures) { t->r->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
-			else					{ t->r->setShader(TextureShader			::getDefaultInstance()) ;}
+			if(useBindlessTextures) { t->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
+			else					{ t->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
 
 			BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
 
-			t->r->render(canvas);
+			t->m_renderable->render(canvas);
 		}
 	}
 	else
 	{
         for(auto tile : toRender)
         {
-            TextureShader::getDefaultInstance()->setTextureID(tile->textureID);
+            TextureShader::getDefaultInstance()->setTextureID(tile->m_textureID);
             
-            tile->r->render(canvas);
+            tile->m_renderable->render(canvas);
         }
 	}
 

@@ -81,11 +81,11 @@ FrameBuffer * FrameBuffer::ensureFrameBuffer(	FrameBuffer *& currBuffer,
 												const GLenum   format,
 												const GLenum   type)
 {
-    if(	currBuffer													&&
-		bufferSize					== currBuffer->getBufferSize()	&&
-		currBuffer->internalformat	== internalformat				&&
-		currBuffer->format			== format						&&
-		currBuffer->type			== type) { return currBuffer ;}
+    if(	currBuffer														&&
+		bufferSize						== currBuffer->getBufferSize()	&&
+		currBuffer->m_internalformat	== internalformat				&&
+		currBuffer->m_format			== format						&&
+		currBuffer->m_type				== type) { return currBuffer ;}
 	
 	delete currBuffer;
 
@@ -98,13 +98,13 @@ FrameBuffer::FrameBuffer(   const GLuint   framebuffer,
                             const ivec2  & bufferSize,
 							const GLint	   internalformat,
 							const GLenum   format,
-							const GLenum   type) :  framebuffer         (framebuffer),
-                                                    textureColorbuffer  (textureColorbuffer),
-                                                    rbo                 (rbo),
-                                                    bufferSize          (bufferSize),
-													internalformat		(internalformat),
-													format				(format),
-													type				(type)
+							const GLenum   type) :  m_framebuffer			(framebuffer),
+                                                    m_textureColorbuffer	(textureColorbuffer),
+                                                    m_rbo					(rbo),
+                                                    m_bufferSize			(bufferSize),
+													m_internalformat		(internalformat),
+													m_format				(format),
+													m_type					(type)
 {
 }
 
@@ -112,24 +112,24 @@ FrameBuffer::~FrameBuffer()
 {
     unbind();
 
-    GL_CHECK(glDeleteTextures        (1, &textureColorbuffer));
- 	GL_CHECK(glDeleteRenderbuffers   (1, &rbo));
-    GL_CHECK(glDeleteFramebuffers    (1, &framebuffer));
+    GL_CHECK(glDeleteTextures        (1, &m_textureColorbuffer));
+ 	GL_CHECK(glDeleteRenderbuffers   (1, &m_rbo));
+    GL_CHECK(glDeleteFramebuffers    (1, &m_framebuffer));
 }
 
-ivec2 FrameBuffer::getBufferSize() const { return bufferSize ;}
+ivec2 FrameBuffer::getBufferSize() const { return m_bufferSize ;}
 
 void FrameBuffer::bind(const bool clear)
 {
-    GL_CHECK(glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &prevFB));
+    GL_CHECK(glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_prevFB));
 
-    GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
+    GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer));
 
 	if(!clear) { return ;}
 
 	GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
-void FrameBuffer::unbind() { GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, prevFB)) ;}
+void FrameBuffer::unbind() { GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_prevFB)) ;}
 
-GLuint FrameBuffer::getTextureID() const { return textureColorbuffer ;}
+GLuint FrameBuffer::getTextureID() const { return m_textureColorbuffer ;}

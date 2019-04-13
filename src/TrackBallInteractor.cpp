@@ -14,28 +14,28 @@ namespace rsmz
     const glm::vec3 TrackBallInteractor::Y(0.f, 1.f, 0.f);
     const glm::vec3 TrackBallInteractor::Z(0.f, 0.f, 1.f);
 
-    TrackBallInteractor::TrackBallInteractor() :    mCameraMotionLeftClick(ARC),
-                                                    mCameraMotionMiddleClick(ROLL),
-                                                    mCameraMotionRightClick(FIRSTPERSON),
-                                                    mCameraMotionScroll(ZOOM),
-                                                    mHeight(1),
-                                                    mIsDragging(false),
-                                                    mIsLeftClick(false),
-                                                    mIsMiddleClick(false),
-                                                    mIsRightClick(false),
-                                                    mIsScrolling(false),
-                                                    mPanScale(.005f),
-                                                    mRollScale(.005f),
-                                                    mRollSum(0.f),
-                                                    mRotation(1.f, 0, 0, 0),
-                                                    mRotationSum(1.f, 0, 0, 0),
-                                                    mSpeed(1.f),
-                                                    mWidth(1),
+    TrackBallInteractor::TrackBallInteractor() :    m_CameraMotionLeftClick(ARC),
+                                                    m_CameraMotionMiddleClick(ROLL),
+                                                    m_CameraMotionRightClick(FIRSTPERSON),
+                                                    m_CameraMotionScroll(ZOOM),
+                                                    m_Height(1),
+                                                    m_IsDragging(false),
+                                                    m_IsLeftClick(false),
+                                                    m_IsMiddleClick(false),
+                                                    m_IsRightClick(false),
+                                                    m_IsScrolling(false),
+                                                    m_PanScale(.005f),
+                                                    m_RollScale(.005f),
+                                                    m_RollSum(0.f),
+                                                    m_Rotation(1.f, 0, 0, 0),
+                                                    m_RotationSum(1.f, 0, 0, 0),
+                                                    m_Speed(1.f),
+                                                    m_Width(1),
                                                     //mZoomScale(.1f * 0.2f),
                                                     //mZoomScale(5.0f * 0.2f),
-                                                    mZoomScale(1.0f * 0.2f),
-                                                    mZoomSum(0.f),
-                                                    mCamera(NULL)
+                                                    m_ZoomScale(1.0f * 0.2f),
+                                                    m_ZoomSum(0.f),
+                                                    m_Camera(NULL)
     {
     }
 
@@ -45,8 +45,8 @@ namespace rsmz
 
     char TrackBallInteractor::clickQuadrant(float x, float y)
     {
-        float halfw = .5f * mWidth;
-        float halfh = .5f * mHeight;
+        float halfw = .5f * m_Width;
+        float halfh = .5f * m_Height;
 
         if (x > halfw) {
             // Opengl image coordinates origin is upperleft.
@@ -68,43 +68,43 @@ namespace rsmz
     {
         //dmess("computeCameraEye");
 
-        glm::vec3 orientation = mRotationSum * Z;
+        glm::vec3 orientation = m_RotationSum * Z;
 
-        if (mZoomSum) {
-            mTranslateLength += mZoomScale * mZoomSum;
-            mZoomSum = 0; // Freeze zooming after applying.
+        if (m_ZoomSum) {
+            m_TranslateLength += m_ZoomScale * m_ZoomSum;
+            m_ZoomSum = 0; // Freeze zooming after applying.
         }
 
-        eye = (mTranslateLength) * orientation + mCamera->getCenterConstRef();
+        eye = (m_TranslateLength) * orientation + m_Camera->getCenterConstRef();
     }
 
     void TrackBallInteractor::computeCameraUp(glm::vec3 & up)
     {
-        up = glm::normalize(mRotationSum * Y);
+        up = glm::normalize(m_RotationSum * Y);
     }
 
     void TrackBallInteractor::computePan(glm::vec3 & pan)
     {
-        glm::vec2 click = mClickPoint - mPrevClickPoint;
-        glm::vec3 look = mCamera->getEyeConstRef() - mCamera->getCenterConstRef();
+        glm::vec2 click = m_ClickPoint - m_PrevClickPoint;
+        glm::vec3 look = m_Camera->getEyeConstRef() - m_Camera->getCenterConstRef();
         float length = glm::length(look);
         //float length = 1.0;
-        glm::vec3 right = glm::normalize(mRotationSum * -X);
+        glm::vec3 right = glm::normalize(m_RotationSum * -X);
         //glm::vec3 right = glm::normalize(-X);
-        glm::vec3 up = mCamera->getUpConstRef();
+        glm::vec3 up = m_Camera->getUpConstRef();
         up.z = 0;
         //up = glm::normalize(up);
         //pan = (up * click.y + right * click.x) * mPanScale * mSpeed * length;
         //pan = (up * click.y + right * click.x) * mPanScale * length;
-        pan = (up * click.y + right * click.x) * mPanScale * length;
+        pan = (up * click.y + right * click.x) * m_PanScale * length;
         //pan = (mCamera->getUpConstRef() * click.y + right * click.x);
     }
 
     void TrackBallInteractor::computePointOnSphere(const glm::vec2 & point, glm::vec3 & result)
     {
         // https://www.opengl.org/wiki/Object_Mouse_Trackball
-        float x = (2.f * point.x - mWidth) / mWidth;
-        float y = (mHeight - 2.f * point.y) / mHeight;
+        float x = (2.f * point.x - m_Width) / m_Width;
+        float y = (m_Height - 2.f * point.y) / m_Height;
 
         float length2 = x*x + y*y;
 
@@ -148,31 +148,31 @@ namespace rsmz
             rotationAxis = glm::cross(u, v);
 
             rotationAxis = glm::normalize(rotationAxis);
-            result = glm::angleAxis(theta * mSpeed, rotationAxis);
+            result = glm::angleAxis(theta * m_Speed, rotationAxis);
         }
     }
 
     void TrackBallInteractor::drag()
     {
-        if (mPrevClickPoint == mClickPoint) {
+        if (m_PrevClickPoint == m_ClickPoint) {
             // Not moving during drag state, so skip unnecessary processing.
             return;
         }
 
-        computePointOnSphere(mClickPoint, mStopVector);
-        computeRotationBetweenVectors(mStartVector,
-                                      mStopVector,
-                                      mRotation);
+        computePointOnSphere(m_ClickPoint, m_StopVector);
+        computeRotationBetweenVectors(m_StartVector,
+                                      m_StopVector,
+                                      m_Rotation);
         // Reverse so scene moves with cursor and not away due to camera model.
-        mRotation = glm::inverse(mRotation);
+        m_Rotation = glm::inverse(m_Rotation);
 
-        drag(mIsLeftClick, mCameraMotionLeftClick);
-        drag(mIsMiddleClick, mCameraMotionMiddleClick);
-        drag(mIsRightClick, mCameraMotionRightClick);
+        drag(m_IsLeftClick, m_CameraMotionLeftClick);
+        drag(m_IsMiddleClick, m_CameraMotionMiddleClick);
+        drag(m_IsRightClick, m_CameraMotionRightClick);
 
         // After applying drag, reset relative start state.
-        mPrevClickPoint = mClickPoint;
-        mStartVector = mStopVector;
+        m_PrevClickPoint = m_ClickPoint;
+        m_StartVector = m_StopVector;
     }
 
     void TrackBallInteractor::drag(bool isClicked, CameraMotionType motion)
@@ -203,7 +203,7 @@ namespace rsmz
 
     void TrackBallInteractor::dragArc()
     {
-        mRotationSum *= mRotation; // Accumulate quaternions.
+        m_RotationSum *= m_Rotation; // Accumulate quaternions.
 
         updateCameraEyeUp(true, true);
     }
@@ -212,8 +212,8 @@ namespace rsmz
     {
         glm::vec3 pan;
         computePan(pan);
-        mCamera->setCenter(pan + mCamera->getCenterConstRef());
-        mCamera->update();
+        m_Camera->setCenter(pan + m_Camera->getCenterConstRef());
+        m_Camera->update();
         freezeTransform();
     }
 
@@ -221,16 +221,16 @@ namespace rsmz
     {
         glm::vec3 pan;
         computePan(pan);
-        mCamera->setCenter(pan + mCamera->getCenterConstRef());
-        mCamera->setEye(pan + mCamera->getEyeConstRef());
-        mCamera->update();
+        m_Camera->setCenter(pan + m_Camera->getCenterConstRef());
+        m_Camera->setEye(pan + m_Camera->getEyeConstRef());
+        m_Camera->update();
         freezeTransform();
     }
 
     void TrackBallInteractor::dragZoom()
     {
         cout << "dragZoom " << endl;
-        glm::vec2 dir = mClickPoint - mPrevClickPoint;
+        glm::vec2 dir = m_ClickPoint - m_PrevClickPoint;
         float ax = fabs(dir.x);
         float ay = fabs(dir.y);
 
@@ -245,45 +245,45 @@ namespace rsmz
 
     void TrackBallInteractor::freezeTransform()
     {
-        if (mCamera) {
+        if (m_Camera) {
             // Opengl is ZYX order.
             // Flip orientation to rotate scene with sticky cursor.
-            mRotationSum = glm::inverse(glm::quat(mCamera->getMatrixConstRef()));
-            mTranslateLength = glm::length(mCamera->getEyeConstRef()-mCamera->getCenterConstRef());
+            m_RotationSum = glm::inverse(glm::quat(m_Camera->getMatrixConstRef()));
+            m_TranslateLength = glm::length(m_Camera->getEyeConstRef()-m_Camera->getCenterConstRef());
         }
     }
 
     Camera* TrackBallInteractor::getCamera()
     {
-        if(!mCamera) { setCamera(new Camera()) ;}
+        if(!m_Camera) { setCamera(new Camera()) ;}
 
-        return mCamera;
+        return m_Camera;
     }
 
     CameraMotionType TrackBallInteractor::getMotionLeftClick()
     {
-        return mCameraMotionLeftClick;
+        return m_CameraMotionLeftClick;
     }
 
     CameraMotionType TrackBallInteractor::getMotionMiddleClick()
     {
-        return mCameraMotionMiddleClick;
+        return m_CameraMotionMiddleClick;
     }
 
     CameraMotionType TrackBallInteractor::getMotionRightClick()
     {
-        return mCameraMotionRightClick;
+        return m_CameraMotionRightClick;
     }
 
     CameraMotionType TrackBallInteractor::getMotionScroll()
     {
-        return mCameraMotionScroll;
+        return m_CameraMotionScroll;
     }
 
     void TrackBallInteractor::rollCamera()
     {
-        glm::vec2 delta = mClickPoint - mPrevClickPoint;
-        char quad = clickQuadrant(mClickPoint.x, mClickPoint.y);
+        glm::vec2 delta = m_ClickPoint - m_PrevClickPoint;
+        char quad = clickQuadrant(m_ClickPoint.x, m_ClickPoint.y);
         switch (quad) {
             case 1:
                 delta.y = -delta.y;
@@ -300,18 +300,18 @@ namespace rsmz
                 break;
         }
 
-        glm::vec3 axis = glm::normalize(mCamera->getCenterConstRef() - mCamera->getEyeConstRef());
-        float angle = mRollScale * mSpeed * (delta.x + delta.y + mRollSum);
+        glm::vec3 axis = glm::normalize(m_Camera->getCenterConstRef() - m_Camera->getEyeConstRef());
+        float angle = m_RollScale * m_Speed * (delta.x + delta.y + m_RollSum);
         glm::quat rot = glm::angleAxis(angle, axis);
-        mCamera->setUp(rot * mCamera->getUpConstRef());
-        mCamera->update();
+        m_Camera->setUp(rot * m_Camera->getUpConstRef());
+        m_Camera->update();
         freezeTransform();
-        mRollSum = 0;
+        m_RollSum = 0;
     }
 
     void TrackBallInteractor::scroll()
     {
-        switch(mCameraMotionScroll) {
+        switch(m_CameraMotionScroll) {
             case ROLL:
                 rollCamera();
                 break;
@@ -324,87 +324,87 @@ namespace rsmz
 
     void TrackBallInteractor::setCamera(Camera *c)
     {
-        mCamera = c;
+        m_Camera = c;
         freezeTransform();
     }
 
     void TrackBallInteractor::setClickPoint(double x, double y)
     {
-        mPrevClickPoint = mClickPoint;
-        mClickPoint.x = x;
-        mClickPoint.y = y;
+        m_PrevClickPoint = m_ClickPoint;
+        m_ClickPoint.x = x;
+        m_ClickPoint.y = y;
     }
 
     void TrackBallInteractor::setLeftClicked(bool value)
     {
-        mIsLeftClick = value;
+        m_IsLeftClick = value;
     }
 
     void TrackBallInteractor::setMiddleClicked(bool value)
     {
-        mIsMiddleClick = value;
+        m_IsMiddleClick = value;
     }
 
     void TrackBallInteractor::setMotionLeftClick(CameraMotionType motion)
     {
-        mCameraMotionLeftClick = motion;
+        m_CameraMotionLeftClick = motion;
     }
 
     void TrackBallInteractor::setMotionMiddleClick(CameraMotionType motion)
     {
-        mCameraMotionMiddleClick = motion;
+        m_CameraMotionMiddleClick = motion;
     }
 
     void TrackBallInteractor::setMotionRightClick(CameraMotionType motion)
     {
-        mCameraMotionRightClick = motion;
+        m_CameraMotionRightClick = motion;
     }
 
     void TrackBallInteractor::setMotionScroll(CameraMotionType motion)
     {
-        mCameraMotionScroll = motion;
+        m_CameraMotionScroll = motion;
     }
 
     void TrackBallInteractor::setRightClicked(bool value)
     {
-        mIsRightClick = value;
+        m_IsRightClick = value;
     }
 
     void TrackBallInteractor::setScreenSize(float width, float height)
     {
         if (width > 1 && height > 1) {
-            mWidth = width;
-            mHeight = height;
+            m_Width = width;
+            m_Height = height;
         }
     }
 
     void TrackBallInteractor::setScrollDirection(bool up)
     {
-        mIsScrolling = true;
-        float inc = mSpeed * (up ? -1.f : 1.f);
-        mZoomSum += inc;
-        mRollSum += inc;
+        m_IsScrolling = true;
+        float inc = m_Speed * (up ? -1.f : 1.f);
+        m_ZoomSum += inc;
+        m_RollSum += inc;
     }
 
     void TrackBallInteractor::setSpeed(float s)
     {
         cout << "speed " << s << endl;
-        mSpeed = s;
+        m_Speed = s;
     }
 
     void TrackBallInteractor::update()
     {
-        const bool isClick = mIsLeftClick || mIsMiddleClick || mIsRightClick;
+        const bool isClick = m_IsLeftClick || m_IsMiddleClick || m_IsRightClick;
 
-        if (! mIsDragging)
+        if (! m_IsDragging)
         {
             if (isClick)
             {
-                mIsDragging = true;
-                computePointOnSphere(mClickPoint, mStartVector);
-            } else if (mIsScrolling) {
+                m_IsDragging = true;
+                computePointOnSphere(m_ClickPoint, m_StartVector);
+            } else if (m_IsScrolling) {
                 scroll();
-                mIsScrolling = false;
+                m_IsScrolling = false;
             }
         } else
         {
@@ -413,7 +413,7 @@ namespace rsmz
                 drag();
             } else
             {
-                mIsDragging = false;
+                m_IsDragging = false;
             }
         }
     }
@@ -423,17 +423,17 @@ namespace rsmz
         if (eye) {
             glm::vec3 eye;
             computeCameraEye(eye);
-            mCamera->setEye(eye);
+            m_Camera->setEye(eye);
         }
         if (up) {
             glm::vec3 up;
             computeCameraUp(up);
-            mCamera->setUp(up);
+            m_Camera->setUp(up);
         }
-        mCamera->update();
+        m_Camera->update();
     }
 
-    float TrackBallInteractor::setZoomScale(const float scale) { return mZoomScale = scale ;}
+    float TrackBallInteractor::setZoomScale(const float scale) { return m_ZoomScale = scale ;}
 
 } // end namespace rsmz
 

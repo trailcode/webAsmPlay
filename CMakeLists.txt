@@ -195,13 +195,14 @@ include_directories(tceOpenSteer/inc)
 include_directories(tceRender/inc)
 include_directories(inc)
 
-add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
+set(sourcePath ${CMAKE_CURRENT_SOURCE_DIR})
 
+add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")
+add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 add_definitions(-DGLM_FORCE_RADIANS)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-set(sourcePath ${CMAKE_CURRENT_SOURCE_DIR})
-add_definitions(-DSOURCE_BASE_PATH=R\"\(${sourcePath}\)\")
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     
