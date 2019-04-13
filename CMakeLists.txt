@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
-#set(default_build_type "Release")
-set(CMAKE_BUILD_TYPE Debug)
+set(default_build_type "Release")
+#set(CMAKE_BUILD_TYPE Debug)
 
 set(USE_FOLDERS ON)
 
@@ -313,6 +313,13 @@ else()
     else()
 
         #link_libraries(${TBB_tbb_LIBRARY_RELEASE})
+        link_libraries(debug ${CURL_LIBRARY_DEBUG} optimized ${CURL_LIBRARY_RELEASE})
+        link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG} optimized ${TBB_tbb_LIBRARY_RELEASE})
+
+    else()
+
+        link_libraries(${TBB_tbb_LIBRARY_RELEASE})
+        link_libraries(${CURL_LIBRARY})
 
     endif()
     
