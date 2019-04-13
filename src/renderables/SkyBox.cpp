@@ -89,7 +89,7 @@ SkyBox::SkyBox()
     files.push_back("back.png");  // zneg
     
 
-    texID = Textures::loadCube(files);
+    m_texID = Textures::loadCube(files);
 
     const GLfloat verts[] = {   -10.0,  10.0, -10.0,
                                 -10.0, -10.0, -10.0,
@@ -133,17 +133,17 @@ SkyBox::SkyBox()
                                 -10.0, -10.0,  10.0,
                                  10.0, -10.0,  10.0 };
 
-    GL_CHECK(glGenBuffers(1, &vbo));
+    GL_CHECK(glGenBuffers(1, &m_vbo));
 
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
     GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW));
-    GL_CHECK(glGenVertexArrays(1, &vao));
-    GL_CHECK(glBindVertexArray(vao));
+    GL_CHECK(glGenVertexArrays(1, &m_vao));
+    GL_CHECK(glBindVertexArray(m_vao));
     GL_CHECK(glEnableVertexAttribArray(0));
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
     GL_CHECK(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL));
 
-    model = rotate(radians(90.0f), vec3(1.0f,0.0f,0.0f));
+    m_model = rotate(radians(90.0f), vec3(1.0f,0.0f,0.0f));
 }
 
 SkyBox::~SkyBox()
@@ -159,18 +159,18 @@ void SkyBox::render(Canvas * canvas)
     value_ptr(centeredView)[13] = 0;
     value_ptr(centeredView)[14] = 0;
 
-    GL_CHECK(glBindVertexArray(vao));
+    GL_CHECK(glBindVertexArray(m_vao));
 
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
     
     skyboxShader->bind();
 
-    skyboxShader->setUniform (MVP_Loc,        mat4(canvas->getProjectionRef()) * centeredView * model);
+    skyboxShader->setUniform (MVP_Loc,        mat4(canvas->getProjectionRef()) * centeredView * m_model);
     skyboxShader->setUniformi(cubeTextureLoc, 0);
 
     GL_CHECK(glDepthMask(GL_FALSE));
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
-    GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, texID));
+    GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, m_texID));
     GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 36));
     GL_CHECK(glDepthMask(GL_TRUE));
 }

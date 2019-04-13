@@ -31,7 +31,6 @@
 #include <webAsmPlay/Types.h>
 
 class Shader;
-
 class Canvas;
 
 class Renderable
@@ -76,13 +75,13 @@ protected:
     Renderable & operator=(const Renderable &)  = delete;
     //Renderable & operator=(      Renderable &)  = delete;
 
-    std::vector<OnDelete> onDeleteCallbacks;
+    std::vector<OnDelete> m_DeleteCallbacks;
 
-    bool isMulti;
+    bool m_isMulti = false;
 
-    Shader * shader = NULL;
+    Shader * m_shader = NULL;
 
-    bool renderFill;
-    bool renderOutline;
+    bool m_renderFill	 = true;
+    bool m_renderOutline = true;
 };
 

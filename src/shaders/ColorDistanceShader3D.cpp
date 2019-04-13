@@ -107,25 +107,25 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
 {
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorSymbology->getTextureID()));
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID()));
 
     if(!isOutline)
     {
         shaderProgramFill->bind();
 
         shaderProgramFill->setUniformi(texUniformFill,          0);
-        shaderProgramFill->setUniformf(heightMultiplierFill,    heightMultiplier);
+        shaderProgramFill->setUniformf(heightMultiplierFill,    m_heightMultiplier);
         shaderProgramFill->setUniform (modelFill,               canvas->getModelRef());
         shaderProgramFill->setUniform (viewFill,                canvas->getViewRef());
         shaderProgramFill->setUniform (projectionFill,          canvas->getProjectionRef());
-        shaderProgramFill->setUniform (lightPosUniformFill,     lightPos);
+        shaderProgramFill->setUniform (lightPosUniformFill,     m_lightPos);
         shaderProgramFill->setUniformf(colorLookupOffsetFill,   0.0f);
     }
     else
     {
         shaderProgramOutline->bind();
 
-        shaderProgramOutline->setUniformf(heightMultiplierOutline,  heightMultiplier);
+        shaderProgramOutline->setUniformf(heightMultiplierOutline,  m_heightMultiplier);
         shaderProgramOutline->setUniform(MV_Outline,                canvas->getMV_Ref());
         shaderProgramOutline->setUniform(MVP_Outline,               canvas->getMVP_Ref());
         shaderProgramOutline->setUniformi(texUniformOutline,        0);
@@ -133,13 +133,11 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
     }
 }
 
-float ColorDistanceShader3D::setHeightMultiplier(const float multiplier) { return heightMultiplier = multiplier ;}
+float ColorDistanceShader3D::setHeightMultiplier(const float multiplier) { return m_heightMultiplier = multiplier	;}
+float ColorDistanceShader3D::getHeightMultiplier() const				 { return m_heightMultiplier				;}
 
-float ColorDistanceShader3D::getHeightMultiplier() const { return heightMultiplier ;}
+vec3 ColorDistanceShader3D::setLightPos(const vec3 & pos) { return m_lightPos = pos	;}
+vec3 ColorDistanceShader3D::getLightPos() const			  { return m_lightPos		;}
 
-vec3 ColorDistanceShader3D::setLightPos(const vec3 & pos) { return lightPos = pos ;}
-
-vec3 ColorDistanceShader3D::getLightPos() const { return lightPos ;}
-
-ColorSymbology * ColorDistanceShader3D::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
-ColorSymbology * ColorDistanceShader3D::getColorSymbology() const { return colorSymbology ;}
+ColorSymbology * ColorDistanceShader3D::setColorSymbology(ColorSymbology * colorSymbology)	{ return m_colorSymbology = colorSymbology	;}
+ColorSymbology * ColorDistanceShader3D::getColorSymbology() const							{ return m_colorSymbology					;}

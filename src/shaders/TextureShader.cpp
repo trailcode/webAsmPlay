@@ -67,7 +67,7 @@ TextureShader::~TextureShader()
 
 }
 
-GLuint TextureShader::setTextureID(const GLuint textureID) { return this->textureID = textureID ;}
+GLuint TextureShader::setTextureID(const GLuint textureID) { return m_textureID = textureID ;}
 
 void TextureShader::bind(   Canvas     * canvas,
                             const bool   isOutline,
@@ -77,7 +77,7 @@ void TextureShader::bind(   Canvas     * canvas,
 
 	GL_CHECK(glActiveTexture(GL_TEXTURE0));
 
-	GL_CHECK(glBindTexture(GL_TEXTURE_2D, textureID));
+	GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_textureID));
 
 	shaderProgram->setUniformi(texLoc, 0);
 

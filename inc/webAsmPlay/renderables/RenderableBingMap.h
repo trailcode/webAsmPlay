@@ -40,11 +40,11 @@ public:
 
     void render(Canvas * canvas, const size_t renderStage = 0) override;
 
-	static std::atomic<size_t> numTiles;
-	static std::atomic<size_t> numLoading;
-	static std::atomic<size_t> numDownloading;
-	static std::atomic<size_t> numUploading;
-	static std::atomic<size_t> numWriting;
+	static std::atomic<size_t> s_numTiles;
+	static std::atomic<size_t> s_numLoading;
+	static std::atomic<size_t> s_numDownloading;
+	static std::atomic<size_t> s_numUploading;
+	static std::atomic<size_t> s_numWriting;
 
 	static size_t numRendered;
 
@@ -57,14 +57,14 @@ private:
 
 	void getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level);
 
-    const AABB2D bounds;
+    const AABB2D m_bounds;
 
-	size_t startLevel = 0;
+	size_t m_startLevel = 0;
 
-    glm::ivec2 minTile;
-    glm::ivec2 maxTile;
+    glm::ivec2 m_minTile;
+    glm::ivec2 m_maxTile;
 
-	const glm::dmat4 trans;
+	const glm::dmat4 m_trans;
 
-	std::vector<RasterTile*> tiles;
+	std::vector<RasterTile*> m_tiles;
 };

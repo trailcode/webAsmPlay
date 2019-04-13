@@ -32,7 +32,6 @@
 #include <algorithm>
 #include <mutex>
 #include <functional>
-#include <unordered_set>
 #include <unordered_map>
 #include <SDL_image.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -60,11 +59,11 @@ using namespace ctpl;
 using namespace geosUtil;
 using namespace bingTileSystem;
 
-atomic<size_t> RenderableBingMap::numTiles			= {0};
-atomic<size_t> RenderableBingMap::numLoading		= {0};
-atomic<size_t> RenderableBingMap::numDownloading	= {0};
-atomic<size_t> RenderableBingMap::numUploading		= {0};
-atomic<size_t> RenderableBingMap::numWriting		= {0};
+atomic<size_t> RenderableBingMap::s_numTiles		= {0};
+atomic<size_t> RenderableBingMap::s_numLoading		= {0};
+atomic<size_t> RenderableBingMap::s_numDownloading	= {0};
+atomic<size_t> RenderableBingMap::s_numUploading	= {0};
+atomic<size_t> RenderableBingMap::s_numWriting		= {0};
 
 size_t RenderableBingMap::numRendered = 0;
 
@@ -197,7 +196,7 @@ namespace
 		{
 			//dmess("Skip here!");
 
-			--RenderableBingMap::numLoading;
+			--RenderableBingMap::s_numLoading;
 
 			return;
 		}
@@ -208,7 +207,7 @@ namespace
 
 		if(fileExists(tileCachePath))
 		{
-			++RenderableBingMap::numUploading;
+			++RenderableBingMap::s_numUploading;
 
 			SDL_Surface * img = IMG_Load(tileCachePath.c_str());
 
@@ -218,9 +217,9 @@ namespace
 			{
 				if (!tile->stillNeeded)
 				{
-					--RenderableBingMap::numUploading;
+					--RenderableBingMap::s_numUploading;
 
-					--RenderableBingMap::numLoading;
+					--RenderableBingMap::s_numLoading;
 
 					SDL_FreeSurface(img);
 					 
@@ -235,11 +234,11 @@ namespace
 
 				if(useBindlessTextures) { tile->handle = glGetTextureHandleARB(tile->textureID) ;}
 
-				++RenderableBingMap::numTiles;
+				++RenderableBingMap::s_numTiles;
 
-				--RenderableBingMap::numLoading;
+				--RenderableBingMap::s_numLoading;
 
-				--RenderableBingMap::numUploading;
+				--RenderableBingMap::s_numUploading;
 			});
 		}
 		else
@@ -252,12 +251,12 @@ namespace
 			{
 				//dmess("Error! No buffer!");
 
-				--RenderableBingMap::numLoading;
+				--RenderableBingMap::s_numLoading;
 
 				return;
 			}
 
-			++RenderableBingMap::numUploading;
+			++RenderableBingMap::s_numUploading;
 
 			uploaderPool.push([tile, tileBuffer, tileCachePath](int ID)
 			{
@@ -265,9 +264,9 @@ namespace
 				{
 					//dmess("Skip here!");
 
-					--RenderableBingMap::numUploading;
+					--RenderableBingMap::s_numUploading;
 
-					--RenderableBingMap::numLoading;
+					--RenderableBingMap::s_numLoading;
 
 					return;
 				}
@@ -278,13 +277,13 @@ namespace
 
 				if(useBindlessTextures) { tile->handle = glGetTextureHandleARB(tile->textureID) ;}
 
-				++RenderableBingMap::numTiles;
+				++RenderableBingMap::s_numTiles;
 
-				--RenderableBingMap::numUploading;
+				--RenderableBingMap::s_numUploading;
 
-				--RenderableBingMap::numLoading;
+				--RenderableBingMap::s_numLoading;
 
-				++RenderableBingMap::numWriting;
+				++RenderableBingMap::s_numWriting;
 
 				writerPool.push([tileCachePath, tileBuffer](int ID)
 				{
@@ -307,7 +306,7 @@ namespace
 					}
 				});
 
-				--RenderableBingMap::numWriting;
+				--RenderableBingMap::s_numWriting;
 			});
 		}
 	}
@@ -317,12 +316,12 @@ void RenderableBingMap::getStartLevel()
 {
 	for (int i = 0; i < 24; ++i)
 	{
-		const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), i);
-		const ivec2 maxTile = latLongToTile(dvec2(get<2>(bounds), get<3>(bounds)), i);
+		const ivec2 minTile = latLongToTile(dvec2(get<0>(m_bounds), get<1>(m_bounds)), i);
+		const ivec2 maxTile = latLongToTile(dvec2(get<2>(m_bounds), get<3>(m_bounds)), i);
 
 		if(minTile == maxTile) { continue ;}
 
-		startLevel = i - 1;
+		m_startLevel = i - 1;
 
 		break;
 	}
@@ -330,7 +329,7 @@ void RenderableBingMap::getStartLevel()
 
 Renderable * RenderableBingMap::create(const AABB2D & bounds, const dmat4 & trans) { return new RenderableBingMap(bounds, trans) ;}
 
-RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : bounds(bounds), trans(trans)
+RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans) : m_bounds(bounds), m_trans(trans)
 {
 	getStartLevel();
 	
@@ -357,12 +356,12 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	const dvec3 P3 = dvec4(tMax.x, tMin.y, 0, 1);
 	const dvec3 P4 = dvec4(tMin.x, tMin.y, 0, 1);
 
-	const dvec3 transCenter = trans * dvec4(center, 1.0);
+	const dvec3 transCenter = m_trans * dvec4(center, 1.0);
 
-	const dvec3 transP1 = trans * dvec4(P1, 1);
-	const dvec3 transP2 = trans * dvec4(P2, 1);
-	const dvec3 transP3 = trans * dvec4(P3, 1);
-	const dvec3 transP4 = trans * dvec4(P4, 1);
+	const dvec3 transP1 = m_trans * dvec4(P1, 1);
+	const dvec3 transP2 = m_trans * dvec4(P2, 1);
+	const dvec3 transP3 = m_trans * dvec4(P3, 1);
+	const dvec3 transP4 = m_trans * dvec4(P4, 1);
 
 	const ivec2 fbSize = canvas->getFrameBufferSize();
 
@@ -389,9 +388,9 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 									/* 3 */dvec3(tMin.x, center.y,  0),		/* 4 */dvec3(center.x, center.y, 0), /* 5 */dvec3(tMax.x, center.y, 0),
 									/* 6 */dvec3(tMin.x, tMin.y,	0),		/* 7 */dvec3(center.x, tMin.y,   0), /* 8 */dvec3(tMax.x, tMin.y,   0)};
 
-		const dvec3 subPointsTrans[] = {	/* 0 */trans * dvec4(tMin.x, tMax.y,   0, 1), /* 1 */trans * dvec4(center.x, tMax.y,   0, 1), /* 2 */trans * dvec4(tMax.x, tMax.y,   0, 1),
-											/* 3 */trans * dvec4(tMin.x, center.y, 0, 1), /* 4 */trans * dvec4(center.x, center.y, 0, 1), /* 5 */trans * dvec4(tMax.x, center.y, 0, 1),
-											/* 6 */trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */trans * dvec4(tMax.x, tMin.y,   0, 1)};
+		const dvec3 subPointsTrans[] = {	/* 0 */m_trans * dvec4(tMin.x, tMax.y,   0, 1), /* 1 */m_trans * dvec4(center.x, tMax.y,   0, 1), /* 2 */m_trans * dvec4(tMax.x, tMax.y,   0, 1),
+											/* 3 */m_trans * dvec4(tMin.x, center.y, 0, 1), /* 4 */m_trans * dvec4(center.x, center.y, 0, 1), /* 5 */m_trans * dvec4(tMax.x, center.y, 0, 1),
+											/* 6 */m_trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */m_trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */m_trans * dvec4(tMax.x, tMin.y,   0, 1)};
 
 		
 		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
@@ -405,7 +404,7 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 	RasterTile * tile = RasterTile::getTile(center, level);
 
-	tiles.push_back(tile);
+	m_tiles.push_back(tile);
 }
 
 extern GLuint theTex;
@@ -420,20 +419,20 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 	
 	theTex = textureBuffer->getTextureID();
 
-	const ivec2 minTile = latLongToTile(dvec2(get<0>(bounds), get<1>(bounds)), startLevel);
+	const ivec2 minTile = latLongToTile(dvec2(get<0>(m_bounds), get<1>(m_bounds)), m_startLevel);
 
-	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), startLevel);
-	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), startLevel);
+	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), m_startLevel);
+	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), m_startLevel);
 
-	vector<RasterTile *> prevTiles = tiles;
+	vector<RasterTile *> prevTiles = m_tiles;
 
-	tiles.clear();
+	m_tiles.clear();
 
-	getTilesToRender(canvas, tMin, tMax, startLevel);
+	getTilesToRender(canvas, tMin, tMax, m_startLevel);
 
-	unordered_set<RasterTile*> tileSet(tiles.begin(), tiles.end());
+	unordered_set<RasterTile*> tileSet(m_tiles.begin(), m_tiles.end());
 
-	for (auto i : tiles) { i->stillNeeded = true ;}
+	for (auto i : m_tiles) { i->stillNeeded = true ;}
 
 	for (auto i : prevTiles)
 	{
@@ -447,7 +446,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	unordered_set<RasterTile*> fallBackTiles;
 
-	for (const auto tile : tiles)
+	for (const auto tile : m_tiles)
 	{
 		if (tile->textureID) { continue; }
 
@@ -456,7 +455,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 		//dmess("currTile->level " << currTile->level);
 
 		int c = 0;
-		for (int parentLevel = currTile->level - 1; parentLevel >= startLevel; --parentLevel)
+		for (int parentLevel = int(currTile->level) - 1; parentLevel >= m_startLevel; --parentLevel)
 		{
 			//if (++c > 2) { break; }
 
@@ -477,16 +476,16 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	for (const auto tile : fallBackTiles)
 	{
-		if (tileSet.find(tile) == tileSet.end()) { tiles.push_back(tile); }
+		if (tileSet.find(tile) == tileSet.end()) { m_tiles.push_back(tile); }
 	}
 
-	sort(tiles.begin(), tiles.end(), [](const RasterTile * A, const RasterTile * B) { return A->level < B->level ;});
+	sort(m_tiles.begin(), m_tiles.end(), [](const RasterTile * A, const RasterTile * B) { return A->level < B->level ;});
 
 	size_t numRendered = 0;
 
 	vector<RasterTile*> toRender;
 
-	for (auto i : tiles)
+	for (auto i : m_tiles)
 	{
 		if (i->textureID)
 		{
@@ -497,7 +496,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 				const dvec2 tMin = tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), i->level);
 				const dvec2 tMax = tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), i->level);
 				
-				i->r = Renderable::create(makeBox(tMin, tMax), trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
+				i->r = Renderable::create(makeBox(tMin, tMax), m_trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
 
 				i->r->ensureVAO();
 
@@ -518,7 +517,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 			loaderPool.push([i](int ID) { fetchTile(ID, i) ;});
 
-			++numLoading;
+			++s_numLoading;
 		}
 	}
 

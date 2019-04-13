@@ -40,6 +40,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <unordered_set>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
@@ -76,6 +77,16 @@ static glm::vec4 __(const OpenSteer::Color & v) { return glm::vec4(v.r(), v.g(),
 std::wstring stringToWstring(const std::string& t_str);
 
 std::string wstringToString(const std::wstring& t_str);
+
+template<typename T>
+inline std::unordered_set<T> toSet(const std::vector<T>& elms)
+{
+	std::unordered_set<T> ret;
+
+	for (size_t i = 0; i < elms.size(); ++i) { ret.insert(elms[i]) ;}
+
+	return ret;
+}
 
 void doProgress(const std::string                                    & message,
                 const size_t                                         i,

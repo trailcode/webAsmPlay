@@ -25,7 +25,6 @@
 */
 #pragma once
 
-#include <memory>
 #include <webAsmPlay/geom/Tessellation.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
@@ -60,5 +59,5 @@ private:
 
     RenderableMesh(VertexArrayObject * vertexArrayObject);
 
-    VertexArrayObject * vertexArrayObject;
+    VertexArrayObject * m_vertexArrayObject;
 };

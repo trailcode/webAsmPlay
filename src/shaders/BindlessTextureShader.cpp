@@ -63,7 +63,7 @@ void BindlessTextureShader::bind(	Canvas		* canvas,
 {
 	shaderProgram->bind();
 
-	shaderProgram->setUniformi(texID_Loc, textureSlot);
+	shaderProgram->setUniformi(texID_Loc, m_textureSlot);
 
 	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }
@@ -78,7 +78,7 @@ BindlessTextureShader::~BindlessTextureShader()
 
 }
 
-GLuint BindlessTextureShader::setTextureSlot(const GLuint textureSlot)
+size_t BindlessTextureShader::setTextureSlot(const size_t textureSlot)
 {
-	return this->textureSlot = textureSlot;
+	return m_textureSlot = (GLuint)textureSlot;
 }

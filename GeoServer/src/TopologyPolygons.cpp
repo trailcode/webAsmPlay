@@ -24,11 +24,15 @@
   \copyright 2018
 */
 
+#include <fstream>
 #include <algorithm>
+#include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/prep/PreparedPolygon.h>
 #include <geos/index/quadtree/Quadtree.h>
+#include <geos/io/WKTWriter.h>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/Attributes.h>
 #include <geoServer/Topology.h>
 
@@ -42,14 +46,14 @@ namespace
     class MyPolygon
     {
     public:
-        MyPolygon(  const Attributes * attrs,
+        MyPolygon(  Attributes		 * attrs,
                     const Polygon    * poly,
-                    const double       area) :  attrs        (attrs),
-                                                poly         (poly),
-                                                polyPrepaired(poly),
-                                                area         (area) {}
+                    const double       area) :  attrs         (attrs),
+                                                poly          (poly),
+                                                polyPrepaired (poly),
+                                                area          (area) {}
 
-        uint32_t getID() const { return attrs->uints32.find("ID")->second ;}
+        uint32_t getID() const { return attrs->m_uints32.find("ID")->second ;}
 
         const Polygon * poly;
 
@@ -57,7 +61,7 @@ namespace
 
         const double area;
 
-        const Attributes * attrs;
+        Attributes * attrs;
     };
 
     size_t lastID = 0; // TODO find a better way to do IDs.
@@ -85,14 +89,14 @@ void topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & po
         
         quadTree.insert(poly(i)->getEnvelopeInternal(), myPoly);
 
-        attrs(i)->uints32["ID"] = ++lastID; 
+        attrs(i)->m_uints32["ID"] = (uint32_t)++lastID; 
     }
 
     dmess("quadTree depth " << quadTree.depth() << " num polys: " << polygons.size());
 
     vector< void * > query;
 
-    for(auto & i : polygons)
+    for(const auto & i : polygons)
     {
         const Polygon * potentialChild = poly(i);
 
@@ -119,8 +123,109 @@ void topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & po
             parent = potentalParent;
         }
 
-        if(parent) { attrs(i)->uints32["parentID"] = parent->getID() ;}
+		if (!parent) { continue; }
+
+		attrs(i)->m_uints32["parentID"] = parent->getID();
+	
+		//parent->attrs->multiUints32s["allChildIDs"].push_back(attrs(i)->uints32["ID"]);
+		parent->attrs->m_multiUints32s["childIDs"].push_back(attrs(i)->m_uints32["ID"]);
     }
 
+	/*
+	for (const auto& i : polygons)
+	{
+		const vector<uint32_t> & allChildIDs = attrs(i)->multiUints32s["allChildIDs"];
+
+		vector<uint32_t> & childIDs = attrs(i)->multiUints32s["childIDs"];
+
+		for (const auto childID : allChildIDs)
+		{
+			auto child = polygons[childID];
+
+			for (const auto ID : attrs(child)->multiUints32s["allChildIDs"])
+			{
+				if (ID == childID) { goto next; }
+			}
+
+			childIDs.push_back(childID);
+		}
+
+	next:;
+	}
+
+	for (const auto& i : polygons)
+	{
+		if (!attrs(i)->multiUints32s["allChildIDs"].size()) { continue; }
+
+		dmess(attrs(i)->multiUints32s["allChildIDs"].size() << " " << attrs(i)->multiUints32s["childIDs"].size());
+	}
+	*/
+
+	//exit(0);
+
     dmess("done topology::discoverTopologicalRelations");
+}
+
+void topology::cutPolygonHoles(vector<AttributedPoligonalArea>& polygons)
+{
+	return;
+
+	dmess("start cutPolygonHoles");
+
+	size_t c = 0;
+
+	const GeometryFactory* geomFactory = GeometryFactory::getDefaultInstance();
+
+	size_t cc = 0;
+
+	for (auto& i : polygons)
+	{
+		const vector<uint32_t> & childIDs = attrs(i)->m_multiUints32s["childIDs"];
+
+		++cc;
+
+		if (childIDs.size()) { dmess(" " << cc << " " << polygons.size()); }
+
+		for (const auto childID : childIDs)
+		{
+			Polygon* P = poly(i);
+
+			if (P == poly(polygons[childID]))
+			{
+				dmess("Here!");
+
+				continue;
+			}
+
+			Geometry* newPoly = P->difference(poly(polygons[childID]));
+
+			if (!dynamic_cast<Polygon*>(newPoly))
+			{
+				dmess("Not poly! " << newPoly->getGeometryType());
+
+				geos::io::WKTWriter w;
+
+				char buf[1024];
+
+				sprintf(buf, "C:/Temp/p_%i.wkt", ++c);
+
+				ofstream out(buf);
+
+				//w.write(*newPoly, out);
+				out << w.write(newPoly);
+
+				out.close();
+
+				geomFactory->destroyGeometry(newPoly);
+
+				continue;
+			}
+			
+			geomFactory->destroyGeometry(P);
+
+			poly(i) = dynamic_cast<Polygon*>(newPoly);
+		}
+	}
+
+	dmess("End cutPolygonHoles");
 }

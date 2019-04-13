@@ -56,9 +56,9 @@ void ColorShader::ensureShader()
 
 ColorShader * ColorShader::getDefaultInstance() { return defaultInstance ;}
 
-ColorShader::ColorShader() :    Shader      ("ColorShader"),
-                                fillColor   (0,1,0,0.5),
-                                outlineColor(1,1,0,1)
+ColorShader::ColorShader() :    Shader			("ColorShader"),
+                                m_fillColor		(0,1,0,0.5),
+                                m_outlineColor	(1,1,0,1)
 {
 
 }
@@ -76,6 +76,6 @@ void ColorShader::bind( Canvas     * canvas,
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 
-    if(isOutline) { shaderProgram->setUniform(colorInUniformLoc, outlineColor) ;}
-    else          { shaderProgram->setUniform(colorInUniformLoc, fillColor)    ;}
+    if(isOutline) { shaderProgram->setUniform(colorInUniformLoc, m_outlineColor) ;}
+    else          { shaderProgram->setUniform(colorInUniformLoc, m_fillColor)    ;}
 }

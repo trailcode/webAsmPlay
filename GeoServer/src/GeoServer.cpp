@@ -207,7 +207,7 @@ string GeoServer::addOsmFile(const string & osmFile)
         {
             const double area = polygon->getArea();
 
-            i.first->doubles["area"] = area;
+            i.first->m_doubles["area"] = area;
 
             polygons.push_back(AttributedPoligonalArea(i.first, polygon, area));
 
@@ -252,6 +252,8 @@ string GeoServer::addOsmFile(const string & osmFile)
     dmess("numPolygons " << polygons.size());
 
     discoverTopologicalRelations(polygons);
+
+	cutPolygonHoles(polygons);
 
     breakLineStrings(lineStrings);
 
@@ -426,7 +428,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                    *(uint32_t *)ptr = server->serializedPolygons.size();
+                    *(uint32_t *)ptr = (uint32_t)server->serializedPolygons.size();
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
@@ -445,7 +447,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                    *(uint32_t *)ptr = server->serializedLineStrings.size();
+                    *(uint32_t *)ptr = (uint32_t)server->serializedLineStrings.size();
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
@@ -464,7 +466,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                    *(uint32_t *)ptr = server->serializedPoints.size();
+                    *(uint32_t *)ptr = (uint32_t)server->serializedPoints.size();
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
@@ -483,7 +485,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
-                    for(size_t i = 0; i < numGeoms; ++i) { bufferSize += serializedPolygons[startIndex + i].length() + sizeof(uint32_t) ;}
+                    for(size_t i = 0; i < numGeoms; ++i) { bufferSize += uint32_t(serializedPolygons[startIndex + i].length() + sizeof(uint32_t)) ;}
 
                     vector<char> data(bufferSize);
 
@@ -499,7 +501,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
                     {
                         const string & geom = serializedPolygons[startIndex + i];
 
-                        *(uint32_t *)ptr = geom.length(); ptr += sizeof(uint32_t);
+                        *(uint32_t *)ptr = (uint32_t)geom.length(); ptr += sizeof(uint32_t);
 
                         memcpy(ptr, geom.data(), geom.length()); 
 
@@ -522,7 +524,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
-                    for(uint i = 0; i < numGeoms; ++i) { bufferSize += serializedLineStrings[startIndex + i].length() + sizeof(uint32_t) ;}
+                    for(uint i = 0; i < numGeoms; ++i) { bufferSize += uint32_t(serializedLineStrings[startIndex + i].length() + sizeof(uint32_t)) ;}
 
                     vector<char> data(bufferSize);
 
@@ -538,7 +540,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
                     {
                         const string & geom = serializedLineStrings[startIndex + i];
 
-                        *(uint32_t *)ptr = geom.length(); ptr += sizeof(uint32_t);
+                        *(uint32_t *)ptr = (uint32_t)geom.length(); ptr += sizeof(uint32_t);
 
                         memcpy(ptr, geom.data(), geom.length()); 
 

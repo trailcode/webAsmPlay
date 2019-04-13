@@ -26,8 +26,6 @@
 #pragma once
 
 #include <unordered_map>
-#include <glm/vec4.hpp>
-#include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/Types.h>
@@ -65,8 +63,8 @@ private:
 
     ~ShaderProgram();
 
-    GLuint shaderProgram;
+    GLuint m_shaderProgram;
     
-    std::unordered_map<std::string, GLint> uniforms;
-    std::unordered_map<std::string, GLint> attributes;
+    std::unordered_map<std::string, GLint> m_uniforms;
+    std::unordered_map<std::string, GLint> m_attributes;
 };

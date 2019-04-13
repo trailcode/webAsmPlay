@@ -95,11 +95,11 @@ namespace
         
         // See: https://wiki.openstreetmap.org/wiki/OSM-3D.org
         
-             if(attrs->hasStringKey("height"))          { height    = atof(attrs->strings["height"]         .c_str()) * scale * 0.3 ;}
-        else if(attrs->hasStringKey("building:height")) { height    = atof(attrs->strings["building:height"].c_str()) * scale * 0.3 ;}
-        else if(attrs->hasStringKey("building:levels")) { height    = atof(attrs->strings["building:levels"].c_str()) * scale       ;}
+             if(attrs->hasStringKey("height"))          { height    = atof(attrs->m_strings["height"]         .c_str()) * scale * 0.3 ;}
+        else if(attrs->hasStringKey("building:height")) { height    = atof(attrs->m_strings["building:height"].c_str()) * scale * 0.3 ;}
+        else if(attrs->hasStringKey("building:levels")) { height    = atof(attrs->m_strings["building:levels"].c_str()) * scale       ;}
         
-        if(attrs->hasStringKey("min_height")) { minHeight = atof(attrs->strings["min_height"].c_str()) * scale * 0.3 ;}
+        if(attrs->hasStringKey("min_height")) { minHeight = atof(attrs->m_strings["min_height"].c_str()) * scale * 0.3 ;}
 
         return make_pair(height, minHeight);
     }

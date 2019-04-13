@@ -25,11 +25,9 @@
 */
 #pragma once
 
-#include <string>
 #include <ostream>
 #include <unordered_map>
 #include <unordered_set>
-#include <memory>
 #include <webAsmPlay/Relation.h>
 #include <webAsmPlay/Types.h>
 
@@ -37,13 +35,15 @@ class Attributes
 {
 public:
 
-    typedef std::unordered_map<std::string, int32_t>     Ints32;
-    typedef std::unordered_map<std::string, int64_t>     Ints64;
-    typedef std::unordered_map<std::string, uint32_t>    UInts32;
-    typedef std::unordered_map<std::string, uint64_t>    UInts64;
-    typedef std::unordered_map<std::string, double >     Doubles;
-    typedef std::unordered_map<std::string, std::string> Strings;
-    typedef std::unordered_map<std::string, StrVec>      MultiStrs;
+    typedef std::unordered_map<std::string, int32_t>		Ints32;
+    typedef std::unordered_map<std::string, int64_t>		Ints64;
+    typedef std::unordered_map<std::string, uint32_t>		UInts32;
+	typedef std::unordered_map<std::string, uint32_t>		UInts32;
+    typedef std::unordered_map<std::string, uint64_t>		UInts64;
+    typedef std::unordered_map<std::string, double >		Doubles;
+    typedef std::unordered_map<std::string, std::string>	Strings;
+    typedef std::unordered_map<std::string, StrVec>			MultiStrs;
+	typedef std::unordered_map<std::string, Uint32Vec>		MultiUInts32;
 
     Attributes();
     Attributes(const char *& attrs);
@@ -57,13 +57,14 @@ public:
 
     bool hasStringKeyValue(const std::string & key, const std::string & value) const;
 
-    Ints32    ints32;
-    UInts32   uints32;
-    UInts64   uints64;
-    Ints64    ints64;
-    Doubles   doubles;
-    Strings   strings;
-    MultiStrs multiStrs;
+    Ints32			m_ints32;
+    UInts32			m_uints32;
+    UInts64			m_uints64;
+    Ints64			m_ints64;
+    Doubles			m_doubles;
+    Strings			m_strings;
+    MultiStrs		m_multiStrs;
+	MultiUInts32	m_multiUints32s;
 
-    std::vector<std::unique_ptr<Relation> > relations;
+    std::vector<std::unique_ptr<Relation> > m_relations;
 };

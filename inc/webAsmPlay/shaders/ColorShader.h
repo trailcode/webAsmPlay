@@ -25,7 +25,6 @@
 */
 #pragma once
 
-#include <glm/vec4.hpp>
 #include <webAsmPlay/shaders/Shader.h>
 
 class ColorShader : public Shader
@@ -45,8 +44,8 @@ public:
 
 private:
 
-    glm::vec4 fillColor;
-    glm::vec4 outlineColor;
+    glm::vec4 m_fillColor;
+    glm::vec4 m_outlineColor;
 
 };
 

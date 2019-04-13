@@ -25,7 +25,6 @@
 */
 #pragma once
 
-#include <glm/mat4x4.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 
 class Canvas;
@@ -48,11 +47,11 @@ public:
 
 protected:
 
-    Shader( const std::string & shaderName);
+    Shader(const std::string & shaderName);
 
     virtual ~Shader() {}
 
-    const std::string shaderName;
+    const std::string m_shaderName;
 
-    ColorSymbology * colorSymbology = NULL;
+    ColorSymbology * m_colorSymbology = NULL;
 };

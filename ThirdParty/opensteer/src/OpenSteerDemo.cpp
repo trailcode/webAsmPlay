@@ -1003,8 +1003,8 @@ namespace {
             const float rSpeed = 0.01f;
 
             // XY distance (in pixels) that mouse moved since last update
-            const float dx = x - gMouseAdjustingCameraLastX;
-            const float dy = y - gMouseAdjustingCameraLastY;
+            const float dx = float(x - gMouseAdjustingCameraLastX);
+            const float dy = float(y - gMouseAdjustingCameraLastY);
             gMouseAdjustingCameraLastX = x;
             gMouseAdjustingCameraLastY = y;
 
@@ -1522,19 +1522,19 @@ OpenSteer::runGraphics (void)
 // ----------------------------------------------------------------------------
 // accessors for GLUT's window dimensions
 
-float openSteerWindowHeight = 0;
-float openSteerWindowWidth  = 0;
+float g_openSteerWindowHeight = 0;
+float g_openSteerWindowWidth  = 0;
 
 float 
 OpenSteer::drawGetWindowHeight (void) 
 {
-    return openSteerWindowHeight;
+    return g_openSteerWindowHeight;
 }
 
 
 float 
 OpenSteer::drawGetWindowWidth  (void) 
 {
-    return openSteerWindowWidth;
+    return g_openSteerWindowWidth;
 }
 

@@ -45,30 +45,12 @@ void GUI::bingTileSystemPanel()
 
     pos = client->getInverseTrans() * pos;
 
-	/*
-    double tmp = pos.x;
-    pos.x = pos.y;
-    pos.y = tmp;
-	*/
-
     const size_t zoomLevel = 16;
 
-	const ivec2 pix = latLongToPixel(pos, zoomLevel);
-
-	const dvec2 pos2 = pixelToLatLong(pix, zoomLevel);
-
-	const ivec2 tile = pixelToTile(pix);
-
+	const ivec2  pix	 = latLongToPixel(pos, zoomLevel);
+	const dvec2  pos2	 = pixelToLatLong(pix, zoomLevel);
+	const ivec2  tile	 = pixelToTile(pix);
     const string quadKey = tileToQuadKey(tile, zoomLevel);
-
-	//dmess("quadKey " << quadKey);
-	//dmess("pos " << pos);
-
-	const size_t numTiles		= RenderableBingMap::numTiles;
-	const size_t numLoading		= RenderableBingMap::numLoading;
-	const size_t numDownloading = RenderableBingMap::numDownloading;
-	const size_t numUploading	= RenderableBingMap::numUploading;
-	const size_t numWriting		= RenderableBingMap::numWriting;
 
     ImGui::Begin("Bing Tile System", &showBingTileSystemPanel);
 
@@ -77,11 +59,11 @@ void GUI::bingTileSystemPanel()
     ImGui::Text(("            pix: " + toStr(pix)).c_str());
     ImGui::Text(("           tile: " + toStr(tile)).c_str());
     ImGui::Text(("        quadKey: " + quadKey).c_str());
-	ImGui::Text(("      num tiles: " + to_string(numTiles)).c_str());
-	ImGui::Text(("    num loading: " + to_string(numLoading)).c_str());
-	ImGui::Text(("num downloading: " + to_string(numDownloading)).c_str());
-	ImGui::Text(("  num uploading: " + to_string(numUploading)).c_str());
-	ImGui::Text(("    num writing: " + to_string(numWriting)).c_str());
+	ImGui::Text(("      num tiles: " + to_string(RenderableBingMap::s_numTiles)).c_str());
+	ImGui::Text(("    num loading: " + to_string(RenderableBingMap::s_numLoading)).c_str());
+	ImGui::Text(("num downloading: " + to_string(RenderableBingMap::s_numDownloading)).c_str());
+	ImGui::Text(("  num uploading: " + to_string(RenderableBingMap::s_numUploading)).c_str());
+	ImGui::Text(("    num writing: " + to_string(RenderableBingMap::s_numWriting)).c_str());
 	ImGui::Text(("   num rendered: " + to_string(RenderableBingMap::numRendered)).c_str());
 
     ImGui::End();

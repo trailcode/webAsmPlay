@@ -76,13 +76,13 @@ GLuint OpenSteerCanvas::render()
     return postRender();
 }
 
-extern float openSteerWindowHeight;
-extern float openSteerWindowWidth;
+extern float g_openSteerWindowHeight;
+extern float g_openSteerWindowWidth;
 
 void OpenSteerCanvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
 {
-    openSteerWindowWidth  = size.x;
-    openSteerWindowHeight = size.y;
+    g_openSteerWindowWidth  = (float)size.x;
+    g_openSteerWindowHeight = (float)size.y;
 
     if(size != this->size)
     {

@@ -46,7 +46,7 @@ void AttributeStatistics::addLineStrings(const vector<AttributedLineString> & li
     {
         Attributes * attrs = get<0>(ls);
 
-        for(const auto & i : attrs->strings) { lineStringAttrStats[i.first].insert(i.second) ;}
+        for(const auto & i : attrs->m_strings) { lineStringAttrStats[i.first].insert(i.second) ;}
     }
 
 	/*

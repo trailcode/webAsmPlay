@@ -128,6 +128,8 @@ MapData OSM_Reader::import(const string & fileName)
 
     FILE * fp = fopen(fileName.c_str(), "r");
 
+	if (!fp) { dmessError("Error! Could not open: " << fileName); }
+
     do
     {
         size_t len = fread(buf, 1, sizeof(buf), fp);
@@ -378,11 +380,11 @@ void OSM_Reader::handleRelation(const char **atts)
     {
         switch(getKey(atts[i]))
         {
-            case OSM_KEY_USER:      attrs->strings["userOSM"]      =        atts[i + 1];  break;
-            case OSM_KEY_TIMESTAMP: attrs->strings["timestampOSM"] =        atts[i + 1];  break;
-            case OSM_KEY_VERSION:   attrs->uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
-            case OSM_KEY_CHANGESET: attrs->uints64["changesetOSM"] = stoull(atts[i + 1]); break;
-            case OSM_KEY_UID:       attrs->uints32["uidOSM"]       = stoull(atts[i + 1]); break;
+            case OSM_KEY_USER:      attrs->m_strings["userOSM"]      =        atts[i + 1];  break;
+            case OSM_KEY_TIMESTAMP: attrs->m_strings["timestampOSM"] =        atts[i + 1];  break;
+            case OSM_KEY_VERSION:   attrs->m_uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
+            case OSM_KEY_CHANGESET: attrs->m_uints64["changesetOSM"] = stoull(atts[i + 1]); break;
+            case OSM_KEY_UID:       attrs->m_uints32["uidOSM"]       = stoull(atts[i + 1]); break;
 
             case OSM_KEY_ID:
             {
@@ -390,7 +392,7 @@ void OSM_Reader::handleRelation(const char **atts)
 
                 relations[ID] = currRelation;
 
-                attrs->uints64["ID_OSM"] = ID;
+                attrs->m_uints64["ID_OSM"] = ID;
 
                 break;
             }
@@ -435,7 +437,7 @@ void OSM_Reader::handleTag(const char **atts)
         }
     }
 
-    curr->attrs->strings[key] = value;
+    curr->attrs->m_strings[key] = value;
 }
 
 void OSM_Reader::handleNode(const char **atts)
@@ -448,13 +450,13 @@ void OSM_Reader::handleNode(const char **atts)
     {
         switch(getKey(atts[i]))
         {
-            case OSM_KEY_CHANGESET: attrs   ->uints64["changesetOSM"] = stoull(atts[i + 1]); break;
-            case OSM_KEY_TIMESTAMP: attrs   ->strings["timestampOSM"] =        atts[i + 1];  break;
-            case OSM_KEY_USER:      attrs   ->strings["userOSM"]      =        atts[i + 1];  break;
-            case OSM_KEY_VERSION:   attrs   ->uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
-            case OSM_KEY_UID:       attrs   ->uints32["uidOSM"]       = stoull(atts[i + 1]); break;
-            case OSM_KEY_LAT:       currNode->pos.y                   =   atof(atts[i + 1]); break;
-            case OSM_KEY_LON:       currNode->pos.x                   =   atof(atts[i + 1]); break;
+            case OSM_KEY_CHANGESET: attrs   ->m_uints64["changesetOSM"] = stoull(atts[i + 1]); break;
+            case OSM_KEY_TIMESTAMP: attrs   ->m_strings["timestampOSM"] =        atts[i + 1];  break;
+            case OSM_KEY_USER:      attrs   ->m_strings["userOSM"]      =        atts[i + 1];  break;
+            case OSM_KEY_VERSION:   attrs   ->m_uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
+            case OSM_KEY_UID:       attrs   ->m_uints32["uidOSM"]       = stoull(atts[i + 1]); break;
+            case OSM_KEY_LAT:       currNode->pos.y                     =   atof(atts[i + 1]); break;
+            case OSM_KEY_LON:       currNode->pos.x                     =   atof(atts[i + 1]); break;
 
             case OSM_KEY_ID:
             {
@@ -462,7 +464,7 @@ void OSM_Reader::handleNode(const char **atts)
 
                 nodes[ID] = currNode;
 
-                attrs->uints64["ID_OSM"] = ID;
+                attrs->m_uints64["ID_OSM"] = ID;
                 
                 break;
             }
@@ -482,11 +484,11 @@ void OSM_Reader::handleWay(const char **atts)
     {
         switch(getKey(atts[i]))
         {
-            case OSM_KEY_USER:      attrs->strings["userOSM"]      =        atts[i + 1];  break;
-            case OSM_KEY_UID:       attrs->uints32["uidOSM"]       = stoull(atts[i + 1]); break;
-            case OSM_KEY_TIMESTAMP: attrs->strings["timestampOSM"] =        atts[i + 1];  break;
-            case OSM_KEY_CHANGESET: attrs->uints64["changesetOSM"] = stoull(atts[i + 1]); break;
-            case OSM_KEY_VERSION:   attrs->uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
+            case OSM_KEY_USER:      attrs->m_strings["userOSM"]      =        atts[i + 1];  break;
+            case OSM_KEY_UID:       attrs->m_uints32["uidOSM"]       = stoull(atts[i + 1]); break;
+            case OSM_KEY_TIMESTAMP: attrs->m_strings["timestampOSM"] =        atts[i + 1];  break;
+            case OSM_KEY_CHANGESET: attrs->m_uints64["changesetOSM"] = stoull(atts[i + 1]); break;
+            case OSM_KEY_VERSION:   attrs->m_uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
 
             case OSM_KEY_ID:
             {   
@@ -494,7 +496,7 @@ void OSM_Reader::handleWay(const char **atts)
 
                 ways[ID] = currWay;
 
-                attrs->uints64["ID_OSM"] = ID;
+                attrs->m_uints64["ID_OSM"] = ID;
                 
                 break;
             }

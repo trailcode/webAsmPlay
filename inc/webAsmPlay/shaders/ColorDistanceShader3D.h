@@ -25,8 +25,6 @@
 */
 #pragma once
 
-#include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
 #include <JSON.h>
 #include <webAsmPlay/shaders/Shader.h>
 
@@ -58,9 +56,9 @@ public:
 
 private:
 
-    float heightMultiplier = 1.0f;
+    float m_heightMultiplier = 1.0f;
 
-    glm::vec3 lightPos;
+    glm::vec3 m_lightPos;
 
-    ColorSymbology * colorSymbology = NULL;
+    ColorSymbology * m_colorSymbology = NULL;
 };

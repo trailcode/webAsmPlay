@@ -74,8 +74,7 @@ private:
     VertexArrayObject(const VertexArrayObject &)              = delete;
     VertexArrayObject(VertexArrayObject &&)                   = delete;
     VertexArrayObject & operator=(const VertexArrayObject &)  = delete;
-    VertexArrayObject & operator=(VertexArrayObject &)        = delete;
-
+    
 		  GLuint    vao                 = 0;
     const GLuint    ebo                 = 0;
     const GLuint    ebo2                = 0;

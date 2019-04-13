@@ -42,9 +42,9 @@ public:
 	BindlessTextureShader();
 	~BindlessTextureShader();
 
-	GLuint setTextureSlot(const GLuint textureSlot);
+	size_t setTextureSlot(const size_t textureSlot);
 
 private:
 
-	GLuint textureSlot = 0;
+	GLuint m_textureSlot = 0;
 };

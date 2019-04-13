@@ -47,5 +47,5 @@ private:
 	TextureLookupShader();
 	~TextureLookupShader();
 
-	GLuint64 texHandle = 0;
+	GLuint64 m_texHandle = 0;
 };

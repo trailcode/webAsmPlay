@@ -68,6 +68,6 @@ private:
 
     RenderablePolygon(VertexArrayObject * vertexArrayObject);
 
-    VertexArrayObject * vertexArrayObject;
+    VertexArrayObject * m_vertexArrayObject;
 }; 
 

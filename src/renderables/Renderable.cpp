@@ -82,28 +82,28 @@ Renderable * Renderable::create(const Geometry * geom,
 
 Renderable::Renderable( const bool isMulti,
                         const bool renderFill,
-                        const bool renderOutline) : isMulti         (isMulti),
-                                                    renderFill      (renderFill),
-                                                    renderOutline   (renderOutline),
-                                                    shader          (ColorShader::getDefaultInstance())
+                        const bool renderOutline) : m_isMulti       (isMulti),
+                                                    m_renderFill    (renderFill),
+                                                    m_renderOutline (renderOutline),
+                                                    m_shader        (ColorShader::getDefaultInstance())
 {
 }
 
 Renderable::~Renderable()
 {
-    for(OnDelete & callback : onDeleteCallbacks) { callback(this) ;}
+    for(OnDelete & callback : m_DeleteCallbacks) { callback(this) ;}
 }
 
-void Renderable::addOnDeleteCallback(const OnDelete & callback) { onDeleteCallbacks.push_back(callback) ;}
+void Renderable::addOnDeleteCallback(const OnDelete & callback) { m_DeleteCallbacks.push_back(callback) ;}
 
-Shader * Renderable::getShader() const { return shader ;}
-Shader * Renderable::setShader(Shader * shader) { return this->shader = shader ;}
+Shader * Renderable::getShader() const			{ return m_shader			;}
+Shader * Renderable::setShader(Shader * shader) { return m_shader = shader	;}
 
-bool Renderable::getRenderFill()    const { return renderFill ;}
-bool Renderable::getRenderOutline() const { return renderOutline ;}
+bool Renderable::getRenderFill()    const { return m_renderFill ;}
+bool Renderable::getRenderOutline() const { return m_renderOutline ;}
 
-bool Renderable::setRenderFill   (const bool render) { return renderFill    = render ;}
-bool Renderable::setRenderOutline(const bool render) { return renderOutline = render ;}
+bool Renderable::setRenderFill   (const bool render) { return m_renderFill    = render ;}
+bool Renderable::setRenderOutline(const bool render) { return m_renderOutline = render ;}
 
 void Renderable::ensureVAO()
 {

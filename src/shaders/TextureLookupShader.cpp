@@ -71,7 +71,4 @@ void TextureLookupShader::bind( Canvas     * canvas,
 	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }
 
-GLuint64 TextureLookupShader::setTextureHandle(const GLuint64& handle)
-{
-	return texHandle = handle;
-}
+GLuint64 TextureLookupShader::setTextureHandle(const GLuint64& handle) { return m_texHandle = handle; }

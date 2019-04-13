@@ -40,7 +40,6 @@
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/Util.h>
 #include <geoServer/Topology.h>
-
 #include <geoServer/AttributeStatistics.h> // TODO does not belong here
 
 using namespace std;

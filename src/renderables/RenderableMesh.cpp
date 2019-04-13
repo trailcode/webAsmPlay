@@ -127,38 +127,38 @@ Renderable * RenderableMesh::create(const Tessellations & tessellations)
 
 RenderableMesh::~RenderableMesh()
 {
-    delete vertexArrayObject;
+    delete m_vertexArrayObject;
 }
 
 RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderable( true,
                                                                                     GUI::renderSettingsFillPolygons,
                                                                                     GUI::renderSettingsRenderPolygonOutlines),
-                                                                        vertexArrayObject(vertexArrayObject)
+                                                                        m_vertexArrayObject(vertexArrayObject)
 {
 
 }
 
 void RenderableMesh::render(Canvas * canvas, const size_t renderStage)
 {
-    vertexArrayObject->bind(shader);
-    vertexArrayObject->bindTriangles();
+    m_vertexArrayObject->bind(m_shader);
+    m_vertexArrayObject->bindTriangles();
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-    if(getRenderFill() && shader->shouldRender(false, renderStage))
+    if(getRenderFill() && m_shader->shouldRender(false, renderStage))
     {
-        shader->bind(canvas, false, renderStage);
+        m_shader->bind(canvas, false, renderStage);
 
-        vertexArrayObject->drawTriangles();
+        m_vertexArrayObject->drawTriangles();
     }
 
-    if(getRenderOutline() && shader->shouldRender(true, renderStage))
+    if(getRenderOutline() && m_shader->shouldRender(true, renderStage))
     {
-        shader->bind(canvas, true, renderStage);
+        m_shader->bind(canvas, true, renderStage);
 
-        vertexArrayObject->bindLines();
+        m_vertexArrayObject->bindLines();
         
-        vertexArrayObject->drawLines();
+        m_vertexArrayObject->drawLines();
     }
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -166,5 +166,5 @@ void RenderableMesh::render(Canvas * canvas, const size_t renderStage)
 
 void RenderableMesh::ensureVAO()
 {
-	vertexArrayObject->ensureVAO();
+	m_vertexArrayObject->ensureVAO();
 }

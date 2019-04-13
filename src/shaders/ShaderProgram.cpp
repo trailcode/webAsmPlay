@@ -126,9 +126,9 @@ ShaderProgram * ShaderProgram::create(const GLSL & programs, const Variables& at
 
 ShaderProgram::ShaderProgram(   const GLuint                         shaderProgram,
                                 const unordered_map<string, GLint> & uniforms,
-                                const unordered_map<string, GLint> & attributes) :  shaderProgram        (shaderProgram),
-                                                                                    uniforms             (uniforms),
-                                                                                    attributes           (attributes)
+                                const unordered_map<string, GLint> & attributes) :  m_shaderProgram (shaderProgram),
+                                                                                    m_uniforms      (uniforms),
+                                                                                    m_attributes    (attributes)
 {
 } 
 
@@ -137,15 +137,15 @@ ShaderProgram::~ShaderProgram()
     // TODO Cleanup!
 }
 
-void ShaderProgram::bind() { GL_CHECK(glUseProgram(shaderProgram)) ;}
+void ShaderProgram::bind() { GL_CHECK(glUseProgram(m_shaderProgram)) ;}
 
-GLuint ShaderProgram::getProgramHandle() const { return shaderProgram ;}
+GLuint ShaderProgram::getProgramHandle() const { return m_shaderProgram ;}
 
 GLint ShaderProgram::getUniformLoc(const string & name) const
 {
-    const auto i = uniforms.find(name);
+    const auto i = m_uniforms.find(name);
 
-    if(i == uniforms.end())
+    if(i == m_uniforms.end())
     {
         dmess("Error uniform: " << name << " not found!");
 
@@ -157,9 +157,9 @@ GLint ShaderProgram::getUniformLoc(const string & name) const
 
 GLint ShaderProgram::getAttributeLoc(const string & name) const
 {
-    const auto i = attributes.find(name);
+    const auto i = m_attributes.find(name);
 
-    if(i == attributes.end())
+    if(i == m_attributes.end())
     {
         dmess("Error uniform: " << name << " not found!");
 

@@ -163,7 +163,7 @@ void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutlin
 
     GL_CHECK(glEnable(GL_DEPTH_TEST));
 
-    shaderProgramDepth->setUniformf(heightMultiplierDepth,    heightMultiplier);
+    shaderProgramDepth->setUniformf(heightMultiplierDepth,    m_heightMultiplier);
     shaderProgramDepth->setUniform (modelDepth,               canvas->getModelRef());
     shaderProgramDepth->setUniform (viewDepth,                canvas->getViewRef());
     shaderProgramDepth->setUniform (projectionDepth,          canvas->getProjectionRef());
@@ -177,7 +177,7 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
 
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorSymbology->getTextureID()));
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID()));
 
     GL_CHECK(glActiveTexture(GL_TEXTURE1));
 
@@ -202,7 +202,7 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
 		shaderProgramFill->setUniformi(topDownTextureUniformFill,		2);
         shaderProgramFill->setUniformf(widthUniformFill,				canvas->getFrameBufferSize().x);
         shaderProgramFill->setUniformf(heightUniformFill,				canvas->getFrameBufferSize().y);
-        shaderProgramFill->setUniformf(heightMultiplierFill,			heightMultiplier);
+        shaderProgramFill->setUniformf(heightMultiplierFill,			m_heightMultiplier);
         shaderProgramFill->setUniform (modelFill,						canvas->getModelRef());
         shaderProgramFill->setUniform (viewFill,						canvas->getViewRef());
         shaderProgramFill->setUniform (projectionFill,					canvas->getProjectionRef());
@@ -211,14 +211,14 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
 		shaderProgramFill->setUniform(invViewMatrixFiLL,	inverse(canvas->getViewRef()));
 		shaderProgramFill->setUniform(MVP_Fill, canvas->getMVP_Ref());
 
-        shaderProgramFill->setUniform (lightPosUniformFill,				lightPos);
+        shaderProgramFill->setUniform (lightPosUniformFill,				m_lightPos);
         shaderProgramFill->setUniformf(colorLookupOffsetFill,			0.0f);
     }
     else
     {
         shaderProgramOutline->bind();
         
-        shaderProgramOutline->setUniformf(heightMultiplierOutline,  heightMultiplier);
+        shaderProgramOutline->setUniformf(heightMultiplierOutline,  m_heightMultiplier);
         shaderProgramOutline->setUniformi(depthTexUniformOutline,   1);
         shaderProgramOutline->setUniformf(widthUniformOutline,      canvas->getFrameBufferSize().x);
         shaderProgramOutline->setUniformf(heightUniformOutline,     canvas->getFrameBufferSize().y);
@@ -238,12 +238,10 @@ bool ColorDistanceDepthShader3D::shouldRender(const bool isOutline, const size_t
     return false;
 }
 
-float ColorDistanceDepthShader3D::setHeightMultiplier(const float multiplier) { return heightMultiplier = multiplier ;}
+float ColorDistanceDepthShader3D::setHeightMultiplier(const float multiplier)	{ return m_heightMultiplier = multiplier ;}
+float ColorDistanceDepthShader3D::getHeightMultiplier() const					{ return m_heightMultiplier				 ;}
 
-float ColorDistanceDepthShader3D::getHeightMultiplier() const { return heightMultiplier ;}
-
-vec3 ColorDistanceDepthShader3D::setLightPos(const vec3 & pos) { return lightPos = pos ;}
-
-vec3 ColorDistanceDepthShader3D::getLightPos() const { return lightPos ;}
+vec3 ColorDistanceDepthShader3D::setLightPos(const vec3 & pos)	{ return m_lightPos = pos ;}
+vec3 ColorDistanceDepthShader3D::getLightPos() const			{ return m_lightPos		  ;}
 
 size_t ColorDistanceDepthShader3D::getNumRenderingStages() const { return 2 ;}

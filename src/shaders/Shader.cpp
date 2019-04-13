@@ -31,14 +31,14 @@
 using namespace std;
 using namespace glm;
 
-Shader::Shader(const string  & shaderName) :    shaderName      (shaderName),
-                                                colorSymbology  (ColorSymbology::getInstance("defaultPolygon")) {}
+Shader::Shader(const string  & shaderName) :    m_shaderName     (shaderName),
+                                                m_colorSymbology (ColorSymbology::getInstance("defaultPolygon")) {}
 
-string Shader::getName() const { return shaderName ;}
+string Shader::getName() const { return m_shaderName ;}
 
 size_t Shader::getNumRenderingStages() const { return 1 ;}
 
 bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) const { return renderingStage == 0 ;}
 
-ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return this->colorSymbology = colorSymbology ;}
-ColorSymbology * Shader::getColorSymbology() const { return colorSymbology ;}
+ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return m_colorSymbology = colorSymbology	;}
+ColorSymbology * Shader::getColorSymbology() const							{ return m_colorSymbology					;}

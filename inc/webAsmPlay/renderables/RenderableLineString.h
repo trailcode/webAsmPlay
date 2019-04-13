@@ -71,9 +71,9 @@ private:
                                 const Uint32Vec  & indices,
                                 const bool         isMulti);
 
-    GLuint vao = 0;
+    GLuint m_vao = 0;
 
-    const GLuint ebo;
-    const GLuint vbo;
-    const size_t numElements;
+    const GLuint m_ebo;
+    const GLuint m_vbo;
+    const size_t m_numElements;
 };

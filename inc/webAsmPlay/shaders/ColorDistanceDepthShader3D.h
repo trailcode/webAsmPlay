@@ -25,8 +25,6 @@
 */
 #pragma once
 
-#include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
 #include <webAsmPlay/shaders/Shader.h>
 
 class ColorDistanceDepthShader3D : public Shader
@@ -59,7 +57,7 @@ private:
     void bindStage0(Canvas * canvas, const bool isOutline);
     void bindStage1(Canvas * canvas, const bool isOutline);
 
-    float heightMultiplier = 1.0f;
+    float m_heightMultiplier = 1.0f;
 
-    glm::vec3 lightPos;
+    glm::vec3 m_lightPos;
 };

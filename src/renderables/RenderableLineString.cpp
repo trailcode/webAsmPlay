@@ -39,20 +39,20 @@ using namespace geosUtil;
 RenderableLineString::RenderableLineString( const GLuint  ebo,
                                             const GLuint  vbo,
                                             const size_t  numElements,
-                                            const bool    isMulti) :    Renderable(  isMulti,
-                                                                                     false,
-                                                                                     GUI::renderSettingsRenderPolygonOutlines),
-                                                                        ebo         (ebo),
-                                                                        vbo         (vbo),
-                                                                        numElements (numElements)
+                                            const bool    isMulti) :    Renderable(   isMulti,
+                                                                                      false,
+                                                                                      GUI::renderSettingsRenderPolygonOutlines),
+                                                                        m_ebo        (ebo),
+                                                                        m_vbo        (vbo),
+                                                                        m_numElements(numElements)
 {
 }
 
 RenderableLineString::~RenderableLineString()
 {
-    GL_CHECK(glDeleteVertexArrays(1, &vao));
-    GL_CHECK(glDeleteBuffers     (1, &ebo));
-    GL_CHECK(glDeleteBuffers     (1, &vbo));
+    GL_CHECK(glDeleteVertexArrays(1, &m_vao));
+    GL_CHECK(glDeleteBuffers     (1, &m_ebo));
+    GL_CHECK(glDeleteBuffers     (1, &m_vbo));
 }
 
 Renderable * RenderableLineString::create(  const LineString * lineString,
@@ -201,15 +201,15 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
 
 void RenderableLineString::ensureVAO()
 {
-	if(vao) { return ;}
+	if(m_vao) { return ;}
 
-	GL_CHECK(glGenVertexArrays(1, &vao));
+	GL_CHECK(glGenVertexArrays(1, &m_vao));
 
-	GL_CHECK(glBindVertexArray(vao));
+	GL_CHECK(glBindVertexArray(m_vao));
 
-	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
 
-	if(!isMulti)
+	if(!m_isMulti)
 	{
 		const size_t totalSize = 2 * sizeof(GLfloat);
 
@@ -233,27 +233,27 @@ void RenderableLineString::ensureVAO()
 
 void RenderableLineString::render(Canvas * canvas, const size_t renderStage)
 {
-    if(!shader->shouldRender(true, renderStage)) { return ;}
+    if(!m_shader->shouldRender(true, renderStage)) { return ;}
 
     if(!getRenderOutline()) { return ;}
 
-    GL_CHECK(glBindVertexArray(                    vao));
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
+    GL_CHECK(glBindVertexArray(                    m_vao));
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo));
     GL_CHECK(glDisable(GL_DEPTH_TEST));
 
 	GL_CHECK(glLineWidth(GUI::lineWidthRender));
 
-    if(!isMulti)
+    if(!m_isMulti)
     {
-        shader->bind(canvas, true, renderStage);
+        m_shader->bind(canvas, true, renderStage);
 
-        GL_CHECK(glDrawElements(GL_LINE_STRIP, (GLsizei)numElements, GL_UNSIGNED_INT, NULL));
+        GL_CHECK(glDrawElements(GL_LINE_STRIP, (GLsizei)m_numElements, GL_UNSIGNED_INT, NULL));
     }
     else
     {
-        shader->bind(canvas, true, renderStage);
+        m_shader->bind(canvas, true, renderStage);
 
-        GL_CHECK(glDrawElements(GL_LINES, (GLsizei)numElements, GL_UNSIGNED_INT, NULL));
+        GL_CHECK(glDrawElements(GL_LINES, (GLsizei)m_numElements, GL_UNSIGNED_INT, NULL));
     }
 
     GL_CHECK(glBindVertexArray(0));

@@ -186,7 +186,7 @@ struct Plane
 
         percent =  getDistanceFromPlane(lineStart) / lineLength;
 
-        if(percent < 0.0f | percent > 1.0f) { return false ;}
+        if((percent < 0.0f) | (percent > 1.0f)) { return false ;}
 
         intersection = lineStart + (direction * percent);
 

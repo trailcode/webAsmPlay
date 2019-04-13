@@ -35,9 +35,9 @@ using namespace glm;
 
 namespace
 {
-    vector<GLfloat> vertsAndColors;
-    vector<GLuint>  triangleIndices;
-    vector<GLuint>  lineIndices;
+    vector<GLfloat> g_vertsAndColors;
+    vector<GLuint>  g_triangleIndices;
+    vector<GLuint>  g_lineIndices;
 
     inline void addTriangle(const vec3  & A,
                             const vec3  & B,
@@ -53,26 +53,26 @@ namespace
 
         memcpy(vertsAndColorsPtr, value_ptr(color), sizeof(GLfloat) * 4); vertsAndColorsPtr += 4;
 
-        *triangleIndicesPtr = startIndex++; ++triangleIndicesPtr;
-        *triangleIndicesPtr = startIndex++; ++triangleIndicesPtr;
-        *triangleIndicesPtr = startIndex++; ++triangleIndicesPtr;
+        *triangleIndicesPtr = (GLuint)startIndex++; ++triangleIndicesPtr;
+        *triangleIndicesPtr = (GLuint)startIndex++; ++triangleIndicesPtr;
+        *triangleIndicesPtr = (GLuint)startIndex++; ++triangleIndicesPtr;
     }
 }
 
 DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
 {
-	if (!vertsAndColors.size()) { return NULL; }
+	if (!g_vertsAndColors.size()) { return NULL; }
 
     GLuint vao  = 0;
     GLuint ebo  = 0;
     GLuint ebo2 = 0;
     GLuint vbo  = 0;
     
-    for(size_t i = 0; i < vertsAndColors.size(); i += 7)
+    for(size_t i = 0; i < g_vertsAndColors.size(); i += 7)
     {
-        const vec3 pos(trans * dvec4(*(vec3 *)&vertsAndColors[i], 1.0));
+        const vec3 pos(trans * dvec4(*(vec3 *)&g_vertsAndColors[i], 1.0));
 
-        memcpy(&vertsAndColors[i], &pos, sizeof(vec3));
+        memcpy(&g_vertsAndColors[i], &pos, sizeof(vec3));
     }
 
     GL_CHECK(glGenVertexArrays(1, &vao));
@@ -84,13 +84,13 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
 
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
 
-    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, vertsAndColors.size() * sizeof(GLfloat), &vertsAndColors[0], GL_STATIC_DRAW));
+    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, g_vertsAndColors.size() * sizeof(GLfloat), &g_vertsAndColors[0], GL_STATIC_DRAW));
     
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * triangleIndices.size(), &triangleIndices[0], GL_STATIC_DRAW));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_triangleIndices.size(), &g_triangleIndices[0], GL_STATIC_DRAW));
     
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
+    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_lineIndices.size(), &g_lineIndices[0], GL_STATIC_DRAW));
 
     // TODO use VertexArrayObject
 
@@ -107,35 +107,35 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
 
     GL_CHECK(glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex) * sizeof(GLfloat))));
 
-    DeferredRenderable * ret = new DeferredRenderable(vao, ebo, ebo2, vbo, triangleIndices.size(), lineIndices.size());
+    DeferredRenderable * ret = new DeferredRenderable(vao, ebo, ebo2, vbo, (GLuint)g_triangleIndices.size(), (GLuint)g_lineIndices.size());
 
-    vertsAndColors .clear();
-    triangleIndices.clear();
-    lineIndices    .clear();
+    g_vertsAndColors .clear();
+    g_triangleIndices.clear();
+    g_lineIndices    .clear();
 
     return ret;
 }
 
 void DeferredRenderable::setFromQueued(const glm::dmat4& trans)
 {
-	for (size_t i = 0; i < vertsAndColors.size(); i += 7)
+	for (size_t i = 0; i < g_vertsAndColors.size(); i += 7)
 	{
-		const vec3 pos(trans * dvec4(*(vec3*)& vertsAndColors[i], 1.0));
+		const vec3 pos(trans * dvec4(*(vec3*)& g_vertsAndColors[i], 1.0));
 
-		memcpy(&vertsAndColors[i], &pos, sizeof(vec3));
+		memcpy(&g_vertsAndColors[i], &pos, sizeof(vec3));
 	}
 
-	GL_CHECK(glBindVertexArray(vao));
+	GL_CHECK(glBindVertexArray(m_vao));
 
-	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
 
-	GL_CHECK(glBufferData(GL_ARRAY_BUFFER, vertsAndColors.size() * sizeof(GLfloat), &vertsAndColors[0], GL_DYNAMIC_DRAW));
+	GL_CHECK(glBufferData(GL_ARRAY_BUFFER, g_vertsAndColors.size() * sizeof(GLfloat), &g_vertsAndColors[0], GL_DYNAMIC_DRAW));
 
-	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-	GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * triangleIndices.size(), &triangleIndices[0], GL_DYNAMIC_DRAW));
+	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo));
+	GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_triangleIndices.size(), &g_triangleIndices[0], GL_DYNAMIC_DRAW));
 
-	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
-	GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_DYNAMIC_DRAW));
+	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2));
+	GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_lineIndices.size(), &g_lineIndices[0], GL_DYNAMIC_DRAW));
 
 	const size_t sizeVertex = 3;
 	const size_t sizeColor = 4;
@@ -150,12 +150,12 @@ void DeferredRenderable::setFromQueued(const glm::dmat4& trans)
 
 	GL_CHECK(glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void*)((sizeVertex) * sizeof(GLfloat))));
 
-	numTriIndices	= triangleIndices.size();
-	numLineIndices	= lineIndices.size();
+	m_numTriIndices		= (GLuint)g_triangleIndices.size();
+	m_numLineIndices	= (GLuint)g_lineIndices.size();
 
-	vertsAndColors.clear();
-	triangleIndices.clear();
-	lineIndices.clear();
+	g_vertsAndColors .clear();
+	g_triangleIndices.clear();
+	g_lineIndices    .clear();
 }
 
 DeferredRenderable::DeferredRenderable( const GLuint & vao,
@@ -163,38 +163,38 @@ DeferredRenderable::DeferredRenderable( const GLuint & vao,
                                         const GLuint & ebo2,
                                         const GLuint & vbo,
                                         const GLuint & numTriIndices,
-                                        const GLuint & numLineIndices) : Renderable    (false,
-                                                                                        GUI::renderSettingsFillPolygons,
-                                                                                        GUI::renderSettingsRenderPolygonOutlines),
-                                                                         vao           (vao),
-                                                                         ebo           (ebo),
-                                                                         ebo2          (ebo2),
-                                                                         vbo           (vbo),
-                                                                         numTriIndices (numTriIndices),
-                                                                         numLineIndices(numLineIndices)
+                                        const GLuint & numLineIndices) : Renderable      (false,
+                                                                                          GUI::renderSettingsFillPolygons,
+																						  GUI::renderSettingsRenderPolygonOutlines),
+                                                                         m_vao           (vao),
+                                                                         m_ebo           (ebo),
+                                                                         m_ebo2          (ebo2),
+                                                                         m_vbo           (vbo),
+                                                                         m_numTriIndices (numTriIndices),
+                                                                         m_numLineIndices(numLineIndices)
 {
     setShader(ColorVertexShader::getDefaultInstance());
 }
 
 DeferredRenderable::~DeferredRenderable()
 {
-    GL_CHECK(glDeleteVertexArrays(1, &vao));
-    GL_CHECK(glDeleteBuffers     (1, &vbo));
-    GL_CHECK(glDeleteBuffers     (1, &ebo));
-    GL_CHECK(glDeleteBuffers     (1, &ebo2));
+    GL_CHECK(glDeleteVertexArrays(1, &m_vao));
+    GL_CHECK(glDeleteBuffers     (1, &m_vbo));
+    GL_CHECK(glDeleteBuffers     (1, &m_ebo));
+    GL_CHECK(glDeleteBuffers     (1, &m_ebo2));
 }
 
 namespace
 {
     inline void addVert(const vec3 & v, const vec4 & color)
     {
-        vertsAndColors.push_back(v.x * 0.1);
-        vertsAndColors.push_back(v.y * 0.1);
-        vertsAndColors.push_back(v.z * 0.1);
-        vertsAndColors.push_back(color.x);
-        vertsAndColors.push_back(color.y);
-        vertsAndColors.push_back(color.z);
-        vertsAndColors.push_back(color.w);
+        g_vertsAndColors.push_back(float(v.x * 0.1));
+        g_vertsAndColors.push_back(float(v.y * 0.1));
+        g_vertsAndColors.push_back(float(v.z * 0.1));
+        g_vertsAndColors.push_back(float(color.x));
+        g_vertsAndColors.push_back(float(color.y));
+        g_vertsAndColors.push_back(float(color.z));
+        g_vertsAndColors.push_back(float(color.w));
     }
 }
 
@@ -202,13 +202,13 @@ void DeferredRenderable::addLine(const vec3 & A,
                                  const vec3 & B,
                                  const vec4 & color)
 {
-    const size_t index = vertsAndColors.size() / 7;
+    const size_t index = g_vertsAndColors.size() / 7;
 
     addVert(A, color);
     addVert(B, color);
     
-    lineIndices.push_back(index + 0);
-    lineIndices.push_back(index + 1);
+    g_lineIndices.push_back((uint32_t)index + 0);
+    g_lineIndices.push_back((uint32_t)index + 1);
 }
 
 void DeferredRenderable::addTriangle(const vec3 & A,
@@ -216,15 +216,15 @@ void DeferredRenderable::addTriangle(const vec3 & A,
                                      const vec3 & C,
                                      const vec4 & color)
 {
-    const size_t index = vertsAndColors.size() / 7;
+    const size_t index = g_vertsAndColors.size() / 7;
 
     addVert(A, color);
     addVert(B, color);
     addVert(C, color);
 
-    triangleIndices.push_back(index + 0);
-    triangleIndices.push_back(index + 1);
-    triangleIndices.push_back(index + 2);
+    g_triangleIndices.push_back((uint32_t)index + 0);
+    g_triangleIndices.push_back((uint32_t)index + 1);
+    g_triangleIndices.push_back((uint32_t)index + 2);
 }
 
 void DeferredRenderable::addQuadrangle( const vec3 & A,
@@ -233,8 +233,6 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
                                         const vec3 & D,
                                         const vec4 & color)
 {
-    const size_t index = vertsAndColors.size() / 7;
-
     addVert(A, color);
     addVert(B, color);
     addVert(C, color);
@@ -242,34 +240,35 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
     addVert(C, color);
     addVert(D, color);
 
-    triangleIndices.push_back(index + 0);
-    triangleIndices.push_back(index + 1);
-    triangleIndices.push_back(index + 2);
-    triangleIndices.push_back(index + 3);
-    triangleIndices.push_back(index + 4);
-    triangleIndices.push_back(index + 5);
+	const size_t index = g_vertsAndColors.size() / 7;
+
+    g_triangleIndices.push_back((uint32_t)index + 0);
+    g_triangleIndices.push_back((uint32_t)index + 1);
+    g_triangleIndices.push_back((uint32_t)index + 2);
+    g_triangleIndices.push_back((uint32_t)index + 3);
+    g_triangleIndices.push_back((uint32_t)index + 4);
+    g_triangleIndices.push_back((uint32_t)index + 5);
 }
 
 void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)
 {
-    if(!shader->shouldRender(false, renderStage)) { return ;}
+    if(!m_shader->shouldRender(false, renderStage)) { return ;}
 
-    GL_CHECK(glBindVertexArray(vao));
-    
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         vbo));
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
+    GL_CHECK(glBindVertexArray(					   m_vao));
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         m_vbo));
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo));
 
     glDisable(GL_DEPTH_TEST);
 
     canvas->pushModel(rotate(canvas->getModelRef(), radians(-90.0), dvec3(1, 0, 0)));
 
-    shader->bind(canvas, false, renderStage);
+    m_shader->bind(canvas, false, renderStage);
+    
+    GL_CHECK(glDrawElements(GL_TRIANGLES, m_numTriIndices, GL_UNSIGNED_INT, NULL));
 
-    GL_CHECK(glDrawElements(GL_TRIANGLES, numTriIndices, GL_UNSIGNED_INT, NULL));
+    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2));
 
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
-
-    GL_CHECK(glDrawElements(GL_LINES, numLineIndices, GL_UNSIGNED_INT, NULL));
+    GL_CHECK(glDrawElements(GL_LINES, m_numLineIndices, GL_UNSIGNED_INT, NULL));
 
     canvas->popMVP();
 }

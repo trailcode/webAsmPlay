@@ -27,8 +27,9 @@ if(MSVC_VERSION)
 	  execute_process(COMMAND ${NUGET} install curl-vc141-dynamic-x86_64	-Version 7.59.0		-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install glfw							-Version 3.2.1.5	-o thirdParty)
 	  execute_process(COMMAND ${NUGET} install unofficial-flayan-glew		-Version 2.1.0		-o thirdParty)
-	  execute_process(COMMAND ${NUGET} install tbb_oss						-Version 9.107.0	-o thirdParty)
-	  execute_process(COMMAND ${NUGET} install expat						-Version 2.1.0.11	-o thirdParty)
+      #execute_process(COMMAND ${NUGET} install tbb							-Version 4.2.3.1	-o thirdParty)
+      execute_process(COMMAND ${NUGET} install tbb_oss						-Version 9.107.0	-o thirdParty)
+	  execute_process(COMMAND ${NUGET} install expat.v140					-Version 2.2.6		-o thirdParty)
 
 	  file(GLOB boost_files ${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc141.1.69.0.0/lib/native/*
 							${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc141.1.69.0.0/lib/native/*
@@ -50,8 +51,11 @@ if(MSVC_VERSION)
 	set(GLEW_LOCATION					${webAsmPlay_BINARY_DIR}/thirdParty/unofficial-flayan-glew.2.1.0/build/native)
 	set(GLFW_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/glfw.3.2.1.5/build/native)
 	set(TBB_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.9.107.0.0/build/native)
-	set(EXPAT_INCLUDE_SEARCH_DIRS		${webAsmPlay_BINARY_DIR}/thirdParty/expat.2.1.0.11/build/native/include)
-    set(EXPAT_LIB_SEARCH_DIRS			${webAsmPlay_BINARY_DIR}/thirdParty/expat.2.1.0.11/build/native/lib/v110/x64)
+	set(TBB_tbb_debug_LIBRARY			${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.9.107.0.0/build/native/lib/x64/Debug/)
+	set(TBB_tbb_LIBRARY					${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.9.107.0.0/build/native/lib/x64/Release/)
+	set(EXPAT_INCLUDE_SEARCH_DIRS		${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/include)
+    set(EXPAT_LIB_SEARCH_DIRS			${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/lib/x64/Debug/
+										${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/lib/x64/Release/)
 	set(CURL_INCLUDE_DIR				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/include)
 	set(CURL_LIBRARY_RELEASE			${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl.lib)
 	set(CURL_LIBRARY_DEBUG				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl_debug.lib)
@@ -285,12 +289,13 @@ else()
     include_directories(./)
     
     link_libraries(debug ${CURL_LIBRARY_DEBUG} optimized ${CURL_LIBRARY_RELEASE})
+	link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG} optimized ${TBB_tbb_LIBRARY_RELEASE})
 
     if(APPLE) # TODO Try to remove.
 
-        link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
-        link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG} optimized ${Boost_RANDOM_LIBRARY_RELEASE})
-        link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
+        link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG}	optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
+        link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG}		optimized ${Boost_RANDOM_LIBRARY_RELEASE})
+        link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG}		optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
 
     endif()
 
@@ -304,11 +309,10 @@ else()
     if(MSVC_VERSION)
 
         #link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG} optimized ${TBB_tbb_LIBRARY_RELEASE})
-		link_libraries(${TBB_tbb_LIBRARY_RELEASE})
 
     else()
 
-        link_libraries(${TBB_tbb_LIBRARY_RELEASE})
+        #link_libraries(${TBB_tbb_LIBRARY_RELEASE})
 
     endif()
     
@@ -401,7 +405,7 @@ else()
 
 		endif()
 
-    endforeach(shaderFile)
+    endforeach(shaderFilePath)
 
 	if(MSVC_VERSION)
 
@@ -446,11 +450,9 @@ else()
     
 	target_include_directories(geoServer PRIVATE "ThirdParty/LAStools")
 	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
-	#target_include_directories(geoServer PRIVATE ${Boost_INCLUDE_DIRS})
-
 
 	target_link_libraries(geoServer libWebAsmPlay)
-    target_link_libraries(geoServer ${EXPAT_LIBRARIES}
+    target_link_libraries(geoServer debug ${EXPAT_LIBRARY_DEBUG} optimized ${EXPAT_LIBRARY_RELEASE}
                             #debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE}
                             #debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
 							)
@@ -484,13 +486,12 @@ else()
 
         set(DLLS_RELEASE	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Release/tbb.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/expat.redist.2.1.0.11/build/native/bin/v110/x64/Release/dynamic/utf8/libexpat.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/bin/x64/Release/libexpat.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl.dll)
 
 		set(DLLS_DEBUG	
-							#${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Debug/tbb_debug.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Release/tbb.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/expat.redist.2.1.0.11/build/native/bin/v110/x64/Debug/dynamic/utf8/libexpat.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Debug/tbb_debug.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/bin/x64/Debug/libexpatd.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl_debug.dll)
 
 

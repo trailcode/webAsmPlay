@@ -66,10 +66,10 @@ private:
                         const GLuint & numTriIndices,
                         const GLuint & numLineIndices);
 
-    const GLuint vao;
-    const GLuint ebo;
-    const GLuint ebo2;
-    const GLuint vbo;
-    GLuint		 numTriIndices;
-    GLuint		 numLineIndices;
+    const GLuint m_vao;
+    const GLuint m_ebo;
+    const GLuint m_ebo2;
+    const GLuint m_vbo;
+    GLuint		 m_numTriIndices;
+    GLuint		 m_numLineIndices;
 };

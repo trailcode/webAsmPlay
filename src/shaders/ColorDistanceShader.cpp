@@ -86,7 +86,7 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 {
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, colorSymbology->getTextureID()));
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID()));
 
 	GL_CHECK(glActiveTexture(GL_TEXTURE1));
 

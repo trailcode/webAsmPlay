@@ -45,16 +45,16 @@ using namespace glm;
 using namespace geos;
 using namespace geos::geom;
 
-RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable(vertexArrayObject->isMulti(),
-                                                                                           GUI::renderSettingsFillPolygons,
-                                                                                           GUI::renderSettingsRenderPolygonOutlines),
-                                                                                vertexArrayObject(vertexArrayObject)
+RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable(			vertexArrayObject->isMulti(),
+																									GUI::renderSettingsFillPolygons,
+																									GUI::renderSettingsRenderPolygonOutlines),
+                                                                                m_vertexArrayObject(vertexArrayObject)
 {
 }
 
 RenderablePolygon::~RenderablePolygon()
 {
-    delete vertexArrayObject;
+    delete m_vertexArrayObject;
 }
 
 Renderable * RenderablePolygon::create( const Polygon * poly,
@@ -155,9 +155,9 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
 
 void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
 {
-    vertexArrayObject->bind(shader);
+    m_vertexArrayObject->bind(m_shader);
 
-    vertexArrayObject->bindTriangles();
+    m_vertexArrayObject->bindTriangles();
 
     GL_CHECK(glEnable(GL_BLEND)); // TODO move into shader
 
@@ -165,24 +165,24 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
 
     GL_CHECK(glDisable(GL_DEPTH_TEST));
 
-    if(getRenderFill() && shader->shouldRender(false, renderStage))
+    if(getRenderFill() && m_shader->shouldRender(false, renderStage))
     {
-        shader->bind(canvas, false, renderStage);
+        m_shader->bind(canvas, false, renderStage);
 
-        vertexArrayObject->drawTriangles();
+        m_vertexArrayObject->drawTriangles();
     }
 
-    if(getRenderOutline() && shader->shouldRender(true, renderStage))
+    if(getRenderOutline() && m_shader->shouldRender(true, renderStage))
     {
-        shader->bind(canvas, true, renderStage);
+        m_shader->bind(canvas, true, renderStage);
 
-        vertexArrayObject->bindLines();
+        m_vertexArrayObject->bindLines();
         
-        vertexArrayObject->drawLines();
+        m_vertexArrayObject->drawLines();
     }
 }
 
 void RenderablePolygon::ensureVAO()
 {
-	vertexArrayObject->ensureVAO();
+	m_vertexArrayObject->ensureVAO();
 }

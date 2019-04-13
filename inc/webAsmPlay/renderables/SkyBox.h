@@ -47,9 +47,9 @@ private:
 
     static void ensureShader();
 
-    GLuint texID;
-    GLuint vbo;
-    GLuint vao;
+    GLuint m_texID = 0;
+    GLuint m_vbo   = 0;
+    GLuint m_vao   = 0;
 
-    glm::mat4 model;
+    glm::mat4 m_model;
 };
