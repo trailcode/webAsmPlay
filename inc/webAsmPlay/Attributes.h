@@ -38,7 +38,6 @@ public:
     typedef std::unordered_map<std::string, int32_t>		Ints32;
     typedef std::unordered_map<std::string, int64_t>		Ints64;
     typedef std::unordered_map<std::string, uint32_t>		UInts32;
-	typedef std::unordered_map<std::string, uint32_t>		UInts32;
     typedef std::unordered_map<std::string, uint64_t>		UInts64;
     typedef std::unordered_map<std::string, double >		Doubles;
     typedef std::unordered_map<std::string, std::string>	Strings;
