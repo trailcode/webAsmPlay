@@ -24,14 +24,8 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
+#pragma once
 
-#ifndef __WEB_ASM_PLAY__DATA_MODEL_OSM__H__
-#define __WEB_ASM_PLAY__DATA_MODEL_OSM__H__
-
-#include <memory>
-#include <vector>
-#include <string>
-#include <glm/vec2.hpp>
 #include <geos/geom/Geometry.h>
 #include <webAsmPlay/Attributes.h>
 
@@ -83,45 +77,45 @@ namespace dataModelOSM
 
     struct OSM_Base
     {
-        OSM_Base() : attrs(new Attributes()) {}
+        OSM_Base() : m_attrs(new Attributes()) {}
 
-        std::unique_ptr<Attributes> attrs;
+        std::unique_ptr<Attributes> m_attrs;
     };
 
     struct OSM_Member
     {
-        std::string role;
-        uint64_t    ref;
-        std::string type;
+        std::string m_role;
+        uint64_t    m_ref;
+        std::string m_type;
     };
 
     struct OSM_Relation : OSM_Base
     {
-        OSM_Relation() : relation(NULL) {}
+        OSM_Relation() {}
 
-        std::vector<const OSM_Member *> members;
+        std::vector<const OSM_Member *> m_members;
 
-        Relation * relation;
+        Relation * m_relation = NULL;
     };
 
     struct OSM_Node : OSM_Base
     {
-        glm::dvec2 pos;
+        glm::dvec2 m_pos;
 
-        std::vector<OSM_Relation *> relations;
+        std::vector<OSM_Relation *> m_relations;
     };
 
     struct OSM_Way : OSM_Base
     {
-        OSM_Way() : used(false) {}
+        OSM_Way() {}
 
-        std::vector<const OSM_Node *> nodes;
+        std::vector<const OSM_Node *> m_nodes;
 
-        bool used;
+        bool used = false;
 
-        std::unique_ptr<geos::geom::Geometry> geom;
+        std::unique_ptr<geos::geom::Geometry> m_geom;
 
-        std::vector<OSM_Relation *> relations;
+        std::vector<OSM_Relation *> m_relations;
     };
 
     size_t getKey(const std::string & key);
@@ -134,5 +128,3 @@ namespace dataModelOSM
     typedef std::unordered_map<uint64_t, OSM_Way      *> OSM_Ways;
     typedef std::unordered_map<uint64_t, OSM_Relation *> OSM_Relations;
 }
-
-#endif // __WEB_ASM_PLAY__DATA_MODEL_OSM__H__

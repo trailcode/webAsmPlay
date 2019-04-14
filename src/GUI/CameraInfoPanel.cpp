@@ -34,30 +34,30 @@ using namespace glm;
 
 void GUI::cameraInfoPanel()
 {
-    if(!showCameraInfoPanel) { return ;}
+    if(!s_showCameraInfoPanel) { return ;}
 
-    ImGui::Begin("Camera", &showCameraInfoPanel);
+    ImGui::Begin("Camera", &s_showCameraInfoPanel);
 
     if(ImGui::CollapsingHeader("Orientation", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::Text(("   Eye: " + toStr(canvas->getCamera()->getEyeConstRef()))   .c_str());
-        ImGui::Text(("Center: " + toStr(canvas->getCamera()->getCenterConstRef())).c_str());
-        ImGui::Text(("    Up: " + toStr(canvas->getCamera()->getUpConstRef()))    .c_str());
+        ImGui::Text(("   Eye: " + toStr(s_canvas->getCamera()->getEyeConstRef()))   .c_str());
+        ImGui::Text(("Center: " + toStr(s_canvas->getCamera()->getCenterConstRef())).c_str());
+        ImGui::Text(("    Up: " + toStr(s_canvas->getCamera()->getUpConstRef()))    .c_str());
     }
 
     if(ImGui::CollapsingHeader("View Matrix", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::Text(toStr(canvas->getViewRef()).c_str());
+        ImGui::Text(toStr(s_canvas->getViewRef()).c_str());
     }
 
     if(ImGui::CollapsingHeader("MVP Matrix", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::Text(toStr(canvas->getMVP_Ref()).c_str());
+        ImGui::Text(toStr(s_canvas->getMVP_Ref()).c_str());
     }
 
 	if(ImGui::CollapsingHeader("Cursor Position", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::Text(("Local pos: " + toStr(vec3(canvas->getCursorPosWC()))).c_str());
+		ImGui::Text(("Local pos: " + toStr(vec3(s_canvas->getCursorPosWC()))).c_str());
 	}
 
     ImGui::End();

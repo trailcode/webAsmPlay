@@ -105,7 +105,7 @@ CoordinateArraySequence * dataModelOSM::getGeosCoordinateSequence(const vector<c
     {
         const OSM_Node * n = nodes[i];
 
-        (*coords)[i] = Coordinate(n->pos.x, n->pos.y);
+        (*coords)[i] = Coordinate(n->m_pos.x, n->m_pos.y);
     }
 
     return new CoordinateArraySequence(coords, 2);

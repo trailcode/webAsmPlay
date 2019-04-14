@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_ATTRIBUTE_STATISTICS_H__
-#define __WEB_ASM_PLAY_ATTRIBUTE_STATISTICS_H__
+#pragma once
 
 #include <webAsmPlay/Types.h>
 
@@ -37,5 +35,3 @@ public:
 
 private:
 };
-
-#endif

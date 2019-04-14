@@ -29,7 +29,7 @@
 
 void GUI::GUI_Settings_Panel()
 {
-    if(!showGUI_Settings_Panel) { return ;}
+    if(!s_showGUI_Settings_Panel) { return ;}
 
     ImGuiStyle* ref = NULL;
     // You can pass in a reference ImGuiStyle structure to compare to, revert to and save to (else it compares to an internally stored reference)
@@ -44,7 +44,7 @@ void GUI::GUI_Settings_Panel()
     if (ref == NULL)
         ref = &ref_saved_style;
 
-    ImGui::Begin("GUI Configuration", &showGUI_Settings_Panel);
+    ImGui::Begin("GUI Configuration", &s_showGUI_Settings_Panel);
 
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.50f);
 

@@ -86,9 +86,9 @@ namespace
 
 void GUI::symbologyPanel()
 {
-    if(!showSymbologyPanel) { return ;}
+    if(!s_showSymbologyPanel) { return ;}
 
-    ImGui::Begin("Symbology", &showSymbologyPanel);
+    ImGui::Begin("Symbology", &s_showSymbologyPanel);
 
     if (ImGui::CollapsingHeader("Linear Features", ImGuiTreeNodeFlags_DefaultOpen))
     {

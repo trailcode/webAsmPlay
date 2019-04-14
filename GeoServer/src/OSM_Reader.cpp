@@ -165,15 +165,15 @@ MapData OSM_Reader::import(const string & fileName)
         const uint64_t   id  = i.first;
         OSM_Way        * way = i.second;
 
-        const vector<const OSM_Node *> & nodes = way->nodes;
+        const vector<const OSM_Node *> & nodes = way->m_nodes;
 
         CoordinateArraySequence * coords = getGeosCoordinateSequence(nodes); // TODO grow layer AABBB
 
         const GeometryFactory * factory = GeometryFactory::getDefaultInstance();
 
-        if((*nodes.begin())->pos != (*nodes.rbegin())->pos)
+        if((*nodes.begin())->m_pos != (*nodes.rbegin())->m_pos)
         {
-            way->geom = unique_ptr<Geometry>(factory->createLineString(coords));
+            way->m_geom = unique_ptr<Geometry>(factory->createLineString(coords));
         }
         else
         {
@@ -188,7 +188,7 @@ MapData OSM_Reader::import(const string & fileName)
             
             LinearRing * externalRing = factory->createLinearRing(coords);
 
-            way->geom = unique_ptr<Geometry>(factory->createPolygon(externalRing, NULL));
+            way->m_geom = unique_ptr<Geometry>(factory->createPolygon(externalRing, NULL));
         }
     }
 
@@ -203,13 +203,13 @@ MapData OSM_Reader::import(const string & fileName)
         vector<OSM_Way *> outers;
         vector<OSM_Way *> inners;
 
-        for(const OSM_Member * member : i.second->members)
+        for(const OSM_Member * member : i.second->m_members)
         {
-            switch(getRelationKey(member->type))
+            switch(getRelationKey(member->m_type))
             {
                 case OSM_TYPE_NODE:
                 {
-                    OSM_Node * node = getNode(member->ref);
+                    OSM_Node * node = getNode(member->m_ref);
 
                     if(!node)
                     {
@@ -219,13 +219,13 @@ MapData OSM_Reader::import(const string & fileName)
                     }
 
                     // TODO, do we need to clip to the bounds?
-                    ret.geometry.push_back(AttributedGeometry(node->attrs.release(), __(node->pos)));
+                    ret.m_geometry.push_back(AttributedGeometry(node->m_attrs.release(), __(node->m_pos)));
 
                     break;
                 }
                 case OSM_TYPE_WAY:
                 {  
-                    OSM_Way * way = getWay(member->ref);
+                    OSM_Way * way = getWay(member->m_ref);
 
                     if(!way)
                     {
@@ -234,7 +234,7 @@ MapData OSM_Reader::import(const string & fileName)
                         continue;
                     }
 
-                    switch(getRelationKey(member->role))
+                    switch(getRelationKey(member->m_role))
                     {
                         case OSM_ROLE_INNER:
 
@@ -248,7 +248,7 @@ MapData OSM_Reader::import(const string & fileName)
 
                             outers.push_back(way);
 
-                            way->relations.push_back(i.second);
+                            way->m_relations.push_back(i.second);
 
                             break;
                     }
@@ -266,17 +266,17 @@ MapData OSM_Reader::import(const string & fileName)
 
         for(auto inner : inners)
         {
-            if(!inner->geom) { continue ;}
+            if(!inner->m_geom) { continue ;}
 
             for(auto outer : outers)
             {
-                if(!outer->geom) { continue ;}
+                if(!outer->m_geom) { continue ;}
 
                 try
                 {
-                    if(!contains(outer->geom, inner->geom)) { continue ;}
+                    if(!contains(outer->m_geom, inner->m_geom)) { continue ;}
 
-                    if(!subtract(outer->geom, inner->geom)) { ++geomOperationErrors ;}
+                    if(!subtract(outer->m_geom, inner->m_geom)) { ++geomOperationErrors ;}
                 }
                 catch(...) { ++geomOperationErrors ;}
             }
@@ -297,9 +297,9 @@ MapData OSM_Reader::import(const string & fileName)
 
 		try
 		{
-			if (way && way->geom)
+			if (way && way->m_geom)
 			{
-				Geometry* geom = bounds->intersection(way->geom.get());
+				Geometry* geom = bounds->intersection(way->m_geom.get());
 
 				if (!geom)
 				{
@@ -308,9 +308,9 @@ MapData OSM_Reader::import(const string & fileName)
 					continue;
 				}
 
-				Attributes* attrs = way->attrs.release();
+				Attributes* attrs = way->m_attrs.release();
 
-				ret.geometry.push_back(AttributedGeometry(attrs, geom)); // TODO not safe!
+				ret.m_geometry.push_back(AttributedGeometry(attrs, geom)); // TODO not safe!
 			}
 			else
 			{
@@ -330,7 +330,7 @@ MapData OSM_Reader::import(const string & fileName)
 
     for(const auto & i : nodes)
     {
-        if(!i.second->relations.size()) { ++a ;}
+        if(!i.second->m_relations.size()) { ++a ;}
         else { ++b ;}
     }
 
@@ -340,10 +340,10 @@ MapData OSM_Reader::import(const string & fileName)
     dmess("numInvalidPoints " << numInvalidPoints);
     dmess("geomOperationErrors " << geomOperationErrors);
 
-    ret.boundsMinY = boundsMinY;
-    ret.boundsMinX = boundsMinX;
-    ret.boundsMaxY = boundsMaxY;
-    ret.boundsMaxX = boundsMaxX;
+    ret.m_boundsMinY = boundsMinY;
+    ret.m_boundsMinX = boundsMinX;
+    ret.m_boundsMaxY = boundsMaxY;
+    ret.m_boundsMaxX = boundsMaxX;
 
     return ret;
 }
@@ -374,7 +374,7 @@ void OSM_Reader::handleRelation(const char **atts)
 {
     curr = currRelation = new OSM_Relation();
 
-    Attributes * attrs = curr->attrs.get();
+    Attributes * attrs = curr->m_attrs.get();
 
     for(size_t i = 0; atts[i] != NULL; i += 2)
     {
@@ -406,15 +406,15 @@ void OSM_Reader::handleMember(const char **atts)
 {
     OSM_Member * member = new OSM_Member();
 
-    currRelation->members.push_back(member);
+    currRelation->m_members.push_back(member);
 
     for(size_t i = 0; atts[i] != NULL; i += 2)
     {
         switch(getKey(atts[i]))
         {
-            case OSM_KEY_ROLE: member->role = atts[i + 1]; break;
-            case OSM_KEY_REF:  member->ref  = stoull(atts[i + 1]); break;
-            case OSM_KEY_TYPE: member->type = atts[i + 1]; break;
+            case OSM_KEY_ROLE: member->m_role =        atts[i + 1];	 break;
+            case OSM_KEY_REF:  member->m_ref  = stoull(atts[i + 1]); break;
+            case OSM_KEY_TYPE: member->m_type =        atts[i + 1];	 break;
 
             default: dmess("Unknown tag: " << atts[i]);
         }
@@ -437,14 +437,14 @@ void OSM_Reader::handleTag(const char **atts)
         }
     }
 
-    curr->attrs->m_strings[key] = value;
+    curr->m_attrs->m_strings[key] = value;
 }
 
 void OSM_Reader::handleNode(const char **atts)
 {
     curr = currNode = new OSM_Node;
 
-    Attributes * attrs = curr->attrs.get();
+    Attributes * attrs = curr->m_attrs.get();
 
     for(size_t i = 0; atts[i] != NULL; i += 2)
     {
@@ -455,8 +455,8 @@ void OSM_Reader::handleNode(const char **atts)
             case OSM_KEY_USER:      attrs   ->m_strings["userOSM"]      =        atts[i + 1];  break;
             case OSM_KEY_VERSION:   attrs   ->m_uints32["versionOSM"]   =   atoi(atts[i + 1]); break;
             case OSM_KEY_UID:       attrs   ->m_uints32["uidOSM"]       = stoull(atts[i + 1]); break;
-            case OSM_KEY_LAT:       currNode->pos.y                     =   atof(atts[i + 1]); break;
-            case OSM_KEY_LON:       currNode->pos.x                     =   atof(atts[i + 1]); break;
+            case OSM_KEY_LAT:       currNode->m_pos.y                   =   atof(atts[i + 1]); break;
+            case OSM_KEY_LON:       currNode->m_pos.x                   =   atof(atts[i + 1]); break;
 
             case OSM_KEY_ID:
             {
@@ -478,7 +478,7 @@ void OSM_Reader::handleWay(const char **atts)
 {
     curr = currWay = new OSM_Way;
 
-    Attributes * attrs = curr->attrs.get();
+    Attributes * attrs = curr->m_attrs.get();
 
     for(size_t i = 0; atts[i] != NULL; i += 2)
     {
@@ -516,7 +516,7 @@ void OSM_Reader::handleND(const char **atts)
             {
                 OSM_Node * node = getNode(stoull(atts[i + 1]));
 
-                if(node) { currWay->nodes.push_back(node) ;}
+                if(node) { currWay->m_nodes.push_back(node) ;}
 
                 break;
             }

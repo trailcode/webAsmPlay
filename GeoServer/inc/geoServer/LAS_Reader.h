@@ -23,6 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2019
 */
+#pragma once
 
 #include <string>
 

@@ -23,12 +23,8 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
+#pragma once
 
-#ifndef __WEB_ASM_PLAY_GEO_SERVER_H__
-#define __WEB_ASM_PLAY_GEO_SERVER_H__
-
-#include <string>
-#include <vector>
 #include <glm/mat4x4.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
@@ -56,9 +52,10 @@ private:
 
     typedef Server::message_ptr message_ptr;
 
-    Server serverEndPoint;
+    Server m_serverEndPoint;
 
     static void onMessage(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
+
 #ifdef __USE_GDAL__
     std::string addGdalSupportedFile(const std::string & gdalFile);
 #endif
@@ -69,18 +66,16 @@ private:
 
     std::string addLasFile(const std::string & lasFile);
 
-    std::vector<std::string> serializedPolygons;
-    std::vector<std::string> serializedLineStrings;
-    std::vector<std::string> serializedPoints;
-    std::vector<std::string> serializedRelations;
-    std::vector<std::string> serializedPaths;
+    std::vector<std::string> m_serializedPolygons;
+    std::vector<std::string> m_serializedLineStrings;
+    std::vector<std::string> m_serializedPoints;
+    std::vector<std::string> m_serializedRelations;
+    std::vector<std::string> m_serializedPaths;
 
-    double boundsMinX;
-    double boundsMinY;
-    double boundsMaxX;
-    double boundsMaxY;
+    double m_boundsMinX;
+    double m_boundsMinY;
+    double m_boundsMaxX;
+    double m_boundsMaxY;
 
-    glm::dmat4 trans;
+    glm::dmat4 m_trans;
 };
-
-#endif // __WEB_ASM_PLAY_GEO_SERVER_H__

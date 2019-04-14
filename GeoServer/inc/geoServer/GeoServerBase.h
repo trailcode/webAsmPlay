@@ -23,12 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_GEO_SERVER_BASE_H__
-#define __WEB_ASM_PLAY_GEO_SERVER_BASE_H__
-
-//#include <utility>
-//#include <string>
+#pragma once
 
 class GeoServerBase
 {
@@ -60,5 +55,3 @@ protected:
 
     GeoServerBase() {}
 };
-
-#endif // __WEB_ASM_PLAY_GEO_SERVER_BASE_H__

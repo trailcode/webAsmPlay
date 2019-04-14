@@ -41,7 +41,7 @@ RenderableLineString::RenderableLineString( const GLuint  ebo,
                                             const size_t  numElements,
                                             const bool    isMulti) :    Renderable(   isMulti,
                                                                                       false,
-                                                                                      GUI::renderSettingsRenderPolygonOutlines),
+                                                                                      GUI::s_renderSettingsRenderPolygonOutlines),
                                                                         m_ebo        (ebo),
                                                                         m_vbo        (vbo),
                                                                         m_numElements(numElements)
@@ -241,7 +241,7 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage)
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo));
     GL_CHECK(glDisable(GL_DEPTH_TEST));
 
-	GL_CHECK(glLineWidth(GUI::lineWidthRender));
+	GL_CHECK(glLineWidth(GUI::s_lineWidthRender));
 
     if(!m_isMulti)
     {

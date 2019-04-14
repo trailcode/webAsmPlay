@@ -35,7 +35,7 @@ void GeoServer::createNavigationPaths(const vector<AttributedLineString> & lineS
 {
     dmess("GeoServer::createNavigationPaths");
 
-    Network network(lineStrings, trans);
+    Network network(lineStrings, m_trans);
 
-    for(size_t i = 0; i < 300; ++i) { serializedPaths.push_back(GeometryConverter::convert(network.getRandomPath())) ;}
+    for(size_t i = 0; i < 300; ++i) { m_serializedPaths.push_back(GeometryConverter::convert(network.getRandomPath())) ;}
 }

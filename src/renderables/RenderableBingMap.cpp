@@ -65,7 +65,7 @@ atomic<size_t> RenderableBingMap::s_numDownloading	= {0};
 atomic<size_t> RenderableBingMap::s_numUploading	= {0};
 atomic<size_t> RenderableBingMap::s_numWriting		= {0};
 
-size_t RenderableBingMap::numRendered = 0;
+size_t RenderableBingMap::s_numRendered = 0;
 
 namespace
 {
@@ -565,7 +565,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
         }
 	}
 
-	RenderableBingMap::numRendered = toRender.size();
+	RenderableBingMap::s_numRendered = toRender.size();
 
 	textureBuffer->unbind();
 }

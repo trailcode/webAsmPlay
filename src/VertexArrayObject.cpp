@@ -29,11 +29,6 @@
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/VertexArrayObject.h>
 
-#ifdef WIN32
-#undef min
-#undef max
-#endif
-
 using namespace std;
 using namespace glm;
 
@@ -100,19 +95,19 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     for(const auto & tess : tessellations)
     {
         // TODO try to remove hard coded values.
-        const float symbologyID_value     = (float(tess->symbologyID * symbologyID_Stride) + 0.5) / 32.0;
-        const float symbologyWallID_value = (float(tess->symbologyID * symbologyID_Stride) + 0.5) / 32.0 + 4.0 / 32.0;
+        const float symbologyID_value     = (float(tess->m_symbologyID * symbologyID_Stride) + 0.5) / 32.0;
+        const float symbologyWallID_value = (float(tess->m_symbologyID * symbologyID_Stride) + 0.5) / 32.0 + 4.0 / 32.0;
 
-        for(size_t i = 0; i < tess->numVerts; ++i)
+        for(size_t i = 0; i < tess->m_numVerts; ++i)
         {
-            const dvec2 P(tess->verts[i * 2 + 0], tess->verts[i * 2 + 1]);
+            const dvec2 P(tess->m_verts[i * 2 + 0], tess->m_verts[i * 2 + 1]);
 
-            verts.push_back(P.x);
-            verts.push_back(P.y);
+            verts.push_back((float)P.x);
+            verts.push_back((float)P.y);
 
             if(IS_3D)  
             {
-                verts.push_back(tess->height);
+                verts.push_back(tess->m_height);
 
                 verts.push_back(0);
                 verts.push_back(0);
@@ -133,13 +128,13 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             }
         }
 
-        for(size_t i = 0; i < tess->numTriangles * 3; ++i) { triangleIndices.push_back(tess->triangleIndices[i] + offset) ;}
+        for(size_t i = 0; i < tess->m_numTriangles * 3; ++i) { triangleIndices.push_back(tess->m_triangleIndices[i] + offset) ;}
 
         size_t lastIndex = 0;
 
-        for(size_t i = 1; i < tess->counterVertIndices.size(); ++i)
+        for(size_t i = 1; i < tess->m_counterVertIndices.size(); ++i)
         {
-            const size_t num = tess->counterVertIndices[i] - lastIndex;
+            const size_t num = tess->m_counterVertIndices[i] - lastIndex;
 
             const size_t localOffset = offset + lastIndex;
 
@@ -149,24 +144,24 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
                 lineIndices.push_back((j + 1) % num + localOffset);
             }
 
-            lastIndex = tess->counterVertIndices[i];
+            lastIndex = tess->m_counterVertIndices[i];
         }
 
-        offset += tess->numVerts;
+        offset += tess->m_numVerts;
 
         if(!IS_3D) { continue ;}
 
-        for(size_t a = 0; a < tess->numVerts; ++a)
+        for(size_t a = 0; a < tess->m_numVerts; ++a)
         {
-            const size_t b = (a + 1) % tess->numVerts;
+            const size_t b = (a + 1) % tess->m_numVerts;
 
-            const vec2 A(tess->verts[a * 2], tess->verts[a * 2 + 1]);
-            const vec2 B(tess->verts[b * 2], tess->verts[b * 2 + 1]);
+            const vec2 A(tess->m_verts[a * 2], tess->m_verts[a * 2 + 1]);
+            const vec2 B(tess->m_verts[b * 2], tess->m_verts[b * 2 + 1]);
 
-            const vec3 p1(A, tess->height);
-            const vec3 p2(B, tess->height);
-            const vec3 p3(B, tess->minHeight);
-            const vec3 p4(A, tess->minHeight);
+            const vec3 p1(A, tess->m_height);
+            const vec3 p2(B, tess->m_height);
+            const vec3 p3(B, tess->m_minHeight);
+            const vec3 p4(A, tess->m_minHeight);
 
 			const vec3 normal = -normalize(triangleNormal(p1, p2, p3)); // Why is this backwards on different system? Winding wrong.
 
@@ -241,25 +236,25 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 									sizeUV);
 }
 
-VertexArrayObject::VertexArrayObject(   const GLuint        ebo,
-                                        const GLuint        ebo2,
-                                        const GLuint        vbo,
-                                        const GLuint        numTrianglesIndices,
-                                        const size_t        numContourLines,
-                                        const bool          isMulti,
-										const size_t		sizeVertex,
-										const size_t		sizeNormal,
-										const size_t		sizeColor,
-										const size_t		sizeUV) :	m_ebo					(ebo),
-                                                                        m_ebo2					(ebo2),
-                                                                        m_vbo					(vbo),
-                                                                        m_numTrianglesIndices	(numTrianglesIndices),
-                                                                        m_numContourLines		(numContourLines),
-                                                                        m_isMulti				(isMulti),
-																		m_sizeVertex			(sizeVertex),
-																		m_sizeNormal			(sizeNormal),
-																		m_sizeColor				(sizeColor),
-																		m_sizeUV				(sizeUV)
+VertexArrayObject::VertexArrayObject(   const GLuint ebo,
+                                        const GLuint ebo2,
+                                        const GLuint vbo,
+                                        const GLuint numTrianglesIndices,
+                                        const size_t numContourLines,
+                                        const bool   isMulti,
+										const size_t sizeVertex,
+										const size_t sizeNormal,
+										const size_t sizeColor,
+										const size_t sizeUV) :	m_ebo					(ebo),
+																m_ebo2					(ebo2),
+																m_vbo					(vbo),
+																m_numTrianglesIndices	(numTrianglesIndices),
+																m_numContourLines		(numContourLines),
+																m_isMulti				(isMulti),
+																m_sizeVertex			(sizeVertex),
+																m_sizeNormal			(sizeNormal),
+																m_sizeColor				(sizeColor),
+																m_sizeUV				(sizeUV)
 {
 
 }
@@ -309,9 +304,7 @@ void VertexArrayObject::ensureVAO()
 	GL_CHECK(glBindVertexArray(    m_vao));
 
 	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
-	//GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-	//GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
-
+	
 	const size_t totalSize = (m_sizeVertex + m_sizeColor + m_sizeNormal + m_sizeUV) * sizeof(GLfloat);
 
 	GL_CHECK(glEnableVertexAttribArray(0));

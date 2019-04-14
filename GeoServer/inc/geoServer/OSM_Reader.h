@@ -23,9 +23,7 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
-
-#ifndef __WEB_ASM_PLAY_OSM_READER_H__
-#define __WEB_ASM_PLAY_OSM_READER_H__
+#pragma once
 
 #include <geoServer/MapData.h>
 
@@ -52,5 +50,3 @@ private:
     OSM_Reader() {}
     ~OSM_Reader() {}
 };
-
-#endif // __WEB_ASM_PLAY_OSM_READER_H__

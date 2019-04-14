@@ -63,7 +63,7 @@ public:
 
 protected:
 
-    Plane planes[6];
+    Plane m_planes[6];
 
 private:
 

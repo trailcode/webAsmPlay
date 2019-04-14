@@ -57,7 +57,7 @@ public:
     
 private:
 
-    geos::geom::Geometry * geom;
+    geos::geom::Geometry * m_geom;
 };
 
 namespace geosUtil
@@ -92,10 +92,7 @@ namespace geosUtil
 
     geos::geom::Coordinate ___(const glm::dvec2 & point);
 
-    inline glm::dvec4 __(const geos::geom::Coordinate & v, const double z, const double w)
-    {
-        return glm::dvec4(v.x, v.y, z, w);
-    }
+    inline glm::dvec4 __(const geos::geom::Coordinate & v, const double z, const double w) { return glm::dvec4(v.x, v.y, z, w) ;}
 
     bool contains(const std::unique_ptr<geos::geom::Geometry> & A, const std::unique_ptr<geos::geom::Geometry> & B);
 

@@ -70,7 +70,7 @@ void GeoClient::createWorld(const char * data)
     
     m_inverseTrans = inverse(m_trans);
 
-	GUI::guiASync([this]() { addBingMap(GUI::renderSettingsRenderBingMaps) ;});
+	GUI::guiASync([this]() { addBingMap(GUI::s_renderSettingsRenderBingMaps) ;});
 
 	addGeometry(data);
 }
@@ -195,8 +195,8 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     {
         r->setShader(ColorDistanceShader::getDefaultInstance());
 
-        r->setRenderFill    (GUI::renderSettingsFillPolygons);
-        r->setRenderOutline (GUI::renderSettingsRenderPolygonOutlines);
+        r->setRenderFill    (GUI::s_renderSettingsFillPolygons);
+        r->setRenderOutline (GUI::s_renderSettingsRenderPolygonOutlines);
 
 		GUI::guiASync([this, r]()
 		{
@@ -210,8 +210,8 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     {
         r->setShader(ColorDistanceDepthShader3D::getDefaultInstance());
 
-        r->setRenderFill    (GUI::renderSettingsFillMeshes);
-        r->setRenderOutline (GUI::renderSettingsRenderMeshOutlines);
+        r->setRenderFill    (GUI::s_renderSettingsFillMeshes);
+        r->setRenderOutline (GUI::s_renderSettingsRenderMeshOutlines);
 
 		GUI::guiASync([this, r]()
 		{
@@ -288,7 +288,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 
-    r->setRenderOutline(GUI::renderSettingsRenderLinearFeatures);
+    r->setRenderOutline(GUI::s_renderSettingsRenderLinearFeatures);
 
 	GUI::guiASync([this, r]()
 	{

@@ -114,7 +114,16 @@ void topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & po
 
             if(potentalParent->poly == potentialChild) { continue ;}
 
-            if(!potentalParent->polyPrepaired.contains(potentialChild)) { continue ;}
+			try
+			{
+				if (!potentalParent->polyPrepaired.contains(potentialChild)) { continue; }
+			}
+			catch (...)
+			{
+				dmess("Here!");
+
+				continue;
+			}
 
             if(potentalParent->area > minArea) { continue ;}
 

@@ -31,21 +31,21 @@
 
 void GUI::geosTestPanel()
 {
-    geosTestCanvas->setEnabled(showSceneViewPanel);
+    s_geosTestCanvas->setEnabled(s_showSceneViewPanel);
 
-    if(!showSceneViewPanel) { return ;}
+    if(!s_showSceneViewPanel) { return ;}
     
-    ImGui::Begin("Geos Tests", &showSceneViewPanel);
+    ImGui::Begin("Geos Tests", &s_showSceneViewPanel);
 
         const ImVec2 pos = ImGui::GetCursorScreenPos();
 
         const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-        geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
+        s_geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
 
-        geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+        s_geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
-        ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)geosTestCanvas->render(),
+        ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)s_geosTestCanvas->render(),
                                                 pos,
                                                 ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
                                                 ImVec2(0, 1),
@@ -59,7 +59,7 @@ void GUI::geosTestPanel()
         ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");
         ImGui::SliderFloat("buffer3", &buffer3, 0.0f, 0.3f, "buffer3 = %.3f");
 
-        geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
+        s_geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
 
     ImGui::End();
 }

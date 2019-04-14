@@ -40,9 +40,9 @@ extern int gPedestrianStartCount;
 
 void GUI::openSteerPanel()
 {
-    if(!showOpenSteerPanel) { return ;}
+    if(!s_showOpenSteerPanel) { return ;}
     
-    ImGui::Begin("OpenSteer Settings", &showOpenSteerPanel);
+    ImGui::Begin("OpenSteer Settings", &s_showOpenSteerPanel);
 
         static int lines = 1000;
 
@@ -57,7 +57,7 @@ void GUI::openSteerPanel()
         {
             gotoNextZombie = true;
 
-            cameraMode = 2; // TODO create an enum!
+            s_cameraMode = 2; // TODO create an enum!
         }
 
         ImGui::SameLine(); ImGui::Checkbox("Annotation", &OpenSteer::enableAnnotation);

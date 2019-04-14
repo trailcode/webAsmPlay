@@ -25,10 +25,8 @@
 */
 
 #include <cstdio>
-#include <algorithm>
 #include <limits>
 #include <ctpl.h>
-#include <glm/vec2.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <boost/filesystem.hpp>
 #include <geos/geom/Polygon.h>
@@ -39,17 +37,11 @@
     #include "ogrsf_frmts.h"
 #endif
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Types.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/geom/GeometryConverter.h>
 #include <geoServer/OSM_Reader.h>
 #include <geoServer/Topology.h>
 #include <geoServer/GeoServer.h>
-
-#ifdef max
-#undef max
-#endif
-
 
 using namespace std;
 using namespace glm;
@@ -66,10 +58,10 @@ namespace
     ctpl::thread_pool pool(1);
 }
 
-GeoServer::GeoServer() :    boundsMinX( numeric_limits<double>::max()),
-                            boundsMinY( numeric_limits<double>::max()),
-                            boundsMaxX(-numeric_limits<double>::max()),
-                            boundsMaxY(-numeric_limits<double>::max())
+GeoServer::GeoServer() : m_boundsMinX( numeric_limits<double>::max()),
+                         m_boundsMinY( numeric_limits<double>::max()),
+                         m_boundsMaxX(-numeric_limits<double>::max()),
+                         m_boundsMaxY(-numeric_limits<double>::max())
 {
 }
 
@@ -186,7 +178,7 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     const MapData mapData = OSM_Reader::import(osmFile);
 
-    dmess("geometry " << mapData.geometry.size());
+    dmess("geometry " << mapData.m_geometry.size());
 
     dvec2 center;
 
@@ -201,7 +193,7 @@ string GeoServer::addOsmFile(const string & osmFile)
     vector<AttributedPoligonalArea> polygons;
     vector<AttributedLineString>    lineStrings;
 
-    for(const AttributedGeometry & i : mapData.geometry)
+    for(const AttributedGeometry & i : mapData.m_geometry)
     {
         if((polygon = dynamic_cast<Polygon *>(i.second)))
         {
@@ -226,7 +218,7 @@ string GeoServer::addOsmFile(const string & osmFile)
         }
         else if((point = dynamic_cast<Point *>(i.second)))
         {
-            if(i.first) { serializedPoints.push_back(GeometryConverter::convert(AttributedPoint(i.first, point))) ;}
+            if(i.first) { m_serializedPoints.push_back(GeometryConverter::convert(AttributedPoint(i.first, point))) ;}
             else        { ++numEmptyPoints ;}
         }
         else
@@ -260,8 +252,8 @@ string GeoServer::addOsmFile(const string & osmFile)
     //createNavigationPaths(lineStrings);
 
 
-    for(const AttributedPoligonalArea & g : polygons)    { serializedPolygons   .push_back(GeometryConverter::convert(g)) ;}
-    for(const AttributedLineString    & l : lineStrings) { serializedLineStrings.push_back(GeometryConverter::convert(l)) ;}
+    for(const AttributedPoligonalArea & g : polygons)    { m_serializedPolygons   .push_back(GeometryConverter::convert(g)) ;}
+    for(const AttributedLineString    & l : lineStrings) { m_serializedLineStrings.push_back(GeometryConverter::convert(l)) ;}
     
     dmess("numEmptyPoints " << numEmptyPoints);
 
@@ -269,27 +261,27 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     center /= double(numVertices);
 
-    boundsMinX = center.x;
-    boundsMaxX = center.x;
-    boundsMinY = center.y;
-    boundsMaxY = center.y;
+    m_boundsMinX = center.x;
+    m_boundsMaxX = center.x;
+    m_boundsMinY = center.y;
+    m_boundsMaxY = center.y;
 
-    if( mapData.boundsMinX != 0.0 &&
-        mapData.boundsMaxX != 0.0 &&
-        mapData.boundsMinY != 0.0 &&
-        mapData.boundsMaxY != 0.0)
+    if( mapData.m_boundsMinX != 0.0 &&
+        mapData.m_boundsMaxX != 0.0 &&
+        mapData.m_boundsMinY != 0.0 &&
+        mapData.m_boundsMaxY != 0.0)
     {
 		dmess("Here!");
 
-        boundsMinX = mapData.boundsMinX;
-        boundsMaxX = mapData.boundsMaxX;
-        boundsMinY = mapData.boundsMinY;
-        boundsMaxY = mapData.boundsMaxY;
+        m_boundsMinX = mapData.m_boundsMinX;
+        m_boundsMaxX = mapData.m_boundsMaxX;
+        m_boundsMinY = mapData.m_boundsMinY;
+        m_boundsMaxY = mapData.m_boundsMaxY;
 
-		dmess("boundsMinX " << boundsMinX);
-		dmess("boundsMaxX " << boundsMaxX);
-		dmess("boundsMinY " << boundsMinY);
-		dmess("boundsMaxY " << boundsMaxY);
+		dmess("boundsMinX " << m_boundsMinX);
+		dmess("boundsMaxX " << m_boundsMaxX);
+		dmess("boundsMinY " << m_boundsMinY);
+		dmess("boundsMaxY " << m_boundsMaxY);
     }
 
 	/*
@@ -302,9 +294,9 @@ string GeoServer::addOsmFile(const string & osmFile)
     const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
 
     // TODO code dup!
-    trans = translate(  s,
-                        dvec3(  (boundsMinY + boundsMinX) * -0.5,
-                                (boundsMaxY + boundsMaxX) * -0.5,
+    m_trans = translate(  s,
+                        dvec3(  (m_boundsMinY + m_boundsMinX) * -0.5,
+                                (m_boundsMaxY + m_boundsMaxX) * -0.5,
                                 0.0));
 
     saveGeoFile("data.geo");
@@ -357,15 +349,15 @@ string GeoServer::saveGeoFile(const string & fileName)
 {
     FILE * fp = fopen(fileName.c_str(), "wb");
 
-    fwrite(&boundsMinX, sizeof(double), 1, fp);
-    fwrite(&boundsMinY, sizeof(double), 1, fp);
-    fwrite(&boundsMaxX, sizeof(double), 1, fp);
-    fwrite(&boundsMaxY, sizeof(double), 1, fp);
+    fwrite(&m_boundsMinX, sizeof(double), 1, fp);
+    fwrite(&m_boundsMinY, sizeof(double), 1, fp);
+    fwrite(&m_boundsMaxX, sizeof(double), 1, fp);
+    fwrite(&m_boundsMaxY, sizeof(double), 1, fp);
 
-    _saveData(fp, serializedPolygons);
-    _saveData(fp, serializedLineStrings);
-    _saveData(fp, serializedPoints);
-    _saveData(fp, serializedRelations);
+    _saveData(fp, m_serializedPolygons);
+    _saveData(fp, m_serializedLineStrings);
+    _saveData(fp, m_serializedPoints);
+    _saveData(fp, m_serializedRelations);
 
     fclose(fp);
 
@@ -378,15 +370,15 @@ string GeoServer::_addGeoFile(const string & geoFile)
 
     FILE * fp = fopen(geoFile.c_str(), "rb");
 
-    fread(&boundsMinX, sizeof(double), 1, fp);
-    fread(&boundsMinY, sizeof(double), 1, fp);
-    fread(&boundsMaxX, sizeof(double), 1, fp);
-    fread(&boundsMaxY, sizeof(double), 1, fp);
+    fread(&m_boundsMinX, sizeof(double), 1, fp);
+    fread(&m_boundsMinY, sizeof(double), 1, fp);
+    fread(&m_boundsMaxX, sizeof(double), 1, fp);
+    fread(&m_boundsMaxY, sizeof(double), 1, fp);
 
-    loadData(fp, serializedPolygons);
-    loadData(fp, serializedLineStrings);
-    loadData(fp, serializedPoints);
-    loadData(fp, serializedRelations);
+    loadData(fp, m_serializedPolygons);
+    loadData(fp, m_serializedLineStrings);
+    loadData(fp, m_serializedPoints);
+    loadData(fp, m_serializedRelations);
 
     fclose(fp);
 
@@ -406,7 +398,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
     try {
 
-        Server * s = &server->serverEndPoint;
+        Server * s = &server->m_serverEndPoint;
 
         const char * data = (char *)msg->get_payload().data();
 
@@ -428,7 +420,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                    *(uint32_t *)ptr = (uint32_t)server->serializedPolygons.size();
+                    *(uint32_t *)ptr = (uint32_t)server->m_serializedPolygons.size();
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
@@ -447,7 +439,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                    *(uint32_t *)ptr = (uint32_t)server->serializedLineStrings.size();
+                    *(uint32_t *)ptr = (uint32_t)server->m_serializedLineStrings.size();
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
@@ -466,7 +458,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                    *(uint32_t *)ptr = (uint32_t)server->serializedPoints.size();
+                    *(uint32_t *)ptr = (uint32_t)server->m_serializedPoints.size();
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
@@ -481,7 +473,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                 pool.push([hdl, s, server, requestID, startIndex, numGeoms](int ID)
                 {
-                    const vector<string> & serializedPolygons = server->serializedPolygons;
+                    const vector<string> & serializedPolygons = server->m_serializedPolygons;
 
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
@@ -520,7 +512,7 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                 pool.push([hdl, s, server, requestID, startIndex, numGeoms](int ID)
                 {
-                    const vector<string> & serializedLineStrings = server->serializedLineStrings;
+                    const vector<string> & serializedLineStrings = server->m_serializedLineStrings;
 
                     uint32_t bufferSize = sizeof(char) + sizeof(uint32_t) * 2;
 
@@ -576,10 +568,10 @@ void GeoServer::onMessage(GeoServer * server, websocketpp::connection_hdl hdl, m
 
                     *(uint32_t *)ptr = requestID; ptr += sizeof(uint32_t);
 
-                    *((AABB2D *)ptr) = AABB2D(  server->boundsMinX,
-                                                server->boundsMinY,
-                                                server->boundsMaxX,
-                                                server->boundsMaxY);
+                    *((AABB2D *)ptr) = AABB2D(  server->m_boundsMinX,
+                                                server->m_boundsMinY,
+                                                server->m_boundsMaxX,
+                                                server->m_boundsMaxY);
 
                     s->send(hdl, &data[0], data.size(), websocketpp::frame::opcode::BINARY);
                 });
@@ -625,15 +617,15 @@ void GeoServer::start()
 {
     dmess("GeoServer::start");
 
-    dmess("   serializedPolygons: " << serializedPolygons.size());
-    dmess("serializedLineStrings: " << serializedLineStrings.size());
-    dmess("     serializedPoints: " << serializedPoints.size());
-    dmess("  serializedRelations: " << serializedRelations.size());
+    dmess("   serializedPolygons: " << m_serializedPolygons.size());
+    dmess("serializedLineStrings: " << m_serializedLineStrings.size());
+    dmess("     serializedPoints: " << m_serializedPoints.size());
+    dmess("  serializedRelations: " << m_serializedRelations.size());
 
-    dmess("boundsMinX " << boundsMinX);
-    dmess("boundsMinY " << boundsMinY);
-    dmess("boundsMaxX " << boundsMaxX);
-    dmess("boundsMaxY " << boundsMaxY);
+    dmess("boundsMinX " << m_boundsMinX);
+    dmess("boundsMinY " << m_boundsMinY);
+    dmess("boundsMaxX " << m_boundsMaxX);
+    dmess("boundsMaxY " << m_boundsMaxY);
 
     cout << "  .-----------------------------------------------------------------." << endl;
     cout << " /  .-.                                                         .-.  \\" << endl;
@@ -653,25 +645,25 @@ void GeoServer::start()
         //serverEndPoint.clear_access_channels(websocketpp::log::alevel::frame_payload);
 
         // this will turn off console output for frame header and payload
-        serverEndPoint.clear_access_channels(websocketpp::log::alevel::frame_header | websocketpp::log::alevel::frame_payload); 
+        m_serverEndPoint.clear_access_channels(websocketpp::log::alevel::frame_header | websocketpp::log::alevel::frame_payload); 
         
         // this will turn off everything in console output
-        serverEndPoint.clear_access_channels(websocketpp::log::alevel::all); 
+        m_serverEndPoint.clear_access_channels(websocketpp::log::alevel::all); 
 
         // Initialize ASIO
-        serverEndPoint.init_asio();
+        m_serverEndPoint.init_asio();
 
         // Register our message handler
-        serverEndPoint.set_message_handler(::bind(&onMessage, this, ::_1, ::_2));
+        m_serverEndPoint.set_message_handler(::bind(&onMessage, this, ::_1, ::_2));
 
         // Listen on port 9002
-        serverEndPoint.listen(9002);
+        m_serverEndPoint.listen(9002);
 
         // Start the server accept loop
-        serverEndPoint.start_accept();
+        m_serverEndPoint.start_accept();
 
         // Start the ASIO io_service run loop
-        serverEndPoint.run();
+        m_serverEndPoint.run();
 
     }
     catch (const std::exception &e)

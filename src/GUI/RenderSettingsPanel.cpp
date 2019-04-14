@@ -40,54 +40,54 @@ using namespace glm;
 
 void GUI::renderSettingsPanel()
 {
-    if(!showRenderSettingsPanel) { return ;}
+    if(!s_showRenderSettingsPanel) { return ;}
 
-    ImGui::Begin("Render Settings", &showRenderSettingsPanel);
+    ImGui::Begin("Render Settings", &s_showRenderSettingsPanel);
 
-        if(ImGui::Checkbox("Fill Meshes", &renderSettingsFillMeshes))
+        if(ImGui::Checkbox("Fill Meshes", &s_renderSettingsFillMeshes))
         {
-            for(Renderable * r : canvas->getMeshesRef()) { r->setRenderFill(renderSettingsFillMeshes) ;}
+            for(Renderable * r : s_canvas->getMeshesRef()) { r->setRenderFill(s_renderSettingsFillMeshes) ;}
         }
 
-        if(ImGui::Checkbox("Mesh Outlines", &renderSettingsRenderMeshOutlines))
+        if(ImGui::Checkbox("Mesh Outlines", &s_renderSettingsRenderMeshOutlines))
         {
-            for(Renderable * r : canvas->getMeshesRef()) { r->setRenderOutline(renderSettingsRenderMeshOutlines) ;}
+            for(Renderable * r : s_canvas->getMeshesRef()) { r->setRenderOutline(s_renderSettingsRenderMeshOutlines) ;}
         }
 
-        if(ImGui::Checkbox("Fill Polygons", &renderSettingsFillPolygons))
+        if(ImGui::Checkbox("Fill Polygons", &s_renderSettingsFillPolygons))
         {
-            for(Renderable * r : canvas->getPolygonsRef()) { r->setRenderFill(renderSettingsFillPolygons) ;}
+            for(Renderable * r : s_canvas->getPolygonsRef()) { r->setRenderFill(s_renderSettingsFillPolygons) ;}
 
-            for(Renderable * r : geosTestCanvas->getPolygonsRef()) { r->setRenderFill(renderSettingsFillPolygons) ;}
+            for(Renderable * r : s_geosTestCanvas->getPolygonsRef()) { r->setRenderFill(s_renderSettingsFillPolygons) ;}
         }
 
-        if(ImGui::Checkbox("Polygon Outlines", &renderSettingsRenderPolygonOutlines))
+        if(ImGui::Checkbox("Polygon Outlines", &s_renderSettingsRenderPolygonOutlines))
         {
-            for(Renderable * r : canvas->getPolygonsRef()) { r->setRenderOutline(renderSettingsRenderPolygonOutlines) ;}
+            for(Renderable * r : s_canvas->getPolygonsRef()) { r->setRenderOutline(s_renderSettingsRenderPolygonOutlines) ;}
 
-            for(Renderable * r : geosTestCanvas->getPolygonsRef()) { r->setRenderOutline(renderSettingsRenderPolygonOutlines) ;}
+            for(Renderable * r : s_geosTestCanvas->getPolygonsRef()) { r->setRenderOutline(s_renderSettingsRenderPolygonOutlines) ;}
         }
 
-        if(ImGui::Checkbox("Linear Features", &renderSettingsRenderLinearFeatures))
+        if(ImGui::Checkbox("Linear Features", &s_renderSettingsRenderLinearFeatures))
         {
-            for(Renderable * r : canvas->getLineStringsRef())
+            for(Renderable * r : s_canvas->getLineStringsRef())
             {
-                r->setRenderFill    (renderSettingsRenderLinearFeatures);
-                r->setRenderOutline (renderSettingsRenderLinearFeatures);
+                r->setRenderFill    (s_renderSettingsRenderLinearFeatures);
+                r->setRenderOutline (s_renderSettingsRenderLinearFeatures);
             }
         }
 
-        if(ImGui::Checkbox("SkyBox", &renderSettingsRenderSkyBox))
+        if(ImGui::Checkbox("SkyBox", &s_renderSettingsRenderSkyBox))
         {   
-            if(renderSettingsRenderSkyBox) { canvas->setSkyBox(skyBox) ;} // TODO create check render functor
-            else                           { canvas->setSkyBox(NULL)   ;}
+            if(s_renderSettingsRenderSkyBox)	{ s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor
+            else								{ s_canvas->setSkyBox(NULL)     ;}
         }
         
-        if(ImGui::Checkbox("BingMaps", &renderSettingsRenderBingMaps))
+        if(ImGui::Checkbox("BingMaps", &s_renderSettingsRenderBingMaps))
         {
-            for(Renderable * r : canvas->getRastersRef())
+            for(Renderable * r : s_canvas->getRastersRef())
             {
-                r->setRenderFill(renderSettingsRenderBingMaps);
+                r->setRenderFill(s_renderSettingsRenderBingMaps);
             }
         }
 
@@ -103,7 +103,7 @@ void GUI::renderSettingsPanel()
 
         const char * items[] = { "TrackBall", "First Person", "Track Entity" };
         
-        ImGui::Combo("Camera", &cameraMode, items, IM_ARRAYSIZE(items));
+        ImGui::Combo("Camera", &s_cameraMode, items, IM_ARRAYSIZE(items));
 
         //ImGui::Text("Linestring Shader");
 
@@ -126,21 +126,21 @@ void GUI::renderSettingsPanel()
                                         ColorVertexShader         ::getDefaultInstance()
                                         });
 
-            for(auto i : canvas->getMeshesRef()) { i->setShader(shaderMap[meshShader]) ;}
+            for(auto i : s_canvas->getMeshesRef()) { i->setShader(shaderMap[meshShader]) ;}
         }
 
-		if(ImGui::SliderFloat("LineWidth", &lineWidthRender, 0.0f, 5.0f, "Line width: %.3f"))
+		if(ImGui::SliderFloat("LineWidth", &s_lineWidthRender, 0.0f, 5.0f, "Line width: %.3f"))
         {
-			dmess("lineWidthRender " << lineWidthRender);
+			dmess("lineWidthRender " << s_lineWidthRender);
 		}
 
-		if(canvas)
+		if(s_canvas)
 		{
-			float perspectiveFOV = canvas->getPerspectiveFOV();
+			float perspectiveFOV = s_canvas->getPerspectiveFOV();
 
 			if(ImGui::SliderFloat("FOV", &perspectiveFOV, 30.0f, 50.0f, "%.3f")) // TODO Why does this not work?
 			{
-				canvas->setPerspectiveFOV(perspectiveFOV);
+				s_canvas->setPerspectiveFOV(perspectiveFOV);
 			}
 		}
         //ImGui::SameLine(); ShowHelpMarker("Refer to the \"Combo\" section below for an explanation of the full BeginCombo/EndCombo API, and demonstration of various flags.\n");

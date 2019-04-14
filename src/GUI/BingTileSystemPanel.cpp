@@ -39,11 +39,11 @@ using namespace bingTileSystem;
 
 void GUI::bingTileSystemPanel()
 {
-    if(!showBingTileSystemPanel) { return ;}
+    if(!s_showBingTileSystemPanel) { return ;}
 
-    dvec4 pos(canvas->getCursorPosWC(), 1.0);
+    dvec4 pos(s_canvas->getCursorPosWC(), 1.0);
 
-    pos = client->getInverseTrans() * pos;
+    pos = s_client->getInverseTrans() * pos;
 
     const size_t zoomLevel = 16;
 
@@ -52,9 +52,9 @@ void GUI::bingTileSystemPanel()
 	const ivec2  tile	 = pixelToTile(pix);
     const string quadKey = tileToQuadKey(tile, zoomLevel);
 
-    ImGui::Begin("Bing Tile System", &showBingTileSystemPanel);
+    ImGui::Begin("Bing Tile System", &s_showBingTileSystemPanel);
 
-	ImGui::Text(("      Local pos: " + toStr(vec2(canvas->getCursorPosWC()))).c_str());
+	ImGui::Text(("      Local pos: " + toStr(vec2(s_canvas->getCursorPosWC()))).c_str());
     ImGui::Text(("            pos: " + toStr(vec2(pos))).c_str());
     ImGui::Text(("            pix: " + toStr(pix)).c_str());
     ImGui::Text(("           tile: " + toStr(tile)).c_str());
@@ -64,7 +64,7 @@ void GUI::bingTileSystemPanel()
 	ImGui::Text(("num downloading: " + to_string(RenderableBingMap::s_numDownloading)).c_str());
 	ImGui::Text(("  num uploading: " + to_string(RenderableBingMap::s_numUploading)).c_str());
 	ImGui::Text(("    num writing: " + to_string(RenderableBingMap::s_numWriting)).c_str());
-	ImGui::Text(("   num rendered: " + to_string(RenderableBingMap::numRendered)).c_str());
+	ImGui::Text(("   num rendered: " + to_string(RenderableBingMap::s_numRendered)).c_str());
 
     ImGui::End();
 }

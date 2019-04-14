@@ -45,11 +45,11 @@ namespace
 
 void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)
 {
-    for(auto c : auxCanvases) { c->onMouseButton(window, button, action, mods) ;}
+    for(auto c : s_auxCanvases) { c->onMouseButton(window, button, action, mods) ;}
     
     if(!GImGui->IO.WantCaptureMouse)
     {
-        canvas->onMouseButton(window, button, action, mods);
+        s_canvas->onMouseButton(window, button, action, mods);
 
         if(action == GLFW_PRESS)
         {
@@ -58,13 +58,13 @@ void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int m
             case SET_PATH_START_POINT:
 
                 // TODO code refactor!
-                client->getNetwork()->setStartEdge(client->pickLineStringRenderable(canvas->getCursorPosWC()));
+                s_client->getNetwork()->setStartEdge(s_client->pickLineStringRenderable(s_canvas->getCursorPosWC()));
 
                 break;
 
             case FIND_PATH:
 
-                client->getNetwork()->findPath(client->pickLineStringRenderable(canvas->getCursorPosWC()));
+                s_client->getNetwork()->findPath(s_client->pickLineStringRenderable(s_canvas->getCursorPosWC()));
 
                 break;
             }
@@ -78,10 +78,10 @@ void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int m
 
 void GUI::cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 {
-    for(auto c : auxCanvases) { c->onMousePosition(window, vec2(xpos, ypos)) ;}
+    for(auto c : s_auxCanvases) { c->onMousePosition(window, vec2(xpos, ypos)) ;}
 
     //canvas->onMousePosition(window, vec2(xpos / 2, ypos / 2));
-    canvas->onMousePosition(window, vec2(xpos, ypos));
+    s_canvas->onMousePosition(window, vec2(xpos, ypos));
 
     refresh();
 }
@@ -90,9 +90,9 @@ void GUI::scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 {
     //dmess("scrollCallback " << xoffset << " " << yoffset);
 
-    for(auto c : auxCanvases) { c->onMouseScroll(window, vec2(xoffset, yoffset)) ;}
+    for(auto c : s_auxCanvases) { c->onMouseScroll(window, vec2(xoffset, yoffset)) ;}
 
-    if(!GImGui->IO.WantCaptureMouse) { canvas->onMouseScroll(window, vec2(xoffset, yoffset)) ;}
+    if(!GImGui->IO.WantCaptureMouse) { s_canvas->onMouseScroll(window, vec2(xoffset, yoffset)) ;}
 
     ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 
@@ -101,9 +101,9 @@ void GUI::scrollCallback(GLFWwindow * window, double xoffset, double yoffset)
 
 void GUI::keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods)
 {
-    for(auto c : auxCanvases) { c->onKey(window, key, scancode, action, mods) ;}
+    for(auto c : s_auxCanvases) { c->onKey(window, key, scancode, action, mods) ;}
 
-    if(!GImGui->IO.WantCaptureKeyboard) { canvas->onKey(window, key, scancode, action, mods) ;}
+    if(!GImGui->IO.WantCaptureKeyboard) { s_canvas->onKey(window, key, scancode, action, mods) ;}
  
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 
@@ -112,9 +112,9 @@ void GUI::keyCallback(GLFWwindow * window, int key, int scancode, int action, in
 
 void GUI::charCallback(GLFWwindow * window, unsigned int c)
 {
-    for(auto ac : auxCanvases) { ac->onChar(window, c) ;}
+    for(auto ac : s_auxCanvases) { ac->onChar(window, c) ;}
 
-    canvas->onChar(window, c);
+    s_canvas->onChar(window, c);
 
     ImGui_ImplGlfw_CharCallback(window, c);
 
@@ -123,25 +123,17 @@ void GUI::charCallback(GLFWwindow * window, unsigned int c)
 
 void GUI::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-
-    //*
     int fbWidth, fbHeight;
 
-    glfwGetFramebufferSize(mainWindow, &fbWidth, &fbHeight); // TODO Perhaps original passed in? 
+    glfwGetFramebufferSize(s_mainWindow, &fbWidth, &fbHeight); // TODO Perhaps original passed in? 
 
-    //canvas->setFrameBufferSize(ivec2(fbWidth * 2, fbHeight * 2));
-    canvas->setFrameBufferSize(ivec2(fbWidth, fbHeight));
+    s_canvas->setFrameBufferSize(ivec2(fbWidth, fbHeight));
 
     // Need to use this to get true size because of retina displays.
     glfwGetWindowSize(window, &width, &height);
 
-	dmess("GUI::framebufferSizeCallback " << width << " " << height << " fbWidth " << fbWidth << " fbHeight " << fbHeight);
-
-    canvas->setArea(ivec2(0,0), ivec2(width, height));
-    //canvas->setArea(ivec2(0,0), ivec2(fbWidth * 2, fbWidth * 2));
-    //canvas->setArea(ivec2(0,0), ivec2(fbWidth / 2, fbWidth / 2));
-    //*/
-
+    s_canvas->setArea(ivec2(0,0), ivec2(width, height));
+    
     refresh();
 }
 
@@ -158,7 +150,7 @@ void GUI::cursorEnterCallback(GLFWwindow * window, int /* entered */)
 
 void GUI::setupCallbacks(GLFWwindow* window)
 {
-    mainWindow = window;
+    s_mainWindow = window;
 
     glfwSetMouseButtonCallback      (window, mouseButtonCallback);
     glfwSetScrollCallback           (window, scrollCallback);

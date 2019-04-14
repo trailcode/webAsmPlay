@@ -23,25 +23,20 @@
   \email trailcode@gmail.com
   \copyright 2018
 */
+#pragma once
 
-#ifndef __WEB_ASM_PLAY_GEO_SERVER_MAP_DATA_H__
-#define __WEB_ASM_PLAY_GEO_SERVER_MAP_DATA_H__
-
-#include <string>
 #include <webAsmPlay/Types.h>
 
 class MapData
 {
 public:
 
-    std::vector<AttributedGeometry> geometry;
+    std::vector<AttributedGeometry> m_geometry;
 
-    double boundsMinX = 0;
-    double boundsMaxX = 0;
-    double boundsMinY = 0;
-    double boundsMaxY = 0;
+    double m_boundsMinX = 0;
+    double m_boundsMaxX = 0;
+    double m_boundsMinY = 0;
+    double m_boundsMaxY = 0;
 
 private:
 };
-
-#endif // __WEB_ASM_PLAY_GEO_SERVER_MAP_DATA_H__

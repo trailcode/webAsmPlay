@@ -191,7 +191,6 @@ struct Plane
         intersection = lineStart + (direction * percent);
 
         return true;
-
     }
 
     /**
@@ -211,9 +210,7 @@ struct Plane
     */
     bool samePlane ( const Plane & plane )
     {
-        return (fabs(plane.dist - dist) < 1e-5f)
-            && sameFacing ( plane );
-
+        return (fabs(plane.dist - dist) < 1e-5f) && sameFacing ( plane );
     }
 
     /**

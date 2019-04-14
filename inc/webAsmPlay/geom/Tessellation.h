@@ -25,7 +25,6 @@
 */
 #pragma once
 
-#include <memory>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
 
@@ -37,11 +36,11 @@ public:
 
     typedef std::vector<ConstPtr> Tessellations;
 
-    static ConstPtr tessellatePolygon(	const geos::geom::Polygon * poly,
-                                                    const glm::dmat4          & trans,
-                                                    const size_t                symbologyID = 0,
-                                                    const double                height      = 0.0,
-                                                    const double                minHeight   = 0.0);
+    static ConstPtr tessellatePolygon(	const geos::geom::Polygon		* poly,
+                                                    const glm::dmat4    & trans,
+                                                    const size_t          symbologyID = 0,
+                                                    const double          height      = 0.0,
+                                                    const double          minHeight   = 0.0);
 
     static void tessellateMultiPolygon( const geos::geom::MultiPolygon  * multiPoly,
                                         const glm::dmat4                & trans,
@@ -55,29 +54,28 @@ public:
 
 private:
 
+	Tessellation(	const size_t symbologyID,
+					const double height,
+					const double minHeight);
+
+	Tessellation(const Tessellation &)              = delete;
+	Tessellation(Tessellation &&)                   = delete;
+	Tessellation & operator=(const Tessellation &)  = delete;
+
     friend class VertexArrayObject;
 
-    double    * verts           = NULL; // TODO make object oriented 
-    uint32_t  * triangleIndices = NULL;
-    uint32_t    numVerts        = 0;
-    uint32_t    numTriangles    = 0;
+    double    * m_verts           = NULL; // TODO make object oriented 
+    uint32_t  * m_triangleIndices = NULL;
+    uint32_t    m_numVerts        = 0;
+    uint32_t    m_numTriangles    = 0;
 
-    Uint32Vec counterVertIndices;
-    Uint32Vec lineIndices;
+    Uint32Vec m_counterVertIndices;
+    Uint32Vec m_lineIndices;
 
-    uint32_t symbologyID;
+    uint32_t m_symbologyID;
 
-    double height;
-    double minHeight;
-
-    Tessellation(const size_t symbologyID,
-                 const double height,
-                 const double minHeight);
-
-    Tessellation(const Tessellation &)              = delete;
-    Tessellation(Tessellation &&)                   = delete;
-    Tessellation & operator=(const Tessellation &)  = delete;
-    //Tessellation & operator=(Tessellation &)        = delete;
+    double m_height;
+    double m_minHeight;
 };
 
 typedef Tessellation::Tessellations Tessellations;

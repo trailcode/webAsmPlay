@@ -45,14 +45,14 @@ using namespace geosUtil;
 
 Tessellation::Tessellation(const size_t symbologyID,
                            const double height,
-                           const double minHeight) : symbologyID(symbologyID),
-                                                     height     (height),
-                                                     minHeight  (minHeight) {}
+                           const double minHeight) : m_symbologyID(symbologyID),
+                                                     m_height     (height),
+                                                     m_minHeight  (minHeight) {}
     
 Tessellation::~Tessellation()
 {
-    free(verts);
-    free(triangleIndices);
+    free(m_verts);
+    free(m_triangleIndices);
 }
 
 Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
@@ -84,7 +84,7 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
         {
             append2d(verts, coords[i]);
 
-            append2ui(ret->lineIndices, i, (i + 1) % num);
+            append2ui(ret->m_lineIndices, i, (i + 1) % num);
         }
     }
     else
@@ -93,12 +93,12 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
         {
             append2d(verts, trans * __(coords[i], 0, 1));
 
-            append2ui(ret->lineIndices, i, (i + 1) % num);
+            append2ui(ret->m_lineIndices, i, (i + 1) % num);
         }
     }
 
-    ret->counterVertIndices.push_back(0);
-    ret->counterVertIndices.push_back(verts.size());
+    ret->m_counterVertIndices.push_back(0);
+    ret->m_counterVertIndices.push_back(verts.size());
 
     for(size_t i = 0; i < poly->getNumInteriorRing(); ++i)
     {
@@ -121,7 +121,7 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
             {
                 append2d(verts, coords[i]);
 
-                append2ui(ret->lineIndices, i + offset, ((i + 1) % num) + offset);
+                append2ui(ret->m_lineIndices, i + offset, ((i + 1) % num) + offset);
             }
         }
         else
@@ -130,25 +130,25 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
             {
                 append2d(verts, trans * __(coords[i], 0, 1));
 
-                append2ui(ret->lineIndices, i + offset, ((i + 1) % num) + offset);
+                append2ui(ret->m_lineIndices, i + offset, ((i + 1) % num) + offset);
             }
         }
 
-        ret->counterVertIndices.push_back(verts.size());
+        ret->m_counterVertIndices.push_back(verts.size());
     }
 
     vector<const double *> counterVertPtrs;
 
-    for(size_t i = 0; i < ret->counterVertIndices.size(); ++i) { counterVertPtrs.push_back(&verts[0] + ret->counterVertIndices[i]) ;}
+    for(size_t i = 0; i < ret->m_counterVertIndices.size(); ++i) { counterVertPtrs.push_back(&verts[0] + ret->m_counterVertIndices[i]) ;}
 
-    tessellate( &ret->verts,
-                &ret->numVerts,
-                &ret->triangleIndices,
-                &ret->numTriangles,
+    tessellate( &ret->m_verts,
+                &ret->m_numVerts,
+                &ret->m_triangleIndices,
+                &ret->m_numTriangles,
                 &counterVertPtrs[0],
                 &counterVertPtrs[0] + counterVertPtrs.size());
 
-    for(size_t i = 0; i < ret->counterVertIndices.size(); ++i) { ret->counterVertIndices[i] /= 2 ;}
+    for(size_t i = 0; i < ret->m_counterVertIndices.size(); ++i) { ret->m_counterVertIndices[i] /= 2 ;}
 
     return unique_ptr<const Tessellation>(ret);
 }
@@ -164,7 +164,7 @@ void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
 
         tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
             
-        if(!(*tessellations.rbegin())->verts)
+        if(!(*tessellations.rbegin())->m_verts)
         {
             dmess("Warning tessellation failed!");
 
@@ -173,8 +173,8 @@ void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
     }
 }
 
-bool Tessellation::isEmpty() const { return verts == NULL ;}
+bool Tessellation::isEmpty() const { return m_verts == NULL ;}
 
-uint32_t Tessellation::getSymbologyID() const { return symbologyID ;}
+uint32_t Tessellation::getSymbologyID() const { return m_symbologyID ;}
 
-double Tessellation::getHeight() const { return height ;}
+double Tessellation::getHeight() const { return m_height ;}

@@ -31,28 +31,25 @@
 
 void GUI::openSteerTestPanel()
 {
-    openSteerCanvas->setEnabled(showOpenSteerTestPanel);
+    s_openSteerCanvas->setEnabled(s_showOpenSteerTestPanel);
 
-    if (!showOpenSteerTestPanel)
-    {
-        return;
-    }
+    if (!s_showOpenSteerTestPanel) { return ;}
 
-    ImGui::Begin("OpenSteer", &showOpenSteerTestPanel);
+    ImGui::Begin("OpenSteer", &s_showOpenSteerTestPanel);
 
         const ImVec2 pos = ImGui::GetCursorScreenPos();
 
         const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-        openSteerCanvas->setArea(__(pos), __(sceneWindowSize));
+        s_openSteerCanvas->setArea(__(pos), __(sceneWindowSize));
 
-        openSteerCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+        s_openSteerCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
-        ImGui::GetWindowDrawList()->AddImage((void *)(size_t)openSteerCanvas->render(),
-                                            pos,
-                                            ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-                                            ImVec2(0, 1),
-                                            ImVec2(1, 0));
+        ImGui::GetWindowDrawList()->AddImage(	(void *)(size_t)s_openSteerCanvas->render(),
+												pos,
+												ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+												ImVec2(0, 1),
+												ImVec2(1, 0));
 
     ImGui::End();
 

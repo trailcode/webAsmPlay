@@ -203,9 +203,9 @@ vector<dvec2> geosUtil::__(const vector<Coordinate> * coords) { return __(*coord
 
 vector<dvec2> geosUtil::__(const unique_ptr<vector<Coordinate> > & coords) { return __(coords.get()) ;}
 
-_ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : geom(geom) {}
+_ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : m_geom(geom) {}
 
-_ScopedGeosGeometry::~_ScopedGeosGeometry() { GeometryFactory::getDefaultInstance()->destroyGeometry(geom) ;}
+_ScopedGeosGeometry::~_ScopedGeosGeometry() { GeometryFactory::getDefaultInstance()->destroyGeometry(m_geom) ;}
 
 
 

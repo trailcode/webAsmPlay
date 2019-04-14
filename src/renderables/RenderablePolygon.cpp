@@ -46,8 +46,8 @@ using namespace geos;
 using namespace geos::geom;
 
 RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable(			vertexArrayObject->isMulti(),
-																									GUI::renderSettingsFillPolygons,
-																									GUI::renderSettingsRenderPolygonOutlines),
+																									GUI::s_renderSettingsFillPolygons,
+																									GUI::s_renderSettingsRenderPolygonOutlines),
                                                                                 m_vertexArrayObject(vertexArrayObject)
 {
 }

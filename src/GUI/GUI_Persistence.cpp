@@ -42,27 +42,27 @@
 using namespace std;
 using namespace glm;
 
-bool GUI::showSceneViewPanel                   = false;
-bool GUI::showPerformancePanel                 = false;
-bool GUI::showRenderSettingsPanel              = false;
-bool GUI::showLogPanel                         = false;
-bool GUI::showAttributePanel                   = false;
-bool GUI::showSymbologyPanel                   = false;
-bool GUI::showGUI_Settings_Panel               = false;
-bool GUI::showOpenSteerTestPanel               = false;
-bool GUI::showOpenSteerPanel                   = false;
-bool GUI::showCameraInfoPanel                  = false;
-bool GUI::showBingTileSystemPanel              = false;
+bool GUI::s_showSceneViewPanel                   = false;
+bool GUI::s_showPerformancePanel                 = false;
+bool GUI::s_showRenderSettingsPanel              = false;
+bool GUI::s_showLogPanel                         = false;
+bool GUI::s_showAttributePanel                   = false;
+bool GUI::s_showSymbologyPanel                   = false;
+bool GUI::s_showGUI_Settings_Panel               = false;
+bool GUI::s_showOpenSteerTestPanel               = false;
+bool GUI::s_showOpenSteerPanel                   = false;
+bool GUI::s_showCameraInfoPanel                  = false;
+bool GUI::s_showBingTileSystemPanel              = false;
 
-bool GUI::renderSettingsFillMeshes             = true;
-bool GUI::renderSettingsRenderMeshOutlines     = true;
-bool GUI::renderSettingsFillPolygons           = true;
-bool GUI::renderSettingsRenderPolygonOutlines  = true;
-bool GUI::renderSettingsRenderLinearFeatures   = true;
-bool GUI::renderSettingsRenderSkyBox           = true;
-bool GUI::renderSettingsRenderBingMaps         = true;
+bool GUI::s_renderSettingsFillMeshes             = true;
+bool GUI::s_renderSettingsRenderMeshOutlines     = true;
+bool GUI::s_renderSettingsFillPolygons           = true;
+bool GUI::s_renderSettingsRenderPolygonOutlines  = true;
+bool GUI::s_renderSettingsRenderLinearFeatures   = true;
+bool GUI::s_renderSettingsRenderSkyBox           = true;
+bool GUI::s_renderSettingsRenderBingMaps         = true;
 
-float GUI::lineWidthRender = 1.0;
+float GUI::s_lineWidthRender = 1.0;
 
 void GUI::loadState()
 {
@@ -89,40 +89,40 @@ void GUI::loadState()
         if(root.find(key) != root.end()) { value = root[key]->AsNumber() ;}
     };
 
-    setBool(L"showSceneViewPanel",                  showSceneViewPanel);
-    setBool(L"showPerformancePanel",                showPerformancePanel);
-    setBool(L"showPerformancePanel",                showPerformancePanel);
-    setBool(L"showRenderSettingsPanel",             showRenderSettingsPanel);
-    setBool(L"showLogPanel",                        showLogPanel);
-    setBool(L"showAttributePanel",                  showAttributePanel);
-    setBool(L"showGUI_Settings_Panel",              showGUI_Settings_Panel);
-    setBool(L"showSymbologyPanel",                  showSymbologyPanel);
-    setBool(L"showOpenSteerTestPanel",              showOpenSteerTestPanel);
-    setBool(L"showOpenSteerPanel",                  showOpenSteerPanel);
-    setBool(L"showCameraInfoPanel",                 showCameraInfoPanel);
-    setBool(L"showBingTileSystemPanel",             showBingTileSystemPanel);
+    setBool(L"showSceneViewPanel",                  s_showSceneViewPanel);
+    setBool(L"showPerformancePanel",                s_showPerformancePanel);
+    setBool(L"showPerformancePanel",                s_showPerformancePanel);
+    setBool(L"showRenderSettingsPanel",             s_showRenderSettingsPanel);
+    setBool(L"showLogPanel",                        s_showLogPanel);
+    setBool(L"showAttributePanel",                  s_showAttributePanel);
+    setBool(L"showGUI_Settings_Panel",              s_showGUI_Settings_Panel);
+    setBool(L"showSymbologyPanel",                  s_showSymbologyPanel);
+    setBool(L"showOpenSteerTestPanel",              s_showOpenSteerTestPanel);
+    setBool(L"showOpenSteerPanel",                  s_showOpenSteerPanel);
+    setBool(L"showCameraInfoPanel",                 s_showCameraInfoPanel);
+    setBool(L"showBingTileSystemPanel",             s_showBingTileSystemPanel);
 
-    setBool(L"renderSettingsFillMeshes",            renderSettingsFillMeshes);
-    setBool(L"renderSettingsRenderMeshOutlines",    renderSettingsRenderMeshOutlines);
-    setBool(L"renderSettingsFillPolygons",          renderSettingsFillPolygons);
-    setBool(L"renderSettingsRenderPolygonOutlines", renderSettingsRenderPolygonOutlines);
-    setBool(L"renderSettingsRenderLinearFeatures",  renderSettingsRenderLinearFeatures);
-    setBool(L"renderSettingsRenderSkyBox",          renderSettingsRenderSkyBox);
-    setBool(L"renderSettingsRenderBingMaps",        renderSettingsRenderBingMaps);
+    setBool(L"renderSettingsFillMeshes",            s_renderSettingsFillMeshes);
+    setBool(L"renderSettingsRenderMeshOutlines",    s_renderSettingsRenderMeshOutlines);
+    setBool(L"renderSettingsFillPolygons",          s_renderSettingsFillPolygons);
+    setBool(L"renderSettingsRenderPolygonOutlines", s_renderSettingsRenderPolygonOutlines);
+    setBool(L"renderSettingsRenderLinearFeatures",  s_renderSettingsRenderLinearFeatures);
+    setBool(L"renderSettingsRenderSkyBox",          s_renderSettingsRenderSkyBox);
+    setBool(L"renderSettingsRenderBingMaps",        s_renderSettingsRenderBingMaps);
     setBool(L"OpenSteerAnnotation",                 OpenSteer::enableAnnotation);
 
-    setNumber(L"cameraMode",                        cameraMode);
+    setNumber(L"cameraMode",                        s_cameraMode);
     setNumber(L"openSteerCameraDist",               openSteerCameraDist);
 
     ColorSymbology::getInstance("defaultMesh")   ->loadState(root);
     ColorSymbology::getInstance("defaultPolygon")->loadState(root);
     ColorSymbology::getInstance("defaultLinear") ->loadState(root);
 
-    if(root.find(L"cameraEye")    != root.end()) { canvas->getCamera()->setEye   (root[L"cameraEye"]   ->AsVec3()) ;}
-    if(root.find(L"cameraCenter") != root.end()) { canvas->getCamera()->setCenter(root[L"cameraCenter"]->AsVec3()) ;}
-    if(root.find(L"cameraUp")     != root.end()) { canvas->getCamera()->setUp    (root[L"cameraUp"]    ->AsVec3()) ;}
+    if(root.find(L"cameraEye")    != root.end()) { s_canvas->getCamera()->setEye   (root[L"cameraEye"]   ->AsVec3()) ;}
+    if(root.find(L"cameraCenter") != root.end()) { s_canvas->getCamera()->setCenter(root[L"cameraCenter"]->AsVec3()) ;}
+    if(root.find(L"cameraUp")     != root.end()) { s_canvas->getCamera()->setUp    (root[L"cameraUp"]    ->AsVec3()) ;}
 
-    canvas->getCamera()->update();
+    s_canvas->getCamera()->update();
 
     if(root.find(L"buildingHeightMultiplier") != root.end())
     {
@@ -136,35 +136,35 @@ void GUI::saveState()
     JSONObject root;
 
     // Booleans
-    root[L"showSceneViewPanel"]                   = new JSONValue(showSceneViewPanel);
-    root[L"showPerformancePanel"]                 = new JSONValue(showPerformancePanel);
-    root[L"showRenderSettingsPanel"]              = new JSONValue(showRenderSettingsPanel);
-    root[L"showLogPanel"]                         = new JSONValue(showLogPanel);
-    root[L"showAttributePanel"]                   = new JSONValue(showAttributePanel);
-    root[L"showGUI_Settings_Panel"]               = new JSONValue(showGUI_Settings_Panel);
-    root[L"showSymbologyPanel"]                   = new JSONValue(showSymbologyPanel);
-    root[L"showOpenSteerTestPanel"]               = new JSONValue(showOpenSteerTestPanel);
-    root[L"showOpenSteerPanel"]                   = new JSONValue(showOpenSteerPanel);
-    root[L"showCameraInfoPanel"]                  = new JSONValue(showCameraInfoPanel);
-    root[L"showBingTileSystemPanel"]              = new JSONValue(showBingTileSystemPanel);
+    root[L"showSceneViewPanel"]                   = new JSONValue(s_showSceneViewPanel);
+    root[L"showPerformancePanel"]                 = new JSONValue(s_showPerformancePanel);
+    root[L"showRenderSettingsPanel"]              = new JSONValue(s_showRenderSettingsPanel);
+    root[L"showLogPanel"]                         = new JSONValue(s_showLogPanel);
+    root[L"showAttributePanel"]                   = new JSONValue(s_showAttributePanel);
+    root[L"showGUI_Settings_Panel"]               = new JSONValue(s_showGUI_Settings_Panel);
+    root[L"showSymbologyPanel"]                   = new JSONValue(s_showSymbologyPanel);
+    root[L"showOpenSteerTestPanel"]               = new JSONValue(s_showOpenSteerTestPanel);
+    root[L"showOpenSteerPanel"]                   = new JSONValue(s_showOpenSteerPanel);
+    root[L"showCameraInfoPanel"]                  = new JSONValue(s_showCameraInfoPanel);
+    root[L"showBingTileSystemPanel"]              = new JSONValue(s_showBingTileSystemPanel);
 
-    root[L"renderSettingsFillMeshes"]             = new JSONValue(renderSettingsFillMeshes);
-    root[L"renderSettingsRenderMeshOutlines"]     = new JSONValue(renderSettingsRenderMeshOutlines);
-    root[L"renderSettingsFillPolygons"]           = new JSONValue(renderSettingsFillPolygons);
-    root[L"renderSettingsRenderPolygonOutlines"]  = new JSONValue(renderSettingsRenderPolygonOutlines);
-    root[L"renderSettingsRenderLinearFeatures"]   = new JSONValue(renderSettingsRenderLinearFeatures);
-    root[L"renderSettingsRenderSkyBox"]           = new JSONValue(renderSettingsRenderSkyBox);
-    root[L"renderSettingsRenderBingMaps"]         = new JSONValue(renderSettingsRenderBingMaps);
+    root[L"renderSettingsFillMeshes"]             = new JSONValue(s_renderSettingsFillMeshes);
+    root[L"renderSettingsRenderMeshOutlines"]     = new JSONValue(s_renderSettingsRenderMeshOutlines);
+    root[L"renderSettingsFillPolygons"]           = new JSONValue(s_renderSettingsFillPolygons);
+    root[L"renderSettingsRenderPolygonOutlines"]  = new JSONValue(s_renderSettingsRenderPolygonOutlines);
+    root[L"renderSettingsRenderLinearFeatures"]   = new JSONValue(s_renderSettingsRenderLinearFeatures);
+    root[L"renderSettingsRenderSkyBox"]           = new JSONValue(s_renderSettingsRenderSkyBox);
+    root[L"renderSettingsRenderBingMaps"]         = new JSONValue(s_renderSettingsRenderBingMaps);
     root[L"buildingHeightMultiplier"]             = new JSONValue(ColorDistanceShader3D::getDefaultInstance()->getHeightMultiplier());
 
-    root[L"cameraEye"]                            = new JSONValue(canvas->getCamera()->getEyeConstRef());
-    root[L"cameraCenter"]                         = new JSONValue(canvas->getCamera()->getCenterConstRef());
-    root[L"cameraUp"]                             = new JSONValue(canvas->getCamera()->getUpConstRef());
+    root[L"cameraEye"]                            = new JSONValue(s_canvas->getCamera()->getEyeConstRef());
+    root[L"cameraCenter"]                         = new JSONValue(s_canvas->getCamera()->getCenterConstRef());
+    root[L"cameraUp"]                             = new JSONValue(s_canvas->getCamera()->getUpConstRef());
 
     root[L"OpenSteerAnnotation"]                  = new JSONValue(OpenSteer::enableAnnotation);
     root[L"openSteerCameraDist"]                  = new JSONValue(openSteerCameraDist);
 
-    root[L"cameraMode"]                           = new JSONValue(cameraMode);
+    root[L"cameraMode"]                           = new JSONValue(s_cameraMode);
 
     ColorSymbology::getInstance("defaultMesh")   ->saveState(root);
     ColorSymbology::getInstance("defaultPolygon")->saveState(root);

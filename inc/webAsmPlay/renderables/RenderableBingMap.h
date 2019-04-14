@@ -46,7 +46,7 @@ public:
 	static std::atomic<size_t> s_numUploading;
 	static std::atomic<size_t> s_numWriting;
 
-	static size_t numRendered;
+	static size_t s_numRendered;
 
 private:
 

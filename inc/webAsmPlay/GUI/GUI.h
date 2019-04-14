@@ -62,14 +62,14 @@ public:
 
     static int getCameraMode();
 
-    static bool renderSettingsFillMeshes;
-    static bool renderSettingsRenderMeshOutlines;
-    static bool renderSettingsFillPolygons;
-    static bool renderSettingsRenderPolygonOutlines;
-    static bool renderSettingsRenderLinearFeatures;
-    static bool renderSettingsRenderSkyBox;
-    static bool renderSettingsRenderBingMaps;
-	static float lineWidthRender;
+    static bool  s_renderSettingsFillMeshes;
+    static bool  s_renderSettingsRenderMeshOutlines;
+    static bool  s_renderSettingsFillPolygons;
+    static bool  s_renderSettingsRenderPolygonOutlines;
+    static bool  s_renderSettingsRenderLinearFeatures;
+    static bool  s_renderSettingsRenderSkyBox;
+    static bool  s_renderSettingsRenderBingMaps;
+	static float s_lineWidthRender;
 
     static void setupCallbacks(GLFWwindow* window);
     static void initOpenGL();
@@ -105,7 +105,7 @@ public:
 		});
 		//this->q.push(_f);
 
-		eventQueue.push(_f);
+		s_eventQueue.push(_f);
 
 		return pck->get_future();
 	}
@@ -145,31 +145,31 @@ private:
     static void windowFocusCallback     (GLFWwindow * window, int focused);
     static void cursorEnterCallback     (GLFWwindow * window, int entered);
     
-    static bool showSceneViewPanel;
-    static bool showPerformancePanel;
-    static bool showRenderSettingsPanel;
-    static bool showLogPanel;
-    static bool showAttributePanel;
-    static bool showGUI_Settings_Panel;
-    static bool showSymbologyPanel;
-    static bool showOpenSteerTestPanel;
-    static bool showOpenSteerPanel;
-    static bool showCameraInfoPanel;
-    static bool showBingTileSystemPanel;
+    static bool s_showSceneViewPanel;
+    static bool s_showPerformancePanel;
+    static bool s_showRenderSettingsPanel;
+    static bool s_showLogPanel;
+    static bool s_showAttributePanel;
+    static bool s_showGUI_Settings_Panel;
+    static bool s_showSymbologyPanel;
+    static bool s_showOpenSteerTestPanel;
+    static bool s_showOpenSteerPanel;
+    static bool s_showCameraInfoPanel;
+    static bool s_showBingTileSystemPanel;
 
-    static GLFWwindow * mainWindow;
+    static GLFWwindow * s_mainWindow;
 
-    static GeosTestCanvas  * geosTestCanvas;
-    static OpenSteerCanvas * openSteerCanvas;
-    static Canvas          * canvas;
-    static SkyBox          * skyBox;
-    static GeoClient       * client;
+    static GeosTestCanvas  * s_geosTestCanvas;
+    static OpenSteerCanvas * s_openSteerCanvas;
+    static Canvas          * s_canvas;
+    static SkyBox          * s_skyBox;
+    static GeoClient       * s_client;
 
-    static std::vector<Canvas *> auxCanvases;
+    static std::vector<Canvas *> s_auxCanvases;
 
-    static int cameraMode;
+    static int s_cameraMode;
     
-    static bool shuttingDown;
+    static bool s_shuttingDown;
 
-	static EventQueue eventQueue;
+	static EventQueue s_eventQueue;
 };

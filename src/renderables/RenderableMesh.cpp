@@ -131,8 +131,8 @@ RenderableMesh::~RenderableMesh()
 }
 
 RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderable( true,
-                                                                                    GUI::renderSettingsFillPolygons,
-                                                                                    GUI::renderSettingsRenderPolygonOutlines),
+                                                                                    GUI::s_renderSettingsFillPolygons,
+                                                                                    GUI::s_renderSettingsRenderPolygonOutlines),
                                                                         m_vertexArrayObject(vertexArrayObject)
 {
 

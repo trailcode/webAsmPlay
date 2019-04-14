@@ -40,7 +40,6 @@
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/GeoClient.h>
@@ -89,16 +88,16 @@ using namespace glm;
 
 #define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
-GeosTestCanvas  * GUI::geosTestCanvas  = NULL;
-OpenSteerCanvas * GUI::openSteerCanvas = NULL;
-Canvas          * GUI::canvas          = NULL;
-SkyBox          * GUI::skyBox          = NULL;
-GLFWwindow      * GUI::mainWindow      = NULL;
-int               GUI::cameraMode      = GUI::CAMERA_TRACK_BALL;
-bool              GUI::shuttingDown    = false;
-GeoClient       * GUI::client          = NULL;
-vector<Canvas *>  GUI::auxCanvases;
-EventQueue		  GUI::eventQueue;
+GeosTestCanvas  * GUI::s_geosTestCanvas		= NULL;
+OpenSteerCanvas * GUI::s_openSteerCanvas	= NULL;
+Canvas          * GUI::s_canvas				= NULL;
+SkyBox          * GUI::s_skyBox				= NULL;
+GLFWwindow      * GUI::s_mainWindow			= NULL;
+int               GUI::s_cameraMode			= GUI::CAMERA_TRACK_BALL;
+bool              GUI::s_shuttingDown		= false;
+GeoClient       * GUI::s_client				= NULL;
+vector<Canvas *>  GUI::s_auxCanvases;
+EventQueue		  GUI::s_eventQueue;
 
 namespace
 {
@@ -329,7 +328,7 @@ void GUI::showMainMenuBar()
              #endif
         }
 
-        if(ImGui::MenuItem("Load Geometry")) { client->loadGeoServerGeometry() ;}
+        if(ImGui::MenuItem("Load Geometry")) { s_client->loadGeoServerGeometry() ;}
 
         ImGui::EndMenu();
     }
@@ -346,17 +345,17 @@ void GUI::showMainMenuBar()
 
     if(ImGui::BeginMenu("View"))
     {
-        if(ImGui::MenuItem("Geos Tests"))       { showSceneViewPanel      ^= 1 ;}
-        if(ImGui::MenuItem("Performance"))      { showPerformancePanel    ^= 1 ;}
-        if(ImGui::MenuItem("Render Settings"))  { showRenderSettingsPanel ^= 1 ;}
-        if(ImGui::MenuItem("Log"))              { showLogPanel            ^= 1 ;}
-        if(ImGui::MenuItem("Attributes"))       { showAttributePanel      ^= 1 ;}
-        if(ImGui::MenuItem("GUI Settings"))     { showGUI_Settings_Panel  ^= 1 ;}
-        if(ImGui::MenuItem("Symbology"))        { showSymbologyPanel      ^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer Test"))   { showOpenSteerTestPanel  ^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer"))        { showOpenSteerPanel      ^= 1 ;}
-        if(ImGui::MenuItem("Camera Info"))      { showCameraInfoPanel     ^= 1 ;}
-        if(ImGui::MenuItem("Bing Tile System")) { showBingTileSystemPanel ^= 1 ;}
+        if(ImGui::MenuItem("Geos Tests"))       { s_showSceneViewPanel      ^= 1 ;}
+        if(ImGui::MenuItem("Performance"))      { s_showPerformancePanel    ^= 1 ;}
+        if(ImGui::MenuItem("Render Settings"))  { s_showRenderSettingsPanel ^= 1 ;}
+        if(ImGui::MenuItem("Log"))              { s_showLogPanel            ^= 1 ;}
+        if(ImGui::MenuItem("Attributes"))       { s_showAttributePanel      ^= 1 ;}
+        if(ImGui::MenuItem("GUI Settings"))     { s_showGUI_Settings_Panel  ^= 1 ;}
+        if(ImGui::MenuItem("Symbology"))        { s_showSymbologyPanel      ^= 1 ;}
+        if(ImGui::MenuItem("OpenSteer Test"))   { s_showOpenSteerTestPanel  ^= 1 ;}
+        if(ImGui::MenuItem("OpenSteer"))        { s_showOpenSteerPanel      ^= 1 ;}
+        if(ImGui::MenuItem("Camera Info"))      { s_showCameraInfoPanel     ^= 1 ;}
+        if(ImGui::MenuItem("Bing Tile System")) { s_showBingTileSystemPanel ^= 1 ;}
 
         ImGui::EndMenu();
     }
@@ -366,9 +365,9 @@ void GUI::showMainMenuBar()
 
 void GUI::performacePanel()
 {
-    if(!showPerformancePanel) { return ;}
+    if(!s_showPerformancePanel) { return ;}
     
-    ImGui::Begin("Performance", &showPerformancePanel);
+    ImGui::Begin("Performance", &s_showPerformancePanel);
 
         static float f = 0.0f;
         static float frameTimes[100] = {0.f};
@@ -382,22 +381,20 @@ void GUI::performacePanel()
 
 void GUI::attributePanel(const string & attrsStr)
 {
-    if(!showAttributePanel) { return ;}
+    if(!s_showAttributePanel) { return ;}
 
-    ImGui::Begin("Attributes", &showAttributePanel);
+    ImGui::Begin("Attributes", &s_showAttributePanel);
 
         ImGui::Text(attrsStr.c_str());
 
     ImGui::End();
 }
 
-#include <webAsmPlay/FrameBuffer.h>
-
 void GUI::doQueue()
 {
 	function<void()> * _f = nullptr;
 
-	if (eventQueue.try_pop(_f))
+	if (s_eventQueue.try_pop(_f))
 	{
 		(*_f)();
 		
@@ -458,7 +455,7 @@ void GUI::mainLoop(GLFWwindow * window)
     // Rendering
     int screenWidth, screenHeight;
 
-    glfwGetFramebufferSize(mainWindow, &screenWidth, &screenHeight);
+    glfwGetFramebufferSize(s_mainWindow, &screenWidth, &screenHeight);
     //glfwGetWindowSize(mainWindow, &screenWidth, &screenHeight);
 
     GL_CHECK(glViewport(0, 0, screenWidth, screenHeight));
@@ -470,22 +467,22 @@ void GUI::mainLoop(GLFWwindow * window)
     GL_CHECK(glDisable(GL_BLEND));
     GL_CHECK(glDisable(GL_DEPTH_TEST));
  
-    canvas->render();
+    s_canvas->render();
     
-    const double dist = distance(canvas->getCamera()->getCenter(), canvas->getCamera()->getEye());
+    const double dist = distance(s_canvas->getCamera()->getCenter(), s_canvas->getCamera()->getEye());
 
-    canvas->getTrackBallInteractor()->setZoomScale(dist * 0.02);
+    s_canvas->getTrackBallInteractor()->setZoomScale(dist * 0.02);
 
-    const dvec4 pos(canvas->getCursorPosWC(), 1.0);
+    const dvec4 pos(s_canvas->getCursorPosWC(), 1.0);
 
-    showCursorPositionOverlay(NULL, client->getInverseTrans() * pos);
+    showCursorPositionOverlay(NULL, s_client->getInverseTrans() * pos);
     //showCursorPositionOverlay(NULL, pos);
 
-    string attrsStr = client->doPicking(mode, pos); // TODO move to updatables
+    string attrsStr = s_client->doPicking(mode, pos); // TODO move to updatables
 
     for(auto & i : updatables) { i() ;}
 
-    if(showLogPanel) { logPanel.Draw("Log", &showLogPanel) ;}
+    if(s_showLogPanel) { logPanel.Draw("Log", &s_showLogPanel) ;}
 
     showMainToolBar();
     showMainMenuBar();
@@ -511,9 +508,9 @@ void GUI::mainLoop(GLFWwindow * window)
 
     ImGui::EndFrame();
 
-    glfwMakeContextCurrent(mainWindow);
+    glfwMakeContextCurrent(s_mainWindow);
 
-    glfwSwapBuffers(mainWindow);
+    glfwSwapBuffers(s_mainWindow);
 
 #ifdef __EMSCRIPTEN__
 
@@ -526,9 +523,9 @@ void GUI::mainLoop(GLFWwindow * window)
 
 char GUI::getMode() { return mode ;}
 
-GLFWwindow * GUI::getMainWindow() { return mainWindow ;}
+GLFWwindow * GUI::getMainWindow() { return s_mainWindow ;}
 
-GeoClient * GUI::getClient() { return client ;}
+GeoClient * GUI::getClient() { return s_client ;}
 
 void GUI::progress(const string & message, const float percent)
 {
@@ -556,10 +553,8 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     static int width, height;
     int fbWidth, fbHeight;
 
-    glfwGetWindowSize(mainWindow, &width, &height);
-    glfwGetFramebufferSize(mainWindow, &fbWidth, &fbHeight);
-
-	dmess("width " << width << " height " << height << " fbWidth " << fbWidth << " fbHeight " << fbHeight);
+    glfwGetWindowSize		(s_mainWindow, &width,	 &height);
+    glfwGetFramebufferSize	(s_mainWindow, &fbWidth, &fbHeight);
 
     //GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
     GL_CHECK(glViewport(0, 0, fbWidth, fbHeight)); // TODO needed?
@@ -577,17 +572,17 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     
 	OpenGL::init();
 
-    canvas = new Canvas(false);
+    s_canvas = new Canvas(false);
 
-    canvas->setArea(ivec2(0,0), ivec2(width, height));
+    s_canvas->setArea(ivec2(0,0), ivec2(width, height));
     //canvas->setArea(ivec2(0,0), ivec2(fbWidth, fbWidth));
 
-    canvas->setFrameBufferSize(ivec2(fbWidth, fbHeight));
+    s_canvas->setFrameBufferSize(ivec2(fbWidth, fbHeight));
 
-    auxCanvases = vector<Canvas *>(
+    s_auxCanvases = vector<Canvas *>(
     {
-        geosTestCanvas  = new GeosTestCanvas(),
-        openSteerCanvas = new OpenSteerCanvas()
+        s_geosTestCanvas  = new GeosTestCanvas(),
+        s_openSteerCanvas = new OpenSteerCanvas()
     });
 }
 
@@ -598,37 +593,37 @@ Updatable GUI::addUpdatable(Updatable updatable)
     return updatable;
 }
 
-int GUI::getCameraMode() { return cameraMode ;}
+int GUI::getCameraMode() { return s_cameraMode ;}
 
 void GUI::shutdown()
 {
     saveState();
 
-    shuttingDown = true;
+    s_shuttingDown = true;
 }
 
-bool GUI::isShuttingDown() { return shuttingDown ;}
+bool GUI::isShuttingDown() { return s_shuttingDown ;}
 
 namespace
 {
-	bool contextSet = false;
+	bool g_contextSet = false;
 }
 
 void GUI::createWorld()
 {
-    skyBox = new SkyBox();
+    s_skyBox = new SkyBox();
 
-    if(renderSettingsRenderSkyBox) { canvas->setSkyBox(skyBox) ;} // TODO create check render functor
-    else                           { canvas->setSkyBox(NULL)   ;}
+    if(s_renderSettingsRenderSkyBox) { s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor
+    else                           { s_canvas->setSkyBox(NULL)   ;}
 
     pool.push([](int ID) {
         
 		OpenGL::ensureSharedContext();
 
-		client = new GeoClient(canvas);
+		s_client = new GeoClient(s_canvas);
 
         //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
-        client->loadGeometry("data.geo");
+        s_client->loadGeometry("data.geo");
 
 		guiASync([]() // TODO try to remove!
 		{
