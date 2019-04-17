@@ -30,7 +30,6 @@
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
-#include <webAsmPlay/FrameBuffer2.h>
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/geom/GeosUtil.h>
@@ -98,7 +97,7 @@ ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
 	{
 		//delete m_auxFrameBuffer;
 
-		m_auxFrameBuffer = new FrameBuffer2(fbSize,
+		m_auxFrameBuffer = new FrameBuffer(fbSize,
 											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,				{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
 												TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
 											FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,	{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
@@ -106,12 +105,8 @@ ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
 												TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
 												TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
 	}
-
-	if (m_auxFrameBuffer->getBufferSize() != fbSize)
-	{
-		m_auxFrameBuffer->setBufferSize(fbSize);
-	}
-	//*/
+	
+	m_auxFrameBuffer->setBufferSize(fbSize);
 
     return m_frameBufferSize = fbSize;
 }
@@ -188,7 +183,7 @@ bool Canvas::preRender()
 		{
 			delete m_frameBuffer;
 
-			m_frameBuffer = new FrameBuffer2(	m_frameBufferSize,
+			m_frameBuffer = new FrameBuffer(	m_frameBufferSize,
 												{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGB32F,				{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
 																											  TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
 												FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,	{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
@@ -485,7 +480,7 @@ dvec3 Canvas::getCursorPosWC()						const	{ return m_cursorPosWC ;}
 Renderable * Canvas::getCursor()					const	{ return m_cursor ;}
 
 //FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
-FrameBuffer2 * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
+FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
 
 #ifdef __EMSCRIPTEN__
 

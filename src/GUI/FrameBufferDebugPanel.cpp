@@ -23,64 +23,29 @@
 \email trailcode@gmail.com
 \copyright 2019
 */
-#pragma once
 
-#include <utility>
-#include <vector>
-#include <glm/vec2.hpp>
-#include <webAsmPlay/OpenGL_Util.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/GUI/GUI.h>
 
-typedef std::pair<GLenum, GLenum> TexParam;
-
-struct FB_Component
+void GUI::frameBufferDepthDebugPanel()
 {
-	FB_Component(	const GLenum				  type,
-					const GLenum				  dataType,
-					const std::vector<TexParam> & textureParameters = std::vector<TexParam>()) :	m_type				(type),
-																									m_dataType			(dataType),
-																									m_textureParameters	(textureParameters) {}
+	if (!s_showFrameBufferDepthDebugPanel) { return; }
 
-	const GLenum m_type;
-	const GLenum m_dataType;
+	ImGui::Begin("FrameBuffer Depth", &s_showFrameBufferDepthDebugPanel);
+	{
+		const ImVec2 pos = ImGui::GetCursorScreenPos();
 
-	const std::vector<TexParam> m_textureParameters;
-};
+		const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-class FrameBuffer2
-{
-public:
-
-	FrameBuffer2(const glm::ivec2					& bufferSize,
-				 const std::vector<FB_Component>	& components);
-								
-	~FrameBuffer2();
-
-	glm::ivec2 getBufferSize() const;
-
-	glm::ivec2 setBufferSize(const glm::ivec2& size);
-
-	void bind(const bool clear = true);
-	void unbind();
-
-	GLuint getTextureID(const size_t component = 0) const;
-
-private:
-
-	glm::ivec2 initFrameBuffer(const glm::ivec2 & bufferSize);
-
-	void cleanup();
-
-	glm::ivec2 m_bufferSize;
-
-	GLuint m_renderFBO;
-
-	std::vector<GLuint> m_textures;
-
-	std::vector<GLenum> m_drawBuffers;
-
-	GLint m_prevFB = 0;
-
-	const std::vector<FB_Component>	m_components;
-
-private:
-};
+		if (s_canvas->getAuxFrameBuffer())
+		{
+			ImGui::GetWindowDrawList()->AddImage((void*)(size_t)s_canvas->getAuxFrameBuffer()->getTextureID(),
+				pos,
+				ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+				ImVec2(0, 1),
+				ImVec2(1, 0));
+		}
+	}
+	ImGui::End();
+}

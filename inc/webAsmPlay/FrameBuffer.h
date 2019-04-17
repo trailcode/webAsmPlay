@@ -1,76 +1,86 @@
-/**
- ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
- ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
- ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
- ╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
- ╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
- ╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
- // This software is provided 'as-is', without any express or implied
- // warranty.  In no event will the authors be held liable for any damages
- // arising from the use of this software.
- // Permission is granted to anyone to use this software for any purpose,
- // including commercial applications, and to alter it and redistribute it
- // freely, subject to the following restrictions:
- // 1. The origin of this software must not be misrepresented; you must not
- //    claim that you wrote the original software. If you use this software
- //    in a product, an acknowledgment in the product documentation would be
- //    appreciated but is not required.
- // 2. Altered source versions must be plainly marked as such, and must not be
- //    misrepresented as being the original software.
- // 3. This notice may not be removed or altered from any source distribution.
+﻿/**
+╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
+┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
+╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
+╱╱┃┃╱╱┃╭╯┃╭╮┃┣┫┃┃╱┃┃╱╭╮┃╭╮┃┃╭╮┃┃┃━┫
+╱╱┃┃╱╱┃┃╱┃╭╮┃┃┃┃╰╮┃╰━╯┃┃╰╯┃┃╰╯┃┃┃━┫
+╱╱╰╯╱╱╰╯╱╰╯╰╯╰╯╰━╯╰━━━╯╰━━╯╰━━╯╰━━╯
+// This software is provided 'as-is', without any express or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//    misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
 
-  \author Matthew Tang
-  \email trailcode@gmail.com
-  \copyright 2018
+\author Matthew Tang
+\email trailcode@gmail.com
+\copyright 2019
 */
 #pragma once
 
+#include <utility>
+#include <vector>
 #include <glm/vec2.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
+
+typedef std::pair<GLenum, GLenum> TexParam;
+
+struct FB_Component
+{
+	FB_Component(	const GLenum				  type,
+					const GLenum				  dataType,
+					const std::vector<TexParam> & textureParameters = std::vector<TexParam>()) :	m_type				(type),
+																									m_dataType			(dataType),
+																									m_textureParameters	(textureParameters) {}
+
+	const GLenum m_type;
+	const GLenum m_dataType;
+
+	const std::vector<TexParam> m_textureParameters;
+};
 
 class FrameBuffer
 {
 public:
 
-    static FrameBuffer * create(const glm::ivec2 & bufferSize,
-								const GLint		   internalformat	= GL_RGBA32F,
-								const GLenum	   format			= GL_RGBA,
-								const GLenum	   type				= GL_FLOAT);
+	FrameBuffer(const glm::ivec2					& bufferSize,
+				 const std::vector<FB_Component>	& components);
+								
+	~FrameBuffer();
 
-    static FrameBuffer * ensureFrameBuffer(	FrameBuffer		*& currBuffer,
-											const glm::ivec2 & bufferSize,
-											const GLint		   internalformat	= GL_RGBA32F,
-											const GLenum	   format			= GL_RGBA,
-											const GLenum	   type				= GL_FLOAT);
+	glm::ivec2 getBufferSize() const;
 
-    ~FrameBuffer();
+	glm::ivec2 setBufferSize(const glm::ivec2& size);
 
-    glm::ivec2 getBufferSize() const;
+	void bind(const bool clear = true);
+	void unbind();
 
-    void bind(const bool clear = true);
-    void unbind();
-
-    GLuint getTextureID() const;
+	GLuint getTextureID(const size_t component = 0) const;
 
 private:
-    
-    FrameBuffer(const GLuint       framebuffer,
-                const GLuint       textureColorbuffer,
-                const GLuint       rbo,
-                const glm::ivec2 & bufferSize,
-				const GLint		   internalformat,
-				const GLenum	   format,
-				const GLenum	   type);
 
-    const GLuint m_framebuffer;
-    const GLuint m_textureColorbuffer;
-    const GLuint m_rbo;
+	glm::ivec2 initFrameBuffer(const glm::ivec2 & bufferSize);
 
-    const glm::ivec2 m_bufferSize;
+	void cleanup();
 
-    GLint m_prevFB = 0;
+	glm::ivec2 m_bufferSize;
 
-	const GLint	 m_internalformat;
-	const GLenum m_format;
-	const GLenum m_type;
+	GLuint m_renderFBO;
+
+	std::vector<GLuint> m_textures;
+
+	std::vector<GLenum> m_drawBuffers;
+
+	GLint m_prevFB = 0;
+
+	const std::vector<FB_Component>	m_components;
+
+private:
 };

@@ -28,9 +28,7 @@
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GeosTestCanvas.h>
-
 #include <webAsmPlay/FrameBuffer.h>
-#include <webAsmPlay/FrameBuffer2.h>
 
 void GUI::geosTestPanel()
 {
@@ -38,7 +36,6 @@ void GUI::geosTestPanel()
 
     if(!s_showSceneViewPanel) { return ;}
     
-	/*
     ImGui::Begin("Geos Tests", &s_showSceneViewPanel);
 
         const ImVec2 pos = ImGui::GetCursorScreenPos();
@@ -66,27 +63,5 @@ void GUI::geosTestPanel()
         s_geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
 
     ImGui::End();
-	*/
-
-	ImGui::Begin("Geos Tests", &s_showSceneViewPanel);
-
-	const ImVec2 pos = ImGui::GetCursorScreenPos();
-
-	const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
-
-	s_geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
-
-	s_geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
-
-	if (s_canvas->getAuxFrameBuffer())
-	{
-		ImGui::GetWindowDrawList()->AddImage((void*)(size_t)s_canvas->getAuxFrameBuffer()->getTextureID(),
-			pos,
-			ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-			ImVec2(0, 1),
-			ImVec2(1, 0));
-	}
-
-	ImGui::End();
 }
 

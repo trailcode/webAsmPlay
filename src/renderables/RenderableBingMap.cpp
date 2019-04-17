@@ -413,7 +413,15 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 {
     if(!getRenderFill()) { return ;}
 
-	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
+	if (!textureBuffer) // TODO refactor
+	{
+		textureBuffer = new FrameBuffer(canvas->getFrameBufferSize(),
+											{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
+	}
+
+	textureBuffer->setBufferSize(canvas->getFrameBufferSize());
 
 	textureBuffer->bind();
 	

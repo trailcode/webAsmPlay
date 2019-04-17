@@ -53,6 +53,7 @@ bool GUI::s_showOpenSteerTestPanel               = false;
 bool GUI::s_showOpenSteerPanel                   = false;
 bool GUI::s_showCameraInfoPanel                  = false;
 bool GUI::s_showBingTileSystemPanel              = false;
+bool GUI::s_showFrameBufferDepthDebugPanel		 = false;
 
 bool GUI::s_renderSettingsFillMeshes             = true;
 bool GUI::s_renderSettingsRenderMeshOutlines     = true;
@@ -101,6 +102,7 @@ void GUI::loadState()
     setBool(L"showOpenSteerPanel",                  s_showOpenSteerPanel);
     setBool(L"showCameraInfoPanel",                 s_showCameraInfoPanel);
     setBool(L"showBingTileSystemPanel",             s_showBingTileSystemPanel);
+	setBool(L"showFrameBufferDepthDebugPanel",		s_showFrameBufferDepthDebugPanel);
 
     setBool(L"renderSettingsFillMeshes",            s_renderSettingsFillMeshes);
     setBool(L"renderSettingsRenderMeshOutlines",    s_renderSettingsRenderMeshOutlines);
@@ -147,6 +149,7 @@ void GUI::saveState()
     root[L"showOpenSteerPanel"]                   = new JSONValue(s_showOpenSteerPanel);
     root[L"showCameraInfoPanel"]                  = new JSONValue(s_showCameraInfoPanel);
     root[L"showBingTileSystemPanel"]              = new JSONValue(s_showBingTileSystemPanel);
+	root[L"showFrameBufferDepthDebugPanel"]       = new JSONValue(s_showFrameBufferDepthDebugPanel);
 
     root[L"renderSettingsFillMeshes"]             = new JSONValue(s_renderSettingsFillMeshes);
     root[L"renderSettingsRenderMeshOutlines"]     = new JSONValue(s_renderSettingsRenderMeshOutlines);

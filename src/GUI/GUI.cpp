@@ -345,17 +345,18 @@ void GUI::showMainMenuBar()
 
     if(ImGui::BeginMenu("View"))
     {
-        if(ImGui::MenuItem("Geos Tests"))       { s_showSceneViewPanel      ^= 1 ;}
-        if(ImGui::MenuItem("Performance"))      { s_showPerformancePanel    ^= 1 ;}
-        if(ImGui::MenuItem("Render Settings"))  { s_showRenderSettingsPanel ^= 1 ;}
-        if(ImGui::MenuItem("Log"))              { s_showLogPanel            ^= 1 ;}
-        if(ImGui::MenuItem("Attributes"))       { s_showAttributePanel      ^= 1 ;}
-        if(ImGui::MenuItem("GUI Settings"))     { s_showGUI_Settings_Panel  ^= 1 ;}
-        if(ImGui::MenuItem("Symbology"))        { s_showSymbologyPanel      ^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer Test"))   { s_showOpenSteerTestPanel  ^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer"))        { s_showOpenSteerPanel      ^= 1 ;}
-        if(ImGui::MenuItem("Camera Info"))      { s_showCameraInfoPanel     ^= 1 ;}
-        if(ImGui::MenuItem("Bing Tile System")) { s_showBingTileSystemPanel ^= 1 ;}
+        if(ImGui::MenuItem("Geos Tests"))			{ s_showSceneViewPanel				^= 1 ;}
+        if(ImGui::MenuItem("Performance"))			{ s_showPerformancePanel			^= 1 ;}
+        if(ImGui::MenuItem("Render Settings"))		{ s_showRenderSettingsPanel			^= 1 ;}
+        if(ImGui::MenuItem("Log"))					{ s_showLogPanel					^= 1 ;}
+        if(ImGui::MenuItem("Attributes"))			{ s_showAttributePanel				^= 1 ;}
+        if(ImGui::MenuItem("GUI Settings"))			{ s_showGUI_Settings_Panel			^= 1 ;}
+        if(ImGui::MenuItem("Symbology"))			{ s_showSymbologyPanel				^= 1 ;}
+        if(ImGui::MenuItem("OpenSteer Test"))		{ s_showOpenSteerTestPanel			^= 1 ;}
+        if(ImGui::MenuItem("OpenSteer"))			{ s_showOpenSteerPanel				^= 1 ;}
+        if(ImGui::MenuItem("Camera Info"))			{ s_showCameraInfoPanel				^= 1 ;}
+        if(ImGui::MenuItem("Bing Tile System"))		{ s_showBingTileSystemPanel			^= 1 ;}
+		if(ImGui::MenuItem("Framebuffer Depth"))	{ s_showFrameBufferDepthDebugPanel	^= 1 ;}
 
         ImGui::EndMenu();
     }
@@ -497,6 +498,7 @@ void GUI::mainLoop(GLFWwindow * window)
     openSteerPanel();
     cameraInfoPanel();
     bingTileSystemPanel();
+	frameBufferDepthDebugPanel();
 
     ImGui::End();
 

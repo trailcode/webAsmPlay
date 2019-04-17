@@ -35,7 +35,6 @@
 #include <webAsmPlay/GUI/ImguiInclude.h>
 
 class FrameBuffer;
-class FrameBuffer2;
 class Renderable;
 class SkyBox;
 class Frustum;
@@ -124,8 +123,7 @@ public:
 
     glm::dvec2 renderCursor(const glm::dvec2 & pos);
 
-	//FrameBuffer * getAuxFrameBuffer() const;
-	FrameBuffer2 * getAuxFrameBuffer() const;
+	FrameBuffer * getAuxFrameBuffer() const;
 
 	double getPerspectiveFOV() const;
 	double setPerspectiveFOV(const double FOV);
@@ -149,8 +147,7 @@ private:
 
     rsmz::TrackBallInteractor * m_trackBallInteractor = NULL;
 
-    //FrameBuffer * m_frameBuffer = NULL;
-	FrameBuffer2 * m_frameBuffer = NULL;
+	FrameBuffer * m_frameBuffer = NULL;
 
     bool m_wantMouseCapture = true;
 
@@ -190,8 +187,7 @@ private:
 
     Renderable * m_cursor = NULL;
 
-    //FrameBuffer * m_auxFrameBuffer = NULL;
-	FrameBuffer2 * m_auxFrameBuffer = NULL;
+	FrameBuffer * m_auxFrameBuffer = NULL;
 
 	Frustum * m_frustum = NULL;
 

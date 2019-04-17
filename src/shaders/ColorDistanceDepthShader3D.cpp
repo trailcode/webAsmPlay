@@ -29,7 +29,6 @@
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/FrameBuffer.h>
-#include <webAsmPlay/FrameBuffer2.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 
