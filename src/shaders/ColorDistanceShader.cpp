@@ -35,6 +35,8 @@
 using namespace std;
 using namespace glm;
 
+REGISTER_SHADER(ColorDistanceShader)
+
 namespace
 {
     ShaderProgram       * shaderProgram     = NULL;

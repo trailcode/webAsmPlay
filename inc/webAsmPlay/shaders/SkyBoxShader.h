@@ -31,13 +31,13 @@ class SkyBoxShader : public Shader
 {
 public:
 
-	static void ensureShader();
-
 	static SkyBoxShader * getDefaultInstance();
 
 	void bind(  Canvas     * canvas,
 				const bool   isOutline,
 				const size_t renderingStage = 0) override;
+
+	static void ensureShader();
 
 private:
 

@@ -28,6 +28,8 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/TextureLookupShader.h>
 
+REGISTER_SHADER(TextureLookupShader)
+
 namespace
 {
 	ShaderProgram		* shaderProgram		= NULL;

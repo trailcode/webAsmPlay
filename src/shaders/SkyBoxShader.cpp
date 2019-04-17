@@ -32,6 +32,8 @@
 
 using namespace glm;
 
+REGISTER_SHADER(SkyBoxShader)
+
 namespace
 {
 	ShaderProgram   * shaderProgram   = NULL;

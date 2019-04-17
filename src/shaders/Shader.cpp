@@ -24,12 +24,15 @@
   \copyright 2018
 */
 
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/Shader.h>
 
 using namespace std;
 using namespace glm;
+
+vector<function<void()>> Shader::s_shadersToRegister;
 
 Shader::Shader(const string  & shaderName) :    m_shaderName     (shaderName),
                                                 m_colorSymbology (ColorSymbology::getInstance("defaultPolygon")) {}
@@ -42,3 +45,15 @@ bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) con
 
 ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return m_colorSymbology = colorSymbology	;}
 ColorSymbology * Shader::getColorSymbology() const							{ return m_colorSymbology					;}
+
+RegisterShader::RegisterShader(const function<void()> & registerFunction)
+{
+	dmess("RegisterShader");
+
+	Shader::s_shadersToRegister.push_back(registerFunction);
+}
+
+void Shader::ensureShaders()
+{
+	for (const auto& i : s_shadersToRegister) { i(); }
+}

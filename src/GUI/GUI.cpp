@@ -47,16 +47,6 @@
 #include <webAsmPlay/OpenSteerCanvas.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/OpenGL_Util.h>
-#include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
-#include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
-#include <webAsmPlay/shaders/ColorShader.h>
-#include <webAsmPlay/shaders/ColorVertexShader.h>
-#include <webAsmPlay/shaders/TextureShader.h>
-#include <webAsmPlay/shaders/TileBoundaryShader.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
-#include <webAsmPlay/shaders/BindlessTextureShader.h>
-#include <webAsmPlay/shaders/SkyBoxShader.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -562,18 +552,6 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     //GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
     GL_CHECK(glViewport(0, 0, fbWidth, fbHeight)); // TODO needed?
 
-    // TODO make these plugins!
-    ColorDistanceShader       ::ensureShader();
-    ColorDistanceShader3D     ::ensureShader();
-    ColorDistanceDepthShader3D::ensureShader();
-    ColorShader               ::ensureShader();
-    ColorVertexShader         ::ensureShader();
-    TextureShader             ::ensureShader();
-    TileBoundaryShader        ::ensureShader();
-	TextureLookupShader		  ::ensureShader();
-	BindlessTextureShader	  ::ensureShader();
-	SkyBoxShader			  ::ensureShader();
-    
 	OpenGL::init();
 
     s_canvas = new Canvas(false);
@@ -618,7 +596,7 @@ void GUI::createWorld()
     s_skyBox = new SkyBox();
 
     if(s_renderSettingsRenderSkyBox) { s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor
-    else                           { s_canvas->setSkyBox(NULL)   ;}
+    else                             { s_canvas->setSkyBox(NULL)     ;}
 
     pool.push([](int ID) {
         

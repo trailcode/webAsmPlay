@@ -28,6 +28,7 @@
 #include <unordered_set>
 #include <tbb/concurrent_queue.h>
 #include <webAsmPlay/GUI/GUI.h>
+#include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/OpenGL_Util.h>
 
@@ -45,14 +46,14 @@ namespace
 
 void OpenGL::init()
 {
+	Shader::ensureShaders();
+
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 
 	for (size_t i = 0; i < numOpenGL_Contexts; ++i)
 	{
 		contextWindows.push(glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow()));
 	}
-
-
 }
 
 void OpenGL::ensureSharedContext()

@@ -25,10 +25,23 @@
 */
 #pragma once
 
+#include <vector>
+#include <functional>
 #include <webAsmPlay/OpenGL_Util.h>
 
 class Canvas;
 class ColorSymbology;
+
+#define REGISTER_SHADER(a) namespace { static RegisterShader __([]() { ##a::ensureShader() ;}) ;}
+
+class RegisterShader
+{
+public:
+
+	RegisterShader(const std::function<void()>& registerFunction);
+
+private:
+};
 
 class Shader
 {
@@ -45,6 +58,8 @@ public:
     ColorSymbology * setColorSymbology(ColorSymbology * colorSymbology);
     ColorSymbology * getColorSymbology() const;
 
+	static void ensureShaders();
+
 protected:
 
     Shader(const std::string & shaderName);
@@ -54,4 +69,11 @@ protected:
     const std::string m_shaderName;
 
     ColorSymbology * m_colorSymbology = NULL;
+
+	friend class RegisterShader;
+
+	static std::vector<std::function<void()>> s_shadersToRegister;
 };
+
+
+

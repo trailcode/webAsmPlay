@@ -32,8 +32,12 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 
+
+
 using namespace std;
 using namespace glm;
+
+REGISTER_SHADER(ColorDistanceDepthShader3D)
 
 // TODO A lot of code duplication! 
 

@@ -30,6 +30,8 @@
 
 using namespace glm;
 
+REGISTER_SHADER(ColorVertexShader)
+
 namespace
 {
     ShaderProgram     * shaderProgram   = NULL;

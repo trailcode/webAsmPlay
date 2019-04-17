@@ -28,6 +28,8 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
 
+REGISTER_SHADER(BindlessTextureShader)
+
 namespace
 {
 	ShaderProgram			* shaderProgram   = NULL;
