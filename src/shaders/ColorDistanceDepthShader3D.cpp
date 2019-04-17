@@ -182,8 +182,6 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
 
     GL_CHECK(glActiveTexture(GL_TEXTURE1));
 
-	dmess("canvas->getAuxFrameBuffer()->getTextureID() " << canvas->getAuxFrameBuffer()->getTextureID());
-
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, canvas->getAuxFrameBuffer()->getTextureID()));
 
 	GL_CHECK(glActiveTexture(GL_TEXTURE2));

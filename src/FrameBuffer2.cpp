@@ -24,40 +24,54 @@
 \copyright 2019
 */
 
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/FrameBuffer2.h>
 
 using namespace std;
 using namespace glm;
 
 FrameBuffer2::FrameBuffer2(	const ivec2					& bufferSize,
-							const vector<FB_Component>	& components)
+							const vector<FB_Component>	& components) : m_components(components)
 {
-	glGenFramebuffers(1,				&m_renderFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER,	 m_renderFBO);
-	
-	m_textures.resize(components.size());
+	m_textures.resize(m_components.size());
 
-	glGenTextures(components.size(), &m_textures[0]);
-
-	for (size_t i = 0; i < components.size(); ++i)
-	{
-		glBindTexture(GL_TEXTURE_2D, m_textures[i]);
-
-		glTexStorage2D(GL_TEXTURE_2D, 1, components[i].m_dataType, bufferSize.x, bufferSize.y);
-
-		for (const auto& texParam : components[i].m_textureParameters) { glTexParameteri(GL_TEXTURE_2D, get<0>(texParam), get<1>(texParam)) ;}
-
-		glFramebufferTexture(GL_FRAMEBUFFER, components[i].m_type, m_textures[i], 0);
-
-		if (components[i].m_type != GL_DEPTH_COMPONENT32F) { m_drawBuffers.push_back(components[i].m_type) ;}
-	}
-
-	glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
-	
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	initFrameBuffer(bufferSize);
 }
 
-FrameBuffer2::~FrameBuffer2()
+FrameBuffer2::~FrameBuffer2() { cleanup() ;}
+
+ivec2 FrameBuffer2::initFrameBuffer(const ivec2& bufferSize)
+{
+	m_bufferSize = bufferSize;
+
+	GL_CHECK(glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_prevFB));
+
+	GL_CHECK(glGenFramebuffers(1,				&m_renderFBO));
+	GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER,	 m_renderFBO));
+
+	glGenTextures(m_components.size(), &m_textures[0]);
+
+	for (size_t i = 0; i < m_components.size(); ++i)
+	{
+		GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_textures[i]));
+
+		GL_CHECK(glTexStorage2D(GL_TEXTURE_2D, 1, m_components[i].m_dataType, m_bufferSize.x, m_bufferSize.y));
+
+		for (const auto& texParam : m_components[i].m_textureParameters) { GL_CHECK(glTexParameteri(GL_TEXTURE_2D, get<0>(texParam), get<1>(texParam))) ;}
+
+		GL_CHECK(glFramebufferTexture(GL_FRAMEBUFFER, m_components[i].m_type, m_textures[i], 0));
+
+		if (m_components[i].m_type != GL_DEPTH_COMPONENT32F) { m_drawBuffers.push_back(m_components[i].m_type) ;}
+	}
+
+	GL_CHECK(glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]));
+
+	GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_prevFB));
+
+	return bufferSize;
+}
+
+void FrameBuffer2::cleanup()
 {
 	unbind();
 
@@ -66,9 +80,13 @@ FrameBuffer2::~FrameBuffer2()
 	GL_CHECK(glDeleteFramebuffers(1, &m_renderFBO));
 }
 
-ivec2 FrameBuffer2::getBufferSize() const
+ivec2 FrameBuffer2::getBufferSize() const { return m_bufferSize ;}
+
+ivec2 FrameBuffer2::setBufferSize(const ivec2& bufferSize)
 {
-	return m_bufferSize;
+	cleanup();
+
+	return initFrameBuffer(bufferSize);
 }
 
 void FrameBuffer2::bind(const bool clear)

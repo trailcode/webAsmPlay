@@ -93,9 +93,10 @@ ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
     //FrameBuffer::ensureFrameBuffer(m_auxFrameBuffer, fbSize);
 
 	//*
-	if (!m_auxFrameBuffer || m_auxFrameBuffer->getBufferSize() != fbSize)
+	//if (!m_auxFrameBuffer || m_auxFrameBuffer->getBufferSize() != fbSize)
+	if (!m_auxFrameBuffer)
 	{
-		delete m_auxFrameBuffer;
+		//delete m_auxFrameBuffer;
 
 		m_auxFrameBuffer = new FrameBuffer2(fbSize,
 											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,				{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
@@ -104,6 +105,11 @@ ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
 												TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
 												TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
 												TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
+	}
+
+	if (m_auxFrameBuffer->getBufferSize() != fbSize)
+	{
+		m_auxFrameBuffer->setBufferSize(fbSize);
 	}
 	//*/
 

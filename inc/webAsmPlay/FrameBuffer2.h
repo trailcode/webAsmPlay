@@ -57,12 +57,18 @@ public:
 
 	glm::ivec2 getBufferSize() const;
 
+	glm::ivec2 setBufferSize(const glm::ivec2& size);
+
 	void bind(const bool clear = true);
 	void unbind();
 
 	GLuint getTextureID(const size_t component = 0) const;
 
 private:
+
+	glm::ivec2 initFrameBuffer(const glm::ivec2 & bufferSize);
+
+	void cleanup();
 
 	glm::ivec2 m_bufferSize;
 
@@ -73,6 +79,8 @@ private:
 	std::vector<GLenum> m_drawBuffers;
 
 	GLint m_prevFB = 0;
+
+	const std::vector<FB_Component>	m_components;
 
 private:
 };
