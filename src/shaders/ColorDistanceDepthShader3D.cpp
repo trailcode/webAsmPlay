@@ -29,6 +29,7 @@
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/FrameBuffer2.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 
@@ -181,6 +182,8 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
 
     GL_CHECK(glActiveTexture(GL_TEXTURE1));
 
+	dmess("canvas->getAuxFrameBuffer()->getTextureID() " << canvas->getAuxFrameBuffer()->getTextureID());
+
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, canvas->getAuxFrameBuffer()->getTextureID()));
 
 	GL_CHECK(glActiveTexture(GL_TEXTURE2));
@@ -200,8 +203,8 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
         shaderProgramFill->setUniformi(colorLookupTextureUniformFill,   0);
         shaderProgramFill->setUniformi(depthTexUniformFill,				1);
 		shaderProgramFill->setUniformi(topDownTextureUniformFill,		2);
-        shaderProgramFill->setUniformf(widthUniformFill,				canvas->getFrameBufferSize().x);
-        shaderProgramFill->setUniformf(heightUniformFill,				canvas->getFrameBufferSize().y);
+        shaderProgramFill->setUniformf(widthUniformFill,				(float)canvas->getFrameBufferSize().x);
+        shaderProgramFill->setUniformf(heightUniformFill,				(float)canvas->getFrameBufferSize().y);
         shaderProgramFill->setUniformf(heightMultiplierFill,			m_heightMultiplier);
         shaderProgramFill->setUniform (modelFill,						canvas->getModelRef());
         shaderProgramFill->setUniform (viewFill,						canvas->getViewRef());
@@ -220,8 +223,8 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
         
         shaderProgramOutline->setUniformf(heightMultiplierOutline,  m_heightMultiplier);
         shaderProgramOutline->setUniformi(depthTexUniformOutline,   1);
-        shaderProgramOutline->setUniformf(widthUniformOutline,      canvas->getFrameBufferSize().x);
-        shaderProgramOutline->setUniformf(heightUniformOutline,     canvas->getFrameBufferSize().y);
+        shaderProgramOutline->setUniformf(widthUniformOutline,      (float)canvas->getFrameBufferSize().x);
+        shaderProgramOutline->setUniformf(heightUniformOutline,     (float)canvas->getFrameBufferSize().y);
         shaderProgramOutline->setUniform (MV_Outline,               canvas->getMV_Ref());
         shaderProgramOutline->setUniform (MVP_Outline,              canvas->getMVP_Ref());
         shaderProgramOutline->setUniformi(texUniformOutline,        0);

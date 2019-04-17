@@ -29,7 +29,7 @@ in vec4 vertexColorNear;
 in vec4 vertexColorFar;
 in vec4 position_in_view_space;
 
-out vec4 outColor;
+layout (location = 0) out vec4 outColor;
 
 void main()
 {

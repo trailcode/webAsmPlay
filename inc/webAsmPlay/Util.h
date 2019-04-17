@@ -25,21 +25,10 @@
 */
 #pragma once
 
-#ifdef OPENGL_CALL_CHECKING
-
-    #ifdef __EMSCRIPTEN__
-        // GLEW
-        #define GLEW_STATIC
-        #include <GL/glew.h>
-    #else
-        #include <GL/gl3w.h>
-    #endif
-
-#endif
-
 #include <string>
 #include <vector>
 #include <chrono>
+#include <initializer_list>
 #include <unordered_set>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -63,6 +52,18 @@ std::string toStr(const glm::ivec2 & v);
 std::string toStr(const glm::vec3 & v);
 
 std::string toStr(const glm::vec4 & v);
+
+template<typename T>
+inline std::vector<T> toVec(const std::initializer_list<T>& list)
+{
+	std::vector<T> ret;
+
+	ret.reserve(list.size());
+
+	for (const auto& i : list) { ret.push_back(i); }
+
+	return ret;
+}
 
 static glm::ivec2 __(const ImVec2 & v) { return glm::ivec2(v.x, v.y) ;}
 

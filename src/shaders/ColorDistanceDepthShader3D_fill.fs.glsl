@@ -42,7 +42,7 @@ uniform mat4		MVP;
 uniform mat4		invPersMatrix;
 uniform mat4		invViewMatrix;
 
-out vec4 outColor;
+layout (location = 0) out vec4 outColor;
 
 void main()
 {

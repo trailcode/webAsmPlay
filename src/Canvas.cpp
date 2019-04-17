@@ -30,6 +30,7 @@
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/FrameBuffer2.h>
 #include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/geom/GeosUtil.h>
@@ -89,7 +90,22 @@ ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
 {
     //if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, fbSize) ;}
 
-    FrameBuffer::ensureFrameBuffer(m_auxFrameBuffer, fbSize);
+    //FrameBuffer::ensureFrameBuffer(m_auxFrameBuffer, fbSize);
+
+	//*
+	if (!m_auxFrameBuffer || m_auxFrameBuffer->getBufferSize() != fbSize)
+	{
+		delete m_auxFrameBuffer;
+
+		m_auxFrameBuffer = new FrameBuffer2(fbSize,
+											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,				{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+												TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
+											FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,	{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+												TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
+												TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
+												TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
+	}
+	//*/
 
     return m_frameBufferSize = fbSize;
 }
@@ -160,7 +176,22 @@ bool Canvas::preRender()
 
     if(m_useFrameBuffer)
     {
-        FrameBuffer::ensureFrameBuffer(m_frameBuffer, m_frameBufferSize)->bind();
+        //FrameBuffer::ensureFrameBuffer(m_frameBuffer, m_frameBufferSize)->bind();
+
+		if (!m_frameBuffer || m_frameBuffer->getBufferSize() != m_frameBufferSize)
+		{
+			delete m_frameBuffer;
+
+			m_frameBuffer = new FrameBuffer2(	m_frameBufferSize,
+												{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGB32F,				{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+																											  TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
+												FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,	{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
+													TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
+		}
+
+		m_frameBuffer->bind();
 
         GL_CHECK(glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y));
     }
@@ -190,6 +221,10 @@ GLuint Canvas::render()
         m_auxFrameBuffer->bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		static const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		glClearBufferfv(GL_COLOR, 0, black);
+		static const GLfloat one = 1.0f;
+		glClearBufferfv(GL_DEPTH, 0, &one);
 
         for(const auto r : m_meshes) { r->render(this, 1) ;}
 
@@ -443,7 +478,8 @@ dvec3 Canvas::getCursorPosWC()						const	{ return m_cursorPosWC ;}
 
 Renderable * Canvas::getCursor()					const	{ return m_cursor ;}
 
-FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
+//FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
+FrameBuffer2 * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
 
 #ifdef __EMSCRIPTEN__
 

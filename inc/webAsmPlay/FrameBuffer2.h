@@ -23,41 +23,56 @@
 \email trailcode@gmail.com
 \copyright 2019
 */
+#pragma once
 
-#version 330 core
+#include <utility>
+#include <vector>
+#include <glm/vec2.hpp>
+#include <webAsmPlay/OpenGL_Util.h>
 
-in vec4 vertexColorNear;
-in vec4 vertexColorFar;
-in vec4 position_in_view_space;
-in vec3 normal; 
-in vec3 fragPos;
-uniform vec3 lightPos;
+typedef std::pair<GLenum, GLenum> TexParam;
 
-//out vec4 outColor;
-layout (location = 0) out vec4 outColor;
-
-void main()
+struct FB_Component
 {
-	float minDist = 0.0;
-	float maxDist = 5.0;
-	vec3 lightColor = vec3(1,1,1);
-	//vec3 objectColor = vec3(1,1,0);
-	vec3 viewPos = vec3(0,0,0);
+	FB_Component(	const GLenum				  type,
+					const GLenum				  dataType,
+					const std::vector<TexParam> & textureParameters = std::vector<TexParam>()) :	m_type				(type),
+																									m_dataType			(dataType),
+																									m_textureParameters	(textureParameters) {}
 
-	// computes the distance between the fragment position 
-	// and the origin (4th coordinate should always be 1 
-	// for points). The origin in view space is actually 
-	// the camera position.
-	float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
+	const GLenum m_type;
+	const GLenum m_dataType;
 
-	dist = min(maxDist, dist) / maxDist;
+	const std::vector<TexParam> m_textureParameters;
+};
 
-	vec4 objectColor = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
+class FrameBuffer2
+{
+public:
 
-	vec3 lightDir = normalize(lightPos - fragPos);
+	FrameBuffer2(const glm::ivec2					& bufferSize,
+				 const std::vector<FB_Component>	& components);
+								
+	~FrameBuffer2();
 
-	float diff = max(dot(normal, lightDir), 0.0);
-	vec3 diffuse = diff * lightColor;
-	vec3 result = diffuse * vec3(objectColor);
-	outColor = vec4(result, objectColor.w);
-}
+	glm::ivec2 getBufferSize() const;
+
+	void bind(const bool clear = true);
+	void unbind();
+
+	GLuint getTextureID(const size_t component = 0) const;
+
+private:
+
+	glm::ivec2 m_bufferSize;
+
+	GLuint m_renderFBO;
+
+	std::vector<GLuint> m_textures;
+
+	std::vector<GLenum> m_drawBuffers;
+
+	GLint m_prevFB = 0;
+
+private:
+};

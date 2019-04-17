@@ -31,7 +31,7 @@ in vec4 vertexColorFar;
 in vec4 position_in_view_space;
 in vec4 glPos;
 
-out vec4 outColor;
+layout (location = 0) out vec4 outColor;
 
 uniform float     width;
 uniform float     height;
