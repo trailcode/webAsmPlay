@@ -56,6 +56,7 @@
 #include <webAsmPlay/shaders/TileBoundaryShader.h>
 #include <webAsmPlay/shaders/TextureLookupShader.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
+#include <webAsmPlay/shaders/SkyBoxShader.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -276,12 +277,12 @@ void GUI::showMainToolBar()
         ImVec2 uv1(1,1);
         //ImVec2 size(16,16);
         ImVec2 size(32,32);
-        toolbar.addButton(ImGui::Toolbutton("Normal Mode",(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Find Path",(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Normal Mode",						(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",			(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",			(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",	(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",				(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Find Path",						(void*)infoIcon,uv0,uv1,size));
 
         toolbar.setProperties(false,false,true,ImVec2(0.5f,0.f));
 
@@ -289,7 +290,7 @@ void GUI::showMainToolBar()
     }
     
     const int pressed = toolbar.render();
-    if (pressed>=0) fprintf(stderr,"Toolbar1: pressed:%d\n",pressed);
+
     switch(pressed)
     {
         case 0: mode = NORMAL_MODE;                 break;
@@ -571,6 +572,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     TileBoundaryShader        ::ensureShader();
 	TextureLookupShader		  ::ensureShader();
 	BindlessTextureShader	  ::ensureShader();
+	SkyBoxShader			  ::ensureShader();
     
 	OpenGL::init();
 

@@ -184,12 +184,14 @@ bool Canvas::preRender()
 			delete m_frameBuffer;
 
 			m_frameBuffer = new FrameBuffer(	m_frameBufferSize,
-												{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGB32F,				{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
-																											  TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
-												FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,	{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
-													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
-													TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
-													TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
+												{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,				
+													{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+														TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
+												FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,
+													{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+														TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
+														TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
+														TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
 		}
 
 		m_frameBuffer->bind();

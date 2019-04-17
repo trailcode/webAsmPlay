@@ -28,11 +28,8 @@
     #include <emscripten/emscripten.h>
     #include <emscripten/bind.h>
 #endif
-#include <glm/gtx/transform.hpp>
-#include <webAsmPlay/Util.h>
 #include <webAsmPlay/Textures.h>
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/shaders/SkyBoxShader.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 
 using namespace std;
@@ -44,31 +41,12 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram * skyboxShader = NULL;
-
-    GLint vertInLoc      = -1;
-    GLint MVP_Loc        = -1;
-    GLint cubeTextureLoc = -1;
-
     vector<SkyBox *> instances;
-}
-
-void SkyBox::ensureShader()
-{
-    if(skyboxShader) { return ;}
-
-	skyboxShader = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"SkyBoxShader.vs.glsl"	},
-													{GL_FRAGMENT_SHADER,	"SkyBoxShader.fs.glsl"	}}),
-                                         Variables({{"vertIn",				vertInLoc				}}),
-                                         Variables({{"MVP",					MVP_Loc					},
-                                                    {"cubeTexture",			cubeTextureLoc			}}));
 }
 
 SkyBox::SkyBox()
 {
     instances.push_back(this);
-
-    ensureShader();
 
     vector<string> files;
 
@@ -79,14 +57,16 @@ SkyBox::SkyBox()
     files.push_back("yneg.png");
     files.push_back("zpos.png");
     files.push_back("zneg.png");
-    */
+    //*/
  
+	//*
     files.push_back("right.png"); // xpos
     files.push_back("left.png");  // xneg
     files.push_back("top.png");   // ypos
     files.push_back("bot.png");   // yneg
     files.push_back("front.png"); // zpos
     files.push_back("back.png");  // zneg
+	//*/
     
 
     m_texID = Textures::loadCube(files);
@@ -142,8 +122,6 @@ SkyBox::SkyBox()
     GL_CHECK(glEnableVertexAttribArray(0));
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
     GL_CHECK(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL));
-
-    m_model = rotate(radians(90.0f), vec3(1.0f,0.0f,0.0f));
 }
 
 SkyBox::~SkyBox()
@@ -153,20 +131,11 @@ SkyBox::~SkyBox()
 
 void SkyBox::render(Canvas * canvas)
 {
-    mat4 centeredView = mat4(canvas->getViewRef());
-
-    value_ptr(centeredView)[12] = 0;
-    value_ptr(centeredView)[13] = 0;
-    value_ptr(centeredView)[14] = 0;
-
     GL_CHECK(glBindVertexArray(m_vao));
 
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
     
-    skyboxShader->bind();
-
-    skyboxShader->setUniform (MVP_Loc,        mat4(canvas->getProjectionRef()) * centeredView * m_model);
-    skyboxShader->setUniformi(cubeTextureLoc, 0);
+	SkyBoxShader::getDefaultInstance()->bind(canvas, false);
 
     GL_CHECK(glDepthMask(GL_FALSE));
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
