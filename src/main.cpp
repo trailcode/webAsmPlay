@@ -81,8 +81,7 @@ int main(int, char**)
 #endif
 
     // Create window with graphics context
-    //GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
-	GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "WebAsmPlay", NULL, NULL);
 
 	/*
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());

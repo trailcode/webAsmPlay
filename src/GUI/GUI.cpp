@@ -292,6 +292,46 @@ void GUI::showMainToolBar()
     }
 }
 
+namespace
+{
+	ivec2 _wndPos;
+	ivec2 _wndSize;
+}
+
+bool g_fullScreen = false;
+
+void setFullScreen( bool fullscreen )
+{
+	//if ( IsFullscreen() == fullscreen )
+		//return;
+	g_fullScreen = fullscreen;
+
+	if ( fullscreen )
+	{
+		// backup windwo position and window size
+		glfwGetWindowPos( GUI::getMainWindow(), &_wndPos[0], &_wndPos[1] );
+		glfwGetWindowSize( GUI::getMainWindow(), &_wndSize[0], &_wndSize[1] );
+
+		// get reolution of monitor
+		const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+		// switch to full screen
+		//glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, 1280 * 2, 720 * 2, 0 );
+		glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
+
+		glfwSwapInterval(1);
+	}
+	else
+	{
+		glfwSwapInterval(1);
+
+		// restore last window size and position
+		glfwSetWindowMonitor( GUI::getMainWindow(), nullptr,  _wndPos[0], _wndPos[1], _wndSize[0], _wndSize[1], 0 );
+	}
+
+	//_updateViewport = true;
+}
+
 void GUI::showMainMenuBar()
 {
     if (!ImGui::BeginMainMenuBar()) { return ;}
@@ -321,6 +361,12 @@ void GUI::showMainMenuBar()
 
         if(ImGui::MenuItem("Load Geometry")) { s_client->loadGeoServerGeometry() ;}
 
+		if (ImGui::MenuItem("Exit"))
+		{
+
+			exit(0);
+		}
+
         ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Edit"))
@@ -336,18 +382,22 @@ void GUI::showMainMenuBar()
 
     if(ImGui::BeginMenu("View"))
     {
-        if(ImGui::MenuItem("Geos Tests"))			{ s_showSceneViewPanel				^= 1 ;}
-        if(ImGui::MenuItem("Performance"))			{ s_showPerformancePanel			^= 1 ;}
-        if(ImGui::MenuItem("Render Settings"))		{ s_showRenderSettingsPanel			^= 1 ;}
-        if(ImGui::MenuItem("Log"))					{ s_showLogPanel					^= 1 ;}
-        if(ImGui::MenuItem("Attributes"))			{ s_showAttributePanel				^= 1 ;}
-        if(ImGui::MenuItem("GUI Settings"))			{ s_showGUI_Settings_Panel			^= 1 ;}
-        if(ImGui::MenuItem("Symbology"))			{ s_showSymbologyPanel				^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer Test"))		{ s_showOpenSteerTestPanel			^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer"))			{ s_showOpenSteerPanel				^= 1 ;}
-        if(ImGui::MenuItem("Camera Info"))			{ s_showCameraInfoPanel				^= 1 ;}
-        if(ImGui::MenuItem("Bing Tile System"))		{ s_showBingTileSystemPanel			^= 1 ;}
-		if(ImGui::MenuItem("Framebuffer Depth"))	{ s_showFrameBufferDepthDebugPanel	^= 1 ;}
+        if (ImGui::MenuItem("Geos Tests"))			{ s_showSceneViewPanel				^= 1 ;}
+        if (ImGui::MenuItem("Performance"))			{ s_showPerformancePanel			^= 1 ;}
+        if (ImGui::MenuItem("Render Settings"))		{ s_showRenderSettingsPanel			^= 1 ;}
+        if (ImGui::MenuItem("Log"))					{ s_showLogPanel					^= 1 ;}
+        if (ImGui::MenuItem("Attributes"))			{ s_showAttributePanel				^= 1 ;}
+        if (ImGui::MenuItem("GUI Settings"))		{ s_showGUI_Settings_Panel			^= 1 ;}
+        if (ImGui::MenuItem("Symbology"))			{ s_showSymbologyPanel				^= 1 ;}
+        if (ImGui::MenuItem("OpenSteer Test"))		{ s_showOpenSteerTestPanel			^= 1 ;}
+        if (ImGui::MenuItem("OpenSteer"))			{ s_showOpenSteerPanel				^= 1 ;}
+        if (ImGui::MenuItem("Camera Info"))			{ s_showCameraInfoPanel				^= 1 ;}
+        if (ImGui::MenuItem("Bing Tile System"))	{ s_showBingTileSystemPanel			^= 1 ;}
+		if (ImGui::MenuItem("Framebuffer Depth"))	{ s_showFrameBufferDepthDebugPanel	^= 1 ;}
+		if (ImGui::MenuItem("Full Screen"))
+		{
+			setFullScreen(!g_fullScreen);
+		}
 
         ImGui::EndMenu();
     }
