@@ -49,7 +49,7 @@ Geometry::Ptr geosUtil::makeBox(const double xmin, const double ymin, const doub
     temp->add(Coordinate(xmin, ymax));
     temp->add(Coordinate(xmax, ymax));
     temp->add(Coordinate(xmax, ymin));
-
+	
     // Must close the linear ring or we will get an error:
     // "Points of LinearRing do not form a closed linestring"
     temp->add(Coordinate(xmin, ymin));

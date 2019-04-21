@@ -197,6 +197,8 @@ bool Canvas::preRender()
         GL_CHECK(glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y));
     }
 
+	m_gBuffer->bind();
+
     if(m_skyBox) { m_skyBox->render(this) ;}
 
     else
@@ -219,8 +221,6 @@ GLuint Canvas::render()
 
     lock_guard<mutex> _(m_renderiablesMutex);
 	
-	m_gBuffer->bind();
-
     if(m_auxFrameBuffer)
     {
         m_auxFrameBuffer->bind();
@@ -252,20 +252,14 @@ GLuint Canvas::render()
 
 	m_gBuffer->unbind();
 	
-	//*
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	SsaoShader::getDefaultInstance()->setColorTextureID(m_gBuffer->getTextureID(0));
 
 	SsaoShader::getDefaultInstance()->bind(this, false, 0);
 
-	//dmess("quad_vao " << quad_vao);
-	//glViewport(0, 0, 2000, 2000);
 	GL_CHECK(glDisable(GL_DEPTH_TEST));
 	
 	GL_CHECK(glBindVertexArray(quad_vao));
 	GL_CHECK(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-	//*/
 
     return postRender();
 }

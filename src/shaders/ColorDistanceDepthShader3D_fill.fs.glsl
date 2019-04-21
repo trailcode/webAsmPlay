@@ -46,7 +46,7 @@ layout (location = 0) out vec4 outColor;
 
 void main()
 {
-	vec4 t = texture(depthTex, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height));
+	vec4 t = textureLod(depthTex, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height), 0);
 
 	float v = abs(t.x - glPos.w);
 
@@ -106,7 +106,7 @@ void main()
 	
 	if(dot(normal, vec3(0,0,1)) > 0.001)
 	{
-		vec4 texColor = vec4(texture(topDownTexture, p.xy).xyz, 0);
+		vec4 texColor = vec4(textureLod(topDownTexture, p.xy, 0).xyz, 0);
 		
 		outColor += texColor;
 	}

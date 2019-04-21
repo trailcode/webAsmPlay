@@ -177,7 +177,7 @@ void topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & po
 
 void topology::cutPolygonHoles(vector<AttributedPoligonalArea>& polygons)
 {
-	return;
+	//return;
 
 	dmess("start cutPolygonHoles");
 
@@ -230,6 +230,8 @@ void topology::cutPolygonHoles(vector<AttributedPoligonalArea>& polygons)
 				continue;
 			}
 			
+			//dmess("P " << P->getNumInteriorRing() << " " << dynamic_cast<Polygon*>(newPoly)->getNumInteriorRing());
+
 			geomFactory->destroyGeometry(P);
 
 			poly(i) = dynamic_cast<Polygon*>(newPoly);

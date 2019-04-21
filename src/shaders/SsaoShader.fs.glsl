@@ -30,14 +30,10 @@
 layout (binding = 0) uniform sampler2D sColor;
 
 // Final output
-//layout (location = 0) out vec4 color;
-out vec4 color;
+layout (location = 0) out vec4 color;
 
 void main()
 {
-	//outColor = vertexColor;
-	//outColor = vec4(1,1,1,1);
-
 	vec2 P = gl_FragCoord.xy / textureSize(sColor, 0);
 
 	vec4 object_color =  textureLod(sColor, P, 0);

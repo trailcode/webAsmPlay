@@ -44,6 +44,8 @@ ivec2 FrameBuffer::initFrameBuffer(const ivec2& bufferSize)
 {
 	m_bufferSize = bufferSize;
 
+	m_drawBuffers.clear();
+
 	GL_CHECK(glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_prevFB));
 
 	GL_CHECK(glGenFramebuffers(1,				&m_renderFBO));
