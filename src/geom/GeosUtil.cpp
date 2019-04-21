@@ -24,6 +24,8 @@
   \copyright 2018
 */
 
+#include <fstream>
+#include <geos/geom/Point.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryFactory.h>
@@ -31,7 +33,6 @@
 #include <geos/geom/CoordinateSequenceFactory.h>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/operation/union/CascadedPolygonUnion.h>
-#include <nlohmann/json.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 
@@ -40,6 +41,7 @@ using namespace glm;
 using namespace nlohmann;
 using namespace geos::geom;
 using namespace geos::operation::geounion;
+using namespace geosUtil;
 
 Geometry::Ptr geosUtil::makeBox(const double xmin, const double ymin, const double xmax, const double ymax)
 {
@@ -209,20 +211,108 @@ _ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : m_geom(geom) {}
 
 _ScopedGeosGeometry::~_ScopedGeosGeometry() { GeometryFactory::getDefaultInstance()->destroyGeometry(m_geom) ;}
 
-string writeGeoJsonFile(const string& fileName, const Geometry * geom)
+void geosUtil::addPoint(json& coordinates, const Point* P) { coordinates.push_back({P->getX(), P->getY()}) ;}
+
+void geosUtil::addLineString(json & coordinates, const LineString* lineString)
 {
-	json geoJson;
-
-	geoJson["type"] = "FeatureCollection";
-
-	json feature;
-
-	json geometry;
-
-	geometry["type"] = "LineString";
-
-	return fileName;
+	for (size_t i = 0; i < lineString->getNumPoints(); ++i) { addPoint(coordinates, lineString->getPointN(i)); }
 }
+
+json geosUtil::addLineString(const LineString* lineString)
+{
+	json coordinates;
+
+	addLineString(coordinates, lineString);
+
+	return coordinates;
+}
+
+void geosUtil::addPolygon(json& coordinates, const Polygon* polygon)
+{
+	coordinates.push_back(addLineString(polygon->getExteriorRing()));
+
+	for (size_t i = 0; i < polygon->getNumInteriorRing(); ++i) { coordinates.push_back(addLineString(polygon->getInteriorRingN(i))) ;}
+}
+
+json geosUtil::addPolygon(const Polygon* polygon)
+{
+	json coordinates;
+
+	addPolygon(coordinates, polygon);
+
+	return coordinates;
+}
+
+string geosUtil::writeGeoJsonFile(const string& fileName, const Geometry* geom) { return writeGeoJsonFile(fileName, vector<const Geometry*>({ geom       })) ;}
+string geosUtil::writeGeoJsonFile(const string& fileName, Geometry::Ptr & geom) { return writeGeoJsonFile(fileName, vector<Geometry*>      ({ geom.get() })) ;}
+
+namespace
+{
+	template<typename Container>
+	string writeGeoJsonFileHelper(const string& fileName, Container & geoms)
+	{
+		json geoJson;
+
+		geoJson["type"] = "FeatureCollection";
+
+		unordered_map<GeometryTypeId, string> typeMap({	{ GEOS_POINT,				"Point"				},
+														{ GEOS_LINESTRING,			"LineString"		},
+														{ GEOS_LINEARRING,			"LineString"		}, // TODO How to handle?
+														{ GEOS_POLYGON,				"Polygon"			},
+														{ GEOS_MULTIPOINT,			"MultiPoint"		},
+														{ GEOS_MULTILINESTRING,		"MultiLineString"	},
+														{ GEOS_MULTIPOLYGON,		"MultiPolygon"		},
+														{ GEOS_GEOMETRYCOLLECTION,	"GeometryCollection"}});
+
+		for (const auto& geom : geoms)
+		{
+			json feature;
+
+			json geometry;
+
+			geometry["type"] = typeMap[geom->getGeometryTypeId()];
+
+			json& coordinates = geometry["coordinates"];
+
+			switch (geom->getGeometryTypeId())
+			{
+		
+			case GEOS_LINESTRING:
+			case GEOS_LINEARRING:	addLineString	(coordinates, geosLineStringConst	(geom)); break;
+			case GEOS_POINT:		addPoint		(coordinates, geosPointConst		(geom)); break;
+			case GEOS_POLYGON:		addPolygon		(coordinates, geosPolygonConst		(geom)); break;
+			case GEOS_MULTIPOLYGON:
+				{
+					const MultiPolygon* multiPolygon = geosMultiPolygonConst(geom);
+
+					for (size_t i = 0; i < multiPolygon->getNumGeometries(); ++i) { coordinates.push_back(addPolygon(geosPolygonConst(multiPolygon->getGeometryN(i)))) ;}
+
+					break;
+				}
+
+			default: dmess("Implement me!");
+			}
+
+			feature["geometry"] = geometry;
+
+			geoJson["features"].push_back(feature);
+		}
+
+		ofstream out(fileName);
+
+		out << geoJson.dump(4);
+
+		out.close();
+
+		return fileName;
+	}
+}
+
+string geosUtil::writeGeoJsonFile(const string& fileName, const vector<Geometry *>			& geoms) { return writeGeoJsonFileHelper(fileName, geoms) ;}
+string geosUtil::writeGeoJsonFile(const string& fileName, const vector<Geometry::Ptr>		& geoms) { return writeGeoJsonFileHelper(fileName, geoms) ;}
+string geosUtil::writeGeoJsonFile(const string& fileName, const vector<const Geometry *>	& geoms) { return writeGeoJsonFileHelper(fileName, geoms) ;}
+
+
 
 
 

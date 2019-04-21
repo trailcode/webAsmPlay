@@ -25,8 +25,6 @@
 */
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <geos/geom/Polygon.h>
-#include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/shaders/ColorShader.h>
@@ -51,6 +49,41 @@ GeosTestCanvas::~GeosTestCanvas()
 
 }
 
+namespace
+{
+	vector<Geometry::Ptr> doGeosTest1(	const float buffer1,
+										const float buffer2,
+										const float buffer3)
+	{
+		vector<Geometry::Ptr> ret;
+
+		Geometry::Ptr shape = makeBox(-0.5,-0.5,0.5,0.5);
+
+		Geometry::Ptr inside = unionPolygons({  makeBox(-0.1,-0.1,0.1,0.1),
+												makeBox(-0.05,-0.6,0.05,0.6),
+												makeBox(-0.6,-0.05,0.6,0.05)});
+
+		shape = Geometry::Ptr(shape->buffer(buffer1));
+
+		ret.push_back(Geometry::Ptr(inside->buffer(buffer2)));
+
+		ret.push_back(Geometry::Ptr(shape->difference(inside.get())));
+
+		for(const LineString * ring : getExternalRings(shape))
+		{
+			Geometry::Ptr buffered(ring->buffer(buffer3));
+
+			Geometry::Ptr buffered2(ring->buffer(buffer3 + 0.15));
+
+			buffered = Geometry::Ptr(buffered->difference(inside.get()));
+
+			for(const LineString * ring : getExternalRings(buffered)) { ret.push_back(Geometry::Ptr(ring->clone())) ;}
+		}
+
+		return ret;
+	}
+}
+
 void GeosTestCanvas::setGeomParameters( const float buffer1,
                                         const float buffer2,
                                         const float buffer3)
@@ -66,49 +99,23 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
     m_geoms.clear();
 
-    Geometry::Ptr shape = makeBox(-0.5,-0.5,0.5,0.5);
+	const mat4 trans = scale(mat4(1.0), vec3(0.6, 0.6, 0.6));
 
-    Geometry::Ptr inside = unionPolygons({  makeBox(-0.1,-0.1,0.1,0.1),
-                                            makeBox(-0.05,-0.6,0.05,0.6),
-                                            makeBox(-0.6,-0.05,0.6,0.05)});
+	for (const auto& geom : doGeosTest1(buffer1, buffer2, buffer3))
+	{
+		Renderable * renderable = Renderable::create(geom, trans);
 
-    shape = Geometry::Ptr(shape->buffer(buffer1));
+		renderable->setShader(ColorShader::getDefaultInstance());
 
-    inside = Geometry::Ptr(inside->buffer(buffer2));
+		renderable->ensureVAO();
 
-    shape = Geometry::Ptr(shape->difference(inside.get()));
+		addRenderable(renderable);
 
-    const mat4 trans = scale(mat4(1.0), vec3(0.6, 0.6, 0.6));
+		m_geoms.push_back(unique_ptr<Renderable>(renderable));
+	}
+}
 
-    Renderable * geom1 = Renderable::create(shape, trans);
-    
-	geom1->setShader(ColorShader::getDefaultInstance());
-
-	geom1->ensureVAO();
-
-    addRenderable(geom1);
-
-    m_geoms.push_back(unique_ptr<Renderable>(geom1));
-
-    for(const LineString * ring : getExternalRings(shape))
-    {
-        Geometry::Ptr buffered(ring->buffer(buffer3));
-
-        Geometry::Ptr buffered2(ring->buffer(buffer3 + 0.15));
-
-        buffered = Geometry::Ptr(buffered->difference(inside.get()));
-
-        for(const LineString * ring : getExternalRings(buffered))
-        {   
-            Renderable * geom = Renderable::create(ring, trans);
-
-			geom->setShader(ColorShader::getDefaultInstance());
-
-			geom->ensureVAO();
-
-            addRenderable(geom);
-
-            m_geoms.push_back(unique_ptr<Renderable>(geom));
-        }
-    }
+void GeosTestCanvas::exportGeoJson() const
+{
+	geosUtil::writeGeoJsonFile("geomsOut.geojson", doGeosTest1(m_buffer1, m_buffer2, m_buffer3));
 }

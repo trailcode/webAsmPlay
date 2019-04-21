@@ -29,8 +29,6 @@
 #include <algorithm>
 #include <tbb/parallel_for.h>
 #include <tbb/concurrent_unordered_map.h>
-#include <geos/geom/Point.h>
-#include <geos/geom/LineString.h>
 #include <geos/geom/GeometryCollection.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/CoordinateArraySequence.h>

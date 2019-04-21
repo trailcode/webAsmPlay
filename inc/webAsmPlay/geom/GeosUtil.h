@@ -32,15 +32,9 @@
 #include <glm/mat4x4.hpp>
 #include <geos/geom/Point.h>
 #include <geos/geom/LineString.h>
-
-namespace geos
-{
-    namespace geom
-    {
-        class Geometry;
-        class Polygon;
-    }
-}
+#include <geos/geom/Polygon.h>
+#include <geos/geom/MultiPolygon.h>
+#include <nlohmann/json.hpp>
 
 #define _SCOPED_GEOS_GEOMETRY_COMBINE1(X, Y) X##Y
 #define _SCOPED_GEOS_GEOMETRY_COMBINE(X, Y) _SCOPED_GEOS_GEOMETRY_COMBINE1(X, Y)
@@ -133,5 +127,43 @@ namespace geosUtil
         return v;
     }
 
-	std::string writeGeoJsonFile(const std::string& fileName);
+	void addPoint(nlohmann::json& coordinates, const geos::geom::Point* P);
+
+	void addLineString(nlohmann::json& coordinates, const geos::geom::LineString* lineString);
+
+	nlohmann::json addLineString(const geos::geom::LineString* lineString);
+
+	void addPolygon(nlohmann::json& coordinates, const geos::geom::Polygon* polygon);
+
+	nlohmann::json addPolygon(const geos::geom::Polygon* polygon);
+
+	std::string writeGeoJsonFile(const std::string& fileName, const std::vector<geos::geom::Geometry *> & geoms);
+
+	std::string writeGeoJsonFile(const std::string& fileName, const std::vector<geos::geom::Geometry::Ptr> & geoms);
+
+	std::string writeGeoJsonFile(const std::string& fileName, const std::vector<const geos::geom::Geometry *> & geoms);
+
+	std::string writeGeoJsonFile(const std::string& fileName, const geos::geom::Geometry * geom);
+
+	std::string writeGeoJsonFile(const std::string& fileName, geos::geom::Geometry::Ptr & geom);
+
+	inline geos::geom::Point		* geosPoint			(geos::geom::Geometry* geom) { return dynamic_cast<geos::geom::Point*>			(geom); }
+	inline geos::geom::LineString	* geosLineString	(geos::geom::Geometry* geom) { return dynamic_cast<geos::geom::LineString*>		(geom); }
+	inline geos::geom::Polygon		* geosPolygon		(geos::geom::Geometry* geom) { return dynamic_cast<geos::geom::Polygon*>		(geom); }
+	inline geos::geom::MultiPolygon	* geosMultiPolygon	(geos::geom::Geometry* geom) { return dynamic_cast<geos::geom::MultiPolygon*>	(geom); }
+
+	inline geos::geom::Point		* geosPoint			(geos::geom::Geometry::Ptr & geom) { return dynamic_cast<geos::geom::Point*>		(geom.get()); }
+	inline geos::geom::LineString	* geosLineString	(geos::geom::Geometry::Ptr & geom) { return dynamic_cast<geos::geom::LineString*>	(geom.get()); }
+	inline geos::geom::Polygon		* geosPolygon		(geos::geom::Geometry::Ptr & geom) { return dynamic_cast<geos::geom::Polygon*>		(geom.get()); }
+	inline geos::geom::MultiPolygon	* geosMultiPolygon	(geos::geom::Geometry::Ptr & geom) { return dynamic_cast<geos::geom::MultiPolygon*>	(geom.get()); }
+
+	inline const geos::geom::Point			* geosPointConst		(const geos::geom::Geometry* geom) { return dynamic_cast<const geos::geom::Point*>			(geom); }
+	inline const geos::geom::LineString		* geosLineStringConst	(const geos::geom::Geometry* geom) { return dynamic_cast<const geos::geom::LineString*>		(geom); }
+	inline const geos::geom::Polygon		* geosPolygonConst		(const geos::geom::Geometry* geom) { return dynamic_cast<const geos::geom::Polygon*>		(geom); }
+	inline const geos::geom::MultiPolygon	* geosMultiPolygonConst	(const geos::geom::Geometry* geom) { return dynamic_cast<const geos::geom::MultiPolygon*>	(geom); }
+
+	inline const geos::geom::Point			* geosPointConst		(const geos::geom::Geometry::Ptr & geom) { return dynamic_cast<const geos::geom::Point*>		(geom.get()); }
+	inline const geos::geom::LineString		* geosLineStringConst	(const geos::geom::Geometry::Ptr & geom) { return dynamic_cast<const geos::geom::LineString*>	(geom.get()); }
+	inline const geos::geom::Polygon		* geosPolygonConst		(const geos::geom::Geometry::Ptr & geom) { return dynamic_cast<const geos::geom::Polygon*>		(geom.get()); }
+	inline const geos::geom::MultiPolygon	* geosMultiPolygonConst	(const geos::geom::Geometry::Ptr & geom) { return dynamic_cast<const geos::geom::MultiPolygon*>	(geom.get()); }
 };

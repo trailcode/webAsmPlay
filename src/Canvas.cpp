@@ -25,8 +25,6 @@
 */
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <geos/geom/Polygon.h>
-#include <geos/geom/LineString.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>

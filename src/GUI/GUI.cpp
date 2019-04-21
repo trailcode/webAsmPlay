@@ -32,9 +32,6 @@
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
-#include <geos/geom/Polygon.h>
-#include <geos/geom/LineString.h>
-#include <geos/geom/Point.h>
 #include <imguitoolbar.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/TrackBallInteractor.h>

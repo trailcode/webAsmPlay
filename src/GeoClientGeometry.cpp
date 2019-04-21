@@ -26,9 +26,7 @@
 */
 
 #include <ctpl/ctpl.h>
-#include <geos/geom/LineString.h>
 #include <glm/gtc/matrix_transform.hpp>
-#include <geos/geom/Polygon.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Attributes.h>

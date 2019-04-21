@@ -29,7 +29,6 @@
 #include <limits>
 #include <unordered_map>
 #include <glm/gtx/hash.hpp>
-#include <geos/geom/LineString.h>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/simplify/DouglasPeuckerLineSimplifier.h>

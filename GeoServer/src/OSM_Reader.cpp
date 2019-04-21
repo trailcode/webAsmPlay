@@ -30,9 +30,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <geos/geom/CoordinateArraySequence.h>
-#include <geos/geom/Polygon.h>
-#include <geos/geom/LineString.h>
-#include <geos/geom/Point.h>
 #include <geos/geom/GeometryFactory.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/Debug.h>

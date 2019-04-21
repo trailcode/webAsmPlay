@@ -62,6 +62,8 @@ void GUI::geosTestPanel()
 
         s_geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
 
+		if (ImGui::Button("Export GeoJSON")) { s_geosTestCanvas->exportGeoJson(); }
+		
     ImGui::End();
 }
 
