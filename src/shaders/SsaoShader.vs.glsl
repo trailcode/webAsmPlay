@@ -21,58 +21,23 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
+#version 430 core
 
-REGISTER_SHADER(TextureLookupShader)
-
-namespace
+out VS_OUT
 {
-	ShaderProgram		* shaderProgram		= NULL;
-	TextureLookupShader * defaultInstance	= NULL;
+	vec3 E;
+} vs_out;
 
-	GLint vertInAttr;
-	GLint MVP_Loc;
-}
-
-void TextureLookupShader::ensureShader()
+void main(void)
 {
-	return; // This one is not compiling!
+	const vec4 vertices[] = vec4[]( vec4(-1.0, -1.0, 0.5, 1.0),
+									vec4( 1.0, -1.0, 0.5, 1.0),
+									vec4(-1.0,  1.0, 0.5, 1.0),
+									vec4( 1.0,  1.0, 0.5, 1.0) );
 
-	if(shaderProgram) { return ;}
-
-	shaderProgram = ShaderProgram::create(	GLSL({		{GL_VERTEX_SHADER,		"TextureLookupShader.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"TextureLookupShader.fs.glsl"	},
-														{GL_GEOMETRY_SHADER,	"TextureLookupShader.gs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttr						}}),
-											Variables({	{"MVP",					MVP_Loc							}}));
-
-	defaultInstance = new TextureLookupShader();
+	gl_Position = vertices[gl_VertexID];
+	vs_out.E = vertices[gl_VertexID].xyz;
 }
-
-TextureLookupShader* TextureLookupShader::getDefaultInstance() { return defaultInstance ;}
-
-TextureLookupShader::TextureLookupShader() : Shader("TextureLookupShader")
-{
-
-}
-
-TextureLookupShader::~TextureLookupShader()
-{
-
-}
-
-void TextureLookupShader::bind( Canvas     * canvas,
-								const bool   isOutline,
-								const size_t renderingStage)
-{
-	shaderProgram->bind();
-
-	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
-}
-
-GLuint64 TextureLookupShader::setTextureHandle(const GLuint64& handle) { return m_texHandle = handle; }

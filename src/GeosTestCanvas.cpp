@@ -29,6 +29,7 @@
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/GeosTestCanvas.h>
@@ -96,6 +97,8 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
         for(const LineString * ring : getExternalRings(buffered))
         {   
             Renderable * geom = Renderable::create(ring, trans);
+
+			geom->setShader(ColorShader::getDefaultInstance());
 
             addRenderable(geom);
 

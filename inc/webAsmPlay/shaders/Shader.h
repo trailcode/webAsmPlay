@@ -25,6 +25,7 @@
 */
 #pragma once
 
+#include <string>
 #include <vector>
 #include <functional>
 #include <webAsmPlay/OpenGL_Util.h>

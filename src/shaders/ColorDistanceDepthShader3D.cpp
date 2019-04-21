@@ -110,7 +110,7 @@ void ColorDistanceDepthShader3D::ensureShader()
 																{"projection",				projectionFill									},
 																{"invPersMatrix",			invPersMatrixFill								},
 																{"invViewMatrix",			invViewMatrixFiLL								},
-														{"MVP", MVP_Fill},
+																{"MVP",						MVP_Fill										},
 																{"colorLookupOffset",		colorLookupOffsetFill							},
 																{"heightMultiplier",		heightMultiplierFill							},
 																{"lightPos",				lightPosUniformFill								},

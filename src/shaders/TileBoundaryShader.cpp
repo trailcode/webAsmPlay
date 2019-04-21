@@ -49,6 +49,8 @@ TileBoundaryShader * TileBoundaryShader::getDefaultInstance()
 
 void TileBoundaryShader::ensureShader()
 {
+	return; // This one is not compiling!
+
     if(shaderProgram) { return ;}
 
 	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"TileBoundaryShader.vs.glsl"	},

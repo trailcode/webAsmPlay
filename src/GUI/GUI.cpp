@@ -309,15 +309,20 @@ void setFullScreen( bool fullscreen )
 	if ( fullscreen )
 	{
 		// backup windwo position and window size
-		glfwGetWindowPos( GUI::getMainWindow(), &_wndPos[0], &_wndPos[1] );
+		glfwGetWindowPos ( GUI::getMainWindow(), &_wndPos[0],  &_wndPos[1]  );
 		glfwGetWindowSize( GUI::getMainWindow(), &_wndSize[0], &_wndSize[1] );
 
+		int count;
+		GLFWmonitor** monitors = glfwGetMonitors(&count);
+
+		dmess("count " << count);
+
 		// get reolution of monitor
-		const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		const GLFWvidmode * mode = glfwGetVideoMode(monitors[0]);
 
 		// switch to full screen
 		//glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, 1280 * 2, 720 * 2, 0 );
-		glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
+		glfwSetWindowMonitor( GUI::getMainWindow(), monitors[0], 0, 0, mode->width, mode->height, mode->refreshRate);
 
 		glfwSwapInterval(1);
 	}
@@ -326,7 +331,7 @@ void setFullScreen( bool fullscreen )
 		glfwSwapInterval(1);
 
 		// restore last window size and position
-		glfwSetWindowMonitor( GUI::getMainWindow(), nullptr,  _wndPos[0], _wndPos[1], _wndSize[0], _wndSize[1], 0 );
+		glfwSetWindowMonitor( GUI::getMainWindow(), nullptr,  _wndPos[0], _wndPos[1], _wndSize[0], _wndSize[1], 0);
 	}
 
 	//_updateViewport = true;
@@ -593,7 +598,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     infoIcon = Textures::load("if_Info_131908.png");
     
     // Define the viewport dimensions
-    static int width, height;
+    static int width, height; 
     int fbWidth, fbHeight;
 
     glfwGetWindowSize		(s_mainWindow, &width,	 &height);

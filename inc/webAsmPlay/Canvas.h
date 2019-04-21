@@ -149,6 +149,8 @@ private:
 
 	FrameBuffer * m_frameBuffer = NULL;
 
+	FrameBuffer* m_gBuffer = NULL;
+
     bool m_wantMouseCapture = true;
 
     glm::ivec2 m_lastShiftKeyDownMousePos;

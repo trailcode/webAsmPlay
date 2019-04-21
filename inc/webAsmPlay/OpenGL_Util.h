@@ -52,7 +52,12 @@
 
 #endif
 
+#include <webAsmPlay/Debug.h>
+
+#define OPENGL_CALL_CHECKING
+
 #ifdef OPENGL_CALL_CHECKING
+
     #define GL_CHECK(stmt) do { stmt; \
             const GLenum err = glGetError(); \
             if (err != GL_NO_ERROR) { \

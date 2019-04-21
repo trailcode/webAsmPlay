@@ -66,6 +66,8 @@ namespace
 
 void ColorDistanceShader3D::ensureShader()
 {
+	if (defaultInstance) { return; }
+
 	shaderProgramFill = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader3D_fill.vs.glsl"	},
 																{GL_FRAGMENT_SHADER,	"ColorDistanceShader3D_fill.fs.glsl"	}}),
 													Variables({	{"vertIn",               vertInAttrFill							},

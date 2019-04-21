@@ -61,7 +61,7 @@ ivec2 FrameBuffer::initFrameBuffer(const ivec2& bufferSize)
 
 		GL_CHECK(glFramebufferTexture(GL_FRAMEBUFFER, m_components[i].m_type, m_textures[i], 0));
 
-		if (m_components[i].m_type != GL_DEPTH_COMPONENT32F) { m_drawBuffers.push_back(m_components[i].m_type) ;}
+		if (m_components[i].m_type != GL_DEPTH_ATTACHMENT) { m_drawBuffers.push_back(m_components[i].m_type) ;}
 	}
 
 	GL_CHECK(glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]));

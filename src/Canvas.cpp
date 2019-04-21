@@ -44,6 +44,7 @@
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
+#include <webAsmPlay/shaders/SsaoShader.h>
 #include <webAsmPlay/Canvas.h>
 
 using namespace std;
@@ -97,16 +98,29 @@ ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
 	{
 		//delete m_auxFrameBuffer;
 
-		m_auxFrameBuffer = new FrameBuffer(fbSize,
-											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,				{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
-												TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
-											FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,	{ TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
-												TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
-												TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
-												TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
+		m_auxFrameBuffer = new FrameBuffer(	fbSize,
+											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
+											FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
+													TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
+
+		m_gBuffer		 = new FrameBuffer(	fbSize,
+											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGB32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
+											 FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
+													TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
 	}
 	
 	m_auxFrameBuffer->setBufferSize(fbSize);
+	m_gBuffer		->setBufferSize(fbSize);
 
     return m_frameBufferSize = fbSize;
 }
@@ -131,28 +145,12 @@ void Canvas::popMVP()
 	m_frustum->set(m_currMVP.m_MVP);
 }
 
-extern vec4 lookat;
-extern vec4 pos;   
-extern vec4 up;
-
 void Canvas::updateMVP()
 {
     m_currMVP.m_view        = m_trackBallInteractor->getCamera()->getMatrix();
-	//currMVP.view = glm::lookAt( glm::vec3( 0.f, 0.f, 2.0f ),glm::vec3( 0.f, 0.f, 0.f ),glm::vec3( 0.0f, 1.0f, 0.0f ) ); 
     m_currMVP.m_projection  = perspective(m_perspectiveFOV, double(m_size.x) / double(m_size.y), 0.0001, 30.0);
-	//currMVP.projection  = perspective(180.0, double(size.x) / double(size.y), 0.0001, 30.0);
-	//currMVP.projection  = glm::frustum(-10, 10, -10, 10, 0, 30);
-	//currMVP.projection  = dmat4(1);
-	//currMVP.projection  = ortho(0.0, (double)size.x,(double)size.y,0.0, 0.1, 100.0);
-	//currMVP.projection  = ortho(-40.0, 40.0, -40.0, 40.0, 0.5, 50.0);
-	//currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.000001, 30.0);
-    
-	float near_plane = 1.0f, far_plane = 40.5f;
-	//currMVP.projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    //currMVP.view = glm::lookAt(trackBallInteractor->getCamera()->getEye(), trackBallInteractor->getCamera()->getCenter(), glm::vec3(0.0, 1.0, 0.0));
-	
-	m_currMVP.m_MV		= m_currMVP.m_view			* m_currMVP.m_model;
-    m_currMVP.m_MVP		= m_currMVP.m_projection	* m_currMVP.m_MV;
+	m_currMVP.m_MV			= m_currMVP.m_view			* m_currMVP.m_model;
+    m_currMVP.m_MVP			= m_currMVP.m_projection	* m_currMVP.m_MV;
 
 	m_frustum->set(m_currMVP.m_MVP);
 }
@@ -175,7 +173,7 @@ bool Canvas::preRender()
     ColorDistanceShader3D     ::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
     ColorDistanceDepthShader3D::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
 
-    if(m_useFrameBuffer)
+    if(false && m_useFrameBuffer)
     {
         //FrameBuffer::ensureFrameBuffer(m_frameBuffer, m_frameBufferSize)->bind();
 
@@ -213,21 +211,19 @@ bool Canvas::preRender()
     return true;
 }
 
+extern GLuint quad_vao;
+
 GLuint Canvas::render()
 {
     if(!preRender()) { return 0 ;}
 
     lock_guard<mutex> _(m_renderiablesMutex);
+	
+	m_gBuffer->bind();
 
     if(m_auxFrameBuffer)
     {
         m_auxFrameBuffer->bind();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		static const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		glClearBufferfv(GL_COLOR, 0, black);
-		static const GLfloat one = 1.0f;
-		glClearBufferfv(GL_DEPTH, 0, &one);
 
         for(const auto r : m_meshes) { r->render(this, 1) ;}
 
@@ -249,12 +245,38 @@ GLuint Canvas::render()
     for(const auto r : m_points)              { r->render(this, 0) ;}
     for(const auto r : m_deferredRenderables) { r->render(this, 0) ;} 
     
-    ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
+	ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
     ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
 
     for(const auto r : m_meshes)              { r->render(this, 0) ;}
 
+	m_gBuffer->unbind();
+	
+	//*
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	SsaoShader::getDefaultInstance()->setColorTextureID(m_gBuffer->getTextureID(0));
+
+	SsaoShader::getDefaultInstance()->bind(this, false, 0);
+
+	//dmess("quad_vao " << quad_vao);
+	//glViewport(0, 0, 2000, 2000);
+	GL_CHECK(glDisable(GL_DEPTH_TEST));
+	
+	GL_CHECK(glBindVertexArray(quad_vao));
+	GL_CHECK(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+	//*/
+
     return postRender();
+}
+
+GLuint Canvas::postRender()
+{
+	renderCursor(m_cursorPosWC);
+
+	if(m_useFrameBuffer) { return m_frameBuffer->getTextureID() ;}
+
+	return 0;
 }
 
 dvec2 Canvas::renderCursor(const dvec2 & pos)
@@ -275,16 +297,6 @@ dvec2 Canvas::renderCursor(const dvec2 & pos)
     
     return pos;
 }
-
-GLuint Canvas::postRender()
-{
-    renderCursor(m_cursorPosWC);
-
-    if(m_useFrameBuffer) { return m_frameBuffer->getTextureID() ;}
-
-    return 0;
-}
-
 
 GLuint Canvas::getTextureID() const
 {
@@ -481,7 +493,6 @@ dvec3 Canvas::getCursorPosWC()						const	{ return m_cursorPosWC ;}
 
 Renderable * Canvas::getCursor()					const	{ return m_cursor ;}
 
-//FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
 FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
 
 #ifdef __EMSCRIPTEN__

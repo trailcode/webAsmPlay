@@ -21,58 +21,54 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
-#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
+#include <webAsmPlay/shaders/SsaoShader.h>
 
-REGISTER_SHADER(TextureLookupShader)
+REGISTER_SHADER(SsaoShader)
 
 namespace
 {
-	ShaderProgram		* shaderProgram		= NULL;
-	TextureLookupShader * defaultInstance	= NULL;
-
-	GLint vertInAttr;
-	GLint MVP_Loc;
+	ShaderProgram * shaderProgram   = NULL;
+	SsaoShader	  * defaultInstance = NULL;
 }
 
-void TextureLookupShader::ensureShader()
-{
-	return; // This one is not compiling!
+SsaoShader* SsaoShader::getDefaultInstance() { return defaultInstance ;}
 
+
+
+void SsaoShader::ensureShader()
+{
 	if(shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(	GLSL({		{GL_VERTEX_SHADER,		"TextureLookupShader.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"TextureLookupShader.fs.glsl"	},
-														{GL_GEOMETRY_SHADER,	"TextureLookupShader.gs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttr						}}),
-											Variables({	{"MVP",					MVP_Loc							}}));
+	shaderProgram = ShaderProgram::create(  GLSL({	{GL_VERTEX_SHADER,		"SsaoShader.vs.glsl"	},
+													{GL_FRAGMENT_SHADER,	"SsaoShader.fs.glsl"	}}),
+											Variables({}),
+											Variables({}));
 
-	defaultInstance = new TextureLookupShader();
+	defaultInstance = new SsaoShader();
 }
 
-TextureLookupShader* TextureLookupShader::getDefaultInstance() { return defaultInstance ;}
-
-TextureLookupShader::TextureLookupShader() : Shader("TextureLookupShader")
+SsaoShader::SsaoShader() : Shader("SsaoShader")
 {
 
 }
 
-TextureLookupShader::~TextureLookupShader()
+SsaoShader::~SsaoShader()
 {
 
 }
 
-void TextureLookupShader::bind( Canvas     * canvas,
-								const bool   isOutline,
-								const size_t renderingStage)
+GLuint SsaoShader::setColorTextureID(const GLuint textureID) { return m_colorTextureID = textureID ;}
+
+void SsaoShader::bind(	Canvas		* canvas,
+						const bool    isOutline,
+						const size_t  renderingStage)
 {
 	shaderProgram->bind();
 
-	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_colorTextureID);
 }
-
-GLuint64 TextureLookupShader::setTextureHandle(const GLuint64& handle) { return m_texHandle = handle; }
