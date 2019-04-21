@@ -38,7 +38,7 @@ public:
 
     GLuint render() override;
 
-    void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size) override;
+	glm::ivec2 setFrameBufferSize(const glm::ivec2 & fbSize, const glm::ivec2 & upperLeft = glm::ivec2(0,0)) override;
 
     void onChar(GLFWwindow * window, const size_t c) override;
 

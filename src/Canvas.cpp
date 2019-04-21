@@ -78,26 +78,15 @@ Canvas::~Canvas()
     // TODO remove from instances!
 }
 
-void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
+ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize, const ivec2 & upperLeft)
 {
-    m_upperLeft = upperLeft;
-    m_size      = size;
+	m_upperLeft = upperLeft;
+	m_size      = fbSize;
 
-    m_trackBallInteractor->setScreenSize((float)size.x, (float)size.y);
-}
+	m_trackBallInteractor->setScreenSize((float)fbSize.x, (float)fbSize.y);
 
-ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
-{
-    //if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, fbSize) ;}
-
-    //FrameBuffer::ensureFrameBuffer(m_auxFrameBuffer, fbSize);
-
-	//*
-	//if (!m_auxFrameBuffer || m_auxFrameBuffer->getBufferSize() != fbSize)
 	if (!m_auxFrameBuffer)
 	{
-		//delete m_auxFrameBuffer;
-
 		m_auxFrameBuffer = new FrameBuffer(	fbSize,
 											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
 												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
@@ -173,14 +162,10 @@ bool Canvas::preRender()
     ColorDistanceShader3D     ::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
     ColorDistanceDepthShader3D::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
 
-    if(false && m_useFrameBuffer)
+    if(m_useFrameBuffer)
     {
-        //FrameBuffer::ensureFrameBuffer(m_frameBuffer, m_frameBufferSize)->bind();
-
-		if (!m_frameBuffer || m_frameBuffer->getBufferSize() != m_frameBufferSize)
+		if (!m_frameBuffer)
 		{
-			delete m_frameBuffer;
-
 			m_frameBuffer = new FrameBuffer(	m_frameBufferSize,
 												{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,				
 													{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
@@ -192,12 +177,14 @@ bool Canvas::preRender()
 														TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
 		}
 
+		m_frameBuffer->setBufferSize(m_size);
+
 		m_frameBuffer->bind();
 
         GL_CHECK(glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y));
     }
 
-	m_gBuffer->bind();
+	//m_gBuffer->bind();
 
     if(m_skyBox) { m_skyBox->render(this) ;}
 
@@ -250,6 +237,7 @@ GLuint Canvas::render()
 
     for(const auto r : m_meshes)              { r->render(this, 0) ;}
 
+	/*
 	m_gBuffer->unbind();
 	
 	SsaoShader::getDefaultInstance()->setColorTextureID(m_gBuffer->getTextureID(0));
@@ -260,6 +248,7 @@ GLuint Canvas::render()
 	
 	GL_CHECK(glBindVertexArray(quad_vao));
 	GL_CHECK(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+	*/
 
     return postRender();
 }

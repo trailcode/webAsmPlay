@@ -54,9 +54,7 @@ public:
     
     virtual ~Canvas();
 
-    virtual void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size);
-
-    virtual glm::ivec2 setFrameBufferSize(const glm::ivec2 & fbSize);
+    virtual glm::ivec2 setFrameBufferSize(const glm::ivec2 & fbSize, const glm::ivec2 & upperLeft = glm::ivec2(0,0));
     virtual glm::ivec2 getFrameBufferSize() const;
 
     virtual GLuint render();

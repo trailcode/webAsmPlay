@@ -42,7 +42,7 @@ void GUI::geosTestPanel()
 
         const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-        s_geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
+		s_geosTestCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
 
         s_geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 

@@ -41,7 +41,7 @@ void GUI::openSteerTestPanel()
 
         const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-        s_openSteerCanvas->setArea(__(pos), __(sceneWindowSize));
+        s_openSteerCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
 
         s_openSteerCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 

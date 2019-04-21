@@ -29,6 +29,7 @@
 #include <locale>
 #include <codecvt>
 #include <JSON.h>
+//#include <nlohmann/json.hpp>
 #include <OpenSteer/Annotation.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
@@ -41,6 +42,7 @@
 
 using namespace std;
 using namespace glm;
+//using namespace nlohmann;
 
 bool GUI::s_showSceneViewPanel                   = false;
 bool GUI::s_showPerformancePanel                 = false;

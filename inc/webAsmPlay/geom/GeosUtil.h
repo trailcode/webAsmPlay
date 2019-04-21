@@ -132,4 +132,6 @@ namespace geosUtil
 
         return v;
     }
+
+	std::string writeGeoJsonFile(const std::string& fileName);
 };

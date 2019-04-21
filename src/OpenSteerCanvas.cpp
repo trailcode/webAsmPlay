@@ -71,7 +71,7 @@ GLuint OpenSteerCanvas::render()
     openSteerDisplayFunc();
 
     unique_ptr<Renderable>(DeferredRenderable::createFromQueued())->render(this);
-    */
+    //*/
 
     return postRender();
 }
@@ -79,17 +79,12 @@ GLuint OpenSteerCanvas::render()
 extern float g_openSteerWindowHeight;
 extern float g_openSteerWindowWidth;
 
-void OpenSteerCanvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
+ivec2 OpenSteerCanvas::setFrameBufferSize(const ivec2 & fbSize, const ivec2 & upperLeft)
 {
-    g_openSteerWindowWidth  = (float)size.x;
-    g_openSteerWindowHeight = (float)size.y;
+    g_openSteerWindowWidth  = (float)fbSize.x;
+    g_openSteerWindowHeight = (float)fbSize.y;
 
-    if(size != m_size)
-    {
-        dmess("Resize!");
-    }
-
-    Canvas::setArea(upperLeft, size);
+    return Canvas::setFrameBufferSize(fbSize, upperLeft);
 }
 
 void openSteerKeyboardFunc (unsigned char key);

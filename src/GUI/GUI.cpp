@@ -604,17 +604,15 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     glfwGetWindowSize		(s_mainWindow, &width,	 &height);
     glfwGetFramebufferSize	(s_mainWindow, &fbWidth, &fbHeight);
 
-    //GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
     GL_CHECK(glViewport(0, 0, fbWidth, fbHeight)); // TODO needed?
 
 	OpenGL::init();
 
     s_canvas = new Canvas(false);
 
-    s_canvas->setArea(ivec2(0,0), ivec2(width, height));
-    //canvas->setArea(ivec2(0,0), ivec2(fbWidth, fbWidth));
-
     s_canvas->setFrameBufferSize(ivec2(fbWidth, fbHeight));
+
+	dmess("fbWidth " << fbWidth << " width " << width);
 
     s_auxCanvases = vector<Canvas *>(
     {

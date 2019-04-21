@@ -31,11 +31,13 @@
 #include <geos/geom/CoordinateSequenceFactory.h>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/operation/union/CascadedPolygonUnion.h>
+#include <nlohmann/json.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 
 using namespace std;
 using namespace glm;
+using namespace nlohmann;
 using namespace geos::geom;
 using namespace geos::operation::geounion;
 
@@ -206,6 +208,21 @@ vector<dvec2> geosUtil::__(const unique_ptr<vector<Coordinate> > & coords) { ret
 _ScopedGeosGeometry::_ScopedGeosGeometry(Geometry * geom) : m_geom(geom) {}
 
 _ScopedGeosGeometry::~_ScopedGeosGeometry() { GeometryFactory::getDefaultInstance()->destroyGeometry(m_geom) ;}
+
+string writeGeoJsonFile(const string& fileName, const Geometry * geom)
+{
+	json geoJson;
+
+	geoJson["type"] = "FeatureCollection";
+
+	json feature;
+
+	json geometry;
+
+	geometry["type"] = "LineString";
+
+	return fileName;
+}
 
 
 

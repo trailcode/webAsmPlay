@@ -55,13 +55,14 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
                                         const float buffer2,
                                         const float buffer3)
 {
-    if( this->m_buffer1 == buffer1 &&
-        this->m_buffer2 == buffer2 &&
-        this->m_buffer3 == buffer3) { return ;}
+	
+    if( m_buffer1 == buffer1 &&
+        m_buffer2 == buffer2 &&
+        m_buffer3 == buffer3) { return ;}
 
-    this->m_buffer1 = buffer1;
-    this->m_buffer2 = buffer2;
-    this->m_buffer3 = buffer3;
+    m_buffer1 = buffer1;
+    m_buffer2 = buffer2;
+    m_buffer3 = buffer3;
 
     m_geoms.clear();
 
@@ -81,6 +82,10 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
     Renderable * geom1 = Renderable::create(shape, trans);
     
+	geom1->setShader(ColorShader::getDefaultInstance());
+
+	geom1->ensureVAO();
+
     addRenderable(geom1);
 
     m_geoms.push_back(unique_ptr<Renderable>(geom1));
@@ -93,17 +98,17 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
         buffered = Geometry::Ptr(buffered->difference(inside.get()));
 
-        //*
         for(const LineString * ring : getExternalRings(buffered))
         {   
             Renderable * geom = Renderable::create(ring, trans);
 
 			geom->setShader(ColorShader::getDefaultInstance());
 
+			geom->ensureVAO();
+
             addRenderable(geom);
 
             m_geoms.push_back(unique_ptr<Renderable>(geom));
         }
-        //*/
     }
 }
