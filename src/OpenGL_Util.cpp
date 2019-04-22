@@ -103,8 +103,8 @@ void OpenGL::init()
 	
 	//if (!quad_vao)
 	{ 
-		GL_CHECK(glGenVertexArrays(1, &quad_vao));
-		GL_CHECK(glBindVertexArray(quad_vao));
+		glGenVertexArrays(1, &quad_vao);
+		glBindVertexArray(    quad_vao);
 
 	} // TODO put in VertexArrayObject;
 

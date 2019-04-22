@@ -52,17 +52,17 @@ namespace
 
 		const GLuint shader = glCreateShader(get<0>(typeAndFile));
 
-		GL_CHECK(glShaderSource(shader, 1, &source, NULL));
+		glShaderSource(shader, 1, &source, NULL);
 
-		GL_CHECK(glCompileShader(shader));
+		glCompileShader(shader);
     
-		GL_CHECK(glGetShaderiv(shader, GL_COMPILE_STATUS, &success));
+		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
 		GLchar infoLog[2048];
 
 		if (!success) 
 		{
-			GL_CHECK(glGetShaderInfoLog(shader, 2048, NULL, infoLog));
+			glGetShaderInfoLog(shader, 2048, NULL, infoLog);
 
 			dmess("GLSL compilation failed: " << _source);
 
@@ -71,7 +71,7 @@ namespace
 			return false;
 		}
 
-		GL_CHECK(glAttachShader(program, shader));
+		glAttachShader(program, shader);
 	}
 }
 
@@ -85,8 +85,8 @@ ShaderProgram * ShaderProgram::create(const GLSL & programs, const Variables& at
 		if(!compile(i, shaderProgram)) { return nullptr ;}
 	}
 
-	GL_CHECK(glLinkProgram (shaderProgram));
-    GL_CHECK(glUseProgram  (shaderProgram));
+	glLinkProgram(shaderProgram);
+    glUseProgram (shaderProgram);
 
 	unordered_map<string, GLint> uniformMap;
     unordered_map<string, GLint> attributeMap;
@@ -137,7 +137,7 @@ ShaderProgram::~ShaderProgram()
     // TODO Cleanup!
 }
 
-void ShaderProgram::bind() { GL_CHECK(glUseProgram(m_shaderProgram)) ;}
+void ShaderProgram::bind() { glUseProgram(m_shaderProgram) ;}
 
 GLuint ShaderProgram::getProgramHandle() const { return m_shaderProgram ;}
 
@@ -169,8 +169,8 @@ GLint ShaderProgram::getAttributeLoc(const string & name) const
     return i->second; 
 }
 
-void ShaderProgram::setUniform (const GLint location, const mat4   & value) const { GL_CHECK(glUniformMatrix4fv(location, 1, false, value_ptr(value))) ;}
-void ShaderProgram::setUniform (const GLint location, const vec4   & value) const { GL_CHECK(glUniform4fv      (location, 1,        value_ptr(value))) ;}
-void ShaderProgram::setUniform (const GLint location, const vec3   & value) const { GL_CHECK(glUniform3fv      (location, 1,        value_ptr(value))) ;}
-void ShaderProgram::setUniformf(const GLint location, const float  & value) const { GL_CHECK(glUniform1f       (location,                     value))  ;}
-void ShaderProgram::setUniformi(const GLint location, const GLuint & value) const { GL_CHECK(glUniform1i       (location,                     value))  ;}
+void ShaderProgram::setUniform (const GLint location, const mat4   & value) const { glUniformMatrix4fv(location, 1, false, value_ptr(value)) ;}
+void ShaderProgram::setUniform (const GLint location, const vec4   & value) const { glUniform4fv      (location, 1,        value_ptr(value)) ;}
+void ShaderProgram::setUniform (const GLint location, const vec3   & value) const { glUniform3fv      (location, 1,        value_ptr(value)) ;}
+void ShaderProgram::setUniformf(const GLint location, const float  & value) const { glUniform1f       (location,                     value)  ;}
+void ShaderProgram::setUniformi(const GLint location, const GLuint & value) const { glUniform1i       (location,                     value)  ;}

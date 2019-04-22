@@ -113,15 +113,15 @@ SkyBox::SkyBox()
                                 -10.0, -10.0,  10.0,
                                  10.0, -10.0,  10.0 };
 
-    GL_CHECK(glGenBuffers(1, &m_vbo));
+    glGenBuffers(1, &m_vbo);
 
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
-    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW));
-    GL_CHECK(glGenVertexArrays(1, &m_vao));
-    GL_CHECK(glBindVertexArray(m_vao));
-    GL_CHECK(glEnableVertexAttribArray(0));
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
-    GL_CHECK(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL));
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 SkyBox::~SkyBox()
@@ -131,17 +131,17 @@ SkyBox::~SkyBox()
 
 void SkyBox::render(Canvas * canvas)
 {
-    GL_CHECK(glBindVertexArray(m_vao));
+	glBindVertexArray(m_vao);
 
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     
 	SkyBoxShader::getDefaultInstance()->bind(canvas, false);
 
-    GL_CHECK(glDepthMask(GL_FALSE));
-    GL_CHECK(glActiveTexture(GL_TEXTURE0));
-    GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, m_texID));
-    GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 36));
-    GL_CHECK(glDepthMask(GL_TRUE));
+    glDepthMask(GL_FALSE);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_texID);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDepthMask(GL_TRUE);
 }
 
 vector<SkyBox *> SkyBox::getInstances() { return instances ;}

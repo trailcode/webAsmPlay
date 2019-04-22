@@ -46,29 +46,29 @@ ivec2 FrameBuffer::initFrameBuffer(const ivec2& bufferSize)
 
 	m_drawBuffers.clear();
 
-	GL_CHECK(glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_prevFB));
+	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_prevFB);
 
-	GL_CHECK(glGenFramebuffers(1,				&m_renderFBO));
-	GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER,	 m_renderFBO));
+	glGenFramebuffers(1,				&m_renderFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER,	 m_renderFBO);
 
 	glGenTextures(m_components.size(), &m_textures[0]);
 
 	for (size_t i = 0; i < m_components.size(); ++i)
 	{
-		GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_textures[i]));
+		glBindTexture(GL_TEXTURE_2D, m_textures[i]);
 
-		GL_CHECK(glTexStorage2D(GL_TEXTURE_2D, 1, m_components[i].m_dataType, m_bufferSize.x, m_bufferSize.y));
+		glTexStorage2D(GL_TEXTURE_2D, 1, m_components[i].m_dataType, m_bufferSize.x, m_bufferSize.y);
 
-		for (const auto& texParam : m_components[i].m_textureParameters) { GL_CHECK(glTexParameteri(GL_TEXTURE_2D, get<0>(texParam), get<1>(texParam))) ;}
+		for (const auto& texParam : m_components[i].m_textureParameters) { glTexParameteri(GL_TEXTURE_2D, get<0>(texParam), get<1>(texParam)) ;}
 
-		GL_CHECK(glFramebufferTexture(GL_FRAMEBUFFER, m_components[i].m_type, m_textures[i], 0));
+		glFramebufferTexture(GL_FRAMEBUFFER, m_components[i].m_type, m_textures[i], 0);
 
 		if (m_components[i].m_type != GL_DEPTH_ATTACHMENT) { m_drawBuffers.push_back(m_components[i].m_type) ;}
 	}
 
-	GL_CHECK(glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]));
+	glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
 
-	GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_prevFB));
+	glBindFramebuffer(GL_FRAMEBUFFER, m_prevFB);
 
 	return bufferSize;
 }
@@ -77,9 +77,9 @@ void FrameBuffer::cleanup()
 {
 	unbind();
 
-	GL_CHECK(glDeleteTextures(m_textures.size(), &m_textures[0]));
+	glDeleteTextures(m_textures.size(), &m_textures[0]);
 
-	GL_CHECK(glDeleteFramebuffers(1, &m_renderFBO));
+	glDeleteFramebuffers(1, &m_renderFBO);
 }
 
 ivec2 FrameBuffer::getBufferSize() const { return m_bufferSize ;}
@@ -95,15 +95,15 @@ ivec2 FrameBuffer::setBufferSize(const ivec2& bufferSize)
 
 void FrameBuffer::bind(const bool clear)
 {
-	GL_CHECK(glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_prevFB));
+	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_prevFB);
 
-	GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_renderFBO));
+	glBindFramebuffer(GL_FRAMEBUFFER, m_renderFBO);
 
 	if(!clear) { return ;}
 
-	GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void FrameBuffer::unbind() { GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_prevFB)); }
+void FrameBuffer::unbind() { glBindFramebuffer(GL_FRAMEBUFFER, m_prevFB); }
 
 GLuint FrameBuffer::getTextureID(const size_t component) const { return m_textures[component] ;}

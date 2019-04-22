@@ -113,35 +113,35 @@ GLuint Textures::load(const SDL_Surface* img)
 {
 	GLuint texture;
 
-    GL_CHECK(glGenTextures(1, &texture));
+    glGenTextures(1, &texture);
 
 	glActiveTexture(GL_TEXTURE0); // NEEDED?
 
     /* Typical Texture Generation Using Data From The Bitmap */
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, texture));
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     int mode = GL_RGB;
 
     if(img->format->BytesPerPixel == 4) { mode = GL_RGBA ;}
 
     /* Generate The Texture */
-    GL_CHECK(glTexImage2D(  GL_TEXTURE_2D, 0, mode, img->w,
-                            img->h, 0, mode,
-                            GL_UNSIGNED_BYTE, img->pixels));
+    glTexImage2D(	GL_TEXTURE_2D, 0, mode, img->w,
+                    img->h, 0, mode,
+                    GL_UNSIGNED_BYTE, img->pixels);
 
     /* Linear Filtering */
-    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     //GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     //GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Needed?
 
-	GL_CHECK(glFlush());
+	glFlush();
 
     return texture;
 }
@@ -178,25 +178,20 @@ GLuint Textures::loadCube(const vector<string> & files)
 
     GLuint texCube;
     
-    GL_CHECK(glGenTextures(1, &texCube));
-    GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, texCube));
+    glGenTextures(1, &texCube);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texCube);
 
-	/*
-    GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-	*/
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-	GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-
-    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, xpos->w, xpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, xpos->pixels));
-    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, xneg->w, xneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, xneg->pixels));
-    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, ypos->w, ypos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, ypos->pixels));
-    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, yneg->w, yneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, yneg->pixels));
-    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, zpos->w, zpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zpos->pixels));
-    GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, zneg->w, zneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zneg->pixels));
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, xpos->w, xpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, xpos->pixels);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, xneg->w, xneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, xneg->pixels);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, ypos->w, ypos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, ypos->pixels);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, yneg->w, yneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, yneg->pixels);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, zpos->w, zpos->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zpos->pixels);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, zneg->w, zneg->h, 0, GL_RGB, GL_UNSIGNED_BYTE, zneg->pixels);
     
-	GL_CHECK(glFlush());
+	glFlush();
 
     /*
     SDL_FreeSurface(xpos); // TODO Causes crashing. MUst not be the correct way to free memory.
@@ -214,27 +209,27 @@ GLuint Textures::create(const vec4 * values, const size_t num)
 {
     GLuint texture;
 
-    GL_CHECK(glGenTextures(1, &texture));
+    glGenTextures(1, &texture);
 
     return set1D(texture, values, num);
 };
 
 GLuint Textures::set1D(const GLuint texture, const glm::vec4 * values, const size_t num)
 {
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, texture)); // TODO Why the OpenGL error?
+    glBindTexture(GL_TEXTURE_2D, texture); // TODO Why the OpenGL error?
 
     // Generate The Texture
-    GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, num, 1, 0, GL_RGBA, GL_FLOAT, values));
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)num, 1, 0, GL_RGBA, GL_FLOAT, values);
     
-    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
     return texture;
 }
 
 GLuint Textures::createFromJpeg(const char * data, const size_t size)
 {
-    SDL_RWops * mem = SDL_RWFromConstMem(data, size);
+    SDL_RWops * mem = SDL_RWFromConstMem(data, (int)size);
     //SDL_RWops * mem = SDL_RWFromMem((void *)data, size);
 
     SDL_Surface * img = IMG_LoadJPG_RW(mem);
@@ -252,28 +247,28 @@ GLuint Textures::createFromJpeg(const char * data, const size_t size)
 
     GLuint texture;
 
-    GL_CHECK(glGenTextures(1, &texture));
+    glGenTextures(1, &texture);
 
 	glActiveTexture(GL_TEXTURE0); // NEEDED?
 
     /* Typical Texture Generation Using Data From The Bitmap */
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, texture));
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     /* Generate The Texture */
-    GL_CHECK(glTexImage2D(  GL_TEXTURE_2D, 0, GL_RGB, img->w,
-                            img->h, 0, GL_RGB,
-                            GL_UNSIGNED_BYTE, img->pixels));
+    glTexImage2D(	GL_TEXTURE_2D, 0, GL_RGB, img->w,
+					img->h, 0, GL_RGB,
+					GL_UNSIGNED_BYTE, img->pixels);
 
     /* Linear Filtering */
-    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	GL_CHECK(glFlush());
+	glFlush();
 
     SDL_FreeSurface(img);
 

@@ -86,13 +86,13 @@ void ColorDistanceShader::bind(Canvas     * canvas,
                                const bool   isOutline,
                                const size_t renderingStage)
 {
-    GL_CHECK(glActiveTexture(GL_TEXTURE0));
+    glActiveTexture(GL_TEXTURE0);
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID()));
+    glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID());
 
-	GL_CHECK(glActiveTexture(GL_TEXTURE1));
+	glActiveTexture(GL_TEXTURE1);
 
-	GL_CHECK(glBindTexture(GL_TEXTURE_2D, theTex));
+	glBindTexture(GL_TEXTURE_2D, theTex);
 
     shaderProgram->bind();
 

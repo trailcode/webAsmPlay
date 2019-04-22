@@ -95,8 +95,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     for(const auto & tess : tessellations)
     {
         // TODO try to remove hard coded values.
-        const float symbologyID_value     = (float(tess->m_symbologyID * symbologyID_Stride) + 0.5) / 32.0;
-        const float symbologyWallID_value = (float(tess->m_symbologyID * symbologyID_Stride) + 0.5) / 32.0 + 4.0 / 32.0;
+        const float symbologyID_value     = float((float(tess->m_symbologyID * symbologyID_Stride) + 0.5) / 32.0);
+        const float symbologyWallID_value = float((float(tess->m_symbologyID * symbologyID_Stride) + 0.5) / 32.0 + 4.0 / 32.0);
 
         for(size_t i = 0; i < tess->m_numVerts; ++i)
         {
@@ -107,7 +107,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             if(IS_3D)  
             {
-                verts.push_back(tess->m_height);
+                verts.push_back((float)tess->m_height);
 
                 verts.push_back(0);
                 verts.push_back(0);
@@ -123,12 +123,12 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
                 const dvec2 uv = (P - min) / (max - min);
 
-                verts.push_back(uv.y);
-                verts.push_back(1 - uv.x);
+                verts.push_back(float(uv.y));
+                verts.push_back(float(1 - uv.x));
             }
         }
 
-        for(size_t i = 0; i < tess->m_numTriangles * 3; ++i) { triangleIndices.push_back(tess->m_triangleIndices[i] + offset) ;}
+        for(size_t i = 0; i < tess->m_numTriangles * 3; ++i) { triangleIndices.push_back((uint32_t)tess->m_triangleIndices[i] + offset) ;}
 
         size_t lastIndex = 0;
 
@@ -140,8 +140,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             for(size_t j = 0; j < num; ++j)
             {
-                lineIndices.push_back(j + localOffset);
-                lineIndices.push_back((j + 1) % num + localOffset);
+                lineIndices.push_back(uint32_t(j + localOffset));
+                lineIndices.push_back(uint32_t((j + 1) % num + localOffset));
             }
 
             lastIndex = tess->m_counterVertIndices[i];
@@ -196,19 +196,19 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     GLuint ebo2 = 0;
     GLuint vbo  = 0;
     
-    GL_CHECK(glGenBuffers(1, &vbo));
-    GL_CHECK(glGenBuffers(1, &ebo));
-    GL_CHECK(glGenBuffers(1, &ebo2));
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+    glGenBuffers(1, &ebo2);
 
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW));
+    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW);
     
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * triangleIndices.size(), &triangleIndices[0], GL_STATIC_DRAW));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * triangleIndices.size(), &triangleIndices[0], GL_STATIC_DRAW);
     
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW);
 
     size_t sizeVertex = 2;
     size_t sizeColor  = 0;
@@ -261,37 +261,37 @@ VertexArrayObject::VertexArrayObject(   const GLuint ebo,
 
 VertexArrayObject::~VertexArrayObject()
 {
-    GL_CHECK(glDeleteVertexArrays(1, &m_vao));
-    GL_CHECK(glDeleteBuffers     (1, &m_vbo));
-    GL_CHECK(glDeleteBuffers     (1, &m_ebo));
-    GL_CHECK(glDeleteBuffers     (1, &m_ebo2));
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteBuffers     (1, &m_vbo);
+    glDeleteBuffers     (1, &m_ebo);
+    glDeleteBuffers     (1, &m_ebo2);
 }
 
 void VertexArrayObject::bind(Shader * shader) const
 {
-    GL_CHECK(glBindVertexArray(m_vao));
+    glBindVertexArray(m_vao);
     
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 }
 
 void VertexArrayObject::bindTriangles() const
 {
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 }
 
 void VertexArrayObject::bindLines() const
 {
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2);
 }
 
 void VertexArrayObject::drawTriangles() const
 {
-    GL_CHECK(glDrawElements(GL_TRIANGLES, m_numTrianglesIndices, GL_UNSIGNED_INT, NULL));
+    glDrawElements(GL_TRIANGLES, m_numTrianglesIndices, GL_UNSIGNED_INT, NULL);
 }
 
 void VertexArrayObject::drawLines() const
 {
-    GL_CHECK(glDrawElements(GL_LINES, m_numContourLines, GL_UNSIGNED_INT, NULL));
+    glDrawElements(GL_LINES, (GLsizei)m_numContourLines, GL_UNSIGNED_INT, NULL);
 }
 
 bool VertexArrayObject::isMulti() const { return m_isMulti ;}
@@ -300,37 +300,37 @@ void VertexArrayObject::ensureVAO()
 {
 	if(m_vao) { return ;}
 
-	GL_CHECK(glGenVertexArrays(1, &m_vao));
-	GL_CHECK(glBindVertexArray(    m_vao));
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(    m_vao);
 
-	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	
 	const size_t totalSize = (m_sizeVertex + m_sizeColor + m_sizeNormal + m_sizeUV) * sizeof(GLfloat);
 
-	GL_CHECK(glEnableVertexAttribArray(0));
+	glEnableVertexAttribArray(0);
 
-	GL_CHECK(glVertexAttribPointer(0, m_sizeVertex, GL_FLOAT, GL_FALSE, totalSize, 0));
+	glVertexAttribPointer(0, (GLint)m_sizeVertex, GL_FLOAT, GL_FALSE, (GLsizei)totalSize, 0);
 
 	if(m_sizeColor)
 	{
-		GL_CHECK(glEnableVertexAttribArray(1));
+		glEnableVertexAttribArray(1);
 
-		GL_CHECK(glVertexAttribPointer(1, m_sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void *)((m_sizeVertex + m_sizeNormal) * sizeof(GLfloat))));
+		glVertexAttribPointer(1, (GLint)m_sizeColor, GL_FLOAT, GL_FALSE, (GLsizei)totalSize, (void *)((m_sizeVertex + m_sizeNormal) * sizeof(GLfloat)));
 	}
 
 	if(m_sizeNormal)
 	{
-		GL_CHECK(glEnableVertexAttribArray(2));
+		glEnableVertexAttribArray(2);
 
-		GL_CHECK(glVertexAttribPointer(2, m_sizeNormal, GL_FLOAT, GL_FALSE, totalSize, (void *)(m_sizeVertex * sizeof(GLfloat))));
+		glVertexAttribPointer(2, (GLint)m_sizeNormal, GL_FLOAT, GL_FALSE, (GLsizei)totalSize, (void *)(m_sizeVertex * sizeof(GLfloat)));
 	}
 
 	if(m_sizeUV)
 	{
-		GL_CHECK(glEnableVertexAttribArray(3));
+		glEnableVertexAttribArray(3);
 
-		GL_CHECK(glVertexAttribPointer(3, m_sizeUV, GL_FLOAT, GL_FALSE, totalSize, (void *)((m_sizeVertex + m_sizeNormal + m_sizeColor) * sizeof(GLfloat))));
+		glVertexAttribPointer(3, (GLint)m_sizeUV, GL_FLOAT, GL_FALSE, (GLsizei)totalSize, (void *)((m_sizeVertex + m_sizeNormal + m_sizeColor) * sizeof(GLfloat)));
 	}
 
-	GL_CHECK(glBindVertexArray(0));
+	glBindVertexArray(0);
 }

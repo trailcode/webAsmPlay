@@ -179,7 +179,7 @@ bool Canvas::preRender()
 
 		m_frameBuffer->bind();
 
-        GL_CHECK(glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y));
+        glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y);
     }
 
 	//m_gBuffer->bind();
@@ -188,12 +188,12 @@ bool Canvas::preRender()
 
     else
     {
-        GL_CHECK(glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w));
+       glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w);
 
-        GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
+       glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    GL_CHECK(glClear(GL_DEPTH_BUFFER_BIT));
+    glClear(GL_DEPTH_BUFFER_BIT);
 
     return true;
 }

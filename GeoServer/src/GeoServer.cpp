@@ -144,7 +144,7 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
         }
     }
     
-    discoverTopologicalRelations(polygons);
+	polygons = discoverTopologicalRelations(polygons);
     breakLineStrings            (lineStrings);
 
     for(const AttributedPoligonalArea & g : polygons)    { serializedPolygons.push_back   (GeometryConverter::convert(g)) ;}
@@ -243,7 +243,7 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     dmess("numPolygons " << polygons.size());
 
-    discoverTopologicalRelations(polygons);
+	polygons = discoverTopologicalRelations(polygons);
 
 	cutPolygonHoles(polygons);
 

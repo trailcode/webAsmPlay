@@ -500,16 +500,15 @@ void GUI::mainLoop(GLFWwindow * window)
     int screenWidth, screenHeight;
 
     glfwGetFramebufferSize(s_mainWindow, &screenWidth, &screenHeight);
-    //glfwGetWindowSize(mainWindow, &screenWidth, &screenHeight);
-
-    GL_CHECK(glViewport(0, 0, screenWidth, screenHeight));
+    
+    glViewport(0, 0, screenWidth, screenHeight);
     
     static float time = 0.f;
     
     time += ImGui::GetIO().DeltaTime;
 
-    GL_CHECK(glDisable(GL_BLEND));
-    GL_CHECK(glDisable(GL_DEPTH_TEST));
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
  
     s_canvas->render();
     
@@ -545,7 +544,7 @@ void GUI::mainLoop(GLFWwindow * window)
 
     ImGui::End();
 
-    GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     ImGui::Render();
 
@@ -601,7 +600,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     glfwGetWindowSize		(s_mainWindow, &width,	 &height);
     glfwGetFramebufferSize	(s_mainWindow, &fbWidth, &fbHeight);
 
-    GL_CHECK(glViewport(0, 0, fbWidth, fbHeight)); // TODO needed?
+    glViewport(0, 0, fbWidth, fbHeight); // TODO needed?
 
 	OpenGL::init();
 

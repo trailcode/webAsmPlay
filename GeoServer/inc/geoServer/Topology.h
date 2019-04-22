@@ -31,7 +31,7 @@ namespace topology
 {
     void breakLineStrings(std::vector<AttributedLineString> & lineStrings);
 
-    void discoverTopologicalRelations(std::vector<AttributedPoligonalArea> & polygons);
+	std::vector<AttributedPoligonalArea> discoverTopologicalRelations(std::vector<AttributedPoligonalArea> & polygons);
 
 	void cutPolygonHoles(std::vector<AttributedPoligonalArea>& polygons);
 }

@@ -165,7 +165,7 @@ void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutlin
 
     shaderProgramDepth->bind();
 
-    GL_CHECK(glEnable(GL_DEPTH_TEST));
+    glEnable(GL_DEPTH_TEST);
 
     shaderProgramDepth->setUniformf(heightMultiplierDepth,    m_heightMultiplier);
     shaderProgramDepth->setUniform (modelDepth,               canvas->getModelRef());
@@ -179,23 +179,23 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
 {
     //dmess("ColorDistanceDepthShader3D::bindStage0");
 
-    GL_CHECK(glActiveTexture(GL_TEXTURE0));
+    glActiveTexture(GL_TEXTURE0);
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID()));
+    glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID());
 
-    GL_CHECK(glActiveTexture(GL_TEXTURE1));
+    glActiveTexture(GL_TEXTURE1);
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, canvas->getAuxFrameBuffer()->getTextureID()));
+    glBindTexture(GL_TEXTURE_2D, canvas->getAuxFrameBuffer()->getTextureID());
 
-	GL_CHECK(glActiveTexture(GL_TEXTURE2));
+	glActiveTexture(GL_TEXTURE2);
 
-	GL_CHECK(glBindTexture(GL_TEXTURE_2D, theTex));
+	glBindTexture(GL_TEXTURE_2D, theTex);
 
-    GL_CHECK(glEnable(GL_BLEND));
+    glEnable(GL_BLEND);
 
-    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    GL_CHECK(glDisable(GL_DEPTH_TEST));
+    glDisable(GL_DEPTH_TEST);
 
     if(!isOutline)
     {

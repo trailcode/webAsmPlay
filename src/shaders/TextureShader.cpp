@@ -77,9 +77,9 @@ void TextureShader::bind(   Canvas     * canvas,
 {
     shaderProgram->bind();
 
-	GL_CHECK(glActiveTexture(GL_TEXTURE0));
+	glActiveTexture(GL_TEXTURE0);
 
-	GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_textureID));
+	glBindTexture(GL_TEXTURE_2D, m_textureID);
 
 	shaderProgram->setUniformi(texLoc, 0);
 
