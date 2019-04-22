@@ -200,8 +200,6 @@ void Network::findPath(const PointOnEdge & end)
     pathAnnotation->setRenderFill(true);
     pathAnnotation->setRenderOutline(true);
 
-	pathAnnotation->ensureVAO();
-
     m_client->getCanvas()->addRenderable(pathAnnotation.get());
 }
 

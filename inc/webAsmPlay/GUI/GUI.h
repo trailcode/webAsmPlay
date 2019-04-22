@@ -26,6 +26,8 @@
 #pragma once
 
 #include <future>
+#include <chrono>
+#include <thread>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Types.h>
 
@@ -94,18 +96,37 @@ public:
 
     static void createWorld();
 
-	//static void guiASync(std::function<void ()> & callback);
+	static bool isMainThread();
 
 	template<typename F>
-	static auto guiASync(F && f) ->std::future<decltype(f())> {
+	static auto guiASync(F && f) ->std::future<decltype(f())>
+	{
 		auto pck = std::make_shared<std::packaged_task<decltype(f())()>>(std::forward<F>(f));
 
-		auto _f = new std::function<void()>([pck]() {
-			(*pck)();
-		});
-		//this->q.push(_f);
+		auto _f = new std::function<void()>([pck]() { (*pck)() ;});
 
 		s_eventQueue.push(_f);
+
+		return pck->get_future();
+	}
+
+	template<typename F>
+	static auto guiSync(F && f, const bool executeDirectlyIfMainThread = true) ->std::future<decltype(f())>
+	{
+		auto pck = std::make_shared<std::packaged_task<decltype(f())()>>(std::forward<F>(f));
+
+		if (executeDirectlyIfMainThread && isMainThread())
+		{
+			f();
+
+			return pck->get_future();
+		}
+
+		auto _f = new std::function<void()>([pck]() { (*pck)() ;});
+
+		s_eventQueue.push(_f);
+
+		while (!s_eventQueue.empty()) { std::this_thread::sleep_for(std::chrono::milliseconds(10)) ;}
 
 		return pck->get_future();
 	}

@@ -387,8 +387,13 @@ void Canvas::onChar(GLFWwindow * window, const size_t c)
     if(!m_enabled) { return ;}
 }
 
-Renderable * Canvas::addRenderable(Renderable * renderiable)
+Renderable * Canvas::addRenderable(Renderable * renderiable, const bool ensureVAO)
 {
+	if (ensureVAO)
+	{
+		GUI::guiSync([renderiable]() { renderiable->ensureVAO(); }, true);
+	}
+
     if(dynamic_cast<DeferredRenderable   *>(renderiable)) { return addRenderable(m_deferredRenderables, renderiable) ;}
     if(dynamic_cast<RenderableLineString *>(renderiable)) { return addRenderable(m_lineStrings,         renderiable) ;}
     if(dynamic_cast<RenderablePolygon    *>(renderiable)) { return addRenderable(m_polygons,            renderiable) ;}
@@ -396,10 +401,8 @@ Renderable * Canvas::addRenderable(Renderable * renderiable)
     if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderable(m_meshes,              renderiable) ;}
     if(dynamic_cast<RenderableBingMap    *>(renderiable)) { return addRenderable(m_rasters,             renderiable) ;}
 
-    dmess("Error! Implement!");
+    dmessError("Error! Implement!");
     
-    abort();
-
     return renderiable;
 }
 

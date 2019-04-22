@@ -80,18 +80,13 @@ void GeoClient::createWorld(const char * data)
 
 void GeoClient::addGeometry(const char* data)
 {
-	/*
+	//*
 	Renderable * renderable = RenderablePolygon::create(dynamic_cast<geos::geom::Polygon *>(makeBox(get<2>(m_bounds), get<3>(m_bounds), get<0>(m_bounds), get<1>(m_bounds)).release()),m_trans);
 
 	renderable->setShader(ColorShader::getDefaultInstance());
 
-	GUI::guiASync([this, renderable]()
-	{
-		renderable->ensureVAO();
-
-		m_canvas->addRenderable(renderable);
-	});
-	*/
+	m_canvas->addRenderable(renderable);
+	//*/
 
 	createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
 	createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
@@ -214,12 +209,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         r->setRenderFill    (GUI::s_renderSettingsFillPolygons);
         r->setRenderOutline (GUI::s_renderSettingsRenderPolygonOutlines);
 
-		GUI::guiASync([this, r]()
-		{
-			r->ensureVAO();
-
-			m_canvas->addRenderable(r);
-		});
+		GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     }
 
     if((r = RenderableMesh::create(polygons3D, m_trans, true)))
@@ -229,12 +219,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         r->setRenderFill    (GUI::s_renderSettingsFillMeshes);
         r->setRenderOutline (GUI::s_renderSettingsRenderMeshOutlines);
 
-		GUI::guiASync([this, r]()
-		{
-			r->ensureVAO();
-
-			m_canvas->addRenderable(r);
-		});
+		GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     }
     
 	indexerPool.stop(true);
@@ -306,12 +291,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     r->setRenderOutline(GUI::s_renderSettingsRenderLinearFeatures);
 
-	GUI::guiASync([this, r]()
-	{
-		r->ensureVAO();
-
-		m_canvas->addRenderable(r);
-	});
+	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     
     dmess("Done creating renderable.");
 
@@ -358,12 +338,7 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 
-	GUI::guiASync([this, r]()
-	{
-		r->ensureVAO();
-
-		m_canvas->addRenderable(r);
-	});
+	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     
     dmess("Done creating renderable.");
 

@@ -434,6 +434,13 @@ void GUI::attributePanel(const string & attrsStr)
     ImGui::End();
 }
 
+namespace
+{
+	const thread::id mainThreadID = this_thread::get_id();
+}
+
+bool GUI::isMainThread() { return this_thread::get_id() == mainThreadID ;}
+
 void GUI::doQueue()
 {
 	function<void()> * _f = nullptr;

@@ -24,8 +24,6 @@
   \copyright 2018
 */
 
-#include <thread>
-
 #ifndef __EMSCRIPTEN__
     #include <curl/curl.h>
 #endif

@@ -79,7 +79,7 @@ public:
 
     rsmz::TrackBallInteractor * getTrackBallInteractor() const;
 
-    Renderable * addRenderable(Renderable * renderiable);
+    Renderable * addRenderable(Renderable * renderiable, const bool ensureVAO = true);
 
     glm::vec4 setClearColor(const glm::vec4 & clearColor);
 

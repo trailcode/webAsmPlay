@@ -107,7 +107,7 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
 		renderable->setShader(ColorShader::getDefaultInstance());
 
-		renderable->ensureVAO();
+		//renderable->ensureVAO();
 
 		addRenderable(renderable);
 
