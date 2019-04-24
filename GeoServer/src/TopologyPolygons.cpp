@@ -78,6 +78,11 @@ vector<AttributedPoligonalArea> topology::discoverTopologicalRelations(vector<At
 {
     dmess("start topology::discoverTopologicalRelations");
 
+	// Add AOI polygon.
+	//makeBox(get<2>(m_bounds), get<3>(m_bounds), get<0>(m_bounds), get<1>(m_bounds)).release());
+	
+	//polygons
+
     // Sort the polygons by their area. Smallest first.
     sort(polygons.begin(), polygons.end(), [](const AttributedPoligonalArea & lhs,
                                               const AttributedPoligonalArea & rhs) { return get<2>(lhs) < get<2>(rhs) ;});
@@ -146,11 +151,14 @@ vector<AttributedPoligonalArea> topology::discoverTopologicalRelations(vector<At
 		parent->children.push_back(&i);
     }
 
+	dmess("Done find children.");
+
+	return polygons;
 
 	int c = 0;
 	
 	for (auto& i : myPolygons)
-	{
+	{ 
 		//dmess("i->children " << i->children.size() << " " << c++);
 
 		++c;
@@ -226,86 +234,3 @@ vector<AttributedPoligonalArea> topology::discoverTopologicalRelations(vector<At
 	return ret;
 }
 
-void topology::cutPolygonHoles(vector<AttributedPoligonalArea>& polygons)
-{
-	return;
-
-	dmess("start cutPolygonHoles");
-
-	size_t c = 0;
-
-	const GeometryFactory* geomFactory = GeometryFactory::getDefaultInstance();
-
-	size_t cc = 0;
-
-	for (auto& i : polygons)
-	{
-		const vector<uint32_t> & childIDs = attrs(i)->m_multiUints32s["childIDs"];
-
-		++cc;
-
-		if (childIDs.size()) { dmess(" " << cc << " " << polygons.size()); }
-
-		for (const auto childID : childIDs)
-		{
-			Polygon* P = poly(i);
-
-			if (P == poly(polygons[childID]))
-			{
-				dmess("Here!");
-
-				continue;
-			}
-
-			if (!P->contains(poly(polygons[childID])))
-			{
-				dmess("Here!");
-
-				continue;
-			}
-
-			if (cc == 3568)
-			{
-				static int c = 0;
-
-				char buf[1024];
-
-				sprintf(buf, "outa/a_%i.geojson", c++);
-
-				geosUtil::writeGeoJsonFile(buf, vector<const Geometry*>({P, poly(polygons[childID])}));
-			}
-
-			Geometry* newPoly = P->difference(poly(polygons[childID]));
-
-			if (!geosPolygon(newPoly))
-			{
-				dmess("Not poly! " << newPoly->getGeometryType());
-
-				geos::io::WKTWriter w;
-
-				char buf[1024];
-
-				sprintf(buf, "C:/Temp/p_%i.wkt", ++c);
-
-				ofstream out(buf);
-
-				//w.write(*newPoly, out);
-				out << w.write(newPoly);
-
-				out.close();
-
-				geomFactory->destroyGeometry(newPoly);
-
-				continue;
-			}
-			
-			//dmess("P " << P->getNumInteriorRing() << " " << dynamic_cast<Polygon*>(newPoly)->getNumInteriorRing());
-
-			geomFactory->destroyGeometry(P);
-
-			poly(i) = geosPolygon(newPoly);
-		}
-	}
-
-	dmess("End cutPolygonHoles");
-}

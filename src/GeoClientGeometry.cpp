@@ -80,7 +80,7 @@ void GeoClient::createWorld(const char * data)
 
 void GeoClient::addGeometry(const char* data)
 {
-	//*
+	/*
 	Renderable * renderable = RenderablePolygon::create(dynamic_cast<geos::geom::Polygon *>(makeBox(get<2>(m_bounds), get<3>(m_bounds), get<0>(m_bounds), get<1>(m_bounds)).release()),m_trans);
 
 	renderable->setShader(ColorShader::getDefaultInstance());
