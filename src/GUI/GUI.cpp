@@ -384,18 +384,19 @@ void GUI::showMainMenuBar()
 
     if(ImGui::BeginMenu("View"))
     {
-        if (ImGui::MenuItem("Geos Tests"))			{ s_showSceneViewPanel				^= 1 ;}
-        if (ImGui::MenuItem("Performance"))			{ s_showPerformancePanel			^= 1 ;}
-        if (ImGui::MenuItem("Render Settings"))		{ s_showRenderSettingsPanel			^= 1 ;}
-        if (ImGui::MenuItem("Log"))					{ s_showLogPanel					^= 1 ;}
-        if (ImGui::MenuItem("Attributes"))			{ s_showAttributePanel				^= 1 ;}
-        if (ImGui::MenuItem("GUI Settings"))		{ s_showGUI_Settings_Panel			^= 1 ;}
-        if (ImGui::MenuItem("Symbology"))			{ s_showSymbologyPanel				^= 1 ;}
-        if (ImGui::MenuItem("OpenSteer Test"))		{ s_showOpenSteerTestPanel			^= 1 ;}
-        if (ImGui::MenuItem("OpenSteer"))			{ s_showOpenSteerPanel				^= 1 ;}
-        if (ImGui::MenuItem("Camera Info"))			{ s_showCameraInfoPanel				^= 1 ;}
-        if (ImGui::MenuItem("Bing Tile System"))	{ s_showBingTileSystemPanel			^= 1 ;}
-		if (ImGui::MenuItem("Framebuffer Depth"))	{ s_showFrameBufferDepthDebugPanel	^= 1 ;}
+        if (ImGui::MenuItem("Geos Tests"))				{ s_showSceneViewPanel					^= 1 ;}
+        if (ImGui::MenuItem("Performance"))				{ s_showPerformancePanel				^= 1 ;}
+        if (ImGui::MenuItem("Render Settings"))			{ s_showRenderSettingsPanel				^= 1 ;}
+        if (ImGui::MenuItem("Log"))						{ s_showLogPanel						^= 1 ;}
+        if (ImGui::MenuItem("Attributes"))				{ s_showAttributePanel					^= 1 ;}
+        if (ImGui::MenuItem("GUI Settings"))			{ s_showGUI_Settings_Panel				^= 1 ;}
+        if (ImGui::MenuItem("Symbology"))				{ s_showSymbologyPanel					^= 1 ;}
+        if (ImGui::MenuItem("OpenSteer Test"))			{ s_showOpenSteerTestPanel				^= 1 ;}
+        if (ImGui::MenuItem("OpenSteer"))				{ s_showOpenSteerPanel					^= 1 ;}
+        if (ImGui::MenuItem("Camera Info"))				{ s_showCameraInfoPanel					^= 1 ;}
+        if (ImGui::MenuItem("Bing Tile System"))		{ s_showBingTileSystemPanel				^= 1 ;}
+		if (ImGui::MenuItem("Framebuffer Depth"))		{ s_showFrameBufferDepthDebugPanel		^= 1 ;}
+		if (ImGui::MenuItem("BingMaps Framebuffer"))	{ s_showBingMapsFrameBufferDebugPanel	^= 1 ;}
 		if (ImGui::MenuItem("Full Screen"))
 		{
 			setFullScreen(!g_fullScreen);
@@ -548,6 +549,7 @@ void GUI::mainLoop(GLFWwindow * window)
     cameraInfoPanel();
     bingTileSystemPanel();
 	frameBufferDepthDebugPanel();
+	bingMapsFrameBufferDebugPanel();
 
     ImGui::End();
 
@@ -642,11 +644,6 @@ void GUI::shutdown()
 
 bool GUI::isShuttingDown() { return s_shuttingDown ;}
 
-namespace
-{
-	bool g_contextSet = false;
-}
-
 void GUI::createWorld()
 {
     s_skyBox = new SkyBox();
@@ -662,15 +659,6 @@ void GUI::createWorld()
 
         //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
         s_client->loadGeometry("data.geo");
-
-		guiASync([]() // TODO try to remove!
-		{
-			//client->addBingMap(renderSettingsRenderBingMaps);
-		});
-
     });
-
-	//client->addBingMap(renderSettingsRenderBingMaps);
 }
 
-//void GUI::guiASync(function<void()> & callback) { eventQueue.push(callback) ;}

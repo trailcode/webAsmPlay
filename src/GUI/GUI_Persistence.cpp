@@ -56,6 +56,7 @@ bool GUI::s_showOpenSteerPanel                   = false;
 bool GUI::s_showCameraInfoPanel                  = false;
 bool GUI::s_showBingTileSystemPanel              = false;
 bool GUI::s_showFrameBufferDepthDebugPanel		 = false;
+bool GUI::s_showBingMapsFrameBufferDebugPanel	 = false;
 
 bool GUI::s_renderSettingsFillMeshes             = true;
 bool GUI::s_renderSettingsRenderMeshOutlines     = true;

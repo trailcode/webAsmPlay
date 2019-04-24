@@ -67,6 +67,8 @@ atomic<size_t> RenderableBingMap::s_numWriting		= {0};
 
 size_t RenderableBingMap::s_numRendered = 0;
 
+FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
+
 namespace
 {
 #ifndef __EMSCRIPTEN__
@@ -131,10 +133,7 @@ namespace
 		{
 			lock_guard<mutex> _(loaderMutex);
 
-			if(curlHandles.find(ID) == curlHandles.end())
-			{
-				curlHandles[ID] = myHandle = curl_easy_init();
-			}
+			if(curlHandles.find(ID) == curlHandles.end()) { curlHandles[ID] = myHandle = curl_easy_init() ;}
 
 			myHandle = curlHandles[ID];
 
@@ -186,9 +185,7 @@ namespace
 		return TileBuffer(ret, size);
 	}
 
-	FrameBuffer * textureBuffer = NULL;
-
-	const bool useBindlessTextures = false;
+	const bool useBindlessTextures = true;
 
 	void fetchTile(const int ID, RasterTile * tile)
 	{
@@ -407,25 +404,65 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	m_tiles.push_back(tile);
 }
 
-extern GLuint theTex;
+extern GLuint theTex; // TODO refactor
+
+namespace
+{
+	void setupBindlessTextures(Canvas* canvas, const vector<RasterTile*>& toRender)
+	{
+		if (!toRender.size()) { return; }
+
+		glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
+
+		GLuint64* pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, toRender.size() * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+		for (size_t i = 0; i < toRender.size(); ++i)
+		{
+			RasterTile* t = toRender[i];
+
+			if (!t->m_textureResident)
+			{
+				glMakeTextureHandleResidentARB(t->m_handle);
+
+				t->m_textureResident = true;
+			}
+
+			pHandles[i * 2] = t->m_handle;
+		}
+
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+		for (size_t i = 0; i < toRender.size(); ++i)
+		{
+			RasterTile* t = toRender[i];
+
+			if (useBindlessTextures)	{ t->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()); }
+			else						{ t->m_renderable->setShader(TextureShader			::getDefaultInstance()); }
+
+			BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
+
+			t->m_renderable->render(canvas);
+		}
+	}
+}
 
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 {
     if(!getRenderFill()) { return ;}
 
-	if (!textureBuffer) // TODO refactor
+	if (!s_textureBuffer) // TODO refactor
 	{
-		textureBuffer = new FrameBuffer(canvas->getFrameBufferSize(),
+		s_textureBuffer = new FrameBuffer(canvas->getFrameBufferSize(),
 											{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
 												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
 													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
 	}
 
-	textureBuffer->setBufferSize(canvas->getFrameBufferSize());
+	s_textureBuffer->setBufferSize(canvas->getFrameBufferSize());
 
-	textureBuffer->bind();
+	s_textureBuffer->bind();
 	
-	theTex = textureBuffer->getTextureID();
+	theTex = s_textureBuffer->getTextureID();
 
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(m_bounds), get<1>(m_bounds)), m_startLevel);
 
@@ -529,40 +566,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 		}
 	}
 
-	if(useBindlessTextures)
-	{
-		glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
-
-		GLuint64 * pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0,  toRender.size() * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
-		for(size_t i = 0; i < toRender.size(); ++i)
-		{
-			RasterTile* t = toRender[i];
-
-			if(!t->m_textureResident)
-			{ 
-				glMakeTextureHandleResidentARB(t->m_handle);
-
-				t->m_textureResident = true;
-			}
-
-			pHandles[i * 2] = t->m_handle;		
-		}
-
-		glUnmapBuffer(GL_UNIFORM_BUFFER);
-
-		for(size_t i = 0; i < toRender.size(); ++i)
-		{
-			RasterTile* t = toRender[i];
-
-			if(useBindlessTextures) { t->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
-			else					{ t->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
-
-			BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
-
-			t->m_renderable->render(canvas);
-		}
-	}
+	if(useBindlessTextures) { setupBindlessTextures(canvas, toRender) ;}
 	else
 	{
         for(auto tile : toRender)
@@ -575,6 +579,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	RenderableBingMap::s_numRendered = toRender.size();
 
-	textureBuffer->unbind();
+	s_textureBuffer->unbind();
 }
 
+FrameBuffer* RenderableBingMap::getFrameBuffer() { return s_textureBuffer ;}

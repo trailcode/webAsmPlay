@@ -31,6 +31,7 @@
 class Frustum;
 
 class RasterTile;
+class FrameBuffer;
 
 class RenderableBingMap : public Renderable
 {
@@ -47,6 +48,8 @@ public:
 	static std::atomic<size_t> s_numWriting;
 
 	static size_t s_numRendered;
+
+	static FrameBuffer* getFrameBuffer();
 
 private:
 
@@ -67,4 +70,6 @@ private:
 	const glm::dmat4 m_trans;
 
 	std::vector<RasterTile*> m_tiles;
+
+	static FrameBuffer* s_textureBuffer;
 };
