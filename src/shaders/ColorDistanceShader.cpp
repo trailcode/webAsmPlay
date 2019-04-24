@@ -29,6 +29,8 @@
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/ColorSymbology.h>
+#include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/renderables/RenderableBingMap.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 
@@ -80,8 +82,6 @@ ColorDistanceShader::~ColorDistanceShader()
 
 ColorDistanceShader * ColorDistanceShader::getDefaultInstance() { return defaultInstance ;}
 
-extern GLuint theTex;
-
 void ColorDistanceShader::bind(Canvas     * canvas,
                                const bool   isOutline,
                                const size_t renderingStage)
@@ -92,7 +92,7 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 
 	glActiveTexture(GL_TEXTURE1);
 
-	glBindTexture(GL_TEXTURE_2D, theTex);
+	glBindTexture(GL_TEXTURE_2D, RenderableBingMap::getFrameBuffer()->getTextureID());
 
     shaderProgram->bind();
 

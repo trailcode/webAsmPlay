@@ -29,6 +29,7 @@
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/renderables/RenderableBingMap.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 
@@ -173,12 +174,8 @@ void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutlin
     shaderProgramDepth->setUniform (projectionDepth,          canvas->getProjectionRef());
 }
 
-GLuint theTex = 0;
-
 void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutline)
 {
-    //dmess("ColorDistanceDepthShader3D::bindStage0");
-
     glActiveTexture(GL_TEXTURE0);
 
     glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID());
@@ -189,7 +186,7 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
 
 	glActiveTexture(GL_TEXTURE2);
 
-	glBindTexture(GL_TEXTURE_2D, theTex);
+	glBindTexture(GL_TEXTURE_2D, RenderableBingMap::getFrameBuffer()->getTextureID());
 
     glEnable(GL_BLEND);
 
@@ -210,11 +207,9 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
         shaderProgramFill->setUniform (modelFill,						canvas->getModelRef());
         shaderProgramFill->setUniform (viewFill,						canvas->getViewRef());
         shaderProgramFill->setUniform (projectionFill,					canvas->getProjectionRef());
-
-		shaderProgramFill->setUniform(invPersMatrixFill,  inverse(canvas->getProjectionRef()));
-		shaderProgramFill->setUniform(invViewMatrixFiLL,	inverse(canvas->getViewRef()));
-		shaderProgramFill->setUniform(MVP_Fill, canvas->getMVP_Ref());
-
+		shaderProgramFill->setUniform(invPersMatrixFill,				inverse(canvas->getProjectionRef()));
+		shaderProgramFill->setUniform(invViewMatrixFiLL,				inverse(canvas->getViewRef()));
+		shaderProgramFill->setUniform(MVP_Fill,							canvas->getMVP_Ref());
         shaderProgramFill->setUniform (lightPosUniformFill,				m_lightPos);
         shaderProgramFill->setUniformf(colorLookupOffsetFill,			0.0f);
     }
@@ -222,14 +217,14 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
     {
         shaderProgramOutline->bind();
         
-        shaderProgramOutline->setUniformf(heightMultiplierOutline,  m_heightMultiplier);
-        shaderProgramOutline->setUniformi(depthTexUniformOutline,   1);
-        shaderProgramOutline->setUniformf(widthUniformOutline,      (float)canvas->getFrameBufferSize().x);
-        shaderProgramOutline->setUniformf(heightUniformOutline,     (float)canvas->getFrameBufferSize().y);
-        shaderProgramOutline->setUniform (MV_Outline,               canvas->getMV_Ref());
-        shaderProgramOutline->setUniform (MVP_Outline,              canvas->getMVP_Ref());
-        shaderProgramOutline->setUniformi(texUniformOutline,        0);
-        shaderProgramOutline->setUniformf(colorLookupOffsetOutline, 1.0f);
+        shaderProgramOutline->setUniformf(heightMultiplierOutline,		m_heightMultiplier);
+        shaderProgramOutline->setUniformi(depthTexUniformOutline,		1);
+        shaderProgramOutline->setUniformf(widthUniformOutline,			(float)canvas->getFrameBufferSize().x);
+        shaderProgramOutline->setUniformf(heightUniformOutline,			(float)canvas->getFrameBufferSize().y);
+        shaderProgramOutline->setUniform (MV_Outline,					canvas->getMV_Ref());
+        shaderProgramOutline->setUniform (MVP_Outline,					canvas->getMVP_Ref());
+        shaderProgramOutline->setUniformi(texUniformOutline,			0);
+        shaderProgramOutline->setUniformf(colorLookupOffsetOutline,		1.0f);
     }
 }
 

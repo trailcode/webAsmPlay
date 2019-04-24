@@ -58,7 +58,7 @@ private:
 
 	void getStartLevel();
 
-	void getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level);
+	bool getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level);
 
     const AABB2D m_bounds;
 
