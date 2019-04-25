@@ -318,7 +318,7 @@ namespace
 
         for(const auto & i : data)
         {
-            const uint32_t numBytes = i.length();
+            const uint32_t numBytes = (uint32_t)i.length();
 
             fwrite(&numBytes, sizeof(uint32_t), 1, fp);
 

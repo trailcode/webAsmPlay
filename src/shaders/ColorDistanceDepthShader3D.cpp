@@ -33,8 +33,6 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 
-
-
 using namespace std;
 using namespace glm;
 

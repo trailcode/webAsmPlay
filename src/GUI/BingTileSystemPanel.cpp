@@ -66,6 +66,8 @@ void GUI::bingTileSystemPanel()
 	ImGui::Text(("    num writing: " + to_string(RenderableBingMap::s_numWriting)).c_str());
 	ImGui::Text(("   num rendered: " + to_string(RenderableBingMap::s_numRendered)).c_str());
 
+	
+
     ImGui::End();
 }
 

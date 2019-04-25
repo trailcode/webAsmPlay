@@ -69,6 +69,8 @@ size_t RenderableBingMap::s_numRendered = 0;
 
 FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
 
+bool RenderableBingMap::s_useCache = true;
+
 namespace
 {
 #ifndef __EMSCRIPTEN__
@@ -406,12 +408,17 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 		//dmess("Here!"); // This Should not be happening
 	}
 
-	RasterTile * tile = RasterTile::getTile(center, level);
+	//RasterTile * tile = RasterTile::getTile(center, level);
+	//RasterTile * tile = RasterTile::getTile(tMin + dvec2(0.001, 0.001), level);
 
-	m_tiles.push_back(tile);
+	//m_tiles.push_back(tile);
+	m_tiles.insert(RasterTile::getTile(center, level));
+	m_tiles.insert(RasterTile::getTile(tMin + dvec2(0.001, 0.001), level)); // Should not need to do this. Rounding errors?
 
 	return true;
 }
+
+#include <webAsmPlay/shaders/ColorShader.h>
 
 namespace
 {
@@ -448,7 +455,11 @@ namespace
 			if (useBindlessTextures)	{ t->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()); }
 			else						{ t->m_renderable->setShader(TextureShader			::getDefaultInstance()); }
 
+			//t->m_renderable->setShader(ColorShader::getDefaultInstance());
+
 			BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
+
+			//t->m_renderable->setRenderOutline(true);
 
 			t->m_renderable->render(canvas);
 		}
@@ -478,13 +489,13 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), m_startLevel);
 	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), m_startLevel);
 
-	vector<RasterTile *> prevTiles = m_tiles;
+	unordered_set<RasterTile *> prevTiles = m_tiles;
 
 	m_tiles.clear();
 
 	getTilesToRender(canvas, tMin, tMax, m_startLevel);
 
-	unordered_set<RasterTile*> tileSet(m_tiles.begin(), m_tiles.end());
+	unordered_set<RasterTile*> tileSet = m_tiles;
 
 	for (auto i : m_tiles) { i->m_stillNeeded = true ;}
 
@@ -522,16 +533,18 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	for (const auto tile : fallBackTiles)
 	{
-		if (tileSet.find(tile) == tileSet.end()) { m_tiles.push_back(tile); }
+		if (tileSet.find(tile) == tileSet.end()) { m_tiles.insert(tile); }
 	}
 
-	sort(m_tiles.begin(), m_tiles.end(), [](const RasterTile * A, const RasterTile * B) { return A->m_level < B->m_level ;});
+	vector<RasterTile*> tiles = toVec(m_tiles);
+
+	sort(tiles.begin(), tiles.end(), [](const RasterTile * A, const RasterTile * B) { return A->m_level < B->m_level ;});
 
 	size_t numRendered = 0;
 
 	vector<RasterTile*> toRender;
 
-	for (auto i : m_tiles)
+	for (auto i : tiles)
 	{
 		if (i->m_textureID)
 		{

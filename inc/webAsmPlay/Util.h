@@ -62,6 +62,18 @@ inline std::vector<T> toVec(const std::initializer_list<T>& list)
 	return ret;
 }
 
+template<typename T>
+inline std::vector<T> toVec(const std::unordered_set<T> & list)
+{
+	std::vector<T> ret;
+
+	ret.reserve(list.size());
+
+	for (const auto& i : list) { ret.push_back(i); }
+
+	return ret;
+}
+
 static glm::ivec2 __(const ImVec2 & v) { return glm::ivec2(v.x, v.y) ;}
 
 static ImVec4 __(const glm::vec4 & v) { return ImVec4(v.x, v.y, v.z, v.q) ;}

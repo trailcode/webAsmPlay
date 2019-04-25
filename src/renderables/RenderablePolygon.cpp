@@ -114,8 +114,8 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
     {
         if(showProgress) { doProgress("(6/6) Creating geometry:", i, polygons.size(), startTime) ;}
 
-        const Geometry  * geom        = get<0>(polygons[i]);
-        const GLuint      symbologyID = get<1>(polygons[i]);
+        const Geometry  * geom        =			get<0>(polygons[i]);
+        const GLuint      symbologyID = (GLuint)get<1>(polygons[i]);
         
         const Polygon      * poly;
         const MultiPolygon * multiPoly;

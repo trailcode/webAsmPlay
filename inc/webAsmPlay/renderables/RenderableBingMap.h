@@ -26,6 +26,7 @@
 #pragma once
 
 #include <atomic>
+#include <unordered_set>
 #include <webAsmPlay/renderables/Renderable.h>
 
 class Frustum;
@@ -51,6 +52,8 @@ public:
 
 	static FrameBuffer* getFrameBuffer();
 
+	static bool s_useCache;
+
 private:
 
     RenderableBingMap(const AABB2D & bounds, const glm::dmat4 & trans);
@@ -69,7 +72,7 @@ private:
 
 	const glm::dmat4 m_trans;
 
-	std::vector<RasterTile*> m_tiles;
+	std::unordered_set<RasterTile*> m_tiles;
 
 	static FrameBuffer* s_textureBuffer;
 };
