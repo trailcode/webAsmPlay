@@ -185,7 +185,7 @@ namespace
 		return TileBuffer(ret, size);
 	}
 
-	const bool useBindlessTextures = true;
+	const bool useBindlessTextures = false;
 
 	void fetchTile(const int ID, RasterTile * tile)
 	{
@@ -445,10 +445,13 @@ namespace
 		{
 			RasterTile* t = toRender[i];
 
-			if (useBindlessTextures)	{ t->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()); }
-			else						{ t->m_renderable->setShader(TextureShader			::getDefaultInstance()); }
+			if (useBindlessTextures)
+            {
+                t->m_renderable->setShader(BindlessTextureShader::getDefaultInstance());
 
-			BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
+                BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
+            }
+			else { t->m_renderable->setShader(TextureShader::getDefaultInstance()); }
 
 			t->m_renderable->render(canvas);
 		}

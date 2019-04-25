@@ -29,7 +29,7 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/TileBoundaryShader.h>
 
-REGISTER_SHADER(TileBoundaryShader)
+//REGISTER_SHADER(TileBoundaryShader)
 
 namespace
 {

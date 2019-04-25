@@ -27,7 +27,7 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/SsaoShader.h>
 
-REGISTER_SHADER(SsaoShader)
+//REGISTER_SHADER(SsaoShader)
 
 namespace
 {

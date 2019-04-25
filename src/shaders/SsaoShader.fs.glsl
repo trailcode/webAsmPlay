@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#version 430 core
+#version 330 core
 
 // Samplers for pre-rendered color, normal and depth
 layout (binding = 0) uniform sampler2D sColor;

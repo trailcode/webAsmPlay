@@ -37,7 +37,7 @@
 using namespace std;
 using namespace glm;
 
-REGISTER_SHADER(ColorDistanceShader)
+//REGISTER_SHADER(ColorDistanceShader)
 
 namespace
 {
