@@ -21,66 +21,30 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
+#pragma once
 
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/BindlessTextureShader.h>
+#include <webAsmPlay/shaders/Shader.h>
 
-REGISTER_SHADER(BindlessTextureShader)
-
-namespace
+class SsaoShader : public Shader
 {
-	ShaderProgram			* shaderProgram   = NULL;
-	BindlessTextureShader	* defaultInstance = NULL;
+public:
+	
+	static SsaoShader * getDefaultInstance();
 
-	GLint vertInAttrLoc;
-	GLint vertUV_InAttrLoc;
+	SsaoShader();
+	~SsaoShader();
 
-	GLint MVP_Loc;
-	//GLint texLoc;
-	GLint texID_Loc;
-}
+	static void ensureShader();
 
-BindlessTextureShader* BindlessTextureShader::getDefaultInstance() { return defaultInstance ;}
+	void bind(	Canvas     * canvas,
+				const bool   isOutline,
+				const size_t renderingStage) override;
 
-void BindlessTextureShader::ensureShader()
-{
-	if(shaderProgram) { return ;}
+	GLuint setColorTextureID(const GLuint textureID);
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"BindlessTextureShader.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"BindlessTextureShader.fs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttrLoc					},
-														{"vertUV_In",			vertUV_InAttrLoc				}}),
-											Variables({	{"MVP",					MVP_Loc							},
-														{"texID",				texID_Loc						}}));
+private:
 
-	defaultInstance = new BindlessTextureShader();
-}
-
-void BindlessTextureShader::bind(	Canvas		* canvas,
-									const bool    isOutline,
-									const size_t  renderingStage)
-{
-	shaderProgram->bind();
-
-	shaderProgram->setUniformi(texID_Loc, m_textureSlot);
-
-	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
-}
-
-BindlessTextureShader::BindlessTextureShader() : Shader("BindlessTextureShader")
-{
-
-}
-
-BindlessTextureShader::~BindlessTextureShader()
-{
-
-}
-
-size_t BindlessTextureShader::setTextureSlot(const size_t textureSlot)
-{
-	return m_textureSlot = (GLuint)textureSlot;
-}
+	GLuint m_colorTextureID = 0;
+};

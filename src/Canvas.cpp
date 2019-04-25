@@ -25,8 +25,6 @@
 */
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <geos/geom/Polygon.h>
-#include <geos/geom/LineString.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
@@ -44,6 +42,7 @@
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
+#include <webAsmPlay/shaders/SsaoShader.h>
 #include <webAsmPlay/Canvas.h>
 
 using namespace std;
@@ -77,19 +76,38 @@ Canvas::~Canvas()
     // TODO remove from instances!
 }
 
-void Canvas::setArea(const ivec2 & upperLeft, const ivec2 & size)
+ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize, const ivec2 & upperLeft)
 {
-    m_upperLeft = upperLeft;
-    m_size      = size;
+	m_upperLeft = upperLeft;
+	m_size      = fbSize;
 
-    m_trackBallInteractor->setScreenSize((float)size.x, (float)size.y);
-}
+	m_trackBallInteractor->setScreenSize((float)fbSize.x, (float)fbSize.y);
 
-ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize)
-{
-    //if(useFrameBuffer) { frameBuffer = FrameBuffer::ensureFrameBuffer(frameBuffer, fbSize) ;}
+	if (!m_auxFrameBuffer)
+	{
+		m_auxFrameBuffer = new FrameBuffer(	fbSize,
+											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
+											FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
+													TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
 
-    FrameBuffer::ensureFrameBuffer(m_auxFrameBuffer, fbSize);
+		m_gBuffer		 = new FrameBuffer(	fbSize,
+											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGB32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
+											 FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
+													TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
+	}
+	
+	m_auxFrameBuffer->setBufferSize(fbSize);
+	m_gBuffer		->setBufferSize(fbSize);
 
     return m_frameBufferSize = fbSize;
 }
@@ -114,28 +132,12 @@ void Canvas::popMVP()
 	m_frustum->set(m_currMVP.m_MVP);
 }
 
-extern vec4 lookat;
-extern vec4 pos;   
-extern vec4 up;
-
 void Canvas::updateMVP()
 {
     m_currMVP.m_view        = m_trackBallInteractor->getCamera()->getMatrix();
-	//currMVP.view = glm::lookAt( glm::vec3( 0.f, 0.f, 2.0f ),glm::vec3( 0.f, 0.f, 0.f ),glm::vec3( 0.0f, 1.0f, 0.0f ) ); 
     m_currMVP.m_projection  = perspective(m_perspectiveFOV, double(m_size.x) / double(m_size.y), 0.0001, 30.0);
-	//currMVP.projection  = perspective(180.0, double(size.x) / double(size.y), 0.0001, 30.0);
-	//currMVP.projection  = glm::frustum(-10, 10, -10, 10, 0, 30);
-	//currMVP.projection  = dmat4(1);
-	//currMVP.projection  = ortho(0.0, (double)size.x,(double)size.y,0.0, 0.1, 100.0);
-	//currMVP.projection  = ortho(-40.0, 40.0, -40.0, 40.0, 0.5, 50.0);
-	//currMVP.projection  = perspective(45.0, double(size.x) / double(size.y), 0.000001, 30.0);
-    
-	float near_plane = 1.0f, far_plane = 40.5f;
-	//currMVP.projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    //currMVP.view = glm::lookAt(trackBallInteractor->getCamera()->getEye(), trackBallInteractor->getCamera()->getCenter(), glm::vec3(0.0, 1.0, 0.0));
-	
-	m_currMVP.m_MV		= m_currMVP.m_view			* m_currMVP.m_model;
-    m_currMVP.m_MVP		= m_currMVP.m_projection	* m_currMVP.m_MV;
+	m_currMVP.m_MV			= m_currMVP.m_view			* m_currMVP.m_model;
+    m_currMVP.m_MVP			= m_currMVP.m_projection	* m_currMVP.m_MV;
 
 	m_frustum->set(m_currMVP.m_MVP);
 }
@@ -160,36 +162,53 @@ bool Canvas::preRender()
 
     if(m_useFrameBuffer)
     {
-        FrameBuffer::ensureFrameBuffer(m_frameBuffer, m_frameBufferSize)->bind();
+		if (!m_frameBuffer)
+		{
+			m_frameBuffer = new FrameBuffer(	m_frameBufferSize,
+												{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,				
+													{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+														TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
+												FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,
+													{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+														TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
+														TexParam(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE),
+														TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
+		}
 
-        GL_CHECK(glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y));
+		m_frameBuffer->setBufferSize(m_size);
+
+		m_frameBuffer->bind();
+
+        glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y);
     }
+
+	//m_gBuffer->bind();
 
     if(m_skyBox) { m_skyBox->render(this) ;}
 
     else
     {
-        GL_CHECK(glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w));
+       glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w);
 
-        GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
+       glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    GL_CHECK(glClear(GL_DEPTH_BUFFER_BIT));
+    glClear(GL_DEPTH_BUFFER_BIT);
 
     return true;
 }
+
+extern GLuint quad_vao;
 
 GLuint Canvas::render()
 {
     if(!preRender()) { return 0 ;}
 
     lock_guard<mutex> _(m_renderiablesMutex);
-
+	
     if(m_auxFrameBuffer)
     {
         m_auxFrameBuffer->bind();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for(const auto r : m_meshes) { r->render(this, 1) ;}
 
@@ -211,12 +230,34 @@ GLuint Canvas::render()
     for(const auto r : m_points)              { r->render(this, 0) ;}
     for(const auto r : m_deferredRenderables) { r->render(this, 0) ;} 
     
-    ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
+	ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
     ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
 
     for(const auto r : m_meshes)              { r->render(this, 0) ;}
 
+	/*
+	m_gBuffer->unbind();
+	
+	SsaoShader::getDefaultInstance()->setColorTextureID(m_gBuffer->getTextureID(0));
+
+	SsaoShader::getDefaultInstance()->bind(this, false, 0);
+
+	GL_CHECK(glDisable(GL_DEPTH_TEST));
+	
+	GL_CHECK(glBindVertexArray(quad_vao));
+	GL_CHECK(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+	*/
+
     return postRender();
+}
+
+GLuint Canvas::postRender()
+{
+	renderCursor(m_cursorPosWC);
+
+	if(m_useFrameBuffer) { return m_frameBuffer->getTextureID() ;}
+
+	return 0;
 }
 
 dvec2 Canvas::renderCursor(const dvec2 & pos)
@@ -237,16 +278,6 @@ dvec2 Canvas::renderCursor(const dvec2 & pos)
     
     return pos;
 }
-
-GLuint Canvas::postRender()
-{
-    renderCursor(m_cursorPosWC);
-
-    if(m_useFrameBuffer) { return m_frameBuffer->getTextureID() ;}
-
-    return 0;
-}
-
 
 GLuint Canvas::getTextureID() const
 {
@@ -356,8 +387,13 @@ void Canvas::onChar(GLFWwindow * window, const size_t c)
     if(!m_enabled) { return ;}
 }
 
-Renderable * Canvas::addRenderable(Renderable * renderiable)
+Renderable * Canvas::addRenderable(Renderable * renderiable, const bool ensureVAO)
 {
+	if (ensureVAO)
+	{
+		GUI::guiSync([renderiable]() { renderiable->ensureVAO(); }, true);
+	}
+
     if(dynamic_cast<DeferredRenderable   *>(renderiable)) { return addRenderable(m_deferredRenderables, renderiable) ;}
     if(dynamic_cast<RenderableLineString *>(renderiable)) { return addRenderable(m_lineStrings,         renderiable) ;}
     if(dynamic_cast<RenderablePolygon    *>(renderiable)) { return addRenderable(m_polygons,            renderiable) ;}
@@ -365,10 +401,8 @@ Renderable * Canvas::addRenderable(Renderable * renderiable)
     if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderable(m_meshes,              renderiable) ;}
     if(dynamic_cast<RenderableBingMap    *>(renderiable)) { return addRenderable(m_rasters,             renderiable) ;}
 
-    dmess("Error! Implement!");
+    dmessError("Error! Implement!");
     
-    abort();
-
     return renderiable;
 }
 

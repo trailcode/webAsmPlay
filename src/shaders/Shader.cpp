@@ -24,12 +24,26 @@
   \copyright 2018
 */
 
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/ColorSymbology.h>
+#include <webAsmPlay/shaders/BindlessTextureShader.h>
+#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
+#include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
+#include <webAsmPlay/shaders/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/ColorShader.h>
+#include <webAsmPlay/shaders/ColorVertexShader.h>
+#include <webAsmPlay/shaders/SkyBoxShader.h>
+#include <webAsmPlay/shaders/SsaoShader.h>
+#include <webAsmPlay/shaders/TextureLookupShader.h>
+#include <webAsmPlay/shaders/TextureShader.h>
+#include <webAsmPlay/shaders/TileBoundaryShader.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/Shader.h>
 
 using namespace std;
 using namespace glm;
+
+vector<function<void()>> Shader::s_shadersToRegister;
 
 Shader::Shader(const string  & shaderName) :    m_shaderName     (shaderName),
                                                 m_colorSymbology (ColorSymbology::getInstance("defaultPolygon")) {}
@@ -42,3 +56,30 @@ bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) con
 
 ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return m_colorSymbology = colorSymbology	;}
 ColorSymbology * Shader::getColorSymbology() const							{ return m_colorSymbology					;}
+
+RegisterShader::RegisterShader(const function<void()> & registerFunction)
+{
+	dmess("RegisterShader");
+
+	Shader::s_shadersToRegister.push_back(registerFunction);
+}
+
+void Shader::ensureShaders()
+{
+	BindlessTextureShader::ensureShader();
+	ColorDistanceShader3D::ensureShader();
+	ColorDistanceDepthShader3D::ensureShader();
+	ColorDistanceShader::ensureShader();
+	ColorShader::ensureShader();
+	ColorVertexShader::ensureShader();
+	SkyBoxShader::ensureShader();
+	SsaoShader::ensureShader();
+	TextureLookupShader::ensureShader();
+	TextureShader::ensureShader();
+	TileBoundaryShader::ensureShader();
+
+	for (const auto& i : s_shadersToRegister)
+	{
+		// i(); // This does not seem to work.
+	}
+}

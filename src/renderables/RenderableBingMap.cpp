@@ -67,6 +67,8 @@ atomic<size_t> RenderableBingMap::s_numWriting		= {0};
 
 size_t RenderableBingMap::s_numRendered = 0;
 
+FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
+
 namespace
 {
 #ifndef __EMSCRIPTEN__
@@ -131,10 +133,7 @@ namespace
 		{
 			lock_guard<mutex> _(loaderMutex);
 
-			if(curlHandles.find(ID) == curlHandles.end())
-			{
-				curlHandles[ID] = myHandle = curl_easy_init();
-			}
+			if(curlHandles.find(ID) == curlHandles.end()) { curlHandles[ID] = myHandle = curl_easy_init() ;}
 
 			myHandle = curlHandles[ID];
 
@@ -186,9 +185,7 @@ namespace
 		return TileBuffer(ret, size);
 	}
 
-	FrameBuffer * textureBuffer = NULL;
-
-	const bool useBindlessTextures = false;
+	const bool useBindlessTextures = true;
 
 	void fetchTile(const int ID, RasterTile * tile)
 	{
@@ -347,7 +344,7 @@ RenderableBingMap::~RenderableBingMap()
 
 }
 
-void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, const dvec2 & tMax, const size_t level)
+bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, const dvec2 & tMax, const size_t level)
 {
 	const dvec3 center = dvec4(((tMin + tMax) * 0.5), 0.0, 1.0);
 
@@ -381,7 +378,8 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 	const Frustum * frust = canvas->getCameraFrustum();
 
-	if (level < 23 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
+	//if (level < 23 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
+	if (level < 24 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	//if (level < 12 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	{
 		const dvec3 subPoints[] = {	/* 0 */dvec3(tMin.x, tMax.y,	0),		/* 1 */dvec3(center.x, tMax.y,   0), /* 2 */dvec3(tMax.x, tMax.y,   0),
@@ -393,32 +391,88 @@ void RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 											/* 6 */m_trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */m_trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */m_trans * dvec4(tMax.x, tMin.y,   0, 1)};
 
 		
-		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
-		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;}
-		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;}
-		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;}
+		bool gotTile = false;
+
+		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { gotTile |= getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
+		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { gotTile |= getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;}
+		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { gotTile |= getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;}
+		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { gotTile |= getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;}
 		// TODO try projecting into a different space and doing a simpler check.
 
-		return;
+		//if (gotTile) { return true; }
+
+		return gotTile;
+
+		//dmess("Here!"); // This Should not be happening
 	}
 
 	RasterTile * tile = RasterTile::getTile(center, level);
 
 	m_tiles.push_back(tile);
+
+	return true;
 }
 
-extern GLuint theTex;
+namespace
+{
+	void renderBindlessTextures(Canvas* canvas, const vector<RasterTile*>& toRender)
+	{
+		if (!toRender.size()) { return; }
+
+		glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
+
+		GLuint64* pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, toRender.size() * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+		for (size_t i = 0; i < toRender.size(); ++i)
+		{
+			RasterTile* t = toRender[i];
+
+			if (!t->m_textureResident)
+			{
+				glMakeTextureHandleResidentARB(t->m_handle);
+
+				t->m_textureResident = true;
+			}
+
+			pHandles[i * 2] = t->m_handle;
+		}
+
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+		//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+		for (size_t i = 0; i < toRender.size(); ++i)
+		{
+			RasterTile* t = toRender[i];
+
+			if (useBindlessTextures)	{ t->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()); }
+			else						{ t->m_renderable->setShader(TextureShader			::getDefaultInstance()); }
+
+			BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
+
+			t->m_renderable->render(canvas);
+		}
+
+		//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	}
+}
 
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 {
     if(!getRenderFill()) { return ;}
 
-	FrameBuffer::ensureFrameBuffer(textureBuffer, canvas->getFrameBufferSize());
+	if (!s_textureBuffer) // TODO refactor
+	{
+		s_textureBuffer = new FrameBuffer(canvas->getFrameBufferSize(),
+											{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
+	}
 
-	textureBuffer->bind();
+	s_textureBuffer->setBufferSize(canvas->getFrameBufferSize());
+
+	s_textureBuffer->bind();
 	
-	theTex = textureBuffer->getTextureID();
-
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(m_bounds), get<1>(m_bounds)), m_startLevel);
 
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), m_startLevel);
@@ -452,23 +506,15 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 		RasterTile* currTile = tile;
 
-		//dmess("currTile->level " << currTile->level);
-
-		int c = 0;
 		for (int parentLevel = int(currTile->m_level) - 1; parentLevel >= m_startLevel; --parentLevel)
 		{
-			//if (++c > 2) { break; }
-
 			currTile = currTile->getParentTile();
 
-			//dmess("currTile " << currTile);
+			if (!currTile->m_textureID) { continue; }
+			
+			fallBackTiles.insert(currTile);
 
-			if (currTile->m_textureID)
-			{
-				fallBackTiles.insert(currTile);
-
-				break;
-			}
+			break;
 		}
 	}
 
@@ -521,40 +567,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 		}
 	}
 
-	if(useBindlessTextures)
-	{
-		glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.textureHandleBuffer);
-
-		GLuint64 * pHandles = (GLuint64*)glMapBufferRange(GL_UNIFORM_BUFFER, 0,  toRender.size() * sizeof(GLuint64) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
-		for(size_t i = 0; i < toRender.size(); ++i)
-		{
-			RasterTile* t = toRender[i];
-
-			if(!t->m_textureResident)
-			{ 
-				glMakeTextureHandleResidentARB(t->m_handle);
-
-				t->m_textureResident = true;
-			}
-
-			pHandles[i * 2] = t->m_handle;		
-		}
-
-		glUnmapBuffer(GL_UNIFORM_BUFFER);
-
-		for(size_t i = 0; i < toRender.size(); ++i)
-		{
-			RasterTile* t = toRender[i];
-
-			if(useBindlessTextures) { t->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
-			else					{ t->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
-
-			BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
-
-			t->m_renderable->render(canvas);
-		}
-	}
+	if(useBindlessTextures) { renderBindlessTextures(canvas, toRender) ;}
 	else
 	{
         for(auto tile : toRender)
@@ -567,6 +580,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	RenderableBingMap::s_numRendered = toRender.size();
 
-	textureBuffer->unbind();
+	s_textureBuffer->unbind();
 }
 
+FrameBuffer* RenderableBingMap::getFrameBuffer() { return s_textureBuffer ;}

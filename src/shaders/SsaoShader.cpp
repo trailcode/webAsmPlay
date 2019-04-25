@@ -21,66 +21,54 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
-#include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/BindlessTextureShader.h>
+#include <webAsmPlay/shaders/SsaoShader.h>
 
-REGISTER_SHADER(BindlessTextureShader)
+REGISTER_SHADER(SsaoShader)
 
 namespace
 {
-	ShaderProgram			* shaderProgram   = NULL;
-	BindlessTextureShader	* defaultInstance = NULL;
-
-	GLint vertInAttrLoc;
-	GLint vertUV_InAttrLoc;
-
-	GLint MVP_Loc;
-	//GLint texLoc;
-	GLint texID_Loc;
+	ShaderProgram * shaderProgram   = NULL;
+	SsaoShader	  * defaultInstance = NULL;
 }
 
-BindlessTextureShader* BindlessTextureShader::getDefaultInstance() { return defaultInstance ;}
+SsaoShader* SsaoShader::getDefaultInstance() { return defaultInstance ;}
 
-void BindlessTextureShader::ensureShader()
+
+
+void SsaoShader::ensureShader()
 {
 	if(shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"BindlessTextureShader.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"BindlessTextureShader.fs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttrLoc					},
-														{"vertUV_In",			vertUV_InAttrLoc				}}),
-											Variables({	{"MVP",					MVP_Loc							},
-														{"texID",				texID_Loc						}}));
+	shaderProgram = ShaderProgram::create(  GLSL({	{GL_VERTEX_SHADER,		"SsaoShader.vs.glsl"	},
+													{GL_FRAGMENT_SHADER,	"SsaoShader.fs.glsl"	}}),
+											Variables({}),
+											Variables({}));
 
-	defaultInstance = new BindlessTextureShader();
+	defaultInstance = new SsaoShader();
 }
 
-void BindlessTextureShader::bind(	Canvas		* canvas,
-									const bool    isOutline,
-									const size_t  renderingStage)
+SsaoShader::SsaoShader() : Shader("SsaoShader")
+{
+
+}
+
+SsaoShader::~SsaoShader()
+{
+
+}
+
+GLuint SsaoShader::setColorTextureID(const GLuint textureID) { return m_colorTextureID = textureID ;}
+
+void SsaoShader::bind(	Canvas		* canvas,
+						const bool    isOutline,
+						const size_t  renderingStage)
 {
 	shaderProgram->bind();
 
-	shaderProgram->setUniformi(texID_Loc, m_textureSlot);
-
-	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
-}
-
-BindlessTextureShader::BindlessTextureShader() : Shader("BindlessTextureShader")
-{
-
-}
-
-BindlessTextureShader::~BindlessTextureShader()
-{
-
-}
-
-size_t BindlessTextureShader::setTextureSlot(const size_t textureSlot)
-{
-	return m_textureSlot = (GLuint)textureSlot;
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_colorTextureID);
 }

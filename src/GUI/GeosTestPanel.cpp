@@ -28,6 +28,7 @@
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GeosTestCanvas.h>
+#include <webAsmPlay/FrameBuffer.h>
 
 void GUI::geosTestPanel()
 {
@@ -41,7 +42,7 @@ void GUI::geosTestPanel()
 
         const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-        s_geosTestCanvas->setArea(__(pos), __(sceneWindowSize));
+		s_geosTestCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
 
         s_geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
@@ -61,6 +62,8 @@ void GUI::geosTestPanel()
 
         s_geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
 
+		if (ImGui::Button("Export GeoJSON")) { s_geosTestCanvas->exportGeoJson(); }
+		
     ImGui::End();
 }
 

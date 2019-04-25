@@ -57,17 +57,14 @@ Renderable * RenderablePoint::create(const dvec3 & _pos,
     GLuint ebo = 0;
     GLuint vbo = 0;
 
-    //GL_CHECK(glGenVertexArrays(1, &vao));
-    GL_CHECK(glGenBuffers     (1, &ebo));
-    GL_CHECK(glGenBuffers     (1, &vbo));
+    glGenBuffers(1, &ebo);
+    glGenBuffers(1, &vbo);
 
-    //GL_CHECK(glBindVertexArray(vao));
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
-    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW));
-
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     return new RenderablePoint(ebo, vbo, false);
 }
@@ -93,11 +90,11 @@ void RenderablePoint::render(Canvas * canvas, const size_t renderStage)
 
     m_shader->bind(canvas, false, renderStage);
 
-    GL_CHECK(glBindVertexArray(                    m_vao));
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         m_vbo));
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo));
+    glBindVertexArray(                    m_vao);
+    glBindBuffer(GL_ARRAY_BUFFER,         m_vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 
-    GL_CHECK(glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL));
+    glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL);
 }
 
 RenderablePoint::RenderablePoint(   const GLuint      ebo,
@@ -113,15 +110,13 @@ RenderablePoint::RenderablePoint(   const GLuint      ebo,
 
 RenderablePoint::~RenderablePoint()
 {
-    GL_CHECK(glDeleteVertexArrays(1, &m_vao));
-    GL_CHECK(glDeleteBuffers     (1, &m_vbo));
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteBuffers     (1, &m_vbo);
 }
 
 void RenderablePoint::ensureVAO()
 {
-	GL_CHECK(glGenVertexArrays(1, &m_vao));
+	glGenVertexArrays(1, &m_vao);
 
-	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
-
-
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 }

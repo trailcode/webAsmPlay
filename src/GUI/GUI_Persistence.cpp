@@ -29,6 +29,7 @@
 #include <locale>
 #include <codecvt>
 #include <JSON.h>
+//#include <nlohmann/json.hpp>
 #include <OpenSteer/Annotation.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
@@ -41,6 +42,7 @@
 
 using namespace std;
 using namespace glm;
+//using namespace nlohmann;
 
 bool GUI::s_showSceneViewPanel                   = false;
 bool GUI::s_showPerformancePanel                 = false;
@@ -53,6 +55,8 @@ bool GUI::s_showOpenSteerTestPanel               = false;
 bool GUI::s_showOpenSteerPanel                   = false;
 bool GUI::s_showCameraInfoPanel                  = false;
 bool GUI::s_showBingTileSystemPanel              = false;
+bool GUI::s_showFrameBufferDepthDebugPanel		 = false;
+bool GUI::s_showBingMapsFrameBufferDebugPanel	 = false;
 
 bool GUI::s_renderSettingsFillMeshes             = true;
 bool GUI::s_renderSettingsRenderMeshOutlines     = true;
@@ -101,6 +105,7 @@ void GUI::loadState()
     setBool(L"showOpenSteerPanel",                  s_showOpenSteerPanel);
     setBool(L"showCameraInfoPanel",                 s_showCameraInfoPanel);
     setBool(L"showBingTileSystemPanel",             s_showBingTileSystemPanel);
+	setBool(L"showFrameBufferDepthDebugPanel",		s_showFrameBufferDepthDebugPanel);
 
     setBool(L"renderSettingsFillMeshes",            s_renderSettingsFillMeshes);
     setBool(L"renderSettingsRenderMeshOutlines",    s_renderSettingsRenderMeshOutlines);
@@ -147,6 +152,7 @@ void GUI::saveState()
     root[L"showOpenSteerPanel"]                   = new JSONValue(s_showOpenSteerPanel);
     root[L"showCameraInfoPanel"]                  = new JSONValue(s_showCameraInfoPanel);
     root[L"showBingTileSystemPanel"]              = new JSONValue(s_showBingTileSystemPanel);
+	root[L"showFrameBufferDepthDebugPanel"]       = new JSONValue(s_showFrameBufferDepthDebugPanel);
 
     root[L"renderSettingsFillMeshes"]             = new JSONValue(s_renderSettingsFillMeshes);
     root[L"renderSettingsRenderMeshOutlines"]     = new JSONValue(s_renderSettingsRenderMeshOutlines);

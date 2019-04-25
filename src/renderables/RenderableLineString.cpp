@@ -50,9 +50,9 @@ RenderableLineString::RenderableLineString( const GLuint  ebo,
 
 RenderableLineString::~RenderableLineString()
 {
-    GL_CHECK(glDeleteVertexArrays(1, &m_vao));
-    GL_CHECK(glDeleteBuffers     (1, &m_ebo));
-    GL_CHECK(glDeleteBuffers     (1, &m_vbo));
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteBuffers     (1, &m_ebo);
+    glDeleteBuffers     (1, &m_vbo);
 }
 
 Renderable * RenderableLineString::create(  const LineString * lineString,
@@ -182,14 +182,14 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
     GLuint ebo = 0;
     GLuint vbo = 0;
 
-    GL_CHECK(glGenBuffers     (1, &ebo));
-    GL_CHECK(glGenBuffers     (1, &vbo));
+    glGenBuffers     (1, &ebo);
+    glGenBuffers     (1, &vbo);
     
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
 
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
-    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * verts.size(), &verts[0], GL_STATIC_DRAW));
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * verts.size(), &verts[0], GL_STATIC_DRAW);
 
     // TODO use the VertexArrayObject
 
@@ -203,31 +203,31 @@ void RenderableLineString::ensureVAO()
 {
 	if(m_vao) { return ;}
 
-	GL_CHECK(glGenVertexArrays(1, &m_vao));
+	glGenVertexArrays(1, &m_vao);
 
-	GL_CHECK(glBindVertexArray(m_vao));
+	glBindVertexArray(m_vao);
 
-	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
 	if(!m_isMulti)
 	{
 		const size_t totalSize = 2 * sizeof(GLfloat);
 
-		GL_CHECK(glEnableVertexAttribArray(0));
+		glEnableVertexAttribArray(0);
 
-		GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, totalSize, 0));
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, totalSize, 0);
 	}
 	else
 	{
 		const size_t totalSize = (2 + 1) * sizeof(GLfloat);
 
-		GL_CHECK(glEnableVertexAttribArray(0));
+		glEnableVertexAttribArray(0);
 
-		GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, totalSize, 0));
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, totalSize, 0);
 
-		GL_CHECK(glEnableVertexAttribArray(1));
+		glEnableVertexAttribArray(1);
 
-		GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, totalSize, (void *)((2) * sizeof(GLfloat))));
+		glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, totalSize, (void *)((2) * sizeof(GLfloat)));
 	}
 }
 
@@ -237,25 +237,25 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage)
 
     if(!getRenderOutline()) { return ;}
 
-    GL_CHECK(glBindVertexArray(                    m_vao));
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo));
-    GL_CHECK(glDisable(GL_DEPTH_TEST));
+    glBindVertexArray(                    m_vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+    glDisable(GL_DEPTH_TEST);
 
-	GL_CHECK(glLineWidth(GUI::s_lineWidthRender));
+	glLineWidth(GUI::s_lineWidthRender);
 
     if(!m_isMulti)
     {
         m_shader->bind(canvas, true, renderStage);
 
-        GL_CHECK(glDrawElements(GL_LINE_STRIP, (GLsizei)m_numElements, GL_UNSIGNED_INT, NULL));
+        glDrawElements(GL_LINE_STRIP, (GLsizei)m_numElements, GL_UNSIGNED_INT, NULL);
     }
     else
     {
         m_shader->bind(canvas, true, renderStage);
 
-        GL_CHECK(glDrawElements(GL_LINES, (GLsizei)m_numElements, GL_UNSIGNED_INT, NULL));
+        glDrawElements(GL_LINES, (GLsizei)m_numElements, GL_UNSIGNED_INT, NULL);
     }
 
-    GL_CHECK(glBindVertexArray(0));
+    glBindVertexArray(0);
 }
 

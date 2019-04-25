@@ -32,9 +32,6 @@
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
-#include <geos/geom/Polygon.h>
-#include <geos/geom/LineString.h>
-#include <geos/geom/Point.h>
 #include <imguitoolbar.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/TrackBallInteractor.h>
@@ -47,15 +44,6 @@
 #include <webAsmPlay/OpenSteerCanvas.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/OpenGL_Util.h>
-#include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
-#include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
-#include <webAsmPlay/shaders/ColorShader.h>
-#include <webAsmPlay/shaders/ColorVertexShader.h>
-#include <webAsmPlay/shaders/TextureShader.h>
-#include <webAsmPlay/shaders/TileBoundaryShader.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
-#include <webAsmPlay/shaders/BindlessTextureShader.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -276,12 +264,12 @@ void GUI::showMainToolBar()
         ImVec2 uv1(1,1);
         //ImVec2 size(16,16);
         ImVec2 size(32,32);
-        toolbar.addButton(ImGui::Toolbutton("Normal Mode",(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Find Path",(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Normal Mode",						(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",			(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",			(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",	(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",				(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Find Path",						(void*)infoIcon,uv0,uv1,size));
 
         toolbar.setProperties(false,false,true,ImVec2(0.5f,0.f));
 
@@ -289,7 +277,7 @@ void GUI::showMainToolBar()
     }
     
     const int pressed = toolbar.render();
-    if (pressed>=0) fprintf(stderr,"Toolbar1: pressed:%d\n",pressed);
+
     switch(pressed)
     {
         case 0: mode = NORMAL_MODE;                 break;
@@ -299,6 +287,51 @@ void GUI::showMainToolBar()
         case 4: mode = SET_PATH_START_POINT;        break;
         case 5: mode = FIND_PATH;                   break;
     }
+}
+
+namespace
+{
+	ivec2 _wndPos;
+	ivec2 _wndSize;
+}
+
+bool g_fullScreen = false;
+
+void setFullScreen( bool fullscreen )
+{
+	//if ( IsFullscreen() == fullscreen )
+		//return;
+	g_fullScreen = fullscreen;
+
+	if ( fullscreen )
+	{
+		// backup windwo position and window size
+		glfwGetWindowPos ( GUI::getMainWindow(), &_wndPos[0],  &_wndPos[1]  );
+		glfwGetWindowSize( GUI::getMainWindow(), &_wndSize[0], &_wndSize[1] );
+
+		int count;
+		GLFWmonitor** monitors = glfwGetMonitors(&count);
+
+		dmess("count " << count);
+
+		// get reolution of monitor
+		const GLFWvidmode * mode = glfwGetVideoMode(monitors[0]);
+
+		// switch to full screen
+		//glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, 1280 * 2, 720 * 2, 0 );
+		glfwSetWindowMonitor( GUI::getMainWindow(), monitors[0], 0, 0, mode->width, mode->height, mode->refreshRate);
+
+		glfwSwapInterval(1);
+	}
+	else
+	{
+		glfwSwapInterval(1);
+
+		// restore last window size and position
+		glfwSetWindowMonitor( GUI::getMainWindow(), nullptr,  _wndPos[0], _wndPos[1], _wndSize[0], _wndSize[1], 0);
+	}
+
+	//_updateViewport = true;
 }
 
 void GUI::showMainMenuBar()
@@ -330,6 +363,12 @@ void GUI::showMainMenuBar()
 
         if(ImGui::MenuItem("Load Geometry")) { s_client->loadGeoServerGeometry() ;}
 
+		if (ImGui::MenuItem("Exit"))
+		{
+
+			exit(0);
+		}
+
         ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Edit"))
@@ -345,17 +384,23 @@ void GUI::showMainMenuBar()
 
     if(ImGui::BeginMenu("View"))
     {
-        if(ImGui::MenuItem("Geos Tests"))       { s_showSceneViewPanel      ^= 1 ;}
-        if(ImGui::MenuItem("Performance"))      { s_showPerformancePanel    ^= 1 ;}
-        if(ImGui::MenuItem("Render Settings"))  { s_showRenderSettingsPanel ^= 1 ;}
-        if(ImGui::MenuItem("Log"))              { s_showLogPanel            ^= 1 ;}
-        if(ImGui::MenuItem("Attributes"))       { s_showAttributePanel      ^= 1 ;}
-        if(ImGui::MenuItem("GUI Settings"))     { s_showGUI_Settings_Panel  ^= 1 ;}
-        if(ImGui::MenuItem("Symbology"))        { s_showSymbologyPanel      ^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer Test"))   { s_showOpenSteerTestPanel  ^= 1 ;}
-        if(ImGui::MenuItem("OpenSteer"))        { s_showOpenSteerPanel      ^= 1 ;}
-        if(ImGui::MenuItem("Camera Info"))      { s_showCameraInfoPanel     ^= 1 ;}
-        if(ImGui::MenuItem("Bing Tile System")) { s_showBingTileSystemPanel ^= 1 ;}
+        if (ImGui::MenuItem("Geos Tests"))				{ s_showSceneViewPanel					^= 1 ;}
+        if (ImGui::MenuItem("Performance"))				{ s_showPerformancePanel				^= 1 ;}
+        if (ImGui::MenuItem("Render Settings"))			{ s_showRenderSettingsPanel				^= 1 ;}
+        if (ImGui::MenuItem("Log"))						{ s_showLogPanel						^= 1 ;}
+        if (ImGui::MenuItem("Attributes"))				{ s_showAttributePanel					^= 1 ;}
+        if (ImGui::MenuItem("GUI Settings"))			{ s_showGUI_Settings_Panel				^= 1 ;}
+        if (ImGui::MenuItem("Symbology"))				{ s_showSymbologyPanel					^= 1 ;}
+        if (ImGui::MenuItem("OpenSteer Test"))			{ s_showOpenSteerTestPanel				^= 1 ;}
+        if (ImGui::MenuItem("OpenSteer"))				{ s_showOpenSteerPanel					^= 1 ;}
+        if (ImGui::MenuItem("Camera Info"))				{ s_showCameraInfoPanel					^= 1 ;}
+        if (ImGui::MenuItem("Bing Tile System"))		{ s_showBingTileSystemPanel				^= 1 ;}
+		if (ImGui::MenuItem("Framebuffer Depth"))		{ s_showFrameBufferDepthDebugPanel		^= 1 ;}
+		if (ImGui::MenuItem("BingMaps Framebuffer"))	{ s_showBingMapsFrameBufferDebugPanel	^= 1 ;}
+		if (ImGui::MenuItem("Full Screen"))
+		{
+			setFullScreen(!g_fullScreen);
+		}
 
         ImGui::EndMenu();
     }
@@ -389,6 +434,13 @@ void GUI::attributePanel(const string & attrsStr)
 
     ImGui::End();
 }
+
+namespace
+{
+	const thread::id mainThreadID = this_thread::get_id();
+}
+
+bool GUI::isMainThread() { return this_thread::get_id() == mainThreadID ;}
 
 void GUI::doQueue()
 {
@@ -456,16 +508,15 @@ void GUI::mainLoop(GLFWwindow * window)
     int screenWidth, screenHeight;
 
     glfwGetFramebufferSize(s_mainWindow, &screenWidth, &screenHeight);
-    //glfwGetWindowSize(mainWindow, &screenWidth, &screenHeight);
-
-    GL_CHECK(glViewport(0, 0, screenWidth, screenHeight));
+    
+    glViewport(0, 0, screenWidth, screenHeight);
     
     static float time = 0.f;
     
     time += ImGui::GetIO().DeltaTime;
 
-    GL_CHECK(glDisable(GL_BLEND));
-    GL_CHECK(glDisable(GL_DEPTH_TEST));
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
  
     s_canvas->render();
     
@@ -497,10 +548,12 @@ void GUI::mainLoop(GLFWwindow * window)
     openSteerPanel();
     cameraInfoPanel();
     bingTileSystemPanel();
+	frameBufferDepthDebugPanel();
+	bingMapsFrameBufferDebugPanel();
 
     ImGui::End();
 
-    GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     ImGui::Render();
 
@@ -550,34 +603,21 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     infoIcon = Textures::load("if_Info_131908.png");
     
     // Define the viewport dimensions
-    static int width, height;
+    static int width, height; 
     int fbWidth, fbHeight;
 
     glfwGetWindowSize		(s_mainWindow, &width,	 &height);
     glfwGetFramebufferSize	(s_mainWindow, &fbWidth, &fbHeight);
 
-    //GL_CHECK(glViewport(0, 0, width, height)); // TODO needed?
-    GL_CHECK(glViewport(0, 0, fbWidth, fbHeight)); // TODO needed?
+    glViewport(0, 0, fbWidth, fbHeight); // TODO needed?
 
-    // TODO make these plugins!
-    ColorDistanceShader       ::ensureShader();
-    ColorDistanceShader3D     ::ensureShader();
-    ColorDistanceDepthShader3D::ensureShader();
-    ColorShader               ::ensureShader();
-    ColorVertexShader         ::ensureShader();
-    TextureShader             ::ensureShader();
-    TileBoundaryShader        ::ensureShader();
-	TextureLookupShader		  ::ensureShader();
-	BindlessTextureShader	  ::ensureShader();
-    
 	OpenGL::init();
 
     s_canvas = new Canvas(false);
 
-    s_canvas->setArea(ivec2(0,0), ivec2(width, height));
-    //canvas->setArea(ivec2(0,0), ivec2(fbWidth, fbWidth));
-
     s_canvas->setFrameBufferSize(ivec2(fbWidth, fbHeight));
+
+	dmess("fbWidth " << fbWidth << " width " << width);
 
     s_auxCanvases = vector<Canvas *>(
     {
@@ -604,17 +644,12 @@ void GUI::shutdown()
 
 bool GUI::isShuttingDown() { return s_shuttingDown ;}
 
-namespace
-{
-	bool g_contextSet = false;
-}
-
 void GUI::createWorld()
 {
     s_skyBox = new SkyBox();
 
     if(s_renderSettingsRenderSkyBox) { s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor
-    else                           { s_canvas->setSkyBox(NULL)   ;}
+    else                             { s_canvas->setSkyBox(NULL)     ;}
 
     pool.push([](int ID) {
         
@@ -624,15 +659,6 @@ void GUI::createWorld()
 
         //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
         s_client->loadGeometry("data.geo");
-
-		guiASync([]() // TODO try to remove!
-		{
-			//client->addBingMap(renderSettingsRenderBingMaps);
-		});
-
     });
-
-	//client->addBingMap(renderSettingsRenderBingMaps);
 }
 
-//void GUI::guiASync(function<void()> & callback) { eventQueue.push(callback) ;}

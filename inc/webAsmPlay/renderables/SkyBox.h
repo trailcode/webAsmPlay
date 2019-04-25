@@ -26,7 +26,6 @@
 #pragma once
 
 #include <vector>
-#include <glm/mat4x4.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 
 class Canvas;
@@ -45,11 +44,7 @@ public:
 
 private:
 
-    static void ensureShader();
-
     GLuint m_texID = 0;
     GLuint m_vbo   = 0;
     GLuint m_vao   = 0;
-
-    glm::mat4 m_model;
 };

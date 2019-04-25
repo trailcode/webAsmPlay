@@ -21,66 +21,31 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
 #include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/BindlessTextureShader.h>
+#include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/GUI/GUI.h>
 
-REGISTER_SHADER(BindlessTextureShader)
-
-namespace
+void GUI::frameBufferDepthDebugPanel()
 {
-	ShaderProgram			* shaderProgram   = NULL;
-	BindlessTextureShader	* defaultInstance = NULL;
+	if (!s_showFrameBufferDepthDebugPanel) { return; }
 
-	GLint vertInAttrLoc;
-	GLint vertUV_InAttrLoc;
+	ImGui::Begin("FrameBuffer Depth", &s_showFrameBufferDepthDebugPanel);
+	{
+		const ImVec2 pos = ImGui::GetCursorScreenPos();
 
-	GLint MVP_Loc;
-	//GLint texLoc;
-	GLint texID_Loc;
-}
+		const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-BindlessTextureShader* BindlessTextureShader::getDefaultInstance() { return defaultInstance ;}
-
-void BindlessTextureShader::ensureShader()
-{
-	if(shaderProgram) { return ;}
-
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"BindlessTextureShader.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"BindlessTextureShader.fs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttrLoc					},
-														{"vertUV_In",			vertUV_InAttrLoc				}}),
-											Variables({	{"MVP",					MVP_Loc							},
-														{"texID",				texID_Loc						}}));
-
-	defaultInstance = new BindlessTextureShader();
-}
-
-void BindlessTextureShader::bind(	Canvas		* canvas,
-									const bool    isOutline,
-									const size_t  renderingStage)
-{
-	shaderProgram->bind();
-
-	shaderProgram->setUniformi(texID_Loc, m_textureSlot);
-
-	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
-}
-
-BindlessTextureShader::BindlessTextureShader() : Shader("BindlessTextureShader")
-{
-
-}
-
-BindlessTextureShader::~BindlessTextureShader()
-{
-
-}
-
-size_t BindlessTextureShader::setTextureSlot(const size_t textureSlot)
-{
-	return m_textureSlot = (GLuint)textureSlot;
+		if (s_canvas->getAuxFrameBuffer())
+		{
+			ImGui::GetWindowDrawList()->AddImage((void*)(size_t)s_canvas->getAuxFrameBuffer()->getTextureID(),
+				pos,
+				ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+				ImVec2(0, 1),
+				ImVec2(1, 0));
+		}
+	}
+	ImGui::End();
 }

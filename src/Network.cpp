@@ -29,7 +29,6 @@
 #include <limits>
 #include <unordered_map>
 #include <glm/gtx/hash.hpp>
-#include <geos/geom/LineString.h>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/simplify/DouglasPeuckerLineSimplifier.h>
@@ -200,8 +199,6 @@ void Network::findPath(const PointOnEdge & end)
 
     pathAnnotation->setRenderFill(true);
     pathAnnotation->setRenderOutline(true);
-
-	pathAnnotation->ensureVAO();
 
     m_client->getCanvas()->addRenderable(pathAnnotation.get());
 }

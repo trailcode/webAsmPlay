@@ -40,6 +40,8 @@ public:
                             const float buffer2,
                             const float buffer3);
 
+	void exportGeoJson() const;
+
 private:
 
     std::vector<std::unique_ptr<Renderable> > m_geoms;

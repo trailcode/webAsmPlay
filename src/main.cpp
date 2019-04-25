@@ -24,8 +24,6 @@
   \copyright 2018
 */
 
-#include <thread>
-
 #ifndef __EMSCRIPTEN__
     #include <curl/curl.h>
 #endif
@@ -71,18 +69,17 @@ int main(int, char**)
     //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
     // Create window with graphics context
-    //GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
-	GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "WebAsmPlay", NULL, NULL);
 
 	/*
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());

@@ -75,22 +75,22 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
         memcpy(&g_vertsAndColors[i], &pos, sizeof(vec3));
     }
 
-    GL_CHECK(glGenVertexArrays(1, &vao));
-    GL_CHECK(glBindVertexArray(vao));
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
 
-    GL_CHECK(glGenBuffers(1, &vbo));
-    GL_CHECK(glGenBuffers(1, &ebo));
-    GL_CHECK(glGenBuffers(1, &ebo2));
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+    glGenBuffers(1, &ebo2);
 
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, g_vertsAndColors.size() * sizeof(GLfloat), &g_vertsAndColors[0], GL_STATIC_DRAW));
+    glBufferData(GL_ARRAY_BUFFER, g_vertsAndColors.size() * sizeof(GLfloat), &g_vertsAndColors[0], GL_STATIC_DRAW);
     
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_triangleIndices.size(), &g_triangleIndices[0], GL_STATIC_DRAW));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_triangleIndices.size(), &g_triangleIndices[0], GL_STATIC_DRAW);
     
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2));
-    GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_lineIndices.size(), &g_lineIndices[0], GL_STATIC_DRAW));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_lineIndices.size(), &g_lineIndices[0], GL_STATIC_DRAW);
 
     // TODO use VertexArrayObject
 
@@ -99,13 +99,13 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
 
     const size_t totalSize = (sizeVertex + sizeColor) * sizeof(GLfloat);
 
-    GL_CHECK(glEnableVertexAttribArray(0));
+    glEnableVertexAttribArray(0);
 
-    GL_CHECK(glVertexAttribPointer(0, sizeVertex, GL_FLOAT, GL_FALSE, totalSize, 0));
+    glVertexAttribPointer(0, sizeVertex, GL_FLOAT, GL_FALSE, totalSize, 0);
 
-    GL_CHECK(glEnableVertexAttribArray(1));
+    glEnableVertexAttribArray(1);
 
-    GL_CHECK(glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex) * sizeof(GLfloat))));
+    glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex) * sizeof(GLfloat)));
 
     DeferredRenderable * ret = new DeferredRenderable(vao, ebo, ebo2, vbo, (GLuint)g_triangleIndices.size(), (GLuint)g_lineIndices.size());
 
@@ -125,30 +125,30 @@ void DeferredRenderable::setFromQueued(const glm::dmat4& trans)
 		memcpy(&g_vertsAndColors[i], &pos, sizeof(vec3));
 	}
 
-	GL_CHECK(glBindVertexArray(m_vao));
+	glBindVertexArray(m_vao);
 
-	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-	GL_CHECK(glBufferData(GL_ARRAY_BUFFER, g_vertsAndColors.size() * sizeof(GLfloat), &g_vertsAndColors[0], GL_DYNAMIC_DRAW));
+	glBufferData(GL_ARRAY_BUFFER, g_vertsAndColors.size() * sizeof(GLfloat), &g_vertsAndColors[0], GL_DYNAMIC_DRAW);
 
-	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo));
-	GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_triangleIndices.size(), &g_triangleIndices[0], GL_DYNAMIC_DRAW));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_triangleIndices.size(), &g_triangleIndices[0], GL_DYNAMIC_DRAW);
 
-	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2));
-	GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_lineIndices.size(), &g_lineIndices[0], GL_DYNAMIC_DRAW));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * g_lineIndices.size(), &g_lineIndices[0], GL_DYNAMIC_DRAW);
 
 	const size_t sizeVertex = 3;
 	const size_t sizeColor = 4;
 
 	const size_t totalSize = (sizeVertex + sizeColor) * sizeof(GLfloat);
 
-	GL_CHECK(glEnableVertexAttribArray(0));
+	glEnableVertexAttribArray(0);
 
-	GL_CHECK(glVertexAttribPointer(0, sizeVertex, GL_FLOAT, GL_FALSE, totalSize, 0));
+	glVertexAttribPointer(0, sizeVertex, GL_FLOAT, GL_FALSE, totalSize, 0);
 
-	GL_CHECK(glEnableVertexAttribArray(1));
+	glEnableVertexAttribArray(1);
 
-	GL_CHECK(glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void*)((sizeVertex) * sizeof(GLfloat))));
+	glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void*)((sizeVertex) * sizeof(GLfloat)));
 
 	m_numTriIndices		= (GLuint)g_triangleIndices.size();
 	m_numLineIndices	= (GLuint)g_lineIndices.size();
@@ -178,10 +178,10 @@ DeferredRenderable::DeferredRenderable( const GLuint & vao,
 
 DeferredRenderable::~DeferredRenderable()
 {
-    GL_CHECK(glDeleteVertexArrays(1, &m_vao));
-    GL_CHECK(glDeleteBuffers     (1, &m_vbo));
-    GL_CHECK(glDeleteBuffers     (1, &m_ebo));
-    GL_CHECK(glDeleteBuffers     (1, &m_ebo2));
+	glDeleteVertexArrays(1, &m_vao);
+    glDeleteBuffers     (1, &m_vbo);
+    glDeleteBuffers     (1, &m_ebo);
+    glDeleteBuffers     (1, &m_ebo2);
 }
 
 namespace
@@ -254,9 +254,9 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)
 {
     if(!m_shader->shouldRender(false, renderStage)) { return ;}
 
-    GL_CHECK(glBindVertexArray(					   m_vao));
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER,         m_vbo));
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo));
+    glBindVertexArray(					  m_vao);
+    glBindBuffer(GL_ARRAY_BUFFER,         m_vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 
     glDisable(GL_DEPTH_TEST);
 
@@ -264,11 +264,11 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)
 
     m_shader->bind(canvas, false, renderStage);
     
-    GL_CHECK(glDrawElements(GL_TRIANGLES, m_numTriIndices, GL_UNSIGNED_INT, NULL));
+    glDrawElements(GL_TRIANGLES, m_numTriIndices, GL_UNSIGNED_INT, NULL);
 
-    GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2);
 
-    GL_CHECK(glDrawElements(GL_LINES, m_numLineIndices, GL_UNSIGNED_INT, NULL));
+    glDrawElements(GL_LINES, m_numLineIndices, GL_UNSIGNED_INT, NULL);
 
     canvas->popMVP();
 }

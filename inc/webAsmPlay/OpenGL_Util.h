@@ -52,18 +52,6 @@
 
 #endif
 
-#ifdef OPENGL_CALL_CHECKING
-    #define GL_CHECK(stmt) do { stmt; \
-            const GLenum err = glGetError(); \
-            if (err != GL_NO_ERROR) { \
-            dmess("OpenGL error " << err << " call " << #stmt); \
-            abort(); \
-            } \
-        } while (0)
-#else
-    #define GL_CHECK(stmt) stmt
-#endif
-
 class OpenGL
 {
 public:

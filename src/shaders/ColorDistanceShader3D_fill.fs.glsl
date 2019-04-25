@@ -33,7 +33,8 @@ in vec3 normal;
 in vec3 fragPos;
 uniform vec3 lightPos;
 
-out vec4 outColor;
+//out vec4 outColor;
+layout (location = 0) out vec4 outColor;
 
 void main()
 {

@@ -95,7 +95,7 @@ void GUI::renderSettingsPanel()
 
         float heightMultiplier = ColorDistanceShader3D::getDefaultInstance()->getHeightMultiplier();
 
-        if(ImGui::SliderFloat("", &heightMultiplier, 0.0f, 5.0f, "Height mult: %.3f"))
+        if(ImGui::SliderFloat("", &heightMultiplier, 0.0f, 1.0f, "Height mult: %.3f"))
         {
             ColorDistanceShader3D     ::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
             ColorDistanceDepthShader3D::getDefaultInstance()->setHeightMultiplier(heightMultiplier);

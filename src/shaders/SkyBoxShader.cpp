@@ -21,66 +21,61 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/BindlessTextureShader.h>
+#include <webAsmPlay/shaders/SkyBoxShader.h>
 
-REGISTER_SHADER(BindlessTextureShader)
+using namespace glm;
+
+REGISTER_SHADER(SkyBoxShader)
 
 namespace
 {
-	ShaderProgram			* shaderProgram   = NULL;
-	BindlessTextureShader	* defaultInstance = NULL;
+	ShaderProgram   * shaderProgram   = NULL;
+	SkyBoxShader	* defaultInstance = NULL;
 
-	GLint vertInAttrLoc;
-	GLint vertUV_InAttrLoc;
+	GLint vertInLoc      = -1;
+	GLint MVP_Loc        = -1;
+	GLint cubeTextureLoc = -1;
 
-	GLint MVP_Loc;
-	//GLint texLoc;
-	GLint texID_Loc;
+	const mat4 model = rotate(radians(90.0f), vec3(1.0f,0.0f,0.0f));
 }
 
-BindlessTextureShader* BindlessTextureShader::getDefaultInstance() { return defaultInstance ;}
-
-void BindlessTextureShader::ensureShader()
+void SkyBoxShader::ensureShader()
 {
 	if(shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"BindlessTextureShader.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"BindlessTextureShader.fs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttrLoc					},
-														{"vertUV_In",			vertUV_InAttrLoc				}}),
-											Variables({	{"MVP",					MVP_Loc							},
-														{"texID",				texID_Loc						}}));
+	shaderProgram = ShaderProgram::create(  GLSL({	{GL_VERTEX_SHADER,		"SkyBoxShader.vs.glsl"		},
+													{GL_FRAGMENT_SHADER,	"SkyBoxShader.fs.glsl"		}}),
+											Variables({	{"vertIn",			vertInLoc					}}),
+											Variables({	{"MVP",				MVP_Loc						},
+														{"cubeTexture",		cubeTextureLoc				}}));
 
-	defaultInstance = new BindlessTextureShader();
+	defaultInstance = new SkyBoxShader();
 }
 
-void BindlessTextureShader::bind(	Canvas		* canvas,
-									const bool    isOutline,
-									const size_t  renderingStage)
+SkyBoxShader::SkyBoxShader() : Shader("SkyBoxShader") {}
+SkyBoxShader::~SkyBoxShader() {}
+
+SkyBoxShader * SkyBoxShader::getDefaultInstance() { return defaultInstance ;}
+
+void SkyBoxShader::bind(Canvas     * canvas,
+						const bool   isOutline,
+						const size_t renderingStage)
 {
 	shaderProgram->bind();
 
-	shaderProgram->setUniformi(texID_Loc, m_textureSlot);
+	mat4 centeredView = mat4(canvas->getViewRef());
 
-	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
-}
+	value_ptr(centeredView)[12] = 0;
+	value_ptr(centeredView)[13] = 0;
+	value_ptr(centeredView)[14] = 0;
 
-BindlessTextureShader::BindlessTextureShader() : Shader("BindlessTextureShader")
-{
-
-}
-
-BindlessTextureShader::~BindlessTextureShader()
-{
-
-}
-
-size_t BindlessTextureShader::setTextureSlot(const size_t textureSlot)
-{
-	return m_textureSlot = (GLuint)textureSlot;
+	shaderProgram->setUniform (MVP_Loc,        mat4(canvas->getProjectionRef()) * centeredView * model);
+	shaderProgram->setUniformi(cubeTextureLoc, 0);
 }

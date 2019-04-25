@@ -26,7 +26,6 @@
 */
 
 #include <ctpl/ctpl.h>
-#include <geos/geom/LineString.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/index/quadtree/Quadtree.h>
 #include <webAsmPlay/Debug.h>
@@ -35,6 +34,7 @@
 #include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/GeometryConverter.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableMesh.h>
@@ -46,10 +46,13 @@
 #include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/GeoClient.h>
 
+#include <webAsmPlay/shaders/ColorShader.h>
+
 using namespace std;
 using namespace std::chrono;
 using namespace glm;
 using namespace ctpl;
+using namespace geosUtil;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
 
@@ -77,6 +80,14 @@ void GeoClient::createWorld(const char * data)
 
 void GeoClient::addGeometry(const char* data)
 {
+	/*
+	Renderable * renderable = RenderablePolygon::create(dynamic_cast<geos::geom::Polygon *>(makeBox(get<2>(m_bounds), get<3>(m_bounds), get<0>(m_bounds), get<1>(m_bounds)).release()),m_trans);
+
+	renderable->setShader(ColorShader::getDefaultInstance());
+
+	m_canvas->addRenderable(renderable);
+	//*/
+
 	createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
 	createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
 	createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
@@ -91,7 +102,7 @@ namespace
         const double scale = 0.005;
 
         double minHeight = 0;
-        double height = scale;
+        double height	 = scale;
         
         // See: https://wiki.openstreetmap.org/wiki/OSM-3D.org
         
@@ -198,12 +209,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         r->setRenderFill    (GUI::s_renderSettingsFillPolygons);
         r->setRenderOutline (GUI::s_renderSettingsRenderPolygonOutlines);
 
-		GUI::guiASync([this, r]()
-		{
-			r->ensureVAO();
-
-			m_canvas->addRenderable(r);
-		});
+		GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     }
 
     if((r = RenderableMesh::create(polygons3D, m_trans, true)))
@@ -213,12 +219,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         r->setRenderFill    (GUI::s_renderSettingsFillMeshes);
         r->setRenderOutline (GUI::s_renderSettingsRenderMeshOutlines);
 
-		GUI::guiASync([this, r]()
-		{
-			r->ensureVAO();
-
-			m_canvas->addRenderable(r);
-		});
+		GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     }
     
 	indexerPool.stop(true);
@@ -290,12 +291,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     r->setRenderOutline(GUI::s_renderSettingsRenderLinearFeatures);
 
-	GUI::guiASync([this, r]()
-	{
-		r->ensureVAO();
-
-		m_canvas->addRenderable(r);
-	});
+	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     
     dmess("Done creating renderable.");
 
@@ -342,12 +338,7 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 
-	GUI::guiASync([this, r]()
-	{
-		r->ensureVAO();
-
-		m_canvas->addRenderable(r);
-	});
+	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     
     dmess("Done creating renderable.");
 

@@ -28,6 +28,8 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/TextureLookupShader.h>
 
+REGISTER_SHADER(TextureLookupShader)
+
 namespace
 {
 	ShaderProgram		* shaderProgram		= NULL;
@@ -39,6 +41,8 @@ namespace
 
 void TextureLookupShader::ensureShader()
 {
+	return; // This one is not compiling!
+
 	if(shaderProgram) { return ;}
 
 	shaderProgram = ShaderProgram::create(	GLSL({		{GL_VERTEX_SHADER,		"TextureLookupShader.vs.glsl"	},

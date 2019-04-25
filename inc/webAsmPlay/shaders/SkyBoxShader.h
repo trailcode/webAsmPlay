@@ -21,66 +21,27 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
+#pragma once
 
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/BindlessTextureShader.h>
+#include <webAsmPlay/shaders/Shader.h>
 
-REGISTER_SHADER(BindlessTextureShader)
-
-namespace
+class SkyBoxShader : public Shader
 {
-	ShaderProgram			* shaderProgram   = NULL;
-	BindlessTextureShader	* defaultInstance = NULL;
+public:
 
-	GLint vertInAttrLoc;
-	GLint vertUV_InAttrLoc;
+	static SkyBoxShader * getDefaultInstance();
 
-	GLint MVP_Loc;
-	//GLint texLoc;
-	GLint texID_Loc;
-}
+	void bind(  Canvas     * canvas,
+				const bool   isOutline,
+				const size_t renderingStage = 0) override;
 
-BindlessTextureShader* BindlessTextureShader::getDefaultInstance() { return defaultInstance ;}
+	static void ensureShader();
 
-void BindlessTextureShader::ensureShader()
-{
-	if(shaderProgram) { return ;}
+private:
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"BindlessTextureShader.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"BindlessTextureShader.fs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttrLoc					},
-														{"vertUV_In",			vertUV_InAttrLoc				}}),
-											Variables({	{"MVP",					MVP_Loc							},
-														{"texID",				texID_Loc						}}));
+	SkyBoxShader();
+	~SkyBoxShader();
+};
 
-	defaultInstance = new BindlessTextureShader();
-}
-
-void BindlessTextureShader::bind(	Canvas		* canvas,
-									const bool    isOutline,
-									const size_t  renderingStage)
-{
-	shaderProgram->bind();
-
-	shaderProgram->setUniformi(texID_Loc, m_textureSlot);
-
-	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
-}
-
-BindlessTextureShader::BindlessTextureShader() : Shader("BindlessTextureShader")
-{
-
-}
-
-BindlessTextureShader::~BindlessTextureShader()
-{
-
-}
-
-size_t BindlessTextureShader::setTextureSlot(const size_t textureSlot)
-{
-	return m_textureSlot = (GLuint)textureSlot;
-}

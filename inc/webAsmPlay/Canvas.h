@@ -54,9 +54,7 @@ public:
     
     virtual ~Canvas();
 
-    virtual void setArea(const glm::ivec2 & upperLeft, const glm::ivec2 & size);
-
-    virtual glm::ivec2 setFrameBufferSize(const glm::ivec2 & fbSize);
+    virtual glm::ivec2 setFrameBufferSize(const glm::ivec2 & fbSize, const glm::ivec2 & upperLeft = glm::ivec2(0,0));
     virtual glm::ivec2 getFrameBufferSize() const;
 
     virtual GLuint render();
@@ -81,7 +79,7 @@ public:
 
     rsmz::TrackBallInteractor * getTrackBallInteractor() const;
 
-    Renderable * addRenderable(Renderable * renderiable);
+    Renderable * addRenderable(Renderable * renderiable, const bool ensureVAO = true);
 
     glm::vec4 setClearColor(const glm::vec4 & clearColor);
 
@@ -147,7 +145,9 @@ private:
 
     rsmz::TrackBallInteractor * m_trackBallInteractor = NULL;
 
-    FrameBuffer * m_frameBuffer = NULL;
+	FrameBuffer * m_frameBuffer = NULL;
+
+	FrameBuffer* m_gBuffer = NULL;
 
     bool m_wantMouseCapture = true;
 
@@ -187,7 +187,7 @@ private:
 
     Renderable * m_cursor = NULL;
 
-    FrameBuffer * m_auxFrameBuffer = NULL;
+	FrameBuffer * m_auxFrameBuffer = NULL;
 
 	Frustum * m_frustum = NULL;
 

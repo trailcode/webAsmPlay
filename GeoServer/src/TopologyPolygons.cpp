@@ -27,19 +27,24 @@
 #include <fstream>
 #include <algorithm>
 #include <geos/geom/GeometryFactory.h>
+#include <geos/geom/GeometryCollection.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/prep/PreparedPolygon.h>
+#include <geos/operation/union/CascadedPolygonUnion.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <geos/io/WKTWriter.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Attributes.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <geoServer/Topology.h>
 
 using namespace std;
 using namespace geos::geom;
 using namespace geos::geom::prep;
 using namespace geos::index::quadtree;
+using namespace geos::operation::geounion;
+using namespace geosUtil;
 
 namespace
 {
@@ -47,29 +52,36 @@ namespace
     {
     public:
         MyPolygon(  Attributes		 * attrs,
-                    const Polygon    * poly,
+                    Polygon    * poly,
                     const double       area) :  attrs         (attrs),
-                                                poly          (poly),
+                                                geom          (poly),
                                                 polyPrepaired (poly),
                                                 area          (area) {}
 
         uint32_t getID() const { return attrs->m_uints32.find("ID")->second ;}
 
-        const Polygon * poly;
+        Geometry * geom;
 
         const PreparedPolygon polyPrepaired;
 
         const double area;
 
         Attributes * attrs;
+
+		vector<const AttributedPoligonalArea *> children;
     };
 
     size_t lastID = 0; // TODO find a better way to do IDs.
 }
 
-void topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & polygons)
+vector<AttributedPoligonalArea> topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & polygons)
 {
     dmess("start topology::discoverTopologicalRelations");
+
+	// Add AOI polygon.
+	//makeBox(get<2>(m_bounds), get<3>(m_bounds), get<0>(m_bounds), get<1>(m_bounds)).release());
+	
+	//polygons
 
     // Sort the polygons by their area. Smallest first.
     sort(polygons.begin(), polygons.end(), [](const AttributedPoligonalArea & lhs,
@@ -112,7 +124,7 @@ void topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & po
         {
             MyPolygon * potentalParent = (MyPolygon *)query[j];
 
-            if(potentalParent->poly == potentialChild) { continue ;}
+			if (potentalParent->geom == potentialChild) { continue; }
 
 			try
 			{
@@ -136,105 +148,89 @@ void topology::discoverTopologicalRelations(vector<AttributedPoligonalArea> & po
 
 		attrs(i)->m_uints32["parentID"] = parent->getID();
 	
-		//parent->attrs->multiUints32s["allChildIDs"].push_back(attrs(i)->uints32["ID"]);
-		parent->attrs->m_multiUints32s["childIDs"].push_back(attrs(i)->m_uints32["ID"]);
+		parent->children.push_back(&i);
     }
 
-	/*
-	for (const auto& i : polygons)
-	{
-		const vector<uint32_t> & allChildIDs = attrs(i)->multiUints32s["allChildIDs"];
+	dmess("Done find children.");
 
-		vector<uint32_t> & childIDs = attrs(i)->multiUints32s["childIDs"];
+	return polygons;
 
-		for (const auto childID : allChildIDs)
+	int c = 0;
+	
+	for (auto& i : myPolygons)
+	{ 
+		//dmess("i->children " << i->children.size() << " " << c++);
+
+		++c;
+
+		if (false && c == 3568)
 		{
-			auto child = polygons[childID];
-
-			for (const auto ID : attrs(child)->multiUints32s["allChildIDs"])
-			{
-				if (ID == childID) { goto next; }
-			}
-
-			childIDs.push_back(childID);
+			vector<const Geometry*> cc;
+			for (const auto& child : i->children) { cc.push_back(poly(*child)); }
+			geosUtil::writeGeoJsonFile("children.geojson", cc);
+			dmess("done write");
 		}
 
-	next:;
+		if (!i->children.size()) { continue; }
+
+		//dmess("c " << c << " " << myPolygons.size() << " " << i->children.size());
+
+		vector<Polygon*> children;
+		
+		for (const auto& child : i->children) { children.push_back(poly(*child)); }
+
+		Geometry * unionedChildren = CascadedPolygonUnion::Union(&children);
+
+		i->geom = i->geom->difference(unionedChildren);
 	}
 
-	for (const auto& i : polygons)
+	vector<AttributedPoligonalArea> ret;
+
+	c = 0;
+
+	for (auto& i : myPolygons)
 	{
-		if (!attrs(i)->multiUints32s["allChildIDs"].size()) { continue; }
-
-		dmess(attrs(i)->multiUints32s["allChildIDs"].size() << " " << attrs(i)->multiUints32s["childIDs"].size());
-	}
-	*/
-
-	//exit(0);
-
-    dmess("done topology::discoverTopologicalRelations");
-}
-
-void topology::cutPolygonHoles(vector<AttributedPoligonalArea>& polygons)
-{
-	return;
-
-	dmess("start cutPolygonHoles");
-
-	size_t c = 0;
-
-	const GeometryFactory* geomFactory = GeometryFactory::getDefaultInstance();
-
-	size_t cc = 0;
-
-	for (auto& i : polygons)
-	{
-		const vector<uint32_t> & childIDs = attrs(i)->m_multiUints32s["childIDs"];
-
-		++cc;
-
-		if (childIDs.size()) { dmess(" " << cc << " " << polygons.size()); }
-
-		for (const auto childID : childIDs)
+		switch (i->geom->getGeometryTypeId())
 		{
-			Polygon* P = poly(i);
-
-			if (P == poly(polygons[childID]))
+		case GEOS_POLYGON: ret.push_back(AttributedPoligonalArea(i->attrs, geosPolygon(i->geom->buffer(0)), i->area)); break;
+		case GEOS_GEOMETRYCOLLECTION:
+		case GEOS_MULTIPOLYGON:
 			{
-				dmess("Here!");
-
-				continue;
-			}
-
-			Geometry* newPoly = P->difference(poly(polygons[childID]));
-
-			if (!dynamic_cast<Polygon*>(newPoly))
-			{
-				dmess("Not poly! " << newPoly->getGeometryType());
-
-				geos::io::WKTWriter w;
+				/*
+				++c;
 
 				char buf[1024];
 
-				sprintf(buf, "C:/Temp/p_%i.wkt", ++c);
+				sprintf(buf, "outa/mult_%i.geojson", c);
 
-				ofstream out(buf);
+				geosUtil::writeGeoJsonFile(buf, i->geom);
+				*/
 
-				//w.write(*newPoly, out);
-				out << w.write(newPoly);
+				GeometryCollection* collection = dynamic_cast<GeometryCollection*>(i->geom);
 
-				out.close();
+				for (size_t j = 0; j < collection->getNumGeometries(); ++j)
+				{
+					const Polygon * polygon = geosPolygonConst(collection->getGeometryN(j));
 
-				geomFactory->destroyGeometry(newPoly);
+					if (!polygon)
+					{
+						dmess("Not polygon! " << collection->getGeometryN(j)->getGeometryType());
 
-				continue;
+						continue;
+					}
+
+					ret.push_back(AttributedPoligonalArea(i->attrs, geosPolygon(polygon->buffer(0)), polygon->getArea()));
+				}
+				break;
 			}
-			
-			geomFactory->destroyGeometry(P);
 
-			poly(i) = dynamic_cast<Polygon*>(newPoly);
-		}
+		default:
+			dmess("Unsupported geometry type: " << i->geom->getGeometryType());
+		}		
 	}
 
-	dmess("End cutPolygonHoles");
+	dmess("done topology::discoverTopologicalRelations");
+
+	return ret;
 }
+

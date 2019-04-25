@@ -31,6 +31,7 @@
 class Frustum;
 
 class RasterTile;
+class FrameBuffer;
 
 class RenderableBingMap : public Renderable
 {
@@ -48,6 +49,8 @@ public:
 
 	static size_t s_numRendered;
 
+	static FrameBuffer* getFrameBuffer();
+
 private:
 
     RenderableBingMap(const AABB2D & bounds, const glm::dmat4 & trans);
@@ -55,7 +58,7 @@ private:
 
 	void getStartLevel();
 
-	void getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level);
+	bool getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level);
 
     const AABB2D m_bounds;
 
@@ -67,4 +70,6 @@ private:
 	const glm::dmat4 m_trans;
 
 	std::vector<RasterTile*> m_tiles;
+
+	static FrameBuffer* s_textureBuffer;
 };

@@ -39,6 +39,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/geom/GeometryConverter.h>
+#include <webAsmPlay/geom/GeosUtil.h>
 #include <geoServer/OSM_Reader.h>
 #include <geoServer/Topology.h>
 #include <geoServer/GeoServer.h>
@@ -52,6 +53,7 @@ using namespace boost;
 using namespace geos::io;
 using namespace geos::geom;
 using namespace topology;
+using namespace geosUtil;
 
 namespace
 {
@@ -144,7 +146,7 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
         }
     }
     
-    discoverTopologicalRelations(polygons);
+	polygons = discoverTopologicalRelations(polygons);
     breakLineStrings            (lineStrings);
 
     for(const AttributedPoligonalArea & g : polygons)    { serializedPolygons.push_back   (GeometryConverter::convert(g)) ;}
@@ -243,9 +245,11 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     dmess("numPolygons " << polygons.size());
 
-    discoverTopologicalRelations(polygons);
+	Polygon * AOI = dynamic_cast<Polygon *>(makeBox(mapData.m_boundsMinX, mapData.m_boundsMinY, mapData.m_boundsMaxX, mapData.m_boundsMaxY).release());
 
-	cutPolygonHoles(polygons);
+	polygons.push_back(AttributedPoligonalArea(new Attributes(), AOI, AOI->getArea()));
+
+	polygons = discoverTopologicalRelations(polygons);
 
     breakLineStrings(lineStrings);
 

@@ -33,6 +33,8 @@
 using namespace std;
 using namespace glm;
 
+REGISTER_SHADER(ColorDistanceShader3D)
+
 // TODO A lot of code duplication! 
 
 namespace
@@ -64,6 +66,8 @@ namespace
 
 void ColorDistanceShader3D::ensureShader()
 {
+	if (defaultInstance) { return; }
+
 	shaderProgramFill = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader3D_fill.vs.glsl"	},
 																{GL_FRAGMENT_SHADER,	"ColorDistanceShader3D_fill.fs.glsl"	}}),
 													Variables({	{"vertIn",               vertInAttrFill							},
@@ -105,9 +109,9 @@ void ColorDistanceShader3D::bind(Canvas     * canvas,
                                  const bool   isOutline,
                                  const size_t renderingStage)
 {
-    GL_CHECK(glActiveTexture(GL_TEXTURE0));
+    glActiveTexture(GL_TEXTURE0);
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID()));
+    glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID());
 
     if(!isOutline)
     {

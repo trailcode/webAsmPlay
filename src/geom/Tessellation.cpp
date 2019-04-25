@@ -30,9 +30,6 @@
 #undef Polygon
 #endif
 
-#include <geos/geom/LineString.h>
-#include <geos/geom/Polygon.h>
-#include <geos/geom/MultiPolygon.h>
 #include <GLU/tessellate.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/geom/GeosUtil.h>

@@ -21,66 +21,23 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/BindlessTextureShader.h>
+#version 430 core
 
-REGISTER_SHADER(BindlessTextureShader)
-
-namespace
+out VS_OUT
 {
-	ShaderProgram			* shaderProgram   = NULL;
-	BindlessTextureShader	* defaultInstance = NULL;
+	vec3 E;
+} vs_out;
 
-	GLint vertInAttrLoc;
-	GLint vertUV_InAttrLoc;
-
-	GLint MVP_Loc;
-	//GLint texLoc;
-	GLint texID_Loc;
-}
-
-BindlessTextureShader* BindlessTextureShader::getDefaultInstance() { return defaultInstance ;}
-
-void BindlessTextureShader::ensureShader()
+void main(void)
 {
-	if(shaderProgram) { return ;}
+	const vec4 vertices[] = vec4[]( vec4(-1.0, -1.0, 0.5, 1.0),
+									vec4( 1.0, -1.0, 0.5, 1.0),
+									vec4(-1.0,  1.0, 0.5, 1.0),
+									vec4( 1.0,  1.0, 0.5, 1.0) );
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"BindlessTextureShader.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"BindlessTextureShader.fs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttrLoc					},
-														{"vertUV_In",			vertUV_InAttrLoc				}}),
-											Variables({	{"MVP",					MVP_Loc							},
-														{"texID",				texID_Loc						}}));
-
-	defaultInstance = new BindlessTextureShader();
-}
-
-void BindlessTextureShader::bind(	Canvas		* canvas,
-									const bool    isOutline,
-									const size_t  renderingStage)
-{
-	shaderProgram->bind();
-
-	shaderProgram->setUniformi(texID_Loc, m_textureSlot);
-
-	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
-}
-
-BindlessTextureShader::BindlessTextureShader() : Shader("BindlessTextureShader")
-{
-
-}
-
-BindlessTextureShader::~BindlessTextureShader()
-{
-
-}
-
-size_t BindlessTextureShader::setTextureSlot(const size_t textureSlot)
-{
-	return m_textureSlot = (GLuint)textureSlot;
+	gl_Position = vertices[gl_VertexID];
+	vs_out.E = vertices[gl_VertexID].xyz;
 }

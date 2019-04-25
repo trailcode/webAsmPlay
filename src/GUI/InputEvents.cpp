@@ -132,8 +132,6 @@ void GUI::framebufferSizeCallback(GLFWwindow* window, int width, int height)
     // Need to use this to get true size because of retina displays.
     glfwGetWindowSize(window, &width, &height);
 
-    s_canvas->setArea(ivec2(0,0), ivec2(width, height));
-    
     refresh();
 }
 
