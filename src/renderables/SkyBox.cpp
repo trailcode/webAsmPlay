@@ -55,6 +55,8 @@ namespace
 
 void SkyBox::ensureShader()
 {
+    dmess("SkyBox::ensureShader");
+    
     if(skyboxShader) { return ;}
 
 	skyboxShader = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"SkyBoxShader.vs.glsl"	},
