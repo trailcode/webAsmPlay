@@ -36,7 +36,7 @@
 using namespace std;
 using namespace glm;
 
-REGISTER_SHADER(ColorDistanceDepthShader3D)
+//REGISTER_SHADER(ColorDistanceDepthShader3D)
 
 // TODO A lot of code duplication! 
 

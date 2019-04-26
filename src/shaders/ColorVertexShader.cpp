@@ -30,7 +30,7 @@
 
 using namespace glm;
 
-REGISTER_SHADER(ColorVertexShader)
+//REGISTER_SHADER(ColorVertexShader)
 
 namespace
 {

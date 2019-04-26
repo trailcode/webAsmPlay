@@ -26,13 +26,14 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/SkyBoxShader.h>
 
 using namespace glm;
 
-REGISTER_SHADER(SkyBoxShader)
+//REGISTER_SHADER(SkyBoxShader)
 
 namespace
 {
@@ -48,6 +49,8 @@ namespace
 
 void SkyBoxShader::ensureShader()
 {
+    dmess("SkyBoxShader::ensureShader");
+
 	if(shaderProgram) { return ;}
 
 	shaderProgram = ShaderProgram::create(  GLSL({	{GL_VERTEX_SHADER,		"SkyBoxShader.vs.glsl"		},

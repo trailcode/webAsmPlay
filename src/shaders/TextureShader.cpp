@@ -29,7 +29,7 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 
-REGISTER_SHADER(TextureShader)
+//REGISTER_SHADER(TextureShader)
 
 namespace
 {

@@ -72,6 +72,8 @@ namespace
 		}
 
 		glAttachShader(program, shader);
+
+        return true;
 	}
 }
 
@@ -80,9 +82,14 @@ ShaderProgram * ShaderProgram::create(const GLSL & programs, const Variables& at
 	GLint  success       = 0;
 	GLuint shaderProgram = glCreateProgram();
 
+    dmess("shaderProgram " << shaderProgram);
+
 	for(const auto & i : programs)
 	{
-		if(!compile(i, shaderProgram)) { return nullptr ;}
+		if(!compile(i, shaderProgram))
+        {
+            return nullptr;
+        }
 	}
 
 	glLinkProgram(shaderProgram);

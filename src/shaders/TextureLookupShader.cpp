@@ -28,7 +28,7 @@
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/TextureLookupShader.h>
 
-REGISTER_SHADER(TextureLookupShader)
+//REGISTER_SHADER(TextureLookupShader)
 
 namespace
 {

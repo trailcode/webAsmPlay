@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#version 440 core
+#version 330 core
 
 #extension GL_ARB_bindless_texture : require
 

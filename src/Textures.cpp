@@ -104,7 +104,7 @@ GLuint Textures::load(const string & filename)
 
     const GLuint texture = load(img);
 
-    SDL_FreeSurface(img);
+    //SDL_FreeSurface(img);
 
     return texture;
 }
@@ -152,6 +152,8 @@ GLuint Textures::loadCube(const vector<string> & files)
     {
         dmess("Error, cube texture incorrect number of files!")
     }
+
+    dmess("files[0] " << files[0]);
 
     SDL_Surface * xpos = IMG_Load(files[0].c_str());
     SDL_Surface * xneg = IMG_Load(files[1].c_str());
