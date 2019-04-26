@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 430 core
 
 in vec4 vertexColorNear;
 in vec4 vertexColorFar;

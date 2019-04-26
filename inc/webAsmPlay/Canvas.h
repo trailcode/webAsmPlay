@@ -122,6 +122,7 @@ public:
     glm::dvec2 renderCursor(const glm::dvec2 & pos);
 
 	FrameBuffer * getAuxFrameBuffer() const;
+	FrameBuffer * getG_FrameBuffer()  const;
 
 	double getPerspectiveFOV() const;
 	double setPerspectiveFOV(const double FOV);
@@ -146,8 +147,7 @@ private:
     rsmz::TrackBallInteractor * m_trackBallInteractor = NULL;
 
 	FrameBuffer * m_frameBuffer = NULL;
-
-	FrameBuffer* m_gBuffer = NULL;
+	FrameBuffer * m_gBuffer		= NULL;
 
     bool m_wantMouseCapture = true;
 

@@ -68,6 +68,8 @@ namespace
 
 			dmess("   " << infoLog);
 
+			dmess("File: " << get<1>(typeAndFile));
+
 			return false;
 		}
 

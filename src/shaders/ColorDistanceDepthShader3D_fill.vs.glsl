@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 430 core
 
 layout(location = 0) in vec3  vertIn;
 layout(location = 1) in float vertColorIn;
@@ -33,6 +33,7 @@ layout(location = 2) in vec3  normalIn;
 uniform mat4      model;
 uniform mat4      view;
 uniform mat4      projection;
+uniform vec3	  lightPos;
 uniform float     colorLookupOffset;
 uniform float     heightMultiplier;
 uniform float     width;
@@ -45,10 +46,14 @@ out vec4 position_in_view_space;
 out vec3 normal;
 out vec3 fragPos;
 out vec4 glPos;
-//noperspective out vec2 viewportPixelCoord;
-//noperspective out vec4 fragCoord2D;
-//flat out vec4 fragCoord2D;
-//out vec4 fragCoord2D;
+
+// Inputs from vertex shader
+out VS_OUT
+{
+	vec3 N;
+	vec3 L;
+	vec3 V;
+} vs_out;
 
 void main()
 {
@@ -58,7 +63,8 @@ void main()
 
 	mat4 MV = view * model;
 
-	position_in_view_space = MV * vert;
+	// Calculate view-space coordinate
+	position_in_view_space = MV * vert; 
 
 	gl_Position = projection * MV * vert;
 
@@ -69,18 +75,12 @@ void main()
 
 	normal = mat3(transpose(inverse(model))) * normalIn;
 
-	/*
-	fragCoord2D  = projection * MV * vec4(vert.xy, 0, 1);
+	// Calculate normal in view-space
+	vs_out.N = mat3(MV) * normalIn;
 
-											// Vertex in NDC-space
-	fragCoord2D.xyz /= fragCoord2D.w;       // Rescale: [-1,1]^3
-	fragCoord2D.w    = 1.0 / fragCoord2D.w; // Invert W
+	// Calculate light vector
+	vs_out.L = lightPos - position_in_view_space.xyz;
 
-													// Vertex in window-space
-	fragCoord2D.xyz *= vec3(0.5) + vec3(0.5); // Rescale: [0,1]^3
-
-	fragCoord2D.xyz += vec3(1);
-
-	fragCoord2D.xyz *= vec3(0.5);
-	*/
+	// Calculate view vector
+	vs_out.V = -position_in_view_space.xyz;
 }

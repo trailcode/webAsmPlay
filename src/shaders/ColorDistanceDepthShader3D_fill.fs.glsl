@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 430 core
 
 in vec4 vertexColorNear;
 in vec4 vertexColorFar;
@@ -43,6 +43,15 @@ uniform mat4		invPersMatrix;
 uniform mat4		invViewMatrix;
 
 layout (location = 0) out vec4 outColor;
+layout (location = 1) out vec4 normalDepth;
+
+// Input from vertex shader
+in VS_OUT
+{
+	vec3 N;
+	vec3 L;
+	vec3 V;
+} fs_in;
 
 void main()
 {
@@ -104,6 +113,10 @@ void main()
 
 	p.xyz *= vec3(0.5);
 	
+	vec3 N = normalize(fs_in.N);
+
+	normalDepth = vec4(N, fs_in.V.z);
+
 	if(dot(normal, vec3(0,0,1)) > 0.001)
 	{
 		vec4 texColor = vec4(textureLod(topDownTexture, p.xy, 0).xyz, 0);

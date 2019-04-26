@@ -24,15 +24,24 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 430 core
 in vec4 vertexColorNear;
 in vec4 vertexColorFar;
 in vec4 position_in_view_space;
 noperspective in vec4 fragCoord2D;
 
+// Input from vertex shader
+in VS_OUT
+{
+	vec3 N;
+	//vec3 L;
+	vec3 V;
+} fs_in;
+
 uniform sampler2D topDownTexture;
 
-out vec4 outColor;
+layout (location = 0) out vec4 outColor;
+layout (location = 1) out vec4 normalDepth;
 
 void main()
 {
@@ -52,4 +61,8 @@ void main()
 	vec4 texColor = vec4(texture(topDownTexture, fragCoord2D.xy).xyz, 0);
 
 	outColor += texColor;
+
+	vec3 N = normalize(fs_in.N);
+
+	normalDepth = vec4(N, fs_in.V.z);
 }

@@ -49,3 +49,25 @@ void GUI::frameBufferDepthDebugPanel()
 	}
 	ImGui::End();
 }
+
+void GUI::normalFrameBufferDebugPanel()
+{
+	if (!s_showNormalFrameBufferDebugPanel) { return; }
+
+	ImGui::Begin("FrameBuffer Normals", &s_showNormalFrameBufferDebugPanel);
+	{
+		const ImVec2 pos = ImGui::GetCursorScreenPos();
+
+		const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+
+		if (s_canvas->getAuxFrameBuffer())
+		{
+			ImGui::GetWindowDrawList()->AddImage((void*)(size_t)s_canvas->getG_FrameBuffer()->getTextureID(1),
+				pos,
+				ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+				ImVec2(0, 1),
+				ImVec2(1, 0));
+		}
+	}
+	ImGui::End();
+}

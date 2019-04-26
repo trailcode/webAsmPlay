@@ -184,7 +184,14 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
 
 	glActiveTexture(GL_TEXTURE2);
 
-	glBindTexture(GL_TEXTURE_2D, RenderableBingMap::getFrameBuffer()->getTextureID());
+	if (RenderableBingMap::getFrameBuffer())
+	{
+		glBindTexture(GL_TEXTURE_2D, RenderableBingMap::getFrameBuffer()->getTextureID());
+	}
+	else
+	{
+		dmess("Fix!!!"); // TODO
+	}
 
     glEnable(GL_BLEND);
 

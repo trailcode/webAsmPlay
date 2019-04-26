@@ -397,6 +397,7 @@ void GUI::showMainMenuBar()
         if (ImGui::MenuItem("Bing Tile System"))		{ s_showBingTileSystemPanel				^= 1 ;}
 		if (ImGui::MenuItem("Framebuffer Depth"))		{ s_showFrameBufferDepthDebugPanel		^= 1 ;}
 		if (ImGui::MenuItem("BingMaps Framebuffer"))	{ s_showBingMapsFrameBufferDebugPanel	^= 1 ;}
+		if (ImGui::MenuItem("Normal Framebuffer"))		{ s_showNormalFrameBufferDebugPanel		^= 1 ;}
 		if (ImGui::MenuItem("Full Screen"))
 		{
 			setFullScreen(!g_fullScreen);
@@ -550,6 +551,7 @@ void GUI::mainLoop(GLFWwindow * window)
     bingTileSystemPanel();
 	frameBufferDepthDebugPanel();
 	bingMapsFrameBufferDebugPanel();
+	normalFrameBufferDebugPanel();
 
     ImGui::End();
 

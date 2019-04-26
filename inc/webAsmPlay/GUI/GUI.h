@@ -156,6 +156,7 @@ private:
     static void bingTileSystemPanel();
 	static void frameBufferDepthDebugPanel();
 	static void bingMapsFrameBufferDebugPanel();
+	static void normalFrameBufferDebugPanel();
 
     static void showHelpMarker(const char* desc);
 
@@ -181,6 +182,7 @@ private:
     static bool s_showBingTileSystemPanel;
 	static bool s_showFrameBufferDepthDebugPanel;
 	static bool s_showBingMapsFrameBufferDebugPanel;
+	static bool s_showNormalFrameBufferDebugPanel;
 
     static GLFWwindow * s_mainWindow;
 

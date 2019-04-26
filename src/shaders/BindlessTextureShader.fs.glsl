@@ -24,11 +24,11 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 430 core
 
 #extension GL_ARB_bindless_texture : require
 
-out vec4 outColor;
+layout (location = 0) out vec4 outColor;
 in vec2 UV;
 uniform int texID;
 

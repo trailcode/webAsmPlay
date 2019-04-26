@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 430 core
 uniform sampler2D tex;
 
 layout(location = 0) in vec2  vertIn;
@@ -39,11 +39,19 @@ out vec4 vertexColorFar;
 out vec4 position_in_view_space;
 noperspective out vec4 fragCoord2D;
 
+// Inputs from vertex shader
+out VS_OUT
+{
+	vec3 N;
+	//vec3 L;
+	vec3 V;
+} vs_out;
+
 void main()
 {
 	vec4 vert = vec4(vertIn.xy, 0, 1);
-	//vec4 vert = vec4(vertIn.xyz, 1);
-
+	
+	// Calculate view-space coordinate
 	position_in_view_space = MV * vert;
 
 	gl_Position = MVP * vert;
@@ -63,4 +71,13 @@ void main()
 	fragCoord2D.xyz += vec3(1);
 
 	fragCoord2D.xyz *= vec3(0.5);
+
+	// Calculate normal in view-space
+	vs_out.N = mat3(MV) * vec3(0,0,1);
+
+	// Calculate light vector
+	//vs_out.L = lightPos - position_in_view_space.xyz;
+
+	// Calculate view vector
+	vs_out.V = -position_in_view_space.xyz;
 }

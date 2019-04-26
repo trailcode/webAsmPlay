@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 430 core
 
 uniform sampler2D tex; // TODO why does the ordering matter here? Something must not be correct.
 

@@ -99,6 +99,9 @@ ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize, const ivec2 & upperLeft)
 											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGB32F,
 												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
 													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
+											 FB_Component(GL_COLOR_ATTACHMENT1, GL_RGBA32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
 											 FB_Component(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT32F,
 												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
 													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST),
@@ -182,7 +185,7 @@ bool Canvas::preRender()
         glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y);
     }
 
-	//m_gBuffer->bind();
+	m_gBuffer->bind();
 
     if(m_skyBox) { m_skyBox->render(this) ;}
 
@@ -235,18 +238,18 @@ GLuint Canvas::render()
 
     for(const auto r : m_meshes)              { r->render(this, 0) ;}
 
-	/*
+	//*
 	m_gBuffer->unbind();
 	
 	SsaoShader::getDefaultInstance()->setColorTextureID(m_gBuffer->getTextureID(0));
 
 	SsaoShader::getDefaultInstance()->bind(this, false, 0);
 
-	GL_CHECK(glDisable(GL_DEPTH_TEST));
+	glDisable(GL_DEPTH_TEST);
 	
-	GL_CHECK(glBindVertexArray(quad_vao));
-	GL_CHECK(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-	*/
+	glBindVertexArray(quad_vao);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	//*/
 
     return postRender();
 }
@@ -478,6 +481,7 @@ dvec3 Canvas::getCursorPosWC()						const	{ return m_cursorPosWC ;}
 Renderable * Canvas::getCursor()					const	{ return m_cursor ;}
 
 FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
+FrameBuffer * Canvas::getG_FrameBuffer()			const	{ return m_gBuffer ;}
 
 #ifdef __EMSCRIPTEN__
 

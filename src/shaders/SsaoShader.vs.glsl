@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#version 330 core
+#version 430 core
 
 out VS_OUT
 {
@@ -39,5 +39,5 @@ void main(void)
 									vec4( 1.0,  1.0, 0.5, 1.0) );
 
 	gl_Position = vertices[gl_VertexID];
-	vs_out.E = vertices[gl_VertexID].xyz;
+	vs_out.E	= vertices[gl_VertexID].xyz;
 }

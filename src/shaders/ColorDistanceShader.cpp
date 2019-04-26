@@ -92,7 +92,14 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 
 	glActiveTexture(GL_TEXTURE1);
 
-	glBindTexture(GL_TEXTURE_2D, RenderableBingMap::getFrameBuffer()->getTextureID());
+	if (RenderableBingMap::getFrameBuffer())
+	{
+		glBindTexture(GL_TEXTURE_2D, RenderableBingMap::getFrameBuffer()->getTextureID());
+	}
+	else
+	{
+		dmess("Fix!"); // HAppens if big maps is not enabled.
+	}
 
     shaderProgram->bind();
 
