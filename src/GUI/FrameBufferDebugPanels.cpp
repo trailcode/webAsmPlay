@@ -26,6 +26,8 @@
 
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/shaders/NormalToRGB_Shader.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 void GUI::frameBufferDepthDebugPanel()
@@ -50,6 +52,8 @@ void GUI::frameBufferDepthDebugPanel()
 	ImGui::End();
 }
 
+extern GLuint quad_vao;
+
 void GUI::normalFrameBufferDebugPanel()
 {
 	if (!s_showNormalFrameBufferDebugPanel) { return; }
@@ -60,13 +64,41 @@ void GUI::normalFrameBufferDebugPanel()
 
 		const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-		if (s_canvas->getAuxFrameBuffer())
+		if (s_canvas->getG_FrameBuffer())
 		{
-			ImGui::GetWindowDrawList()->AddImage((void*)(size_t)s_canvas->getG_FrameBuffer()->getTextureID(1),
-				pos,
-				ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-				ImVec2(0, 1),
-				ImVec2(1, 0));
+			static FrameBuffer* fb = NULL;
+
+			if (!fb)
+			{
+				fb = new FrameBuffer(	__(sceneWindowSize),
+										{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGB32F,				
+											{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+												TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
+			}
+
+			fb->setBufferSize(__(sceneWindowSize));
+
+			fb->bind();
+
+			//glViewport(0, 0, (GLsizei)sceneWindowSize.x, (GLsizei)sceneWindowSize.y);
+
+			NormalToRGB_Shader::bind(s_canvas->getG_FrameBuffer()->getTextureID(1));
+
+			glDisable(GL_DEPTH_TEST);
+
+			glBindVertexArray(quad_vao);
+
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+			fb->unbind();
+
+			ImGui::GetWindowDrawList()->AddImage(	
+													//(void*)(size_t)s_canvas->getG_FrameBuffer()->getTextureID(1),
+													(void*)(size_t)fb->getTextureID(),
+													pos,
+													ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+													ImVec2(0, 1),
+													ImVec2(1, 0));
 		}
 	}
 	ImGui::End();

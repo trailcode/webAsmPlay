@@ -25,62 +25,59 @@
 */
 
 #version 430 core
+uniform sampler2D tex;
 
-layout(location = 0) in vec3  vertIn;
+layout(location = 0) in vec2  vertIn;
 layout(location = 1) in float vertColorIn;
-layout(location = 2) in vec3  normalIn;
 
-uniform mat4      model;
-uniform mat4      view;
-uniform mat4      projection;
-uniform vec3	  lightPos;
-uniform float     colorLookupOffset;
-uniform float     heightMultiplier;
-uniform float     width;
-uniform float     height;
-uniform sampler2D colorLookupTexture;
+uniform mat4 MVP;
+uniform mat4 MV;
+uniform float colorLookupOffset;
 
 out vec4 vertexColorNear;
 out vec4 vertexColorFar;
 out vec4 position_in_view_space;
-out vec3 normal;
-out vec3 fragPos;
-out vec4 glPos;
+noperspective out vec4 fragCoord2D;
 
 // Inputs from vertex shader
 out VS_OUT
 {
 	vec3 N;
-	vec3 L;
+	//vec3 L;
 	vec3 V;
 } vs_out;
 
 void main()
 {
-	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
-
-	fragPos = vec3(model * vert);
-
-	mat4 MV = view * model;
-
+	vec4 vert = vec4(vertIn.xy, 0, 1);
+	
 	// Calculate view-space coordinate
-	position_in_view_space = MV * vert; 
+	position_in_view_space = MV * vert;
 
-	gl_Position = projection * MV * vert;
+	gl_Position = MVP * vert;
 
-	glPos = gl_Position; // TODO just use gl_Position?
+	vertexColorNear = texture(tex, vec2(vertColorIn +		 colorLookupOffset  / 32.0, 0.5));
+	vertexColorFar = texture(tex,  vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
 
-	vertexColorNear = texture(colorLookupTexture, vec2(vertColorIn +        colorLookupOffset  / 32.0, 0.5));
-	vertexColorFar  = texture(colorLookupTexture, vec2(vertColorIn + (2.0 + colorLookupOffset) / 32.0, 0.5));
+	fragCoord2D  = MVP * vec4(vert.xy, 0, 1);
 
-	normal = mat3(transpose(inverse(model))) * normalIn;
+	// Vertex in NDC-space
+	fragCoord2D.xyz /= fragCoord2D.w;       // Rescale: [-1,1]^3
+	fragCoord2D.w    = 1.0 / fragCoord2D.w; // Invert W
+
+											// Vertex in window-space
+	fragCoord2D.xyz *= vec3(0.5) + vec3(0.5); // Rescale: [0,1]^3
+
+	fragCoord2D.xyz += vec3(1);
+
+	fragCoord2D.xyz *= vec3(0.5);
 
 	// Calculate normal in view-space
-	//vs_out.N = mat3(MV) * normalIn;
-	vs_out.N = normalIn;
+	//vs_out.N = mat3(MV) * vec3(0,0,1);
+	vs_out.N = vec3(0, 0, 1);
 
 	// Calculate light vector
-	vs_out.L = lightPos - position_in_view_space.xyz;
+	//vs_out.L = lightPos - position_in_view_space.xyz;
 
 	// Calculate view vector
 	vs_out.V = -position_in_view_space.xyz;

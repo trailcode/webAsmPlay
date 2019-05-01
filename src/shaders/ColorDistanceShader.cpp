@@ -41,7 +41,8 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram       * shaderProgram     = NULL;
+	ShaderProgram       * shaderProgramPre	= NULL;
+    ShaderProgram       * shaderProgram		= NULL;
     ColorDistanceShader * defaultInstance   = NULL;
 
     GLint vertInAttrLoc;
@@ -58,15 +59,15 @@ void ColorDistanceShader::ensureShader()
 {
 	if(shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"ColorDistanceShader.fs.glsl"	}}),
-                                            Variables({	{"vertIn",				vertInAttrLoc					},
-														{"vertColorIn",			vertColorInAttrLoc				}}),
-                                            Variables({	{"MV",					MV_Loc							},
-														{"MVP",					MVP_Loc							},
-														{"tex",					texUniformLoc					},
-														{"topDownTexture",		topDownTextureUniform			},
-														{"colorLookupOffset",	colorLookupOffsetLoc			}}));
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader_fill.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"ColorDistanceShader_fill.fs.glsl"	}}),
+											Variables({	{"vertIn",				vertInAttrLoc						},
+														{"vertColorIn",			vertColorInAttrLoc					}}),
+											Variables({	{"MV",					MV_Loc								},
+														{"MVP",					MVP_Loc								},
+														{"tex",					texUniformLoc						},
+														{"topDownTexture",		topDownTextureUniform				},
+														{"colorLookupOffset",	colorLookupOffsetLoc				}}));
 
     defaultInstance = new ColorDistanceShader();
 }
@@ -86,6 +87,9 @@ void ColorDistanceShader::bind(Canvas     * canvas,
                                const bool   isOutline,
                                const size_t renderingStage)
 {
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+
     glActiveTexture(GL_TEXTURE0);
 
     glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID());
@@ -98,18 +102,24 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 	}
 	else
 	{
-		dmess("Fix!"); // HAppens if big maps is not enabled.
+		dmess("Fix!"); // Happens if big maps is not enabled.
 	}
 
-    shaderProgram->bind();
+	shaderProgram->bind();
 
-    shaderProgram->setUniform(MV_Loc,  canvas->getMV_Ref());
-    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+	shaderProgram->setUniform(MV_Loc,  canvas->getMV_Ref());
+	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 
-    shaderProgram->setUniformi(texUniformLoc,			0);
+	shaderProgram->setUniformi(texUniformLoc,			0);
 	shaderProgram->setUniformi(topDownTextureUniform,	1);
 
     if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 2.0f) ;}
     else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}
 }
 
+size_t ColorDistanceShader::getNumRenderingStages() const { return 2 ;}
+
+bool ColorDistanceShader::shouldRender(const bool isOutline, const size_t renderingStage) const
+{
+	return true;
+}

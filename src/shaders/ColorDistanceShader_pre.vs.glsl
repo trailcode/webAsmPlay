@@ -24,28 +24,13 @@
 \copyright 2019
 */
 
-#version 430 core
+#version 410 core
 
-layout(location = 0) in vec3  vertIn;
-layout(location = 1) in float vertColorIn;
-layout(location = 2) in vec3  normalIn;
+// Per-vertex inputs
+layout (location = 0) in vec4 position;
 
-uniform mat4      model;
-uniform mat4      view;
-uniform mat4      projection;
-uniform vec3	  lightPos;
-uniform float     colorLookupOffset;
-uniform float     heightMultiplier;
-uniform float     width;
-uniform float     height;
-uniform sampler2D colorLookupTexture;
-
-out vec4 vertexColorNear;
-out vec4 vertexColorFar;
-out vec4 position_in_view_space;
-out vec3 normal;
-out vec3 fragPos;
-out vec4 glPos;
+uniform mat4 mv_matrix;
+uniform mat4 proj_matrix;
 
 // Inputs from vertex shader
 out VS_OUT
@@ -55,33 +40,24 @@ out VS_OUT
 	vec3 V;
 } vs_out;
 
-void main()
+// Position of light
+uniform vec3 light_pos = vec3(100.0, 100.0, 100.0);
+
+void main(void)
 {
-	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
-
-	fragPos = vec3(model * vert);
-
-	mat4 MV = view * model;
-
 	// Calculate view-space coordinate
-	position_in_view_space = MV * vert; 
-
-	gl_Position = projection * MV * vert;
-
-	glPos = gl_Position; // TODO just use gl_Position?
-
-	vertexColorNear = texture(colorLookupTexture, vec2(vertColorIn +        colorLookupOffset  / 32.0, 0.5));
-	vertexColorFar  = texture(colorLookupTexture, vec2(vertColorIn + (2.0 + colorLookupOffset) / 32.0, 0.5));
-
-	normal = mat3(transpose(inverse(model))) * normalIn;
+	vec4 P = mv_matrix * position;
 
 	// Calculate normal in view-space
-	//vs_out.N = mat3(MV) * normalIn;
-	vs_out.N = normalIn;
+	//vs_out.N = mat3(mv_matrix) * normal;
+	vs_out.N = vec3(0, 0, 1);
 
 	// Calculate light vector
-	vs_out.L = lightPos - position_in_view_space.xyz;
+	vs_out.L = light_pos - P.xyz;
 
 	// Calculate view vector
-	vs_out.V = -position_in_view_space.xyz;
+	vs_out.V = -P.xyz;
+
+	// Calculate the clip-space position of each vertex
+	gl_Position = proj_matrix * P;
 }

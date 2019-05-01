@@ -21,67 +21,26 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2019
+\copyright 2018
 */
+#pragma once
 
-#version 430 core
+#include <webAsmPlay/OpenGL_Util.h>
 
-layout(location = 0) in vec3  vertIn;
-layout(location = 1) in float vertColorIn;
-layout(location = 2) in vec3  normalIn;
-
-uniform mat4      model;
-uniform mat4      view;
-uniform mat4      projection;
-uniform vec3	  lightPos;
-uniform float     colorLookupOffset;
-uniform float     heightMultiplier;
-uniform float     width;
-uniform float     height;
-uniform sampler2D colorLookupTexture;
-
-out vec4 vertexColorNear;
-out vec4 vertexColorFar;
-out vec4 position_in_view_space;
-out vec3 normal;
-out vec3 fragPos;
-out vec4 glPos;
-
-// Inputs from vertex shader
-out VS_OUT
+class NormalToRGB_Shader
 {
-	vec3 N;
-	vec3 L;
-	vec3 V;
-} vs_out;
+public:
 
-void main()
-{
-	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
+	static void ensureShader();
 
-	fragPos = vec3(model * vert);
+	static void bind(const GLuint textureID);
 
-	mat4 MV = view * model;
+private:
 
-	// Calculate view-space coordinate
-	position_in_view_space = MV * vert; 
+	NormalToRGB_Shader() {}
+	~NormalToRGB_Shader() {}
 
-	gl_Position = projection * MV * vert;
+	// TODO add delete keywords
 
-	glPos = gl_Position; // TODO just use gl_Position?
-
-	vertexColorNear = texture(colorLookupTexture, vec2(vertColorIn +        colorLookupOffset  / 32.0, 0.5));
-	vertexColorFar  = texture(colorLookupTexture, vec2(vertColorIn + (2.0 + colorLookupOffset) / 32.0, 0.5));
-
-	normal = mat3(transpose(inverse(model))) * normalIn;
-
-	// Calculate normal in view-space
-	//vs_out.N = mat3(MV) * normalIn;
-	vs_out.N = normalIn;
-
-	// Calculate light vector
-	vs_out.L = lightPos - position_in_view_space.xyz;
-
-	// Calculate view vector
-	vs_out.V = -position_in_view_space.xyz;
-}
+	GLuint m_textureID = 0;
+};

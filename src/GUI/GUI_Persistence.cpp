@@ -107,6 +107,8 @@ void GUI::loadState()
     setBool(L"showCameraInfoPanel",                 s_showCameraInfoPanel);
     setBool(L"showBingTileSystemPanel",             s_showBingTileSystemPanel);
 	setBool(L"showFrameBufferDepthDebugPanel",		s_showFrameBufferDepthDebugPanel);
+	setBool(L"showBingMapsFrameBufferDebugPanel",	s_showBingMapsFrameBufferDebugPanel);
+	setBool(L"showNormalFrameBufferDebugPanel",		s_showNormalFrameBufferDebugPanel);
 
     setBool(L"renderSettingsFillMeshes",            s_renderSettingsFillMeshes);
     setBool(L"renderSettingsRenderMeshOutlines",    s_renderSettingsRenderMeshOutlines);
@@ -154,6 +156,8 @@ void GUI::saveState()
     root[L"showCameraInfoPanel"]                  = new JSONValue(s_showCameraInfoPanel);
     root[L"showBingTileSystemPanel"]              = new JSONValue(s_showBingTileSystemPanel);
 	root[L"showFrameBufferDepthDebugPanel"]       = new JSONValue(s_showFrameBufferDepthDebugPanel);
+	root[L"showBingMapsFrameBufferDebugPanel"]    = new JSONValue(s_showBingMapsFrameBufferDebugPanel);
+	root[L"showNormalFrameBufferDebugPanel"]      = new JSONValue(s_showNormalFrameBufferDebugPanel);
 
     root[L"renderSettingsFillMeshes"]             = new JSONValue(s_renderSettingsFillMeshes);
     root[L"renderSettingsRenderMeshOutlines"]     = new JSONValue(s_renderSettingsRenderMeshOutlines);

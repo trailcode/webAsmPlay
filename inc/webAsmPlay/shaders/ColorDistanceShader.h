@@ -42,5 +42,9 @@ public:
     ColorDistanceShader();
     ~ColorDistanceShader();
 
+	size_t getNumRenderingStages() const;
+
+	bool shouldRender(const bool isOutline, const size_t renderingStage) const;
+
 private:
 };

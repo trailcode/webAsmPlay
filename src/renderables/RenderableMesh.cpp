@@ -94,18 +94,8 @@ void RenderableMesh::getTesselations(	Tessellations					 & tessellations,
                 tessellations.pop_back();
             }
         }
-        else if((multiPoly = dynamic_cast<const MultiPolygon *>(geom)))
-        {
-            dmess("Have a multiPoly!");
-
-            //tesselateMultiPolygon(multiPoly, trans, tessellations);
-            abort();
-        }
-        else
-        {
-            dmess("Warning not a polygon or multi-polygon.");
-            abort();
-        }
+        else if((multiPoly = dynamic_cast<const MultiPolygon *>(geom))) { dmessError("Have a multiPoly!")						;}
+        else															{ dmessError("Warning not a polygon or multi-polygon.") ;}
     }
 
     if(showProgress) { GUI::progress("", 1.0) ;}

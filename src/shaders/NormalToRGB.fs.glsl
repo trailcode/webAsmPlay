@@ -24,13 +24,19 @@
 \copyright 2019
 */
 
-#version 430 core
+#version 330 core
 
-in  vec4 glPos;
-layout (location = 0) out vec4 outColor;
+out vec4 outColor;
+
+uniform sampler2D tex;
 
 void main()
 {
-	//outColor = vec4(1,1,1,1);
-	outColor = vec4(glPos.w, glPos.w, glPos.w, 1);
+	vec2 P = gl_FragCoord.xy / textureSize(tex, 0);
+	
+	vec4 frag = textureLod(tex, P, 0);
+	
+	outColor = (frag + vec4(1,1,1,1)) * 0.5;
+
+	outColor.a = 1.0;
 }

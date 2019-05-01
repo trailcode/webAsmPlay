@@ -43,7 +43,7 @@ uniform mat4		invPersMatrix;
 uniform mat4		invViewMatrix;
 
 layout (location = 0) out vec4 outColor;
-layout (location = 1) out vec4 normalDepth;
+//layout (location = 1) out vec4 normalDepth;
 
 // Input from vertex shader
 in VS_OUT
@@ -113,9 +113,9 @@ void main()
 
 	p.xyz *= vec3(0.5);
 	
-	vec3 N = normalize(fs_in.N);
+	//vec3 N = normalize(fs_in.N);
 
-	normalDepth = vec4(N, fs_in.V.z);
+	//normalDepth = vec4(N, fs_in.V.z);
 
 	if(dot(normal, vec3(0,0,1)) > 0.001)
 	{

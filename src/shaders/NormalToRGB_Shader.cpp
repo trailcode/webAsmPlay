@@ -21,63 +21,43 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2019
+\copyright 2018
 */
 
-#version 430 core
-uniform sampler2D tex;
+#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/shaders/NormalToRGB_Shader.h>
 
-layout(location = 0) in vec2  vertIn;
-layout(location = 1) in float vertColorIn;
+//REGISTER_SHADER(TextureShader)
 
-uniform mat4 MVP;
-uniform mat4 MV;
-uniform float colorLookupOffset;
-
-out vec4 vertexColorNear;
-out vec4 vertexColorFar;
-out vec4 position_in_view_space;
-noperspective out vec4 fragCoord2D;
-
-// Inputs from vertex shader
-out VS_OUT
+namespace
 {
-	vec3 N;
-	//vec3 L;
-	vec3 V;
-} vs_out;
+	ShaderProgram  * shaderProgram   = NULL;
 
-void main()
-{
-	vec4 vert = vec4(vertIn.xy, 0, 1);
+	GLint vertInAttrLoc;
 	
-	// Calculate view-space coordinate
-	position_in_view_space = MV * vert;
+	GLint MVP_Loc;
+	GLint texLoc;
+}
 
-	gl_Position = MVP * vert;
+void NormalToRGB_Shader::ensureShader()
+{
+	if(shaderProgram) { return ;}
 
-	vertexColorNear = texture(tex, vec2(vertColorIn +		 colorLookupOffset  / 32.0, 0.5));
-	vertexColorFar = texture(tex,  vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"NormalToRGB.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"NormalToRGB.fs.glsl"	}}),
+											Variables(),
+											Variables({	{"tex",					texLoc					}}));
+}
 
-	fragCoord2D  = MVP * vec4(vert.xy, 0, 1);
+void NormalToRGB_Shader::bind(const GLuint textureID)
+{
+	shaderProgram->bind();
 
-	// Vertex in NDC-space
-	fragCoord2D.xyz /= fragCoord2D.w;       // Rescale: [-1,1]^3
-	fragCoord2D.w    = 1.0 / fragCoord2D.w; // Invert W
+	glActiveTexture(GL_TEXTURE0);
 
-											// Vertex in window-space
-	fragCoord2D.xyz *= vec3(0.5) + vec3(0.5); // Rescale: [0,1]^3
+	glBindTexture(GL_TEXTURE_2D, textureID);
 
-	fragCoord2D.xyz += vec3(1);
-
-	fragCoord2D.xyz *= vec3(0.5);
-
-	// Calculate normal in view-space
-	vs_out.N = mat3(MV) * vec3(0,0,1);
-
-	// Calculate light vector
-	//vs_out.L = lightPos - position_in_view_space.xyz;
-
-	// Calculate view vector
-	vs_out.V = -position_in_view_space.xyz;
+	shaderProgram->setUniformi(texLoc, 0);
 }

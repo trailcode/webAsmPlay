@@ -163,7 +163,7 @@ bool Canvas::preRender()
     ColorDistanceShader3D     ::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
     ColorDistanceDepthShader3D::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
 
-    if(m_useFrameBuffer)
+    if(false && m_useFrameBuffer)
     {
 		if (!m_frameBuffer)
 		{
@@ -185,9 +185,9 @@ bool Canvas::preRender()
         glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y);
     }
 
-	m_gBuffer->bind();
+	//m_gBuffer->bind();
 
-    if(m_skyBox) { m_skyBox->render(this) ;}
+    //if(m_skyBox) { m_skyBox->render(this) ;}
 
     else
     {
@@ -195,6 +195,10 @@ bool Canvas::preRender()
 
        glClear(GL_COLOR_BUFFER_BIT);
     }
+
+	glClearColor(0,0,0,1);
+
+	glClear(GL_COLOR_BUFFER_BIT);
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -208,24 +212,36 @@ GLuint Canvas::render()
     if(!preRender()) { return 0 ;}
 
     lock_guard<mutex> _(m_renderiablesMutex);
-	
-    if(m_auxFrameBuffer)
+
+	m_gBuffer->bind();
+
+	glClearColor(0,0,0,1);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
+	ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
+
+    //if(m_auxFrameBuffer)
     {
-        m_auxFrameBuffer->bind();
+        //m_auxFrameBuffer->bind();
 
-        for(const auto r : m_meshes) { r->render(this, 1) ;}
+		for(const auto r : m_polygons) { r->render(this, 1) ;}
+        for(const auto r : m_meshes)   { r->render(this, 1) ;}
 
-        glFlush();
+        //glFlush();
 
-        m_auxFrameBuffer->unbind();
+        //m_auxFrameBuffer->unbind();
     }
+
+	//if(m_skyBox) { m_skyBox->render(this) ;}
 
     for(const auto r : m_rasters) { r->render(this, 0) ;}
 
     // TODO try to refactor this. Who owns the symbology?
     ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
 
-    for(const auto r : m_polygons)            { r->render(this, 0) ;}
+    //for(const auto r : m_polygons)            { r->render(this, 0) ;}
 
     ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultLinear"));
 
@@ -233,15 +249,20 @@ GLuint Canvas::render()
     for(const auto r : m_points)              { r->render(this, 0) ;}
     for(const auto r : m_deferredRenderables) { r->render(this, 0) ;} 
     
+	/*
 	ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
     ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
+	*/
 
-    for(const auto r : m_meshes)              { r->render(this, 0) ;}
+    //for(const auto r : m_meshes)              { r->render(this, 0) ;}
 
 	//*
 	m_gBuffer->unbind();
 	
-	SsaoShader::getDefaultInstance()->setColorTextureID(m_gBuffer->getTextureID(0));
+	if(m_skyBox) { m_skyBox->render(this) ;}
+
+	SsaoShader::getDefaultInstance()->setColorTextureID			(m_gBuffer->getTextureID(0));
+	SsaoShader::getDefaultInstance()->setNormalDepthTextureID	(m_gBuffer->getTextureID(1));
 
 	SsaoShader::getDefaultInstance()->bind(this, false, 0);
 

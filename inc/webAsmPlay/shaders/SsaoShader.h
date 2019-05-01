@@ -42,9 +42,11 @@ public:
 				const bool   isOutline,
 				const size_t renderingStage) override;
 
-	GLuint setColorTextureID(const GLuint textureID);
+	GLuint setColorTextureID		(const GLuint textureID);
+	GLuint setNormalDepthTextureID	(const GLuint textureID);
 
 private:
 
-	GLuint m_colorTextureID = 0;
+	GLuint m_colorTextureID			= 0;
+	GLuint m_normalDepthTextureID	= 0;
 };

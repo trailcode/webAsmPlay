@@ -42,16 +42,16 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram              * shaderProgramDepth    = NULL;
+    ShaderProgram              * shaderProgramPre    = NULL;
     ShaderProgram              * shaderProgramFill     = NULL;
     ShaderProgram              * shaderProgramOutline  = NULL;
     ColorDistanceDepthShader3D * defaultInstance       = NULL;
 
-    GLint vertInAttrDepth;
-    GLint heightMultiplierDepth;
-    GLint modelDepth;
-    GLint viewDepth;
-    GLint projectionDepth;
+    GLint vertInAttrPre;
+    GLint heightMultiplierPre;
+    GLint modelPre;
+    GLint viewPre;
+    GLint projectionPre;
 
     GLint vertInAttrFill;
     GLint normalInAttrFill;
@@ -88,13 +88,13 @@ void ColorDistanceDepthShader3D::ensureShader()
 {
 	if(defaultInstance) { return ;}
 
-	shaderProgramDepth = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_depth.vs.glsl"		},
-																{GL_FRAGMENT_SHADER,		"ColorDistanceDepthShader3D_depth.fs.glsl"		}}),
-													Variables({	{"vertIn",					vertInAttrDepth									}}),
-													Variables({	{"model",					modelDepth										},
-																{"view",					viewDepth										},
-																{"projection",				projectionDepth									},
-																{"heightMultiplier",		heightMultiplierDepth							}}));
+	shaderProgramPre = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_pre.vs.glsl"		},
+																{GL_FRAGMENT_SHADER,		"ColorDistanceDepthShader3D_pre.fs.glsl"		}}),
+													Variables({	{"vertIn",					vertInAttrPre									}}),
+													Variables({	{"model",					modelPre										},
+																{"view",					viewPre											},
+																{"projection",				projectionPre									},
+																{"heightMultiplier",		heightMultiplierPre								}}));
 
 	shaderProgramFill = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_fill.vs.glsl"		},
 																{GL_FRAGMENT_SHADER,		"ColorDistanceDepthShader3D_fill.fs.glsl"		}}),
@@ -153,8 +153,7 @@ void ColorDistanceDepthShader3D::bind(Canvas     * canvas,
         case 0: return bindStage0(canvas, isOutline);
         case 1: return bindStage1(canvas, isOutline);
         default: 
-            dmess("Error!");
-            abort();
+            dmessError("Error!");
     }
 }
 
@@ -162,14 +161,15 @@ void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutlin
 {
     //dmess("ColorDistanceDepthShader3D::bindStage1");
 
-    shaderProgramDepth->bind();
+    shaderProgramPre->bind();
 
+	glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 
-    shaderProgramDepth->setUniformf(heightMultiplierDepth,    m_heightMultiplier);
-    shaderProgramDepth->setUniform (modelDepth,               canvas->getModelRef());
-    shaderProgramDepth->setUniform (viewDepth,                canvas->getViewRef());
-    shaderProgramDepth->setUniform (projectionDepth,          canvas->getProjectionRef());
+    shaderProgramPre->setUniformf(heightMultiplierPre,    m_heightMultiplier);
+    shaderProgramPre->setUniform (modelPre,               canvas->getModelRef());
+    shaderProgramPre->setUniform (viewPre,                canvas->getViewRef());
+    shaderProgramPre->setUniform (projectionPre,          canvas->getProjectionRef());
 }
 
 void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutline)
@@ -198,7 +198,7 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glDisable(GL_DEPTH_TEST);
-
+	
     if(!isOutline)
     {
         shaderProgramFill->bind();
@@ -245,7 +245,7 @@ bool ColorDistanceDepthShader3D::shouldRender(const bool isOutline, const size_t
 float ColorDistanceDepthShader3D::setHeightMultiplier(const float multiplier)	{ return m_heightMultiplier = multiplier ;}
 float ColorDistanceDepthShader3D::getHeightMultiplier() const					{ return m_heightMultiplier				 ;}
 
-vec3 ColorDistanceDepthShader3D::setLightPos(const vec3 & pos)	{ return m_lightPos = pos ;}
-vec3 ColorDistanceDepthShader3D::getLightPos() const			{ return m_lightPos		  ;}
+vec3 ColorDistanceDepthShader3D::setLightPos(const vec3 & pos)					{ return m_lightPos = pos ;}
+vec3 ColorDistanceDepthShader3D::getLightPos() const							{ return m_lightPos		  ;}
 
-size_t ColorDistanceDepthShader3D::getNumRenderingStages() const { return 2 ;}
+size_t ColorDistanceDepthShader3D::getNumRenderingStages() const				{ return 2 ;}

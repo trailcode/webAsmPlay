@@ -26,20 +26,26 @@
 
 #version 430 core
 
-layout(location = 0) in vec3 vertIn;
+in  vec4 glPos;
+//layout (location = 0) out vec4 outColor;
+layout (location = 1) out vec4 normalDepth;
 
-uniform mat4   model;
-uniform mat4   view;
-uniform mat4   projection;
-uniform float  heightMultiplier;
-
-out vec4 glPos;
+// Input from vertex shader
+in VS_OUT
+{
+	vec3 N;
+	vec3 L;
+	vec3 V;
+} fs_in;
 
 void main()
 {
-	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
+	//outColor = vec4(1,1,1,1);
+	//outColor = vec4(glPos.w, glPos.w, glPos.w, 1);
+	//normalDepth = vec4(glPos.w, glPos.w, glPos.w, 1);
 
-	gl_Position = projection * view * model * vert;
+	//vec3 N = normalize(fs_in.N);
+	vec3 N = fs_in.N;
 
-	glPos = gl_Position;
+	normalDepth = vec4(N, fs_in.V.z);
 }

@@ -24,64 +24,45 @@
 \copyright 2019
 */
 
-#version 430 core
+#version 410 core
 
-layout(location = 0) in vec3  vertIn;
-layout(location = 1) in float vertColorIn;
-layout(location = 2) in vec3  normalIn;
+// Output
+layout (location = 0) out vec4 color;
+layout (location = 1) out vec4 normal_depth;
 
-uniform mat4      model;
-uniform mat4      view;
-uniform mat4      projection;
-uniform vec3	  lightPos;
-uniform float     colorLookupOffset;
-uniform float     heightMultiplier;
-uniform float     width;
-uniform float     height;
-uniform sampler2D colorLookupTexture;
-
-out vec4 vertexColorNear;
-out vec4 vertexColorFar;
-out vec4 position_in_view_space;
-out vec3 normal;
-out vec3 fragPos;
-out vec4 glPos;
-
-// Inputs from vertex shader
-out VS_OUT
+// Input from vertex shader
+in VS_OUT
 {
 	vec3 N;
 	vec3 L;
 	vec3 V;
-} vs_out;
+} fs_in;
 
-void main()
+// Material properties
+uniform vec3 diffuse_albedo = vec3(0.8, 0.8, 0.9);
+uniform vec3 specular_albedo = vec3(0.01);
+uniform float specular_power = 128.0;
+uniform float shading_level = 1.0;
+
+void main(void)
 {
-	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
+	// Normalize the incoming N, L and V vectors
+	vec3 N = normalize(fs_in.N);
+	vec3 L = normalize(fs_in.L);
+	vec3 V = normalize(fs_in.V);
 
-	fragPos = vec3(model * vert);
+	// Calculate R locally
+	vec3 R = reflect(-L, N);
 
-	mat4 MV = view * model;
+	// Compute the diffuse and specular components for each fragment
+	vec3 diffuse = max(dot(N, L), 0.0) * diffuse_albedo;
 
-	// Calculate view-space coordinate
-	position_in_view_space = MV * vert; 
+	diffuse *= diffuse;
 
-	gl_Position = projection * MV * vert;
+	vec3 specular = pow(max(dot(R, V), 0.0), specular_power) * specular_albedo;
 
-	glPos = gl_Position; // TODO just use gl_Position?
-
-	vertexColorNear = texture(colorLookupTexture, vec2(vertColorIn +        colorLookupOffset  / 32.0, 0.5));
-	vertexColorFar  = texture(colorLookupTexture, vec2(vertColorIn + (2.0 + colorLookupOffset) / 32.0, 0.5));
-
-	normal = mat3(transpose(inverse(model))) * normalIn;
-
-	// Calculate normal in view-space
-	//vs_out.N = mat3(MV) * normalIn;
-	vs_out.N = normalIn;
-
-	// Calculate light vector
-	vs_out.L = lightPos - position_in_view_space.xyz;
-
-	// Calculate view vector
-	vs_out.V = -position_in_view_space.xyz;
+	// Write final color to the framebuffer
+	color = mix(vec4(0.0), vec4(diffuse + specular, 1.0), shading_level);
+	//color = vec4(0.5, 0.5, 0, 1);
+	normal_depth = vec4(N, fs_in.V.z);
 }

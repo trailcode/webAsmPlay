@@ -24,12 +24,6 @@
   \copyright 2018
 */
 
-#ifdef WIN32
-#define Polygon Polygon_Custom // Prevent Polygon ambiguity
-#include <windows.h>
-#undef Polygon
-#endif
-
 #include <chrono>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
@@ -131,19 +125,8 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
                 tessellations.pop_back();
             }
         }
-        else if((multiPoly = dynamic_cast<const MultiPolygon *>(geom)))
-        {
-            dmess("Have a multiPoly!");
-
-            //tesselateMultiPolygon(multiPoly, trans, tessellations);
-            abort();
-        }
-        else
-        {
-            dmess("Warning not a polygon or multi-polygon.");
-            
-            abort();
-        }
+        else if((multiPoly = dynamic_cast<const MultiPolygon *>(geom))) { dmessError("Have a multiPoly!")						;}
+        else															{ dmessError("Warning not a polygon or multi-polygon.") ;}
     }
 
     Renderable * ret = new RenderablePolygon(VertexArrayObject::create(tessellations));
@@ -159,11 +142,11 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
 
     m_vertexArrayObject->bindTriangles();
 
-    glEnable(GL_BLEND); // TODO move into shader
+    //glEnable(GL_BLEND); // TODO move into shader
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glDisable(GL_DEPTH_TEST);
+    //glDisable(GL_DEPTH_TEST);
 
     if(getRenderFill() && m_shader->shouldRender(false, renderStage))
     {
@@ -182,7 +165,4 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
     }
 }
 
-void RenderablePolygon::ensureVAO()
-{
-	m_vertexArrayObject->ensureVAO();
-}
+void RenderablePolygon::ensureVAO() { m_vertexArrayObject->ensureVAO() ;}

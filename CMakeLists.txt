@@ -64,6 +64,7 @@ else()
     set(CURL_LIBRARY_DEBUG ${CURL_LIBRARY})
 endif()
 
+
 #set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD 14)
 
@@ -433,7 +434,7 @@ else()
 
 	add_library(libWebAsmPlay STATIC ${sources})
 	
-	add_executable(webAsmPlay "src/Main.cpp")
+	add_executable(webAsmPlay "src/Main.cpp" "readme.md")
 	target_link_libraries(webAsmPlay libWebAsmPlay)
 
 	add_executable(geoServer ${geoServer_SRC})
