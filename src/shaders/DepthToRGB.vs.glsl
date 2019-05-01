@@ -24,19 +24,14 @@
 \copyright 2019
 */
 
-#version 430 core
-
-out vec4 outColor;
-
-uniform sampler2D tex;
+#version 330 core
 
 void main()
 {
-	vec2 P = gl_FragCoord.xy / textureSize(tex, 0);
-	
-	vec4 frag = textureLod(tex, P, 0);
-	
-	outColor = (frag + vec4(1,1,1,1)) * 0.5;
+	const vec4 vertices[] = vec4[]( vec4(-1.0, -1.0, 0.5, 1.0),
+									vec4( 1.0, -1.0, 0.5, 1.0),
+									vec4(-1.0,  1.0, 0.5, 1.0),
+									vec4( 1.0,  1.0, 0.5, 1.0) );
 
-	outColor.a = 1.0;
+	gl_Position = vertices[gl_VertexID];
 }

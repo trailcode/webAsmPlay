@@ -18,27 +18,27 @@ if(MSVC_VERSION)
 	  message(FATAL "Cannot find nuget command line tool.\nInstall it with e.g. choco install nuget.commandline")
 	else()
 
-	execute_process(COMMAND ${NUGET} install vii.SDL2_image				-Version 2.0.3		-o thirdParty)
-	execute_process(COMMAND ${NUGET} install boost_filesystem-vc141		-Version 1.69.0.0	-o thirdParty)
-	execute_process(COMMAND ${NUGET} install boost_random-vc141			-Version 1.69.0.0	-o thirdParty)
-	execute_process(COMMAND ${NUGET} install boost_date_time-vc141		-Version 1.69.0.0	-o thirdParty)
-	execute_process(COMMAND ${NUGET} install boost_regex-vc141			-Version 1.69.0.0	-o thirdParty)
-	execute_process(COMMAND ${NUGET} install boost_system-vc141			-Version 1.69.0.0	-o thirdParty)
-	execute_process(COMMAND ${NUGET} install curl-vc141-dynamic-x86_64	-Version 7.59.0		-o thirdParty)
-	execute_process(COMMAND ${NUGET} install glfw						-Version 3.2.1.5	-o thirdParty)
-	execute_process(COMMAND ${NUGET} install unofficial-flayan-glew		-Version 2.1.0		-o thirdParty)
-	execute_process(COMMAND ${NUGET} install tbb_oss					-Version 9.107.0	-o thirdParty)
-	execute_process(COMMAND ${NUGET} install expat.v140					-Version 2.2.6		-o thirdParty)
+		execute_process(COMMAND ${NUGET} install vii.SDL2_image				-Version 2.0.3		-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_filesystem-vc141		-Version 1.69.0.0	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_random-vc141			-Version 1.69.0.0	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_date_time-vc141		-Version 1.69.0.0	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_regex-vc141			-Version 1.69.0.0	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_system-vc141			-Version 1.69.0.0	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install curl-vc141-dynamic-x86_64	-Version 7.59.0		-o thirdParty)
+		execute_process(COMMAND ${NUGET} install glfw						-Version 3.2.1.5	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install unofficial-flayan-glew		-Version 2.1.0		-o thirdParty)
+		execute_process(COMMAND ${NUGET} install tbb_oss					-Version 9.107.0	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install expat.v140					-Version 2.2.6		-o thirdParty)
 	
-	file(GLOB boost_files	${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc141.1.69.0.0/lib/native/*
-							${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc141.1.69.0.0/lib/native/*
-							${webAsmPlay_BINARY_DIR}/thirdParty/boost_random-vc141.1.69.0.0/lib/native/*
-							${webAsmPlay_BINARY_DIR}/thirdParty/boost_date_time-vc141.1.69.0.0/lib/native/*
-							${webAsmPlay_BINARY_DIR}/thirdParty/boost_regex-vc141.1.69.0.0/lib/native/*)
+		file(GLOB boost_files	${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc141.1.69.0.0/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc141.1.69.0.0/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_random-vc141.1.69.0.0/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_date_time-vc141.1.69.0.0/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_regex-vc141.1.69.0.0/lib/native/*)
 
-	foreach(file ${boost_files})
-		execute_process(COMMAND cmake -E copy ${file} ${webAsmPlay_BINARY_DIR}/thirdParty/boost.1.69.0.0/lib/)
-	endforeach(file)
+		foreach(file ${boost_files})
+			execute_process(COMMAND cmake -E copy ${file} ${webAsmPlay_BINARY_DIR}/thirdParty/boost.1.69.0.0/lib/)
+		endforeach(file)
 	endif()
 
 	set(TBB_LIB_PATH_SUFFIX /lib/x64/Debug /lib/x64/Release)
@@ -61,9 +61,8 @@ if(MSVC_VERSION)
 
 else()
     set(CURL_LIBRARY_RELEASE ${CURL_LIBRARY})
-    set(CURL_LIBRARY_DEBUG ${CURL_LIBRARY})
+    set(CURL_LIBRARY_DEBUG   ${CURL_LIBRARY})
 endif()
-
 
 #set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD 14)

@@ -37,6 +37,7 @@
 #include <webAsmPlay/shaders/TextureLookupShader.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/NormalToRGB_Shader.h>
+#include <webAsmPlay/shaders/DepthToRGB_Shader.h>
 #include <webAsmPlay/shaders/TileBoundaryShader.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/Shader.h>
@@ -78,6 +79,7 @@ void Shader::ensureShaders()
 	TextureLookupShader::ensureShader();
 	TextureShader::ensureShader();
 	NormalToRGB_Shader::ensureShader();
+	DepthToRGB_Shader::ensureShader();
 	TileBoundaryShader::ensureShader();
 
 	for (const auto& i : s_shadersToRegister)

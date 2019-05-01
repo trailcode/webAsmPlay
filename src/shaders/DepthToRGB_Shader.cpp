@@ -21,22 +21,43 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2019
+\copyright 2018
 */
 
-#version 430 core
+#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/shaders/DepthToRGB_Shader.h>
 
-out vec4 outColor;
+//REGISTER_SHADER(TextureShader)
 
-uniform sampler2D tex;
-
-void main()
+namespace
 {
-	vec2 P = gl_FragCoord.xy / textureSize(tex, 0);
-	
-	vec4 frag = textureLod(tex, P, 0);
-	
-	outColor = (frag + vec4(1,1,1,1)) * 0.5;
+	ShaderProgram  * shaderProgram   = NULL;
 
-	outColor.a = 1.0;
+	GLint vertInAttrLoc;
+	
+	GLint MVP_Loc;
+	GLint texLoc;
+}
+
+void DepthToRGB_Shader::ensureShader()
+{
+	if(shaderProgram) { return ;}
+
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"DepthToRGB.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"DepthToRGB.fs.glsl"	}}),
+											Variables(),
+											Variables({	{"tex",					texLoc					}}));
+}
+
+void DepthToRGB_Shader::bind(const GLuint textureID)
+{
+	shaderProgram->bind();
+
+	glActiveTexture(GL_TEXTURE0);
+
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	shaderProgram->setUniformi(texLoc, 0);
 }

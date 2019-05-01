@@ -33,10 +33,8 @@ uniform sampler2D tex;
 void main()
 {
 	vec2 P = gl_FragCoord.xy / textureSize(tex, 0);
-	
-	vec4 frag = textureLod(tex, P, 0);
-	
-	outColor = (frag + vec4(1,1,1,1)) * 0.5;
 
-	outColor.a = 1.0;
+	vec4 frag = textureLod(tex, P, 0);
+
+	outColor = vec4(frag.w, frag.w, frag.w, 1.0);
 }

@@ -21,22 +21,26 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2019
+\copyright 2018
 */
+#pragma once
 
-#version 430 core
+#include <webAsmPlay/OpenGL_Util.h>
 
-out vec4 outColor;
-
-uniform sampler2D tex;
-
-void main()
+class DepthToRGB_Shader
 {
-	vec2 P = gl_FragCoord.xy / textureSize(tex, 0);
-	
-	vec4 frag = textureLod(tex, P, 0);
-	
-	outColor = (frag + vec4(1,1,1,1)) * 0.5;
+public:
 
-	outColor.a = 1.0;
-}
+	static void ensureShader();
+
+	static void bind(const GLuint textureID);
+
+private:
+
+	DepthToRGB_Shader() {}
+	~DepthToRGB_Shader() {}
+
+	// TODO add delete keywords
+
+	GLuint m_textureID = 0;
+};
