@@ -130,6 +130,8 @@ RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderab
 
 void RenderableMesh::render(Canvas * canvas, const size_t renderStage)
 {
+	glEnable(GL_DEPTH_TEST);
+
     m_vertexArrayObject->bind(m_shader);
     m_vertexArrayObject->bindTriangles();
 

@@ -57,7 +57,16 @@ using namespace geos::geom;
 namespace
 {
     std::vector<Canvas *> instances;
+
+	struct uniforms_block
+	{
+		mat4     mv_matrix;
+		mat4     view_matrix;
+		mat4     proj_matrix;
+	};
 }
+
+GLuint          uniforms_buffer = 0;
 
 Canvas::Canvas( const bool   useFrameBuffer,
                 const vec4 & clearColor) :  m_useFrameBuffer		(useFrameBuffer),
@@ -66,6 +75,10 @@ Canvas::Canvas( const bool   useFrameBuffer,
 											m_frustum				(new Frustum())
 {
     instances.push_back(this);
+
+	glGenBuffers(1, &uniforms_buffer);
+	glBindBuffer(GL_UNIFORM_BUFFER,  uniforms_buffer);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms_block), NULL, GL_DYNAMIC_DRAW);
 }
 
 Canvas::~Canvas()
@@ -96,7 +109,7 @@ ivec2 Canvas::setFrameBufferSize(const ivec2 & fbSize, const ivec2 & upperLeft)
 													TexParam(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)})});
 
 		m_gBuffer		 = new FrameBuffer(	fbSize,
-											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGB32F,
+											{FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
 												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
 													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)}),
 											 FB_Component(GL_COLOR_ATTACHMENT1, GL_RGBA32F,
@@ -139,10 +152,24 @@ void Canvas::updateMVP()
 {
     m_currMVP.m_view        = m_trackBallInteractor->getCamera()->getMatrix();
     m_currMVP.m_projection  = perspective(m_perspectiveFOV, double(m_size.x) / double(m_size.y), 0.0001, 30.0);
+	//m_currMVP.m_projection  = perspective(m_perspectiveFOV, double(m_size.x) / double(m_size.y), 0.1, 1000.0);
 	m_currMVP.m_MV			= m_currMVP.m_view			* m_currMVP.m_model;
     m_currMVP.m_MVP			= m_currMVP.m_projection	* m_currMVP.m_MV;
 
 	m_frustum->set(m_currMVP.m_MVP);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+
+	uniforms_block * block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER,
+																0,
+																sizeof(uniforms_block),
+																GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+	block->mv_matrix	= m_currMVP.m_MV;
+	block->view_matrix	= m_currMVP.m_view;
+	block->proj_matrix	= m_currMVP.m_projection;
+
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
 }
 
 bool Canvas::preRender()
@@ -219,8 +246,16 @@ GLuint Canvas::render()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	static const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	static const GLfloat one = 1.0f;
+
+	glClearBufferfv(GL_COLOR, 0, black);
+	glClearBufferfv(GL_COLOR, 1, black);
+	glClearBufferfv(GL_DEPTH, 0, &one);
+
 	ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
 	ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
+	ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
 
     //if(m_auxFrameBuffer)
     {
@@ -239,7 +274,7 @@ GLuint Canvas::render()
     for(const auto r : m_rasters) { r->render(this, 0) ;}
 
     // TODO try to refactor this. Who owns the symbology?
-    ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
+    //ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
 
     //for(const auto r : m_polygons)            { r->render(this, 0) ;}
 

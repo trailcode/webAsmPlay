@@ -91,7 +91,7 @@ SsaoShader::SsaoShader() : Shader("SsaoShader")
 
 		} while (length(point_data.point[i]) > 1.0f);
 
-		normalize(point_data.point[i]);
+		point_data.point[i] = normalize(point_data.point[i]);
 	}
 
 	for (size_t i = 0; i < 256; i++)

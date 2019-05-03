@@ -34,6 +34,13 @@ uniform mat4   view;
 uniform mat4   projection;
 uniform float  heightMultiplier;
 
+layout (std140, binding = 0) uniform constants
+{
+	mat4 mv_matrix;
+	mat4 view_matrix;
+	mat4 proj_matrix;
+};
+
 out vec4 glPos;
 
 // Inputs from vertex shader
@@ -52,7 +59,8 @@ void main()
 
 	gl_Position = projection * view * model * vert;
 
-	vs_out.N = normalIn;
+	//vs_out.N = normalIn;
+	vs_out.N = mat3(mv_matrix) * normalIn;
 	vs_out.V = -position_in_view_space.xyz;
 
 	glPos = gl_Position;

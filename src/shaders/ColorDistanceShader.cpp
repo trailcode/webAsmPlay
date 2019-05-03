@@ -59,6 +59,7 @@ void ColorDistanceShader::ensureShader()
 {
 	if(shaderProgram) { return ;}
 
+	/*
 	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader_fill.vs.glsl"	},
 														{GL_FRAGMENT_SHADER,	"ColorDistanceShader_fill.fs.glsl"	}}),
 											Variables({	{"vertIn",				vertInAttrLoc						},
@@ -68,6 +69,18 @@ void ColorDistanceShader::ensureShader()
 														{"tex",					texUniformLoc						},
 														{"topDownTexture",		topDownTextureUniform				},
 														{"colorLookupOffset",	colorLookupOffsetLoc				}}));
+														//*/
+	//*
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader_pre.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"ColorDistanceShader_pre.fs.glsl"	}}),
+											Variables({	{"vertIn",				vertInAttrLoc						},
+														{"vertColorIn",			vertColorInAttrLoc					}}),
+											Variables({	{"MV",					MV_Loc								},
+														{"MVP",					MVP_Loc								},
+														{"tex",					texUniformLoc						},
+														{"topDownTexture",		topDownTextureUniform				},
+														{"colorLookupOffset",	colorLookupOffsetLoc				}}));
+														//*/
 
     defaultInstance = new ColorDistanceShader();
 }

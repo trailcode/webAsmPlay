@@ -62,6 +62,8 @@ void main()
 
 	outColor += texColor;
 
+	//outColor = vec4(0.5, 0.5, 0, 1);
+
 	vec3 N = normalize(fs_in.N);
 
 	normalDepth = vec4(N, fs_in.V.z);

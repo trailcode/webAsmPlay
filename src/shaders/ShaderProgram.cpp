@@ -79,7 +79,10 @@ namespace
 	}
 }
 
-ShaderProgram * ShaderProgram::create(const GLSL & programs, const Variables& attributes, const Variables& uniforms)
+ShaderProgram * ShaderProgram::create(	const GLSL		& programs,
+										const Variables	& attributes,
+										const Variables	& uniforms,
+										const Variables & uniformBlocks)
 {
 	GLint  success       = 0;
 	GLuint shaderProgram = glCreateProgram();
@@ -97,9 +100,10 @@ ShaderProgram * ShaderProgram::create(const GLSL & programs, const Variables& at
 	glLinkProgram(shaderProgram);
     glUseProgram (shaderProgram);
 
+	unordered_map<string, GLint> attributeMap;
 	unordered_map<string, GLint> uniformMap;
-    unordered_map<string, GLint> attributeMap;
-
+	unordered_map<string, GLint> uniformBlockMap;
+    
     for(const auto & variable : attributes)
     {
         variable.second = glGetAttribLocation(shaderProgram, variable.first.c_str());
@@ -128,16 +132,19 @@ ShaderProgram * ShaderProgram::create(const GLSL & programs, const Variables& at
         uniformMap[variable.first] = variable.second;
     }
 
-    return new ShaderProgram(shaderProgram,
-                             uniformMap,
-                             attributeMap);
+    return new ShaderProgram(	shaderProgram,
+								attributeMap,
+								uniformMap,
+								uniformBlockMap);
 }
 
 ShaderProgram::ShaderProgram(   const GLuint                         shaderProgram,
+								const unordered_map<string, GLint> & attributes,
                                 const unordered_map<string, GLint> & uniforms,
-                                const unordered_map<string, GLint> & attributes) :  m_shaderProgram (shaderProgram),
-                                                                                    m_uniforms      (uniforms),
-                                                                                    m_attributes    (attributes)
+								const unordered_map<string, GLint> & uniformBlocks) :	m_shaderProgram (shaderProgram),
+																						m_attributes    (attributes),
+																						m_uniforms      (uniforms),
+																						m_uniformBlocks	(uniformBlocks)
 {
 } 
 

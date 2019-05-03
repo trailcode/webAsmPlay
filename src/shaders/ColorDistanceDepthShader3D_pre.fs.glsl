@@ -44,8 +44,8 @@ void main()
 	//outColor = vec4(glPos.w, glPos.w, glPos.w, 1);
 	//normalDepth = vec4(glPos.w, glPos.w, glPos.w, 1);
 
-	//vec3 N = normalize(fs_in.N);
-	vec3 N = fs_in.N;
+	vec3 N = normalize(fs_in.N);
+	//vec3 N = fs_in.N;
 
 	normalDepth = vec4(N, fs_in.V.z);
 }

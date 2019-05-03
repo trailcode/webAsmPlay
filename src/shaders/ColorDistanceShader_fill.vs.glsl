@@ -30,6 +30,15 @@ uniform sampler2D tex;
 layout(location = 0) in vec2  vertIn;
 layout(location = 1) in float vertColorIn;
 
+/*
+layout (std140, binding = 0) uniform constants
+{
+	mat4 mv_matrix;
+	mat4 view_matrix;
+	mat4 proj_matrix;
+};
+*/
+
 uniform mat4 MVP;
 uniform mat4 MV;
 uniform float colorLookupOffset;

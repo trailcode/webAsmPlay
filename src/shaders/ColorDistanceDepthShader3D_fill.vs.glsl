@@ -83,5 +83,6 @@ void main()
 	vs_out.L = lightPos - position_in_view_space.xyz;
 
 	// Calculate view vector
-	vs_out.V = -position_in_view_space.xyz;
+	//vs_out.V = -position_in_view_space.xyz;
+	vs_out.V = position_in_view_space.xyz;
 }

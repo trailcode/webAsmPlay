@@ -148,6 +148,8 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
 
     //glDisable(GL_DEPTH_TEST);
 
+	glEnable(GL_DEPTH_TEST);
+
     if(getRenderFill() && m_shader->shouldRender(false, renderStage))
     {
         m_shader->bind(canvas, false, renderStage);

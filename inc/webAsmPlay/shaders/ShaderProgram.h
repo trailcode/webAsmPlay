@@ -38,9 +38,10 @@ class ShaderProgram
 {
 public:
 
-	static ShaderProgram * create(const GLSL		& programs,
-                                  const Variables	& attributes = Variables(),
-                                  const Variables	& uniforms   = Variables());
+	static ShaderProgram * create(	const GLSL		& programs,
+									const Variables	& attributes	= Variables(),
+									const Variables	& uniforms		= Variables(),
+									const Variables & uniformBlocks = Variables());
 
     void bind();
 
@@ -57,14 +58,16 @@ public:
 
 private:
 
-    ShaderProgram(const GLuint                                   shaderProgram,
-                  const std::unordered_map<std::string, GLint> & uniforms,
-                  const std::unordered_map<std::string, GLint> & attributes);
+    ShaderProgram(	const GLuint                                   shaderProgram,
+					const std::unordered_map<std::string, GLint> & attributes,
+					const std::unordered_map<std::string, GLint> & uniforms,
+					const std::unordered_map<std::string, GLint> & uniformBlocks);
 
     ~ShaderProgram();
 
     GLuint m_shaderProgram;
     
-    std::unordered_map<std::string, GLint> m_uniforms;
     std::unordered_map<std::string, GLint> m_attributes;
+	std::unordered_map<std::string, GLint> m_uniforms;
+	std::unordered_map<std::string, GLint> m_uniformBlocks;
 };

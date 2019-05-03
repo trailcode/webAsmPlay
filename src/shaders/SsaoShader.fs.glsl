@@ -37,9 +37,11 @@ uniform bool randomize_points = true;
 
 uniform float ssao_level = 0.7;
 uniform float object_level = 1.0;
-uniform float ssao_radius = 0.005 * 3500.0 / 1000.0;
+//uniform float ssao_radius = 0.005 * 3500.0 / 1000.0;
+//uniform float ssao_radius = 0.05;
+uniform float ssao_radius = 0.000001;
 uniform uint point_count = 64;
-uniform bool randomize_points = true;
+uniform bool randomize_points = false;
 
 // Samplers for pre-rendered color, normal and depth
 layout (binding = 0) uniform sampler2D sColor;
@@ -95,52 +97,73 @@ void main()
 	if (!randomize_points)
 		r = 0.5;
 
+	r = 0.005;
+	//r = 0;
+
 	// For each random point (or direction)...
 	for (i = 0; i < point_count; i++)
 	{
 		// Get direction
 		vec3 dir = points.pos[i].xyz;
 
+		//dir = vec3(1, 0, 0);
+
 		// Put it into the correct hemisphere
 		if (dot(N, dir) < 0.0)
 			dir = -dir;
 
-		// f is the distance we've stepped in this direction
+		// f is the distance we've stepped in this direction 
 		// z is the interpolated depth
 		float f = 0.0;
 		float z = my_depth;
 
 		// We're going to take 4 steps - we could make this
 		// configurable
-		total += 4.0;
+		//total += 4.0;
 
-		for (j = 0; j < 4; j++)
+		int numIter = 1;
+
+		total += numIter;
+
+		//for (j = 0; j < 4; j++)
+		for (j = 0; j < numIter; j++)
 		{
 			// Step in the right direction
 			f += r;
 			// Step _towards_ viewer reduces z
 			z -= dir.z * f;
+			//z -= 0.001;
 
 			// Read depth from current fragment
-			float their_depth =
-				textureLod(sNormalDepth,
-				(P + dir.xy * f * ssao_radius), 0).w;
+			//float their_depth = textureLod(sNormalDepth, (P + dir.xy * f * ssao_radius), 0).w;
+			float their_depth = textureLod(sNormalDepth, (P + dir.xy * f), 0).w;
+			//float their_depth = textureLod(sNormalDepth, (P + dir.xy * 0 * ssao_radius), 0).w;
+			//float their_depth = textureLod(sNormalDepth, P, 0).w;
 
 			// Calculate a weighting (d) for this fragment's
 			// contribution to occlusion
-			float d = abs(their_depth - my_depth);
-			d *= d;
+			float d = abs(their_depth - my_depth) * 1.0;
+			//d *= d;
 
 			// If we're obscured, accumulate occlusion
-			if ((z - their_depth) > 0.0)
+			//if ((z - their_depth) > 0.0)
+			if ((z - their_depth) > 0.0 && d > 0.001)
+			//if ((z - their_depth) > 0.01)
 			{
-				occ += 4.0 / (1.0 + d);
+				//occ += 4.0 / (1.0 + d);
+				//occ += 4.0;
+				//occ += d;
+				//occ += float(numIter);
+				occ += float(numIter) / (1.0 + d);
 			}
+			//occ += d;
+			//occ = my_depth;
 		}
 	}
 
 	// Calculate occlusion amount
 	float ao_amount = (1.0 - occ / total);
+	//float ao_amount = occ / total;
 	//float ao_amount = (occ / total);
 
 	// Get object color from color texture
@@ -149,5 +172,6 @@ void main()
 	// Mix in ambient color scaled by SSAO level
 	//color = object_level * object_color + mix(vec4(0.2), vec4(ao_amount), ssao_level);
 	//color = (object_level * object_color) * vec4(vec3(ao_amount), 1.0);
-	color = object_level * object_color;
+	//color = object_level * object_color;
+	color = vec4(vec3(ao_amount), 1.0);
 }
