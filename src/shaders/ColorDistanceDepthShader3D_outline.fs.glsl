@@ -33,27 +33,27 @@ in vec4 glPos;
 
 layout (location = 0) out vec4 outColor;
 
-uniform float     width;
-uniform float     height;
 uniform sampler2D depthTex;
 
 bool canDiscard()
 {
-	float posX = gl_FragCoord.x / width;
-	float posY = gl_FragCoord.y / height;
+	vec2 size = textureSize(depthTex, 0);
 
-	float deltaX = 1.0f / width;
-	float deltaY = 1.0f / height;
+	float posX = gl_FragCoord.x / size.x;
+	float posY = gl_FragCoord.y / size.y;
+
+	float deltaX = 1.0f / size.x;
+	float deltaY = 1.0f / size.y;
 
 	for(float x = -1.0f; x < 2.0f; x += 1.0f) 
 	for(float y = -1.0f; y < 2.0f; y += 1.0f)
 	{
-		vec4 t = texture(depthTex, vec2(posX + x * deltaX, posY + y * deltaY));
+		vec4 t = textureLod(depthTex, vec2(posX + x * deltaX, posY + y * deltaY), 0);
 
-		float v = abs(t.x - glPos.w);
+		float v = abs(t.w - glPos.w);
 
 		if(v <= 0.0001) { return false ;}
-		//if(v <= 0.001) { return false ;}
+		//if(v <= 0.1) { return false ;}
 	}
 
 	return true;

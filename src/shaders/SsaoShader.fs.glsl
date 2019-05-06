@@ -121,7 +121,7 @@ void main()
 		// configurable
 		//total += 4.0;
 
-		int numIter = 1;
+		int numIter = 2;
 
 		total += numIter;
 
@@ -162,7 +162,8 @@ void main()
 	}
 
 	// Calculate occlusion amount
-	float ao_amount = (1.0 - occ / total);
+	//float ao_amount = (1.0 - occ / total);
+	float ao_amount = min(1.0, (1.0 - occ / total));
 	//float ao_amount = occ / total;
 	//float ao_amount = (occ / total);
 
@@ -171,7 +172,8 @@ void main()
 
 	// Mix in ambient color scaled by SSAO level
 	//color = object_level * object_color + mix(vec4(0.2), vec4(ao_amount), ssao_level);
-	//color = (object_level * object_color) * vec4(vec3(ao_amount), 1.0);
+	//color = (object_level * object_color) * vec4(vec3(ao_amount * 0.5), 1.0);
+	color = (object_level * object_color) * vec4(vec3(ao_amount), 1.0);
 	//color = object_level * object_color;
-	color = vec4(vec3(ao_amount), 1.0);
+	//color = vec4(vec3(ao_amount), 1.0);
 }

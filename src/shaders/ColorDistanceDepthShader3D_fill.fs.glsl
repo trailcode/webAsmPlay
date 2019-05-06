@@ -34,8 +34,6 @@ in vec3 fragPos;
 in vec4 glPos;
 
 uniform vec3		lightPos;
-uniform float		width;
-uniform float		height;
 uniform sampler2D	topDownTexture;
 uniform sampler2D	depthTex;
 uniform mat4		MVP;
@@ -55,24 +53,25 @@ in VS_OUT
 
 void main()
 {
-	vec4 t = textureLod(depthTex, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height), 0);
+	vec2 size = textureSize(depthTex, 0);
 
-	float v = abs(t.x - glPos.w);
+	vec4 t = textureLod(depthTex, gl_FragCoord.xy / size, 0);
 
-	if(v > 0.0001)
-	{
-		discard;
-	}
+	float v = abs(t.w - glPos.w);
+
+	if(v > 0.0001) { discard ;}
 
 	float minDist = 0.0;
 	float maxDist = 5.0;
+
 	vec3 lightColor = vec3(1,1,1);
-	vec3 viewPos = vec3(0,0,0);
+	vec3 viewPos    = vec3(0,0,0);
 
 	// computes the distance between the fragment position 
 	// and the origin (4th coordinate should always be 1 
 	// for points). The origin in view space is actually 
 	// the camera position.
+
 	float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
 
 	dist = min(maxDist, dist) / maxDist;
@@ -82,17 +81,23 @@ void main()
 	vec3 lightDir = normalize(lightPos - fragPos);
 
 	float diff = max(dot(normal, lightDir), 0.0);
+
 	vec3 diffuse = diff * lightColor;
+
 	vec3 result = diffuse * vec3(objectColor);
+
+	/*
 	if(distance(result, vec3(0,0,0)) < 0.0001)
-		//if(distance(result, vec3(0,0,0)) > 0.0001)
+	//if(distance(result, vec3(0,0,0)) > 0.0001)
 	{
 		//discard;
 	}
+	*/
+
 	outColor = vec4(result, objectColor.w);
 
 	// From: https://www.khronos.org/opengl/wiki/Compute_eye_space_from_window_space
-	vec4 viewport = vec4(0,0,width,height);
+	vec4 viewport = vec4(0, 0, size.x, size.y);
 	vec4 ndcPos;
 	ndcPos.xy = ((2.0 * gl_FragCoord.xy) - (2.0 * viewport.xy)) / (viewport.zw) - 1;
 	ndcPos.z = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far) / (gl_DepthRange.far - gl_DepthRange.near);
@@ -113,10 +118,6 @@ void main()
 
 	p.xyz *= vec3(0.5);
 	
-	//vec3 N = normalize(fs_in.N);
-
-	//normalDepth = vec4(N, fs_in.V.z);
-
 	if(dot(normal, vec3(0,0,1)) > 0.001)
 	{
 		vec4 texColor = vec4(textureLod(topDownTexture, p.xy, 0).xyz, 0);

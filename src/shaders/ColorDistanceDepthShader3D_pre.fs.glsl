@@ -26,8 +26,6 @@
 
 #version 430 core
 
-in  vec4 glPos;
-//layout (location = 0) out vec4 outColor;
 layout (location = 1) out vec4 normalDepth;
 
 // Input from vertex shader
@@ -40,12 +38,7 @@ in VS_OUT
 
 void main()
 {
-	//outColor = vec4(1,1,1,1);
-	//outColor = vec4(glPos.w, glPos.w, glPos.w, 1);
-	//normalDepth = vec4(glPos.w, glPos.w, glPos.w, 1);
-
 	vec3 N = normalize(fs_in.N);
-	//vec3 N = fs_in.N;
 
 	normalDepth = vec4(N, fs_in.V.z);
 }

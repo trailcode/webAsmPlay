@@ -59,28 +59,15 @@ void ColorDistanceShader::ensureShader()
 {
 	if(shaderProgram) { return ;}
 
-	/*
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader_fill.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"ColorDistanceShader_fill.fs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttrLoc						},
-														{"vertColorIn",			vertColorInAttrLoc					}}),
-											Variables({	{"MV",					MV_Loc								},
-														{"MVP",					MVP_Loc								},
-														{"tex",					texUniformLoc						},
-														{"topDownTexture",		topDownTextureUniform				},
-														{"colorLookupOffset",	colorLookupOffsetLoc				}}));
-														//*/
-	//*
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader_pre.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"ColorDistanceShader_pre.fs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttrLoc						},
-														{"vertColorIn",			vertColorInAttrLoc					}}),
-											Variables({	{"MV",					MV_Loc								},
-														{"MVP",					MVP_Loc								},
-														{"tex",					texUniformLoc						},
-														{"topDownTexture",		topDownTextureUniform				},
-														{"colorLookupOffset",	colorLookupOffsetLoc				}}));
-														//*/
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"ColorDistanceShader.fs.glsl"	}}),
+											Variables({	{"vertIn",				vertInAttrLoc					},
+														{"vertColorIn",			vertColorInAttrLoc				}}),
+											Variables({	{"MV",					MV_Loc							},
+														{"MVP",					MVP_Loc							},
+														{"tex",					texUniformLoc					},
+														{"topDownTexture",		topDownTextureUniform			},
+														{"colorLookupOffset",	colorLookupOffsetLoc			}}));
 
     defaultInstance = new ColorDistanceShader();
 }
@@ -132,7 +119,4 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 
 size_t ColorDistanceShader::getNumRenderingStages() const { return 2 ;}
 
-bool ColorDistanceShader::shouldRender(const bool isOutline, const size_t renderingStage) const
-{
-	return true;
-}
+bool ColorDistanceShader::shouldRender(const bool isOutline, const size_t renderingStage) const { return true ;}

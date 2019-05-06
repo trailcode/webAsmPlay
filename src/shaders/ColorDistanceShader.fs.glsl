@@ -90,7 +90,7 @@ void main(void)
 
 	vec4 texColor = vec4(texture(topDownTexture, fragCoord2D.xy).xyz, 0);
 
-	//color += texColor;
+	color += texColor;
 
 	normal_depth = vec4(N, fs_in.V.z);
 }

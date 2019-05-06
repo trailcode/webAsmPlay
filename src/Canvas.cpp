@@ -242,6 +242,10 @@ GLuint Canvas::render()
 
 	m_gBuffer->bind();
 
+	vector<GLenum> m_drawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
+
+	glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
+
 	glClearColor(0,0,0,1);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -271,6 +275,12 @@ GLuint Canvas::render()
 
 	//if(m_skyBox) { m_skyBox->render(this) ;}
 
+	{
+		vector<GLenum> m_drawBuffers({ GL_COLOR_ATTACHMENT0 });
+
+		glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
+	}
+
     for(const auto r : m_rasters) { r->render(this, 0) ;}
 
     // TODO try to refactor this. Who owns the symbology?
@@ -278,18 +288,18 @@ GLuint Canvas::render()
 
     //for(const auto r : m_polygons)            { r->render(this, 0) ;}
 
-    ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultLinear"));
+    //ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultLinear"));
 
     for(const auto r : m_lineStrings)         { r->render(this, 0) ;}
     for(const auto r : m_points)              { r->render(this, 0) ;}
     for(const auto r : m_deferredRenderables) { r->render(this, 0) ;} 
     
-	/*
-	ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
-    ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
-	*/
+	//*
+	//ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
+    //ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
+	//*/
 
-    //for(const auto r : m_meshes)              { r->render(this, 0) ;}
+    for(const auto r : m_meshes)              { r->render(this, 0) ;}
 
 	//*
 	m_gBuffer->unbind();
