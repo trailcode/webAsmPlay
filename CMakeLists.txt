@@ -11,6 +11,7 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 
 set(EXPAT_INSTALL "/usr/local/Cellar/expat/2.2.6") # OSX
 
+
 if(MSVC_VERSION)
 
 	find_program(NUGET nuget)

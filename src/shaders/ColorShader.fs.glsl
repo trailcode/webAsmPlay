@@ -25,11 +25,12 @@
 */
 
 #version 430 core
+
 layout (location = 0) out vec4 outColor;
+
 in vec4 vertexColor;
 
 void main()
 {
 	outColor = vertexColor;
-	//outColor = vec4(1,1,1,1);
 }

@@ -29,8 +29,15 @@
 layout(location = 0) in vec3  vertIn;
 layout(location = 1) in float vertColorIn;
 
-uniform mat4      MVP;
-uniform mat4      MV;
+layout(std140, binding = 0) uniform constants
+{
+	mat4 model;
+	mat4 view;
+	mat4 proj;
+	mat4 modelView;
+	mat4 modelViewProj;
+};
+
 uniform float     colorLookupOffset;
 uniform float     heightMultiplier;
 uniform sampler2D tex;
@@ -44,9 +51,9 @@ void main()
 {
 	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
 
-	position_in_view_space = MV * vert;
+	position_in_view_space = modelView * vert;
 
-	gl_Position = MVP * vert;
+	gl_Position = modelViewProj * vert;
 
 	glPos = gl_Position;
 

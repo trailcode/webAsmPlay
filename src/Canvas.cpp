@@ -60,9 +60,11 @@ namespace
 
 	struct uniforms_block
 	{
-		mat4     mv_matrix;
-		mat4     view_matrix;
-		mat4     proj_matrix;
+		mat4 model;
+		mat4 view;
+		mat4 proj;
+		mat4 modelView;
+		mat4 modelViewProj;
 	};
 }
 
@@ -165,9 +167,11 @@ void Canvas::updateMVP()
 																sizeof(uniforms_block),
 																GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-	block->mv_matrix	= m_currMVP.m_MV;
-	block->view_matrix	= m_currMVP.m_view;
-	block->proj_matrix	= m_currMVP.m_projection;
+	block->model			= m_currMVP.m_model;
+	block->view				= m_currMVP.m_view;
+	block->proj				= m_currMVP.m_projection;
+	block->modelView		= m_currMVP.m_MV;
+	block->modelViewProj	= m_currMVP.m_MVP;
 
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 }
@@ -246,9 +250,9 @@ GLuint Canvas::render()
 
 	glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
 
-	glClearColor(0,0,0,1);
+	//glClearColor(0,0,0,1);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	static const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	static const GLfloat one = 1.0f;
@@ -257,23 +261,13 @@ GLuint Canvas::render()
 	glClearBufferfv(GL_COLOR, 1, black);
 	glClearBufferfv(GL_DEPTH, 0, &one);
 
-	ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
-	ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
-	ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
+	ColorDistanceShader3D		::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh")); // TODO Only need to do once?
+	ColorDistanceDepthShader3D	::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
+	ColorDistanceShader			::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
 
-    //if(m_auxFrameBuffer)
-    {
-        //m_auxFrameBuffer->bind();
-
-		for(const auto r : m_polygons) { r->render(this, 1) ;}
-        for(const auto r : m_meshes)   { r->render(this, 1) ;}
-
-        //glFlush();
-
-        //m_auxFrameBuffer->unbind();
-    }
-
-	//if(m_skyBox) { m_skyBox->render(this) ;}
+	for(const auto r : m_rasters)	{ r->render(this, 0) ;}
+	for(const auto r : m_polygons)	{ r->render(this, 1) ;}
+    for(const auto r : m_meshes)	{ r->render(this, 1) ;}
 
 	{
 		vector<GLenum> m_drawBuffers({ GL_COLOR_ATTACHMENT0 });
@@ -281,27 +275,11 @@ GLuint Canvas::render()
 		glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
 	}
 
-    for(const auto r : m_rasters) { r->render(this, 0) ;}
-
-    // TODO try to refactor this. Who owns the symbology?
-    //ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
-
-    //for(const auto r : m_polygons)            { r->render(this, 0) ;}
-
-    //ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultLinear"));
-
     for(const auto r : m_lineStrings)         { r->render(this, 0) ;}
     for(const auto r : m_points)              { r->render(this, 0) ;}
     for(const auto r : m_deferredRenderables) { r->render(this, 0) ;} 
-    
-	//*
-	//ColorDistanceShader3D     ::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
-    //ColorDistanceDepthShader3D::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
-	//*/
-
     for(const auto r : m_meshes)              { r->render(this, 0) ;}
-
-	//*
+	
 	m_gBuffer->unbind();
 	
 	if(m_skyBox) { m_skyBox->render(this) ;}
@@ -315,7 +293,6 @@ GLuint Canvas::render()
 	
 	glBindVertexArray(quad_vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	//*/
 
     return postRender();
 }

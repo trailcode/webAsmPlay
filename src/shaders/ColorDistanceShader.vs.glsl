@@ -31,18 +31,17 @@ uniform sampler2D tex;
 layout (location = 0) in vec4 position;
 layout(location = 1) in float vertColorIn;
 
+layout(std140, binding = 0) uniform constants
+{
+	mat4 model;
+	mat4 view;
+	mat4 proj;
+	mat4 modelView;
+	mat4 modelViewProj;
+};
 
-
-uniform mat4 MV;
 uniform float colorLookupOffset;
 //uniform mat4 proj_matrix;
-
-layout (std140, binding = 0) uniform constants
-{
-	mat4 mv_matrix;
-	mat4 view_matrix;
-	mat4 proj_matrix;
-};
 
 // Inputs from vertex shader
 out VS_OUT
@@ -65,18 +64,18 @@ void main(void)
 	vec4 vert = vec4(position.xy, 0, 1);
 
 	// Calculate view-space coordinate
-	position_in_view_space = mv_matrix * vert;
+	position_in_view_space = modelView * vert;
 
 	vertexColorNear = texture(tex, vec2(vertColorIn +		 colorLookupOffset  / 32.0, 0.5));
 	vertexColorFar = texture(tex,  vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
 
 	// Calculate view-space coordinate
-	vec4 P = mv_matrix * vert;
+	vec4 P = modelView * vert;
 
 	// Calculate normal in view-space
 	//vs_out.N = mat3(mv_matrix) * normal;
 	//vs_out.N = vec3(0, 0, 1);
-	vs_out.N = mat3(mv_matrix) * vec3(0, 0, 1);
+	vs_out.N = mat3(modelView) * vec3(0, 0, 1);
 
 	// Calculate light vector
 	vs_out.L = light_pos - P.xyz;
@@ -85,9 +84,9 @@ void main(void)
 	vs_out.V = -P.xyz;
 	
 	// Calculate the clip-space position of each vertex
-	gl_Position = proj_matrix * P;
+	gl_Position = proj * P;
 
-	fragCoord2D  = proj_matrix * mv_matrix * vec4(position.xy, 0, 1);
+	fragCoord2D  = proj * modelView * vec4(position.xy, 0, 1);
 
 	// Vertex in NDC-space
 	fragCoord2D.xyz /= fragCoord2D.w;       // Rescale: [-1,1]^3

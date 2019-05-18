@@ -36,9 +36,17 @@ in vec4 glPos;
 uniform vec3		lightPos;
 uniform sampler2D	topDownTexture;
 uniform sampler2D	depthTex;
-uniform mat4		MVP;
 uniform mat4		invPersMatrix;
 uniform mat4		invViewMatrix;
+
+layout(std140, binding = 0) uniform constants
+{
+	mat4 model;
+	mat4 view;
+	mat4 proj;
+	mat4 modelView;
+	mat4 modelViewProj;
+};
 
 layout (location = 0) out vec4 outColor;
 //layout (location = 1) out vec4 normalDepth;
@@ -108,7 +116,7 @@ void main()
 
 	worldPos.z = 0;
 
-	vec4 p = MVP * worldPos;
+	vec4 p = modelViewProj * worldPos;
 	p.xyz /= p.w;       // Rescale: [-1,1]^3
 	p.w    = 1.0 / p.w; // Invert W
 													

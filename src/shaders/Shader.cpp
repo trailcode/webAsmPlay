@@ -34,7 +34,6 @@
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/shaders/SkyBoxShader.h>
 #include <webAsmPlay/shaders/SsaoShader.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/NormalToRGB_Shader.h>
 #include <webAsmPlay/shaders/DepthToRGB_Shader.h>
@@ -76,7 +75,6 @@ void Shader::ensureShaders()
 	ColorVertexShader::ensureShader();
 	SkyBoxShader::ensureShader();
 	SsaoShader::ensureShader();
-	TextureLookupShader::ensureShader();
 	TextureShader::ensureShader();
 	NormalToRGB_Shader::ensureShader();
 	DepthToRGB_Shader::ensureShader();

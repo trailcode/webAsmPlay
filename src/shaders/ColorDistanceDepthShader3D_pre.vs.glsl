@@ -29,16 +29,15 @@
 layout(location = 0) in vec3 vertIn;
 layout(location = 2) in vec3 normalIn;
 
-uniform mat4   model;
-uniform mat4   view;
-uniform mat4   projection;
 uniform float  heightMultiplier;
 
-layout (std140, binding = 0) uniform constants
+layout(std140, binding = 0) uniform constants
 {
-	mat4 mv_matrix;
-	mat4 view_matrix;
-	mat4 proj_matrix;
+	mat4 model;
+	mat4 view;
+	mat4 proj;
+	mat4 modelView;
+	mat4 modelViewProj;
 };
 
 out vec4 glPos;
@@ -57,10 +56,10 @@ void main()
 
 	vec4 position_in_view_space = view * model * vert;
 
-	gl_Position = projection * view * model * vert;
+	gl_Position = proj * view * model * vert;
 
 	//vs_out.N = normalIn;
-	vs_out.N = mat3(mv_matrix) * normalIn;
+	vs_out.N = mat3(modelView) * normalIn;
 	vs_out.V = -position_in_view_space.xyz;
 
 	glPos = gl_Position;

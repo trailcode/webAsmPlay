@@ -30,9 +30,6 @@ layout(location = 0) in vec3  vertIn;
 layout(location = 1) in float vertColorIn;
 layout(location = 2) in vec3  normalIn;
 
-uniform mat4      model;
-uniform mat4      view;
-uniform mat4      projection;
 uniform vec3	  lightPos;
 uniform float     colorLookupOffset;
 uniform float     heightMultiplier;
@@ -40,12 +37,22 @@ uniform float     width;
 uniform float     height;
 uniform sampler2D colorLookupTexture;
 
+layout(std140, binding = 0) uniform constants
+{
+	mat4 model;
+	mat4 view;
+	mat4 proj;
+	mat4 modelView;
+	mat4 modelViewProj;
+};
+
 out vec4 vertexColorNear;
 out vec4 vertexColorFar;
 out vec4 position_in_view_space;
 out vec3 normal;
 out vec3 fragPos;
 out vec4 glPos;
+
 
 // Inputs from vertex shader
 out VS_OUT
@@ -55,18 +62,18 @@ out VS_OUT
 	vec3 V;
 } vs_out;
 
+
 void main()
 {
 	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
 
 	fragPos = vec3(model * vert);
 
-	mat4 MV = view * model;
-
 	// Calculate view-space coordinate
-	position_in_view_space = MV * vert; 
+	position_in_view_space = modelView * vert; 
 
-	gl_Position = projection * MV * vert;
+	//gl_Position = projection * MV * vert;
+	gl_Position = modelViewProj * vert;
 
 	glPos = gl_Position; // TODO just use gl_Position?
 

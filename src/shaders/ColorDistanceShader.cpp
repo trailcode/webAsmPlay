@@ -87,7 +87,7 @@ void ColorDistanceShader::bind(Canvas     * canvas,
                                const bool   isOutline,
                                const size_t renderingStage)
 {
-	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
     glActiveTexture(GL_TEXTURE0);

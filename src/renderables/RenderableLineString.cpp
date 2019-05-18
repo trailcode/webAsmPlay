@@ -239,7 +239,6 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage)
 
     glBindVertexArray(                    m_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-    glDisable(GL_DEPTH_TEST);
 
 	glLineWidth(GUI::s_lineWidthRender);
 
