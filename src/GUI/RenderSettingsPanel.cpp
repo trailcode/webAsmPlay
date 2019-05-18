@@ -111,7 +111,7 @@ void GUI::renderSettingsPanel()
 
         ImGui::Combo("Linestring", &lineStringShader, shaders, IM_ARRAYSIZE(shaders)); 
         
-        static int meshShader = 2;
+        static int meshShader = 1;
 
         if(ImGui::Combo("Mesh", &meshShader, shaders, IM_ARRAYSIZE(shaders)))
         {

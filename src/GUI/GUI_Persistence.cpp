@@ -164,7 +164,8 @@ void GUI::saveState()
     root[L"renderSettingsRenderLinearFeatures"]   = new JSONValue(s_renderSettingsRenderLinearFeatures);
     root[L"renderSettingsRenderSkyBox"]           = new JSONValue(s_renderSettingsRenderSkyBox);
     root[L"renderSettingsRenderBingMaps"]         = new JSONValue(s_renderSettingsRenderBingMaps);
-    
+	root[L"buildingHeightMultiplier"]             = new JSONValue(ColorDistanceDepthShader3D::getDefaultInstance()->getHeightMultiplier());
+
     root[L"cameraEye"]                            = new JSONValue(s_canvas->getCamera()->getEyeConstRef());
     root[L"cameraCenter"]                         = new JSONValue(s_canvas->getCamera()->getCenterConstRef());
     root[L"cameraUp"]                             = new JSONValue(s_canvas->getCamera()->getUpConstRef());
