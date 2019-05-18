@@ -29,13 +29,20 @@
 layout(location = 0) in vec3 vertIn;
 layout(location = 3) in vec2 vertUV_In;
 
-out vec2 UV;
+layout(std140, binding = 0) uniform constants
+{
+	mat4 model;
+	mat4 view;
+	mat4 proj;
+	mat4 modelView;
+	mat4 modelViewProj;
+};
 
-uniform mat4 MVP;
+out vec2 UV;
 
 void main()
 {
-	gl_Position = MVP * vec4(vertIn.xyz, 1);
+	gl_Position = modelViewProj * vec4(vertIn.xyz, 1);
 
 	UV = vertUV_In;
 }

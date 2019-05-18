@@ -39,7 +39,6 @@ namespace
 	GLint vertUV_InAttrLoc;
 
 	GLint MVP_Loc;
-	//GLint texLoc;
 	GLint texID_Loc;
 }
 

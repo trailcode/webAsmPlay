@@ -47,7 +47,6 @@
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
 #include <webAsmPlay/shaders/ColorShader.h>
-#include <webAsmPlay/shaders/TextureLookupShader.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/Frustum.h>
@@ -187,7 +186,7 @@ namespace
 		return TileBuffer(ret, size);
 	}
 
-	const bool useBindlessTextures = false;
+	const bool useBindlessTextures = true;
 
 	void fetchTile(const int ID, RasterTile * tile)
 	{

@@ -30,13 +30,6 @@ layout(location = 0) in vec3  vertIn;
 layout(location = 1) in float vertColorIn;
 layout(location = 2) in vec3  normalIn;
 
-uniform vec3	  lightPos;
-uniform float     colorLookupOffset;
-uniform float     heightMultiplier;
-uniform float     width;
-uniform float     height;
-uniform sampler2D colorLookupTexture;
-
 layout(std140, binding = 0) uniform constants
 {
 	mat4 model;
@@ -45,6 +38,13 @@ layout(std140, binding = 0) uniform constants
 	mat4 modelView;
 	mat4 modelViewProj;
 };
+
+uniform vec3	  lightPos;
+uniform float     colorLookupOffset;
+uniform float     heightMultiplier;
+uniform float     width;
+uniform float     height;
+uniform sampler2D colorLookupTexture;
 
 out vec4 vertexColorNear;
 out vec4 vertexColorFar;

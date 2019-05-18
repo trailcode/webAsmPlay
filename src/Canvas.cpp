@@ -40,7 +40,6 @@
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/SsaoShader.h>
 #include <webAsmPlay/Canvas.h>
@@ -191,7 +190,6 @@ bool Canvas::preRender()
 
     updateMVP();
 
-    ColorDistanceShader3D     ::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
     ColorDistanceDepthShader3D::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
 
     if(false && m_useFrameBuffer)
@@ -261,7 +259,6 @@ GLuint Canvas::render()
 	glClearBufferfv(GL_COLOR, 1, black);
 	glClearBufferfv(GL_DEPTH, 0, &one);
 
-	ColorDistanceShader3D		::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh")); // TODO Only need to do once?
 	ColorDistanceDepthShader3D	::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
 	ColorDistanceShader			::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
 

@@ -28,7 +28,6 @@
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/renderables/Renderable.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
@@ -93,11 +92,10 @@ void GUI::renderSettingsPanel()
 
         //ImGui::Spacing();
 
-        float heightMultiplier = ColorDistanceShader3D::getDefaultInstance()->getHeightMultiplier();
+        float heightMultiplier = ColorDistanceDepthShader3D::getDefaultInstance()->getHeightMultiplier();
 
         if(ImGui::SliderFloat("", &heightMultiplier, 0.0f, 1.0f, "Height mult: %.3f"))
         {
-            ColorDistanceShader3D     ::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
             ColorDistanceDepthShader3D::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
         }
 
@@ -107,7 +105,7 @@ void GUI::renderSettingsPanel()
 
         //ImGui::Text("Linestring Shader");
 
-        const char * shaders[] = { "ColorDistanceShader", "ColorDistanceShader3D", "ColorDistanceDepthShader3D", "ColorShader", "ColorVertexShader" };
+        const char * shaders[] = { "ColorDistanceShader", "ColorDistanceDepthShader3D", "ColorShader", "ColorVertexShader" };
 
         static int lineStringShader = 0;
 
@@ -120,7 +118,6 @@ void GUI::renderSettingsPanel()
             dmess("meshShader " << meshShader);
 
             vector<Shader *> shaderMap({ColorDistanceShader       ::getDefaultInstance(),
-                                        ColorDistanceShader3D     ::getDefaultInstance(),
                                         ColorDistanceDepthShader3D::getDefaultInstance(),
                                         ColorShader               ::getDefaultInstance(),
                                         ColorVertexShader         ::getDefaultInstance()

@@ -27,7 +27,6 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
-#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorShader.h>
@@ -68,7 +67,6 @@ RegisterShader::RegisterShader(const function<void()> & registerFunction)
 void Shader::ensureShaders()
 {
 	BindlessTextureShader::ensureShader();
-	ColorDistanceShader3D::ensureShader();
 	ColorDistanceDepthShader3D::ensureShader();
 	ColorDistanceShader::ensureShader();
 	ColorShader::ensureShader();

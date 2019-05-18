@@ -36,7 +36,6 @@
 #include <webAsmPlay/Camera.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
-#include <webAsmPlay/shaders/ColorDistanceShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -134,7 +133,6 @@ void GUI::loadState()
 
     if(root.find(L"buildingHeightMultiplier") != root.end())
     {
-        ColorDistanceShader3D     ::getDefaultInstance()->setHeightMultiplier(root[L"buildingHeightMultiplier"]->AsNumber());
         ColorDistanceDepthShader3D::getDefaultInstance()->setHeightMultiplier(root[L"buildingHeightMultiplier"]->AsNumber());
     }
 }
@@ -166,8 +164,7 @@ void GUI::saveState()
     root[L"renderSettingsRenderLinearFeatures"]   = new JSONValue(s_renderSettingsRenderLinearFeatures);
     root[L"renderSettingsRenderSkyBox"]           = new JSONValue(s_renderSettingsRenderSkyBox);
     root[L"renderSettingsRenderBingMaps"]         = new JSONValue(s_renderSettingsRenderBingMaps);
-    root[L"buildingHeightMultiplier"]             = new JSONValue(ColorDistanceShader3D::getDefaultInstance()->getHeightMultiplier());
-
+    
     root[L"cameraEye"]                            = new JSONValue(s_canvas->getCamera()->getEyeConstRef());
     root[L"cameraCenter"]                         = new JSONValue(s_canvas->getCamera()->getCenterConstRef());
     root[L"cameraUp"]                             = new JSONValue(s_canvas->getCamera()->getUpConstRef());
