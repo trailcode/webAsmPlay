@@ -45,8 +45,13 @@ public:
 	GLuint setColorTextureID		(const GLuint textureID);
 	GLuint setNormalDepthTextureID	(const GLuint textureID);
 
+	float setSSAO_Radius(const float radius);
+	float getSSAO_Radius() const;
+
 private:
 
 	GLuint m_colorTextureID			= 0;
 	GLuint m_normalDepthTextureID	= 0;
+
+	float m_SSAO_Radius = 0.005;
 };

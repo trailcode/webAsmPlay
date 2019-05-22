@@ -39,7 +39,7 @@ uniform float ssao_level = 0.7;
 uniform float object_level = 1.0;
 //uniform float ssao_radius = 0.005 * 3500.0 / 1000.0;
 //uniform float ssao_radius = 0.05;
-uniform float ssao_radius = 0.000001;
+uniform float ssaoRadius = 0.000001;
 uniform uint point_count = 64;
 uniform bool randomize_points = false;
 
@@ -97,7 +97,7 @@ void main()
 	if (!randomize_points)
 		r = 0.5;
 
-	r = 0.005;
+	r = ssaoRadius;
 	//r = 0;
 
 	// For each random point (or direction)...

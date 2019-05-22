@@ -383,10 +383,10 @@ else()
 
 		if(MSVC_VERSION)
 
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			MAIN_DEPENDENCY "${shaderFilePath}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	MAIN_DEPENDENCY "${shaderFilePath}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		MAIN_DEPENDENCY "${shaderFilePath}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"				MAIN_DEPENDENCY "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			MAIN_DEPENDENCY "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	MAIN_DEPENDENCY "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		MAIN_DEPENDENCY "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"				MAIN_DEPENDENCY "${shaderFilePath}")
 
 			list(APPEND shaderFileDestRelease			"${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}")
 			list(APPEND shaderFileDestRelWithDebInfo	"${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}")
@@ -395,7 +395,7 @@ else()
 
 		else()
 
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" DEPENDS "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" DEPENDS "${shaderFilePath}")
 
 			list(APPEND shaderFileDest "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}")
 

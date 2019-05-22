@@ -38,6 +38,8 @@ namespace
 
 	GLuint points_buffer;
 
+	GLint ssaoRadius;
+
 	struct SAMPLE_POINTS
 	{
 		vec4 point[256];
@@ -68,10 +70,10 @@ void SsaoShader::ensureShader()
 {
 	if(shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({	{GL_VERTEX_SHADER,		"SsaoShader.vs.glsl"	},
-													{GL_FRAGMENT_SHADER,	"SsaoShader.fs.glsl"	}}),
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"SsaoShader.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"SsaoShader.fs.glsl"	}}),
 											Variables({}),
-											Variables({}));
+											Variables({	{"ssaoRadius",			ssaoRadius				}}));
 
 	defaultInstance = new SsaoShader();
 }
@@ -115,11 +117,22 @@ SsaoShader::~SsaoShader()
 GLuint SsaoShader::setColorTextureID		(const GLuint textureID) { return m_colorTextureID			= textureID ;}
 GLuint SsaoShader::setNormalDepthTextureID	(const GLuint textureID) { return m_normalDepthTextureID	= textureID ;}
 
+float SsaoShader::setSSAO_Radius(const float radius)
+{
+	//shaderProgram->setUniformf(ssaoRadius, radius);
+
+	return m_SSAO_Radius = radius;
+}
+
+float SsaoShader::getSSAO_Radius() const { return m_SSAO_Radius; }
+
 void SsaoShader::bind(	Canvas		* canvas,
 						const bool    isOutline,
 						const size_t  renderingStage)
 {
 	shaderProgram->bind();
+
+	shaderProgram->setUniformf(ssaoRadius, m_SSAO_Radius);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, points_buffer);
 

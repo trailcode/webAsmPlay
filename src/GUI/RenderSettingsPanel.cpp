@@ -31,6 +31,7 @@
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
+#include <webAsmPlay/shaders/SsaoShader.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -140,6 +141,17 @@ void GUI::renderSettingsPanel()
 				s_canvas->setPerspectiveFOV(perspectiveFOV);
 			}
 		}
+
+		if (ImGui::CollapsingHeader("SSAO", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			float ssaoRadius = SsaoShader::getDefaultInstance()->getSSAO_Radius() * 4000.0;
+
+			if (ImGui::SliderFloat("SSAO Radius", &ssaoRadius, 0.0f, 50.0f, "SSAO Radius: %.3f"))
+			{
+				SsaoShader::getDefaultInstance()->setSSAO_Radius(ssaoRadius / 4000.0);
+			}
+		}
+
         //ImGui::SameLine(); ShowHelpMarker("Refer to the \"Combo\" section below for an explanation of the full BeginCombo/EndCombo API, and demonstration of various flags.\n");
 
     ImGui::End();
