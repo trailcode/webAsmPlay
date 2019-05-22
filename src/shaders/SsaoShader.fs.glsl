@@ -38,7 +38,8 @@ uniform bool randomize_points = true;
 uniform float ssao_level = 0.7;
 uniform float object_level = 1.0;
 uniform float ssaoRadius = 0.000001;
-//uniform float ssaoMix
+//uniform float ssaoMix = 0.5;
+uniform float mixPercent;
 //uniform uint pointCount = 64;
 uniform float minDepth;
 uniform int pointCount = 64;
@@ -177,5 +178,6 @@ void main()
 	//color = (object_level * object_color) * vec4(vec3(ao_amount * 0.5), 1.0);
 	//color = (object_level * object_color) * vec4(vec3(ao_amount), 1.0);
 	//color = object_level * object_color;
-	color = vec4(vec3(ao_amount), 1.0);
+	//color = vec4(vec3(ao_amount), 1.0);
+	color = vec4(vec3(ao_amount), 1.0) * mix(vec4(1.0), object_color, mixPercent);
 }

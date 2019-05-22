@@ -54,6 +54,9 @@ public:
 	float setMinDepth(const float minDepth);
 	float getMinDepth() const;
 
+	float setMixPercent(const float percent);
+	float getMixPercent() const;
+
 private:
 
 	GLuint m_colorTextureID			= 0;
@@ -64,5 +67,7 @@ private:
 	GLuint m_numPoints = 64;
 
 	float m_minDepth = 0.001;
+
+	float m_mixPercent = 1.0;
 	
 };

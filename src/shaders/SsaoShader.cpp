@@ -24,6 +24,7 @@
 \copyright 2019
 */
 
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/SsaoShader.h>
 
@@ -41,6 +42,7 @@ namespace
 	GLint ssaoRadius;
 	GLint pointCount;
 	GLint minDepth;
+	GLint mixPercent;
 
 	struct SAMPLE_POINTS
 	{
@@ -77,7 +79,8 @@ void SsaoShader::ensureShader()
 											Variables({}),
 											Variables({	{"ssaoRadius",			ssaoRadius				},
 														{"pointCount",			pointCount				},
-														{"minDepth",			minDepth				}}));
+														{"minDepth",			minDepth				},
+														{"mixPercent",			mixPercent				}}));
 
 	defaultInstance = new SsaoShader();
 }
@@ -130,11 +133,14 @@ float SsaoShader::setSSAO_Radius(const float radius)
 
 float SsaoShader::getSSAO_Radius() const { return m_SSAO_Radius; }
 
-GLuint SsaoShader::setNumPoints(const GLuint num)	{ return m_numPoints = num; }
-GLuint SsaoShader::getNumPoints() const				{ return m_numPoints; }
+GLuint SsaoShader::setNumPoints(const GLuint num)		{ return m_numPoints = num; }
+GLuint SsaoShader::getNumPoints() const					{ return m_numPoints; }
 
-float SsaoShader::setMinDepth(const float minDepth) { return m_minDepth = minDepth; }
-float SsaoShader::getMinDepth() const				{ return m_minDepth; }
+float SsaoShader::setMinDepth(const float minDepth)		{ return m_minDepth = minDepth; }
+float SsaoShader::getMinDepth() const					{ return m_minDepth; }
+
+float SsaoShader::setMixPercent(const float percent)	{ return m_mixPercent = percent; }
+float SsaoShader::getMixPercent() const					{ return m_mixPercent; }
 
 void SsaoShader::bind(	Canvas		* canvas,
 						const bool    isOutline,
@@ -145,6 +151,7 @@ void SsaoShader::bind(	Canvas		* canvas,
 	shaderProgram->setUniformf(ssaoRadius,	m_SSAO_Radius);
 	shaderProgram->setUniformi(pointCount,	m_numPoints);
 	shaderProgram->setUniformf(minDepth,	m_minDepth);
+	shaderProgram->setUniformf(mixPercent,	m_mixPercent);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, points_buffer);
 
