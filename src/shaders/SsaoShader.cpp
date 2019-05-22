@@ -39,6 +39,7 @@ namespace
 	GLuint points_buffer;
 
 	GLint ssaoRadius;
+	GLint pointCount;
 
 	struct SAMPLE_POINTS
 	{
@@ -73,7 +74,8 @@ void SsaoShader::ensureShader()
 	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"SsaoShader.vs.glsl"	},
 														{GL_FRAGMENT_SHADER,	"SsaoShader.fs.glsl"	}}),
 											Variables({}),
-											Variables({	{"ssaoRadius",			ssaoRadius				}}));
+											Variables({	{"ssaoRadius",			ssaoRadius				},
+														{"pointCount",			pointCount				}}));
 
 	defaultInstance = new SsaoShader();
 }
@@ -126,6 +128,9 @@ float SsaoShader::setSSAO_Radius(const float radius)
 
 float SsaoShader::getSSAO_Radius() const { return m_SSAO_Radius; }
 
+GLuint SsaoShader::setNumPoints(const GLuint num)	{ return m_numPoints = num; }
+GLuint SsaoShader::getNumPoints() const				{ return m_numPoints; }
+
 void SsaoShader::bind(	Canvas		* canvas,
 						const bool    isOutline,
 						const size_t  renderingStage)
@@ -133,6 +138,10 @@ void SsaoShader::bind(	Canvas		* canvas,
 	shaderProgram->bind();
 
 	shaderProgram->setUniformf(ssaoRadius, m_SSAO_Radius);
+
+	const GLint num = m_numPoints;
+
+	shaderProgram->setUniformi(pointCount, num);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, points_buffer);
 

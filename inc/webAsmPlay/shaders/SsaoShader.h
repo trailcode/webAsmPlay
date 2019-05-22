@@ -48,10 +48,16 @@ public:
 	float setSSAO_Radius(const float radius);
 	float getSSAO_Radius() const;
 
+	GLuint setNumPoints(const GLuint num);
+	GLuint getNumPoints() const;
+
 private:
 
 	GLuint m_colorTextureID			= 0;
 	GLuint m_normalDepthTextureID	= 0;
 
 	float m_SSAO_Radius = 0.005;
+
+	GLuint m_numPoints = 64;
+	
 };

@@ -31,16 +31,15 @@
 uniform float ssao_level = 0.5;
 uniform float object_level = 0;
 uniform float ssao_radius = 0.005 * 3500.0 / 1000.0;
-uniform uint point_count = 64;
+uniform uint pointCount = 64;
 uniform bool randomize_points = true;
 */
 
 uniform float ssao_level = 0.7;
 uniform float object_level = 1.0;
-//uniform float ssao_radius = 0.005 * 3500.0 / 1000.0;
-//uniform float ssao_radius = 0.05;
 uniform float ssaoRadius = 0.000001;
-uniform uint point_count = 64;
+//uniform uint pointCount = 64;
+uniform int pointCount = 64;
 uniform bool randomize_points = false;
 
 // Samplers for pre-rendered color, normal and depth
@@ -101,7 +100,7 @@ void main()
 	//r = 0;
 
 	// For each random point (or direction)...
-	for (i = 0; i < point_count; i++)
+	for (i = 0; i < pointCount; i++)
 	{
 		// Get direction
 		vec3 dir = points.pos[i].xyz;

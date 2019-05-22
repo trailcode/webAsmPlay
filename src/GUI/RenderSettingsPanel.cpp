@@ -145,10 +145,16 @@ void GUI::renderSettingsPanel()
 		if (ImGui::CollapsingHeader("SSAO", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			float ssaoRadius = SsaoShader::getDefaultInstance()->getSSAO_Radius() * 4000.0;
+			int   numPoints  = SsaoShader::getDefaultInstance()->getNumPoints();
 
 			if (ImGui::SliderFloat("SSAO Radius", &ssaoRadius, 0.0f, 50.0f, "SSAO Radius: %.3f"))
 			{
 				SsaoShader::getDefaultInstance()->setSSAO_Radius(ssaoRadius / 4000.0);
+			}
+
+			if (ImGui::SliderInt("Num Points:", &numPoints, 1, 256))
+			{
+				SsaoShader::getDefaultInstance()->setNumPoints(numPoints);
 			}
 		}
 
