@@ -146,6 +146,7 @@ void GUI::renderSettingsPanel()
 		{
 			float ssaoRadius = SsaoShader::getDefaultInstance()->getSSAO_Radius() * 4000.0;
 			int   numPoints  = SsaoShader::getDefaultInstance()->getNumPoints();
+			float minDepth   = SsaoShader::getDefaultInstance()->getMinDepth() * 1000.0;
 
 			if (ImGui::SliderFloat("SSAO Radius", &ssaoRadius, 0.0f, 50.0f, "SSAO Radius: %.3f"))
 			{
@@ -155,6 +156,11 @@ void GUI::renderSettingsPanel()
 			if (ImGui::SliderInt("Num Points:", &numPoints, 1, 256))
 			{
 				SsaoShader::getDefaultInstance()->setNumPoints(numPoints);
+			}
+
+			if (ImGui::SliderFloat("Min Depth", &minDepth, 0.0f, 50.0f, "Min Depth: %.3f"))
+			{
+				SsaoShader::getDefaultInstance()->setMinDepth(minDepth / 1000.0);
 			}
 		}
 

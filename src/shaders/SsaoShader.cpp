@@ -40,6 +40,7 @@ namespace
 
 	GLint ssaoRadius;
 	GLint pointCount;
+	GLint minDepth;
 
 	struct SAMPLE_POINTS
 	{
@@ -75,7 +76,8 @@ void SsaoShader::ensureShader()
 														{GL_FRAGMENT_SHADER,	"SsaoShader.fs.glsl"	}}),
 											Variables({}),
 											Variables({	{"ssaoRadius",			ssaoRadius				},
-														{"pointCount",			pointCount				}}));
+														{"pointCount",			pointCount				},
+														{"minDepth",			minDepth				}}));
 
 	defaultInstance = new SsaoShader();
 }
@@ -131,17 +133,18 @@ float SsaoShader::getSSAO_Radius() const { return m_SSAO_Radius; }
 GLuint SsaoShader::setNumPoints(const GLuint num)	{ return m_numPoints = num; }
 GLuint SsaoShader::getNumPoints() const				{ return m_numPoints; }
 
+float SsaoShader::setMinDepth(const float minDepth) { return m_minDepth = minDepth; }
+float SsaoShader::getMinDepth() const				{ return m_minDepth; }
+
 void SsaoShader::bind(	Canvas		* canvas,
 						const bool    isOutline,
 						const size_t  renderingStage)
 {
 	shaderProgram->bind();
 
-	shaderProgram->setUniformf(ssaoRadius, m_SSAO_Radius);
-
-	const GLint num = m_numPoints;
-
-	shaderProgram->setUniformi(pointCount, num);
+	shaderProgram->setUniformf(ssaoRadius,	m_SSAO_Radius);
+	shaderProgram->setUniformi(pointCount,	m_numPoints);
+	shaderProgram->setUniformf(minDepth,	m_minDepth);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, points_buffer);
 

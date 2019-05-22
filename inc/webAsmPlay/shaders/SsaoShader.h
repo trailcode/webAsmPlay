@@ -51,6 +51,9 @@ public:
 	GLuint setNumPoints(const GLuint num);
 	GLuint getNumPoints() const;
 
+	float setMinDepth(const float minDepth);
+	float getMinDepth() const;
+
 private:
 
 	GLuint m_colorTextureID			= 0;
@@ -59,5 +62,7 @@ private:
 	float m_SSAO_Radius = 0.005;
 
 	GLuint m_numPoints = 64;
+
+	float m_minDepth = 0.001;
 	
 };
