@@ -398,10 +398,8 @@ void GUI::showMainMenuBar()
 		if (ImGui::MenuItem("Framebuffer Depth"))		{ s_showFrameBufferDepthDebugPanel		^= 1 ;}
 		if (ImGui::MenuItem("BingMaps Framebuffer"))	{ s_showBingMapsFrameBufferDebugPanel	^= 1 ;}
 		if (ImGui::MenuItem("Normal Framebuffer"))		{ s_showNormalFrameBufferDebugPanel		^= 1 ;}
-		if (ImGui::MenuItem("Full Screen"))
-		{
-			setFullScreen(!g_fullScreen);
-		}
+		if (ImGui::MenuItem("Animation"))				{ s_showAnimationPanel					^= 1 ;}
+		if (ImGui::MenuItem("Full Screen"))				{ setFullScreen(!g_fullScreen) ;}
 
         ImGui::EndMenu();
     }
@@ -552,6 +550,7 @@ void GUI::mainLoop(GLFWwindow * window)
 	frameBufferDepthDebugPanel();
 	bingMapsFrameBufferDebugPanel();
 	normalFrameBufferDebugPanel();
+	animationPanel();
 
     ImGui::End();
 

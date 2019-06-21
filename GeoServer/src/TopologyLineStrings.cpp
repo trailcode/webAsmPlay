@@ -27,6 +27,7 @@
 #include <memory>
 #include <list>
 #include <algorithm>
+#include <boost/geometry.hpp>
 #include <tbb/parallel_for.h>
 #include <tbb/concurrent_unordered_map.h>
 #include <geos/geom/GeometryCollection.h>
