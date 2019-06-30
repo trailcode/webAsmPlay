@@ -31,10 +31,10 @@
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Types.h>
 
-//class GLFWwindow;
 class Canvas;
 class GeosTestCanvas;
 class OpenSteerCanvas;
+class AnimationCanvas;
 class SkyBox;
 class GeoClient;
 
@@ -190,6 +190,7 @@ private:
 
     static GeosTestCanvas  * s_geosTestCanvas;
     static OpenSteerCanvas * s_openSteerCanvas;
+	static AnimationCanvas * s_animationCanvas;
     static Canvas          * s_canvas;
     static SkyBox          * s_skyBox;
     static GeoClient       * s_client;

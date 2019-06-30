@@ -229,7 +229,6 @@ namespace rsmz
 
     void TrackBallInteractor::dragZoom()
     {
-        cout << "dragZoom " << endl;
         glm::vec2 dir = m_ClickPoint - m_PrevClickPoint;
         float ax = fabs(dir.x);
         float ay = fabs(dir.y);

@@ -24,30 +24,31 @@
 \copyright 2019
 */
 
-#include <webAsmPlay/Util.h>
-#include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/AnimationCanvas.h>
-#include <webAsmPlay/GUI/GUI.h>
 
-void GUI::animationPanel()
+using namespace glm;
+
+AnimationCanvas::AnimationCanvas(const bool   useFrameBuffer,
+								 const vec4 & clearColor)
 {
-	if (!s_showAnimationPanel) { return; }
+}
 
-	ImGui::Begin("Animation", &s_showAnimationPanel);
-	{
-		const ImVec2 pos = ImGui::GetCursorScreenPos();
+AnimationCanvas::~AnimationCanvas()
+{
 
-		const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+}
 
-		s_animationCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
+GLuint AnimationCanvas::render()
+{
+	return 0;
+}
 
-		s_animationCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+ivec2 AnimationCanvas::setFrameBufferSize(const ivec2& fbSize, const ivec2& upperLeft)
+{
+	return fbSize;
+}
 
-		ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)s_animationCanvas->render(),
-												pos,
-												ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-												ImVec2(0, 1),
-												ImVec2(1, 0));
-	}
-	ImGui::End();
+void AnimationCanvas::onChar(GLFWwindow* window, const size_t c)
+{
+
 }

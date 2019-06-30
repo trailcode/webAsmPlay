@@ -38,7 +38,11 @@ public:
 
 	RasterTile(const glm::dvec2& center, const size_t level);
 
+	~RasterTile();
+
 	static RasterTile* getTile(const glm::dvec2& center, const size_t level);
+
+	static size_t pruneTiles();
 
 	RasterTile* getParentTile() const;
 
@@ -56,4 +60,6 @@ public:
 	GLuint64 m_handle = 0;
 
 	bool m_textureResident = false;
+
+	size_t m_lastRenderFrame = 0;
 };
