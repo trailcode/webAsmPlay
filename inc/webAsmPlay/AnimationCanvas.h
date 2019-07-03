@@ -23,51 +23,25 @@
 \email trailcode@gmail.com
 \copyright 2019
 */
+
 #pragma once
 
-#include <webAsmPlay/shaders/Shader.h>
+#include <webAsmPlay/Canvas.h>
 
-class SsaoShader : public Shader
+class AnimationCanvas : public Canvas
 {
 public:
-	
-	static SsaoShader * getDefaultInstance();
 
-	SsaoShader();
-	~SsaoShader();
+	AnimationCanvas(const bool        useFrameBuffer = true,
+					const glm::vec4 & clearColor     = glm::vec4(0.5, 0.5, 1, 1));
 
-	static void ensureShader();
+	~AnimationCanvas();
 
-	void bind(	Canvas     * canvas,
-				const bool   isOutline,
-				const size_t renderingStage) override;
+	GLuint render() override;
 
-	GLuint setColorTextureID		(const GLuint textureID);
-	GLuint setNormalDepthTextureID	(const GLuint textureID);
+	glm::ivec2 setFrameBufferSize(const glm::ivec2 & fbSize, const glm::ivec2 & upperLeft = glm::ivec2(0,0)) override;
 
-	float setSSAO_Radius(const float radius);
-	float getSSAO_Radius() const;
-
-	GLuint setNumPoints(const GLuint num);
-	GLuint getNumPoints() const;
-
-	float setMinDepth(const float minDepth);
-	float getMinDepth() const;
-
-	float setMixPercent(const float percent);
-	float getMixPercent() const;
+	void onChar(GLFWwindow * window, const size_t c) override;
 
 private:
-
-	GLuint m_colorTextureID			= 0;
-	GLuint m_normalDepthTextureID	= 0;
-
-	float m_SSAO_Radius = 0.005;
-
-	GLuint m_numPoints = 64;
-
-	float m_minDepth = 0.001;
-
-	float m_mixPercent = 1.0;
-	
 };

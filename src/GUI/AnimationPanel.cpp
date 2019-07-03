@@ -23,51 +23,31 @@
 \email trailcode@gmail.com
 \copyright 2019
 */
-#pragma once
 
-#include <webAsmPlay/shaders/Shader.h>
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/GUI/ImguiInclude.h>
+#include <webAsmPlay/AnimationCanvas.h>
+#include <webAsmPlay/GUI/GUI.h>
 
-class SsaoShader : public Shader
+void GUI::animationPanel()
 {
-public:
-	
-	static SsaoShader * getDefaultInstance();
+	if (!s_showAnimationPanel) { return; }
 
-	SsaoShader();
-	~SsaoShader();
+	ImGui::Begin("Animation", &s_showAnimationPanel);
+	{
+		const ImVec2 pos = ImGui::GetCursorScreenPos();
 
-	static void ensureShader();
+		const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-	void bind(	Canvas     * canvas,
-				const bool   isOutline,
-				const size_t renderingStage) override;
+		s_animationCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
 
-	GLuint setColorTextureID		(const GLuint textureID);
-	GLuint setNormalDepthTextureID	(const GLuint textureID);
+		s_animationCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
-	float setSSAO_Radius(const float radius);
-	float getSSAO_Radius() const;
-
-	GLuint setNumPoints(const GLuint num);
-	GLuint getNumPoints() const;
-
-	float setMinDepth(const float minDepth);
-	float getMinDepth() const;
-
-	float setMixPercent(const float percent);
-	float getMixPercent() const;
-
-private:
-
-	GLuint m_colorTextureID			= 0;
-	GLuint m_normalDepthTextureID	= 0;
-
-	float m_SSAO_Radius = 0.005;
-
-	GLuint m_numPoints = 64;
-
-	float m_minDepth = 0.001;
-
-	float m_mixPercent = 1.0;
-	
-};
+		ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)s_animationCanvas->render(),
+												pos,
+												ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+												ImVec2(0, 1),
+												ImVec2(1, 0));
+	}
+	ImGui::End();
+}

@@ -25,6 +25,7 @@
 */
 
 #include <unordered_map>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/RasterTile.h>
 
@@ -34,7 +35,7 @@ using namespace bingTileSystem;
 
 namespace
 {
-	unordered_map<string, RasterTile*> currTileSet;
+	unordered_map<string, RasterTile*> a_currTileSet;
 }
 
 RasterTile::RasterTile(const dvec2& center, const size_t level) : m_center(center), m_level(level)
@@ -42,18 +43,71 @@ RasterTile::RasterTile(const dvec2& center, const size_t level) : m_center(cente
 	
 }
 
+RasterTile::~RasterTile()
+{
+	const uint ID = m_textureID;
+
+	glDeleteTextures(1, &ID); // TODO create and array of them to delete!, You can push here, and delete later
+
+	const string quadKey = tileToQuadKey(latLongToTile(m_center, m_level), m_level);
+
+	a_currTileSet.erase(quadKey);
+}
+
 RasterTile* RasterTile::getTile(const dvec2& center, const size_t level)
 {
 	const string quadKey = tileToQuadKey(latLongToTile(center, level), level);
 
-	unordered_map<string, RasterTile*>::const_iterator i = currTileSet.find(quadKey);
+	unordered_map<string, RasterTile*>::const_iterator i = a_currTileSet.find(quadKey);
 
-	if (i != currTileSet.end()) { return i->second; }
+	if (i != a_currTileSet.end()) { return i->second; }
 
-	return currTileSet[quadKey] = new RasterTile(center, level);
+	return a_currTileSet[quadKey] = new RasterTile(center, level);
 }
 
 RasterTile* RasterTile::getParentTile() const
 {
 	return getTile(m_center, m_level - 1);
+}
+
+#include <algorithm>
+#include <sstream>
+
+size_t RasterTile::pruneTiles()
+{
+	//auto tiles = toVec(a_currTileSet);
+
+	vector<RasterTile*> tiles;
+
+	for (const auto i : a_currTileSet) { tiles.push_back(i.second); }
+
+	sort(tiles.begin(), tiles.end(), [](const RasterTile* A, RasterTile* B)
+	{
+		return A->m_lastRenderFrame < B->m_lastRenderFrame;
+	});
+
+	stringstream ss;
+
+	dmess("tiles " << tiles.size());
+
+	if (tiles.size() < 5500) { return 0; }
+
+	//for (size_t i = 0; i < std::min((int)10, (int)tiles.size()); ++i)
+	for (size_t i = 0; i < tiles.size(); ++i)
+	{
+		//dmess(tiles[i]->m_lastRenderFrame << " ");
+
+		if (tiles[i]->m_loading)
+		{
+			//dmess("Loading " << i << " " << tiles[i]->m_lastRenderFrame);
+
+			continue;
+		}
+
+		//dmess("delete " << i << " " << tiles[i]->m_lastRenderFrame);
+
+		delete tiles[i];
+	}
+
+	return 0;
 }

@@ -31,6 +31,7 @@
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
+#include <webAsmPlay/shaders/SsaoShader.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -140,6 +141,35 @@ void GUI::renderSettingsPanel()
 				s_canvas->setPerspectiveFOV(perspectiveFOV);
 			}
 		}
+
+		if (ImGui::CollapsingHeader("SSAO", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			float ssaoRadius = SsaoShader::getDefaultInstance()->getSSAO_Radius() * 4000.0;
+			int   numPoints  = SsaoShader::getDefaultInstance()->getNumPoints();
+			float minDepth   = SsaoShader::getDefaultInstance()->getMinDepth() * 1000.0;
+			float mixPercent = SsaoShader::getDefaultInstance()->getMixPercent() * 100.0;
+
+			if (ImGui::SliderFloat("SSAO Radius", &ssaoRadius, 0.0f, 50.0f, "SSAO Radius: %.3f"))
+			{
+				SsaoShader::getDefaultInstance()->setSSAO_Radius(ssaoRadius / 4000.0);
+			}
+
+			if (ImGui::SliderInt("Num Points:", &numPoints, 1, 256))
+			{
+				SsaoShader::getDefaultInstance()->setNumPoints(numPoints);
+			}
+
+			if (ImGui::SliderFloat("Min Depth", &minDepth, 0.0f, 50.0f, "Min Depth: %.3f"))
+			{
+				SsaoShader::getDefaultInstance()->setMinDepth(minDepth / 1000.0);
+			}
+
+			if (ImGui::SliderFloat("Mix Percent", &mixPercent, 0.0f, 100.0f, "Mix Percent: %.3f"))
+			{
+				SsaoShader::getDefaultInstance()->setMixPercent(mixPercent / 100.0);
+			}
+		}
+
         //ImGui::SameLine(); ShowHelpMarker("Refer to the \"Combo\" section below for an explanation of the full BeginCombo/EndCombo API, and demonstration of various flags.\n");
 
     ImGui::End();

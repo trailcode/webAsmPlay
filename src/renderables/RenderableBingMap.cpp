@@ -69,6 +69,7 @@ size_t RenderableBingMap::s_numRendered = 0;
 FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
 
 bool RenderableBingMap::s_useCache = true;
+const bool useBindlessTextures = false;
 
 namespace
 {
@@ -185,8 +186,6 @@ namespace
 
 		return TileBuffer(ret, size);
 	}
-
-	const bool useBindlessTextures = false;
 
 	void fetchTile(const int ID, RasterTile * tile)
 	{
@@ -421,6 +420,10 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 namespace
 {
+	vector<RasterTile*> a_lastTilesRendered;
+
+	size_t a_frameNumber = 0;
+
 	void renderBindlessTextures(Canvas* canvas, const vector<RasterTile*>& toRender)
 	{
 		if (!toRender.size()) { return; }
@@ -544,37 +547,39 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	vector<RasterTile*> toRender;
 
-	for (auto i : tiles)
+	for (auto tile : tiles)
 	{
-		if (i->m_textureID)
+		if (tile->m_textureID)
 		{
-			if(!i->m_renderable)
+			if(!tile->m_renderable)
 			{
-				const ivec2 iTile = latLongToTile(i->m_center, i->m_level);
+				const ivec2 iTile = latLongToTile(tile->m_center, tile->m_level);
 
-				const dvec2 tMin = tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), i->m_level);
-				const dvec2 tMax = tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), i->m_level);
+				const dvec2 tMin = tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), tile->m_level);
+				const dvec2 tMax = tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), tile->m_level);
 				
-				i->m_renderable = Renderable::create(makeBox(tMin, tMax), m_trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
+				tile->m_renderable = Renderable::create(makeBox(tMin, tMax), m_trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
 
-				i->m_renderable->ensureVAO();
+				tile->m_renderable->ensureVAO();
 
-				if(useBindlessTextures) { i->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
-				else					{ i->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
+				if(useBindlessTextures) { tile->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
+				else					{ tile->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
 
-				i->m_renderable->setRenderOutline (false);
-				i->m_renderable->setRenderFill    (true);
+				tile->m_renderable->setRenderOutline (false);
+				tile->m_renderable->setRenderFill    (true);
 			}
 
-			toRender.push_back(i);
+			tile->m_lastRenderFrame = a_frameNumber;
+
+			toRender.push_back(tile);
 
 			++numRendered;
 		}
-		else if (!i->m_loading)
+		else if (!tile->m_loading)
 		{
-			i->m_loading = true;
+			tile->m_loading = true;
 
-			loaderPool.push([i](int ID) { fetchTile(ID, i) ;});
+			loaderPool.push([tile](int ID) { fetchTile(ID, tile) ;});
 
 			++s_numLoading;
 		}
@@ -594,6 +599,10 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 	RenderableBingMap::s_numRendered = toRender.size();
 
 	s_textureBuffer->unbind();
+
+	RasterTile::pruneTiles();
+
+	++a_frameNumber;
 }
 
 FrameBuffer* RenderableBingMap::getFrameBuffer() { return s_textureBuffer ;}

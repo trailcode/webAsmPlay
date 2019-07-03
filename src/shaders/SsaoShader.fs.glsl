@@ -31,16 +31,18 @@
 uniform float ssao_level = 0.5;
 uniform float object_level = 0;
 uniform float ssao_radius = 0.005 * 3500.0 / 1000.0;
-uniform uint point_count = 64;
+uniform uint pointCount = 64;
 uniform bool randomize_points = true;
 */
 
 uniform float ssao_level = 0.7;
 uniform float object_level = 1.0;
-//uniform float ssao_radius = 0.005 * 3500.0 / 1000.0;
-//uniform float ssao_radius = 0.05;
-uniform float ssao_radius = 0.000001;
-uniform uint point_count = 64;
+uniform float ssaoRadius = 0.000001;
+//uniform float ssaoMix = 0.5;
+uniform float mixPercent;
+//uniform uint pointCount = 64;
+uniform float minDepth;
+uniform int pointCount = 64;
 uniform bool randomize_points = false;
 
 // Samplers for pre-rendered color, normal and depth
@@ -97,11 +99,11 @@ void main()
 	if (!randomize_points)
 		r = 0.5;
 
-	r = 0.005;
+	r = ssaoRadius;
 	//r = 0;
 
 	// For each random point (or direction)...
-	for (i = 0; i < point_count; i++)
+	for (i = 0; i < pointCount; i++)
 	{
 		// Get direction
 		vec3 dir = points.pos[i].xyz;
@@ -147,8 +149,9 @@ void main()
 
 			// If we're obscured, accumulate occlusion
 			//if ((z - their_depth) > 0.0)
-			if ((z - their_depth) > 0.0 && d > 0.001)
-			//if ((z - their_depth) > 0.01)
+			if ((z - their_depth) > 0.0 && d > minDepth)
+			//if ((z - their_depth) > 0.0 && d < minDepth) // Strange affect 
+			//if ((z - their_depth) > minDepth)
 			{
 				//occ += 4.0 / (1.0 + d);
 				//occ += 4.0;
@@ -173,7 +176,8 @@ void main()
 	// Mix in ambient color scaled by SSAO level
 	//color = object_level * object_color + mix(vec4(0.2), vec4(ao_amount), ssao_level);
 	//color = (object_level * object_color) * vec4(vec3(ao_amount * 0.5), 1.0);
-	color = (object_level * object_color) * vec4(vec3(ao_amount), 1.0);
+	//color = (object_level * object_color) * vec4(vec3(ao_amount), 1.0);
 	//color = object_level * object_color;
 	//color = vec4(vec3(ao_amount), 1.0);
+	color = vec4(vec3(ao_amount), 1.0) * mix(vec4(1.0), object_color, mixPercent);
 }

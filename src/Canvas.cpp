@@ -153,7 +153,6 @@ void Canvas::updateMVP()
 {
     m_currMVP.m_view        = m_trackBallInteractor->getCamera()->getMatrix();
     m_currMVP.m_projection  = perspective(m_perspectiveFOV, double(m_size.x) / double(m_size.y), 0.0001, 30.0);
-	//m_currMVP.m_projection  = perspective(m_perspectiveFOV, double(m_size.x) / double(m_size.y), 0.1, 1000.0);
 	m_currMVP.m_MV			= m_currMVP.m_view			* m_currMVP.m_model;
     m_currMVP.m_MVP			= m_currMVP.m_projection	* m_currMVP.m_MV;
 
@@ -192,7 +191,7 @@ bool Canvas::preRender()
 
     ColorDistanceDepthShader3D::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
 
-    if(false && m_useFrameBuffer)
+    if(m_useFrameBuffer)
     {
 		if (!m_frameBuffer)
 		{
@@ -214,22 +213,9 @@ bool Canvas::preRender()
         glViewport(0, 0, m_frameBufferSize.x, m_frameBufferSize.y);
     }
 
-	//m_gBuffer->bind();
+	glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w);
 
-    //if(m_skyBox) { m_skyBox->render(this) ;}
-
-    else
-    {
-       glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w);
-
-       glClear(GL_COLOR_BUFFER_BIT);
-    }
-
-	glClearColor(0,0,0,1);
-
-	glClear(GL_COLOR_BUFFER_BIT);
-
-    glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     return true;
 }
@@ -247,10 +233,6 @@ GLuint Canvas::render()
 	vector<GLenum> m_drawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
 
 	glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
-
-	//glClearColor(0,0,0,1);
-
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	static const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	static const GLfloat one = 1.0f;
@@ -313,7 +295,6 @@ dvec2 Canvas::renderCursor(const dvec2 & pos)
 	}
 
     pushModel(translate(dmat4(1.0), dvec3(pos, 0.0)));
-	//pushModel(translate(dmat4(1.0), dvec3(0,0, 0.0)));
 
     m_cursor->render(this, 0);
 

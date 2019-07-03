@@ -185,8 +185,8 @@ GLint ShaderProgram::getAttributeLoc(const string & name) const
     return i->second; 
 }
 
-void ShaderProgram::setUniform (const GLint location, const mat4   & value) const { glUniformMatrix4fv(location, 1, false, value_ptr(value)) ;}
-void ShaderProgram::setUniform (const GLint location, const vec4   & value) const { glUniform4fv      (location, 1,        value_ptr(value)) ;}
-void ShaderProgram::setUniform (const GLint location, const vec3   & value) const { glUniform3fv      (location, 1,        value_ptr(value)) ;}
-void ShaderProgram::setUniformf(const GLint location, const float  & value) const { glUniform1f       (location,                     value)  ;}
-void ShaderProgram::setUniformi(const GLint location, const GLuint & value) const { glUniform1i       (location,                     value)  ;}
+void ShaderProgram::setUniform  (const GLint location, const mat4   & value) const { glUniformMatrix4fv(location, 1, false, value_ptr(value)) ;}
+void ShaderProgram::setUniform  (const GLint location, const vec4   & value) const { glUniform4fv      (location, 1,        value_ptr(value)) ;}
+void ShaderProgram::setUniform  (const GLint location, const vec3   & value) const { glUniform3fv      (location, 1,        value_ptr(value)) ;}
+void ShaderProgram::setUniformf (const GLint location, const float  & value) const { glUniform1f       (location,                     value)  ;}
+void ShaderProgram::setUniformi (const GLint location, const GLint  & value) const { glUniform1i       (location,                     value)  ;}

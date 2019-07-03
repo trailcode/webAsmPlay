@@ -42,6 +42,7 @@
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/GeosTestCanvas.h>
 #include <webAsmPlay/OpenSteerCanvas.h>
+#include <webAsmPlay/AnimationCanvas.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/renderables/SkyBox.h>
@@ -78,6 +79,7 @@ using namespace glm;
 
 GeosTestCanvas  * GUI::s_geosTestCanvas		= NULL;
 OpenSteerCanvas * GUI::s_openSteerCanvas	= NULL;
+AnimationCanvas * GUI::s_animationCanvas	= NULL;
 Canvas          * GUI::s_canvas				= NULL;
 SkyBox          * GUI::s_skyBox				= NULL;
 GLFWwindow      * GUI::s_mainWindow			= NULL;
@@ -398,10 +400,8 @@ void GUI::showMainMenuBar()
 		if (ImGui::MenuItem("Framebuffer Depth"))		{ s_showFrameBufferDepthDebugPanel		^= 1 ;}
 		if (ImGui::MenuItem("BingMaps Framebuffer"))	{ s_showBingMapsFrameBufferDebugPanel	^= 1 ;}
 		if (ImGui::MenuItem("Normal Framebuffer"))		{ s_showNormalFrameBufferDebugPanel		^= 1 ;}
-		if (ImGui::MenuItem("Full Screen"))
-		{
-			setFullScreen(!g_fullScreen);
-		}
+		if (ImGui::MenuItem("Animation"))				{ s_showAnimationPanel					^= 1 ;}
+		if (ImGui::MenuItem("Full Screen"))				{ setFullScreen(!g_fullScreen) ;}
 
         ImGui::EndMenu();
     }
@@ -552,6 +552,7 @@ void GUI::mainLoop(GLFWwindow * window)
 	frameBufferDepthDebugPanel();
 	bingMapsFrameBufferDebugPanel();
 	normalFrameBufferDebugPanel();
+	animationPanel();
 
     ImGui::End();
 
@@ -624,7 +625,8 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     s_auxCanvases = vector<Canvas *>(
     {
         s_geosTestCanvas  = new GeosTestCanvas(),
-        s_openSteerCanvas = new OpenSteerCanvas()
+        s_openSteerCanvas = new OpenSteerCanvas(),
+		s_animationCanvas = new AnimationCanvas()
     });
 }
 

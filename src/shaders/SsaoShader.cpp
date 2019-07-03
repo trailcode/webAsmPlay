@@ -24,6 +24,7 @@
 \copyright 2019
 */
 
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/SsaoShader.h>
 
@@ -37,6 +38,11 @@ namespace
 	SsaoShader	  * defaultInstance = NULL;
 
 	GLuint points_buffer;
+
+	GLint ssaoRadius;
+	GLint pointCount;
+	GLint minDepth;
+	GLint mixPercent;
 
 	struct SAMPLE_POINTS
 	{
@@ -68,10 +74,13 @@ void SsaoShader::ensureShader()
 {
 	if(shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({	{GL_VERTEX_SHADER,		"SsaoShader.vs.glsl"	},
-													{GL_FRAGMENT_SHADER,	"SsaoShader.fs.glsl"	}}),
+	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"SsaoShader.vs.glsl"	},
+														{GL_FRAGMENT_SHADER,	"SsaoShader.fs.glsl"	}}),
 											Variables({}),
-											Variables({}));
+											Variables({	{"ssaoRadius",			ssaoRadius				},
+														{"pointCount",			pointCount				},
+														{"minDepth",			minDepth				},
+														{"mixPercent",			mixPercent				}}));
 
 	defaultInstance = new SsaoShader();
 }
@@ -115,11 +124,34 @@ SsaoShader::~SsaoShader()
 GLuint SsaoShader::setColorTextureID		(const GLuint textureID) { return m_colorTextureID			= textureID ;}
 GLuint SsaoShader::setNormalDepthTextureID	(const GLuint textureID) { return m_normalDepthTextureID	= textureID ;}
 
+float SsaoShader::setSSAO_Radius(const float radius)
+{
+	//shaderProgram->setUniformf(ssaoRadius, radius);
+
+	return m_SSAO_Radius = radius;
+}
+
+float SsaoShader::getSSAO_Radius() const { return m_SSAO_Radius; }
+
+GLuint SsaoShader::setNumPoints(const GLuint num)		{ return m_numPoints = num; }
+GLuint SsaoShader::getNumPoints() const					{ return m_numPoints; }
+
+float SsaoShader::setMinDepth(const float minDepth)		{ return m_minDepth = minDepth; }
+float SsaoShader::getMinDepth() const					{ return m_minDepth; }
+
+float SsaoShader::setMixPercent(const float percent)	{ return m_mixPercent = percent; }
+float SsaoShader::getMixPercent() const					{ return m_mixPercent; }
+
 void SsaoShader::bind(	Canvas		* canvas,
 						const bool    isOutline,
 						const size_t  renderingStage)
 {
 	shaderProgram->bind();
+
+	shaderProgram->setUniformf(ssaoRadius,	m_SSAO_Radius);
+	shaderProgram->setUniformi(pointCount,	m_numPoints);
+	shaderProgram->setUniformf(minDepth,	m_minDepth);
+	shaderProgram->setUniformf(mixPercent,	m_mixPercent);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, points_buffer);
 
