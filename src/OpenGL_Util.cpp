@@ -94,7 +94,7 @@ GLuint quad_vao = 0;
 
 void OpenGL::init()
 {
-    //*
+    /*
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
 	glDebugMessageCallback(glDebugOutput, nullptr);
