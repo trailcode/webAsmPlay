@@ -186,7 +186,7 @@ namespace
 		return TileBuffer(ret, size);
 	}
 
-	const bool useBindlessTextures = true;
+	const bool useBindlessTextures = false;
 
 	void fetchTile(const int ID, RasterTile * tile)
 	{

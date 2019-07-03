@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#version 430 core
+#version 410 core
 
 out VS_OUT
 {
