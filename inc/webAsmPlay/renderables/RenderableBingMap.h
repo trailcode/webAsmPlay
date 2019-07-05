@@ -63,6 +63,8 @@ private:
 
 	bool getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level);
 
+	static void fetchTile(const int ID, RasterTile* tile);
+
     const AABB2D m_bounds;
 
 	size_t m_startLevel = 0;

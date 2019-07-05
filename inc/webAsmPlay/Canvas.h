@@ -127,6 +127,8 @@ public:
 	double getPerspectiveFOV() const;
 	double setPerspectiveFOV(const double FOV);
 
+	size_t getFrameNumber() const;
+
 protected:
 
     bool preRender();
@@ -137,6 +139,8 @@ protected:
     glm::ivec2 m_size = glm::ivec2(1,1);
 
     glm::ivec2 m_frameBufferSize = glm::ivec2(1,1);
+
+	size_t m_frameNumber = 0;
 
 private:
 

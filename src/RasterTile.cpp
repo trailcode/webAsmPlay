@@ -54,20 +54,25 @@ RasterTile::~RasterTile()
 	a_currTileSet.erase(quadKey);
 }
 
-RasterTile* RasterTile::getTile(const dvec2& center, const size_t level)
+RasterTile* RasterTile::getTile(const dvec2& center, const size_t level, const size_t accessTime)
 {
 	const string quadKey = tileToQuadKey(latLongToTile(center, level), level);
 
 	unordered_map<string, RasterTile*>::const_iterator i = a_currTileSet.find(quadKey);
 
-	if (i != a_currTileSet.end()) { return i->second; }
+	RasterTile* tile;
 
-	return a_currTileSet[quadKey] = new RasterTile(center, level);
+	if (i != a_currTileSet.end())	{ tile = i->second ;}
+	else							{ tile = a_currTileSet[quadKey] = new RasterTile(center, level) ;}
+
+	tile->m_lastAccessTime = accessTime;
+
+	return tile;
 }
 
-RasterTile* RasterTile::getParentTile() const
+RasterTile* RasterTile::getParentTile(const size_t accessTime) const
 {
-	return getTile(m_center, m_level - 1);
+	return getTile(m_center, m_level - 1, accessTime);
 }
 
 #include <algorithm>
@@ -83,17 +88,19 @@ size_t RasterTile::pruneTiles()
 
 	sort(tiles.begin(), tiles.end(), [](const RasterTile* A, RasterTile* B)
 	{
-		return A->m_lastRenderFrame < B->m_lastRenderFrame;
+		return A->m_lastAccessTime < B->m_lastAccessTime;
 	});
 
-	stringstream ss;
+	//dmess("tiles " << tiles.size() << " a_currTileSet " << a_currTileSet.size());
 
-	dmess("tiles " << tiles.size());
+	const size_t cacheSize = 2500;
 
-	if (tiles.size() < 5500) { return 0; }
+	if (tiles.size() < cacheSize) { return 0; }
+
+	size_t numFreed = 0;
 
 	//for (size_t i = 0; i < std::min((int)10, (int)tiles.size()); ++i)
-	for (size_t i = 0; i < tiles.size(); ++i)
+	for (size_t i = 0; i < tiles.size() - cacheSize; ++i)
 	{
 		//dmess(tiles[i]->m_lastRenderFrame << " ");
 
@@ -107,7 +114,11 @@ size_t RasterTile::pruneTiles()
 		//dmess("delete " << i << " " << tiles[i]->m_lastRenderFrame);
 
 		delete tiles[i];
+
+		++numFreed;
 	}
+
+	dmess("numFreed " << numFreed << " " << tiles.size() - cacheSize << " a_currTileSet " << a_currTileSet.size());
 
 	return 0;
 }

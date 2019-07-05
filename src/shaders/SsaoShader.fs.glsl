@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#version 410 core
+#version 420 core
 
 // Various uniforms controlling SSAO effect
 /*

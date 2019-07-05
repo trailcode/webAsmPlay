@@ -217,6 +217,8 @@ bool Canvas::preRender()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	++m_frameNumber;
+
     return true;
 }
 
@@ -495,14 +497,16 @@ bool Canvas::getEnabled()							const	{ return m_enabled				;}
 double Canvas::getPerspectiveFOV()					const	{ return m_perspectiveFOV		;}
 double Canvas::setPerspectiveFOV(const double FOV)			{ return m_perspectiveFOV = FOV ;}
 
-vector<Canvas *> Canvas::getInstances()						{ return instances ;}
+vector<Canvas *> Canvas::getInstances()						{ return instances				;}
 
-dvec3 Canvas::getCursorPosWC()						const	{ return m_cursorPosWC ;}
+dvec3 Canvas::getCursorPosWC()						const	{ return m_cursorPosWC			;}
 
-Renderable * Canvas::getCursor()					const	{ return m_cursor ;}
+Renderable * Canvas::getCursor()					const	{ return m_cursor				;}
 
-FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer ;}
-FrameBuffer * Canvas::getG_FrameBuffer()			const	{ return m_gBuffer ;}
+FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer		;}
+FrameBuffer * Canvas::getG_FrameBuffer()			const	{ return m_gBuffer				;}
+
+size_t Canvas::getFrameNumber()						const	{ return m_frameNumber			;}
 
 #ifdef __EMSCRIPTEN__
 

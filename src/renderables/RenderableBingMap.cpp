@@ -68,14 +68,14 @@ size_t RenderableBingMap::s_numRendered = 0;
 
 FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
 
-bool RenderableBingMap::s_useCache = true;
+bool RenderableBingMap::s_useCache = false;
 const bool useBindlessTextures = false;
 
 namespace
 {
 #ifndef __EMSCRIPTEN__
 
-    thread_pool loaderPool	(16);
+    thread_pool loaderPool	(64);
     thread_pool uploaderPool(1);
 	thread_pool writerPool	(1);
 
@@ -187,125 +187,133 @@ namespace
 		return TileBuffer(ret, size);
 	}
 
-	void fetchTile(const int ID, RasterTile * tile)
+	
+}
+
+void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
+{
+	if (!tile->m_stillNeeded)
 	{
-		if (!tile->m_stillNeeded)
+		//dmess("Skip here!");
+
+		tile->m_loading = false;
+
+		--s_numLoading;
+
+		return;
+	}
+
+	const string quadKey = tileToQuadKey(latLongToTile(tile->m_center, tile->m_level), tile->m_level);
+
+	const string tileCachePath = "./tiles/" + quadKey + ".jpg";
+
+	if(s_useCache && fileExists(tileCachePath))
+	{
+		++s_numUploading;
+
+		SDL_Surface * img = IMG_Load(tileCachePath.c_str());
+
+		if (!img) { goto download; }
+
+		uploaderPool.push([tile, img](int ID)
 		{
-			//dmess("Skip here!");
-
-			--RenderableBingMap::s_numLoading;
-
-			return;
-		}
-
-		const string quadKey = tileToQuadKey(latLongToTile(tile->m_center, tile->m_level), tile->m_level);
-
-		const string tileCachePath = "./tiles/" + quadKey + ".jpg";
-
-		if(fileExists(tileCachePath))
-		{
-			++RenderableBingMap::s_numUploading;
-
-			SDL_Surface * img = IMG_Load(tileCachePath.c_str());
-
-			if (!img) { goto download; }
-
-			uploaderPool.push([tile, img](int ID)
+			if (!tile->m_stillNeeded)
 			{
-				if (!tile->m_stillNeeded)
-				{
-					--RenderableBingMap::s_numUploading;
+				--s_numUploading;
 
-					--RenderableBingMap::s_numLoading;
-
-					SDL_FreeSurface(img);
-					 
-					return;
-				}
-
-				OpenGL::ensureSharedContext();
-
-				tile->m_textureID = Textures::load(img);
+				--s_numLoading;
 
 				SDL_FreeSurface(img);
-
-				if(useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
-
-				++RenderableBingMap::s_numTiles;
-
-				--RenderableBingMap::s_numLoading;
-
-				--RenderableBingMap::s_numUploading;
-			});
-		}
-		else
-		{
-		download:
-
-			TileBuffer tileBuffer = downloadTile(ID, quadKey);
-
-			if (!get<0>(tileBuffer))
-			{
-				//dmess("Error! No buffer!");
-
-				--RenderableBingMap::s_numLoading;
 
 				return;
 			}
 
-			++RenderableBingMap::s_numUploading;
+			OpenGL::ensureSharedContext();
 
-			uploaderPool.push([tile, tileBuffer, tileCachePath](int ID)
+			tile->m_textureID = Textures::load(img);
+
+			SDL_FreeSurface(img);
+
+			if(useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
+
+			++s_numTiles;
+
+			--s_numLoading;
+
+			--s_numUploading;
+		});
+	}
+	else
+	{
+	download:
+
+		TileBuffer tileBuffer = downloadTile(ID, quadKey);
+
+		if (!get<0>(tileBuffer))
+		{
+			dmess("Error! No buffer!");
+
+			--s_numLoading;
+
+			return;
+		}
+
+		++s_numUploading;
+
+		uploaderPool.push([tile, tileBuffer, tileCachePath](int ID)
+		{
+			if (!tile->m_stillNeeded)
 			{
-				if (!tile->m_stillNeeded)
+				tile->m_loading = false;
+				
+				--s_numUploading;
+
+				--s_numLoading;
+
+				return;
+			}
+
+			OpenGL::ensureSharedContext();
+
+			tile->m_textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
+
+			if(useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
+
+			++s_numTiles;
+
+			--s_numUploading;
+
+			--s_numLoading;
+
+			tile->m_loading = false;
+
+			if (!s_useCache) { return ;}
+
+			++s_numWriting;
+
+			writerPool.push([tileCachePath, tileBuffer](int ID)
+			{
+				FILE * fp = fopen(tileCachePath.c_str(), "wb");
+
+				if(fp)
 				{
-					//dmess("Skip here!");
+					fwrite(get<0>(tileBuffer), sizeof(char), get<1>(tileBuffer), fp);
 
-					--RenderableBingMap::s_numUploading;
-
-					--RenderableBingMap::s_numLoading;
-
-					return;
+					fclose(fp);
+				}
+				else
+				{
+					dmess("Warn could not write file: " << tileCachePath);
 				}
 
-				OpenGL::ensureSharedContext();
-
-				tile->m_textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
-
-				if(useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
-
-				++RenderableBingMap::s_numTiles;
-
-				--RenderableBingMap::s_numUploading;
-
-				--RenderableBingMap::s_numLoading;
-
-				++RenderableBingMap::s_numWriting;
-
-				writerPool.push([tileCachePath, tileBuffer](int ID)
+				if( get<0>(tileBuffer) )
 				{
-					FILE * fp = fopen(tileCachePath.c_str(), "wb");
-
-					if(fp)
-					{
-						fwrite(get<0>(tileBuffer), sizeof(char), get<1>(tileBuffer), fp);
-
-						fclose(fp);
-					}
-					else
-					{
-						dmess("Warn could not write file: " << tileCachePath);
-					}
-				
-					if( get<0>(tileBuffer) )
-					{
-						free ( (void *)get<0>(tileBuffer) );
-					}
-				});
-
-				--RenderableBingMap::s_numWriting;
+					free ( (void *)get<0>(tileBuffer) );
+				}
 			});
-		}
+
+			--s_numWriting;
+		});
 	}
 }
 
@@ -410,8 +418,8 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	//RasterTile * tile = RasterTile::getTile(tMin + dvec2(0.001, 0.001), level);
 
 	//m_tiles.push_back(tile);
-	m_tiles.insert(RasterTile::getTile(center, level));
-	m_tiles.insert(RasterTile::getTile(tMin + dvec2(0.001, 0.001), level)); // Should not need to do this. Rounding errors?
+	m_tiles.insert(RasterTile::getTile(center, level, canvas->getFrameNumber()));
+	m_tiles.insert(RasterTile::getTile(tMin + dvec2(0.001, 0.001), level, canvas->getFrameNumber())); // Should not need to do this. Rounding errors?
 
 	return true;
 }
@@ -421,8 +429,6 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 namespace
 {
 	vector<RasterTile*> a_lastTilesRendered;
-
-	size_t a_frameNumber = 0;
 
 	void renderBindlessTextures(Canvas* canvas, const vector<RasterTile*>& toRender)
 	{
@@ -506,8 +512,6 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 	{
 		if(tileSet.find(i) == tileSet.end())
 		{
-			i->m_loading = false;
-
 			i->m_stillNeeded = false;
 		}
 	}
@@ -522,7 +526,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 		for (int parentLevel = int(currTile->m_level) - 1; parentLevel >= m_startLevel; --parentLevel)
 		{
-			currTile = currTile->getParentTile();
+			currTile = currTile->getParentTile(canvas->getFrameNumber());
 
 			if (!currTile->m_textureID) { continue; }
 			
@@ -569,13 +573,11 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 				tile->m_renderable->setRenderFill    (true);
 			}
 
-			tile->m_lastRenderFrame = a_frameNumber;
-
 			toRender.push_back(tile);
 
 			++numRendered;
 		}
-		else if (!tile->m_loading)
+		else if (!tile->m_loading && tile->m_stillNeeded)
 		{
 			tile->m_loading = true;
 
@@ -600,9 +602,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	s_textureBuffer->unbind();
 
-	RasterTile::pruneTiles();
-
-	++a_frameNumber;
+	if(!(canvas->getFrameNumber() % 50)) { RasterTile::pruneTiles() ;}
 }
 
 FrameBuffer* RenderableBingMap::getFrameBuffer() { return s_textureBuffer ;}
