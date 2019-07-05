@@ -44,6 +44,8 @@ public:
 
 	static size_t pruneTiles();
 
+	static size_t getNumTiles();
+
 	RasterTile* getParentTile(const size_t accessTime) const;
 
 	const glm::dvec2	m_center;
@@ -62,4 +64,6 @@ public:
 	bool m_textureResident = false;
 
 	size_t m_lastAccessTime = 0;
+
+	static std::atomic_size_t s_desiredMaxNumTiles;
 };

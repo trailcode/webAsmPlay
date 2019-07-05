@@ -42,7 +42,6 @@ public:
 
     void render(Canvas * canvas, const size_t renderStage = 0) override;
 
-	static std::atomic<size_t> s_numTiles;
 	static std::atomic<size_t> s_numLoading;
 	static std::atomic<size_t> s_numDownloading;
 	static std::atomic<size_t> s_numUploading;

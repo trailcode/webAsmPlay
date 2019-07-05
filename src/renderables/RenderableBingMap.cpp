@@ -58,7 +58,6 @@ using namespace ctpl;
 using namespace geosUtil;
 using namespace bingTileSystem;
 
-atomic<size_t> RenderableBingMap::s_numTiles		= {0};
 atomic<size_t> RenderableBingMap::s_numLoading		= {0};
 atomic<size_t> RenderableBingMap::s_numDownloading	= {0};
 atomic<size_t> RenderableBingMap::s_numUploading	= {0};
@@ -68,8 +67,8 @@ size_t RenderableBingMap::s_numRendered = 0;
 
 FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
 
-bool RenderableBingMap::s_useCache = false;
-const bool useBindlessTextures = false;
+bool RenderableBingMap::s_useCache = true;
+const bool useBindlessTextures = true;
 
 namespace
 {
@@ -219,6 +218,8 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 		{
 			if (!tile->m_stillNeeded)
 			{
+				tile->m_loading = false;
+
 				--s_numUploading;
 
 				--s_numLoading;
@@ -236,11 +237,11 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 			if(useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
 
-			++s_numTiles;
-
 			--s_numLoading;
 
 			--s_numUploading;
+
+			tile->m_loading = false;
 		});
 	}
 	else
@@ -254,6 +255,8 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 			dmess("Error! No buffer!");
 
 			--s_numLoading;
+
+			tile->m_loading = false;
 
 			return;
 		}
@@ -278,8 +281,6 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 			tile->m_textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
 
 			if(useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
-
-			++s_numTiles;
 
 			--s_numUploading;
 

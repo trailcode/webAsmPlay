@@ -38,6 +38,8 @@ namespace
 	unordered_map<string, RasterTile*> a_currTileSet;
 }
 
+atomic_size_t RasterTile::s_desiredMaxNumTiles = { 1500 };
+
 RasterTile::RasterTile(const dvec2& center, const size_t level) : m_center(center), m_level(level)
 {
 	
@@ -75,13 +77,8 @@ RasterTile* RasterTile::getParentTile(const size_t accessTime) const
 	return getTile(m_center, m_level - 1, accessTime);
 }
 
-#include <algorithm>
-#include <sstream>
-
 size_t RasterTile::pruneTiles()
 {
-	//auto tiles = toVec(a_currTileSet);
-
 	vector<RasterTile*> tiles;
 
 	for (const auto i : a_currTileSet) { tiles.push_back(i.second); }
@@ -91,34 +88,24 @@ size_t RasterTile::pruneTiles()
 		return A->m_lastAccessTime < B->m_lastAccessTime;
 	});
 
-	//dmess("tiles " << tiles.size() << " a_currTileSet " << a_currTileSet.size());
-
-	const size_t cacheSize = 2500;
+	const size_t cacheSize = s_desiredMaxNumTiles;
 
 	if (tiles.size() < cacheSize) { return 0; }
 
 	size_t numFreed = 0;
 
-	//for (size_t i = 0; i < std::min((int)10, (int)tiles.size()); ++i)
 	for (size_t i = 0; i < tiles.size() - cacheSize; ++i)
 	{
-		//dmess(tiles[i]->m_lastRenderFrame << " ");
-
-		if (tiles[i]->m_loading)
-		{
-			//dmess("Loading " << i << " " << tiles[i]->m_lastRenderFrame);
-
-			continue;
-		}
-
-		//dmess("delete " << i << " " << tiles[i]->m_lastRenderFrame);
+		if (tiles[i]->m_loading) { continue ;}
 
 		delete tiles[i];
 
 		++numFreed;
 	}
 
-	dmess("numFreed " << numFreed << " " << tiles.size() - cacheSize << " a_currTileSet " << a_currTileSet.size());
+	dmess("numFreed " << numFreed << " " << tiles.size() - cacheSize << " a_currTileSet " << a_currTileSet.size() << " cacheSize " << cacheSize);
 
-	return 0;
+	return numFreed;
 }
+
+size_t RasterTile::getNumTiles() { return a_currTileSet.size() ;}
