@@ -29,11 +29,10 @@
 #include <locale>
 #include <codecvt>
 #include <JSON.h>
-//#include <nlohmann/json.hpp>
 #include <OpenSteer/Annotation.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/canvas/Canvas.h>
+#include <webAsmPlay/canvas/Camera.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>

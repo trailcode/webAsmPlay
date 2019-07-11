@@ -27,7 +27,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
-#include <webAsmPlay/GeosTestCanvas.h>
+#include <webAsmPlay/canvas/GeosTestCanvas.h>
 #include <webAsmPlay/FrameBuffer.h>
 
 void GUI::geosTestPanel()

@@ -35,7 +35,7 @@
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/LineString.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>

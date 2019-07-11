@@ -27,7 +27,7 @@
 
 #include <memory>
 #include <vector>
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 
 class GeosTestCanvas : public Canvas
 {

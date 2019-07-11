@@ -25,7 +25,7 @@
 */
 #pragma once
 
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 
 class OpenSteerCanvas : public Canvas
 {

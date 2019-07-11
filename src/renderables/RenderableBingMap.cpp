@@ -37,8 +37,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/canvas/Canvas.h>
+#include <webAsmPlay/canvas/Camera.h>
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>

@@ -30,7 +30,7 @@
 #include <geos/index/quadtree/Quadtree.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Attributes.h>
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/Util.h>

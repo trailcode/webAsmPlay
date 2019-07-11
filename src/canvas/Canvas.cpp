@@ -42,7 +42,7 @@
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/SsaoShader.h>
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 
 using namespace std;
 using namespace rsmz;

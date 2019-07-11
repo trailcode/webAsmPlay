@@ -28,7 +28,7 @@
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/BingTileSystem.h>
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/renderables/RasterTile.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>

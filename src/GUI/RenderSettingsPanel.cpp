@@ -25,7 +25,7 @@
 */
 
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/GeosTestCanvas.h>
+#include <webAsmPlay/canvas/GeosTestCanvas.h>
 #include <webAsmPlay/renderables/Renderable.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>

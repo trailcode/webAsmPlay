@@ -26,7 +26,7 @@
 
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
-#include <webAsmPlay/AnimationCanvas.h>
+#include <webAsmPlay/canvas/AnimationCanvas.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 void GUI::animationPanel()

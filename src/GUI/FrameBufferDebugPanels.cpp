@@ -24,7 +24,7 @@
 \copyright 2019
 */
 
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/shaders/NormalToRGB_Shader.h>

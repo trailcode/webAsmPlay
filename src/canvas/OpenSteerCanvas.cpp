@@ -29,9 +29,9 @@
 #include <OpenSteer/OpenSteerDemo.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/canvas/Camera.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
-#include <webAsmPlay/OpenSteerCanvas.h>
+#include <webAsmPlay/canvas/OpenSteerCanvas.h>
 
 using namespace std;
 using namespace glm;

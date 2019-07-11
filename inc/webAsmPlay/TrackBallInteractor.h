@@ -23,7 +23,7 @@ Modified by Matthew Tang (trailcode@gmail.com)
 */
 #pragma once
 
-#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/canvas/Camera.h>
 #include <glm/gtc/quaternion.hpp>
 
 namespace rsmz

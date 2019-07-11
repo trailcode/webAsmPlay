@@ -32,8 +32,8 @@
 #include <OpenSteer/OpenSteerDemo.h>
 #include <OpenSteer/Draw.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Camera.h>
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Camera.h>
+#include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/ZombiePlugin.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>

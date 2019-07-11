@@ -36,7 +36,7 @@
 #include <geos/index/quadtree/Quadtree.h>
 #include <geoServer/GeoServerBase.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/geom/GeosUtil.h>

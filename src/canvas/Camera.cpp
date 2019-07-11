@@ -1,7 +1,7 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/canvas/Camera.h>
 #include <webAsmPlay/Debug.h>
 
 using namespace std;

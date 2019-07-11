@@ -31,7 +31,7 @@
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/Network.h>
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Zombie.h>
 

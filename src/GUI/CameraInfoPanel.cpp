@@ -25,8 +25,8 @@
 */
 
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Canvas.h>
-#include <webAsmPlay/Camera.h>
+#include <webAsmPlay/canvas/Canvas.h>
+#include <webAsmPlay/canvas/Camera.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 

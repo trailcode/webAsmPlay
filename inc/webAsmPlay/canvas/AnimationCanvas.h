@@ -24,31 +24,24 @@
 \copyright 2019
 */
 
-#include <webAsmPlay/AnimationCanvas.h>
+#pragma once
 
-using namespace glm;
+#include <webAsmPlay/canvas/Canvas.h>
 
-AnimationCanvas::AnimationCanvas(const bool   useFrameBuffer,
-								 const vec4 & clearColor)
+class AnimationCanvas : public Canvas
 {
-}
+public:
 
-AnimationCanvas::~AnimationCanvas()
-{
+	AnimationCanvas(const bool        useFrameBuffer = true,
+					const glm::vec4 & clearColor     = glm::vec4(0.5, 0.5, 1, 1));
 
-}
+	~AnimationCanvas();
 
-GLuint AnimationCanvas::render()
-{
-	return 0;
-}
+	GLuint render() override;
 
-ivec2 AnimationCanvas::setFrameBufferSize(const ivec2& fbSize, const ivec2& upperLeft)
-{
-	return fbSize;
-}
+	glm::ivec2 setFrameBufferSize(const glm::ivec2 & fbSize, const glm::ivec2 & upperLeft = glm::ivec2(0,0)) override;
 
-void AnimationCanvas::onChar(GLFWwindow* window, const size_t c)
-{
+	void onChar(GLFWwindow * window, const size_t c) override;
 
-}
+private:
+};

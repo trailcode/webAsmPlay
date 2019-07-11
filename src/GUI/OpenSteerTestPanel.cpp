@@ -25,7 +25,7 @@
 */
 
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/OpenSteerCanvas.h>
+#include <webAsmPlay/canvas/OpenSteerCanvas.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
 

@@ -26,7 +26,7 @@
 
 #include <glm/gtx/transform.hpp>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 

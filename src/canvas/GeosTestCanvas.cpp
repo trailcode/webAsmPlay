@@ -30,7 +30,7 @@
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
-#include <webAsmPlay/GeosTestCanvas.h>
+#include <webAsmPlay/canvas/GeosTestCanvas.h>
 
 using namespace std;
 using namespace glm;

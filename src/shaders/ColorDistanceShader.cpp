@@ -27,7 +27,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Textures.h>
-#include <webAsmPlay/Canvas.h>
+#include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
