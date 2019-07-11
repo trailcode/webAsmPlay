@@ -119,6 +119,9 @@ public:
 
     Renderable * getCursor() const;
 
+	glm::ivec2 getUpperLeft() const;
+	glm::ivec2 getSize() const;
+
     glm::dvec2 renderCursor(const glm::dvec2 & pos);
 
 	FrameBuffer * getAuxFrameBuffer() const;
@@ -141,8 +144,6 @@ protected:
     glm::ivec2 m_frameBufferSize = glm::ivec2(1,1);
 
 	size_t m_frameNumber = 0;
-
-private:
 
     Renderable * addRenderable(std::list<Renderable *> & container, Renderable * renderiable);
 

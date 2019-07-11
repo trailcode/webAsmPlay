@@ -31,6 +31,8 @@
 
 void GUI::animationPanel()
 {
+	s_animationCanvas->setEnabled(s_showAnimationPanel);
+
 	if (!s_showAnimationPanel) { return; }
 
 	ImGui::Begin("Animation", &s_showAnimationPanel);

@@ -24,9 +24,13 @@
 \copyright 2019
 */
 
+#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/canvas/AnimationCanvas.h>
 
 using namespace glm;
+
+//extern IMGUI_API ImGuiContext* GImGui;
 
 AnimationCanvas::AnimationCanvas(const bool   useFrameBuffer,
 								 const vec4 & clearColor)
@@ -40,12 +44,16 @@ AnimationCanvas::~AnimationCanvas()
 
 GLuint AnimationCanvas::render()
 {
+	if(!m_enabled) { return 0 ;}
+
 	return 0;
 }
 
-ivec2 AnimationCanvas::setFrameBufferSize(const ivec2& fbSize, const ivec2& upperLeft)
+void AnimationCanvas::onMousePosition(GLFWwindow* window, const vec2& mousePos)
 {
-	return fbSize;
+	if(!m_enabled) { return ;}
+
+	dmess("AnimationCanvas::onMousePosition " << mousePos.x << " " << mousePos.y);
 }
 
 void AnimationCanvas::onChar(GLFWwindow* window, const size_t c)

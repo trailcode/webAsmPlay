@@ -78,9 +78,13 @@ void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int m
 
 void GUI::cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 {
-    for(auto c : s_auxCanvases) { c->onMousePosition(window, vec2(xpos, ypos)) ;}
+    for(auto c : s_auxCanvases)
+	{
+		const auto localPos = vec2(xpos, ypos) - vec2(c->getUpperLeft());
 
-    //canvas->onMousePosition(window, vec2(xpos / 2, ypos / 2));
+		c->onMousePosition(window, localPos);
+	}
+
     s_canvas->onMousePosition(window, vec2(xpos, ypos));
 
     refresh();

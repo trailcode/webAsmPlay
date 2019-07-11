@@ -39,7 +39,7 @@ public:
 
 	GLuint render() override;
 
-	glm::ivec2 setFrameBufferSize(const glm::ivec2 & fbSize, const glm::ivec2 & upperLeft = glm::ivec2(0,0)) override;
+	void onMousePosition(GLFWwindow * window, const glm::vec2 & mousePos);
 
 	void onChar(GLFWwindow * window, const size_t c) override;
 

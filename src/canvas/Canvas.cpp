@@ -328,14 +328,12 @@ void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
 {
     if(!m_enabled) { return ;}
 
-    const vec2 pos = mousePos - vec2(m_upperLeft);
-
-    m_trackBallInteractor->setClickPoint(pos.x, pos.y);
+    m_trackBallInteractor->setClickPoint(mousePos.x, mousePos.y);
     m_trackBallInteractor->update();
 
     // From: http://antongerdelan.net/opengl/raycasting.html
-    const vec4 rayClip = vec4(		   (2.0f * pos.x) / m_size.x - 1.0f,
-                                1.0f - (2.0f * pos.y) / m_size.y, -1.0, 1.0);
+    const vec4 rayClip = vec4(		   (2.0f * mousePos.x) / m_size.x - 1.0f,
+                                1.0f - (2.0f * mousePos.y) / m_size.y, -1.0, 1.0);
 
     dvec4 rayEye = inverse(m_currMVP.m_projection) * rayClip;
     
@@ -502,6 +500,9 @@ vector<Canvas *> Canvas::getInstances()						{ return instances				;}
 dvec3 Canvas::getCursorPosWC()						const	{ return m_cursorPosWC			;}
 
 Renderable * Canvas::getCursor()					const	{ return m_cursor				;}
+
+ivec2 Canvas::getUpperLeft()						const	{ return m_upperLeft			;}
+ivec2 Canvas::getSize()								const	{ return m_size					;}
 
 FrameBuffer * Canvas::getAuxFrameBuffer()			const	{ return m_auxFrameBuffer		;}
 FrameBuffer * Canvas::getG_FrameBuffer()			const	{ return m_gBuffer				;}
