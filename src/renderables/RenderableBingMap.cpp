@@ -43,13 +43,13 @@
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/OpenGL_Util.h>
-#include <webAsmPlay/RasterTile.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/Frustum.h>
+#include <webAsmPlay/renderables/RasterTile.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 
 using namespace std;

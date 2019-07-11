@@ -27,7 +27,7 @@
 #include <unordered_map>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/BingTileSystem.h>
-#include <webAsmPlay/RasterTile.h>
+#include <webAsmPlay/renderables/RasterTile.h>
 
 using namespace std;
 using namespace glm;
@@ -36,6 +36,8 @@ using namespace bingTileSystem;
 namespace
 {
 	unordered_map<string, RasterTile*> a_currTileSet;
+
+	vector<uint> a_texturesToFree;
 }
 
 atomic_size_t RasterTile::s_desiredMaxNumTiles = { 1500 };
@@ -47,9 +49,7 @@ RasterTile::RasterTile(const dvec2& center, const size_t level) : m_center(cente
 
 RasterTile::~RasterTile()
 {
-	const uint ID = m_textureID;
-
-	glDeleteTextures(1, &ID); // TODO create and array of them to delete!, You can push here, and delete later
+	a_texturesToFree.push_back(m_textureID);
 
 	const string quadKey = tileToQuadKey(latLongToTile(m_center, m_level), m_level);
 
@@ -94,6 +94,7 @@ size_t RasterTile::pruneTiles()
 
 	size_t numFreed = 0;
 
+	
 	for (size_t i = 0; i < tiles.size() - cacheSize; ++i)
 	{
 		if (tiles[i]->m_loading) { continue ;}
@@ -103,7 +104,11 @@ size_t RasterTile::pruneTiles()
 		++numFreed;
 	}
 
-	dmess("numFreed " << numFreed << " " << tiles.size() - cacheSize << " a_currTileSet " << a_currTileSet.size() << " cacheSize " << cacheSize);
+	glDeleteTextures(a_texturesToFree.size(), &a_texturesToFree[0]);
+
+	a_texturesToFree.clear();
+
+	//dmess("numFreed " << numFreed << " " << tiles.size() - cacheSize << " a_currTileSet " << a_currTileSet.size() << " cacheSize " << cacheSize);
 
 	return numFreed;
 }

@@ -331,21 +331,14 @@ else()
 
 		if(MSVC_VERSION)
 
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}"	DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"		COMMAND cmake_if_different -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}" COMMAND cmake_if_different -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}"	DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		COMMAND cmake_if_different -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}"			COMMAND cmake_if_different -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
 
-			list(APPEND assetFileDestRelease		"${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}")
-			list(APPEND assetFileDestRelWithDebInfo "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}")
-			list(APPEND assetFileDestMinSizeRel		"${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}")
-			list(APPEND assetFileDestDebug			"${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}")
-			
 		else()
 
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-
-			list(APPEND assetFileDest "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" COMMAND cmake -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
 			
 		endif()
 
@@ -357,74 +350,18 @@ else()
 
 		if(MSVC_VERSION)
 
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-
-			list(APPEND configFileDestRelease			"${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}")
-			list(APPEND configFileDestRelWithDebInfo	"${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}")
-			list(APPEND configFileDestMinSizeRel		"${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}")
-			list(APPEND configFileDestDebug				"${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			COMMAND cmake -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	COMMAND cmake -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		COMMAND cmake -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			COMMAND cmake -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
 
 		else()
 
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-
-			list(APPEND configFileDest "${CMAKE_CURRENT_BINARY_DIR}/${configFile}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" COMMAND cmake -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
 
 		endif()
 
     endforeach(configFile)
-
-	foreach(shaderFilePath ${webAsmPlayShadersGLSL_SRC})
-
-		get_filename_component(shaderFile ${shaderFilePath} NAME)
-
-		if(MSVC_VERSION)
-
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			MAIN_DEPENDENCY "${shaderFilePath}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	MAIN_DEPENDENCY "${shaderFilePath}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		MAIN_DEPENDENCY "${shaderFilePath}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"				MAIN_DEPENDENCY "${shaderFilePath}")
-
-			list(APPEND shaderFileDestRelease			"${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}")
-			list(APPEND shaderFileDestRelWithDebInfo	"${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}")
-			list(APPEND shaderFileDestMinSizeRel		"${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}")
-			list(APPEND shaderFileDestDebug				"${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}")
-
-		else()
-
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" DEPENDS "${shaderFilePath}")
-
-			list(APPEND shaderFileDest "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}")
-
-		endif()
-
-    endforeach(shaderFilePath)
-
-	if(MSVC_VERSION)
-
-		ADD_CUSTOM_TARGET(assetsRelease			ALL DEPENDS ${assetFileDestRelease})
-		ADD_CUSTOM_TARGET(assetsRelWithDebInfo	ALL DEPENDS ${assetFileDestRelWithDebInfo})
-		ADD_CUSTOM_TARGET(assetsMinSizeRel		ALL DEPENDS ${assetFileDestMinSizeRel})
-		ADD_CUSTOM_TARGET(assetsDebug			ALL DEPENDS ${assetFileDestDebug})
-		ADD_CUSTOM_TARGET(configsRelease		ALL DEPENDS ${configFileDestRelease})
-		ADD_CUSTOM_TARGET(configsRelWithDebInfo ALL DEPENDS ${configFileDestRelWithDebInfo})
-		ADD_CUSTOM_TARGET(configsMinSizeRel		ALL DEPENDS ${configFileDestMinSizeRel})
-		ADD_CUSTOM_TARGET(configsDebug			ALL DEPENDS ${configFileDestDebug})
-		ADD_CUSTOM_TARGET(shadersRelease		ALL DEPENDS ${shaderFileDestRelease})
-		ADD_CUSTOM_TARGET(shadersRelWithDebInfo	ALL DEPENDS ${shaderFileDestRelWithDebInfo})
-		ADD_CUSTOM_TARGET(shadersMinSizeRel		ALL DEPENDS ${shaderFileDestMinSizeRel})
-		ADD_CUSTOM_TARGET(shadersDebug			ALL DEPENDS ${shaderFileDestDebug})
-
-	else()
-
-		ADD_CUSTOM_TARGET(configs ALL DEPENDS ${configFileDest})
-		ADD_CUSTOM_TARGET(assets ALL DEPENDS ${assetFileDest})
-		ADD_CUSTOM_TARGET(shaders ALL DEPENDS ${shaderFileDest})
-
-	endif()
 
     if(APPLE)
 	    SET(CMAKE_CXX_LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
@@ -443,10 +380,39 @@ else()
 	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
 
 	target_link_libraries(geoServer libWebAsmPlay)
-    target_link_libraries(geoServer debug ${EXPAT_LIBRARY_DEBUG} optimized ${EXPAT_LIBRARY_RELEASE}
-                            #debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE}
-                            #debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
-							)
+    target_link_libraries(geoServer debug ${EXPAT_LIBRARY_DEBUG} optimized ${EXPAT_LIBRARY_RELEASE})
+
+	foreach(shaderFilePath ${webAsmPlayShadersGLSL_SRC})
+
+		get_filename_component(shaderFile ${shaderFilePath} NAME)
+
+		if(MSVC_VERSION)
+
+		#add_custom_command(TARGET unitTests POST_BUILD
+         #              COMMAND ${CMAKE_COMMAND} ARGS -E copy "$<$<CONFIG:debug>:${DEBUG_EXE_PATH}>$<$<CONFIG:release>:${RELEASE_EXE_PATH}>" "$<$<CONFIG:debug>:${DEBUG_NEW_EXE}>$<$<CONFIG:release>:${RELEASE_NEW_EXE}>")
+
+			set(debugShader ${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile})
+			set(releaseShader ${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile})
+
+			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			COMMAND cmake -E copy_if_different "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			MAIN_DEPENDENCY "${shaderFilePath}")
+			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	COMMAND cmake -E copy_if_different "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	MAIN_DEPENDENCY "${shaderFilePath}")
+			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		COMMAND cmake -E copy_if_different "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		MAIN_DEPENDENCY "${shaderFilePath}")
+			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"			COMMAND cmake -E copy_if_different "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"			MAIN_DEPENDENCY "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	TARGET webAsmPlay PRE_LINK COMMAND cmake -E copy "${shaderFilePath}" "$<$<CONFIG:debug>:${debugShader}>$<$<CONFIG:release>:${releaseShader}>"			MAIN_DEPENDENCY "${shaderFilePath}")
+			#ADD_CUSTOM_COMMAND(	TARGET shaders COMMAND cmake -E copy "${shaderFilePath}" "$<$<CONFIG:debug>:${debugShader}>$<$<CONFIG:release>:${releaseShader}>")
+			
+
+			
+
+			#"$<$<CONFIG:Debug>:${debugShader}>$<$<CONFIG:Release>:${releaseShader}>$<$<CONFIG:RelWithDebInfo>:${releaseShader}>"
+
+		else()
+
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" COMMAND cmake -E copy_if_different "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" DEPENDS "${shaderFilePath}")
+
+		endif()
+
+    endforeach(shaderFilePath)
 
 	if(MSVC_VERSION)
 
@@ -487,13 +453,13 @@ else()
 
 
         foreach(dll ${DLLS_RELEASE} ${DLLS_COMMON})
-            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
-			add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
-			add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel")
+            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
+			add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
+			add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel")
         endforeach(dll)
 		
         foreach(dll ${DLLS_DEBUG} ${DLLS_COMMON})
-            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Debug")
         endforeach(dll)
 
 

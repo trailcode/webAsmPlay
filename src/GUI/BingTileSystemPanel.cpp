@@ -30,7 +30,7 @@
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
-#include <webAsmPlay/RasterTile.h>
+#include <webAsmPlay/renderables/RasterTile.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 #pragma warning( pop ) 
 
@@ -73,7 +73,7 @@ void GUI::bingTileSystemPanel()
 	{
 		dmess("maxDesiredNumTiles " << maxDesiredNumTiles);
 
-		RasterTile::s_desiredMaxNumTiles = (size_t)maxDesiredNumTiles;
+		RasterTile::s_desiredMaxNumTiles = (size_t)maxDesiredNumTiles; 
 	}
 	
 
