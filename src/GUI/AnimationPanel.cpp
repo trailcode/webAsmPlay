@@ -50,8 +50,6 @@ void GUI::animationPanel()
 												ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
 												ImVec2(0, 1),
 												ImVec2(1, 0));
-
-		dmess("ImGui::IsItemActive() " << ImGui::IsItemActive());
 	}
 	ImGui::End();
 }

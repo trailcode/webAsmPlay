@@ -127,6 +127,7 @@ int main(int, char**)
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;
+	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
     //window->Viewport->DpiScale = 2.0;
 
