@@ -37,7 +37,7 @@ void GUI::animationPanel()
 
 	ImGui::Begin("Animation", &s_showAnimationPanel);
 	{
-		const ImVec2 pos = ImGui::GetCursorScreenPos();
+		const ImVec2 pos = ImGui::GetCursorScreenPos();		
 
 		const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
@@ -50,6 +50,8 @@ void GUI::animationPanel()
 												ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
 												ImVec2(0, 1),
 												ImVec2(1, 0));
+
+		dmess("ImGui::IsItemActive() " << ImGui::IsItemActive());
 	}
 	ImGui::End();
 }

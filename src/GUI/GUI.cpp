@@ -155,7 +155,7 @@ struct AppLog
 
     void Draw(const char* title, bool* p_opened = NULL)
     {
-        ImGui::SetNextWindowSize(ImVec2(500,400), ImGuiSetCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(500, 400));
         ImGui::Begin(title, p_opened);
         if (ImGui::Button("Clear")) Clear();
         ImGui::SameLine();
@@ -491,7 +491,7 @@ void GUI::mainLoop(GLFWwindow * window)
         
     }
 
-    opt_flags |= ImGuiDockNodeFlags_PassthruDockspace;
+	opt_flags |= ImGuiDockNodeFlags_PassthruCentralNode;
 
     window_flags |= ImGuiWindowFlags_NoBackground;
 
