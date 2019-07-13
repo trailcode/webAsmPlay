@@ -88,6 +88,9 @@ bool              GUI::s_shuttingDown		= false;
 GeoClient       * GUI::s_client				= NULL;
 vector<Canvas *>  GUI::s_auxCanvases;
 EventQueue		  GUI::s_eventQueue;
+bool			  GUI::s_animationRunning	= false;
+float			  GUI::s_currAnimationTime	= 0;
+float			  GUI::s_animationDuration	= 42.0f;
 
 namespace
 {
@@ -317,11 +320,11 @@ void setFullScreen( bool fullscreen )
 		dmess("count " << count);
 
 		// get reolution of monitor
-		const GLFWvidmode * mode = glfwGetVideoMode(monitors[0]);
+		const GLFWvidmode * mode = glfwGetVideoMode(monitors[1]);
 
 		// switch to full screen
 		//glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, 1280 * 2, 720 * 2, 0 );
-		glfwSetWindowMonitor( GUI::getMainWindow(), monitors[0], 0, 0, mode->width, mode->height, mode->refreshRate);
+		glfwSetWindowMonitor( GUI::getMainWindow(), monitors[1], 0, 0, mode->width, mode->height, mode->refreshRate);
 
 		glfwSwapInterval(1);
 	}
@@ -554,6 +557,8 @@ void GUI::mainLoop(GLFWwindow * window)
 	normalFrameBufferDebugPanel();
 	animationPanel();
 
+	//ImGui::ShowDemoWindow();
+
     ImGui::End();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -567,6 +572,13 @@ void GUI::mainLoop(GLFWwindow * window)
     glfwMakeContextCurrent(s_mainWindow);
 
     glfwSwapBuffers(s_mainWindow);
+
+	if (s_animationRunning)
+	{
+		s_currAnimationTime += ImGui::GetIO().DeltaTime;
+
+		if (s_currAnimationTime > s_animationDuration) { s_animationDuration = s_currAnimationTime; }
+	}
 
 #ifdef __EMSCRIPTEN__
 

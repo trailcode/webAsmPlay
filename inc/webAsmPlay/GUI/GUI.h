@@ -133,6 +133,11 @@ public:
 
 	static void doQueue();
 
+	static bool s_animationRunning;
+
+	static float s_currAnimationTime;
+	static float s_animationDuration;
+
 private:
 
     GUI() {}

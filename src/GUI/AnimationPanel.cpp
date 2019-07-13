@@ -29,6 +29,8 @@
 #include <webAsmPlay/canvas/AnimationCanvas.h>
 #include <webAsmPlay/GUI/GUI.h>
 
+
+
 void GUI::animationPanel()
 {
 	s_animationCanvas->setEnabled(s_showAnimationPanel);
@@ -50,6 +52,36 @@ void GUI::animationPanel()
 												ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
 												ImVec2(0, 1),
 												ImVec2(1, 0));
+		if (ImGui::Button("Pos"))
+		{
+
+		} ImGui::SameLine();
+
+		if (ImGui::Button("<<"))
+		{
+
+		} ImGui::SameLine();
+
+		if (ImGui::Button("<"))
+		{
+
+		} ImGui::SameLine();
+
+		if (ImGui::Button(GUI::s_animationRunning ? "||" : "|>")) { GUI::s_animationRunning ^= 1 ;} ImGui::SameLine();
+
+		if (ImGui::Button(">"))
+		{
+
+		} ImGui::SameLine();
+
+		if (ImGui::Button(">>"))
+		{
+
+		} ImGui::SameLine();
+
+		ImGui::SetCursorPos(ImVec2(0, sceneWindowSize.y - 50));
+
+		ImGui::SliderFloat("###animationTime", &GUI::s_currAnimationTime, 0.0f, GUI::s_animationDuration);
 	}
 	ImGui::End();
 }
