@@ -27,8 +27,8 @@
 #include <cstdio>
 #include <limits>
 #include <ctpl.h>
+#include <filesystem>
 #include <glm/gtc/matrix_transform.hpp>
-#include <boost/filesystem.hpp>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/Point.h>

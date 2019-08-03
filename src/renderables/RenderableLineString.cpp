@@ -77,7 +77,6 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
         return NULL;
     }
 
-    //FloatVec  verts  (coords.size() * 3);
     FloatVec  verts  (coords.size() * 2);
     Uint32Vec indices(coords.size());
 
@@ -97,8 +96,6 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
         for(size_t i = 0; i < coords.size(); ++i)
         {
             append2f(vertsPtr, trans * dvec4(coords[i].x, coords[i].y, 0, 1));
-
-            //append(vertsPtr, 0);
 
             indices[i] = (uint32_t)i;
         }

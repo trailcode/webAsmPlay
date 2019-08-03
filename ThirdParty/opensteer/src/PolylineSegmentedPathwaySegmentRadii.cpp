@@ -67,28 +67,6 @@ namespace {
         return numOfPoints - ( closedCycle ? 0 : 1 );
     }
     
-    
-    
-    /**
-     * Returns @c true if all radii in the range @a first to @a last (excluding
-     * @a last) are greater or equal to @c 0, @c false otherwise.
-     */
-    template< typename Iterator >
-        bool allRadiiNonNegative( Iterator first, Iterator last ) {
-            return std::find_if( first, last, std::bind2nd( std::less< float >(), 0.0f ) ) == last;
-        }
-    
-    /**
-     * Returns @c true if all radii are greater or equal to @c 0, @c false
-     * otherwise.
-     */
-    bool allRadiiNonNegative( std::vector< float > const& radii ) {
-        return allRadiiNonNegative( radii.begin(), radii.end() );
-    }
-    
-
-    
-    
 } // namespace anonymous 
 
 
@@ -109,7 +87,7 @@ OpenSteer::PolylineSegmentedPathwaySegmentRadii::PolylineSegmentedPathwaySegment
                                                                                        bool closedCycle )
     : path_( numOfPoints, points, closedCycle ), segmentRadii_( radii, radii + radiiCount( numOfPoints, closedCycle ) )
 {
-    assert( allRadiiNonNegative( segmentRadii_ ) && "All radii must be positive or zero." );
+    
 }
 
 
@@ -118,7 +96,7 @@ OpenSteer::PolylineSegmentedPathwaySegmentRadii::PolylineSegmentedPathwaySegment
 OpenSteer::PolylineSegmentedPathwaySegmentRadii::PolylineSegmentedPathwaySegmentRadii( PolylineSegmentedPathwaySegmentRadii const& other )
     : SegmentedPathway( other ), path_( other.path_ ), segmentRadii_( other.segmentRadii_ )
 {
-    assert( allRadiiNonNegative( segmentRadii_ ) && "All radii must be positive or zero." );    
+    
 }
 
 
@@ -209,7 +187,6 @@ OpenSteer::PolylineSegmentedPathwaySegmentRadii::setSegmentRadii( size_type star
 {
     assert( startIndex < segmentCount() && "startIndex out of range." );
     assert( startIndex + numOfRadii <= segmentCount() && "Too many radii to set." );
-    assert( allRadiiNonNegative( radii, radii + numOfRadii ) && "All radii must be positive or zero." );
     
     std::copy( radii, radii + numOfRadii, segmentRadii_.begin() + startIndex );
 }

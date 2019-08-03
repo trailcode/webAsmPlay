@@ -511,10 +511,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	for (auto i : prevTiles)
 	{
-		if(tileSet.find(i) == tileSet.end())
-		{
-			i->m_stillNeeded = false;
-		}
+		if(tileSet.find(i) == tileSet.end()) { i->m_stillNeeded = false ;}
 	}
 
 	unordered_set<RasterTile*> fallBackTiles;

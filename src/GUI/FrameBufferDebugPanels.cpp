@@ -77,9 +77,7 @@ void GUI::frameBufferDepthDebugPanel()
 
 			fb->unbind();
 
-			ImGui::GetWindowDrawList()->AddImage(	
-													//(void*)(size_t)s_canvas->getG_FrameBuffer()->getTextureID(1),
-													(void*)(size_t)fb->getTextureID(),
+			ImGui::GetWindowDrawList()->AddImage(	(void*)(size_t)fb->getTextureID(),
 													pos,
 													ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
 													ImVec2(0, 1),
@@ -105,8 +103,6 @@ void GUI::normalFrameBufferDebugPanel()
 
 			bindFB(fb, sceneWindowSize);
 
-			//glViewport(0, 0, (GLsizei)sceneWindowSize.x, (GLsizei)sceneWindowSize.y);
-
 			NormalToRGB_Shader::bind(s_canvas->getG_FrameBuffer()->getTextureID(1));
 
 			glDisable(GL_DEPTH_TEST);
@@ -117,9 +113,7 @@ void GUI::normalFrameBufferDebugPanel()
 
 			fb->unbind();
 
-			ImGui::GetWindowDrawList()->AddImage(	
-													//(void*)(size_t)s_canvas->getG_FrameBuffer()->getTextureID(1),
-													(void*)(size_t)fb->getTextureID(),
+			ImGui::GetWindowDrawList()->AddImage(	(void*)(size_t)fb->getTextureID(),
 													pos,
 													ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
 													ImVec2(0, 1),
@@ -128,6 +122,4 @@ void GUI::normalFrameBufferDebugPanel()
 
 		ImGui::End();
 	}
-
-
 }

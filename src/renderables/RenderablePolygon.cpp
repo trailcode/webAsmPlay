@@ -142,12 +142,6 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
 
     m_vertexArrayObject->bindTriangles();
 
-    //glEnable(GL_BLEND); // TODO move into shader
-
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    //glDisable(GL_DEPTH_TEST);
-
 	glEnable(GL_DEPTH_TEST);
 
     if(getRenderFill() && m_shader->shouldRender(false, renderStage))
