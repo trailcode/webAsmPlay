@@ -119,7 +119,7 @@ void GUI::loadState()
     setBool(L"OpenSteerAnnotation",                 OpenSteer::enableAnnotation);
 
     setNumber(L"cameraMode",                        s_cameraMode);
-    setNumber(L"openSteerCameraDist",               openSteerCameraDist);
+    setNumber(L"openSteerCameraDist",               s_openSteerCameraDist);
 
     ColorSymbology::getInstance("defaultMesh")   ->loadState(root);
     ColorSymbology::getInstance("defaultPolygon")->loadState(root);
@@ -172,7 +172,7 @@ void GUI::saveState()
     root[L"cameraUp"]                             = new JSONValue(s_canvas->getCamera()->getUpConstRef());
 
     root[L"OpenSteerAnnotation"]                  = new JSONValue(OpenSteer::enableAnnotation);
-    root[L"openSteerCameraDist"]                  = new JSONValue(openSteerCameraDist);
+    root[L"openSteerCameraDist"]                  = new JSONValue(s_openSteerCameraDist);
 
     root[L"cameraMode"]                           = new JSONValue(s_cameraMode);
 

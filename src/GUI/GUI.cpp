@@ -94,30 +94,25 @@ float			  GUI::s_animationDuration	= 42.0f;
 
 namespace
 {
-    bool doShowProgressBar = false;
+    bool a_doShowProgressBar = false;
 
-    string progressText = "progress";
+    string a_progressText = "progress";
 
-    float progressBarValue = 0.0f;
+    float a_progressBarValue = 0.0f;
 
-    ImGuiTextBuffer * Buf = NULL;
+    ImGuiTextBuffer * a_buf = NULL;
 
-    uint32_t infoIcon = 0;
+    uint32_t a_infoIcon = 0;
 
-    static char mode = GUI::NORMAL_MODE;
+    static char a_mode = GUI::NORMAL_MODE;
 
-    list<Updatable> updatables;
+    list<Updatable> a_updatables;
 
 #ifndef __EMSCRIPTEN__
 
-    ctpl::thread_pool pool(1);
+    ctpl::thread_pool a_pool(1);
 
 #endif
-}
-
-void errorCallback(int error, const char* description)
-{
-    fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
 void GUI::refresh()
@@ -146,7 +141,7 @@ struct AppLog
 {
     bool ScrollToBottom = true;
 
-    void Clear() { Buf->clear(); }
+    void Clear() { a_buf->clear(); }
 
     void AddLog(const char* fmt, ...)
     {
@@ -167,7 +162,7 @@ struct AppLog
         ImGui::BeginChild("scrolling");
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,1));
         if (copy) ImGui::LogToClipboard();
-        ImGui::TextUnformatted(Buf->begin());
+        ImGui::TextUnformatted(a_buf->begin());
         if (ScrollToBottom)
             ImGui::SetScrollHere(1.0f);
         //ScrollToBottom = false;
@@ -219,29 +214,29 @@ void dmessCallback(const string & file, const size_t line, const string & messag
 {
     cout << file << " " << line << " " << message;
     
-    if(Buf) { Buf->appendf("%s %i %s", file.c_str(), (int)line, message.c_str()) ;}
+    if(a_buf) { a_buf->appendf("%s %i %s", file.c_str(), (int)line, message.c_str()) ;}
 }
 
 void GUI::showProgressBar()
 {
-    if(!doShowProgressBar) { return ;}
+    if(!a_doShowProgressBar) { return ;}
 
     static float progressBarLength = 350.0f;
     ImVec2 window_pos(ImGui::GetIO().DisplaySize.x / 2 - progressBarLength,  ImGui::GetIO().DisplaySize.y / 2);
     ImVec2 window_pos_pivot(0,0);
     ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
     ImGui::SetNextWindowBgAlpha(0.6f); // Transparent background
-    if (ImGui::Begin(progressText.c_str(),
-                     &doShowProgressBar,    ImGuiWindowFlags_NoTitleBar |
+    if (ImGui::Begin(a_progressText.c_str(),
+                     &a_doShowProgressBar,    ImGuiWindowFlags_NoTitleBar |
                                             ImGuiWindowFlags_NoResize |
                                             ImGuiWindowFlags_AlwaysAutoResize |
                                             ImGuiWindowFlags_NoSavedSettings |
                                             ImGuiWindowFlags_NoFocusOnAppearing |
                                             ImGuiWindowFlags_NoNav))
     {
-        ImGui::Text(progressText.c_str());
+        ImGui::Text(a_progressText.c_str());
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        ImGui::ProgressBar(progressBarValue, ImVec2(progressBarLength,0.0f));
+        ImGui::ProgressBar(a_progressBarValue, ImVec2(progressBarLength,0.0f));
     }
     ImGui::End();
 }
@@ -269,12 +264,12 @@ void GUI::showMainToolBar()
         ImVec2 uv1(1,1);
         //ImVec2 size(16,16);
         ImVec2 size(32,32);
-        toolbar.addButton(ImGui::Toolbutton("Normal Mode",						(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",			(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",			(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",	(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",				(void*)infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Find Path",						(void*)infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Normal Mode",						(void*)a_infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",			(void*)a_infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",			(void*)a_infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",	(void*)a_infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",				(void*)a_infoIcon,uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Find Path",						(void*)a_infoIcon,uv0,uv1,size));
 
         toolbar.setProperties(false,false,true,ImVec2(0.5f,0.f));
 
@@ -285,12 +280,12 @@ void GUI::showMainToolBar()
 
     switch(pressed)
     {
-        case 0: mode = NORMAL_MODE;                 break;
-        case 1: mode = PICK_MODE_LINESTRING;        break;
-        case 2: mode = PICK_MODE_POLYGON_SINGLE;    break;
-        case 3: mode = PICK_MODE_POLYGON_MULTIPLE;  break;
-        case 4: mode = SET_PATH_START_POINT;        break;
-        case 5: mode = FIND_PATH;                   break;
+        case 0: a_mode = NORMAL_MODE;                 break;
+        case 1: a_mode = PICK_MODE_LINESTRING;        break;
+        case 2: a_mode = PICK_MODE_POLYGON_SINGLE;    break;
+        case 3: a_mode = PICK_MODE_POLYGON_MULTIPLE;  break;
+        case 4: a_mode = SET_PATH_START_POINT;        break;
+        case 5: a_mode = FIND_PATH;                   break;
     }
 }
 
@@ -460,7 +455,7 @@ void GUI::doQueue()
 
 void GUI::mainLoop(GLFWwindow * window)
 {
-    if(!Buf) {  Buf = new ImGuiTextBuffer() ;}
+    if(!a_buf) {  a_buf = new ImGuiTextBuffer() ;}
     // Game loop
     
     //dmess("mainLoop");
@@ -533,9 +528,9 @@ void GUI::mainLoop(GLFWwindow * window)
     showCursorPositionOverlay(NULL, s_client->getInverseTrans() * pos);
     //showCursorPositionOverlay(NULL, pos);
 
-    string attrsStr = s_client->doPicking(mode, pos); // TODO move to updatables
+    string attrsStr = s_client->doPicking(a_mode, pos); // TODO move to a_updatables
 
-    for(auto & i : updatables) { i() ;}
+    for(auto & i : a_updatables) { i() ;}
 
     if(s_showLogPanel) { logPanel.Draw("Log", &s_showLogPanel) ;}
 
@@ -593,23 +588,23 @@ void GUI::progress(const string & message, const float percent)
 {
     if(percent >= 1.0)
     {
-        doShowProgressBar = false;
+        a_doShowProgressBar = false;
 
         return;
     }
 
-    doShowProgressBar = true;
+    a_doShowProgressBar = true;
 
-    progressText = message;
+    a_progressText = message;
 
-    progressBarValue = percent;
+    a_progressBarValue = percent;
 }
 
 void GUI::initOpenGL() // TODO, need some code refactor here
 {
     debugLoggerFunc = &dmessCallback;
 
-    infoIcon = Textures::load("if_Info_131908.png");
+    a_infoIcon = Textures::load("if_Info_131908.png");
     
     // Define the viewport dimensions
     static int width, height; 
@@ -638,7 +633,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
 
 Updatable GUI::addUpdatable(Updatable updatable)
 {
-    updatables.push_back(updatable);
+    a_updatables.push_back(updatable);
 
     return updatable;
 }
@@ -650,7 +645,7 @@ void GUI::createWorld()
     if(s_renderSettingsRenderSkyBox) { s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor
     else                             { s_canvas->setSkyBox(NULL)     ;}
 
-    pool.push([](int ID) {
+    a_pool.push([](int ID) {
         
 		OpenGL::ensureSharedContext();
 
@@ -672,7 +667,7 @@ void GUI::shutdown()
 
 bool GUI::isShuttingDown() { return s_shuttingDown ;}
 
-char GUI::getMode() { return mode ;}
+char GUI::getMode() { return a_mode ;}
 
 GLFWwindow * GUI::getMainWindow() { return s_mainWindow ;}
 

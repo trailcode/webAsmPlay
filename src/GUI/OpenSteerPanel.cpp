@@ -32,7 +32,7 @@
 
 using namespace OpenSteer;
 
-float GUI::openSteerCameraDist = 0.4f;
+float GUI::s_openSteerCameraDist = 0.4f;
 
 bool gotoNextZombie = false; // TODO find a better way!
 
@@ -51,7 +51,7 @@ void GUI::openSteerPanel()
             gPedestrianStartCount = lines;
         }
 
-        ImGui::SliderFloat("", &openSteerCameraDist, 0.007f, 1.5f, "Camera dist: %.3f");
+        ImGui::SliderFloat("", &s_openSteerCameraDist, 0.007f, 1.5f, "Camera dist: %.3f");
         
         if(ImGui::Button("Next Zombie"))
         {

@@ -95,7 +95,7 @@ public:
 
     static bool isShuttingDown();
 
-    static float openSteerCameraDist;
+    static float s_openSteerCameraDist;
 
     static GeoClient * getClient();
 
