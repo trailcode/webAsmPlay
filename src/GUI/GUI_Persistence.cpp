@@ -40,7 +40,6 @@
 
 using namespace std;
 using namespace glm;
-//using namespace nlohmann;
 
 bool GUI::s_showSceneViewPanel                   = false;
 bool GUI::s_showPerformancePanel                 = false;

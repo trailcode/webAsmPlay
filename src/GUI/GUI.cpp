@@ -589,12 +589,6 @@ void GUI::mainLoop(GLFWwindow * window)
 	
 }
 
-char GUI::getMode() { return mode ;}
-
-GLFWwindow * GUI::getMainWindow() { return s_mainWindow ;}
-
-GeoClient * GUI::getClient() { return s_client ;}
-
 void GUI::progress(const string & message, const float percent)
 {
     if(percent >= 1.0)
@@ -649,17 +643,6 @@ Updatable GUI::addUpdatable(Updatable updatable)
     return updatable;
 }
 
-int GUI::getCameraMode() { return s_cameraMode ;}
-
-void GUI::shutdown()
-{
-    saveState();
-
-    s_shuttingDown = true;
-}
-
-bool GUI::isShuttingDown() { return s_shuttingDown ;}
-
 void GUI::createWorld()
 {
     s_skyBox = new SkyBox();
@@ -677,4 +660,26 @@ void GUI::createWorld()
         s_client->loadGeometry("data.geo");
     });
 }
+
+int GUI::getCameraMode() { return s_cameraMode ;}
+
+void GUI::shutdown()
+{
+    saveState();
+
+    s_shuttingDown = true;
+}
+
+bool GUI::isShuttingDown() { return s_shuttingDown ;}
+
+char GUI::getMode() { return mode ;}
+
+GLFWwindow * GUI::getMainWindow() { return s_mainWindow ;}
+
+GeoClient * GUI::getClient() { return s_client ;}
+
+Canvas * GUI::getMainCanvas() { return s_canvas ;}
+
+Camera * GUI::getMainCamera() { return s_canvas->getCamera() ;}
+
 

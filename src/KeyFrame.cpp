@@ -24,78 +24,71 @@
 \copyright 2019
 */
 
-#include <webAsmPlay/Util.h>
-#include <webAsmPlay/KeyFrame.h>
-#include <webAsmPlay/GUI/ImguiInclude.h>
-#include <webAsmPlay/canvas/AnimationCanvas.h>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GUI/GUI.h>
+#include <webAsmPlay/canvas/Camera.h>
+#include <webAsmPlay/KeyFrame.h>
 
+using namespace std;
+using namespace glm;
 
+list<KeyFrame> KeyFrame::s_keyFrames;
 
-void GUI::animationPanel()
+void KeyFrame::create()
 {
-	s_animationCanvas->setEnabled(s_showAnimationPanel);
+	const auto camera = GUI::getMainCamera();
 
-	if (!s_showAnimationPanel) { return; }
+	list<KeyFrame>::iterator i;
 
-	ImGui::Begin("Animation", &s_showAnimationPanel);
+	for(i = s_keyFrames.begin(); i != s_keyFrames.end(); ++i)
 	{
-		const ImVec2 pos = ImGui::GetCursorScreenPos();		
-
-		const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
-
-		s_animationCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
-
-		s_animationCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
-
-		ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)s_animationCanvas->render(),
-												pos,
-												ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-												ImVec2(0, 1),
-												ImVec2(1, 0));
-		if (ImGui::Button("Pos"))
-		{
-			KeyFrame::create();
-
-		} ImGui::SameLine();
-
-		if (ImGui::Button("Print"))
-		{
-			KeyFrame::printFrames();
-
-		} ImGui::SameLine();
-
-		if (ImGui::Button("Closest"))
-		{
-			KeyFrame::setClosest();
-
-		} ImGui::SameLine();
-
-		if (ImGui::Button("<<"))
-		{
-
-		} ImGui::SameLine();
-
-		if (ImGui::Button("<"))
-		{
-
-		} ImGui::SameLine();
-
-		if (ImGui::Button(GUI::s_animationRunning ? "||" : "|>")) { GUI::s_animationRunning ^= 1 ;} ImGui::SameLine();
-
-		if (ImGui::Button(">"))
-		{
-
-		} ImGui::SameLine();
-
-		if (ImGui::Button(">>"))
-		{
-
-		} ImGui::SameLine();
-
-		ImGui::SetCursorPos(ImVec2(0, sceneWindowSize.y - 50));
-
-		ImGui::SliderFloat("###animationTime", &GUI::s_currAnimationTime, 0.0f, GUI::s_animationDuration);
+		if(i->m_timeIndex >= GUI::s_currAnimationTime) { break ;}
 	}
-	ImGui::End();
+
+	s_keyFrames.insert(i, std::move(KeyFrame(	GUI::s_currAnimationTime,
+												camera->getCenterConstRef(),
+												camera->getEyeConstRef(),
+												camera->getUpConstRef())));
+}
+
+KeyFrame::KeyFrame(	const float timeIndex,
+					const vec3	cameraCenter,
+					const vec3	cameraEye,
+					const vec3	cameraUp) :	m_timeIndex		(timeIndex),
+											m_cameraCenter	(cameraCenter),
+											m_cameraEye		(cameraEye),
+											m_cameraUp		(cameraUp)
+{
+
+}
+
+void KeyFrame::printFrames()
+{
+	dmess("--------------------------------------------------------");
+
+	for(const auto & frame : s_keyFrames)
+	{
+		dmess("Time: " << frame.m_timeIndex << " center: " << frame.m_cameraCenter << " eye: " << frame.m_cameraEye);
+	}
+}
+
+void KeyFrame::setClosest()
+{
+	list<KeyFrame>::iterator i;
+
+	for(i = s_keyFrames.begin(); i != s_keyFrames.end(); ++i)
+	{
+		if(i->m_timeIndex > GUI::s_currAnimationTime) { break ;}
+	}
+
+	--i;
+
+	dmess(" " << i->m_timeIndex);
+
+	const auto camera = GUI::getMainCamera();
+
+	camera->setCenter(i->m_cameraCenter);
+	camera->setEye(i->m_cameraEye);
+	camera->setUp(i->m_cameraUp);
+	camera->update();
 }

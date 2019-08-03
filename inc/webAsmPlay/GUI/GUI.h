@@ -38,6 +38,11 @@ class AnimationCanvas;
 class SkyBox;
 class GeoClient;
 
+namespace rsmz
+{
+	class Camera;
+}
+
 class GUI
 {
 public:
@@ -93,6 +98,10 @@ public:
     static float openSteerCameraDist;
 
     static GeoClient * getClient();
+
+	static Canvas * getMainCanvas();
+
+	static rsmz::Camera * getMainCamera();
 
     static void createWorld();
 

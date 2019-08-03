@@ -24,39 +24,33 @@
 \copyright 2019
 */
 
-#include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Util.h>
-#include <webAsmPlay/canvas/AnimationCanvas.h>
+#pragma once
 
-using namespace glm;
+#include <list>
+#include <glm/vec3.hpp>
 
-//extern IMGUI_API ImGuiContext* GImGui;
-
-AnimationCanvas::AnimationCanvas(const bool   useFrameBuffer,
-								 const vec4 & clearColor)
+class KeyFrame
 {
-}
+public:
 
-AnimationCanvas::~AnimationCanvas()
-{
+	static void create();
 
-}
+	static void printFrames();
 
-GLuint AnimationCanvas::render()
-{
-	if(!m_enabled) { return 0 ;}
+	static void setClosest();
 
-	return 0;
-}
+	const float m_timeIndex;
 
-void AnimationCanvas::onMousePosition(GLFWwindow* window, const vec2& mousePos)
-{
-	if(!m_enabled) { return ;}
+	const glm::vec3 m_cameraCenter;
+	const glm::vec3 m_cameraEye;
+	const glm::vec3 m_cameraUp;
 
-	//dmess("AnimationCanvas::onMousePosition " << mousePos.x << " " << mousePos.y);
-}
+private:
 
-void AnimationCanvas::onChar(GLFWwindow* window, const size_t c)
-{
+	KeyFrame(	const float		timeIndex,
+				const glm::vec3 cameraCenter,
+				const glm::vec3 cameraEye,
+				const glm::vec3 cameraUp);
 
-}
+	static std::list<KeyFrame> s_keyFrames;
+};
