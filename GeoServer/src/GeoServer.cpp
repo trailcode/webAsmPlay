@@ -147,7 +147,8 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
     }
     
 	polygons = discoverTopologicalRelations(polygons);
-    breakLineStrings            (lineStrings);
+
+    breakLineStrings(lineStrings);
 
     for(const AttributedPoligonalArea & g : polygons)    { serializedPolygons.push_back   (GeometryConverter::convert(g)) ;}
     for(const AttributedLineString    & l : lineStrings) { serializedLineStrings.push_back(GeometryConverter::convert(l)) ;}

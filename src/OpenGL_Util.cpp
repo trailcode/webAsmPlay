@@ -36,20 +36,20 @@ using namespace tbb;
 
 namespace
 {
-	const size_t numOpenGL_Contexts = 10;
+	const size_t a_numOpenGL_Contexts = 10;
 	
-	concurrent_queue<GLFWwindow *> contextWindows;
+	concurrent_queue<GLFWwindow *> a_contextWindows;
 
-	unordered_set<thread::id> setContextes;
+	unordered_set<thread::id> a_setContextes;
 }
 
-void APIENTRY glDebugOutput(GLenum source, 
-	GLenum type, 
-	GLuint id, 
-	GLenum severity, 
-	GLsizei length, 
-	const GLchar *message, 
-	const void *userParam)
+void APIENTRY glDebugOutput(GLenum			  source, 
+							GLenum			  type, 
+							GLuint			  id, 
+							GLenum			  severity, 
+							GLsizei			  length, 
+							const GLchar	* message, 
+							const void		* userParam)
 {
 	// ignore non-significant error/warning codes
 	if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return; 
@@ -115,9 +115,9 @@ void OpenGL::init()
 
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 
-	for (size_t i = 0; i < numOpenGL_Contexts; ++i)
+	for (size_t i = 0; i < a_numOpenGL_Contexts; ++i)
 	{
-		contextWindows.push(glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow()));
+		a_contextWindows.push(glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow()));
 	}
 }
 
@@ -125,13 +125,13 @@ void OpenGL::ensureSharedContext()
 {
 	const thread::id threadID = this_thread::get_id();
 
-	if(setContextes.find(threadID) != setContextes.end()) { return ;}
+	if(a_setContextes.find(threadID) != a_setContextes.end()) { return ;}
 
 	GLFWwindow * contextWindow = NULL;
 
-	if(!contextWindows.try_pop(contextWindow)) { dmessError("Unable to create opengl shared context! Increase the number available.") }
+	if(!a_contextWindows.try_pop(contextWindow)) { dmessError("Unable to create opengl shared context! Increase the number available.") }
 
 	glfwMakeContextCurrent(contextWindow);
 
-	setContextes.insert(threadID);
+	a_setContextes.insert(threadID);
 }

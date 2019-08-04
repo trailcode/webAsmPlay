@@ -116,7 +116,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     dmess("Start polygon quadTree...");
 
-    auto startTime = system_clock::now();
+    const auto startTime = system_clock::now();
 
 	indexerPool.push([this, &geoms](int ID)
 	{
@@ -138,7 +138,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 			r->setRenderFill   (true);
 			r->setRenderOutline(true);
 
-			tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
+			const auto data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
 
 			m_quadTreePolygons->insert(g->getEnvelopeInternal(), data);
 		}
@@ -154,10 +154,8 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     ColoredExtrudedGeometryVec polygons3D;
 
-    for(size_t i = 0; i < geoms.size(); ++i)
+	for(const auto [attrs, geom] : geoms)
     {
-        Attributes * attrs = geoms[i].first;
-
         GLuint colorID   = 0;
         double height    = 0.0;
         double minHeight = 0.0;
@@ -185,9 +183,9 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
                 attrs->hasStringKeyValue("surface", "grass"))    { colorID = 1 ;}
         else if(attrs->hasStringKeyValue("landuse", "reservor")) { colorID = 2 ;}
 
-        if(height == 0.0) { polygons.push_back(ColoredGeometry(geoms[i].second, colorID)) ;}
+        if(height == 0.0) { polygons.push_back(ColoredGeometry(geom, colorID)) ;}
 
-        else { polygons3D.push_back(ColoredExtrudedGeometry(geoms[i].second, colorID, height, minHeight)) ;}
+        else { polygons3D.push_back(ColoredExtrudedGeometry(geom, colorID, height, minHeight)) ;}
     }
 
     dmess("polygons " << polygons.size() << " polygons3D " << polygons3D.size());
@@ -229,13 +227,9 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     vector<Edge *> edges;
 
-	for(size_t i = 0; i < geoms.size(); ++i)
+	for(const auto [attrs, geom] : geoms)
 	{
-		//doProgress("(2/6) Indexing linestrings:", i, geoms.size(), startTime);
-
-		Attributes     * attrs   = geoms[i].first;
-		const Geometry * geom    = geoms[i].second;
-		GLuint           colorID = 0;
+		GLuint colorID = 0;
 
 		// TODO Code dup!
 
@@ -300,16 +294,14 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     auto startTime = system_clock::now();
 
-    //vector<const Geometry *> points;
     ColoredGeometryVec points;
 
     for(size_t i = 0; i < geoms.size(); ++i)
     {
         doProgress("(2/6) Indexing points:", i, geoms.size(), startTime);
 
-        Attributes     * attrs = geoms[i].first;
-        const Geometry * geom  = geoms[i].second;
-        
+		const auto [attrs, geom] = geoms[i];
+
         Renderable * r = Renderable::create(geom, m_trans);
         
         if(!r) { dmess("!r"); continue ;}
@@ -319,7 +311,6 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
         m_quadTreePoints->insert(geom->getEnvelopeInternal(), data);
 
         points.push_back(ColoredGeometry(geom->buffer(0.0001), 1));
-        //points.push_back(geom);
     }
     
     GUI::progress("", 1.0);

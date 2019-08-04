@@ -39,6 +39,8 @@ public:
 
 	static void setClosest();
 
+	static void update(const float timeIndex);
+
 	const float m_timeIndex;
 
 	const glm::vec3 m_cameraCenter;

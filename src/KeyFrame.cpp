@@ -92,3 +92,10 @@ void KeyFrame::setClosest()
 	camera->setUp(i->m_cameraUp);
 	camera->update();
 }
+
+void KeyFrame::update(const float timeIndex)
+{
+	dmess("update: " << timeIndex);
+
+
+}

@@ -47,6 +47,7 @@
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/KeyFrame.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 // .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
@@ -573,6 +574,8 @@ void GUI::mainLoop(GLFWwindow * window)
 		s_currAnimationTime += ImGui::GetIO().DeltaTime;
 
 		if (s_currAnimationTime > s_animationDuration) { s_animationDuration = s_currAnimationTime; }
+
+		KeyFrame::update(s_currAnimationTime);
 	}
 
 #ifdef __EMSCRIPTEN__
