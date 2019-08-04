@@ -25,12 +25,9 @@
   \copyright 2018
 */
 
-#ifndef __EMSCRIPTEN__
-#include <boost/filesystem.hpp>
-using namespace boost;
-#endif
-
 #include <codecvt>
+#include <fstream>
+#include <filesystem>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/Util.h>
 
