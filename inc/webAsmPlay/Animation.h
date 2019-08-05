@@ -43,7 +43,11 @@ public:
 
 	static void load(const nlohmann::json & animation);
 
+	static void loadFile(const std::string & jsonFile);
+
 	static const nlohmann::json save();
+
+	static size_t numKeys();
 
 private:
 

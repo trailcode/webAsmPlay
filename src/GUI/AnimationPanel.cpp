@@ -91,6 +91,8 @@ void GUI::animationPanel()
 
 		} ImGui::SameLine();
 
+		ImGui::Text("num keys: %i", Animation::numKeys()); ImGui::SameLine();
+
 		ImGui::SetCursorPos(ImVec2(0, sceneWindowSize.y - 50));
 
 		ImGui::SliderFloat("###animationTime", &GUI::s_currAnimationTime, 0.0f, GUI::s_animationDuration);

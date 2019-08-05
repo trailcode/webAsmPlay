@@ -34,6 +34,7 @@
 using namespace std;
 using namespace std::chrono;
 using namespace glm;
+using namespace nlohmann;
 
 string toStr(const mat4 & m)
 {
@@ -149,4 +150,19 @@ string readFile(const string fileName)
 	if (!t.is_open()) { dmessError("Error could not open file: " << fileName) ;}
 
 	return string((std::istreambuf_iterator<char>(t)), istreambuf_iterator<char>());
+}
+
+json loadJson(const string & fileName)
+{
+	json ret;
+
+	ifstream in(fileName);
+
+	if(!in.is_open()) { return ret ;}
+
+	ret << in;
+
+	in.close();
+
+	return ret;
 }

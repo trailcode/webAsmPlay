@@ -24,6 +24,7 @@
   \copyright 2019
 */
 
+#include <fstream>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -78,9 +79,9 @@ void Animation::setClosest()
 
 	camera->setCenter(i->m_cameraCenter);
 	camera->setEye(i->m_cameraEye);
-	camera->setUp(i->m_cameraUp);
+	//camera->setUp(i->m_cameraUp);
 	camera->update();
-
+	
 	update(GUI::s_currAnimationTime);
 }
 
@@ -130,6 +131,26 @@ void Animation::load(const json & animation)
 	}
 }
 
+void Animation::loadFile(const string & jsonFile)
+{
+	ifstream in(jsonFile);
+
+	if(!in.is_open())
+	{
+		dmess("Warn: could not open animation file: " << jsonFile);
+
+		return;
+	}
+
+	json animation;
+
+	animation << in;
+
+	in.close();
+
+	load(animation);
+}
+
 const json Animation::save()
 {
 	json animation;
@@ -146,3 +167,5 @@ const json Animation::save()
 
 	return animation;
 }
+
+size_t Animation::numKeys() { return s_keyFrames.size() ;}
