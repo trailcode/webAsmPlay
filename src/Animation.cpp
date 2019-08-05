@@ -29,6 +29,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/canvas/Camera.h>
+#include <webAsmPlay/TrackBallInteractor.h>
 #include <webAsmPlay/Animation.h>
 
 using namespace std;
@@ -75,12 +76,10 @@ void Animation::setClosest()
 
 	dmess(" " << i->m_timeIndex);
 
-	const auto camera = GUI::getMainCamera();
-
-	camera->setCenter(i->m_cameraCenter);
-	camera->setEye(i->m_cameraEye);
+	GUI::getMainCamera()->setCenter(i->m_cameraCenter);
+	GUI::getMainCamera()->setEye(i->m_cameraEye);
 	//camera->setUp(i->m_cameraUp);
-	camera->update();
+	GUI::getMainCamera()->update();
 	
 	update(GUI::s_currAnimationTime);
 }
@@ -169,3 +168,43 @@ const json Animation::save()
 }
 
 size_t Animation::numKeys() { return s_keyFrames.size() ;}
+
+namespace
+{
+	void setKey(const KeyFrame & key)
+	{
+		GUI::getMainCamera()->setCenter(key.m_cameraCenter);
+		GUI::getMainCamera()->setEye(key.m_cameraEye);
+		//camera->setUp(i->m_cameraUp);
+
+		GUI::getTrackBallInteractor()->updateCameraEyeUp(true, true);
+
+		GUI::getMainCamera()->update();
+
+		GUI::s_currAnimationTime = key.m_timeIndex;
+	}
+}
+
+void Animation::prev()
+{
+	list<KeyFrame>::iterator i;
+
+	for(i = s_keyFrames.begin(); i != s_keyFrames.end(); ++i)
+	{
+		if(i->m_timeIndex >= GUI::s_currAnimationTime) { break ;}
+	}
+
+	setKey(*--i);
+}
+
+void Animation::next()
+{
+	list<KeyFrame>::iterator i;
+
+	for(i = s_keyFrames.begin(); i != s_keyFrames.end(); ++i)
+	{
+		if(i->m_timeIndex > GUI::s_currAnimationTime) { break ;}
+	}
+
+	setKey(*i);
+}

@@ -71,7 +71,7 @@ namespace rsmz
         float setZoomScale(const float scale);
         void update();
 
-    protected:
+    //protected:
         char clickQuadrant(float x, float y);
         void computeCameraEye(glm::vec3 & eye);
         void computeCameraUp(glm::vec3 & up);

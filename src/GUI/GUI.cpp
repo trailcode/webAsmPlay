@@ -680,4 +680,6 @@ Canvas * GUI::getMainCanvas() { return s_canvas ;}
 
 Camera * GUI::getMainCamera() { return s_canvas->getCamera() ;}
 
+TrackBallInteractor * GUI::getTrackBallInteractor() { return getMainCanvas()->getTrackBallInteractor() ;}
+
 

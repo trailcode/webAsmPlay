@@ -49,6 +49,10 @@ public:
 
 	static size_t numKeys();
 
+	static void prev();
+
+	static void next();
+
 private:
 
 	Animation() {}

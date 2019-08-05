@@ -41,6 +41,7 @@ class GeoClient;
 namespace rsmz
 {
 	class Camera;
+	class TrackBallInteractor;
 }
 
 class GUI
@@ -102,6 +103,8 @@ public:
 	static Canvas * getMainCanvas();
 
 	static rsmz::Camera * getMainCamera();
+
+	static rsmz::TrackBallInteractor * getTrackBallInteractor();
 
     static void createWorld();
 

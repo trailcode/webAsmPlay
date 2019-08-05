@@ -76,6 +76,7 @@ void GUI::animationPanel()
 
 		if (ImGui::Button("<"))
 		{
+			Animation::prev();
 
 		} ImGui::SameLine();
 
@@ -83,6 +84,7 @@ void GUI::animationPanel()
 
 		if (ImGui::Button(">"))
 		{
+			Animation::next();
 
 		} ImGui::SameLine();
 
