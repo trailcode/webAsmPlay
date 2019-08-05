@@ -33,6 +33,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/canvas/Camera.h>
+#include <webAsmPlay/canvas/TrackBallInteractor.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
@@ -132,7 +133,9 @@ void GUI::loadState()
     if(root.find(L"cameraCenter") != root.end()) { s_canvas->getCamera()->setCenter(root[L"cameraCenter"]->AsVec3()) ;}
     if(root.find(L"cameraUp")     != root.end()) { s_canvas->getCamera()->setUp    (root[L"cameraUp"]    ->AsVec3()) ;}
 
-    s_canvas->getCamera()->update();
+	getTrackBallInteractor()->updateCameraEyeUp(true, true);
+	
+    getMainCamera()->update();
 
     if(root.find(L"buildingHeightMultiplier") != root.end())
     {

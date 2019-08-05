@@ -70,8 +70,10 @@ namespace rsmz
         void setSpeed(float s);
         float setZoomScale(const float scale);
         void update();
+		void updateCameraEyeUp(bool eye, bool up);
 
-    //protected:
+    protected:
+
         char clickQuadrant(float x, float y);
         void computeCameraEye(glm::vec3 & eye);
         void computeCameraUp(glm::vec3 & up);
@@ -91,8 +93,7 @@ namespace rsmz
         void rollCamera();
         void freezeTransform();
         void scroll();
-        void updateCameraEyeUp(bool eye, bool up);
-
+        
     private:
         Camera *m_Camera;
         CameraMotionType m_CameraMotionLeftClick;
