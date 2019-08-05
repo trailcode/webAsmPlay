@@ -34,7 +34,7 @@
 #include "imgui_impl_glfw.h"
 #include <imguitoolbar.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
-#include <webAsmPlay/TrackBallInteractor.h>
+#include <webAsmPlay/canvas/TrackBallInteractor.h>
 #include <webAsmPlay/canvas/Camera.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/canvas/Canvas.h>

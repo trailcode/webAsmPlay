@@ -29,7 +29,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/canvas/Camera.h>
-#include <webAsmPlay/TrackBallInteractor.h>
+#include <webAsmPlay/canvas/TrackBallInteractor.h>
 #include <webAsmPlay/Animation.h>
 
 using namespace std;

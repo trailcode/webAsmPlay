@@ -28,7 +28,7 @@
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
-#include <webAsmPlay/TrackBallInteractor.h>
+#include <webAsmPlay/canvas/TrackBallInteractor.h>
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/Frustum.h>

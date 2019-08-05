@@ -182,7 +182,6 @@ if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
 
 endif()
 
-
 include_directories(ThirdParty)
 include_directories(ThirdParty/GLUTesselator/include)
 include_directories(ThirdParty/geos/include)

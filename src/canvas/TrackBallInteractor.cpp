@@ -1,6 +1,6 @@
 #include <iostream>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/TrackBallInteractor.h>
+#include <webAsmPlay/canvas/TrackBallInteractor.h>
 #include <glm/gtx/norm.hpp> // length2
 #include <glm/vec3.hpp>
 #include <glm/gtc/type_ptr.hpp>
