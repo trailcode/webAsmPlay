@@ -29,6 +29,7 @@
 #include <locale>
 #include <codecvt>
 #include <JSON.h>
+#include <nlohmann/json.hpp>>
 #include <OpenSteer/Annotation.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/canvas/Canvas.h>
@@ -36,10 +37,12 @@
 #include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
+#include <webAsmPlay/Animation.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
 using namespace glm;
+using namespace nlohmann;
 
 bool GUI::s_showSceneViewPanel                   = false;
 bool GUI::s_showPerformancePanel                 = false;
@@ -135,6 +138,16 @@ void GUI::loadState()
     {
         ColorDistanceDepthShader3D::getDefaultInstance()->setHeightMultiplier(root[L"buildingHeightMultiplier"]->AsNumber());
     }
+
+	ifstream animation("animation.json");
+
+	json ani;
+
+	ani << animation;
+
+	animation.close();
+
+	Animation::load(ani);
 }
 
 void GUI::saveState()
@@ -187,6 +200,14 @@ void GUI::saveState()
     configFile << converter.to_bytes(JSONValue(root).Stringify());
 
     configFile.close();
+
+	/*
+	ofstream animation("animation.json");
+
+	animation << Animation::save().dump(4);
+
+	animation.close();
+	*/
 }
 
 

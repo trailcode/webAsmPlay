@@ -31,25 +31,14 @@
 
 using namespace std;
 using namespace glm;
+using namespace nlohmann;
 
-list<KeyFrame> KeyFrame::s_keyFrames;
-
-void KeyFrame::create()
+/*
+KeyFrame KeyFrame::create()
 {
-	const auto camera = GUI::getMainCamera();
-
-	list<KeyFrame>::iterator i;
-
-	for(i = s_keyFrames.begin(); i != s_keyFrames.end(); ++i)
-	{
-		if(i->m_timeIndex >= GUI::s_currAnimationTime) { break ;}
-	}
-
-	s_keyFrames.insert(i, std::move(KeyFrame(	GUI::s_currAnimationTime,
-												camera->getCenterConstRef(),
-												camera->getEyeConstRef(),
-												camera->getUpConstRef())));
+	
 }
+*/
 
 KeyFrame::KeyFrame(	const float timeIndex,
 					const vec3	cameraCenter,
@@ -62,40 +51,23 @@ KeyFrame::KeyFrame(	const float timeIndex,
 
 }
 
-void KeyFrame::printFrames()
+/*
+json KeyFrame::save()
 {
-	dmess("--------------------------------------------------------");
+	json keyFrames;
 
-	for(const auto & frame : s_keyFrames)
+	for(const auto & i : s_keyFrames)
 	{
-		dmess("Time: " << frame.m_timeIndex << " center: " << frame.m_cameraCenter << " eye: " << frame.m_cameraEye);
-	}
-}
+		json keyFrame;
 
-void KeyFrame::setClosest()
-{
-	list<KeyFrame>::iterator i;
-
-	for(i = s_keyFrames.begin(); i != s_keyFrames.end(); ++i)
-	{
-		if(i->m_timeIndex > GUI::s_currAnimationTime) { break ;}
+		keyFrames["frames"].push_back
 	}
 
-	--i;
-
-	dmess(" " << i->m_timeIndex);
-
-	const auto camera = GUI::getMainCamera();
-
-	camera->setCenter(i->m_cameraCenter);
-	camera->setEye(i->m_cameraEye);
-	camera->setUp(i->m_cameraUp);
-	camera->update();
+	return keyFrames;
 }
 
-void KeyFrame::update(const float timeIndex)
+void KeyFrame::load(const json & keyFrames)
 {
-	dmess("update: " << timeIndex);
-
-
+	s_keyFrames.clear();
 }
+*/

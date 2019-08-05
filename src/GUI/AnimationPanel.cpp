@@ -25,12 +25,10 @@
 */
 
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/KeyFrame.h>
+#include <webAsmPlay/Animation.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/canvas/AnimationCanvas.h>
 #include <webAsmPlay/GUI/GUI.h>
-
-
 
 void GUI::animationPanel()
 {
@@ -55,19 +53,19 @@ void GUI::animationPanel()
 												ImVec2(1, 0));
 		if (ImGui::Button("Pos"))
 		{
-			KeyFrame::create();
+			Animation::createKeyFrame();
 
 		} ImGui::SameLine();
 
 		if (ImGui::Button("Print"))
 		{
-			KeyFrame::printFrames();
+			Animation::printFrames();
 
 		} ImGui::SameLine();
 
 		if (ImGui::Button("Closest"))
 		{
-			KeyFrame::setClosest();
+			Animation::setClosest();
 
 		} ImGui::SameLine();
 

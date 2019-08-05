@@ -28,18 +28,15 @@
 
 #include <list>
 #include <glm/vec3.hpp>
+#include <nlohmann/json.hpp>
 
 class KeyFrame
 {
 public:
 
-	static void create();
+	static nlohmann::json save();
 
-	static void printFrames();
-
-	static void setClosest();
-
-	static void update(const float timeIndex);
+	static void load(const nlohmann::json & keyFrames);
 
 	const float m_timeIndex;
 
@@ -49,10 +46,10 @@ public:
 
 private:
 
+	friend class Animation;
+
 	KeyFrame(	const float		timeIndex,
 				const glm::vec3 cameraCenter,
 				const glm::vec3 cameraEye,
 				const glm::vec3 cameraUp);
-
-	static std::list<KeyFrame> s_keyFrames;
 };

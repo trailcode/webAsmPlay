@@ -32,6 +32,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <nlohmann/json.hpp>
 #include <OpenSteer/Vec3.h>
 #include <OpenSteer/Color.h>
 #include <webAsmPlay/Debug.h>
@@ -83,6 +84,22 @@ static glm::vec4 __(const ImVec4 & v) { return glm::vec4(v.x, v.y, v.z, v.w) ;}
 static glm::vec3 __(const OpenSteer::Vec3 & v) { return glm::vec3(v.x, v.y, v.z) ;}
 
 static glm::vec4 __(const OpenSteer::Color & v) { return glm::vec4(v.r(), v.g(), v.b(), v.a()) ;}
+
+static auto toTuple(const glm::vec1 & P) { return std::make_tuple(P.x) ;}
+
+static auto toTuple(const glm::vec2 & P) { return std::make_tuple(P.x, P.y) ;}
+
+static auto toTuple(const glm::vec3 & P) { return std::make_tuple(P.x, P.y, P.z) ;}
+
+static auto toTuple(const glm::vec4 & P) { return std::make_tuple(P.x, P.y, P.z, P.w) ;}
+
+static glm::vec1 toVec1(const nlohmann::json & P) { return glm::vec1(P[0]) ;}
+
+static glm::vec2 toVec2(const nlohmann::json & P) { return glm::vec2(P[0], P[1]) ;}
+
+static glm::vec3 toVec3(const nlohmann::json & P) { return glm::vec3(P[0], P[1], P[2]) ;}
+
+static glm::vec4 toVec4(const nlohmann::json & P) { return glm::vec4(P[0], P[1], P[2], P[3]) ;}
 
 std::wstring stringToWstring(const std::string& t_str);
 
