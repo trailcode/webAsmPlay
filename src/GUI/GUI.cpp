@@ -557,8 +557,6 @@ void GUI::mainLoop(GLFWwindow * window)
 
     ImGui::End();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     ImGui::Render();
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

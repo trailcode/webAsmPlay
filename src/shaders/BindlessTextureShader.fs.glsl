@@ -34,7 +34,7 @@ uniform int texID;
 
 layout (binding = 6, std140) uniform TEXTURE_BLOCK
 {
-	sampler2D      texa[2048];
+	sampler2D      texa[1024];
 };
 
 void main()

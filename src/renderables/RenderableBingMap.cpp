@@ -68,7 +68,7 @@ size_t RenderableBingMap::s_numRendered = 0;
 FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
 
 bool RenderableBingMap::s_useCache = true;
-const bool useBindlessTextures = true;
+const bool useBindlessTextures = false;
 
 namespace
 {
@@ -252,7 +252,7 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 		if (!get<0>(tileBuffer))
 		{
-			dmess("Error! No buffer!");
+			//dmess("Error! No buffer!");
 
 			--s_numLoading;
 
