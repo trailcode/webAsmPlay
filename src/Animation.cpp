@@ -121,12 +121,21 @@ void Animation::update(const float timeIndex)
 
 void Animation::load(const json & animation)
 {
-	for(const auto & keyFrame : animation["keyFrames"])
+	try
 	{
-		s_keyFrames.push_back(move(KeyFrame(		keyFrame["timeIndex"],
-											toVec3( keyFrame["cameraEye"]),
-											toVec3( keyFrame["cameraCenter"]),
-											toVec3( keyFrame["cameraUp"]))));
+		for(const auto & keyFrame : animation["keyFrames"])
+		{
+			s_keyFrames.push_back(move(KeyFrame(		keyFrame["timeIndex"],
+												toVec3( keyFrame["cameraEye"]),
+												toVec3( keyFrame["cameraCenter"]),
+												toVec3( keyFrame["cameraUp"]))));
+		}
+	}
+	catch(const exception & e)
+	{
+		dmess("Error loading: " << e.what());
+
+		s_keyFrames.clear();
 	}
 }
 
