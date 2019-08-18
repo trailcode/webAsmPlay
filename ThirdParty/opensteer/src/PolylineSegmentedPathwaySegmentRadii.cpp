@@ -149,7 +149,7 @@ OpenSteer::PolylineSegmentedPathwaySegmentRadii::setPathway( size_type numOfPoin
                                                              float const radii[],
                                                              bool closedCycle )
 {
-    assert( allRadiiNonNegative( radii, radii + radiiCount( numOfPoints, closedCycle ) ) && "All radii must be positive or zero." );
+    //assert( allRadiiNonNegative( radii, radii + radiiCount( numOfPoints, closedCycle ) ) && "All radii must be positive or zero." );
     path_.setPath( numOfPoints, points, closedCycle );
     segmentRadii_.assign( radii, radii + radiiCount( numOfPoints, closedCycle ) );
     shrinkToFit( segmentRadii_ );

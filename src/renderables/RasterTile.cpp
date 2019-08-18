@@ -104,7 +104,7 @@ size_t RasterTile::pruneTiles()
 		++numFreed;
 	}
 
-	glDeleteTextures(a_texturesToFree.size(), &a_texturesToFree[0]);
+	if(a_texturesToFree.size()) { glDeleteTextures(a_texturesToFree.size(), &a_texturesToFree[0]) ;}
 
 	a_texturesToFree.clear();
 

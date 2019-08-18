@@ -44,6 +44,8 @@ public:
 	const glm::vec3 m_cameraEye;
 	const glm::vec3 m_cameraUp;
 
+	const size_t m_ID;
+
 private:
 
 	friend class Animation;

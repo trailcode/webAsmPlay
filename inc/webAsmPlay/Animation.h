@@ -27,6 +27,7 @@
 #pragma once
 
 #include <list>
+#include <vector>
 #include <webAsmPlay/KeyFrame.h>
 
 class Animation
@@ -58,5 +59,9 @@ private:
 	Animation() {}
 	~Animation() {}
 
+	static void updateKeyFramesVec();
+
 	static std::list<KeyFrame> s_keyFrames;
+
+	static std::vector<KeyFrame *> s_keyFramesVec;
 };

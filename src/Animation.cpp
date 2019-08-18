@@ -36,7 +36,8 @@ using namespace std;
 using namespace glm;
 using namespace nlohmann;
 
-list<KeyFrame> Animation::s_keyFrames;
+list<KeyFrame>		Animation::s_keyFrames;
+vector<KeyFrame *>	Animation::s_keyFramesVec;
 
 void Animation::createKeyFrame()
 {
@@ -51,6 +52,15 @@ void Animation::createKeyFrame()
 										GUI::getMainCamera()->getCenterConstRef(),
 										GUI::getMainCamera()->getEyeConstRef(),
 										GUI::getMainCamera()->getUpConstRef())));
+
+	updateKeyFramesVec();
+}
+
+void Animation::updateKeyFramesVec()
+{
+	s_keyFramesVec.clear();
+
+	for(auto & i : s_keyFrames) { s_keyFramesVec.push_back(&i) ;}
 }
 
 void Animation::printFrames()
@@ -59,7 +69,7 @@ void Animation::printFrames()
 
 	for(const auto & frame : s_keyFrames)
 	{
-		dmess("Time: " << frame.m_timeIndex << " center: " << frame.m_cameraCenter << " eye: " << frame.m_cameraEye);
+		dmess("Time: " << frame.m_timeIndex << " " << frame.m_ID << " center: " << frame.m_cameraCenter << " eye: " << frame.m_cameraEye);
 	}
 }
 
@@ -76,9 +86,9 @@ void Animation::setClosest()
 
 	dmess(" " << i->m_timeIndex);
 
-	GUI::getMainCamera()->setCenter(i->m_cameraCenter);
-	GUI::getMainCamera()->setEye(i->m_cameraEye);
-	//camera->setUp(i->m_cameraUp);
+	GUI::getMainCamera()->setCenter	(i->m_cameraCenter);
+	GUI::getMainCamera()->setEye	(i->m_cameraEye);
+	GUI::getMainCamera()->setUp		(i->m_cameraUp);
 	GUI::getMainCamera()->update();
 	
 	update(GUI::s_currAnimationTime);
@@ -102,6 +112,7 @@ namespace
 
 void Animation::update(const float timeIndex)
 {
+	/*
 	dmess("update: " << timeIndex);
 
 	list<KeyFrame>::iterator i;
@@ -116,7 +127,28 @@ void Animation::update(const float timeIndex)
 
 	const double t = (timeIndex - prev.m_timeIndex) / (next.m_timeIndex - prev.m_timeIndex);
 
-	dmess("prev " << prev.m_timeIndex << " next " << next.m_timeIndex << " t " << t);
+	dmess("prev " << prev.m_timeIndex << " next " << next.m_timeIndex << " t " << t << " prevIndex: " << prev.m_ID << " nextIndex " << next.m_ID);
+	//*/
+
+	//*
+	int i = 0;
+	
+	for(; i < s_keyFramesVec.size(); ++i)
+	{
+		dmess("s_keyFramesVec[i]->m_timeIndex " << s_keyFramesVec[i]->m_timeIndex);
+
+		if(s_keyFramesVec[i]->m_timeIndex > GUI::s_currAnimationTime) { break ;} 
+	}
+
+	dmess("i " << i << " " << s_keyFramesVec.size());
+
+	const auto next1 = s_keyFramesVec[i];
+	const auto prev1 = s_keyFramesVec[(i - 1) % s_keyFramesVec.size()];
+
+	const double t = (timeIndex - prev1->m_timeIndex) / (next1->m_timeIndex - prev1->m_timeIndex);
+
+	dmess("prev " << prev1->m_timeIndex << " " << prev1->m_ID  << " next " << next1->m_timeIndex << " " << next1->m_ID << " t " << t);
+	//*/
 }
 
 void Animation::load(const json & animation)
@@ -137,6 +169,8 @@ void Animation::load(const json & animation)
 
 		s_keyFrames.clear();
 	}
+
+	updateKeyFramesVec();
 }
 
 void Animation::loadFile(const string & jsonFile)
@@ -165,10 +199,10 @@ const json Animation::save()
 
 	for(const auto & i : s_keyFrames)
 	{
-		json keyFrame{	{"timeIndex",		i.m_timeIndex},
-						{"cameraEye",		toTuple(i.m_cameraEye)},
-						{"cameraCenter",	toTuple(i.m_cameraCenter)},
-						{"cameraUp",		toTuple(i.m_cameraUp)}};
+		json keyFrame{	{"timeIndex",		i.m_timeIndex				},
+						{"cameraEye",		toTuple(i.m_cameraEye)		},
+						{"cameraCenter",	toTuple(i.m_cameraCenter)	},
+						{"cameraUp",		toTuple(i.m_cameraUp)		}};
 
 		animation["keyFrames"].push_back(keyFrame);
 	}
@@ -182,9 +216,9 @@ namespace
 {
 	void setKey(const KeyFrame & key)
 	{
-		GUI::getMainCamera()->setCenter(key.m_cameraCenter);
-		GUI::getMainCamera()->setEye(key.m_cameraEye);
-		//camera->setUp(i->m_cameraUp);
+		GUI::getMainCamera()->setCenter	(key.m_cameraCenter);
+		GUI::getMainCamera()->setEye	(key.m_cameraEye);
+		GUI::getMainCamera()->setUp		(key.m_cameraUp);
 
 		GUI::getTrackBallInteractor()->updateCameraEyeUp(true, true);
 

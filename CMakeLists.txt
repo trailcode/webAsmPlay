@@ -26,7 +26,7 @@ if(MSVC_VERSION)
 		execute_process(COMMAND ${NUGET} install boost_regex-vc141			-Version 1.69.0.0	-o thirdParty)
 		execute_process(COMMAND ${NUGET} install boost_system-vc141			-Version 1.69.0.0	-o thirdParty)
 		execute_process(COMMAND ${NUGET} install curl-vc141-dynamic-x86_64	-Version 7.59.0		-o thirdParty)
-		execute_process(COMMAND ${NUGET} install glfw						-Version 3.2.1.5	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install glfw						-Version 3.3.0.1	-o thirdParty)
 		execute_process(COMMAND ${NUGET} install unofficial-flayan-glew		-Version 2.1.0		-o thirdParty)
 		execute_process(COMMAND ${NUGET} install tbb_oss					-Version 9.107.0	-o thirdParty)
 		execute_process(COMMAND ${NUGET} install expat.v140					-Version 2.2.6		-o thirdParty)
@@ -49,7 +49,7 @@ if(MSVC_VERSION)
 	set(SDL2_PATH SDL2_SEARCH_PATHS		${webAsmPlay_BINARY_DIR}/thirdParty/sdl2.new.2.0.8/build/native)
 	set(SDL2_IMAGE_PATH					${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.2.0.3/build/native)
 	set(GLEW_LOCATION					${webAsmPlay_BINARY_DIR}/thirdParty/unofficial-flayan-glew.2.1.0/build/native)
-	set(GLFW_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/glfw.3.2.1.5/build/native)
+	set(GLFW_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/glfw.3.3.0.1/build/native)
 	set(TBB_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.9.107.0.0/build/native)
 	set(TBB_tbb_debug_LIBRARY			${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.9.107.0.0/build/native/lib/x64/Debug/)
 	set(TBB_tbb_LIBRARY					${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.9.107.0.0/build/native/lib/x64/Release/)
@@ -64,6 +64,7 @@ else()
     set(CURL_LIBRARY_RELEASE ${CURL_LIBRARY})
     set(CURL_LIBRARY_DEBUG   ${CURL_LIBRARY})
 endif()
+
 
 set (CMAKE_CXX_STANDARD 17)
 #set (CMAKE_CXX_STANDARD 14)
@@ -470,7 +471,7 @@ else()
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/libwebp-7.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/SDL2_image.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/zlib1.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/glfw.3.2.1.5/build/native/bin/dynamic/v140/x64/glfw3.dll)
+							${webAsmPlay_BINARY_DIR}/thirdParty/glfw.3.3.0.1/build/native/bin/dynamic/v140/x64/glfw3.dll)
 
         set(DLLS_RELEASE	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Release/tbb.dll
