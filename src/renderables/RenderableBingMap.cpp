@@ -551,6 +551,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	for (auto tile : tiles)
 	{
+		if(tile->m_loading) { continue ;}
+		
 		if (tile->m_textureID)
 		{
 			if(!tile->m_renderable)
@@ -575,7 +577,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 			++numRendered;
 		}
-		else if (!tile->m_loading && tile->m_stillNeeded)
+		else if (tile->m_stillNeeded)
 		{
 			tile->m_loading = true;
 
@@ -600,7 +602,10 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	s_textureBuffer->unbind();
 
-	if(!(canvas->getFrameNumber() % 50)) { RasterTile::pruneTiles() ;}
+	//if(!(canvas->getFrameNumber() % 50)) { RasterTile::pruneTiles() ;}
+	//if(!(canvas->getFrameNumber() % 5)) { RasterTile::pruneTiles() ;}
+
+	RasterTile::pruneTiles();
 }
 
 FrameBuffer* RenderableBingMap::getFrameBuffer() { return s_textureBuffer ;}

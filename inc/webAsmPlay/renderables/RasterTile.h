@@ -27,6 +27,7 @@
 #pragma once
 
 #include <atomic>
+#include <mutex>
 #include <glm/vec2.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 
@@ -66,4 +67,6 @@ public:
 	size_t m_lastAccessTime = 0;
 
 	static std::atomic_size_t s_desiredMaxNumTiles;
+
+	std::mutex m_mutex;
 };

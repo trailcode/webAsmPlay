@@ -24,6 +24,7 @@
   \copyright 2019
 */
 
+#include <algorithm>
 #include <unordered_map>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/BingTileSystem.h>
@@ -51,8 +52,8 @@ RasterTile::RasterTile(const dvec2& center, const size_t level) : m_center(cente
 
 RasterTile::~RasterTile()
 {
-	a_texturesToFree.push_back(m_textureID);
-
+	if(m_textureID) { a_texturesToFree.push_back(m_textureID) ;}
+	
 	const string quadKey = tileToQuadKey(latLongToTile(m_center, m_level), m_level);
 
 	a_currTileSet.erase(quadKey);
@@ -83,7 +84,10 @@ size_t RasterTile::pruneTiles()
 {
 	vector<RasterTile*> tiles;
 
-	for (const auto i : a_currTileSet) { tiles.push_back(i.second); }
+	for (const auto tile : a_currTileSet)
+	{
+		if(!tile.second->m_loading) { tiles.push_back(tile.second) ;}
+	}
 
 	sort(tiles.begin(), tiles.end(), [](const RasterTile* A, RasterTile* B)
 	{
@@ -99,14 +103,33 @@ size_t RasterTile::pruneTiles()
 	
 	for (size_t i = 0; i < tiles.size() - cacheSize; ++i)
 	{
-		if (tiles[i]->m_loading) { continue ;}
-
 		delete tiles[i];
 
 		++numFreed;
 	}
 
-	if(a_texturesToFree.size()) { glDeleteTextures(a_texturesToFree.size(), &a_texturesToFree[0]) ;}
+	if(a_texturesToFree.size())
+	{
+		/*
+		unordered_set<uint> texs(a_texturesToFree.begin(), a_texturesToFree.end());
+
+		if(texs.size() != a_texturesToFree.size())
+		{
+			dmess("Duplicates!");
+		}
+
+		vector<uint> texsa;
+
+		for(const auto i : texs)
+		{
+			texsa.push_back(i);
+		}
+
+		glDeleteTextures(texsa.size(), &texsa[0]);
+		*/
+
+		glDeleteTextures(a_texturesToFree.size(), &a_texturesToFree[0]);
+	}
 
 	a_texturesToFree.clear();
 
@@ -116,3 +139,4 @@ size_t RasterTile::pruneTiles()
 }
 
 size_t RasterTile::getNumTiles() { return a_currTileSet.size() ;}
+
