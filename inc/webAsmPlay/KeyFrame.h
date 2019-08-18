@@ -50,8 +50,8 @@ private:
 
 	friend class Animation;
 
-	KeyFrame(	const float		timeIndex,
-				const glm::vec3 cameraCenter,
-				const glm::vec3 cameraEye,
-				const glm::vec3 cameraUp);
+	KeyFrame(	const float		  timeIndex,
+				const glm::vec3 & cameraCenter,
+				const glm::vec3 & cameraEye,
+				const glm::vec3 & cameraUp);
 };

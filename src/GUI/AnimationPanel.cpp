@@ -24,11 +24,14 @@
 \copyright 2019
 */
 
+#include <fstream>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Animation.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/canvas/AnimationCanvas.h>
 #include <webAsmPlay/GUI/GUI.h>
+
+using namespace std;
 
 void GUI::animationPanel()
 {
@@ -93,11 +96,21 @@ void GUI::animationPanel()
 
 		} ImGui::SameLine();
 
+		if (ImGui::Button("Save"))
+		{
+			ofstream animation("animation.json");
+
+			animation << Animation::save().dump(4);
+
+			animation.close();
+
+		} ImGui::SameLine();
+
 		ImGui::Text("num keys: %i", Animation::numKeys()); ImGui::SameLine();
 
 		ImGui::SetCursorPos(ImVec2(0, sceneWindowSize.y - 50));
 
-		ImGui::SliderFloat("###animationTime", &GUI::s_currAnimationTime, 0.0f, GUI::s_animationDuration);
+		if(ImGui::SliderFloat("###animationTime", &GUI::s_currAnimationTime, 0.0f, GUI::s_animationDuration)) { Animation::update(GUI::s_currAnimationTime) ;}
 	}
 	ImGui::End();
 }

@@ -68,7 +68,7 @@ size_t RenderableBingMap::s_numRendered = 0;
 FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
 
 bool RenderableBingMap::s_useCache = true;
-const bool useBindlessTextures = false;
+const bool useBindlessTextures = true;
 
 namespace
 {

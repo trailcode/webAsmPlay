@@ -242,7 +242,7 @@ GLuint Textures::createFromJpeg(const char * data, const size_t size)
 
     if(!img)
     {
-		dmess("Error! " << size << " " << (void*)data << " mem " << mem);
+		//dmess("Error! " << size << " " << (void*)data << " mem " << mem);
 
         return 0;
     }

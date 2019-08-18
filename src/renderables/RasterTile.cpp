@@ -40,7 +40,9 @@ namespace
 	vector<uint> a_texturesToFree;
 }
 
-atomic_size_t RasterTile::s_desiredMaxNumTiles = { 1500 };
+//atomic_size_t RasterTile::s_desiredMaxNumTiles = { 1500 };
+atomic_size_t RasterTile::s_desiredMaxNumTiles = { 4000 };
+//atomic_size_t RasterTile::s_desiredMaxNumTiles = { 10500 };
 
 RasterTile::RasterTile(const dvec2& center, const size_t level) : m_center(center), m_level(level)
 {

@@ -45,14 +45,14 @@ namespace
 	size_t currID = 0;
 }
 
-KeyFrame::KeyFrame(	const float timeIndex,
-					const vec3	cameraCenter,
-					const vec3	cameraEye,
-					const vec3	cameraUp) :	m_timeIndex		(timeIndex),
-											m_cameraCenter	(cameraCenter),
-											m_cameraEye		(cameraEye),
-											m_cameraUp		(cameraUp),
-											m_ID			(++currID)
+KeyFrame::KeyFrame(	const float   timeIndex,
+					const vec3	& cameraCenter,
+					const vec3	& cameraEye,
+					const vec3	& cameraUp) :	m_timeIndex		(timeIndex),
+												m_cameraCenter	(cameraCenter),
+												m_cameraEye		(cameraEye),
+												m_cameraUp		(cameraUp),
+												m_ID			(++currID)
 {
 
 }

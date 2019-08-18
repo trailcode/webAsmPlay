@@ -571,7 +571,12 @@ void GUI::mainLoop(GLFWwindow * window)
 	{
 		s_currAnimationTime += ImGui::GetIO().DeltaTime;
 
-		if (s_currAnimationTime > s_animationDuration) { s_animationDuration = s_currAnimationTime; }
+		if (s_currAnimationTime > s_animationDuration)
+		{
+			//s_animationDuration = s_currAnimationTime;
+
+			s_currAnimationTime = s_currAnimationTime - s_animationDuration;
+		}
 
 		Animation::update(s_currAnimationTime);
 	}

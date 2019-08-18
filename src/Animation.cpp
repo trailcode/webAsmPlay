@@ -99,7 +99,7 @@ namespace
 	// From: https://blog.demofox.org/2015/08/08/cubic-hermite-interpolation/
 	// t is a value that goes from 0 to 1 to interpolate in a C1 continuous way across uniformly sampled data points.
 	// when t is 0, this will return B.  When t is 1, this will return C.
-	double cubicHermite (const double A, const double B, const double C, const double D, const double t)
+	inline double cubicHermite (const double A, const double B, const double C, const double D, const double t)
 	{
 		float a = -A/2.0f + (3.0f*B)/2.0f - (3.0f*C)/2.0f + D/2.0f;
 		float b = A - (5.0f*B)/2.0f + 2.0f*C - D / 2.0f;
@@ -108,47 +108,48 @@ namespace
  
 		return a*t*t*t + b*t*t + c*t + d;
 	}
+
+	inline vec3 cubicHermite(const vec3 A, const vec3 B, const vec3 C, const vec3 D, const double t)
+	{
+		return vec3(cubicHermite(A.x, B.x, C.x, D.x, t),
+					cubicHermite(A.y, B.y, C.y, D.y, t),
+					cubicHermite(A.z, B.z, C.z, D.z, t));
+	}
 }
 
 void Animation::update(const float timeIndex)
 {
-	/*
-	dmess("update: " << timeIndex);
-
-	list<KeyFrame>::iterator i;
-
-	for(i = s_keyFrames.begin(); i != s_keyFrames.end(); ++i)
-	{
-		if(i->m_timeIndex > GUI::s_currAnimationTime) { break ;}
-	}
-
-	const auto & next = *i;
-	const auto & prev = *--i;
-
-	const double t = (timeIndex - prev.m_timeIndex) / (next.m_timeIndex - prev.m_timeIndex);
-
-	dmess("prev " << prev.m_timeIndex << " next " << next.m_timeIndex << " t " << t << " prevIndex: " << prev.m_ID << " nextIndex " << next.m_ID);
-	//*/
-
-	//*
 	int i = 0;
 	
 	for(; i < s_keyFramesVec.size(); ++i)
 	{
-		dmess("s_keyFramesVec[i]->m_timeIndex " << s_keyFramesVec[i]->m_timeIndex);
-
 		if(s_keyFramesVec[i]->m_timeIndex > GUI::s_currAnimationTime) { break ;} 
 	}
 
-	dmess("i " << i << " " << s_keyFramesVec.size());
-
-	const auto next1 = s_keyFramesVec[i];
+	const auto next1 = s_keyFramesVec[(i + 0) % s_keyFramesVec.size()];
+	const auto next2 = s_keyFramesVec[(i + 1) % s_keyFramesVec.size()];
 	const auto prev1 = s_keyFramesVec[(i - 1) % s_keyFramesVec.size()];
+	const auto prev2 = s_keyFramesVec[(i - 2) % s_keyFramesVec.size()];
 
 	const double t = (timeIndex - prev1->m_timeIndex) / (next1->m_timeIndex - prev1->m_timeIndex);
 
-	dmess("prev " << prev1->m_timeIndex << " " << prev1->m_ID  << " next " << next1->m_timeIndex << " " << next1->m_ID << " t " << t);
-	//*/
+	/*
+	dmess(	" prev2 " << prev2->m_timeIndex << " " << prev2->m_ID <<
+			" prev1 " << prev1->m_timeIndex << " " << prev1->m_ID <<
+			" next1 " << next1->m_timeIndex << " " << next1->m_ID <<
+			" next2 " << next2->m_timeIndex << " " << next2->m_ID << " t " << t);
+			*/
+
+	const auto cameraCenter = cubicHermite(prev2->m_cameraCenter,	prev1->m_cameraCenter,	next1->m_cameraCenter,	next2->m_cameraCenter,	t);
+	const auto cameraEye	= cubicHermite(prev2->m_cameraEye,		prev1->m_cameraEye,		next1->m_cameraEye,		next2->m_cameraEye,		t);
+	const auto cameraUp		= cubicHermite(prev2->m_cameraUp,		prev1->m_cameraUp,		next1->m_cameraUp,		next2->m_cameraUp,		t);
+
+	GUI::getMainCamera()->setCenter	(cameraCenter);
+	GUI::getMainCamera()->setEye	(cameraEye);
+	//GUI::getMainCamera()->setEye	(cameraCenter + vec3(0,0,1));
+	GUI::getMainCamera()->setUp		(cameraUp);
+
+	GUI::getMainCamera()->update();
 }
 
 void Animation::load(const json & animation)
@@ -157,10 +158,10 @@ void Animation::load(const json & animation)
 	{
 		for(const auto & keyFrame : animation["keyFrames"])
 		{
-			s_keyFrames.push_back(move(KeyFrame(		keyFrame["timeIndex"],
-												toVec3( keyFrame["cameraEye"]),
+			s_keyFrames.push_back(KeyFrame(		keyFrame["timeIndex"],
 												toVec3( keyFrame["cameraCenter"]),
-												toVec3( keyFrame["cameraUp"]))));
+												toVec3( keyFrame["cameraEye"]),
+												toVec3( keyFrame["cameraUp"])));
 		}
 	}
 	catch(const exception & e)

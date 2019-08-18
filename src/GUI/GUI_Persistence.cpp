@@ -196,11 +196,13 @@ void GUI::saveState()
 
     configFile.close();
 
+	/*
 	ofstream animation("animation.json");
 
 	animation << Animation::save().dump(4);
 
 	animation.close();
+	*/
 }
 
 
