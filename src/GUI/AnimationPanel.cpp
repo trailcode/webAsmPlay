@@ -54,47 +54,27 @@ void GUI::animationPanel()
 												ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
 												ImVec2(0, 1),
 												ImVec2(1, 0));
-		if (ImGui::Button("Pos"))
-		{
-			Animation::createKeyFrame();
 
+		if (ImGui::Button("Add")) { Animation::createKeyFrame() ;} ImGui::SameLine();
+
+		if(ImGui::Button("Del"))
+		{
+			
 		} ImGui::SameLine();
 
-		if (ImGui::Button("Print"))
-		{
-			Animation::printFrames();
+		if (ImGui::Button("Print")) { Animation::printFrames() ;} ImGui::SameLine();
 
-		} ImGui::SameLine();
+		if (ImGui::Button("Closest")) { Animation::setClosest() ;} ImGui::SameLine();
 
-		if (ImGui::Button("Closest"))
-		{
-			Animation::setClosest();
+		if (ImGui::Button("<<")) { } ImGui::SameLine();
 
-		} ImGui::SameLine();
-
-		if (ImGui::Button("<<"))
-		{
-
-		} ImGui::SameLine();
-
-		if (ImGui::Button("<"))
-		{
-			Animation::prev();
-
-		} ImGui::SameLine();
+		if (ImGui::Button("<")) { Animation::prev() ;} ImGui::SameLine();
 
 		if (ImGui::Button(GUI::s_animationRunning ? "||" : "|>")) { GUI::s_animationRunning ^= 1 ;} ImGui::SameLine();
 
-		if (ImGui::Button(">"))
-		{
-			Animation::next();
+		if (ImGui::Button(">")) { Animation::next() ;} ImGui::SameLine();
 
-		} ImGui::SameLine();
-
-		if (ImGui::Button(">>"))
-		{
-
-		} ImGui::SameLine();
+		if (ImGui::Button(">>")) { } ImGui::SameLine();
 
 		if (ImGui::Button("Save"))
 		{

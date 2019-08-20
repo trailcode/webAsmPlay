@@ -221,7 +221,7 @@ namespace
 		GUI::getMainCamera()->setEye	(key.m_cameraEye);
 		GUI::getMainCamera()->setUp		(key.m_cameraUp);
 
-		GUI::getTrackBallInteractor()->updateCameraEyeUp(true, true);
+		//GUI::getTrackBallInteractor()->updateCameraEyeUp(true, true);
 
 		GUI::getMainCamera()->update();
 
@@ -252,3 +252,9 @@ void Animation::next()
 
 	setKey(*i);
 }
+
+void Animation::deleteClosest()
+{
+
+}
+

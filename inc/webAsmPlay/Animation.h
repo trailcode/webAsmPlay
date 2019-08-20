@@ -54,6 +54,8 @@ public:
 
 	static void next();
 
+	static void deleteClosest();
+
 private:
 
 	Animation() {}
