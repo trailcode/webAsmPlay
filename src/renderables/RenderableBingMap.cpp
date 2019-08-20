@@ -33,6 +33,7 @@
 #include <mutex>
 #include <functional>
 #include <unordered_map>
+#include <filesystem>
 #include <SDL_image.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Util.h>
@@ -53,6 +54,7 @@
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 
 using namespace std;
+using namespace std::filesystem;
 using namespace glm;
 using namespace ctpl;
 using namespace geosUtil;
@@ -67,8 +69,8 @@ size_t RenderableBingMap::s_numRendered = 0;
 
 FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
 
-bool RenderableBingMap::s_useCache	= false;
-const bool useBindlessTextures		= false;
+bool RenderableBingMap::s_useCache	= true;
+const bool useBindlessTextures		= true;
 
 namespace
 {
@@ -173,9 +175,11 @@ namespace
 			dmess("result " << result << " myHandle " << myHandle);
 		}
 		
+		TileBuffer ret(output->buffer, output->size);
+
 		delete output;
 
-		return TileBuffer(output->buffer, output->size);
+		return ret;
 	}
 
 	
@@ -190,6 +194,15 @@ void RenderableBingMap::fetchTile(RasterTile * tile)
 	loaderPool.push([tile](int ID) { fetchTile(ID, tile) ;});
 
 	++s_numLoading;
+}
+
+void RenderableBingMap::markTileNoData(RasterTile* tile)
+{
+	--s_numLoading;
+
+	tile->m_loading = false;
+
+	tile->m_textureID = RasterTile::s_NO_DATA;
 }
 
 void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
@@ -211,9 +224,16 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 	{
 		++s_numUploading;
 
+		if(!file_size(tileCachePath.c_str())) { return markTileNoData(tile) ;}
+
 		SDL_Surface * img = IMG_Load(tileCachePath.c_str());
 
-		if (!img) { goto download; }
+		if (!img) { goto download ;}
+
+		if(img->format->BytesPerPixel < 3)
+		{
+			dmess("Here!");
+		}
 
 		uploaderPool.push([tile, img, tileCachePath](int ID)
 		{
@@ -253,13 +273,17 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 		if (!get<0>(tileBuffer) || get<1>(tileBuffer) == 11)
 		{
-			dmess("Error! No buffer!");
+			markTileNoData(tile);
 
-			--s_numLoading;
+			if (!s_useCache) { return ;}
 
-			tile->m_loading = false;
+			FILE * fp = fopen(tileCachePath.c_str(), "wb");
 
-			tile->m_textureID = RasterTile::s_NO_DATA;
+			if(fp)
+			{
+				fclose(fp);
+			}
+			else { dmess("Warn could not write file: " << tileCachePath) ;}
 
 			return;
 		}
@@ -283,6 +307,8 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 			tile->m_textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
 
+			if(!tile->m_textureID) { return markTileNoData(tile) ;}
+
 			if(useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
 
 			--s_numUploading;
@@ -305,10 +331,7 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 					fclose(fp);
 				}
-				else
-				{
-					dmess("Warn could not write file: " << tileCachePath);
-				}
+				else { dmess("Warn could not write file: " << tileCachePath) ;}
 
 				if( get<0>(tileBuffer) ) { free ((void *)get<0>(tileBuffer)) ;}
 			});
@@ -452,8 +475,6 @@ namespace
 
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 
-		//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
 		for (size_t i = 0; i < toRender.size(); ++i)
 		{
 			RasterTile* t = toRender[i];
@@ -466,12 +487,8 @@ namespace
             }
 			else { t->m_renderable->setShader(TextureShader::getDefaultInstance()); }
 
-			//t->m_renderable->setRenderOutline(true);
-
 			t->m_renderable->render(canvas);
 		}
-
-		//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	}
 }
 
@@ -540,8 +557,6 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 		}
 	}
 
-	//if(fallBackTiles.size()) dmess("fallBackTiles " << fallBackTiles.size());
-
 	for (const auto tile : fallBackTiles) { m_tiles.insert(tile) ;}
 
 	vector<RasterTile*> tiles = toVec(m_tiles);
@@ -556,7 +571,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 	{
 		if(tile->m_loading) { continue ;}
 		
-		if (tile->m_textureID)
+		if (tile->textureReady())
 		{
 			if(!tile->m_renderable)
 			{
@@ -587,7 +602,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 	else
 	{
         for(auto tile : toRender)
-        {
+        { 
             TextureShader::getDefaultInstance()->setTextureID(tile->m_textureID);
             
             tile->m_renderable->render(canvas);

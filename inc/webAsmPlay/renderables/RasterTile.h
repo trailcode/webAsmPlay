@@ -49,6 +49,8 @@ public:
 
 	RasterTile* getParentTile(const size_t accessTime) const;
 
+	bool textureReady() const;
+
 	const glm::dvec2	m_center;
 	const size_t		m_level;
 
@@ -58,7 +60,9 @@ public:
 
 	Renderable* m_renderable = NULL;
 
-	std::atomic_uint m_textureID = { 0 };
+	static GLuint s_NO_DATA;
+
+	std::atomic<GLuint> m_textureID = { 0 };
 
 	GLuint64 m_handle = 0;
 
@@ -67,6 +71,4 @@ public:
 	size_t m_lastAccessTime = 0;
 
 	static std::atomic_size_t s_desiredMaxNumTiles;
-
-	std::mutex m_mutex;
 };

@@ -24,6 +24,7 @@
   \copyright 2019
 */
 
+#include <limits>
 #include <algorithm>
 #include <unordered_map>
 #include <webAsmPlay/Util.h>
@@ -45,6 +46,8 @@ namespace
 atomic_size_t RasterTile::s_desiredMaxNumTiles = { 4000 };
 //atomic_size_t RasterTile::s_desiredMaxNumTiles = { 10500 };
 
+GLuint RasterTile::s_NO_DATA = numeric_limits<GLuint>::max();
+
 RasterTile::RasterTile(const dvec2& center, const size_t level) : m_center(center), m_level(level)
 {
 	
@@ -52,7 +55,7 @@ RasterTile::RasterTile(const dvec2& center, const size_t level) : m_center(cente
 
 RasterTile::~RasterTile()
 {
-	if(m_textureID) { a_texturesToFree.push_back(m_textureID) ;}
+	if(textureReady()) { a_texturesToFree.push_back(m_textureID) ;}
 	
 	const string quadKey = tileToQuadKey(latLongToTile(m_center, m_level), m_level);
 
@@ -80,6 +83,13 @@ RasterTile* RasterTile::getParentTile(const size_t accessTime) const
 	return getTile(m_center, m_level - 1, accessTime);
 }
 
+bool RasterTile::textureReady() const
+{
+	const GLuint textureID = m_textureID;
+
+	return textureID != 0 && textureID != s_NO_DATA;
+}
+
 size_t RasterTile::pruneTiles()
 {
 	vector<RasterTile*> tiles;
@@ -100,7 +110,6 @@ size_t RasterTile::pruneTiles()
 
 	size_t numFreed = 0;
 
-	
 	for (size_t i = 0; i < tiles.size() - cacheSize; ++i)
 	{
 		delete tiles[i];
@@ -108,28 +117,7 @@ size_t RasterTile::pruneTiles()
 		++numFreed;
 	}
 
-	if(a_texturesToFree.size())
-	{
-		/*
-		unordered_set<uint> texs(a_texturesToFree.begin(), a_texturesToFree.end());
-
-		if(texs.size() != a_texturesToFree.size())
-		{
-			dmess("Duplicates!");
-		}
-
-		vector<uint> texsa;
-
-		for(const auto i : texs)
-		{
-			texsa.push_back(i);
-		}
-
-		glDeleteTextures(texsa.size(), &texsa[0]);
-		*/
-
-		glDeleteTextures(a_texturesToFree.size(), &a_texturesToFree[0]);
-	}
+	if(a_texturesToFree.size()) { glDeleteTextures((GLsizei)a_texturesToFree.size(), &a_texturesToFree[0]) ;}
 
 	a_texturesToFree.clear();
 
