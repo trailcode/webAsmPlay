@@ -316,11 +316,11 @@ void setFullScreen( bool fullscreen )
 		dmess("count " << count);
 
 		// get reolution of monitor
-		const GLFWvidmode * mode = glfwGetVideoMode(monitors[1]);
+		const GLFWvidmode * mode = glfwGetVideoMode(monitors[0]);
 
 		// switch to full screen
-		//glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, 1280 * 2, 720 * 2, 0 );
-		glfwSetWindowMonitor( GUI::getMainWindow(), monitors[1], 0, 0, mode->width, mode->height, mode->refreshRate);
+		glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, 1920, 1080, 0 );
+		//glfwSetWindowMonitor( GUI::getMainWindow(), monitors[0], 0, 0, mode->width, mode->height, mode->refreshRate);
 
 		glfwSwapInterval(1);
 	}

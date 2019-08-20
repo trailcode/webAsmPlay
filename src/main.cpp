@@ -55,6 +55,8 @@ int main(int, char**)
     if (!glfwInit())
         return 1;
 
+	
+
     // Decide GL+GLSL versions
 #if __APPLE__
     // GL 3.2 + GLSL 150
@@ -79,7 +81,8 @@ int main(int, char**)
 #endif
 
     // Create window with graphics context
-	GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "WebAsmPlay", NULL, NULL);
+	//GLFWwindow* window = glfwCreateWindow(1280 * 2, 720 * 2, "WebAsmPlay", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(1920, 1080, "WebAsmPlay", NULL, NULL);
 
 	/*
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
