@@ -119,6 +119,8 @@ namespace
 
 void Animation::update(const float timeIndex)
 {
+	if(s_keyFramesVec.size() < 4) { return ;}
+
 	int i = 0;
 	
 	for(; i < s_keyFramesVec.size(); ++i)
