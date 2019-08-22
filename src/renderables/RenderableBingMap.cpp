@@ -305,9 +305,25 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 			OpenGL::ensureSharedContext();
 
-			tile->m_textureID = Textures::createFromJpeg(get<0>(tileBuffer), get<1>(tileBuffer));
+			SDL_RWops * mem = SDL_RWFromConstMem(get<0>(tileBuffer), get<1>(tileBuffer));
 
-			if(!tile->m_textureID) { return markTileNoData(tile) ;}
+			SDL_Surface * img = IMG_LoadJPG_RW(mem);
+
+			if(!img) { return markTileNoData(tile) ;}
+
+			const auto bytesPerPixel = img->format->BytesPerPixel;
+
+			if(bytesPerPixel < 3)
+			{
+				SDL_FreeSurface(img);
+
+				// Must be the no data png image, mark as no data.
+				return markTileNoData(tile);
+			}
+
+			tile->m_textureID = Textures::load(img);
+
+			SDL_FreeSurface(img);
 
 			if(useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
 

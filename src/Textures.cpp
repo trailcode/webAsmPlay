@@ -125,9 +125,15 @@ GLuint Textures::load(const SDL_Surface* img)
     if(img->format->BytesPerPixel == 4) { mode = GL_RGBA ;}
 
     /* Generate The Texture */
-    glTexImage2D(	GL_TEXTURE_2D, 0, mode, img->w,
-                    img->h, 0, mode,
-                    GL_UNSIGNED_BYTE, img->pixels);
+    glTexImage2D(	GL_TEXTURE_2D,
+					0,
+					mode,
+					img->w,
+                    img->h,
+					0,
+					mode,
+                    GL_UNSIGNED_BYTE,
+					img->pixels);
 
     /* Linear Filtering */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -225,54 +231,6 @@ GLuint Textures::set1D(const GLuint texture, const glm::vec4 * values, const siz
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-    return texture;
-}
-
-GLuint Textures::createFromJpeg(const char * data, const size_t size)
-{
-    SDL_RWops * mem = SDL_RWFromConstMem(data, (int)size);
-    //SDL_RWops * mem = SDL_RWFromMem((void *)data, size);
-
-    SDL_Surface * img = IMG_LoadJPG_RW(mem);
-
-    //dmess("w " << image->w << " h " << image->h << " pitch " << image->pitch);
-
-    SDL_RWclose(mem);
-
-    if(!img)
-    {
-		//dmess("Error! " << size << " " << (void*)data << " mem " << mem);
-
-        return 0;
-    }
-
-    GLuint texture;
-
-    glGenTextures(1, &texture);
-
-	glActiveTexture(GL_TEXTURE0); // NEEDED?
-
-    /* Typical Texture Generation Using Data From The Bitmap */
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    /* Generate The Texture */
-    glTexImage2D(	GL_TEXTURE_2D, 0, GL_RGB, img->w,
-					img->h, 0, GL_RGB,
-					GL_UNSIGNED_BYTE, img->pixels);
-
-    /* Linear Filtering */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-
-	glFlush();
-
-    SDL_FreeSurface(img);
 
     return texture;
 }
