@@ -230,11 +230,6 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 		if (!img) { goto download ;}
 
-		if(img->format->BytesPerPixel < 3)
-		{
-			dmess("Here!");
-		}
-
 		uploaderPool.push([tile, img, tileCachePath](int ID)
 		{
 			if (!tile->m_stillNeeded)
