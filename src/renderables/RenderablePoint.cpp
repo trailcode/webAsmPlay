@@ -53,7 +53,6 @@ Renderable * RenderablePoint::create(const dvec3 & _pos,
 
     const GLuint indices[] = {0,1,2,3};
 
-    //GLuint vao = 0;
     GLuint ebo = 0;
     GLuint vbo = 0;
 
@@ -73,7 +72,6 @@ Renderable * RenderablePoint::create(const ConstGeosGeomVec & points,
                                      const dmat4            & trans,
                                      const bool               showProgress)
 {
-    //abort();
     for(const auto i : points)
     {
         const dvec2 P(dynamic_cast<const Point *>(i)->getX(), dynamic_cast<const Point *>(i)->getY());
@@ -91,10 +89,11 @@ void RenderablePoint::render(Canvas * canvas, const size_t renderStage)
     m_shader->bind(canvas, false, renderStage);
 
     glBindVertexArray(                    m_vao);
-    glBindBuffer(GL_ARRAY_BUFFER,         m_vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 
     glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL);
+
+	glBindVertexArray(0);
 }
 
 RenderablePoint::RenderablePoint(   const GLuint      ebo,
@@ -116,7 +115,15 @@ RenderablePoint::~RenderablePoint()
 
 void RenderablePoint::ensureVAO()
 {
+	if(m_vao) { return ;}
+
 	glGenVertexArrays(1, &m_vao);
 
+	glBindVertexArray(m_vao);
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 }

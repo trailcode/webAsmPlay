@@ -296,7 +296,9 @@ dvec2 Canvas::renderCursor(const dvec2 & pos)
 		m_cursor->ensureVAO();
 	}
 
-    pushModel(translate(dmat4(1.0), dvec3(pos, 0.0)));
+	const auto model = translate(dmat4(1.0), dvec3(pos, 0.0));
+
+    pushModel(model);
 
     m_cursor->render(this, 0);
 

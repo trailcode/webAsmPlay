@@ -24,20 +24,42 @@
   \copyright 2018
 */
 
+#include <fstream>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/StreetSide.h>
+
+using namespace std;
 
 namespace
 {
-	StreeSide * a_instance = nullptr;
+	StreetSide * a_instance = nullptr;
+
+	string a_key;
 }
 
-StreeSide::StreeSide() {}
-
-StreeSide::~StreeSide() {}
-
-StreeSide * StreeSide::getInstance()
+StreetSide::StreetSide()
 {
-	if(!a_instance) { a_instance = new StreeSide ;}
+	ifstream keyFile("bingMapsKey.txt");
+
+	if(!keyFile.is_open())
+	{
+		dmess("Could not open Bing Maps keyt file: bingMapsKey.txt");
+
+		return;
+	}
+
+	if(!getline(keyFile, a_key)) { dmessError("Key file: bingMapsKey.txt is not valid!") ;}
+
+	dmess("Key: " << a_key);
+	
+	keyFile.close();
+}
+
+StreetSide::~StreetSide() {}
+
+StreetSide * StreetSide::getInstance()
+{
+	if(!a_instance) { a_instance = new StreetSide ;}
 
 	return a_instance;
 }

@@ -25,14 +25,14 @@
 */
 #pragma once
 
-class StreeSide
+class StreetSide
 {
 public:
 
-	static StreeSide * getInstance();
+	static StreetSide * getInstance();
 
 private:
 
-	StreeSide();
-	~StreeSide();
+	StreetSide();
+	~StreetSide();
 };
