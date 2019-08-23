@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <string>
+
 namespace curlUtil
 {
 	/**
@@ -40,4 +42,6 @@ namespace curlUtil
 	};
 
 	size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data);	
+
+	BufferStruct * download(const std::string & url, const size_t threadID = 0);
 }

@@ -25,10 +25,27 @@
   \copyright 2019
 */
 
+#ifndef __EMSCRIPTEN__
+    #include <curl/curl.h>
+    #include <ctpl.h>
+#endif
+
+#include <thread>
+#include <unordered_map>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/CurlUtil.h>
 
+using namespace std;
 using namespace curlUtil;
+
+namespace
+{
+	mutex loaderMutex;
+
+	unordered_map<int, CURL *> a_curlHandles;
+
+	
+}
 
 BufferStruct::~BufferStruct()
 {
@@ -51,4 +68,9 @@ size_t curlUtil::writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void 
 	mem->m_buffer[mem->m_size] = 0;
 
 	return realsize;
+}
+
+BufferStruct * curlUtil::download(const string & url, const size_t threadID)
+{
+	return 0;	
 }

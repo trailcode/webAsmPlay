@@ -82,7 +82,7 @@ private:
 
 	const std::vector<FB_Component>	m_components;
 
-	GLint m_prevViewport[4];
+	GLint m_prevViewport[4] = {0, 0, 0, 0};
 
 private:
 };

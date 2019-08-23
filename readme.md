@@ -196,6 +196,7 @@ No notes.
     * Investigate this some more.
 * Add overrides keywords. 
 * Experiment with compute shaders for updating bot positions. 
+* Add VLD and check for memory leaks.
 
 ### Bugs
 

@@ -68,6 +68,13 @@ namespace rsmz
     {
         //dmess("computeCameraEye");
 
+		if(!m_Camera)
+		{
+			dmess("Warn no m_Camera!");
+
+			return;
+		}
+
         glm::vec3 orientation = m_RotationSum * Z;
 
         if (m_ZoomSum) {

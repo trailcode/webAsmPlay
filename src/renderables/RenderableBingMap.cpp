@@ -71,7 +71,7 @@ size_t RenderableBingMap::s_numRendered = 0;
 
 FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
 
-bool RenderableBingMap::s_useCache	= true;
+bool RenderableBingMap::s_useCache	= false;
 const bool useBindlessTextures		= true;
 
 namespace
@@ -117,6 +117,7 @@ namespace
 		}
 
 		CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
+
 		BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
 		
 		//if(!myHandle) { myHandle = curl_easy_init() ;}
