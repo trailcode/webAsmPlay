@@ -32,10 +32,12 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/CurlUtil.h>
 #include <webAsmPlay/StreetSide.h>
 
 using namespace std;
 using namespace nlohmann;
+using namespace curlUtil;
 
 namespace
 {
@@ -71,31 +73,6 @@ StreetSide * StreetSide::getInstance()
 	return a_instance;
 }
 
-// Define our struct for accepting LCs output
-struct BufferStruct // TODO code duplication
-{
-    char * buffer;
-    size_t size;
-};
-
-size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) // TODO code duplication
-{
-    size_t realsize = size * nmemb;
-
-    struct BufferStruct * mem = (struct BufferStruct *) data;
-
-    mem->buffer = (char *)realloc(mem->buffer, mem->size + realsize + 1);
-
-    if ( mem->buffer )
-    {
-        memcpy( &( mem->buffer[ mem->size ] ), ptr, realsize );
-        mem->size += realsize;
-        mem->buffer[ mem->size ] = 0;
-    }
-        
-    return realsize;
-}
-
 void StreetSide::queryViewport()
 {
 	// curl "https://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?appkey=AuftgJsO0Xs8Ts4M1xZUQJQXJNsvmh3IV8DkNieCiy3tCwCUMq76-WpkrBtNAuEm^&c=2000^&e=2.3268620483818374^&jsCallback=jsonpCache.kzikAeXGbFvsYGP^&n=48.8596821424352^&s=48.85712660600309^&w=2.322977794823074" -H "Sec-Fetch-Mode: no-cors" -H "Referer: https://www.openstreetmap.org/id" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36" --compressed
@@ -107,9 +84,6 @@ void StreetSide::queryViewport()
 	CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
 
 	BufferStruct output; // Create an instance of out BufferStruct to accept LCs output
-
-	output.buffer = nullptr;
-	output.size = 0;
 
 	//if(!myHandle) { myHandle = curl_easy_init() ;}
 
@@ -133,7 +107,7 @@ void StreetSide::queryViewport()
 
 	if (result = curl_easy_perform(myHandle)) { dmessError("result " << result << " myHandle " << myHandle) ;}
 
-	dmess("Size: " << output.size);
+	dmess("Size: " << output.m_size);
 
 	//dmess("output: " << output.buffer);
 
@@ -142,7 +116,7 @@ void StreetSide::queryViewport()
 		Membuf(char* begin, char* end) { setg(begin, begin, end) ;}
 	};
 
-	Membuf sbuf(output.buffer, output.buffer + output.size);
+	Membuf sbuf(output.m_buffer, output.m_buffer + output.m_size);
 
 	istream in(&sbuf);
 

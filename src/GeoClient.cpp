@@ -38,6 +38,7 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/Network.h>
+#include <webAsmPlay/CurlUtil.h>
 #include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/GeometryConverter.h>
@@ -56,6 +57,7 @@ using namespace std::chrono;
 using namespace glm;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
+using namespace curlUtil;
 
 typedef unordered_map<size_t, GeoRequestGetNumGeoms      *> NumGeomsRequests;
 typedef unordered_map<size_t, GeoRequestLayerBounds      *> LayerBoundsRequests;
@@ -604,32 +606,6 @@ namespace
 
 namespace
 {
-	// Define our struct for accepting LCs output
-	struct BufferStruct // TODO code dupilcation
-	{
-		char * buffer;
-		size_t size;
-	};
-
-	// This is the function we pass to LC, which writes the output to a BufferStruct
-	static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) // TODO code dupilcation
-	{
-		size_t realsize = size * nmemb;
-
-		struct BufferStruct * mem = (struct BufferStruct *) data;
-
-		mem->buffer = (char *)realloc(mem->buffer, mem->size + realsize + 1);
-
-		if (mem->buffer)
-		{
-			memcpy(&(mem->buffer[mem->size]), ptr, realsize);
-			mem->size += realsize;
-			mem->buffer[mem->size] = 0;
-		}
-
-		return realsize;
-	}
-
 #ifndef __EMSCRIPTEN__
 
 	CURL * myHandle = NULL; // TODO code dup
@@ -658,32 +634,24 @@ void GeoClient::loadGeometry(const string fileName)
 	if (!fileName.rfind("http", 1))
 	{
 		CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
-		struct BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
-		output->buffer = NULL;
-		output->size = 0;
-
+		
+		BufferStruct output; // Create an instance of out BufferStruct to accept LCs output
+		
 		if (!myHandle) { myHandle = curl_easy_init(); }
 
 		/* Notice the lack of major error checking, for brevity */
 
 		curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
-		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)output); // Passing our BufferStruct to LC
+		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, &output); // Passing our BufferStruct to LC
 
 		curl_easy_setopt(myHandle, CURLOPT_URL, fileName.c_str());
 		result = curl_easy_perform(myHandle);
 		
-		createWorld(output->buffer);
+		createWorld(output.m_buffer);
 
 		GUI::progress("", 1.0);
 
-		if (output->buffer)
-		{
-			free(output->buffer);
-			//output.buffer = 0;
-			//output.size = 0;
-		}
-
-		delete output;
+		if (output.m_buffer) { free(output.m_buffer) ;}
 
 		return;
 	}

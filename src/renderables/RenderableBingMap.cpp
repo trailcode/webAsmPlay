@@ -43,6 +43,7 @@
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>
+#include <webAsmPlay/CurlUtil.h>
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/shaders/TextureShader.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
@@ -59,6 +60,7 @@ using namespace glm;
 using namespace ctpl;
 using namespace geosUtil;
 using namespace bingTileSystem;
+using namespace curlUtil;
 
 atomic<size_t> RenderableBingMap::s_numLoading		= {0};
 atomic<size_t> RenderableBingMap::s_numDownloading	= {0};
@@ -102,32 +104,6 @@ namespace
 
 	//GLuint64 * pHandles = NULL;
 
-    // Define our struct for accepting LCs output
-    struct BufferStruct // TODO code duplication
-    {
-        char * buffer;
-        size_t size;
-    };
-
-    // This is the function we pass to LC, which writes the output to a BufferStruct
-    static size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) // TODO code duplication
-    {
-        size_t realsize = size * nmemb;
-
-        struct BufferStruct * mem = (struct BufferStruct *) data;
-
-        mem->buffer = (char *)realloc(mem->buffer, mem->size + realsize + 1);
-
-        if ( mem->buffer )
-        {
-            memcpy( &( mem->buffer[ mem->size ] ), ptr, realsize );
-            mem->size += realsize;
-            mem->buffer[ mem->size ] = 0;
-        }
-        
-        return realsize;
-    }
-
 	typedef pair<const char *, const size_t> TileBuffer;
 
 	TileBuffer downloadTile(const int ID, const string & quadKey)
@@ -145,16 +121,14 @@ namespace
 		}
 
 		CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
-		struct BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
-		output->buffer = NULL;
-		output->size = 0;
-
+		BufferStruct output; // Create an instance of out BufferStruct to accept LCs output
+		
 		//if(!myHandle) { myHandle = curl_easy_init() ;}
 
 		/* Notice the lack of major error checking, for brevity */
 
 		curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
-		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, (void *)output); // Passing our BufferStruct to LC
+		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, &output); // Passing our BufferStruct to LC
 
 		//const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
 		const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A";
@@ -175,11 +149,7 @@ namespace
 			dmess("result " << result << " myHandle " << myHandle);
 		}
 		
-		TileBuffer ret(output->buffer, output->size);
-
-		delete output;
-
-		return ret;
+		return TileBuffer(output.m_buffer, output.m_size);
 	}
 }
 
