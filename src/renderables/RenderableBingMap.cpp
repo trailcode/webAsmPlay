@@ -181,8 +181,6 @@ namespace
 
 		return ret;
 	}
-
-	
 }
 
 void RenderableBingMap::fetchTile(RasterTile * tile)
@@ -354,7 +352,7 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 void RenderableBingMap::getStartLevel()
 {
-	for (int i = 0; i < 24; ++i)
+	for (int i = 0; i <= 24; ++i)
 	{
 		const ivec2 minTile = latLongToTile(dvec2(get<0>(m_bounds), get<1>(m_bounds)), i);
 		const ivec2 maxTile = latLongToTile(dvec2(get<2>(m_bounds), get<3>(m_bounds)), i);
@@ -386,6 +384,8 @@ RenderableBingMap::~RenderableBingMap()
 
 }
 
+float resDelta = 1.0;
+
 bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, const dvec2 & tMax, const size_t level)
 {
 	const dvec3 center = dvec4(((tMin + tMax) * 0.5), 0.0, 1.0);
@@ -411,7 +411,7 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 	const dvec3 screenP3 = project(transP3, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
 	const dvec3 screenP4 = project(transP4, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
 
-	const double tileSize = 256.0;
+	const double tileSize = 256.0 * resDelta;
 
 	const double D1 = distance(screenP1, screenP2);
 	const double D2 = distance(screenP2, screenP3);
@@ -515,10 +515,12 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
 	}
 
-	s_textureBuffer->setBufferSize(canvas->getFrameBufferSize());
+	const auto fbSize = canvas->getFrameBufferSize();
+
+	s_textureBuffer->setBufferSize(fbSize);
 
 	s_textureBuffer->bind();
-	
+
 	const ivec2 minTile = latLongToTile(dvec2(get<0>(m_bounds), get<1>(m_bounds)), m_startLevel);
 
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), m_startLevel);

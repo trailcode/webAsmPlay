@@ -30,6 +30,7 @@
 #include <webAsmPlay/BingTileSystem.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
+#include <webAsmPlay/StreetSide.h>
 #include <webAsmPlay/renderables/RasterTile.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 #pragma warning( pop ) 
@@ -37,6 +38,8 @@
 using namespace std;
 using namespace glm;
 using namespace bingTileSystem;
+
+extern float resDelta;
 
 void GUI::bingTileSystemPanel()
 {
@@ -76,6 +79,12 @@ void GUI::bingTileSystemPanel()
 		RasterTile::s_desiredMaxNumTiles = (size_t)maxDesiredNumTiles; 
 	}
 	
+	ImGui::SliderFloat("###ResDelta", &resDelta, 0.125f, 5);
+	
+	if (ImGui::Button("StreetSide"))
+	{
+		StreetSide::queryViewport();
+	}
 
     ImGui::End();
 }

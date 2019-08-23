@@ -82,5 +82,7 @@ private:
 
 	const std::vector<FB_Component>	m_components;
 
+	GLint m_prevViewport[4];
+
 private:
 };

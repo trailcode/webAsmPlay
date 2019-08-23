@@ -99,11 +99,20 @@ void FrameBuffer::bind(const bool clear)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_renderFBO);
 
+	glGetIntegerv(GL_VIEWPORT, m_prevViewport);
+
+	glViewport(0, 0, m_bufferSize.x, m_bufferSize.y);
+
 	if(!clear) { return ;}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void FrameBuffer::unbind() { glBindFramebuffer(GL_FRAMEBUFFER, m_prevFB); }
+void FrameBuffer::unbind()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, m_prevFB);
+
+	glViewport(m_prevViewport[0], m_prevViewport[1], m_prevViewport[2], m_prevViewport[3]);
+}
 
 GLuint FrameBuffer::getTextureID(const size_t component) const { return m_textures[component] ;}

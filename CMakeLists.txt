@@ -355,6 +355,11 @@ else()
 
 		if(MSVC_VERSION)
 
+			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+
 			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
 			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
 			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")

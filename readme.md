@@ -204,8 +204,9 @@ No notes.
 * Upgraded OSX, glfw is having problems now :( Happened after upgrading to xcode 10
     * https://github.com/glfw/glfw/issues/1337
     * https://www.syntaxbomb.com/index.php?topic=4927.0
-* Bots seem to get tot the end of the path, but do not detect they are there and just spin around the end. 
+* Bots seem to get to the end of the path, but do not detect they are there and just spin around the end. 
 * Geos Test Canvas is broken.
+* Scrolling in Bing Maps framebuffer crashes.
 
 
 ## To Read
@@ -213,3 +214,6 @@ http://ogldev.atspace.co.uk/www/tutorial45/tutorial45.html
 
 https://wiki.openstreetmap.org/wiki/OpenStreetCam
 
+https://github.com/dkniffin/personal-website/blob/master/_drafts/2014-11-24-streetside-api.md
+
+https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system

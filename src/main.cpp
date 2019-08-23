@@ -39,6 +39,8 @@
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions 
 #include <webAsmPlay/OpenGL_Util.h>
 
+#include <webAsmPlay/StreetSide.h>
+
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
@@ -54,8 +56,6 @@ int main(int, char**)
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
-
-	
 
     // Decide GL+GLSL versions
 #if __APPLE__
@@ -129,6 +129,7 @@ int main(int, char**)
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
     io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
@@ -164,6 +165,10 @@ int main(int, char**)
 
     GUI::setupCallbacks(window);
     GUI::initOpenGL();
+
+	//StreetSide::test(); return 0;
+	StreetSide::queryViewport(); return 0;
+
     GUI::loadState();
     GUI::createWorld();
 

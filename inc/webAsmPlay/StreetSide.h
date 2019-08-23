@@ -31,6 +31,8 @@ public:
 
 	static StreetSide * getInstance();
 
+	static void queryViewport();
+
 private:
 
 	StreetSide();
