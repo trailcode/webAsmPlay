@@ -35,6 +35,8 @@ namespace curlUtil
 	{
 		char * m_buffer = nullptr;
 		size_t m_size	= 0;
+
+		~BufferStruct();
 	};
 
 	size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data);	

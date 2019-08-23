@@ -30,6 +30,11 @@
 
 using namespace curlUtil;
 
+BufferStruct::~BufferStruct()
+{
+	free(m_buffer);
+}
+
 // This is the function we pass to LC, which writes the output to a BufferStruct
 size_t curlUtil::writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
 {
@@ -39,12 +44,11 @@ size_t curlUtil::writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void 
 
 	mem->m_buffer = (char *)realloc(mem->m_buffer, mem->m_size + realsize + 1);
 
-	if (mem->m_buffer)
-	{
-		memcpy(&(mem->m_buffer[mem->m_size]), ptr, realsize);
-		mem->m_size += realsize;
-		mem->m_buffer[mem->m_size] = 0;
-	}
+	if (!mem->m_buffer) { return realsize ;}
+	
+	memcpy(&(mem->m_buffer[mem->m_size]), ptr, realsize);
+	mem->m_size += realsize;
+	mem->m_buffer[mem->m_size] = 0;
 
 	return realsize;
 }

@@ -102,11 +102,7 @@ namespace
 		GLuint      textureHandleBuffer;
 	} buffers;
 
-	//GLuint64 * pHandles = NULL;
-
-	typedef pair<const char *, const size_t> TileBuffer;
-
-	TileBuffer downloadTile(const int ID, const string & quadKey)
+	BufferStruct * downloadTile(const int ID, const string & quadKey)
 	{
 		CURL * myHandle = NULL;
 
@@ -121,14 +117,14 @@ namespace
 		}
 
 		CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
-		BufferStruct output; // Create an instance of out BufferStruct to accept LCs output
+		BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
 		
 		//if(!myHandle) { myHandle = curl_easy_init() ;}
 
 		/* Notice the lack of major error checking, for brevity */
 
 		curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
-		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, &output); // Passing our BufferStruct to LC
+		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, output); // Passing our BufferStruct to LC
 
 		//const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
 		const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A";
@@ -149,7 +145,9 @@ namespace
 			dmess("result " << result << " myHandle " << myHandle);
 		}
 		
-		return TileBuffer(output.m_buffer, output.m_size);
+		//return TileBuffer(output.m_buffer, output.m_size);
+
+		return output;
 	}
 }
 
@@ -232,9 +230,9 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 	{
 	download:
 
-		TileBuffer tileBuffer = downloadTile(ID, quadKey);
+		auto tileBuffer = shared_ptr<BufferStruct>(downloadTile(ID, quadKey));
 
-		if (!get<0>(tileBuffer) || get<1>(tileBuffer) == 11)
+		if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
 		{
 			markTileNoData(tile);
 
@@ -268,9 +266,7 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 			OpenGL::ensureSharedContext();
 
-			SDL_RWops * mem = SDL_RWFromConstMem(get<0>(tileBuffer), get<1>(tileBuffer));
-
-			SDL_Surface * img = IMG_LoadJPG_RW(mem);
+			SDL_Surface * img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
 
 			if(!img) { return markTileNoData(tile) ;}
 
@@ -306,13 +302,11 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 				if(fp)
 				{
-					fwrite(get<0>(tileBuffer), sizeof(char), get<1>(tileBuffer), fp);
+					fwrite(tileBuffer->m_buffer, sizeof(char), tileBuffer->m_size, fp);
 
 					fclose(fp);
 				}
 				else { dmess("Warn could not write file: " << tileCachePath) ;}
-
-				if( get<0>(tileBuffer) ) { free ((void *)get<0>(tileBuffer)) ;}
 			});
 
 			--s_numWriting;
