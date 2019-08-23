@@ -25,7 +25,6 @@
 */
 
 #ifndef __EMSCRIPTEN__
-    #include <curl/curl.h>
     #include <ctpl.h>
 #endif
 
@@ -79,14 +78,8 @@ namespace
 #ifndef __EMSCRIPTEN__
 
     thread_pool loaderPool	(64);
-	//thread_pool loaderPool	(1);
     thread_pool uploaderPool(1);
 	thread_pool writerPool	(1);
-
-    mutex loaderMutex;
-    mutex uploaderMutex;
-
-    unordered_map<int, CURL *> curlHandles;
 
 #endif
 
@@ -101,55 +94,6 @@ namespace
 		//GLuint      transformBuffer;
 		GLuint      textureHandleBuffer;
 	} buffers;
-
-	BufferStruct * downloadTile(const int ID, const string & quadKey)
-	{
-		CURL * myHandle = NULL;
-
-		{
-			lock_guard<mutex> _(loaderMutex);
-
-			if(curlHandles.find(ID) == curlHandles.end()) { curlHandles[ID] = myHandle = curl_easy_init() ;}
-
-			myHandle = curlHandles[ID];
-
-			if (!myHandle) { dmessError("Could not create CURL handle!") ;}
-		}
-
-		CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
-
-		BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
-		
-		//if(!myHandle) { myHandle = curl_easy_init() ;}
-
-		/* Notice the lack of major error checking, for brevity */
-
-		curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
-		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, output); // Passing our BufferStruct to LC
-
-		//const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=146&c4w=1";
-		const string url =  "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A";
-
-		//dmess("url " << url);
-
-		// http://ecn.{subdomain}.tiles.virtualearth.net/tiles/hs0203232101212100{faceId}{tileId}?g=6617&key={BingMapsKey}
-															   //0231010301213112
-															   //0231010301210232
-															   //0201012211200132
-		
-		//dmess("url " << url);
-
-		curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
-
-		if (result = curl_easy_perform(myHandle))
-		{
-			dmess("result " << result << " myHandle " << myHandle);
-		}
-		
-		//return TileBuffer(output.m_buffer, output.m_size);
-
-		return output;
-	}
 }
 
 void RenderableBingMap::fetchTile(RasterTile * tile)
@@ -231,7 +175,7 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 	{
 	download:
 
-		auto tileBuffer = shared_ptr<BufferStruct>(downloadTile(ID, quadKey));
+		auto tileBuffer = shared_ptr<BufferStruct>(download("http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A", ID));
 
 		if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
 		{

@@ -40,11 +40,9 @@ using namespace curlUtil;
 
 namespace
 {
-	mutex loaderMutex;
+	mutex a_loaderMutex;
 
 	unordered_map<int, CURL *> a_curlHandles;
-
-	
 }
 
 BufferStruct::~BufferStruct()
@@ -72,5 +70,31 @@ size_t curlUtil::writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void 
 
 BufferStruct * curlUtil::download(const string & url, const size_t threadID)
 {
-	return 0;	
+	CURL * myHandle = nullptr;
+
+	{
+		lock_guard<mutex> _(a_loaderMutex);
+
+		if(a_curlHandles.find(threadID + 1) == a_curlHandles.end()) { a_curlHandles[threadID + 1] = myHandle = curl_easy_init() ;}
+
+		myHandle = a_curlHandles[threadID + 1];
+
+		if (!myHandle) { dmessError("Could not create CURL handle!") ;}
+	}
+
+	CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
+
+	BufferStruct * output = new BufferStruct; // Create an instance of out BufferStruct to accept LCs output
+	
+	curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
+	curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, output); // Passing our BufferStruct to LC
+
+	curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
+
+	if (result = curl_easy_perform(myHandle))
+	{
+		dmess("result " << result << " myHandle " << myHandle);
+	}
+
+	return output;
 }
