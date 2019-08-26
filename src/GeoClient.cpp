@@ -608,7 +608,7 @@ namespace
 {
 #ifndef __EMSCRIPTEN__
 
-	CURL * myHandle = NULL; // TODO code dup
+	CURL * myHandle = nullptr; // TODO code dup
 
 #endif
 }

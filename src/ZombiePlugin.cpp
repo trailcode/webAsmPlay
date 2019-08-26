@@ -48,7 +48,7 @@ namespace
     bool gUseDirectedPathFollowing = true;  // TODO dup!
     bool gWanderSwitch = true; // TODO dup!
 
-    Network * network = NULL;
+    Network * network = nullptr;
 
     ZombiePlugin gZombiePlugin;
 }
@@ -315,7 +315,7 @@ void ZombiePlugin::removePedestrianFromCrowd()
 
         // if it is OpenSteerDemo's selected vehicle, unselect it
         if (pedestrian == OpenSteerDemo::selectedVehicle)
-            OpenSteerDemo::selectedVehicle = NULL;
+            OpenSteerDemo::selectedVehicle = nullptr;
 
         // delete the Pedestrian
         delete pedestrian;

@@ -32,8 +32,8 @@
 
 namespace
 {
-	ShaderProgram			* shaderProgram   = NULL;
-	BindlessTextureShader	* defaultInstance = NULL;
+	ShaderProgram			* shaderProgram   = nullptr;
+	BindlessTextureShader	* defaultInstance = nullptr;
 
 	GLint vertInAttrLoc;
 	GLint vertUV_InAttrLoc;

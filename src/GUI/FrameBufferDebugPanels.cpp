@@ -63,7 +63,7 @@ void GUI::frameBufferDepthDebugPanel()
 
 		if (s_canvas->getG_FrameBuffer())
 		{
-			static FrameBuffer* fb = NULL;
+			static FrameBuffer* fb = nullptr;
 
 			bindFB(fb, sceneWindowSize);
 
@@ -99,7 +99,7 @@ void GUI::normalFrameBufferDebugPanel()
 
 		if (s_canvas->getG_FrameBuffer())
 		{
-			static FrameBuffer* fb = NULL;
+			static FrameBuffer* fb = nullptr;
 
 			bindFB(fb, sceneWindowSize);
 

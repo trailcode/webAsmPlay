@@ -168,7 +168,7 @@ void Network::setEdges(const vector<AttributedLineString> & lineStrings)
         Attributes     * attrs   = lineStrings[i].first;
         const Geometry * geom    = lineStrings[i].second;
 
-        edges.push_back(new Edge(NULL, dynamic_cast<const LineString *>(geom), attrs));
+        edges.push_back(new Edge(nullptr, dynamic_cast<const LineString *>(geom), attrs));
     }
 
     setEdges(edges);
@@ -257,7 +257,7 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
     endPoint = end;
 
-    if(!get<1>(start)) { return NULL ;}
+    if(!get<1>(start)) { return nullptr ;}
 
     Q.clear();
     Q.reserve(nodes.size());
@@ -329,7 +329,7 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
         }
     }
 
-    return NULL;
+    return nullptr;
 
     done:;
 
@@ -407,12 +407,12 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
     //dmess("end Network::findPath");
 
-    return NULL;
+    return nullptr;
 }
 
 vector<dvec2> Network::getRandomPath()
 {
-    unique_ptr<vector<Coordinate> > coords = NULL;
+    unique_ptr<vector<Coordinate> > coords = nullptr;
 
     for(; !coords ;)
     {

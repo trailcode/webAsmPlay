@@ -79,7 +79,7 @@ Renderable * RenderablePoint::create(const ConstGeosGeomVec & points,
         dmess("P " << P.x << " " << P.y);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void RenderablePoint::render(Canvas * canvas, const size_t renderStage)
@@ -91,7 +91,7 @@ void RenderablePoint::render(Canvas * canvas, const size_t renderStage)
     glBindVertexArray(                    m_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 
-    glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, NULL);
+    glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, nullptr);
 
 	glBindVertexArray(0);
 }

@@ -37,8 +37,8 @@ using namespace glm;
 
 namespace
 {
-	ShaderProgram   * shaderProgram   = NULL;
-	SkyBoxShader	* defaultInstance = NULL;
+	ShaderProgram   * shaderProgram   = nullptr;
+	SkyBoxShader	* defaultInstance = nullptr;
 
 	GLint vertInLoc      = -1;
 	GLint MVP_Loc        = -1;

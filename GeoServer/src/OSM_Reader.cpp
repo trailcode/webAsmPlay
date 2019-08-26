@@ -66,10 +66,10 @@ namespace
     OSM_Ways      ways;
     OSM_Relations relations;
 
-    OSM_Base     * curr         = NULL;
-    OSM_Node     * currNode     = NULL;
-    OSM_Way      * currWay      = NULL;
-    OSM_Relation * currRelation = NULL;
+    OSM_Base     * curr         = nullptr;
+    OSM_Node     * currNode     = nullptr;
+    OSM_Way      * currWay      = nullptr;
+    OSM_Relation * currRelation = nullptr;
 
     double boundsMinX = 0;
     double boundsMaxX = 0;
@@ -80,7 +80,7 @@ namespace
     {
         const auto i = nodes.find(ID);
 
-        if(i == nodes.end()) { return NULL ;}
+        if(i == nodes.end()) { return nullptr ;}
 
         return i->second;
     }
@@ -89,7 +89,7 @@ namespace
     {
         const auto i = ways.find(ID);
 
-        if(i == ways.end()) { return NULL ;}
+        if(i == ways.end()) { return nullptr ;}
 
         return i->second;
     }
@@ -98,7 +98,7 @@ namespace
     {
         const auto i = relations.find(ID);
 
-        if(i == relations.end()) { return NULL ;}
+        if(i == relations.end()) { return nullptr ;}
 
         return i->second;
     }
@@ -115,7 +115,7 @@ MapData OSM_Reader::import(const string & fileName)
 
     char buf[BUFSIZ];
 
-    XML_Parser parser = XML_ParserCreate(NULL);
+    XML_Parser parser = XML_ParserCreate(nullptr);
     
     int done;
     int depth = 0;
@@ -185,7 +185,7 @@ MapData OSM_Reader::import(const string & fileName)
             
             LinearRing * externalRing = factory->createLinearRing(coords);
 
-            way->m_geom = unique_ptr<Geometry>(factory->createPolygon(externalRing, NULL));
+            way->m_geom = unique_ptr<Geometry>(factory->createPolygon(externalRing, nullptr));
         }
     }
 
@@ -373,7 +373,7 @@ void OSM_Reader::handleRelation(const char **atts)
 
     Attributes * attrs = curr->m_attrs.get();
 
-    for(size_t i = 0; atts[i] != NULL; i += 2)
+    for(size_t i = 0; atts[i] != nullptr; i += 2)
     {
         switch(getKey(atts[i]))
         {
@@ -405,7 +405,7 @@ void OSM_Reader::handleMember(const char **atts)
 
     currRelation->m_members.push_back(member);
 
-    for(size_t i = 0; atts[i] != NULL; i += 2)
+    for(size_t i = 0; atts[i] != nullptr; i += 2)
     {
         switch(getKey(atts[i]))
         {
@@ -423,7 +423,7 @@ void OSM_Reader::handleTag(const char **atts)
     string key;
     string value;
 
-    for(size_t i = 0; atts[i] != NULL; i += 2)
+    for(size_t i = 0; atts[i] != nullptr; i += 2)
     {
         switch(getKey(atts[i]))
         {
@@ -443,7 +443,7 @@ void OSM_Reader::handleNode(const char **atts)
 
     Attributes * attrs = curr->m_attrs.get();
 
-    for(size_t i = 0; atts[i] != NULL; i += 2)
+    for(size_t i = 0; atts[i] != nullptr; i += 2)
     {
         switch(getKey(atts[i]))
         {
@@ -477,7 +477,7 @@ void OSM_Reader::handleWay(const char **atts)
 
     Attributes * attrs = curr->m_attrs.get();
 
-    for(size_t i = 0; atts[i] != NULL; i += 2)
+    for(size_t i = 0; atts[i] != nullptr; i += 2)
     {
         switch(getKey(atts[i]))
         {
@@ -505,7 +505,7 @@ void OSM_Reader::handleWay(const char **atts)
 
 void OSM_Reader::handleND(const char **atts)
 {
-    for(size_t i = 0; atts[i] != NULL; i += 2)
+    for(size_t i = 0; atts[i] != nullptr; i += 2)
     {
         switch(getKey(atts[i]))
         {
@@ -525,7 +525,7 @@ void OSM_Reader::handleND(const char **atts)
 
 void OSM_Reader::handleBounds(const char **atts)
 {
-    for(size_t i = 0; atts[i] != NULL; i += 2)
+    for(size_t i = 0; atts[i] != nullptr; i += 2)
     {
         switch(getKey(atts[i]))
         {

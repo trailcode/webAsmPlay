@@ -106,14 +106,14 @@ namespace
             //GeometryFactory::getDefaultInstance()->destroyGeometry(get<1>(*ls));
             //delete get<1>(*ls);
 
-            //get<1>(*ls) = NULL;
+            //get<1>(*ls) = nullptr;
         }
 
         list<LineString *> splits; // TODO try to put the below ls in splits initially. 
 
-        AttributedLineString * ls;
+        AttributedLineString * ls = nullptr;
 
-        PreparedLineString * pls = NULL;
+        PreparedLineString * pls = nullptr;
 
         bool noSplits;
 

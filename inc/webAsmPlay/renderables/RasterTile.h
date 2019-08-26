@@ -58,7 +58,7 @@ public:
 
 	std::atomic_bool m_stillNeeded = { true };
 
-	Renderable* m_renderable = NULL;
+	Renderable* m_renderable = nullptr;
 
 	static GLuint s_NO_DATA;
 

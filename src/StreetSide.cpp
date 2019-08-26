@@ -77,7 +77,7 @@ void StreetSide::queryViewport()
 {
 	// curl "https://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?appkey=AuftgJsO0Xs8Ts4M1xZUQJQXJNsvmh3IV8DkNieCiy3tCwCUMq76-WpkrBtNAuEm^&c=2000^&e=2.3268620483818374^&jsCallback=jsonpCache.kzikAeXGbFvsYGP^&n=48.8596821424352^&s=48.85712660600309^&w=2.322977794823074" -H "Sec-Fetch-Mode: no-cors" -H "Referer: https://www.openstreetmap.org/id" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36" --compressed
 
-	CURL * myHandle = NULL;
+	CURL * myHandle = nullptr;
 
 	myHandle = curl_easy_init();
 

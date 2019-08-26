@@ -33,9 +33,8 @@
 
 namespace
 {
-    ShaderProgram * shaderProgram   = NULL;
-
-    TileBoundaryShader * defaultInstance = NULL;
+    ShaderProgram		* shaderProgram   = nullptr;
+    TileBoundaryShader	* defaultInstance = nullptr;
 
     GLint vertInAttrLoc;
     

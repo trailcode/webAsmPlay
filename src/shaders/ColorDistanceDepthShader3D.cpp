@@ -42,10 +42,10 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram              * shaderProgramPre    = NULL;
-    ShaderProgram              * shaderProgramFill     = NULL;
-    ShaderProgram              * shaderProgramOutline  = NULL;
-    ColorDistanceDepthShader3D * defaultInstance       = NULL;
+    ShaderProgram              * shaderProgramPre		= nullptr;
+    ShaderProgram              * shaderProgramFill		= nullptr;
+    ShaderProgram              * shaderProgramOutline	= nullptr;
+    ColorDistanceDepthShader3D * defaultInstance		= nullptr;
 
     GLint vertInAttrPre;
     GLint heightMultiplierPre;

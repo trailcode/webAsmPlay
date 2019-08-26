@@ -62,7 +62,7 @@ Renderable * RenderableLineString::create(  const LineString * lineString,
     {
         dmess("Error lineString is NULL!");
 
-        return NULL;
+        return nullptr;
     }
 
     return create(*lineString->getCoordinatesRO()->toVector(), trans);
@@ -74,7 +74,7 @@ Renderable * RenderableLineString::create(const vector<Coordinate> & coords, con
     {
         dmess("Bad geometry!");
 
-        return NULL;
+        return nullptr;
     }
 
     FloatVec  verts  (coords.size() * 2);
@@ -243,13 +243,13 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage)
     {
         m_shader->bind(canvas, true, renderStage);
 
-        glDrawElements(GL_LINE_STRIP, (GLsizei)m_numElements, GL_UNSIGNED_INT, NULL);
+        glDrawElements(GL_LINE_STRIP, (GLsizei)m_numElements, GL_UNSIGNED_INT, nullptr);
     }
     else
     {
         m_shader->bind(canvas, true, renderStage);
 
-        glDrawElements(GL_LINES, (GLsizei)m_numElements, GL_UNSIGNED_INT, NULL);
+        glDrawElements(GL_LINES, (GLsizei)m_numElements, GL_UNSIGNED_INT, nullptr);
     }
 
     glBindVertexArray(0);

@@ -32,6 +32,5 @@ using namespace std;
 
 PointCloud * LAS_Reader::readPointCloud(const string lasFile)
 {
-
-    return NULL;
+    return nullptr;
 }

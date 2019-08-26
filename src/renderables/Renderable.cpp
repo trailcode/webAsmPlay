@@ -60,24 +60,21 @@ Renderable * Renderable::create(const Geometry * geom,
 {
     switch(geom->getGeometryTypeId())
     {
-        //case GEOS_POINT:                dmess("Implement me!"); return NULL;
         case GEOS_POINT:
             return RenderablePoint::create(dynamic_cast<const Point *>(geom), trans);
         case GEOS_LINESTRING:           
         case GEOS_LINEARRING:           return RenderableLineString::create(dynamic_cast<const LineString *>(geom), trans);
 		case GEOS_POLYGON:              return RenderablePolygon   ::create(dynamic_cast<const Polygon    *>(geom), trans, 0, boxUV);
 
-        case GEOS_MULTIPOINT:           dmess("Implement me!"); return NULL;
-        case GEOS_MULTILINESTRING:      dmess("Implement me!"); return NULL;
+        case GEOS_MULTIPOINT:           dmess("Implement me!"); return nullptr;
+        case GEOS_MULTILINESTRING:      dmess("Implement me!"); return nullptr;
         case GEOS_MULTIPOLYGON:         return RenderablePolygon::create(   dynamic_cast<const MultiPolygon *>(geom), trans, 0, boxUV);
 
-        case GEOS_GEOMETRYCOLLECTION:   dmess("Implement me!"); return NULL;
-        default:
-            dmess("Error!");
-            abort();
+        case GEOS_GEOMETRYCOLLECTION:   dmess("Implement me!"); return nullptr;
+        default: dmessError("Error!");
     }
 
-    return NULL;
+    return nullptr;
 }
 
 Renderable::Renderable( const bool isMulti,

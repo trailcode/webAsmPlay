@@ -73,15 +73,13 @@ protected:
     Renderable(const Renderable &)              = delete;
     Renderable(      Renderable &&)             = delete;
     Renderable & operator=(const Renderable &)  = delete;
-    //Renderable & operator=(      Renderable &)  = delete;
-
+    
     std::vector<OnDelete> m_DeleteCallbacks;
 
-    bool m_isMulti = false;
+    Shader * m_shader = nullptr;
 
-    Shader * m_shader = NULL;
-
-    bool m_renderFill	 = true;
-    bool m_renderOutline = true;
+	bool m_isMulti			= false;
+    bool m_renderFill		= true;
+    bool m_renderOutline	= true;
 };
 

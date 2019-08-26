@@ -71,7 +71,7 @@ class Network
 {
 public:
 
-    Network(GeoClient * client = NULL);
+    Network(GeoClient * client = nullptr);
 
     Network(const std::vector<AttributedLineString> & lineStrings, const glm::dmat4 & trans);
 
@@ -91,7 +91,7 @@ public:
 
 private:
 
-    GeoClient * m_client = NULL;
+    GeoClient * m_client = nullptr;
 
     glm::dmat4 m_trans;
 };

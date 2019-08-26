@@ -52,7 +52,7 @@ using namespace geosUtil;
 
 void openSteerDisplayFunc();
 
-thread * openSteerThread = NULL; // TODO make a thread waiting collection.
+thread * openSteerThread = nullptr; // TODO make a thread waiting collection.
 
 namespace
 {

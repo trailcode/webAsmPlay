@@ -149,10 +149,10 @@ protected:
 
     void updateMVP();
 
-    rsmz::TrackBallInteractor * m_trackBallInteractor = NULL;
+    rsmz::TrackBallInteractor * m_trackBallInteractor = nullptr;
 
-	FrameBuffer * m_frameBuffer = NULL;
-	FrameBuffer * m_gBuffer		= NULL;
+	FrameBuffer * m_frameBuffer = nullptr;
+	FrameBuffer * m_gBuffer		= nullptr;
 
     bool m_wantMouseCapture = true;
 
@@ -184,17 +184,17 @@ protected:
     
     glm::dvec3 m_cursorPosWC;
 
-    SkyBox * m_skyBox = NULL;
+    SkyBox * m_skyBox = nullptr;
 
     bool m_enabled = true;
 
     std::mutex m_renderiablesMutex;
 
-    Renderable * m_cursor = NULL;
+    Renderable * m_cursor = nullptr;
 
-	FrameBuffer * m_auxFrameBuffer = NULL;
+	FrameBuffer * m_auxFrameBuffer = nullptr;
 
-	Frustum * m_frustum = NULL;
+	Frustum * m_frustum = nullptr;
 
 	double m_perspectiveFOV = 45.0;
 };

@@ -52,7 +52,7 @@ namespace
 
 		const GLuint shader = glCreateShader(get<0>(typeAndFile));
 
-		glShaderSource(shader, 1, &source, NULL);
+		glShaderSource(shader, 1, &source, nullptr);
 
 		glCompileShader(shader);
     
@@ -62,7 +62,7 @@ namespace
 
 		if (!success) 
 		{
-			glGetShaderInfoLog(shader, 2048, NULL, infoLog);
+			glGetShaderInfoLog(shader, 2048, nullptr, infoLog);
 
 			dmess("GLSL compilation failed: " << _source);
 

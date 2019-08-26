@@ -95,7 +95,7 @@ namespace dataModelOSM
 
         std::vector<const OSM_Member *> m_members;
 
-        Relation * m_relation = NULL;
+        Relation * m_relation = nullptr;
     };
 
     struct OSM_Node : OSM_Base

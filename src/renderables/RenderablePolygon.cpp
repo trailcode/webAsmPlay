@@ -60,7 +60,7 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
 
     tesselations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
 
-    if((*tesselations.begin())->isEmpty()) { return NULL ;}
+    if((*tesselations.begin())->isEmpty()) { return nullptr ;}
 
     if(get<0>(boxUV) != get<2>(boxUV))
     {
@@ -69,14 +69,14 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
 
 		VertexArrayObject * vao = VertexArrayObject::create(tesselations, AABB2D(min.x, min.y, max.x, max.y));
 
-		if (!vao) { return NULL ;}
+		if (!vao) { return nullptr ;}
 
         return new RenderablePolygon(vao);
     }
 
 	VertexArrayObject * vao = VertexArrayObject::create(tesselations);
 
-	if (!vao) { return NULL; }
+	if (!vao) { return nullptr; }
 
     return new RenderablePolygon(vao);
 }

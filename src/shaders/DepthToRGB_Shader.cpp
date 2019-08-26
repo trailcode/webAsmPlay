@@ -33,7 +33,7 @@
 
 namespace
 {
-	ShaderProgram  * shaderProgram   = NULL;
+	ShaderProgram  * shaderProgram = nullptr;
 
 	GLint vertInAttrLoc;
 	

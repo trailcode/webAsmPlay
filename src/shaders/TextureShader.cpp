@@ -33,8 +33,8 @@
 
 namespace
 {
-    ShaderProgram * shaderProgram   = NULL;
-    TextureShader * defaultInstance = NULL;
+    ShaderProgram * shaderProgram   = nullptr;
+    TextureShader * defaultInstance = nullptr;
 
     GLint vertInAttrLoc;
     GLint vertUV_InAttrLoc;

@@ -79,7 +79,7 @@ namespace
 template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS>
 VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellations, const AABB2D & boxUV)
 {
-    if(!tessellations.size()) { return NULL ;}
+    if(!tessellations.size()) { return nullptr ;}
 
     FloatVec  verts;
     Uint32Vec triangleIndices;
@@ -189,7 +189,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 	{
 		dmess("Warning !triangleIndices.size()");
 
-		return NULL;
+		return nullptr;
 	}
 
     GLuint ebo  = 0;
@@ -286,12 +286,12 @@ void VertexArrayObject::bindLines() const
 
 void VertexArrayObject::drawTriangles() const
 {
-    glDrawElements(GL_TRIANGLES, m_numTrianglesIndices, GL_UNSIGNED_INT, NULL);
+    glDrawElements(GL_TRIANGLES, m_numTrianglesIndices, GL_UNSIGNED_INT, nullptr);
 }
 
 void VertexArrayObject::drawLines() const
 {
-    glDrawElements(GL_LINES, (GLsizei)m_numContourLines, GL_UNSIGNED_INT, NULL);
+    glDrawElements(GL_LINES, (GLsizei)m_numContourLines, GL_UNSIGNED_INT, nullptr);
 }
 
 bool VertexArrayObject::isMulti() const { return m_isMulti ;}

@@ -69,7 +69,7 @@ protected:
 
     const std::string m_shaderName;
 
-    ColorSymbology * m_colorSymbology = NULL;
+    ColorSymbology * m_colorSymbology = nullptr;
 
 	friend class RegisterShader;
 

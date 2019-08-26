@@ -80,7 +80,7 @@ void GUI::renderSettingsPanel()
         if(ImGui::Checkbox("SkyBox", &s_renderSettingsRenderSkyBox))
         {   
             if(s_renderSettingsRenderSkyBox)	{ s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor
-            else								{ s_canvas->setSkyBox(NULL)     ;}
+            else								{ s_canvas->setSkyBox(nullptr)  ;}
         }
         
         if(ImGui::Checkbox("BingMaps", &s_renderSettingsRenderBingMaps))

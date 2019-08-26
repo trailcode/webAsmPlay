@@ -118,7 +118,7 @@ vector<AttributedPoligonalArea> topology::discoverTopologicalRelations(vector<At
 
         double minArea = numeric_limits<double>::max();
 
-        MyPolygon * parent = NULL;
+        MyPolygon * parent = nullptr;
 
         for(size_t j = 0; j < query.size(); ++j)
         {

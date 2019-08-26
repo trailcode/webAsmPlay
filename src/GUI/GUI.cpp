@@ -78,15 +78,15 @@ using namespace glm;
 
 #define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
-GeosTestCanvas  * GUI::s_geosTestCanvas		= NULL;
-OpenSteerCanvas * GUI::s_openSteerCanvas	= NULL;
-AnimationCanvas * GUI::s_animationCanvas	= NULL;
-Canvas          * GUI::s_canvas				= NULL;
-SkyBox          * GUI::s_skyBox				= NULL;
-GLFWwindow      * GUI::s_mainWindow			= NULL;
+GeosTestCanvas  * GUI::s_geosTestCanvas		= nullptr;
+OpenSteerCanvas * GUI::s_openSteerCanvas	= nullptr;
+AnimationCanvas * GUI::s_animationCanvas	= nullptr;
+Canvas          * GUI::s_canvas				= nullptr;
+SkyBox          * GUI::s_skyBox				= nullptr;
+GLFWwindow      * GUI::s_mainWindow			= nullptr;
 int               GUI::s_cameraMode			= GUI::CAMERA_TRACK_BALL;
 bool              GUI::s_shuttingDown		= false;
-GeoClient       * GUI::s_client				= NULL;
+GeoClient       * GUI::s_client				= nullptr;
 vector<Canvas *>  GUI::s_auxCanvases;
 EventQueue		  GUI::s_eventQueue;
 bool			  GUI::s_animationRunning	= false;
@@ -101,7 +101,7 @@ namespace
 
     float a_progressBarValue = 0.0f;
 
-    ImGuiTextBuffer * a_buf = NULL;
+    ImGuiTextBuffer * a_buf = nullptr;
 
     uint32_t a_infoIcon = 0;
 
@@ -152,7 +152,7 @@ struct AppLog
         ScrollToBottom = true;
     }
 
-    void Draw(const char* title, bool* p_opened = NULL)
+    void Draw(const char* title, bool* p_opened = nullptr)
     {
 		ImGui::SetNextWindowSize(ImVec2(500, 400));
         ImGui::Begin(title, p_opened);
@@ -199,11 +199,11 @@ static void showCursorPositionOverlay(bool* p_open, const dvec4 & cursorPos)
 
         if (ImGui::BeginPopupContextWindow())
         {
-            if (ImGui::MenuItem("Custom",       NULL, corner == -1)) corner = -1;
-            if (ImGui::MenuItem("Top-left",     NULL, corner ==  0)) corner =  0;
-            if (ImGui::MenuItem("Top-right",    NULL, corner ==  1)) corner =  1;
-            if (ImGui::MenuItem("Bottom-left",  NULL, corner ==  2)) corner =  2;
-            if (ImGui::MenuItem("Bottom-right", NULL, corner ==  3)) corner =  3;
+            if (ImGui::MenuItem("Custom",       nullptr, corner == -1)) corner = -1;
+            if (ImGui::MenuItem("Top-left",     nullptr, corner ==  0)) corner =  0;
+            if (ImGui::MenuItem("Top-right",    nullptr, corner ==  1)) corner =  1;
+            if (ImGui::MenuItem("Bottom-left",  nullptr, corner ==  2)) corner =  2;
+            if (ImGui::MenuItem("Bottom-right", nullptr, corner ==  3)) corner =  3;
             if (p_open && ImGui::MenuItem("Close")) *p_open = false;
             ImGui::EndPopup();
         }
@@ -495,7 +495,7 @@ void GUI::mainLoop(GLFWwindow * window)
     window_flags |= ImGuiWindowFlags_NoBackground;
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("DockSpace Demo", NULL, window_flags);
+    ImGui::Begin("DockSpace Demo", nullptr, window_flags);
     ImGui::PopStyleVar();
 
     ImGui::PopStyleVar(2); // Full screen
@@ -526,9 +526,8 @@ void GUI::mainLoop(GLFWwindow * window)
 
     const dvec4 pos(s_canvas->getCursorPosWC(), 1.0);
 
-    showCursorPositionOverlay(NULL, s_client->getInverseTrans() * pos);
-    //showCursorPositionOverlay(NULL, pos);
-
+    showCursorPositionOverlay(nullptr, s_client->getInverseTrans() * pos);
+    
     string attrsStr = s_client->doPicking(a_mode, pos); // TODO move to a_updatables
 
     for(auto & i : a_updatables) { i() ;}
@@ -649,7 +648,7 @@ void GUI::createWorld()
     s_skyBox = new SkyBox();
 
     if(s_renderSettingsRenderSkyBox) { s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor
-    else                             { s_canvas->setSkyBox(NULL)     ;}
+    else                             { s_canvas->setSkyBox(nullptr)  ;}
 
     a_pool.push([](int ID) {
         

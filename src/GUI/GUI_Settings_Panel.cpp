@@ -31,17 +31,17 @@ void GUI::GUI_Settings_Panel()
 {
     if(!s_showGUI_Settings_Panel) { return ;}
 
-    ImGuiStyle* ref = NULL;
+    ImGuiStyle* ref = nullptr;
     // You can pass in a reference ImGuiStyle structure to compare to, revert to and save to (else it compares to an internally stored reference)
     ImGuiStyle& style = ImGui::GetStyle();
     static ImGuiStyle ref_saved_style;
 
     // Default to using internal storage as reference
     static bool init = true;
-    if (init && ref == NULL)
+    if (init && ref == nullptr)
         ref_saved_style = style;
     init = false;
-    if (ref == NULL)
+    if (ref == nullptr)
         ref = &ref_saved_style;
 
     ImGui::Begin("GUI Configuration", &s_showGUI_Settings_Panel);

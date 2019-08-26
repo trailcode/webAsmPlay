@@ -34,7 +34,7 @@ using namespace glm;
 
 namespace
 {
-    Textures * instance = NULL;
+    Textures * instance = nullptr;
 
     int invertImage(int width, int height, void *image_pixels)
     {

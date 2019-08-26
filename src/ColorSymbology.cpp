@@ -34,8 +34,6 @@ using namespace glm;
 
 namespace
 {
-    //ColorSymbology * instance = NULL;
-
     glm::vec4 initalColors[32];
 
     unordered_map<string, ColorSymbology *> instances;

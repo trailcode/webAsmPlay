@@ -35,7 +35,7 @@ namespace rsmz
                                                     //mZoomScale(5.0f * 0.2f),
                                                     m_ZoomScale(1.0f * 0.2f),
                                                     m_ZoomSum(0.f),
-                                                    m_Camera(NULL)
+                                                    m_Camera(nullptr)
     {
     }
 

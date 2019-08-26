@@ -61,7 +61,7 @@ namespace
 
 DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
 {
-	if (!g_vertsAndColors.size()) { return NULL; }
+	if (!g_vertsAndColors.size()) { return nullptr; }
 
     GLuint vao  = 0;
     GLuint ebo  = 0;
@@ -264,11 +264,11 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)
 
     m_shader->bind(canvas, false, renderStage);
     
-    glDrawElements(GL_TRIANGLES, m_numTriIndices, GL_UNSIGNED_INT, NULL);
+    glDrawElements(GL_TRIANGLES, m_numTriIndices, GL_UNSIGNED_INT, nullptr);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2);
 
-    glDrawElements(GL_LINES, m_numLineIndices, GL_UNSIGNED_INT, NULL);
+    glDrawElements(GL_LINES, m_numLineIndices, GL_UNSIGNED_INT, nullptr);
 
     canvas->popMVP();
 }

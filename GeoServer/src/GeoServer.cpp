@@ -100,7 +100,7 @@ string GeoServer::addGdalSupportedFile(const string & gdalFile)
 
     GDALAllRegister();
 
-    GDALDataset * poDS = (GDALDataset *)GDALOpenEx(gdalFile.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+    GDALDataset * poDS = (GDALDataset *)GDALOpenEx(gdalFile.c_str(), GDAL_OF_VECTOR, nullptr, nullptr, nullptr);
 
     if(!poDS) { dmess("Error opening: " << gdalFile) ;}
 

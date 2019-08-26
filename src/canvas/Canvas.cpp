@@ -79,7 +79,7 @@ Canvas::Canvas( const bool   useFrameBuffer,
 
 	glGenBuffers(1, &uniforms_buffer);
 	glBindBuffer(GL_UNIFORM_BUFFER,  uniforms_buffer);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms_block), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms_block), nullptr, GL_DYNAMIC_DRAW);
 }
 
 Canvas::~Canvas()

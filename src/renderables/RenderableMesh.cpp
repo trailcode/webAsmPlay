@@ -109,7 +109,7 @@ Renderable * RenderableMesh::create(const Tessellations & tessellations)
     {
         dmess("Error! Could not create VertexArrayObject!");
 
-        return NULL;
+        return nullptr;
     };
 
     return new RenderableMesh(vao);

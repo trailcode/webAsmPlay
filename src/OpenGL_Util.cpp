@@ -117,7 +117,7 @@ void OpenGL::init()
 
 	for (size_t i = 0; i < a_numOpenGL_Contexts; ++i)
 	{
-		a_contextWindows.push(glfwCreateWindow(1, 1, "Thread Window", NULL, GUI::getMainWindow()));
+		a_contextWindows.push(glfwCreateWindow(1, 1, "Thread Window", nullptr, GUI::getMainWindow()));
 	}
 }
 
@@ -127,7 +127,7 @@ void OpenGL::ensureSharedContext()
 
 	if(a_setContextes.find(threadID) != a_setContextes.end()) { return ;}
 
-	GLFWwindow * contextWindow = NULL;
+	GLFWwindow * contextWindow = nullptr;
 
 	if(!a_contextWindows.try_pop(contextWindow)) { dmessError("Unable to create opengl shared context! Increase the number available.") }
 

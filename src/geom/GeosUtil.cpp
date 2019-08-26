@@ -60,9 +60,9 @@ Geometry::Ptr geosUtil::makeBox(const double xmin, const double ymin, const doub
 
     LinearRing * shell = geomFact->createLinearRing(temp);
 
-    // NULL in this case could instead be a collection of one or more holes
+    // nullptr in this case could instead be a collection of one or more holes
     // in the interior of the polygon
-    return Geometry::Ptr(geomFact->createPolygon(shell, NULL));
+    return Geometry::Ptr(geomFact->createPolygon(shell, nullptr));
 }
 
 Geometry::Ptr geosUtil::makeBox(const dvec2 & min, const dvec2 & max)

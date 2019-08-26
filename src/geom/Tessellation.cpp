@@ -170,7 +170,7 @@ void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
     }
 }
 
-bool Tessellation::isEmpty() const { return m_verts == NULL ;}
+bool Tessellation::isEmpty() const { return m_verts == nullptr ;}
 
 uint32_t Tessellation::getSymbologyID() const { return m_symbologyID ;}
 

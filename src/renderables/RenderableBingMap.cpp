@@ -68,7 +68,7 @@ atomic<size_t> RenderableBingMap::s_numWriting		= {0};
 
 size_t RenderableBingMap::s_numRendered = 0;
 
-FrameBuffer * RenderableBingMap::s_textureBuffer = NULL;
+FrameBuffer * RenderableBingMap::s_textureBuffer = nullptr;
 
 bool RenderableBingMap::s_useCache	= true;
 const bool useBindlessTextures		= true;
@@ -91,8 +91,8 @@ namespace
 
 	struct
 	{
-		//GLuint      transformBuffer;
-		GLuint      textureHandleBuffer;
+		GLuint textureHandleBuffer;
+
 	} buffers;
 }
 

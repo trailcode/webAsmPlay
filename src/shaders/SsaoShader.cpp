@@ -34,8 +34,8 @@ using namespace glm;
 
 namespace
 {
-	ShaderProgram * shaderProgram   = NULL;
-	SsaoShader	  * defaultInstance = NULL;
+	ShaderProgram * shaderProgram   = nullptr;
+	SsaoShader	  * defaultInstance = nullptr;
 
 	GLuint points_buffer;
 

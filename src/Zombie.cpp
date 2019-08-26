@@ -50,7 +50,7 @@ extern Canvas * theCanvas;
 Zombie::Zombie(ProximityDatabase & pd, Network * network)
 {
     // allocate a token for this boid in the proximity database
-    m_proximityToken = NULL;
+    m_proximityToken = nullptr;
 
     newPD (pd);
 

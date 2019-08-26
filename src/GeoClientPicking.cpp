@@ -60,7 +60,7 @@ PointOnEdge GeoClient::pickLineStringRenderable(const vec3 & _pos) const
     
     double minDist = numeric_limits<double>::max();
 
-    Edge * closest = NULL;
+    Edge * closest = nullptr;
 
     Coordinate pointOnEdge;
 
@@ -101,8 +101,8 @@ pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _
 
     double minArea = numeric_limits<double>::max();
 
-    Renderable * smallest      = NULL;
-    Attributes * smallestAttrs = NULL;
+    Renderable * smallest      = nullptr;
+    Attributes * smallestAttrs = nullptr;
 
     for(const void * _data : query)
     {

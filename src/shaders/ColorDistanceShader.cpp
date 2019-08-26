@@ -41,9 +41,9 @@ using namespace glm;
 
 namespace
 {
-	ShaderProgram       * shaderProgramPre	= NULL;
-    ShaderProgram       * shaderProgram		= NULL;
-    ColorDistanceShader * defaultInstance   = NULL;
+	ShaderProgram       * shaderProgramPre	= nullptr;
+    ShaderProgram       * shaderProgram		= nullptr;
+    ColorDistanceShader * defaultInstance   = nullptr;
 
     GLint vertInAttrLoc;
     GLint vertColorInAttrLoc;

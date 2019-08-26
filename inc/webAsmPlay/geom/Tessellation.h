@@ -64,8 +64,8 @@ private:
 
     friend class VertexArrayObject;
 
-    double    * m_verts           = NULL; // TODO make object oriented 
-    uint32_t  * m_triangleIndices = NULL;
+    double    * m_verts           = nullptr; // TODO make object oriented 
+    uint32_t  * m_triangleIndices = nullptr;
     uint32_t    m_numVerts        = 0;
     uint32_t    m_numTriangles    = 0;
 

@@ -117,9 +117,9 @@ private:
     
     Client::connection_ptr m_con;
 
-    Client * m_client = NULL;
+    Client * m_client = nullptr;
 
-    std::thread * m_clientThread = NULL;
+    std::thread * m_clientThread = nullptr;
 
 #endif
 
