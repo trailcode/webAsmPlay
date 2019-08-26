@@ -48,19 +48,20 @@ out VS_OUT
 	vec3 N;
 	vec3 L;
 	vec3 V;
+
 } vs_out;
 
 void main()
 {
 	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
 
-	vec4 position_in_view_space = view * model * vert;
+	vec4 posViewSpace = modelView * vert;
 
-	gl_Position = proj * view * model * vert;
+	gl_Position = modelViewProj * vert;
 
 	//vs_out.N = normalIn;
 	vs_out.N = mat3(modelView) * normalIn;
-	vs_out.V = -position_in_view_space.xyz;
+	vs_out.V = -posViewSpace.xyz;
 
 	glPos = gl_Position;
 

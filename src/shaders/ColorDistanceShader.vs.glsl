@@ -28,8 +28,8 @@
 uniform sampler2D tex;
 
 // Per-vertex inputs
-layout (location = 0) in vec4 position;
-layout(location = 1) in float vertColorIn;
+layout(location = 0) in vec4	position;
+layout(location = 1) in float	vertColorIn;
 
 layout(std140, binding = 0) uniform constants
 {
@@ -41,19 +41,20 @@ layout(std140, binding = 0) uniform constants
 };
 
 uniform float colorLookupOffset;
-//uniform mat4 proj_matrix;
 
-// Inputs from vertex shader
+// Inputs for vertex shader
 out VS_OUT
 {
 	vec3 N;
 	vec3 L;
 	vec3 V;
+
 } vs_out;
 
 out vec4 vertexColorNear;
 out vec4 vertexColorFar;
-out vec4 position_in_view_space;
+out vec4 posViewSpace;
+
 noperspective out vec4 fragCoord2D;
 
 // Position of light
@@ -64,17 +65,16 @@ void main(void)
 	vec4 vert = vec4(position.xy, 0, 1);
 
 	// Calculate view-space coordinate
-	position_in_view_space = modelView * vert;
+	posViewSpace = modelView * vert;
 
 	vertexColorNear = texture(tex, vec2(vertColorIn +		 colorLookupOffset  / 32.0, 0.5));
-	vertexColorFar = texture(tex,  vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
+	vertexColorFar  = texture(tex, vec2(vertColorIn + (1.0 + colorLookupOffset) / 32.0, 0.5));
 
 	// Calculate view-space coordinate
 	vec4 P = modelView * vert;
 
 	// Calculate normal in view-space
 	//vs_out.N = mat3(mv_matrix) * normal;
-	//vs_out.N = vec3(0, 0, 1);
 	vs_out.N = mat3(modelView) * vec3(0, 0, 1);
 
 	// Calculate light vector
@@ -89,10 +89,10 @@ void main(void)
 	fragCoord2D  = proj * modelView * vec4(position.xy, 0, 1);
 
 	// Vertex in NDC-space
-	fragCoord2D.xyz /= fragCoord2D.w;       // Rescale: [-1,1]^3
-	fragCoord2D.w    = 1.0 / fragCoord2D.w; // Invert W
+	fragCoord2D.xyz /= fragCoord2D.w;		  // Rescale: [-1,1]^3
+	fragCoord2D.w    = 1.0 / fragCoord2D.w;   // Invert W
 
-											// Vertex in window-space
+											  // Vertex in window-space
 	fragCoord2D.xyz *= vec3(0.5) + vec3(0.5); // Rescale: [0,1]^3
 
 	fragCoord2D.xyz += vec3(1);

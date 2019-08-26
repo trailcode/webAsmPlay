@@ -44,14 +44,14 @@ uniform sampler2D tex;
 
 out vec4 vertexColorNear;
 out vec4 vertexColorFar;
-out vec4 position_in_view_space;
+out vec4 posViewSpace;
 out vec4 glPos;
 
 void main()
 {
 	vec4 vert = vec4(vertIn.xy, vertIn.z * heightMultiplier, 1);
 
-	position_in_view_space = modelView * vert;
+	posViewSpace = modelView * vert;
 
 	gl_Position = modelViewProj * vert;
 

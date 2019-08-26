@@ -29,17 +29,19 @@
 #extension GL_ARB_bindless_texture : require
 
 layout (location = 0) out vec4 outColor;
+
 in vec2 UV;
+
 uniform int texID;
 
 layout (binding = 6, std140) uniform TEXTURE_BLOCK
 {
-	sampler2D      texa[1024];
+	sampler2D tex[1024];
 };
 
 void main()
 {
-	outColor = texture( texa[texID], UV );
+	outColor = texture( tex[texID], UV );
 
 	outColor.a = 1.0;
 }

@@ -32,7 +32,7 @@ layout (location = 1) out vec4 normal_depth;
 
 in vec4 vertexColorNear;
 in vec4 vertexColorFar;
-in vec4 position_in_view_space;
+in vec4 posViewSpace;
 
 noperspective in vec4 fragCoord2D;
 
@@ -42,13 +42,8 @@ in VS_OUT
 	vec3 N;
 	vec3 L;
 	vec3 V;
-} fs_in;
 
-// Material properties
-uniform vec3 diffuse_albedo = vec3(0.8, 0.8, 0.9);
-uniform vec3 specular_albedo = vec3(0.01);
-uniform float specular_power = 128.0;
-uniform float shading_level = 1.0;
+} fs_in;
 
 uniform sampler2D topDownTexture;
 
@@ -59,21 +54,6 @@ void main(void)
 	vec3 L = normalize(fs_in.L);
 	vec3 V = normalize(fs_in.V);
 
-	/*
-	// Calculate R locally
-	vec3 R = reflect(-L, N);
-
-	// Compute the diffuse and specular components for each fragment
-	vec3 diffuse = max(dot(N, L), 0.0) * diffuse_albedo;
-
-	diffuse *= diffuse;
-
-	vec3 specular = pow(max(dot(R, V), 0.0), specular_power) * specular_albedo;
-
-	// Write final color to the framebuffer
-	color = mix(vec4(0.0), vec4(diffuse + specular, 1.0), shading_level);
-	*/
-
 	float minDist = 0.0;
 	float maxDist = 5.0;
 
@@ -81,13 +61,12 @@ void main(void)
 	// and the origin (4th coordinate should always be 1 
 	// for points). The origin in view space is actually 
 	// the camera position.
-	float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
+	float dist = max(0.0, distance(posViewSpace, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
 
 	dist = min(maxDist, dist) / maxDist;
 
-	//color = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
-	color = vertexColorNear;
-
+	color = vertexColorNear * (1.0f - dist) + vertexColorFar * dist;
+	
 	vec4 texColor = vec4(texture(topDownTexture, fragCoord2D.xy).xyz, 0);
 
 	color += texColor;

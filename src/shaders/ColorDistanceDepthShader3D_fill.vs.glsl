@@ -60,6 +60,7 @@ out VS_OUT
 	vec3 N;
 	vec3 L;
 	vec3 V;
+
 } vs_out;
 
 
@@ -72,7 +73,6 @@ void main()
 	// Calculate view-space coordinate
 	position_in_view_space = modelView * vert; 
 
-	//gl_Position = projection * MV * vert;
 	gl_Position = modelViewProj * vert;
 
 	glPos = gl_Position; // TODO just use gl_Position?

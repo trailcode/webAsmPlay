@@ -49,7 +49,6 @@ layout(std140, binding = 0) uniform constants
 };
 
 layout (location = 0) out vec4 outColor;
-//layout (location = 1) out vec4 normalDepth;
 
 // Input from vertex shader
 in VS_OUT
@@ -57,6 +56,7 @@ in VS_OUT
 	vec3 N;
 	vec3 L;
 	vec3 V;
+
 } fs_in;
 
 void main()
@@ -94,30 +94,31 @@ void main()
 
 	vec3 result = diffuse * vec3(objectColor);
 
-	/*
-	if(distance(result, vec3(0,0,0)) < 0.0001)
-	//if(distance(result, vec3(0,0,0)) > 0.0001)
-	{
-		//discard;
-	}
-	*/
-
 	outColor = vec4(result, objectColor.w);
 
 	// From: https://www.khronos.org/opengl/wiki/Compute_eye_space_from_window_space
 	vec4 viewport = vec4(0, 0, size.x, size.y);
+	
 	vec4 ndcPos;
+	
 	ndcPos.xy = ((2.0 * gl_FragCoord.xy) - (2.0 * viewport.xy)) / (viewport.zw) - 1;
+	
 	ndcPos.z = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far) / (gl_DepthRange.far - gl_DepthRange.near);
+
 	ndcPos.w = 1.0;
+
 	vec4 clipPos = ndcPos / gl_FragCoord.w;
-	vec4 eyePos = invPersMatrix * clipPos; // This is eye space, we need world space.
-	vec4 worldPos = invViewMatrix * eyePos;// World space
+
+	vec4 eyePos = invPersMatrix * clipPos;  // This is eye space, we need world space.
+
+	vec4 worldPos = invViewMatrix * eyePos; // World space
 
 	worldPos.z = 0;
 
 	vec4 p = modelViewProj * worldPos;
+
 	p.xyz /= p.w;       // Rescale: [-1,1]^3
+
 	p.w    = 1.0 / p.w; // Invert W
 													
 	p.xyz *= vec3(0.5) + vec3(0.5); // Rescale: [0,1]^3 // Vertex in window-space

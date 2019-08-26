@@ -34,6 +34,7 @@ in VS_OUT
 	vec3 N;
 	vec3 L;
 	vec3 V;
+
 } fs_in;
 
 void main()

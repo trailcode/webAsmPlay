@@ -28,7 +28,7 @@
 
 in vec4 vertexColorNear;
 in vec4 vertexColorFar;
-in vec4 position_in_view_space;
+in vec4 posViewSpace;
 in vec4 glPos;
 
 layout (location = 0) out vec4 outColor;
@@ -53,7 +53,6 @@ bool canDiscard()
 		float v = abs(t.w - glPos.w);
 
 		if(v <= 0.0001) { return false ;}
-		//if(v <= 0.1) { return false ;}
 	}
 
 	return true;
@@ -70,7 +69,7 @@ void main()
 	// and the origin (4th coordinate should always be 1 
 	// for points). The origin in view space is actually 
 	// the camera position.
-	float dist = max(0.0, distance(position_in_view_space, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
+	float dist = max(0.0, distance(posViewSpace, vec4(0.0, 0.0, 0.0, 1.0)) + minDist);
 
 	dist = min(maxDist, dist) / maxDist;
 
