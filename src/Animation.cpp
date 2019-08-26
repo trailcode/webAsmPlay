@@ -117,6 +117,8 @@ namespace
 	}
 }
 
+void Animation::update() { update(GUI::s_currAnimationTime) ;}
+
 void Animation::update(const float timeIndex)
 {
 	if(s_keyFramesVec.size() < 4) { return ;}
@@ -135,20 +137,14 @@ void Animation::update(const float timeIndex)
 
 	const double t = (timeIndex - prev1->m_timeIndex) / (next1->m_timeIndex - prev1->m_timeIndex);
 
-	/*
-	dmess(	" prev2 " << prev2->m_timeIndex << " " << prev2->m_ID <<
-			" prev1 " << prev1->m_timeIndex << " " << prev1->m_ID <<
-			" next1 " << next1->m_timeIndex << " " << next1->m_ID <<
-			" next2 " << next2->m_timeIndex << " " << next2->m_ID << " t " << t);
-			*/
+	auto cameraCenter	= cubicHermite(prev2->m_cameraCenter,	prev1->m_cameraCenter,	next1->m_cameraCenter,	next2->m_cameraCenter,	t);
+	auto cameraEye		= cubicHermite(prev2->m_cameraEye,		prev1->m_cameraEye,		next1->m_cameraEye,		next2->m_cameraEye,		t);
+	auto cameraUp		= cubicHermite(prev2->m_cameraUp,		prev1->m_cameraUp,		next1->m_cameraUp,		next2->m_cameraUp,		t);
 
-	const auto cameraCenter = cubicHermite(prev2->m_cameraCenter,	prev1->m_cameraCenter,	next1->m_cameraCenter,	next2->m_cameraCenter,	t);
-	const auto cameraEye	= cubicHermite(prev2->m_cameraEye,		prev1->m_cameraEye,		next1->m_cameraEye,		next2->m_cameraEye,		t);
-	const auto cameraUp		= cubicHermite(prev2->m_cameraUp,		prev1->m_cameraUp,		next1->m_cameraUp,		next2->m_cameraUp,		t);
+	if(cameraEye.z < 0.01) { cameraEye.z = 0.01 ;}
 
 	GUI::getMainCamera()->setCenter	(cameraCenter);
 	GUI::getMainCamera()->setEye	(cameraEye);
-	//GUI::getMainCamera()->setEye	(cameraCenter + vec3(0,0,1));
 	GUI::getMainCamera()->setUp		(cameraUp);
 
 	GUI::getMainCamera()->update();
@@ -255,8 +251,35 @@ void Animation::next()
 	setKey(*i);
 }
 
+KeyFrame * Animation::getClosest() { return getClosest(GUI::s_currAnimationTime) ;}
+
+KeyFrame * Animation::getClosest(const float timeIndex)
+{
+	if(!s_keyFramesVec.size()) { return nullptr ;}
+
+	int i = 0;
+	
+	for(; i < s_keyFramesVec.size(); ++i)
+	{
+		if(s_keyFramesVec[i]->m_timeIndex > timeIndex) { break ;} 
+	}
+
+	const auto next = s_keyFramesVec[(i + 0) % s_keyFramesVec.size()];
+	const auto prev = s_keyFramesVec[(i - 1) % s_keyFramesVec.size()];
+	
+	if(fabs(timeIndex - prev->m_timeIndex) < fabs(timeIndex - next->m_timeIndex)) { return prev ;}
+	
+	return next;
+}
+
 void Animation::deleteClosest()
 {
+	auto closest = getClosest();
 
+	if(!closest) { return ;}
+
+	s_keyFrames.remove(*closest);
+
+	updateKeyFramesVec();
 }
 

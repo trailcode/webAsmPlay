@@ -40,6 +40,8 @@ public:
 
 	static void setClosest();
 
+	static void update();
+
 	static void update(const float timeIndex);
 
 	static void load(const nlohmann::json & animation);
@@ -55,6 +57,10 @@ public:
 	static void next();
 
 	static void deleteClosest();
+
+	static KeyFrame * getClosest();
+
+	static KeyFrame * getClosest(const float timeIndex);
 
 private:
 

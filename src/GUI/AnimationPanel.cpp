@@ -57,10 +57,7 @@ void GUI::animationPanel()
 
 		if (ImGui::Button("Add")) { Animation::createKeyFrame() ;} ImGui::SameLine();
 
-		if(ImGui::Button("Del"))
-		{
-			
-		} ImGui::SameLine();
+		if(ImGui::Button("Del")) { Animation::deleteClosest() ;} ImGui::SameLine();
 
 		if (ImGui::Button("Print")) { Animation::printFrames() ;} ImGui::SameLine();
 
@@ -88,9 +85,11 @@ void GUI::animationPanel()
 
 		ImGui::Text("num keys: %i", Animation::numKeys()); ImGui::SameLine();
 
+		if(const auto closestKey = Animation::getClosest()) { ImGui::Text("Clo Key: %i", closestKey->m_ID); ImGui::SameLine() ;}
+
 		ImGui::SetCursorPos(ImVec2(0, sceneWindowSize.y - 50));
 
-		if(ImGui::SliderFloat("###animationTime", &GUI::s_currAnimationTime, 0.0f, GUI::s_animationDuration)) { Animation::update(GUI::s_currAnimationTime) ;}
+		if(ImGui::SliderFloat("###animationTime", &GUI::s_currAnimationTime, 0.0f, GUI::s_animationDuration)) { Animation::update() ;}
 	}
 	ImGui::End();
 }

@@ -45,6 +45,8 @@ namespace
 	size_t currID = 0;
 }
 
+bool KeyFrame::operator==(const KeyFrame& other) const noexcept { return m_ID == other.m_ID ;}
+
 KeyFrame::KeyFrame(	const float   timeIndex,
 					const vec3	& cameraCenter,
 					const vec3	& cameraEye,

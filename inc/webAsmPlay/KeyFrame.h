@@ -46,6 +46,8 @@ public:
 
 	const size_t m_ID;
 
+	bool operator==(const KeyFrame & other) const noexcept;
+
 private:
 
 	friend class Animation;
