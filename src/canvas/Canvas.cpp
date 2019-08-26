@@ -256,6 +256,8 @@ GLuint Canvas::render()
 		glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
 	}
 
+	ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultLinear"));
+
     for(const auto r : m_lineStrings)         { r->render(this, 0) ;}
     for(const auto r : m_points)              { r->render(this, 0) ;}
     for(const auto r : m_deferredRenderables) { r->render(this, 0) ;} 

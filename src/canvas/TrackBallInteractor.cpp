@@ -426,6 +426,8 @@ namespace rsmz
 
     void TrackBallInteractor::updateCameraEyeUp(bool eye, bool up)
     {
+		if(!m_Camera) { return ;}
+
         if (eye) {
             glm::vec3 eye;
             computeCameraEye(eye);
