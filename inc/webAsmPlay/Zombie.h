@@ -49,9 +49,9 @@ public:
 
 #else
 
-	typedef tbb::concurrent_vector<Zombie*> groupType;
+	//typedef tbb::concurrent_vector<Zombie*> groupType;
 
-	//typedef std::vector<Zombie *> groupType;
+	typedef std::vector<Zombie *> groupType;
 
 #endif
 
