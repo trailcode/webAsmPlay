@@ -48,6 +48,7 @@ public:
     Edge(Renderable * renderable, const geos::geom::LineString * geom, Attributes * attributes);
 
     Renderable * getRenderable() const;
+	Renderable * setRenderable(Renderable * renderable);
 
     const geos::geom::LineString * getGeometry() const;
 

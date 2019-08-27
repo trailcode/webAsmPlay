@@ -60,6 +60,8 @@ Renderable       * Edge::getRenderable() const { return m_renderable ;}
 const LineString * Edge::getGeometry()   const { return m_geom       ;}
 Attributes       * Edge::getAttributes() const { return m_attributes ;}
 
+Renderable		 * Edge::setRenderable(Renderable * renderable) { return m_renderable = renderable ;}
+
 #define INF 0x3f3f3f3f // TODO use numeric_limits!
 
 namespace

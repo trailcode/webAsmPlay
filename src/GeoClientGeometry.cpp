@@ -131,14 +131,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
         
 			tie(attrs, g) = geoms[i];
 
-			Renderable * r = Renderable::create(g, m_trans);
-        
-			if(!r) { continue ;}
-        
-			r->setRenderFill   (true);
-			r->setRenderOutline(true);
-
-			const auto data = new tuple<Renderable *, const Geometry *, Attributes *>(r, g, attrs);
+			const auto data = new tuple<Renderable *, const Geometry *, Attributes *>(nullptr, g, attrs);
 
 			m_quadTreePolygons->insert(g->getEnvelopeInternal(), data);
 		}
@@ -227,6 +220,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
     vector<Edge *> edges;
 
+	dmess("Start here");
+
 	for(const auto [attrs, geom] : geoms)
 	{
 		GLuint colorID = 0;
@@ -245,14 +240,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
 		unique_ptr<Geometry> buffered(geom->buffer(0.00001, 3));
 
-		Renderable * r = Renderable::create(buffered.get(), m_trans);
-        
-		if(!r) { continue ;}
-        
-		r->setRenderFill   (true);
-		r->setRenderOutline(true);
-
-		Edge * edge = new Edge(r, dynamic_cast<const LineString *>(geom), attrs);
+		Edge * edge = new Edge(nullptr, dynamic_cast<const LineString *>(geom), attrs);
 
 		edges.push_back(edge);
 
@@ -260,6 +248,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 
 		polylines.push_back(make_pair(geom, colorID));
 	}
+
+	dmess("End here");
 
 	dmess("edges " << edges.size());
 

@@ -97,16 +97,17 @@ pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _
     m_quadTreePolygons->query(&bounds, query);
     
     // TODO, there might be a method accepting a Coordinate
-    Point * p = scopedGeosGeometry(GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y)));
+    auto p = scopedGeosGeometry(GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y)));
 
     double minArea = numeric_limits<double>::max();
 
-    Renderable * smallest      = nullptr;
-    Attributes * smallestAttrs = nullptr;
+	typedef tuple<Renderable *, const Geometry *, Attributes *> AttributedGeom;
 
-    for(const void * _data : query)
+    AttributedGeom * smallest = nullptr;
+    
+    for(const auto _data : query)
     {
-        tuple<Renderable *, const Geometry *, Attributes *> * data = (tuple<Renderable *, const Geometry *, Attributes *> *)_data;
+        auto data = (AttributedGeom *)_data;
 
         const Geometry * geom = get<1>(*data);
 
@@ -116,12 +117,21 @@ pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _
 
         if(area >= minArea) { continue ;}
 
-        minArea       = area; 
-        smallest      = get<0>(*data);
-        smallestAttrs = get<2>(*data); 
+        minArea  = area; 
+		smallest = data;
     }
 
-    return make_pair(smallest, smallestAttrs);
+	if(!get<0>(*smallest))
+	{
+		if(get<0>(*smallest) = Renderable::create(get<1>(*smallest), m_trans))
+		{
+			get<0>(*smallest)->setRenderFill   (true);
+			get<0>(*smallest)->setRenderOutline(true);
+		}
+		else { dmess("Warn! Could not create renderable!") ;}
+	}
+
+    return make_pair(get<0>(*smallest), get<2>(*smallest));
 }
 
 vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(const vec3 & _pos) const
@@ -145,6 +155,16 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(cons
         const Geometry * geom = get<1>(*data);
 
         if(!p->within(geom)) { continue ;}
+
+		if(!get<0>(*data))
+		{
+			if(get<0>(*data) = Renderable::create(geom, m_trans))
+			{
+				get<0>(*data)->setRenderFill   (true);
+				get<0>(*data)->setRenderOutline(true);
+			}
+			else { dmess("Warn! Could not create Renderable!") ;}
+		}
 
         picked.push_back(make_tuple(get<0>(*data), get<2>(*data), geom->getArea()));
     }
@@ -176,6 +196,17 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
             tie(pointOnEdge, edge) = pickLineStringRenderable(m_canvas->getCursorPosWC());
 
             if(!edge) { break ;}
+
+			if(!edge->getRenderable())
+			{
+				if(auto r = Renderable::create(edge->getGeometry(), m_trans))
+				{
+					r->setRenderFill   (true);
+					r->setRenderOutline(true);
+
+					edge->setRenderable(r);
+				}
+			}
 
 			edge->getRenderable()->ensureVAO();
 

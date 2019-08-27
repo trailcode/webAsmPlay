@@ -66,10 +66,10 @@ typedef unordered_map<size_t, GetRequestGetAllGeometries *> GetAllGeometriesRequ
 
 namespace
 {
-    NumGeomsRequests            numGeomsRequests;
-    LayerBoundsRequests         layerBoundsRequests;
-    GeometryRequests            geometryRequests;
-    GetAllGeometriesRequests    getAllGeometriesRequests;
+    NumGeomsRequests            a_numGeomsRequests;
+    LayerBoundsRequests         a_layerBoundsRequests;
+    GeometryRequests            a_geometryRequests;
+    GetAllGeometriesRequests    a_allGeometriesRequests;
 }
 
 GeoClient::GeoClient(Canvas * canvas) : m_canvas(canvas)
@@ -132,7 +132,7 @@ void GeoClient::getNumPolygons(const function<void (const size_t)> & callback)
 
     GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
 
-    numGeomsRequests[request->m_ID] = request;
+    a_numGeomsRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -163,7 +163,7 @@ void GeoClient::getNumPolylines(const function<void (const size_t)> & callback)
 {
     GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
 
-    numGeomsRequests[request->m_ID] = request;
+    a_numGeomsRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -196,7 +196,7 @@ void GeoClient::getNumPoints(const function<void (const size_t)> & callback)
 
     GeoRequestGetNumGeoms * request = new GeoRequestGetNumGeoms(callback);
 
-    numGeomsRequests[request->m_ID] = request;
+    a_numGeomsRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -229,7 +229,7 @@ void GeoClient::getLayerBounds(const function<void (const AABB2D &)> & callback)
 
     GeoRequestLayerBounds * request = new GeoRequestLayerBounds(callback);
 
-    layerBoundsRequests[request->m_ID] = request;
+    a_layerBoundsRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -264,7 +264,7 @@ void GeoClient::getPolygons(const size_t                                      st
 
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
-    getAllGeometriesRequests[request->m_ID] = request;
+    a_allGeometriesRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -305,7 +305,7 @@ void GeoClient::getPolylines(const size_t                                     st
 
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
-    getAllGeometriesRequests[request->m_ID] = request;
+    a_allGeometriesRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -346,7 +346,7 @@ void GeoClient::getPoints(const size_t                              startIndex,
 
     GetRequestGetAllGeometries * request = new GetRequestGetAllGeometries(callback);
 
-    getAllGeometriesRequests[request->m_ID] = request;
+    a_allGeometriesRequests[request->m_ID] = request;
 
 #ifdef __EMSCRIPTEN__
 
@@ -393,13 +393,13 @@ void GeoClient::onMessage(const string & data)
 
             const uint32_t numGeoms = getUint32(ptr);
 
-            const auto i = numGeomsRequests.find(requestID);
+            const auto i = a_numGeomsRequests.find(requestID);
 
             unique_ptr<GeoRequestGetNumGeoms> request(i->second);
 
             request->m_callback(numGeoms);
 
-            numGeomsRequests.erase(i);
+            a_numGeomsRequests.erase(i);
 
             break;
         }
@@ -408,13 +408,13 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = getUint32(++ptr);
 
-            const auto i = getAllGeometriesRequests.find(requestID);
+            const auto i = a_allGeometriesRequests.find(requestID);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
             request->m_callback(GeometryConverter::getGeosPolygons(ptr));
 
-            getAllGeometriesRequests.erase(i);
+            a_allGeometriesRequests.erase(i);
 
             break;
         }
@@ -423,13 +423,13 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = getUint32(++ptr);;
 
-            const auto i = getAllGeometriesRequests.find(requestID);
+            const auto i = a_allGeometriesRequests.find(requestID);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
             request->m_callback(GeometryConverter::getGeosLineStrings(ptr));
 
-            getAllGeometriesRequests.erase(i);
+            a_allGeometriesRequests.erase(i);
 
             break;
         }
@@ -438,13 +438,13 @@ void GeoClient::onMessage(const string & data)
         {
             const uint32_t requestID = getUint32(++ptr);;
 
-            const auto i = getAllGeometriesRequests.find(requestID);
+            const auto i = a_allGeometriesRequests.find(requestID);
 
             unique_ptr<GetRequestGetAllGeometries> request(i->second);
 
             request->m_callback(GeometryConverter::getGeosPoints(ptr));
 
-            getAllGeometriesRequests.erase(i);
+            a_allGeometriesRequests.erase(i);
 
             break;
         }
@@ -455,13 +455,13 @@ void GeoClient::onMessage(const string & data)
 
             const AABB2D & bounds = *(AABB2D *)ptr;
 
-            const auto i = layerBoundsRequests.find(requestID);
+            const auto i = a_layerBoundsRequests.find(requestID);
 
             unique_ptr<GeoRequestLayerBounds> request(i->second);
 
             request->m_callback(bounds);
 
-            layerBoundsRequests.erase(i);
+            a_layerBoundsRequests.erase(i);
 
             break;
         }
