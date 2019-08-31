@@ -91,6 +91,17 @@ int main(int, char**)
 	GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "My Title", glfwGetPrimaryMonitor(), nullptr);
 	//*/
 
+	/*
+	int count;
+	GLFWmonitor** monitors = glfwGetMonitors(&count);
+
+	const GLFWvidmode * mode = glfwGetVideoMode(monitors[0]);
+
+	// switch to full screen
+	//glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, 1920, 1080, 0 );
+	glfwSetWindowMonitor( window, monitors[0], 0, 0, mode->width, mode->height, mode->refreshRate);
+	*/
+
     //GLFWwindow* window = glfwCreateWindow(640, 480, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
     if (window == nullptr)
         return 1;
@@ -124,24 +135,32 @@ int main(int, char**)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
     io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
     //window->Viewport->DpiScale = 2.0;
 
+	// Setup style
+    //ImGui::StyleColorsDark();
+    ImGui::StyleColorsClassic();
+
+	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     //return 0;
-
-    // Setup style
-    //ImGui::StyleColorsDark();
-    ImGui::StyleColorsClassic();
 
     // Load Fonts
     // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
@@ -161,7 +180,7 @@ int main(int, char**)
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     viewport->DpiScale = 1.0;
-
+	
     GUI::setupCallbacks(window);
     GUI::initOpenGL();
 

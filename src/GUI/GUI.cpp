@@ -316,11 +316,11 @@ void setFullScreen( bool fullscreen )
 		dmess("count " << count);
 
 		// get reolution of monitor
-		const GLFWvidmode * mode = glfwGetVideoMode(monitors[0]);
+		const GLFWvidmode * mode = glfwGetVideoMode(monitors[1]);
 
 		// switch to full screen
-		glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, 1920, 1080, 0 );
-		//glfwSetWindowMonitor( GUI::getMainWindow(), monitors[0], 0, 0, mode->width, mode->height, mode->refreshRate);
+		//glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, 1920, 1080, 0 );
+		glfwSetWindowMonitor( GUI::getMainWindow(), monitors[1], 0, 0, mode->width, mode->height, mode->refreshRate);
 
 		glfwSwapInterval(1);
 	}
@@ -493,6 +493,7 @@ void GUI::mainLoop(GLFWwindow * window)
 	opt_flags |= ImGuiDockNodeFlags_PassthruCentralNode;
 
     window_flags |= ImGuiWindowFlags_NoBackground;
+	
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("DockSpace Demo", nullptr, window_flags);
@@ -560,9 +561,20 @@ void GUI::mainLoop(GLFWwindow * window)
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    ImGui::EndFrame();
+    //ImGui::EndFrame();
 
     glfwMakeContextCurrent(s_mainWindow);
+
+	// Update and Render additional Platform Windows
+	// (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
+	//  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		GLFWwindow* backup_current_context = glfwGetCurrentContext();
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+		glfwMakeContextCurrent(backup_current_context);
+	}
 
     glfwSwapBuffers(s_mainWindow);
 
