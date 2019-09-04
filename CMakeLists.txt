@@ -11,6 +11,8 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 
 set(EXPAT_INSTALL "/usr/local/Cellar/expat/2.2.6") # OSX
 
+#set(BOOST_VERSION "1.70.0.0")
+set(BOOST_VERSION "1.69.0.0")
 
 if(MSVC_VERSION)
 
@@ -20,32 +22,34 @@ if(MSVC_VERSION)
 	else()
 
 		execute_process(COMMAND ${NUGET} install vii.SDL2_image				-Version 2.0.3		-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_filesystem-vc141		-Version 1.69.0.0	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_random-vc141			-Version 1.69.0.0	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_date_time-vc141		-Version 1.69.0.0	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_regex-vc141			-Version 1.69.0.0	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_system-vc141			-Version 1.69.0.0	-o thirdParty)
+		
+        execute_process(COMMAND ${NUGET} install boost_filesystem-vc141		-Version ${BOOST_VERSION}	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_random-vc141			-Version ${BOOST_VERSION}	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_date_time-vc141		-Version ${BOOST_VERSION}	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_regex-vc141			-Version ${BOOST_VERSION}	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_system-vc141			-Version ${BOOST_VERSION}	-o thirdParty)
+
 		execute_process(COMMAND ${NUGET} install curl-vc141-dynamic-x86_64	-Version 7.59.0		-o thirdParty)
 		execute_process(COMMAND ${NUGET} install glfw						-Version 3.3.0.1	-o thirdParty)
 		execute_process(COMMAND ${NUGET} install unofficial-flayan-glew		-Version 2.1.0		-o thirdParty)
 		execute_process(COMMAND ${NUGET} install tbb_oss					-Version 9.107.0	-o thirdParty)
 		execute_process(COMMAND ${NUGET} install expat.v140					-Version 2.2.6		-o thirdParty)
 	
-		file(GLOB boost_files	${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc141.1.69.0.0/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc141.1.69.0.0/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_random-vc141.1.69.0.0/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_date_time-vc141.1.69.0.0/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_regex-vc141.1.69.0.0/lib/native/*)
+		file(GLOB boost_files	${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc141.${BOOST_VERSION}/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc141.${BOOST_VERSION}/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_random-vc141.${BOOST_VERSION}/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_date_time-vc141.${BOOST_VERSION}/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_regex-vc141.${BOOST_VERSION}/lib/native/*)
 
 		foreach(file ${boost_files})
-			execute_process(COMMAND cmake -E copy ${file} ${webAsmPlay_BINARY_DIR}/thirdParty/boost.1.69.0.0/lib/)
+			execute_process(COMMAND cmake -E copy ${file} ${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/)
 		endforeach(file)
 	endif()
 
 	set(TBB_LIB_PATH_SUFFIX /lib/x64/Debug /lib/x64/Release)
 
-	set(BOOST_INCLUDEDIR				${webAsmPlay_BINARY_DIR}/thirdParty/boost.1.69.0.0/lib/native/include)
-	set(BOOST_LIBRARYDIR				${webAsmPlay_BINARY_DIR}/thirdParty/boost.1.69.0.0/lib/)
+	set(BOOST_INCLUDEDIR				${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/native/include)
+	set(BOOST_LIBRARYDIR				${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/)
 	set(SDL2_PATH SDL2_SEARCH_PATHS		${webAsmPlay_BINARY_DIR}/thirdParty/sdl2.new.2.0.8/build/native)
 	set(SDL2_IMAGE_PATH					${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.2.0.3/build/native)
 	set(GLEW_LOCATION					${webAsmPlay_BINARY_DIR}/thirdParty/unofficial-flayan-glew.2.1.0/build/native)
