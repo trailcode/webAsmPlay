@@ -31,6 +31,7 @@
 
 using namespace std;
 using namespace glm;
+using namespace nlohmann;
 
 namespace
 {
@@ -122,4 +123,28 @@ void ColorSymbology::saveState(JSONObject & dataStore)
 
         dataStore[stringToWstring(buf)] = new JSONValue(m_colors[i]);
     }
+}
+
+void ColorSymbology::loadState(const json & state)
+{
+	char buf[1024];
+
+	for(size_t i = 0; i < 32; ++i)
+	{
+		sprintf(buf, "ColorSymbology_%s_attributeColor_%i", m_name.c_str(), (int)i);
+
+		if(hasKey(state, buf)) { m_colors[i] = vec4(state[buf]) ;}
+	}
+}
+
+void ColorSymbology::saveState(json & state) const
+{
+	char buf[1024];
+
+	for(size_t i = 0; i < 32; ++i)
+    {
+        sprintf(buf, "ColorSymbology_%s_attributeColor_%i", m_name.c_str(), (int)i);
+
+		state[buf] = toTuple(m_colors[i]);
+	}
 }

@@ -243,3 +243,5 @@ bool fileExists(const std::string& fileName);
 std::string readFile(const std::string fileName);
 
 nlohmann::json loadJson(const std::string & fileName);
+
+inline bool hasKey(const nlohmann::json & data, const std::string & key) { return data.find(key) != data.end() ;}

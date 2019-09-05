@@ -163,6 +163,7 @@ file(GLOB webAsmPlayRenderables_SRC "src/renderables/*.cpp" "inc/webAsmPlay/rend
 file(GLOB webAsmPlayGeom_SRC        "src/geom/*.cpp"		"inc/webAsmPlay/geom/*.h")
 file(GLOB webAsmPlayGUI_SRC	        "src/GUI/*.cpp"			"inc/webAsmPlay/GUI/*.h")
 file(GLOB webAsmPlayCanvas_SRC      "src/canvas/*.cpp"		"inc/webAsmPLay/canvas/*.h")
+file(GLOB webAsmPlayBing_SRC		"src/bing/*.cpp"		"inc/webAsmPlay/bing/*.h")
 file(GLOB geoServer_SRC             "GeoServer/src/*.cpp"	"GeoServer/inc/geoServer/*.h")
                   
 file(GLOB sources   ${webAsmPlay_SRC}
@@ -172,6 +173,7 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     ${webAsmPlayGeom_SRC}
 					${webAsmPlayGUI_SRC}
 					${webAsmPlayCanvas_SRC}
+					${webAsmPlayBing_SRC}
                     ${geosSrc}
                     ${GLUTesselatorSrc}
                     ${simpleJSON_SRC}
@@ -525,6 +527,7 @@ source_group("webAsmPlay\\renderables"		FILES ${webAsmPlayRenderables_SRC})
 source_group("webAsmPlay\\canvas"			FILES ${webAsmPlayCanvas_SRC})
 source_group("webAsmPlay\\geom"				FILES ${webAsmPlayGeom_SRC})
 source_group("webAsmPlay\\GUI"				FILES ${webAsmPlayGUI_SRC})
+source_group("webAsmPlay\\Bing"				FILES ${webAsmPlayBing_SRC})
 
 
 

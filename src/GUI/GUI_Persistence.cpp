@@ -147,6 +147,7 @@ void GUI::loadState()
 
 void GUI::saveState()
 {
+	/*
     JSONObject root;
 
     // Booleans
@@ -195,6 +196,47 @@ void GUI::saveState()
     configFile << converter.to_bytes(JSONValue(root).Stringify());
 
     configFile.close();
+	*/
+
+	json state;
+
+	state["showSceneViewPanel"]						= s_showSceneViewPanel;
+	state["showPerformancePanel"]					= s_showPerformancePanel;
+	state["showRenderSettingsPanel"]				= s_showRenderSettingsPanel;
+    state["showLogPanel"]							= s_showLogPanel;
+    state["showAttributePanel"]						= s_showAttributePanel;
+    state["showGUI_Settings_Panel"]					= s_showGUI_Settings_Panel;
+    state["showSymbologyPanel"]						= s_showSymbologyPanel;
+    state["showOpenSteerTestPanel"]					= s_showOpenSteerTestPanel;
+    state["showOpenSteerPanel"]						= s_showOpenSteerPanel;
+    state["showCameraInfoPanel"]					= s_showCameraInfoPanel;
+    state["showBingTileSystemPanel"]				= s_showBingTileSystemPanel;
+	state["showFrameBufferDepthDebugPanel"]			= s_showFrameBufferDepthDebugPanel;
+	state["showBingMapsFrameBufferDebugPanel"]		= s_showBingMapsFrameBufferDebugPanel;
+	state["showNormalFrameBufferDebugPanel"]		= s_showNormalFrameBufferDebugPanel;
+	state["showAnimationPanel"]						= s_showAnimationPanel;
+
+    state["renderSettingsFillMeshes"]				= s_renderSettingsFillMeshes;
+    state["renderSettingsRenderMeshOutlines"]		= s_renderSettingsRenderMeshOutlines;
+    state["renderSettingsFillPolygons"]				= s_renderSettingsFillPolygons;
+    state["renderSettingsRenderPolygonOutlines"]	= s_renderSettingsRenderPolygonOutlines;
+    state["renderSettingsRenderLinearFeatures"]		= s_renderSettingsRenderLinearFeatures;
+    state["renderSettingsRenderSkyBox"]				= s_renderSettingsRenderSkyBox;
+    state["renderSettingsRenderBingMaps"]			= s_renderSettingsRenderBingMaps;
+	state["buildingHeightMultiplier"]				= ColorDistanceDepthShader3D::getDefaultInstance()->getHeightMultiplier();
+
+	state["cameraEye"]								= toTuple(s_canvas->getCamera()->getEyeConstRef());
+    state["cameraCenter"]							= toTuple(s_canvas->getCamera()->getCenterConstRef());
+    state["cameraUp"]								= toTuple(s_canvas->getCamera()->getUpConstRef());
+
+    state["OpenSteerAnnotation"]					= OpenSteer::enableAnnotation;
+    state["openSteerCameraDist"]					= s_openSteerCameraDist;
+
+    state["cameraMode"]								= s_cameraMode;
+
+	ColorSymbology::getInstance("defaultMesh")->saveState(state);
+
+	dmess(state.dump(4));
 }
 
 

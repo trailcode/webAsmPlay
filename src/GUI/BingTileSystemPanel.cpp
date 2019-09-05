@@ -27,10 +27,10 @@
 #pragma warning( disable : 4005)
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/BingTileSystem.h>
+#include <webAsmPlay/bing/BingTileSystem.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
-#include <webAsmPlay/StreetSide.h>
+#include <webAsmPlay/bing/StreetSide.h>
 #include <webAsmPlay/renderables/RasterTile.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 #pragma warning( pop ) 

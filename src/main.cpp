@@ -39,7 +39,7 @@
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions 
 #include <webAsmPlay/OpenGL_Util.h>
 
-#include <webAsmPlay/StreetSide.h>
+#include <webAsmPlay/bing/StreetSide.h>
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -129,7 +129,7 @@ int main(int, char**)
 
 #endif
 
-    glfwSwapInterval(1); // Enable vsync
+    glfwSwapInterval(0); // Enable vsync
 
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
@@ -184,7 +184,7 @@ int main(int, char**)
     GUI::setupCallbacks(window);
     GUI::initOpenGL();
 
-	//StreetSide::queryViewport(); return 0;
+	StreetSide::queryViewport(); return 0;
 
     GUI::loadState();
     GUI::createWorld();

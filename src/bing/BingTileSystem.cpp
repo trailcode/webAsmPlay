@@ -30,7 +30,7 @@
 #include <cmath>
 #include <algorithm>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/BingTileSystem.h>
+#include <webAsmPlay/bing/BingTileSystem.h>
 
 using namespace std;
 using namespace glm;

@@ -39,7 +39,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/canvas/Camera.h>
-#include <webAsmPlay/BingTileSystem.h>
+#include <webAsmPlay/bing/BingTileSystem.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/CurlUtil.h>

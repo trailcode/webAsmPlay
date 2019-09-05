@@ -33,7 +33,7 @@
 #include <nlohmann/json.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/CurlUtil.h>
-#include <webAsmPlay/StreetSide.h>
+#include <webAsmPlay/bing/StreetSide.h>
 
 using namespace std;
 using namespace nlohmann;
@@ -128,21 +128,25 @@ void StreetSide::queryViewport()
 
 	for(const auto & bubble : j)
 	{
-		dmess(bubble.dump(4));
+		//dmess(bubble.dump(4));
 
-		/*
+		// https://github.com/microsoft/MicrosoftStreetsidePlugin/blob/master/src/org/openstreetmap/josm/plugins/streetside/StreetsideImage.java
+		
 		try
 		{
-			const auto id	= bubble["id"];
-			const auto lat	= bubble["la"];
-			const auto lon	= bubble["lo"];
+			const auto id	= bubble["id"]; 
+			const auto lat	= bubble["la"]; // Latitude of the Streetside image
+			const auto lon	= bubble["lo"]; // Longitude of the Streetside image
+			const auto roll = bubble["ro"]; // Roll
+			const auto pitch = bubble["pi"]; // Pitch
+			const auto blurring = bubble["bl"]; // Blurring instructions
+			const auto altitude = bubble["al"]; // The bubble altitude, in meters above the WGS84 ellipsoid
 
-			dmess("id " << id << " lat " << lat << " lon " << lon);
+			dmess("id " << id << " lat " << lat << " lon " << lon << " roll " << roll << " pitch " << pitch << " altitude " << altitude << " blurring " << blurring);
 		}
 		catch (const std::exception&)
 		{
 
 		}
-		*/
 	}
 }

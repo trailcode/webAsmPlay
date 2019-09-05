@@ -561,7 +561,7 @@ void GUI::mainLoop(GLFWwindow * window)
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    //ImGui::EndFrame();
+    ImGui::EndFrame();
 
     glfwMakeContextCurrent(s_mainWindow);
 

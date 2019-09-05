@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/BingTileSystem.h>
+#include <webAsmPlay/bing/BingTileSystem.h>
 #include <webAsmPlay/renderables/RasterTile.h>
 
 using namespace std;

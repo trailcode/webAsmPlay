@@ -27,6 +27,7 @@
 
 #include <glm/vec4.hpp>
 #include <JSONValue.h>
+#include <nlohmann/json.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 
 class ColorSymbology
@@ -44,6 +45,10 @@ public:
     void loadState(const JSONObject & dataStore);
 
     void saveState(JSONObject & dataStore);
+
+	void loadState(const nlohmann::json & state);
+
+    void saveState(nlohmann::json & state) const;
 
 private:
 
