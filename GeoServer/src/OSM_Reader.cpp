@@ -82,6 +82,8 @@ namespace
 
         if(i == nodes.end()) { return nullptr ;}
 
+		++i->second->m_useCount;
+
         return i->second;
     }
 
@@ -255,7 +257,7 @@ MapData OSM_Reader::import(const string & fileName)
                     
                 default:
 
-                    //dmess("Implement me! [" << member->type << "]");
+                    //dmess("Implement me! [" << member->m_type << "]");
 
                     break;
             }
@@ -312,7 +314,7 @@ MapData OSM_Reader::import(const string & fileName)
 			}
 			else
 			{
-				//dmess("!way->geom");
+				dmess("!way->geom");
 			}
 		}
 		catch (...)
@@ -330,6 +332,13 @@ MapData OSM_Reader::import(const string & fileName)
     {
         if(!i.second->m_relations.size()) { ++a ;}
         else { ++b ;}
+
+		if(!i.second->m_useCount)
+		{
+			// Most of these seems to be trees
+			// TODO, do we need to clip to the bounds?
+            ret.m_geometry.push_back(AttributedGeometry(i.second->m_attrs.release(), __(i.second->m_pos)));
+		}
     }
 
     dmess("a " << a << " b " << b);
