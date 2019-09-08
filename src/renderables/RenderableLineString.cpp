@@ -188,8 +188,10 @@ Renderable * RenderableLineString::create(  const FloatVec  & verts,
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * verts.size(), &verts[0], GL_STATIC_DRAW);
 
-    // TODO use the VertexArrayObject
-
+	// Flush is required if executing in a thread different from the main thread.
+	glFlush();
+    
+	// TODO use the VertexArrayObject
     return new RenderableLineString(ebo,
                                     vbo,
                                     indices.size(),

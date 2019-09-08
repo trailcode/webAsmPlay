@@ -30,9 +30,9 @@
 #endif
 
 #include <fstream>
-#include <nlohmann/json.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/CurlUtil.h>
+#include <webAsmPlay/bing/Bubble.h>
 #include <webAsmPlay/bing/StreetSide.h>
 
 using namespace std;
@@ -73,7 +73,7 @@ StreetSide * StreetSide::getInstance()
 	return a_instance;
 }
 
-void StreetSide::queryViewport()
+vector<Bubble *> StreetSide::query(const double boundsMinX, const double boundsMaxX, const double boundsMinY, const double boundsMaxY)
 {
 	// curl "https://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?appkey=AuftgJsO0Xs8Ts4M1xZUQJQXJNsvmh3IV8DkNieCiy3tCwCUMq76-WpkrBtNAuEm^&c=2000^&e=2.3268620483818374^&jsCallback=jsonpCache.kzikAeXGbFvsYGP^&n=48.8596821424352^&s=48.85712660600309^&w=2.322977794823074" -H "Sec-Fetch-Mode: no-cors" -H "Referer: https://www.openstreetmap.org/id" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36" --compressed
 
@@ -94,16 +94,30 @@ void StreetSide::queryViewport()
 
 	string key = ""; // Seems to not need the key here. Why is that?
 
+	/*
 	string north = "48.8494592138742";
 	string south = "48.846903155548425";
 	string west = "2.338514809058132";
 	string east = "2.3423990626168965";
+	*/
+
+	string north = "48.8494592138742";
+	string south = "48.846903155548425";
+	string west = "2.338514809058132";
+	string east = "";
 
 	//string url = "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?appkey=" + key + "&c=2000&e=" + east + "&jsCallback=jsonpCache.YxGhVcRWotSieZc&n=" + north + "&s=" + south + "&w=" + west;
 	//string url = "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?appkey=" + key + "&c=2000&e=" + east + "&n=" + north + "&s=" + south + "&w=" + west;
-	string url = "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?c=2000&e=" + east + "&n=" + north + "&s=" + south + "&w=" + west;
+	//string url = "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?c=2000&e=" + east + "&n=" + north + "&s=" + south + "&w=" + west;
 	
-	curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
+	char url[2048];
+
+	// Seems to return a max of 1000 bubbles, boo.
+
+	sprintf(url, "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?c=2000&e=%f&n=%f&s=%f&w=%f", boundsMaxX, boundsMaxY, boundsMinY, boundsMinX);
+	
+	//curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
+	curl_easy_setopt(myHandle, CURLOPT_URL, url);
 
 	if (result = curl_easy_perform(myHandle)) { dmessError("result " << result << " myHandle " << myHandle) ;}
 
@@ -126,12 +140,23 @@ void StreetSide::queryViewport()
 
 	//dmess("j " << j.dump(4));
 
+	vector<Bubble *> ret;
+
 	for(const auto & bubble : j)
 	{
 		//dmess(bubble.dump(4));
 
-		// https://github.com/microsoft/MicrosoftStreetsidePlugin/blob/master/src/org/openstreetmap/josm/plugins/streetside/StreetsideImage.java
-		
+		//continue;
+
+		auto _bubble = Bubble::create(bubble);
+
+		if(!_bubble) { continue ;}
+
+		ret.push_back(_bubble);
+
+		//dmess(*_bubble);
+
+		/*
 		try
 		{
 			const auto id	= bubble["id"]; 
@@ -139,7 +164,8 @@ void StreetSide::queryViewport()
 			const auto lon	= bubble["lo"]; // Longitude of the Streetside image
 			const auto roll = bubble["ro"]; // Roll
 			const auto pitch = bubble["pi"]; // Pitch
-			const auto blurring = bubble["bl"]; // Blurring instructions
+			//const auto blurring = bubble["bl"]; // Blurring instructions
+			const string blurring = "";
 			const auto altitude = bubble["al"]; // The bubble altitude, in meters above the WGS84 ellipsoid
 
 			dmess("id " << id << " lat " << lat << " lon " << lon << " roll " << roll << " pitch " << pitch << " altitude " << altitude << " blurring " << blurring);
@@ -148,5 +174,8 @@ void StreetSide::queryViewport()
 		{
 
 		}
+		*/
 	}
+
+	return ret;
 }

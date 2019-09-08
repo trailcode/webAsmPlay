@@ -297,6 +297,7 @@ MapData OSM_Reader::import(const string & fileName)
 			if (way && way->m_geom)
 			{
 				Geometry* geom = bounds->intersection(way->m_geom.get());
+				//Geometry* geom = way->m_geom.release(); 
 
 				if (!geom)
 				{

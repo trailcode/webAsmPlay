@@ -210,6 +210,9 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * lineIndices.size(), &lineIndices[0], GL_STATIC_DRAW);
 
+	// Flush is required if executing in a thread different from the main thread.
+	glFlush();
+
     size_t sizeVertex = 2;
     size_t sizeColor  = 0;
     size_t sizeNormal = 0;

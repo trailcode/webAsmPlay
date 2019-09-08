@@ -218,3 +218,13 @@ https://wiki.openstreetmap.org/wiki/OpenStreetCam
 https://github.com/dkniffin/personal-website/blob/master/_drafts/2014-11-24-streetside-api.md
 
 https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
+
+given bubble.key in base 10, convert to base 4 and get quadkey
+load tiles: https://t.ssl.ak.tiles.virtualearth.net/tiles/hs0011023230012333103.jpg?g=6338&n=z
+tiles indexed by quadkey using cube map: https://github.com/openstreetmap/iD/blob/76ffb5ef972b27b2a5658f0465282999da836b0f/modules/services/streetside.js#L866-L884
+
+how to build quadkey: https://github.com/openstreetmap/iD/blob/76ffb5ef972b27b2a5658f0465282999da836b0f/modules/services/streetside.js#L866-L884
+
+number of digits in quadkey depends on resolution: https://github.com/openstreetmap/iD/blob/76ffb5ef972b27b2a5658f0465282999da836b0f/modules/services/streetside.js#L372
+
+https://github.com/openstreetmap/iD/blob/76ffb5ef972b27b2a5658f0465282999da836b0f/modules/services/streetside.js#L372

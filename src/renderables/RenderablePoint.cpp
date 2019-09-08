@@ -65,6 +65,9 @@ Renderable * RenderablePoint::create(const dvec3 & _pos,
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+	// Flush is required if executing in a thread different from the main thread.
+	glFlush();
+
     return new RenderablePoint(ebo, vbo, false);
 }
 

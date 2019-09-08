@@ -83,7 +83,7 @@ void GUI::bingTileSystemPanel()
 	
 	if (ImGui::Button("StreetSide"))
 	{
-		StreetSide::queryViewport();
+		//StreetSide::queryViewport();
 	}
 
     ImGui::End();

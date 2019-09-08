@@ -147,7 +147,7 @@ void GUI::loadState()
 
 void GUI::saveState()
 {
-	/*
+	//*
     JSONObject root;
 
     // Booleans
@@ -196,8 +196,9 @@ void GUI::saveState()
     configFile << converter.to_bytes(JSONValue(root).Stringify());
 
     configFile.close();
-	*/
+	//*/
 
+	/*
 	json state;
 
 	state["showSceneViewPanel"]						= s_showSceneViewPanel;
@@ -237,6 +238,7 @@ void GUI::saveState()
 	ColorSymbology::getInstance("defaultMesh")->saveState(state);
 
 	dmess(state.dump(4));
+	*/
 }
 
 

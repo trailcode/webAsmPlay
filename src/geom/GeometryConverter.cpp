@@ -101,8 +101,9 @@ void GeometryConverter::convert(const Point * point, stringstream & data)
     const double x = point->getX();
     const double y = point->getY();
 
-    data.write((const char *)&x, sizeof(double));
+	// TODO WTF? Why are these reversed?
     data.write((const char *)&y, sizeof(double));
+    data.write((const char *)&x, sizeof(double));
 }
 
 void GeometryConverter::convert(const AttributedLineString & lineString, stringstream & data)

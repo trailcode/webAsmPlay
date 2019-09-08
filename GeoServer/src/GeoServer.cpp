@@ -40,6 +40,8 @@
 #include <webAsmPlay/Attributes.h>
 #include <webAsmPlay/geom/GeometryConverter.h>
 #include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/bing/Bubble.h>
+#include <webAsmPlay/bing/StreetSide.h>
 #include <geoServer/OSM_Reader.h>
 #include <geoServer/Topology.h>
 #include <geoServer/GeoServer.h>
@@ -215,14 +217,11 @@ string GeoServer::addOsmFile(const string & osmFile)
                 ++numVertices;
             }
         }
-        else if((lineString = dynamic_cast<LineString *>(i.second)))
-        {
-            lineStrings.push_back(AttributedLineString(i.first, lineString));
-        }
+        else if((lineString = dynamic_cast<LineString *>(i.second))) { lineStrings.push_back(AttributedLineString(i.first, lineString)) ;}
         else if((point = dynamic_cast<Point *>(i.second)))
         {
             if(i.first) { m_serializedPoints.push_back(GeometryConverter::convert(AttributedPoint(i.first, point))) ;}
-            else        { ++numEmptyPoints ;}
+            else        { ++numEmptyPoints																			;}
         }
         else
         {
@@ -296,6 +295,10 @@ string GeoServer::addOsmFile(const string & osmFile)
 	boundsMaxY = mapData.boundsMaxY;
 	*/
 
+	m_bubbles = StreetSide::query(m_boundsMinX, m_boundsMaxX, m_boundsMinY, m_boundsMaxY);
+
+	dmess("m_bubbles " << m_bubbles.size());
+
     const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
 
     // TODO code dup!
@@ -363,6 +366,11 @@ string GeoServer::saveGeoFile(const string & fileName)
     _saveData(fp, m_serializedLineStrings);
     _saveData(fp, m_serializedPoints);
     _saveData(fp, m_serializedRelations);
+
+	dmess("m_serializedPoints " << m_serializedPoints.size());
+	dmess("m_serializedRelations " << m_serializedRelations.size());
+
+	Bubble::save(fp, m_bubbles);
 
     fclose(fp);
 

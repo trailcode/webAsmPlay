@@ -112,6 +112,8 @@ namespace
 
 void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms)
 {
+	//return;
+
     dmess("GeoClient::createPolygonRenderiables " << geoms.size());
 
     dmess("Start polygon quadTree...");
@@ -134,6 +136,14 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 			const auto data = new tuple<Renderable *, const Geometry *, Attributes *>(nullptr, g, attrs);
 
 			m_quadTreePolygons->insert(g->getEnvelopeInternal(), data);
+
+			/*
+			Coordinate c;
+
+			g->getEnvelopeInternal()->centre(c);
+
+			dmess("x " << c.x << " " << c.y);
+			//*/
 		}
 	});
 
@@ -188,6 +198,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     if((r = RenderablePolygon::create(polygons, m_trans, true)))
     {
         r->setShader(ColorDistanceShader::getDefaultInstance());
+		//r->setShader(ColorShader::getDefaultInstance());
 
         r->setRenderFill    (GUI::s_renderSettingsFillPolygons);
         r->setRenderOutline (GUI::s_renderSettingsRenderPolygonOutlines);
@@ -264,7 +275,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     Renderable * r = RenderableLineString::create(polylines, m_trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
-
+	
     r->setRenderOutline(GUI::s_renderSettingsRenderLinearFeatures);
 
 	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
@@ -281,6 +292,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms)
 {
     dmess("Start create points " << geoms.size());
+
+	if(!geoms.size()) { return ;}
 
     auto startTime = system_clock::now();
 
@@ -301,6 +314,14 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
         m_quadTreePoints->insert(geom->getEnvelopeInternal(), data);
 
         points.push_back(ColoredGeometry(geom->buffer(0.0001), 1));
+
+		/*
+		Coordinate c;
+
+		geom->getEnvelopeInternal()->centre(c);
+
+		dmess("x " << c.x << " " << c.y);
+		//*/
     }
     
     GUI::progress("", 1.0);
@@ -310,6 +331,7 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
     Renderable * r = RenderablePolygon::create(points, m_trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
+	//r->setShader(ColorShader::getDefaultInstance());
 
 	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     

@@ -25,13 +25,17 @@
 */
 #pragma once
 
+#include <vector>;
+
+class Bubble;
+
 class StreetSide
 {
 public:
 
 	static StreetSide * getInstance();
 
-	static void queryViewport();
+	static std::vector<Bubble *> query(const double boundsMinX, const double boundsMaxX, const double boundsMinY, const double boundsMaxY);
 
 private:
 

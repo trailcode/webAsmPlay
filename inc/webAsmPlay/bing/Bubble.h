@@ -1,3 +1,5 @@
+﻿#pragma once
+
 /**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
@@ -21,65 +23,37 @@
 
   \author Matthew Tang
   \email trailcode@gmail.com
-  \copyright 2018
+  \copyright 2019
 */
-#pragma once
 
-#include <glm/mat4x4.hpp>
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
-#include <webAsmPlay/Types.h>
-#include <geoServer/GeoServerBase.h>
+#include <cstdlib>
+#include <glm/vec2.hpp>
+#include <nlohmann/json.hpp>
 
-class Bubble;
-
-class GeoServer : public GeoServerBase
+class Bubble
 {
 public:
 
-    GeoServer();
-    ~GeoServer();
+	static Bubble * create(const nlohmann::json & bubble);
 
-    std::string addGeoFile(const std::string & geomFile);
+	Bubble();
 
-    void start();
+	Bubble(	const size_t		  ID,
+			const glm::dvec2	& pos,
+			const glm::dvec2	& rollPitch,
+			const double		  altitude);
 
-    std::string saveGeoFile(const std::string & fileName);
+	static FILE * save(FILE * fp, const std::vector<Bubble *> & bubbles);
 
-    void createNavigationPaths(const std::vector<AttributedLineString> & lineStrings);
+	static std::vector<Bubble> load(FILE * fp);
+
+	friend std::ostream & operator<< (std::ostream &out, Bubble const &t);
+
+	const size_t		m_ID;
+	const glm::dvec2	m_pos;
+	const glm::dvec2	m_rollPitch;
+	const double		m_altitude;
 
 private:
-    
-    typedef websocketpp::server<websocketpp::config::asio> Server;
-
-    typedef Server::message_ptr message_ptr;
-
-    Server m_serverEndPoint;
-
-    static void onMessage(GeoServer * server, websocketpp::connection_hdl hdl, message_ptr msg);
-
-#ifdef __USE_GDAL__
-    std::string addGdalSupportedFile(const std::string & gdalFile);
-#endif
-
-    std::string addOsmFile(const std::string & osmFile);
-
-    std::string _addGeoFile(const std::string & geoFile);
-
-    std::string addLasFile(const std::string & lasFile);
-
-    std::vector<std::string> m_serializedPolygons;
-    std::vector<std::string> m_serializedLineStrings;
-    std::vector<std::string> m_serializedPoints;
-    std::vector<std::string> m_serializedRelations;
-    std::vector<std::string> m_serializedPaths;
-
-    double m_boundsMinX;
-    double m_boundsMinY;
-    double m_boundsMaxX;
-    double m_boundsMaxY;
-
-    glm::dmat4 m_trans;
-
-	std::vector<Bubble *> m_bubbles;
 };
+
