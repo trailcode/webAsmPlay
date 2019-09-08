@@ -72,6 +72,14 @@ void SkyBoxShader::bind(Canvas     * canvas,
 						const size_t renderingStage)
 {
 	shaderProgram->bind();
+	
+	//glEnable(GL_BLEND); // TODO Why is this required?
+	//glDisable(GL_BLEND);
+
+	//glBlendFunc(GL_ONE, GL_ONE);
+
+	//glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
 
 	mat4 centeredView = mat4(canvas->getViewRef());
 

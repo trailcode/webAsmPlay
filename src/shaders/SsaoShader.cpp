@@ -153,11 +153,17 @@ void SsaoShader::bind(	Canvas		* canvas,
 	shaderProgram->setUniformf(minDepth,	m_minDepth);
 	shaderProgram->setUniformf(mixPercent,	m_mixPercent);
 
+	//glEnable(GL_BLEND);
+
+	//glBlendFunc(GL_ONE, GL_ONE);
+
+	//glDisable(GL_BLEND);
+
+	glDisable(GL_DEPTH_TEST);
+	
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, points_buffer);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_colorTextureID);
+	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, m_colorTextureID);
 
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, m_normalDepthTextureID);
+	glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, m_normalDepthTextureID);
 }

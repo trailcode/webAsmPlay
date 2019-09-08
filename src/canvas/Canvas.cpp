@@ -272,8 +272,6 @@ GLuint Canvas::render()
 
 	SsaoShader::getDefaultInstance()->bind(this, false, 0);
 
-	glDisable(GL_DEPTH_TEST);
-	
 	glBindVertexArray(quad_vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 

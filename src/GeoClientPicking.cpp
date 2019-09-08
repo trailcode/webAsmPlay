@@ -30,6 +30,7 @@
 #include <geos/algorithm/distance/PointPairDistance.h>
 #include <geos/index/quadtree/Quadtree.h>
 #include <webAsmPlay/GUI/GUI.h>
+#include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/renderables/Renderable.h>
 #include <webAsmPlay/geom/GeosUtil.h>
@@ -120,6 +121,8 @@ pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _
         minArea  = area; 
 		smallest = data;
     }
+
+	if(!smallest) { return make_pair(nullptr, nullptr) ;}
 
 	if(!get<0>(*smallest))
 	{
@@ -224,6 +227,8 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
             
             glDisable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
+
+			//renderable->setShader(ColorShader::getDefaultInstance());
 
 			renderable->ensureVAO();
 

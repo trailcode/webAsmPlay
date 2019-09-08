@@ -88,6 +88,7 @@ void ColorDistanceShader::bind(Canvas     * canvas,
                                const size_t renderingStage)
 {
 	glDisable(GL_DEPTH_TEST);
+
 	glDisable(GL_BLEND);
 
     glActiveTexture(GL_TEXTURE0);

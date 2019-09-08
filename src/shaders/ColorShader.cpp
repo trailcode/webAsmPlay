@@ -78,6 +78,12 @@ void ColorShader::bind( Canvas     * canvas,
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 
+	glDisable(GL_DEPTH_TEST);
+
+	glEnable(GL_BLEND);
+
+	glBlendFunc(GL_ONE, GL_ONE);
+
     if(isOutline) { shaderProgram->setUniform(colorInUniformLoc, m_outlineColor) ;}
     else          { shaderProgram->setUniform(colorInUniformLoc, m_fillColor)    ;}
 }

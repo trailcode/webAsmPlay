@@ -55,9 +55,11 @@ void DepthToRGB_Shader::bind(const GLuint textureID)
 {
 	shaderProgram->bind();
 
-	glActiveTexture(GL_TEXTURE0);
+	glDisable(GL_BLEND);
 
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	glDisable(GL_DEPTH_TEST);
+
+	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, textureID);
 
 	shaderProgram->setUniformi(texLoc, 0);
 }

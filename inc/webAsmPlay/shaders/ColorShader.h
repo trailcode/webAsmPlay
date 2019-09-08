@@ -25,6 +25,7 @@
 */
 #pragma once
 
+#include <glm/vec4.hpp>
 #include <webAsmPlay/shaders/Shader.h>
 
 class ColorShader : public Shader
