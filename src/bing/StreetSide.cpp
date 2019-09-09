@@ -94,32 +94,19 @@ vector<Bubble *> StreetSide::query(const double boundsMinX, const double boundsM
 
 	string key = ""; // Seems to not need the key here. Why is that?
 
-	/*
-	string north = "48.8494592138742";
-	string south = "48.846903155548425";
-	string west = "2.338514809058132";
-	string east = "2.3423990626168965";
-	*/
-
-	string north = "48.8494592138742";
-	string south = "48.846903155548425";
-	string west = "2.338514809058132";
-	string east = "";
-
-	//string url = "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?appkey=" + key + "&c=2000&e=" + east + "&jsCallback=jsonpCache.YxGhVcRWotSieZc&n=" + north + "&s=" + south + "&w=" + west;
-	//string url = "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?appkey=" + key + "&c=2000&e=" + east + "&n=" + north + "&s=" + south + "&w=" + west;
-	//string url = "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?c=2000&e=" + east + "&n=" + north + "&s=" + south + "&w=" + west;
-	
 	char url[2048];
 
 	// Seems to return a max of 1000 bubbles, boo.
 
 	sprintf(url, "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?c=2000&e=%f&n=%f&s=%f&w=%f", boundsMaxX, boundsMaxY, boundsMinY, boundsMinX);
+	//sprintf(url, "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?appkey=%s&c=2000&e=%f&n=%f&s=%f&w=%f", key.c_str(), boundsMaxX, boundsMaxY, boundsMinY, boundsMinX);
 	
 	//curl_easy_setopt(myHandle, CURLOPT_URL, url.c_str());
 	curl_easy_setopt(myHandle, CURLOPT_URL, url);
 
 	if (result = curl_easy_perform(myHandle)) { dmessError("result " << result << " myHandle " << myHandle) ;}
+
+	dmess("url " << url);
 
 	dmess("Size: " << output.m_size);
 

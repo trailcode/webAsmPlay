@@ -25,6 +25,12 @@
 */
 #pragma once
 
+#ifndef __EMSCRIPTEN__
+#include <websocketpp/config/asio_no_tls_client.hpp>
+#include <websocketpp/client.hpp>
+#include <thread>
+#endif
+
 #include <unordered_map>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/Types.h>
@@ -53,6 +59,24 @@ public:
 
     virtual ~GeoClient();
 
+    static void onMessage(const std::string & data);
+
+    void getNumPolygons(const std::function<void (const size_t)> & callback);
+
+    void getNumPolylines(const std::function<void (const size_t)> & callback);
+
+    void getNumPoints(const std::function<void (const size_t)> & callback);
+
+    void getLayerBounds(const std::function<void (const AABB2D &)> & callback);
+
+    void getPolygons(const size_t startIndex, const size_t numPolys, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
+
+    void getPolylines(const size_t startIndex, const size_t numPolylines, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
+
+    void getPoints(const size_t startIndex, const size_t numPoints, std::function<void (std::vector<AttributedGeometry> geoms)> callback);
+
+    void loadGeoServerGeometry();
+
     void loadGeometry(const std::string fileName);
 
     void addBingMap(const bool enabled);
@@ -80,9 +104,30 @@ public:
 
 private:
     
+#ifndef __EMSCRIPTEN__
+
+    static void on_open(GeoClient * client, websocketpp::connection_hdl hdl);
+    
+    // pull out the type of messages sent by our config
+    typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
+
+	typedef websocketpp::client<websocketpp::config::asio_client> Client;
+
+    static void on_message(GeoClient * client, websocketpp::connection_hdl hdl, message_ptr msg);
+    
+    Client::connection_ptr m_con;
+
+    Client * m_client = nullptr;
+
+    std::thread * m_clientThread = nullptr;
+
+#endif
+
     void createPolygonRenderiables   (const std::vector<AttributedGeometry> & geoms);
     void createLineStringRenderiables(const std::vector<AttributedGeometry> & geoms);
     void createPointRenderiables     (const std::vector<AttributedGeometry> & geoms);
+
+    void ensureClient();
 
     geos::index::quadtree::Quadtree * m_quadTreePolygons;
     geos::index::quadtree::Quadtree * m_quadTreeLineStrings;
@@ -97,5 +142,4 @@ private:
 
     AABB2D m_bounds;
 };
-
 

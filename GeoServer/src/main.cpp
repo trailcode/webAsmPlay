@@ -106,7 +106,5 @@ int main(const int argc, char ** argv)
     
     s.addGeoFile(argv[1]);
 
-    s.start();
-
     return 0;
 }

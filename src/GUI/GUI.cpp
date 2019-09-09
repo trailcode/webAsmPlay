@@ -345,43 +345,17 @@ void GUI::showMainMenuBar()
         if (ImGui::MenuItem("Open", "Ctrl+O")) {
 
         }
-        if(ImGui::MenuItem("Test Web Worker"))
-        {
-            #ifdef __EMSCRIPTEN__
-                //worker_handle worker = emscripten_create_worker("worker.js");
-                //emscripten_call_worker(worker, "one", 0, 0, cback, (void*)42);
-            #else
-                dmess("Implement me!");
-            #endif
-        }
-
-        if(ImGui::MenuItem("Test Emscripten Fetch"))
-        {
-             #ifdef __EMSCRIPTEN__
-
-             #endif
-        }
-
-        if(ImGui::MenuItem("Load Geometry")) { s_client->loadGeoServerGeometry() ;}
-
-		if (ImGui::MenuItem("Exit"))
-		{
-
-			exit(0);
-		}
+        
+		if (ImGui::MenuItem("Exit")) { exit(0) ;}
 
         ImGui::EndMenu();
     }
+
+	/*
     if (ImGui::BeginMenu("Edit"))
     {
-        if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-        if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-        ImGui::Separator();
-        if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-        if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-        if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-        ImGui::EndMenu();
     }
+	*/
 
     if(ImGui::BeginMenu("View"))
     {
