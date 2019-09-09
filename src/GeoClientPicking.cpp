@@ -202,7 +202,9 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
 			if(!edge->getRenderable())
 			{
-				if(auto r = Renderable::create(edge->getGeometry(), m_trans))
+				unique_ptr<Geometry> bufferedEdge(edge->getGeometry()->buffer(0.00001, 3));
+
+				if(auto r = Renderable::create(bufferedEdge, m_trans))
 				{
 					r->setRenderFill   (true);
 					r->setRenderOutline(true);

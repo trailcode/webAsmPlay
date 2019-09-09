@@ -137,7 +137,7 @@ void GeoClient::loadGeometry(const string fileName)
 		return;
 	}
 
-    FILE * fp = fopen(fileName.c_str(), "rb");
+    auto fp = fopen(fileName.c_str(), "rb");
 
     if(!fp)
     {

@@ -112,38 +112,19 @@ namespace
 
 void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms)
 {
-	//return;
-
     dmess("GeoClient::createPolygonRenderiables " << geoms.size());
 
-    dmess("Start polygon quadTree...");
-
-    const auto startTime = system_clock::now();
+    auto startTime = system_clock::now();
 
 	indexerPool.push([this, &geoms](int ID)
 	{
-		OpenGL::ensureSharedContext();
-
 		for(size_t i = 0; i < geoms.size(); ++i)
 		{
-			//doProgress("(5/6) Indexing polygons:", i, geoms.size(), startTime);
+			//doProgress("(5/6) Indexing polygons:", i, geoms.size(), _startTime);
 
-			Attributes     * attrs;
-			const Geometry * g;
-        
-			tie(attrs, g) = geoms[i];
+			const auto [attrs, g] = geoms[i];
 
-			const auto data = new tuple<Renderable *, const Geometry *, Attributes *>(nullptr, g, attrs);
-
-			m_quadTreePolygons->insert(g->getEnvelopeInternal(), data);
-
-			/*
-			Coordinate c;
-
-			g->getEnvelopeInternal()->centre(c);
-
-			dmess("x " << c.x << " " << c.y);
-			//*/
+			m_quadTreePolygons->insert(g->getEnvelopeInternal(), new tuple{ nullptr, g, attrs });
 		}
 	});
 
@@ -151,8 +132,6 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     dmess("quadTree " << m_quadTreePolygons->depth() << " " << geoms.size());
     
-    dmess("Start base geom...");
-
     ColoredGeometryVec polygons;
 
     ColoredExtrudedGeometryVec polygons3D;
@@ -193,20 +172,16 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     dmess("polygons " << polygons.size() << " polygons3D " << polygons3D.size());
 
-    Renderable * r;
-
-    if((r = RenderablePolygon::create(polygons, m_trans, true)))
+    if(auto r = RenderablePolygon::create(polygons, m_trans, true))
     {
-        r->setShader(ColorDistanceShader::getDefaultInstance());
-		//r->setShader(ColorShader::getDefaultInstance());
-
+        r->setShader		(ColorDistanceShader::getDefaultInstance());
         r->setRenderFill    (GUI::s_renderSettingsFillPolygons);
         r->setRenderOutline (GUI::s_renderSettingsRenderPolygonOutlines);
 
 		GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     }
 
-    if((r = RenderableMesh::create(polygons3D, m_trans, true)))
+    if(auto r = RenderableMesh::create(polygons3D, m_trans, true))
     {
         r->setShader(ColorDistanceDepthShader3D::getDefaultInstance());
 
@@ -216,7 +191,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 		GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     }
     
-	indexerPool.stop(true);
+	//indexerPool.stop(true);
 
     dmess("End base geom");
 }
@@ -230,8 +205,6 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
     ColoredGeometryVec polylines;
 
     vector<Edge *> edges;
-
-	dmess("Start here");
 
 	for(const auto [attrs, geom] : geoms)
 	{
@@ -249,30 +222,21 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 		else if(attrs->hasStringKeyValue("highway", "service"))      { colorID = 8 ;}
 		else if(attrs->hasStringKey     ("highway"))                 { colorID = 9 ;}
 
-		unique_ptr<Geometry> buffered(geom->buffer(0.00001, 3));
-
 		Edge * edge = new Edge(nullptr, dynamic_cast<const LineString *>(geom), attrs);
-
+		
 		edges.push_back(edge);
-
-		m_quadTreeLineStrings->insert(geom->getEnvelopeInternal(), edge);
 
 		polylines.push_back(make_pair(geom, colorID));
 	}
 
-	dmess("End here");
-
-	dmess("edges " << edges.size());
-
+	indexerPool.push([this, edges](int ID)
+	{
+		for(const auto edge : edges) { m_quadTreeLineStrings->insert(edge->getGeometry()->getEnvelopeInternal(), edge) ;}
+	});
+	
 	m_network->setEdges(edges);
 	
-    GUI::progress("Linestring index:", 1.0);
-
-    //OpenSteerGlue::init(canvas, network);
-
-    dmess("linestring quadTree " << m_quadTreeLineStrings->depth() << " " << geoms.size());
-
-    Renderable * r = RenderableLineString::create(polylines, m_trans, true);
+    auto r = RenderableLineString::create(polylines, m_trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 	
@@ -305,34 +269,21 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
 		const auto [attrs, geom] = geoms[i];
 
-        Renderable * r = Renderable::create(geom, m_trans);
+        auto r = Renderable::create(geom, m_trans);
         
         if(!r) { dmess("!r"); continue ;}
         
-        tuple<Renderable *, const Geometry *, Attributes *> * data = new tuple<Renderable *, const Geometry *, Attributes *>(r, geom, attrs);
-
-        m_quadTreePoints->insert(geom->getEnvelopeInternal(), data);
+        m_quadTreePoints->insert(geom->getEnvelopeInternal(), new tuple{ r, geom, attrs });
 
         points.push_back(ColoredGeometry(geom->buffer(0.00001, 3), 1));
-
-		/*
-		Coordinate c;
-
-		geom->getEnvelopeInternal()->centre(c);
-
-		dmess("x " << c.x << " " << c.y);
-		//*/
     }
     
     GUI::progress("", 1.0);
 
-    dmess("Points quadTree " << m_quadTreePoints->depth() << " " << geoms.size());
-
     Renderable * r = RenderablePolygon::create(points, m_trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
-	//r->setShader(ColorShader::getDefaultInstance());
-
+	
 	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     
     dmess("Done creating renderable.");
