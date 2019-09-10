@@ -182,6 +182,7 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(cons
     return ret;
 }
 
+
 string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 {
     Renderable * renderable;

@@ -232,7 +232,7 @@ void RenderableLineString::ensureVAO()
 
 void RenderableLineString::render(Canvas * canvas, const size_t renderStage)
 {
-    if(!m_shader->shouldRender(true, renderStage)) { return ;}
+    if(!m_shader->m_shouldRender(true, renderStage)) { return ;}
 
     if(!getRenderOutline()) { return ;}
 

@@ -72,8 +72,18 @@ void ColorDistanceShader::ensureShader()
     defaultInstance = new ColorDistanceShader();
 }
 
-ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader")
+ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader",
+													// Should render functor
+													[](const bool isOutline, const size_t renderingStage) -> bool
+													{
+														return renderingStage == 1;
+													})
 {
+}
+
+ColorDistanceShader::ColorDistanceShader(const ShouldRenderFunctor & shouldRenderFunctor) : Shader("ColorDistanceShader", shouldRenderFunctor)
+{
+
 }
 
 ColorDistanceShader::~ColorDistanceShader()
@@ -119,5 +129,3 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 }
 
 size_t ColorDistanceShader::getNumRenderingStages() const { return 2 ;}
-
-bool ColorDistanceShader::shouldRender(const bool isOutline, const size_t renderingStage) const { return true ;}

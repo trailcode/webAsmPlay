@@ -87,7 +87,7 @@ Renderable * RenderablePoint::create(const ConstGeosGeomVec & points,
 
 void RenderablePoint::render(Canvas * canvas, const size_t renderStage)
 {
-    if(!m_shader->shouldRender(true, renderStage)) { return ;}
+    if(!m_shader->m_shouldRender(true, renderStage)) { return ;}
 
     m_shader->bind(canvas, false, renderStage);
 

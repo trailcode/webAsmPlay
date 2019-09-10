@@ -32,5 +32,6 @@ out vec4 outColor;
 
 void main()
 {
-	outColor = vertexColor;
+	//outColor = vertexColor;
+	outColor = vec4(1,1,0,0.5);
 }

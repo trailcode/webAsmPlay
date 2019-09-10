@@ -33,7 +33,10 @@
 #include <geos/geom/GeometryFactory.h>
 #include <geos/simplify/DouglasPeuckerLineSimplifier.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
+#include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/shaders/ColorDistanceShader.h>
+#include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/Util.h>
@@ -197,8 +200,15 @@ void Network::findPath(const PointOnEdge & end)
 
     Geometry::Ptr buffered(path->buffer(0.00005, 3));
 
-    pathAnnotation = unique_ptr<Renderable>(Renderable::create(buffered, m_client->getTrans()));
+	vector<ColoredGeometry> geoms;
 
+	geoms.push_back(ColoredGeometry(buffered.get(), 1));
+
+    pathAnnotation = unique_ptr<Renderable>(Renderable::create(buffered, m_client->getTrans()));
+	//pathAnnotation = unique_ptr<Renderable>(RenderablePolygon::create(geoms, m_client->getTrans(), true));
+
+	//pathAnnotation->setShader(ColorDistanceShader::getDefaultInstance());
+	pathAnnotation->setShader(ColorVertexShader::getDefaultInstance());
     pathAnnotation->setRenderFill(true);
     pathAnnotation->setRenderOutline(true);
 

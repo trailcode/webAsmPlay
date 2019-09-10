@@ -54,16 +54,20 @@ public:
 
     virtual size_t getNumRenderingStages() const;
 
-    virtual bool shouldRender(const bool isOutline, const size_t renderingStage) const;
-
     ColorSymbology * setColorSymbology(ColorSymbology * colorSymbology);
     ColorSymbology * getColorSymbology() const;
 
 	static void ensureShaders();
 
+	typedef std::function<bool(const bool isOutline, const size_t renderingStage)> ShouldRenderFunctor;
+
+	const ShouldRenderFunctor m_shouldRender;
+	
 protected:
 
-    Shader(const std::string & shaderName);
+	static ShouldRenderFunctor s_defaultShouldRender;
+
+    Shader(const std::string & shaderName, const ShouldRenderFunctor & shouldRenderFunctor = s_defaultShouldRender);
 
     virtual ~Shader() {}
 

@@ -106,7 +106,16 @@ void ColorDistanceDepthShader3D::ensureShader()
     defaultInstance = new ColorDistanceDepthShader3D();
 }
 
-ColorDistanceDepthShader3D::ColorDistanceDepthShader3D() : Shader("ColorDistanceDepthShader3D")
+ColorDistanceDepthShader3D::ColorDistanceDepthShader3D() : Shader("ColorDistanceDepthShader3D",
+[](const bool isOutline, const size_t renderingStage) -> bool
+{
+if(renderingStage == 0) { return true ;}
+
+    if(renderingStage == 1 && !isOutline) { return true ;}
+
+    return false;
+}
+)
 {
 }
 
@@ -191,15 +200,6 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
         shaderProgramOutline->setUniformi(texUniformOutline,			0);
         shaderProgramOutline->setUniformf(colorLookupOffsetOutline,		1.0f);
     }
-}
-
-bool ColorDistanceDepthShader3D::shouldRender(const bool isOutline, const size_t renderingStage) const
-{
-    if(renderingStage == 0) { return true ;}
-
-    if(renderingStage == 1 && !isOutline) { return true ;}
-
-    return false;
 }
 
 float ColorDistanceDepthShader3D::setHeightMultiplier(const float multiplier)	{ return m_heightMultiplier = multiplier ;}

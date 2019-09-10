@@ -69,3 +69,4 @@ void ColorVertexShader::bind(Canvas     * canvas,
 
     shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }
+

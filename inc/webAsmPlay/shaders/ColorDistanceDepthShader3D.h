@@ -50,8 +50,6 @@ public:
 
     size_t getNumRenderingStages() const override;
 
-    bool shouldRender(const bool isOutline, const size_t renderingStage) const override;
-
 private:
 
     void bindStage0(Canvas * canvas, const bool isOutline);

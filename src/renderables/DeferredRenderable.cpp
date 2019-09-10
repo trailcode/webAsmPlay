@@ -252,7 +252,7 @@ void DeferredRenderable::addQuadrangle( const vec3 & A,
 
 void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)
 {
-    if(!m_shader->shouldRender(false, renderStage)) { return ;}
+    if(!m_shader->m_shouldRender(false, renderStage)) { return ;}
 
     glBindVertexArray(					  m_vao);
     glBindBuffer(GL_ARRAY_BUFFER,         m_vbo);

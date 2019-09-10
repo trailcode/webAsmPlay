@@ -247,7 +247,9 @@ GLuint Canvas::render()
 	ColorDistanceShader			::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
 
 	for(const auto r : m_rasters)	{ r->render(this, 0) ;}
-	for(const auto r : m_polygons)	{ r->render(this, 1) ;}
+	for(const auto r : m_polygons)
+	{
+	r->render(this, 1) ;}
     for(const auto r : m_meshes)	{ r->render(this, 1) ;}
 
 	{
@@ -258,6 +260,10 @@ GLuint Canvas::render()
 
 	ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultLinear"));
 
+	for(const auto r : m_polygons)	{
+		r->render(this, 0);
+	}
+    
     for(const auto r : m_lineStrings)         { r->render(this, 0) ;}
     for(const auto r : m_points)              { r->render(this, 0) ;}
     for(const auto r : m_deferredRenderables) { r->render(this, 0) ;} 

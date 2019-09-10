@@ -136,22 +136,26 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
     return ret;
 }
 
+//#include <webAsmPlay/shaders/ColorVertexShader.h>
+
 void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
 {
+	//if(renderStage == 1 && dynamic_cast<ColorVertexShader *>(m_shader)) { return ;}
+
     m_vertexArrayObject->bind(m_shader);
 
     m_vertexArrayObject->bindTriangles();
 
 	glEnable(GL_DEPTH_TEST);
 
-    if(getRenderFill() && m_shader->shouldRender(false, renderStage))
+    if(getRenderFill() && m_shader->m_shouldRender(false, renderStage))
     {
         m_shader->bind(canvas, false, renderStage);
 
         m_vertexArrayObject->drawTriangles();
     }
 
-    if(getRenderOutline() && m_shader->shouldRender(true, renderStage))
+    if(getRenderOutline() && m_shader->m_shouldRender(true, renderStage))
     {
         m_shader->bind(canvas, true, renderStage);
 

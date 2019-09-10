@@ -40,11 +40,10 @@ public:
               const size_t renderingStage = 0) override;
 
     ColorDistanceShader();
+	ColorDistanceShader(const ShouldRenderFunctor & shouldRenderFunctor);
     ~ColorDistanceShader();
 
 	size_t getNumRenderingStages() const;
-
-	bool shouldRender(const bool isOutline, const size_t renderingStage) const;
 
 private:
 };

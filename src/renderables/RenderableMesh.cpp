@@ -133,14 +133,14 @@ void RenderableMesh::render(Canvas * canvas, const size_t renderStage)
     m_vertexArrayObject->bind(m_shader);
     m_vertexArrayObject->bindTriangles();
 
-    if(getRenderFill() && m_shader->shouldRender(false, renderStage))
+    if(getRenderFill() && m_shader->m_shouldRender(false, renderStage))
     {
         m_shader->bind(canvas, false, renderStage);
 
         m_vertexArrayObject->drawTriangles();
     }
 
-    if(getRenderOutline() && m_shader->shouldRender(true, renderStage))
+    if(getRenderOutline() && m_shader->m_shouldRender(true, renderStage))
     {
         m_shader->bind(canvas, true, renderStage);
 

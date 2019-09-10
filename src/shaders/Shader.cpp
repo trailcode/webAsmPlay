@@ -45,14 +45,19 @@ using namespace glm;
 
 vector<function<void()>> Shader::s_shadersToRegister;
 
-Shader::Shader(const string  & shaderName) :    m_shaderName     (shaderName),
-                                                m_colorSymbology (ColorSymbology::getInstance("defaultPolygon")) {}
+Shader::ShouldRenderFunctor Shader::s_defaultShouldRender = {[](const bool isOutline, const size_t renderingStage)
+{
+	return renderingStage == 0;
+}};
+
+Shader::Shader(	const string				& shaderName,
+				const ShouldRenderFunctor	& shouldRenderFunctor) :    m_shaderName		(shaderName),
+																		m_colorSymbology	(ColorSymbology::getInstance("defaultPolygon")),
+																		m_shouldRender		(shouldRenderFunctor) {}
 
 string Shader::getName() const { return m_shaderName ;}
 
 size_t Shader::getNumRenderingStages() const { return 1 ;}
-
-bool Shader::shouldRender(const bool isOutline, const size_t renderingStage) const { return renderingStage == 0 ;}
 
 ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return m_colorSymbology = colorSymbology	;}
 ColorSymbology * Shader::getColorSymbology() const							{ return m_colorSymbology					;}

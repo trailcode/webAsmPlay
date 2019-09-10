@@ -238,8 +238,12 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 	
     auto r = RenderableLineString::create(polylines, m_trans, true);
 
-    r->setShader(ColorDistanceShader::getDefaultInstance());
-	
+	r->setShader(new ColorDistanceShader(	// Should render functor
+											[](const bool isOutline, const size_t renderingStage) -> bool
+											{
+												return renderingStage == 0;
+											}));
+
     r->setRenderOutline(GUI::s_renderSettingsRenderLinearFeatures);
 
 	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
