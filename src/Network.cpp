@@ -71,14 +71,14 @@ namespace
 {
     typedef vector<Edge *> Edges;
 
-    Edges edges;
+    Edges a_edges;
 
-    unordered_map<dvec2, Edges> edgeMap;
+    unordered_map<dvec2, Edges> a_edgeMap;
 
-    PointOnEdge startPoint;
-    PointOnEdge endPoint;
+    PointOnEdge a_startPoint;
+    PointOnEdge a_endPoint;
 
-    unique_ptr<Renderable> startRenderable;
+    unique_ptr<Renderable> a_startRenderable;
 
     class Node;
 
@@ -90,12 +90,12 @@ namespace
     {
     public:
 
-        Neighbors neighbors;
+        Neighbors m_neighbors;
     };
 
-    vector<Node> nodes;
+    vector<Node> a_nodes;
 
-    unordered_map<dvec2, size_t> nodeMap;
+    unordered_map<dvec2, size_t> a_nodeMap;
 
     typedef pair<int, size_t> Path;
 
@@ -106,13 +106,13 @@ namespace
         int operator() (const Path & p1, const Path & p2) { return get<0>(p1) > get<0>(p2) ;}
     };
 
-    unique_ptr<Renderable> pathAnnotation;
+    unique_ptr<Renderable> a_pathAnnotation;
 
     // Dijkstra state arrays
-    vector<int>    dist;
-    vector<bool>   seen;
-    vector<size_t> parent;
-    vector<Path>   Q;
+    vector<int>    a_dist;
+    vector<bool>   a_seen;
+    vector<size_t> a_parent;
+    vector<Path>   a_Q;
 }
 
 Network::Network(GeoClient * client) : m_client(client) {}
@@ -124,40 +124,38 @@ Network::Network(const vector<AttributedLineString> & lineStrings, const dmat4 &
 
 Network::~Network() {}
 
-void Network::setEdges(const Edges & _edges)
+void Network::setEdges(const Edges & edges)
 {
-    edges = _edges;
+    a_edges = edges;
 
-    dmess("start Network::build " << edges.size());
+    dmess("start Network::build " << a_edges.size());
 
-    for(const auto & edge : edges)
+    for(const auto & edge : a_edges)
     {
-        edgeMap[edge->m_start].push_back(edge);
-        edgeMap[edge->m_end  ].push_back(edge);
+        a_edgeMap[edge->m_start].push_back(edge);
+        a_edgeMap[edge->m_end  ].push_back(edge);
     }
 
-    nodes.resize(edgeMap.size());
+    a_nodes.resize(a_edgeMap.size());
 
-    Q.reserve(nodes.size());
+    a_Q.reserve(a_nodes.size());
 
-    dist   = vector<int>   (nodes.size(), INF);
-    seen   = vector<bool>  (nodes.size(), false);
-    parent = vector<size_t>(nodes.size());
+    a_dist   = vector<int>   (a_nodes.size(), INF);
+    a_seen   = vector<bool>  (a_nodes.size(), false);
+    a_parent = vector<size_t>(a_nodes.size());
 
     size_t currNode = 0;
 
-    for(const auto i : edgeMap) { nodeMap[i.first] = currNode++ ;}
+    for(const auto i : a_edgeMap) { a_nodeMap[i.first] = currNode++ ;}
 
-    for(const auto i : edgeMap)
+    for(const auto & [currPos, edges] : a_edgeMap)
     {
-        const dvec2 & currPos = i.first;
+        auto & neighbors = a_nodes[a_nodeMap[currPos]].m_neighbors;
 
-        Neighbors & neighbors = nodes[nodeMap[currPos]].neighbors;
-
-        for(const auto & j : i.second)
+        for(const auto & edge : edges)
         {
-            if(currPos == j->m_start) { neighbors.push_back(NodeEdge(nodeMap[j->m_end],   j)) ;}
-            else                    { neighbors.push_back(NodeEdge(nodeMap[j->m_start], j)) ;}
+            if(currPos == edge->m_start)	{ neighbors.push_back(NodeEdge(a_nodeMap[edge->m_end],   edge)) ;}
+            else							{ neighbors.push_back(NodeEdge(a_nodeMap[edge->m_start], edge)) ;}
         }
     }
 
@@ -183,16 +181,16 @@ void Network::setStartEdge(const PointOnEdge & start)
 {
     dmess("Network::setStartEdge");
 
-    startPoint = start;
+    a_startPoint = start;
 
-    startRenderable = unique_ptr<Renderable>(RenderablePoint::create(vec3(get<0>(start), 0), m_client->getTrans()));
+    a_startRenderable = unique_ptr<Renderable>(RenderablePoint::create(vec3(get<0>(start), 0), m_client->getTrans()));
 
-    m_client->getCanvas()->addRenderable(startRenderable.get());
+    m_client->getCanvas()->addRenderable(a_startRenderable.get());
 }
 
 void Network::findPath(const PointOnEdge & end)
 {
-    vector<Coordinate> * coords = findPath(startPoint, end);
+    auto coords = findPath(a_startPoint, end);
 
     if(!coords) { return ;}
 
@@ -204,47 +202,50 @@ void Network::findPath(const PointOnEdge & end)
 
 	geoms.push_back(ColoredGeometry(buffered.get(), 1));
 
-    pathAnnotation = unique_ptr<Renderable>(Renderable::create(buffered, m_client->getTrans()));
+    a_pathAnnotation = unique_ptr<Renderable>(Renderable::create(buffered, m_client->getTrans()));
 	
-	pathAnnotation->setShader(ColorVertexShader::getDefaultInstance());
-    pathAnnotation->setRenderFill(true);
-    pathAnnotation->setRenderOutline(true);
+	a_pathAnnotation->setShader(ColorVertexShader::getDefaultInstance());
+    a_pathAnnotation->setRenderFill(true);
+    a_pathAnnotation->setRenderOutline(true);
 
-    m_client->getCanvas()->addRenderable(pathAnnotation.get());
+    m_client->getCanvas()->addRenderable(a_pathAnnotation.get());
 }
 
-class nodeTotalGreater
+namespace
 {
+	class NodeTotalGreater
+	{
+		public:
 
-	public:
-		nodeTotalGreater() { ;}
-		bool operator() ( const Path & p1, const Path & p2)
-		const
-		{
-            return get<0>(p1) > get<0>(p2);
-		}
-};
+			NodeTotalGreater() { ;}
+
+			bool operator() ( const Path & p1, const Path & p2) const { return get<0>(p1) > get<0>(p2) ;}
+	};
+}
 
 Path popPriorityQueue()
 {
-	Path path = Q.front();
-	pop_heap(Q.begin(), Q.end(), nodeTotalGreater() );
-	Q.pop_back();
+	auto path = a_Q.front();
+
+	pop_heap(a_Q.begin(), a_Q.end(), NodeTotalGreater() );
+
+	a_Q.pop_back();
+
 	return path;
 }
 
 void pushPriorityQueue(const Path & path)
 {
-	Q.push_back(path);
+	a_Q.push_back(path);
 
-	push_heap(Q.begin(), Q.end(), nodeTotalGreater() );
+	push_heap(a_Q.begin(), a_Q.end(), NodeTotalGreater() );
 }
 
 void updateTileOnPriorityQueue(const size_t path, const int newDist)
 {
 	vector<Path>::iterator i;
 
-	for(i = Q.begin(); i != Q.end(); ++i)
+	for(i = a_Q.begin(); i != a_Q.end(); ++i)
 	{
 		if(i->second != path) { continue ;}
 		
@@ -252,7 +253,7 @@ void updateTileOnPriorityQueue(const size_t path, const int newDist)
         
         i->first = newDist;
 
-        push_heap(Q.begin(), i + 1, nodeTotalGreater());
+        push_heap(a_Q.begin(), i + 1, NodeTotalGreater());
 
         return;
 	}
@@ -265,29 +266,29 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 {
     //dmess("start Network::findPath");
 
-    endPoint = end;
+    a_endPoint = end;
 
     if(!get<1>(start)) { return nullptr ;}
 
-    Q.clear();
-    Q.reserve(nodes.size());
+    a_Q.clear();
+    a_Q.reserve(a_nodes.size());
 
-    priority_queue<Path, vector<Path> , PathCmp> pq(PathCmp(), Q);
+    priority_queue<Path, vector<Path> , PathCmp> pq(PathCmp(), a_Q);
     //pq.clear();
 
-    const size_t startIndex = nodeMap[start.second->m_start];
+    const size_t startIndex = a_nodeMap[start.second->m_start];
 
     // TODO, try to only reset the ones which have been modified.
-    for(size_t i = 0; i < nodes.size(); ++i)
+    for(size_t i = 0; i < a_nodes.size(); ++i)
     {
-        dist[i] = INF;
+        a_dist[i] = INF;
 
-        seen[i] = false;
+        a_seen[i] = false;
     }
 
-    dist[startIndex] = 0;
+    a_dist[startIndex] = 0;
 
-    parent[startIndex] = startIndex;
+    a_parent[startIndex] = startIndex;
 
     pq.push(Path(0.0, startIndex));
 
@@ -304,9 +305,9 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
         //const size_t u = popPriorityQueue().second;
 
-        seen[u] = true;
+        a_seen[u] = true;
 
-        for(const auto x : nodes[u].neighbors)
+        for(const auto x : a_nodes[u].m_neighbors)
         {
             v = x.first;
 
@@ -314,24 +315,24 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
             {
                 //dmess("Done!");
 
-                parent[v] = u;
+                a_parent[v] = u;
 
                 goto done;
             }
 
             const int weight = x.second->getWeight();
 
-            const int newDist = dist[u] + weight;
+            const int newDist = a_dist[u] + weight;
 
-            if(seen[v])
+            if(a_seen[v])
             {
                 //updateTileOnPriorityQueue(v, newDist);
             }
-            else if(dist[v] > newDist)
+            else if(a_dist[v] > newDist)
             {
-                dist[v] = newDist;
+                a_dist[v] = newDist;
 
-                parent[v] = u;
+                a_parent[v] = u;
 
                 pq.push(Path(newDist, v));
                 //pushPriorityQueue(Path(newDist, v));
@@ -349,9 +350,9 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
     do
     {
-        const size_t next = parent[v];
+        const size_t next = a_parent[v];
 
-        for(const auto & i : nodes[next].neighbors)
+        for(const auto & i : a_nodes[next].m_neighbors)
         {
             if(i.first != v) { continue ;} // TODO should have O(1) access to edge
 
@@ -426,8 +427,8 @@ vector<dvec2> Network::getRandomPath()
 
     for(; !coords ;)
     {
-        Edge * A = edges[rand() % edges.size()];
-        Edge * B = edges[rand() % edges.size()];
+        Edge * A = a_edges[rand() % a_edges.size()];
+        Edge * B = a_edges[rand() % a_edges.size()];
 
         coords = unique_ptr<vector<Coordinate> >(findPath(PointOnEdge(A->m_start, A), PointOnEdge(B->m_end, B)));
     }

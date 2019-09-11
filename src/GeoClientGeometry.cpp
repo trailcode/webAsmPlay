@@ -47,8 +47,6 @@
 #include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/GeoClient.h>
 
-#include <webAsmPlay/shaders/ColorShader.h>
-
 using namespace std;
 using namespace std::chrono;
 using namespace glm;
