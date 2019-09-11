@@ -42,6 +42,7 @@
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/GeoClient.h>
@@ -174,7 +175,13 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     if(auto r = RenderablePolygon::create(polygons, m_trans, true))
     {
-        r->setShader		(ColorDistanceShader::getDefaultInstance());
+		r->setShader(new ColorDistanceShader(	ColorSymbology::getInstance("defaultPolygon"),
+												// Should render functor
+												[](const bool isOutline, const size_t renderingStage) -> bool
+												{
+													return renderingStage == 1;
+												}));
+
         r->setRenderFill    (GUI::s_renderSettingsFillPolygons);
         r->setRenderOutline (GUI::s_renderSettingsRenderPolygonOutlines);
 
@@ -183,7 +190,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     if(auto r = RenderableMesh::create(polygons3D, m_trans, true))
     {
-        r->setShader(ColorDistanceDepthShader3D::getDefaultInstance());
+		r->setShader(ColorDistanceDepthShader3D::getDefaultInstance());
 
         r->setRenderFill    (GUI::s_renderSettingsFillMeshes);
         r->setRenderOutline (GUI::s_renderSettingsRenderMeshOutlines);
@@ -191,8 +198,6 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 		GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     }
     
-	//indexerPool.stop(true);
-
     dmess("End base geom");
 }
 
@@ -238,7 +243,8 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 	
     auto r = RenderableLineString::create(polylines, m_trans, true);
 
-	r->setShader(new ColorDistanceShader(	// Should render functor
+	r->setShader(new ColorDistanceShader(	ColorSymbology::getInstance("defaultLinear"),
+											// Should render functor
 											[](const bool isOutline, const size_t renderingStage) -> bool
 											{
 												return renderingStage == 0;

@@ -28,9 +28,9 @@
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/canvas/Canvas.h>
-#include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 
@@ -73,6 +73,7 @@ void ColorDistanceShader::ensureShader()
 }
 
 ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader",
+													nullptr,
 													// Should render functor
 													[](const bool isOutline, const size_t renderingStage) -> bool
 													{
@@ -81,7 +82,10 @@ ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader",
 {
 }
 
-ColorDistanceShader::ColorDistanceShader(const ShouldRenderFunctor & shouldRenderFunctor) : Shader("ColorDistanceShader", shouldRenderFunctor)
+ColorDistanceShader::ColorDistanceShader(	ColorSymbology				* colorSymbology,
+											const ShouldRenderFunctor	& shouldRenderFunctor) : Shader("ColorDistanceShader",
+																										colorSymbology,
+																										shouldRenderFunctor)
 {
 
 }

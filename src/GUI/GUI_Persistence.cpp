@@ -34,7 +34,7 @@
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/canvas/Camera.h>
 #include <webAsmPlay/canvas/TrackBallInteractor.h>
-#include <webAsmPlay/ColorSymbology.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/Animation.h>

@@ -205,9 +205,7 @@ void Network::findPath(const PointOnEdge & end)
 	geoms.push_back(ColoredGeometry(buffered.get(), 1));
 
     pathAnnotation = unique_ptr<Renderable>(Renderable::create(buffered, m_client->getTrans()));
-	//pathAnnotation = unique_ptr<Renderable>(RenderablePolygon::create(geoms, m_client->getTrans(), true));
-
-	//pathAnnotation->setShader(ColorDistanceShader::getDefaultInstance());
+	
 	pathAnnotation->setShader(ColorVertexShader::getDefaultInstance());
     pathAnnotation->setRenderFill(true);
     pathAnnotation->setRenderOutline(true);

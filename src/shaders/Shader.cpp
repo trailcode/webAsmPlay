@@ -25,7 +25,7 @@
 */
 
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/ColorSymbology.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
@@ -51,8 +51,9 @@ Shader::ShouldRenderFunctor Shader::s_defaultShouldRender = {[](const bool isOut
 }};
 
 Shader::Shader(	const string				& shaderName,
+				ColorSymbology				* colorSymbology,
 				const ShouldRenderFunctor	& shouldRenderFunctor) :    m_shaderName		(shaderName),
-																		m_colorSymbology	(ColorSymbology::getInstance("defaultPolygon")),
+																		m_colorSymbology	(colorSymbology ? colorSymbology : ColorSymbology::getInstance("defaultPolygon")),
 																		m_shouldRender		(shouldRenderFunctor) {}
 
 string Shader::getName() const { return m_shaderName ;}

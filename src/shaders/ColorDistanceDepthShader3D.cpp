@@ -27,9 +27,9 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/canvas/Canvas.h>
-#include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 
@@ -106,16 +106,16 @@ void ColorDistanceDepthShader3D::ensureShader()
     defaultInstance = new ColorDistanceDepthShader3D();
 }
 
-ColorDistanceDepthShader3D::ColorDistanceDepthShader3D() : Shader("ColorDistanceDepthShader3D",
-[](const bool isOutline, const size_t renderingStage) -> bool
-{
-if(renderingStage == 0) { return true ;}
+ColorDistanceDepthShader3D::ColorDistanceDepthShader3D(ColorSymbology * colorSymbology) : Shader	("ColorDistanceDepthShader3D",
+																									colorSymbology ? colorSymbology : ColorSymbology::getInstance("defaultMesh"),
+																									[](const bool isOutline, const size_t renderingStage) -> bool
+																									{
+																										if(renderingStage == 0) { return true ;}
 
-    if(renderingStage == 1 && !isOutline) { return true ;}
+																										if(renderingStage == 1 && !isOutline) { return true ;}
 
-    return false;
-}
-)
+																										return false;
+																									})
 {
 }
 

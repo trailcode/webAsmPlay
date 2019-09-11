@@ -33,7 +33,8 @@ public:
 
     static ColorDistanceDepthShader3D * getDefaultInstance();
 
-    ColorDistanceDepthShader3D();
+    ColorDistanceDepthShader3D(ColorSymbology * colorSymbology = nullptr);
+	
     ~ColorDistanceDepthShader3D();
 
     static void ensureShader();

@@ -67,7 +67,9 @@ protected:
 
 	static ShouldRenderFunctor s_defaultShouldRender;
 
-    Shader(const std::string & shaderName, const ShouldRenderFunctor & shouldRenderFunctor = s_defaultShouldRender);
+    Shader(	const std::string			& shaderName,
+			ColorSymbology				* colorSymbology = nullptr,
+			const ShouldRenderFunctor	& shouldRenderFunctor = s_defaultShouldRender);
 
     virtual ~Shader() {}
 

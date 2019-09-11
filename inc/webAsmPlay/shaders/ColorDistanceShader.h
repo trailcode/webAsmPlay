@@ -40,7 +40,7 @@ public:
               const size_t renderingStage = 0) override;
 
     ColorDistanceShader();
-	ColorDistanceShader(const ShouldRenderFunctor & shouldRenderFunctor);
+	ColorDistanceShader(ColorSymbology * colorSymbology, const ShouldRenderFunctor & shouldRenderFunctor);
     ~ColorDistanceShader();
 
 	size_t getNumRenderingStages() const;

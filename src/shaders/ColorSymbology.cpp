@@ -27,7 +27,7 @@
 #include <unordered_map>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Textures.h>
-#include <webAsmPlay/ColorSymbology.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 
 using namespace std;
 using namespace glm;

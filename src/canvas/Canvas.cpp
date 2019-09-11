@@ -29,7 +29,6 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/canvas/TrackBallInteractor.h>
-#include <webAsmPlay/ColorSymbology.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/Frustum.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
@@ -39,6 +38,7 @@
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 #include <webAsmPlay/renderables/SkyBox.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/SsaoShader.h>
@@ -243,27 +243,15 @@ GLuint Canvas::render()
 	glClearBufferfv(GL_COLOR, 1, black);
 	glClearBufferfv(GL_DEPTH, 0, &one);
 
-	ColorDistanceDepthShader3D	::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultMesh"));
-	ColorDistanceShader			::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultPolygon"));
-
 	for(const auto r : m_rasters)	{ r->render(this, 0) ;}
-	for(const auto r : m_polygons)
-	{
-	r->render(this, 1) ;}
+	for(const auto r : m_polygons)	{ r->render(this, 1) ;}
     for(const auto r : m_meshes)	{ r->render(this, 1) ;}
 
-	{
-		vector<GLenum> m_drawBuffers({ GL_COLOR_ATTACHMENT0 });
+	m_drawBuffers = {{ GL_COLOR_ATTACHMENT0 }};
 
-		glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
-	}
+	glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
 
-	ColorDistanceShader::getDefaultInstance()->setColorSymbology(ColorSymbology::getInstance("defaultLinear"));
-
-	for(const auto r : m_polygons)	{
-		r->render(this, 0);
-	}
-    
+	for(const auto r : m_polygons)			  { r->render(this, 0) ;}
     for(const auto r : m_lineStrings)         { r->render(this, 0) ;}
     for(const auto r : m_points)              { r->render(this, 0) ;}
     for(const auto r : m_deferredRenderables) { r->render(this, 0) ;} 

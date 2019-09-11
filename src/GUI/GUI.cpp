@@ -37,17 +37,17 @@
 #include <webAsmPlay/canvas/TrackBallInteractor.h>
 #include <webAsmPlay/canvas/Camera.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/GeoClient.h>
+#include <webAsmPlay/Animation.h>
 #include <webAsmPlay/canvas/GeosTestCanvas.h>
 #include <webAsmPlay/canvas/OpenSteerCanvas.h>
 #include <webAsmPlay/canvas/AnimationCanvas.h>
-#include <webAsmPlay/ColorSymbology.h>
-#include <webAsmPlay/OpenGL_Util.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/geom/GeosUtil.h>
-#include <webAsmPlay/Animation.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 // .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
