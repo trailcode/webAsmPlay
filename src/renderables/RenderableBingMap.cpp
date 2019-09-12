@@ -137,7 +137,7 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 		if(!file_size(tileCachePath.c_str())) { return markTileNoData(tile) ;}
 
-		SDL_Surface * img = IMG_Load(tileCachePath.c_str());
+		auto img = IMG_Load(tileCachePath.c_str());
 
 		if (!img) { goto download ;}
 
@@ -211,7 +211,7 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 			OpenGL::ensureSharedContext();
 
-			SDL_Surface * img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
+			auto img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
 
 			if(!img) { return markTileNoData(tile) ;}
 
@@ -381,33 +381,33 @@ namespace
 
 		for (size_t i = 0; i < toRender.size(); ++i)
 		{
-			RasterTile* t = toRender[i];
+			auto tile = toRender[i];
 
-			if (!t->m_textureResident)
+			if (!tile->m_textureResident)
 			{
-				glMakeTextureHandleResidentARB(t->m_handle);
+				glMakeTextureHandleResidentARB(tile->m_handle);
 
-				t->m_textureResident = true;
+				tile->m_textureResident = true;
 			}
 
-			pHandles[i * 2] = t->m_handle;
+			pHandles[i * 2] = tile->m_handle;
 		}
 
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 
 		for (size_t i = 0; i < toRender.size(); ++i)
 		{
-			RasterTile* t = toRender[i];
+			auto tile = toRender[i];
 
 			if (useBindlessTextures)
             {
-                t->m_renderable->setShader(BindlessTextureShader::getDefaultInstance());
+                tile->m_renderable->setShader(BindlessTextureShader::getDefaultInstance());
 
                 BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
             }
-			else { t->m_renderable->setShader(TextureShader::getDefaultInstance()); }
+			else { tile->m_renderable->setShader(TextureShader::getDefaultInstance()); }
 
-			t->m_renderable->render(canvas);
+			tile->m_renderable->render(canvas);
 		}
 	}
 }
@@ -456,7 +456,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 	{
 		if (tile->textureReady()) { continue; }
 
-		RasterTile* currTile = tile;
+		auto currTile = tile;
 
 		for (int parentLevel = int(currTile->m_level) - 1; parentLevel >= m_startLevel; --parentLevel)
 		{

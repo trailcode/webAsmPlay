@@ -55,7 +55,7 @@ using namespace geos::geom;
 
 namespace
 {
-    std::vector<Canvas *> instances;
+    std::vector<Canvas *> a_instances;
 
 	struct uniforms_block
 	{
@@ -75,11 +75,11 @@ Canvas::Canvas( const bool   useFrameBuffer,
                                             m_trackBallInteractor	(new TrackBallInteractor()),
 											m_frustum				(new Frustum())
 {
-    instances.push_back(this);
+    a_instances.push_back(this);
 
-	glGenBuffers(1, &uniforms_buffer);
+	glGenBuffers(1,					&uniforms_buffer);
 	glBindBuffer(GL_UNIFORM_BUFFER,  uniforms_buffer);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms_block), nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER,  sizeof(uniforms_block), nullptr, GL_DYNAMIC_DRAW);
 }
 
 Canvas::~Canvas()
@@ -243,7 +243,7 @@ GLuint Canvas::render()
 	glClearBufferfv(GL_COLOR, 1, black);
 	glClearBufferfv(GL_DEPTH, 0, &one);
 
-	for(const auto r : m_rasters)	{ r->render(this, 0) ;}
+	for(const auto r : m_rasters)	{ r->render(this, 1) ;}
 	for(const auto r : m_polygons)	{ r->render(this, 1) ;}
     for(const auto r : m_meshes)	{ r->render(this, 1) ;}
 
@@ -491,7 +491,7 @@ bool Canvas::getEnabled()							const	{ return m_enabled				;}
 double Canvas::getPerspectiveFOV()					const	{ return m_perspectiveFOV		;}
 double Canvas::setPerspectiveFOV(const double FOV)			{ return m_perspectiveFOV = FOV ;}
 
-vector<Canvas *> Canvas::getInstances()						{ return instances				;}
+vector<Canvas *> Canvas::getInstances()						{ return a_instances			;}
 
 dvec3 Canvas::getCursorPosWC()						const	{ return m_cursorPosWC			;}
 
