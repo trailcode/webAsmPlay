@@ -59,7 +59,9 @@ void TextureShader::ensureShader()
     defaultInstance = new TextureShader();
 }
 
-TextureShader::TextureShader() : Shader("TextureShader")
+TextureShader::TextureShader() : Shader("TextureShader",
+										nullptr,
+										Shader::s_defaultShouldRender)
 {
 
 }

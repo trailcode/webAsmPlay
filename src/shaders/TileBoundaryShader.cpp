@@ -61,7 +61,9 @@ void TileBoundaryShader::ensureShader()
     defaultInstance = new TileBoundaryShader();
 }
 
-TileBoundaryShader::TileBoundaryShader() : Shader("TileBoundaryShader")
+TileBoundaryShader::TileBoundaryShader() : Shader(	"TileBoundaryShader",
+													nullptr,
+													Shader::s_defaultShouldRender)
 {
 
 }

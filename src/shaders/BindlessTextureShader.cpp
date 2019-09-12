@@ -26,6 +26,7 @@
 
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/BindlessTextureShader.h>
 
 //REGISTER_SHADER(BindlessTextureShader)
@@ -69,7 +70,9 @@ void BindlessTextureShader::bind(	Canvas		* canvas,
 	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
 }
 
-BindlessTextureShader::BindlessTextureShader() : Shader("BindlessTextureShader")
+BindlessTextureShader::BindlessTextureShader() : Shader("BindlessTextureShader",
+														ColorSymbology::getInstance("defaultPolygon"),
+														Shader::s_defaultShouldRender)
 {
 
 }

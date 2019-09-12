@@ -26,6 +26,7 @@
 
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 
 using namespace glm;
@@ -58,11 +59,12 @@ void ColorShader::ensureShader()
 
 ColorShader * ColorShader::getDefaultInstance() { return defaultInstance ;}
 
-ColorShader::ColorShader() :    Shader			("ColorShader"),
+ColorShader::ColorShader() :    Shader(	"ColorShader",
+										ColorSymbology::getInstance("defaultPolygon"),
+										Shader::s_defaultShouldRender),
                                 m_fillColor		(0,1,0,0.5),
                                 m_outlineColor	(1,1,0,1)
 {
-
 }
 
 ColorShader::~ColorShader()

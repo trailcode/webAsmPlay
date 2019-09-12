@@ -26,6 +26,7 @@
 
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
+#include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 
 using namespace glm;
@@ -56,7 +57,10 @@ void ColorVertexShader::ensureShader()
     defaultInstance = new ColorVertexShader();
 }
 
-ColorVertexShader::ColorVertexShader() : Shader("ColorVertexShader") {}
+ColorVertexShader::ColorVertexShader() : Shader("ColorVertexShader",
+												ColorSymbology::getInstance("defaultPolygon"),
+												Shader::s_defaultShouldRender) {}
+
 ColorVertexShader::~ColorVertexShader() {}
 
 ColorVertexShader * ColorVertexShader::getDefaultInstance() { return defaultInstance ;}

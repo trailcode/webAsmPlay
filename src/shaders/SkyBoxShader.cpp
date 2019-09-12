@@ -62,7 +62,10 @@ void SkyBoxShader::ensureShader()
 	defaultInstance = new SkyBoxShader();
 }
 
-SkyBoxShader::SkyBoxShader() : Shader("SkyBoxShader") {}
+SkyBoxShader::SkyBoxShader() : Shader(	"SkyBoxShader",
+										nullptr,
+										Shader::s_defaultShouldRender) {}
+
 SkyBoxShader::~SkyBoxShader() {}
 
 SkyBoxShader * SkyBoxShader::getDefaultInstance() { return defaultInstance ;}

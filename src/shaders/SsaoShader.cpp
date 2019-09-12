@@ -85,7 +85,9 @@ void SsaoShader::ensureShader()
 	defaultInstance = new SsaoShader();
 }
 
-SsaoShader::SsaoShader() : Shader("SsaoShader")
+SsaoShader::SsaoShader() : Shader(	"SsaoShader",
+									nullptr,
+									Shader::s_defaultShouldRender)
 {
 	SAMPLE_POINTS point_data;
 

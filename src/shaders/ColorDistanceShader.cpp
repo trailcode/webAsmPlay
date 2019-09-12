@@ -73,7 +73,7 @@ void ColorDistanceShader::ensureShader()
 }
 
 ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader",
-													nullptr,
+													ColorSymbology::getInstance("defaultPolygon"),
 													// Should render functor
 													[](const bool isOutline, const size_t renderingStage) -> bool
 													{
