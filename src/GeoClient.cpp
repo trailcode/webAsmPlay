@@ -38,7 +38,6 @@
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/Network.h>
 #include <webAsmPlay/CurlUtil.h>
-#include <webAsmPlay/GeoClientRequest.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/GeometryConverter.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
@@ -57,19 +56,6 @@ using namespace glm;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
 using namespace curlUtil;
-
-typedef unordered_map<size_t, GeoRequestGetNumGeoms      *> NumGeomsRequests;
-typedef unordered_map<size_t, GeoRequestLayerBounds      *> LayerBoundsRequests;
-typedef unordered_map<size_t, GeoRequestGeometry         *> GeometryRequests;
-typedef unordered_map<size_t, GetRequestGetAllGeometries *> GetAllGeometriesRequests;
-
-namespace
-{
-    NumGeomsRequests            a_numGeomsRequests;
-    LayerBoundsRequests         a_layerBoundsRequests;
-    GeometryRequests            a_geometryRequests;
-    GetAllGeometriesRequests    a_allGeometriesRequests;
-}
 
 GeoClient::GeoClient(Canvas * canvas) : m_canvas(canvas)
 {

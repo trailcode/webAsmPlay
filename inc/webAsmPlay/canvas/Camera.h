@@ -33,8 +33,7 @@ namespace rsmz
     {
     public:
         Camera();
-        ~Camera();
-
+        
         const glm::mat4 & getMatrixConstRef() const;
         glm::mat4 getMatrix() const;
         const float* getMatrixFlatPtr() const;

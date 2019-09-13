@@ -367,14 +367,14 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
 
     if(edges.size() > 1)
     {
-        vector<Coordinate> * coords = new vector<Coordinate>();
+        auto coords = new vector<Coordinate>();
 
         Edge * A = edges[0];
         Edge * B = edges[1];
 
         dvec2 lastPoint;
 
-        const vector<Coordinate> * points = A->getGeometry()->getCoordinatesRO()->toVector();
+        const auto points = A->getGeometry()->getCoordinatesRO()->toVector();
 
         if(A->m_end == B->m_start || A->m_end == B->m_end)
         {
@@ -393,7 +393,7 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
         {
             A = edges[i];
             
-            const vector<Coordinate> * points = A->getGeometry()->getCoordinatesRO()->toVector();
+            const auto points = A->getGeometry()->getCoordinatesRO()->toVector();
 
             if(lastPoint == A->m_start)
             {
@@ -427,8 +427,8 @@ vector<dvec2> Network::getRandomPath()
 
     for(; !coords ;)
     {
-        Edge * A = a_edges[rand() % a_edges.size()];
-        Edge * B = a_edges[rand() % a_edges.size()];
+        auto A = a_edges[rand() % a_edges.size()];
+        auto B = a_edges[rand() % a_edges.size()];
 
         coords = unique_ptr<vector<Coordinate> >(findPath(PointOnEdge(A->m_start, A), PointOnEdge(B->m_end, B)));
     }

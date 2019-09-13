@@ -55,26 +55,23 @@ void openSteerDisplayFunc();
 
 thread * openSteerThread = nullptr; // TODO make a thread waiting collection.
 
-namespace
-{
-    const double scaleValue = 1.0 / (60.0 * 2.0);
-
-    const dmat4 geomTrans(scale(dmat4(1.0), dvec3(scaleValue, scaleValue, scaleValue)));
-
-    const dmat4 geomInverseTrans(inverse(geomTrans));
-
-    unique_ptr<Renderable> openSteerGeom;
-
-    mutex openSteerMutex;
-}
-
 extern bool gotoNextZombie; // TODO Un-globalize
 
 namespace
 {
-    vec4 lookat;
-    vec4 pos;   
-    vec4 up;
+    const double a_scaleValue = 1.0 / (60.0 * 2.0);
+
+    const dmat4 a_geomTrans(scale(dmat4(1.0), dvec3(a_scaleValue, a_scaleValue, a_scaleValue)));
+
+    const dmat4 a_geomInverseTrans(inverse(a_geomTrans));
+
+    unique_ptr<Renderable> a_openSteerGeom;
+
+    mutex a_openSteerMutex;
+
+    vec4 a_lookat;
+    vec4 a_pos;   
+    vec4 a_up;
 
     void updateOpenSteerCamera()
     {
@@ -82,49 +79,31 @@ namespace
             
         const dmat4 rotate = glm::rotate(radians(-90.0), dvec3(1, 0, 0));
 
-        lookat = rotate * geomTrans * vec4(__(OpenSteerDemo::camera.target)     * scale, 1);
-        pos    = rotate * geomTrans * vec4(__(OpenSteerDemo::camera.position()) * scale, 1);
-        pos.z *= -1;
-        up     = rotate * vec4(__(OpenSteer::OpenSteerDemo::camera.up()), 1);
-        up.z *= -1;
+        a_lookat = rotate * a_geomTrans * vec4(__(OpenSteerDemo::camera.target)     * scale, 1);
+        a_pos    = rotate * a_geomTrans * vec4(__(OpenSteerDemo::camera.position()) * scale, 1);
+        a_pos.z *= -1;
+        a_up     = rotate * vec4(__(OpenSteer::OpenSteerDemo::camera.up()), 1);
+        a_up.z  *= -1;
 
-        pos = vec4(vec3(lookat) + normalize(vec3(pos) - vec3(lookat)) * GUI::s_openSteerCameraDist, 1);
+        a_pos = vec4(vec3(a_lookat) + normalize(vec3(a_pos) - vec3(a_lookat)) * GUI::s_openSteerCameraDist, 1);
 
-        pos.z = glm::max(float(GUI::s_openSteerCameraDist * 0.5f), float(pos.z)); // When switching camera to next Zombie, keep camera above ground.
+        a_pos.z = glm::max(float(GUI::s_openSteerCameraDist * 0.5f), float(a_pos.z)); // When switching camera to next Zombie, keep camera above ground.
     }
 
     void updateOpenSteer()
     {
-		//return;
-
         if(gotoNextZombie)
         {
             dmess("gotoNextZombie");
 
             gotoNextZombie = false;
 
-			lock_guard<mutex> _(openSteerMutex);
+			lock_guard<mutex> _(a_openSteerMutex);
 
             OpenSteerDemo::selectNextVehicle();
         }
 
         OpenSteerDemo::updateSimulation();
-
-		//lock_guard<mutex> _(openSteerMutex);
-
-		//updateOpenSteerCamera();
-
-		//OpenSteerDemo::redraw();
-
-		/*
-        lock_guard<mutex> _(openSteerMutex);
-
-        updateOpenSteerCamera();
-
-        OpenSteerDemo::redraw();
-
-        openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans));
-		*/
     }
 }
 
@@ -134,10 +113,7 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
     ZombiePlugin::setNetwork(network);
 
-	//return;
-
 #ifndef __EMSCRIPTEN__
-//#if 0
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -148,8 +124,6 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
     openSteerThread = new thread([]()
     {
-		
-
         for(; !GUI::isShuttingDown() ;) { updateOpenSteer() ;}
 
         // TODO cleanup threadWin!
@@ -161,56 +135,44 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
 #endif
 
-	//OpenSteerDemo::initialize();
-
-
     dmess("Done OpenSteer::OpenSteerDemo::initialize();");
 
     GUI::addUpdatable([canvas]()
     {
-		//return;
-
-        lock_guard<mutex> _(openSteerMutex);
+        lock_guard<mutex> _(a_openSteerMutex);
 
 #ifdef __EMSCRIPTEN__
-//#if 1
 
         updateOpenSteer();
 
 #endif
 
-		//lock_guard<mutex> _(openSteerMutex);
-
 		updateOpenSteerCamera();
 
 		OpenSteerDemo::redraw();
 
-		//openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans));
-
-		//*
-		if (!openSteerGeom) { openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(geomTrans)); }
+		if (!a_openSteerGeom) { a_openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(a_geomTrans)); }
 		else
 		{
-			((DeferredRenderable*)openSteerGeom.get())->setFromQueued(geomTrans);
+			((DeferredRenderable*)a_openSteerGeom.get())->setFromQueued(a_geomTrans);
 		}
-		//*/
-
+		
         if(GUI::getCameraMode() == GUI::CAMERA_FOLLOW_ENTITY)
         {
             // TODO this will be one frame behind!
-            canvas->getCamera()->setCenter(lookat);
-            canvas->getCamera()->setEye   (pos);
-            canvas->getCamera()->setUp    (up);
+            canvas->getCamera()->setCenter(a_lookat);
+            canvas->getCamera()->setEye   (a_pos);
+            canvas->getCamera()->setUp    (a_up);
 
             canvas->getCamera()->update();
         }
 
-        if(openSteerGeom) { openSteerGeom->render(canvas, POST_G_BUFFER) ;}
+        if(a_openSteerGeom) { a_openSteerGeom->render(canvas, POST_G_BUFFER) ;}
     });
 }
 
-const dmat4 & OpenSteerGlue::getGeomTrans()         { return geomTrans ;}
-const dmat4 & OpenSteerGlue::getGeomInverseTrans()  { return geomInverseTrans ;}
+const dmat4 & OpenSteerGlue::getGeomTrans()         { return a_geomTrans ;}
+const dmat4 & OpenSteerGlue::getGeomInverseTrans()  { return a_geomInverseTrans ;}
 
 PolylineSegmentedPathwaySingleRadius * OpenSteerGlue::getPath(const vector<dvec2> & path)
 {
@@ -230,7 +192,7 @@ PolylineSegmentedPathwaySingleRadius * OpenSteerGlue::getPath(const vector<dvec2
 
     for(const auto & i : path)
     {
-        const dvec3 pos(geomInverseTrans * dvec4(i, 0, 1));
+        const dvec3 pos(a_geomInverseTrans * dvec4(i, 0, 1));
         
         if(seen.find(pos) != seen.end())
         {

@@ -57,11 +57,11 @@ namespace
 	{
 		vector<Geometry::Ptr> ret;
 
-		Geometry::Ptr shape = makeBox(-0.5,-0.5,0.5,0.5);
+		auto shape = makeBox(-0.5,-0.5,0.5,0.5);
 
-		Geometry::Ptr inside = unionPolygons({  makeBox(-0.1,-0.1,0.1,0.1),
-												makeBox(-0.05,-0.6,0.05,0.6),
-												makeBox(-0.6,-0.05,0.6,0.05)});
+		auto inside = unionPolygons({	makeBox(-0.1,-0.1,0.1,0.1),
+										makeBox(-0.05,-0.6,0.05,0.6),
+										makeBox(-0.6,-0.05,0.6,0.05)});
 
 		shape = Geometry::Ptr(shape->buffer(buffer1));
 
@@ -77,7 +77,7 @@ namespace
 
 			buffered = Geometry::Ptr(buffered->difference(inside.get()));
 
-			for(const LineString * ring : getExternalRings(buffered)) { ret.push_back(Geometry::Ptr(ring->clone())) ;}
+			for(const auto ring : getExternalRings(buffered)) { ret.push_back(Geometry::Ptr(ring->clone())) ;}
 		}
 
 		return ret;
@@ -106,8 +106,6 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 		Renderable * renderable = Renderable::create(geom, trans);
 
 		renderable->setShader(ColorShader::getDefaultInstance());
-
-		//renderable->ensureVAO();
 
 		addRenderable(renderable);
 

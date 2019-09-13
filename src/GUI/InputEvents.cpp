@@ -40,7 +40,7 @@ using namespace glm;
 
 namespace
 {
-    ivec2 lastShiftKeyDownMousePos;
+    ivec2 a_lastShiftKeyDownMousePos;
 }
 
 void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int mods)

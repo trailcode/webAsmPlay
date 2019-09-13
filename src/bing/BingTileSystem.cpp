@@ -39,11 +39,11 @@ using namespace glm;
 
 namespace
 {
-    const double earthRadius    =  6378137;  
-    const double minLatitude    = -85.05112878;  
-    const double maxLatitude    =  85.05112878;  
-    const double minLongitude   = -180;  
-    const double maxLongitude   =  180; 
+    const double a_earthRadius    =  6378137;  
+    const double a_minLatitude    = -85.05112878;  
+    const double a_maxLatitude    =  85.05112878;  
+    const double a_minLongitude   = -180;  
+    const double a_maxLongitude   =  180; 
 
     inline double clip(const double n, const double minValue, const double maxValue)  
     {  
@@ -55,9 +55,9 @@ size_t bingTileSystem::mapSize(const size_t levelOfDetail) { return (size_t)256 
 
 double bingTileSystem::groundResolution(double latitude, const size_t levelOfDetail)
 {
-    latitude = clip(latitude, minLatitude, maxLatitude);
+    latitude = clip(latitude, a_minLatitude, a_maxLatitude);
 
-    return cos(latitude * M_PI / 180) * 2 * M_PI * earthRadius / mapSize(levelOfDetail);
+    return cos(latitude * M_PI / 180) * 2 * M_PI * a_earthRadius / mapSize(levelOfDetail);
 }
 
 double bingTileSystem::mapScale(const double latitude, const size_t levelOfDetail, const size_t screenDpi)
@@ -67,8 +67,8 @@ double bingTileSystem::mapScale(const double latitude, const size_t levelOfDetai
 
 ivec2 bingTileSystem::latLongToPixel(const dvec2 & latLong, const size_t levelOfDetail)
 {
-    const double latitude  = clip(latLong.x, minLatitude,  maxLatitude);
-    const double longitude = clip(latLong.y, minLongitude, maxLongitude);
+    const double latitude  = clip(latLong.x, a_minLatitude,  a_maxLatitude);
+    const double longitude = clip(latLong.y, a_minLongitude, a_maxLongitude);
 
     const double x = (longitude + 180) / 360;
     const double sinLatitude = sin(latitude * M_PI / 180);

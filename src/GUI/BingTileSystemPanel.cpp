@@ -31,7 +31,7 @@
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/bing/StreetSide.h>
-#include <webAsmPlay/renderables/RasterTile.h>
+#include <webAsmPlay/bing/RasterTile.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 #pragma warning( pop ) 
 

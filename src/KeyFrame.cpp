@@ -33,16 +33,9 @@ using namespace std;
 using namespace glm;
 using namespace nlohmann;
 
-/*
-KeyFrame KeyFrame::create()
-{
-	
-}
-*/
-
 namespace
 {
-	size_t currID = 0;
+	size_t a_currID = 0;
 }
 
 bool KeyFrame::operator==(const KeyFrame& other) const noexcept { return m_ID == other.m_ID ;}
@@ -54,28 +47,7 @@ KeyFrame::KeyFrame(	const float   timeIndex,
 												m_cameraCenter	(cameraCenter),
 												m_cameraEye		(cameraEye),
 												m_cameraUp		(cameraUp),
-												m_ID			(++currID)
+												m_ID			(++a_currID)
 {
 
 }
-
-/*
-json KeyFrame::save()
-{
-	json keyFrames;
-
-	for(const auto & i : s_keyFrames)
-	{
-		json keyFrame;
-
-		keyFrames["frames"].push_back
-	}
-
-	return keyFrames;
-}
-
-void KeyFrame::load(const json & keyFrames)
-{
-	s_keyFrames.clear();
-}
-*/

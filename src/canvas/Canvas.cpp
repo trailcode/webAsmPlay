@@ -57,17 +57,17 @@ namespace
 {
     std::vector<Canvas *> a_instances;
 
+	GLuint a_uniforms_buffer = 0;
+
 	struct uniforms_block
 	{
-		mat4 model;
-		mat4 view;
-		mat4 proj;
-		mat4 modelView;
-		mat4 modelViewProj;
+		mat4 m_model;
+		mat4 m_view;
+		mat4 m_proj;
+		mat4 m_modelView;
+		mat4 m_modelViewProj;
 	};
 }
-
-GLuint          uniforms_buffer = 0;
 
 Canvas::Canvas( const bool   useFrameBuffer,
                 const vec4 & clearColor) :  m_useFrameBuffer		(useFrameBuffer),
@@ -77,8 +77,8 @@ Canvas::Canvas( const bool   useFrameBuffer,
 {
     a_instances.push_back(this);
 
-	glGenBuffers(1,					&uniforms_buffer);
-	glBindBuffer(GL_UNIFORM_BUFFER,  uniforms_buffer);
+	glGenBuffers(1,					&a_uniforms_buffer);
+	glBindBuffer(GL_UNIFORM_BUFFER,  a_uniforms_buffer);
 	glBufferData(GL_UNIFORM_BUFFER,  sizeof(uniforms_block), nullptr, GL_DYNAMIC_DRAW);
 }
 
@@ -158,18 +158,18 @@ void Canvas::updateMVP()
 
 	m_frustum->set(m_currMVP.m_MVP);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, a_uniforms_buffer);
 
-	uniforms_block * block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER,
-																0,
-																sizeof(uniforms_block),
-																GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+	auto block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER,
+													0,
+													sizeof(uniforms_block),
+													GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-	block->model			= m_currMVP.m_model;
-	block->view				= m_currMVP.m_view;
-	block->proj				= m_currMVP.m_projection;
-	block->modelView		= m_currMVP.m_MV;
-	block->modelViewProj	= m_currMVP.m_MVP;
+	block->m_model			= m_currMVP.m_model;
+	block->m_view			= m_currMVP.m_view;
+	block->m_proj			= m_currMVP.m_projection;
+	block->m_modelView		= m_currMVP.m_MV;
+	block->m_modelViewProj	= m_currMVP.m_MVP;
 
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 }
@@ -385,10 +385,10 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
             {
                 double xPos;
                 double yPos;
-                glfwGetCursorPos(window, &xPos, &yPos);
-                m_lastShiftKeyDownMousePos = ivec2(xPos, yPos);
 
-                //dmess("lastShiftKeyDownMousePos " << lastShiftKeyDownMousePos);
+                glfwGetCursorPos(window, &xPos, &yPos);
+
+                m_lastShiftKeyDownMousePos = ivec2(xPos, yPos);
             }
 
             break;
