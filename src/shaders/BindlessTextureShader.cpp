@@ -33,46 +33,49 @@
 
 namespace
 {
-	ShaderProgram			* shaderProgram   = nullptr;
-	BindlessTextureShader	* defaultInstance = nullptr;
+	ShaderProgram			* a_shaderProgram   = nullptr;
+	BindlessTextureShader	* a_defaultInstance = nullptr;
 
-	GLint vertInAttrLoc;
-	GLint vertUV_InAttrLoc;
+	GLint a_vertInAttr;
+	GLint a_vertUV_InAttr;
 
-	GLint MVP_Loc;
-	GLint texID_Loc;
+	GLint a_MVP;
+	GLint a_texID;
 }
 
-BindlessTextureShader* BindlessTextureShader::getDefaultInstance() { return defaultInstance ;}
+BindlessTextureShader* BindlessTextureShader::getDefaultInstance() { return a_defaultInstance ;}
 
 void BindlessTextureShader::ensureShader()
 {
-	if(shaderProgram) { return ;}
+	if(a_shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"BindlessTextureShader.vs.glsl"	},
+	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"BindlessTextureShader.vs.glsl"	},
 														{GL_FRAGMENT_SHADER,	"BindlessTextureShader.fs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttrLoc					},
-														{"vertUV_In",			vertUV_InAttrLoc				}}),
-											Variables({	{"MVP",					MVP_Loc							},
-														{"texID",				texID_Loc						}}));
+											Variables({	{"vertIn",				a_vertInAttr					},
+														{"vertUV_In",			a_vertUV_InAttr					}}),
+											Variables({	{"MVP",					a_MVP							},
+														{"texID",				a_texID							}}));
 
-	defaultInstance = new BindlessTextureShader();
+	a_defaultInstance = new BindlessTextureShader([](const bool isOutline, const size_t renderingStage) -> bool
+	{
+		return renderingStage == G_BUFFER;
+	});
 }
 
 void BindlessTextureShader::bind(	Canvas		* canvas,
 									const bool    isOutline,
 									const size_t  renderingStage)
 {
-	shaderProgram->bind();
+	a_shaderProgram->bind();
 
-	shaderProgram->setUniformi(texID_Loc, m_textureSlot);
+	a_shaderProgram->setUniformi(a_texID, m_textureSlot);
 
-	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+	a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
 }
 
-BindlessTextureShader::BindlessTextureShader() : Shader("BindlessTextureShader",
-														ColorSymbology::getInstance("defaultPolygon"),
-														Shader::s_defaultShouldRender)
+BindlessTextureShader::BindlessTextureShader(const ShouldRenderFunctor & shouldRender) : Shader("BindlessTextureShader",
+																								ColorSymbology::getInstance("defaultPolygon"),
+																								shouldRender)
 {
 
 }

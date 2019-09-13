@@ -177,7 +177,7 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 												// Should render functor
 												[](const bool isOutline, const size_t renderingStage) -> bool
 												{
-													return renderingStage == 1;
+													return renderingStage == G_BUFFER;
 												}));
 
         r->setRenderFill    (GUI::s_renderSettingsFillPolygons);
@@ -245,7 +245,7 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 											// Should render functor
 											[](const bool isOutline, const size_t renderingStage) -> bool
 											{
-												return renderingStage == 0;
+												return renderingStage == POST_G_BUFFER;
 											}));
 
     r->setRenderOutline(GUI::s_renderSettingsRenderLinearFeatures);

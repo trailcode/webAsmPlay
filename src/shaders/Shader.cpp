@@ -47,7 +47,7 @@ vector<function<void()>> Shader::s_shadersToRegister;
 
 Shader::ShouldRenderFunctor Shader::s_defaultShouldRender = {[](const bool isOutline, const size_t renderingStage)
 {
-	return renderingStage == 0;
+	return renderingStage == POST_G_BUFFER;
 }};
 
 Shader::Shader(	const string				& shaderName,

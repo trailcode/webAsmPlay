@@ -34,29 +34,29 @@ using namespace glm;
 
 namespace
 {
-	ShaderProgram * shaderProgram   = nullptr;
-	SsaoShader	  * defaultInstance = nullptr;
+	ShaderProgram * a_shaderProgram   = nullptr;
+	SsaoShader	  * a_defaultInstance = nullptr;
 
-	GLuint points_buffer;
+	GLuint a_points_buffer;
 
-	GLint ssaoRadius;
-	GLint pointCount;
-	GLint minDepth;
-	GLint mixPercent;
+	GLint a_ssaoRadius;
+	GLint a_pointCount;
+	GLint a_minDepth;
+	GLint a_mixPercent;
 
 	struct SAMPLE_POINTS
 	{
-		vec4 point[256];
-		vec4 random_vectors[256];
+		vec4 m_point[256];
+		vec4 m_random_vectors[256];
 	};
 
-	// Random number generator
-	static unsigned int seed = 0x13371337;
-
+	// Random number generator // TODO, use a lib function
 	static inline float random_float()
 	{
 		float res;
 		unsigned int tmp;
+
+		static unsigned int seed = 0x13371337;
 
 		seed *= 16807;
 
@@ -68,21 +68,21 @@ namespace
 	}
 }
 
-SsaoShader* SsaoShader::getDefaultInstance() { return defaultInstance ;}
+SsaoShader* SsaoShader::getDefaultInstance() { return a_defaultInstance ;}
 
 void SsaoShader::ensureShader()
 {
-	if(shaderProgram) { return ;}
+	if(a_shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"SsaoShader.vs.glsl"	},
+	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"SsaoShader.vs.glsl"	},
 														{GL_FRAGMENT_SHADER,	"SsaoShader.fs.glsl"	}}),
 											Variables({}),
-											Variables({	{"ssaoRadius",			ssaoRadius				},
-														{"pointCount",			pointCount				},
-														{"minDepth",			minDepth				},
-														{"mixPercent",			mixPercent				}}));
+											Variables({	{"ssaoRadius",			a_ssaoRadius			},
+														{"pointCount",			a_pointCount			},
+														{"minDepth",			a_minDepth				},
+														{"mixPercent",			a_mixPercent			}}));
 
-	defaultInstance = new SsaoShader();
+	a_defaultInstance = new SsaoShader();
 }
 
 SsaoShader::SsaoShader() : Shader(	"SsaoShader",
@@ -95,26 +95,27 @@ SsaoShader::SsaoShader() : Shader(	"SsaoShader",
 	{
 		do
 		{
-			point_data.point[i][0] = random_float() * 2.0f - 1.0f;
-			point_data.point[i][1] = random_float() * 2.0f - 1.0f;
-			point_data.point[i][2] = random_float(); //  * 2.0f - 1.0f;
-			point_data.point[i][3] = 0.0f;
+			point_data.m_point[i][0] = random_float() * 2.0f - 1.0f;
+			point_data.m_point[i][1] = random_float() * 2.0f - 1.0f;
+			point_data.m_point[i][2] = random_float(); //  * 2.0f - 1.0f;
+			point_data.m_point[i][3] = 0.0f;
 
-		} while (length(point_data.point[i]) > 1.0f);
+		} while (length(point_data.m_point[i]) > 1.0f);
 
-		point_data.point[i] = normalize(point_data.point[i]);
+		point_data.m_point[i] = normalize(point_data.m_point[i]);
 	}
 
 	for (size_t i = 0; i < 256; i++)
 	{
-		point_data.random_vectors[i][0] = random_float();
-		point_data.random_vectors[i][1] = random_float();
-		point_data.random_vectors[i][2] = random_float();
-		point_data.random_vectors[i][3] = random_float();
+		point_data.m_random_vectors[i][0] = random_float();
+		point_data.m_random_vectors[i][1] = random_float();
+		point_data.m_random_vectors[i][2] = random_float();
+		point_data.m_random_vectors[i][3] = random_float();
 	}
 
-	glGenBuffers(1, &points_buffer);
-	glBindBuffer(GL_UNIFORM_BUFFER, points_buffer);
+	glGenBuffers(1, &a_points_buffer);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, a_points_buffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(SAMPLE_POINTS), &point_data, GL_STATIC_DRAW);
 }
 
@@ -148,22 +149,16 @@ void SsaoShader::bind(	Canvas		* canvas,
 						const bool    isOutline,
 						const size_t  renderingStage)
 {
-	shaderProgram->bind();
+	a_shaderProgram->bind();
 
-	shaderProgram->setUniformf(ssaoRadius,	m_SSAO_Radius);
-	shaderProgram->setUniformi(pointCount,	m_numPoints);
-	shaderProgram->setUniformf(minDepth,	m_minDepth);
-	shaderProgram->setUniformf(mixPercent,	m_mixPercent);
-
-	//glEnable(GL_BLEND);
-
-	//glBlendFunc(GL_ONE, GL_ONE);
-
-	//glDisable(GL_BLEND);
+	a_shaderProgram->setUniformf(a_ssaoRadius,	m_SSAO_Radius);
+	a_shaderProgram->setUniformi(a_pointCount,	m_numPoints);
+	a_shaderProgram->setUniformf(a_minDepth,	m_minDepth);
+	a_shaderProgram->setUniformf(a_mixPercent,	m_mixPercent);
 
 	glDisable(GL_DEPTH_TEST);
 	
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, points_buffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, a_points_buffer);
 
 	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, m_colorTextureID);
 

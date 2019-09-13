@@ -35,7 +35,8 @@ public:
 
     static void ensureShader();
 
-    TextureShader();
+    TextureShader(const ShouldRenderFunctor & shouldRender);
+
     ~TextureShader();
 
     void bind(Canvas     * canvas,

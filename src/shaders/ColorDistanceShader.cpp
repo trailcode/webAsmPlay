@@ -41,35 +41,35 @@ using namespace glm;
 
 namespace
 {
-	ShaderProgram       * shaderProgramPre	= nullptr;
-    ShaderProgram       * shaderProgram		= nullptr;
-    ColorDistanceShader * defaultInstance   = nullptr;
+	ShaderProgram       * a_shaderProgramPre	= nullptr;
+    ShaderProgram       * a_shaderProgram		= nullptr;
+    ColorDistanceShader * a_defaultInstance   = nullptr;
 
-    GLint vertInAttrLoc;
-    GLint vertColorInAttrLoc;
+    GLint a_vertInAttr;
+    GLint a_vertColorInAttr;
 
-    GLint colorLookupOffsetLoc;
-    GLint MV_Loc;
-    GLint MVP_Loc;
-    GLint texUniformLoc;
-	GLint topDownTextureUniform;
+    GLint a_colorLookupOffset;
+    GLint a_MV;
+    GLint a_MVP;
+    GLint a_texUniform;
+	GLint a_topDownTextureUniform;
 }
 
 void ColorDistanceShader::ensureShader()
 {
-	if(shaderProgram) { return ;}
+	if(a_shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader.vs.glsl"	},
+	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"ColorDistanceShader.vs.glsl"	},
 														{GL_FRAGMENT_SHADER,	"ColorDistanceShader.fs.glsl"	}}),
-											Variables({	{"vertIn",				vertInAttrLoc					},
-														{"vertColorIn",			vertColorInAttrLoc				}}),
-											Variables({	{"MV",					MV_Loc							},
-														{"MVP",					MVP_Loc							},
-														{"tex",					texUniformLoc					},
-														{"topDownTexture",		topDownTextureUniform			},
-														{"colorLookupOffset",	colorLookupOffsetLoc			}}));
+											Variables({	{"vertIn",				a_vertInAttr					},
+														{"vertColorIn",			a_vertColorInAttr				}}),
+											Variables({	{"MV",					a_MV							},
+														{"MVP",					a_MVP							},
+														{"tex",					a_texUniform					},
+														{"topDownTexture",		a_topDownTextureUniform			},
+														{"colorLookupOffset",	a_colorLookupOffset				}}));
 
-    defaultInstance = new ColorDistanceShader();
+    a_defaultInstance = new ColorDistanceShader();
 }
 
 ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader",
@@ -77,7 +77,7 @@ ColorDistanceShader::ColorDistanceShader() : Shader("ColorDistanceShader",
 													// Should render functor
 													[](const bool isOutline, const size_t renderingStage) -> bool
 													{
-														return renderingStage == 1;
+														return renderingStage == G_BUFFER;
 													})
 {
 }
@@ -95,7 +95,7 @@ ColorDistanceShader::~ColorDistanceShader()
 
 }
 
-ColorDistanceShader * ColorDistanceShader::getDefaultInstance() { return defaultInstance ;}
+ColorDistanceShader * ColorDistanceShader::getDefaultInstance() { return a_defaultInstance ;}
 
 void ColorDistanceShader::bind(Canvas     * canvas,
                                const bool   isOutline,
@@ -120,16 +120,16 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 		dmess("Fix!"); // Happens if big maps is not enabled.
 	}
 
-	shaderProgram->bind();
+	a_shaderProgram->bind();
 
-	shaderProgram->setUniform(MV_Loc,  canvas->getMV_Ref());
-	shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+	a_shaderProgram->setUniform(a_MV,  canvas->getMV_Ref());
+	a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
 
-	shaderProgram->setUniformi(texUniformLoc,			0);
-	shaderProgram->setUniformi(topDownTextureUniform,	1);
+	a_shaderProgram->setUniformi(a_texUniform,				0);
+	a_shaderProgram->setUniformi(a_topDownTextureUniform,	1);
 
-    if(isOutline) { shaderProgram->setUniformf(colorLookupOffsetLoc, 2.0f) ;}
-    else          { shaderProgram->setUniformf(colorLookupOffsetLoc, 0.0f) ;}
+    if(isOutline) { a_shaderProgram->setUniformf(a_colorLookupOffset, 2.0f) ;}
+    else          { a_shaderProgram->setUniformf(a_colorLookupOffset, 0.0f) ;}
 }
 
 size_t ColorDistanceShader::getNumRenderingStages() const { return 2 ;}

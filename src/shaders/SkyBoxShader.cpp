@@ -37,12 +37,12 @@ using namespace glm;
 
 namespace
 {
-	ShaderProgram   * shaderProgram   = nullptr;
-	SkyBoxShader	* defaultInstance = nullptr;
+	ShaderProgram   * a_shaderProgram   = nullptr;
+	SkyBoxShader	* a_defaultInstance = nullptr;
 
-	GLint vertInLoc      = -1;
-	GLint MVP_Loc        = -1;
-	GLint cubeTextureLoc = -1;
+	GLint a_vertIn;
+	GLint a_MVP;
+	GLint a_cubeTexture;
 
 	const mat4 model = rotate(radians(90.0f), vec3(1.0f,0.0f,0.0f));
 }
@@ -51,15 +51,15 @@ void SkyBoxShader::ensureShader()
 {
     dmess("SkyBoxShader::ensureShader");
 
-	if(shaderProgram) { return ;}
+	if(a_shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({	{GL_VERTEX_SHADER,		"SkyBoxShader.vs.glsl"		},
+	a_shaderProgram = ShaderProgram::create(GLSL({	{GL_VERTEX_SHADER,		"SkyBoxShader.vs.glsl"		},
 													{GL_FRAGMENT_SHADER,	"SkyBoxShader.fs.glsl"		}}),
-											Variables({	{"vertIn",			vertInLoc					}}),
-											Variables({	{"MVP",				MVP_Loc						},
-														{"cubeTexture",		cubeTextureLoc				}}));
+											Variables({	{"vertIn",			a_vertIn					}}),
+											Variables({	{"MVP",				a_MVP						},
+														{"cubeTexture",		a_cubeTexture				}}));
 
-	defaultInstance = new SkyBoxShader();
+	a_defaultInstance = new SkyBoxShader();
 }
 
 SkyBoxShader::SkyBoxShader() : Shader(	"SkyBoxShader",
@@ -68,20 +68,14 @@ SkyBoxShader::SkyBoxShader() : Shader(	"SkyBoxShader",
 
 SkyBoxShader::~SkyBoxShader() {}
 
-SkyBoxShader * SkyBoxShader::getDefaultInstance() { return defaultInstance ;}
+SkyBoxShader * SkyBoxShader::getDefaultInstance() { return a_defaultInstance ;}
 
 void SkyBoxShader::bind(Canvas     * canvas,
 						const bool   isOutline,
 						const size_t renderingStage)
 {
-	shaderProgram->bind();
+	a_shaderProgram->bind();
 	
-	//glEnable(GL_BLEND); // TODO Why is this required?
-	//glDisable(GL_BLEND);
-
-	//glBlendFunc(GL_ONE, GL_ONE);
-
-	//glEnable(GL_DEPTH_TEST);
 	glDisable(GL_DEPTH_TEST);
 
 	mat4 centeredView = mat4(canvas->getViewRef());
@@ -90,6 +84,6 @@ void SkyBoxShader::bind(Canvas     * canvas,
 	value_ptr(centeredView)[13] = 0;
 	value_ptr(centeredView)[14] = 0;
 
-	shaderProgram->setUniform (MVP_Loc,        mat4(canvas->getProjectionRef()) * centeredView * model);
-	shaderProgram->setUniformi(cubeTextureLoc, 0);
+	a_shaderProgram->setUniform (a_MVP,         mat4(canvas->getProjectionRef()) * centeredView * model);
+	a_shaderProgram->setUniformi(a_cubeTexture, 0);
 }

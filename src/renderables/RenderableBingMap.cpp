@@ -71,7 +71,7 @@ size_t RenderableBingMap::s_numRendered = 0;
 FrameBuffer * RenderableBingMap::s_textureBuffer = nullptr;
 
 bool RenderableBingMap::s_useCache	= true;
-const bool useBindlessTextures		= true;
+const bool useBindlessTextures		= false;
 
 namespace
 {
@@ -371,7 +371,9 @@ namespace
 {
 	vector<RasterTile*> a_lastTilesRendered;
 
-	void renderBindlessTextures(Canvas* canvas, const vector<RasterTile*>& toRender)
+	BindlessTextureShader a_bindlessShader();
+
+	void renderBindlessTextures(Canvas* canvas, const vector<RasterTile*>& toRender, const size_t renderStage)
 	{
 		if (!toRender.size()) { return; }
 
@@ -407,7 +409,7 @@ namespace
             }
 			else { tile->m_renderable->setShader(TextureShader::getDefaultInstance()); }
 
-			tile->m_renderable->render(canvas);
+			tile->m_renderable->render(canvas, renderStage);
 		}
 	}
 }
@@ -435,13 +437,13 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 	const dvec2 tMin = tileToLatLong(ivec2(minTile.x + 0, minTile.y + 0), m_startLevel);
 	const dvec2 tMax = tileToLatLong(ivec2(minTile.x + 1, minTile.y + 1), m_startLevel);
 
-	unordered_set<RasterTile *> prevTiles = m_tiles;
+	auto prevTiles = m_tiles;
 
 	m_tiles.clear();
 
 	getTilesToRender(canvas, tMin, tMax, m_startLevel);
 
-	unordered_set<RasterTile*> tileSet = m_tiles;
+	auto tileSet = m_tiles;
 
 	for (auto i : m_tiles) { i->m_stillNeeded = true ;}
 
@@ -481,7 +483,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	for (const auto tile : fallBackTiles) { m_tiles.insert(tile) ;}
 
-	vector<RasterTile*> tiles = toVec(m_tiles);
+	auto tiles = toVec(m_tiles);
 
 	sort(tiles.begin(), tiles.end(), [](const RasterTile * A, const RasterTile * B) { return A->m_level < B->m_level ;});
 
@@ -520,14 +522,14 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 		else { fetchTile(tile) ;}
 	}
 
-	if(useBindlessTextures) { renderBindlessTextures(canvas, toRender) ;}
+	if(useBindlessTextures) { renderBindlessTextures(canvas, toRender, renderStage) ;}
 	else
 	{
         for(auto tile : toRender)
         { 
             TextureShader::getDefaultInstance()->setTextureID(tile->m_textureID);
             
-            tile->m_renderable->render(canvas);
+            tile->m_renderable->render(canvas, renderStage);
         }
 	}
 

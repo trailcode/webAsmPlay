@@ -44,6 +44,12 @@ public:
 private:
 };
 
+enum RenderingStage
+{
+	G_BUFFER		= 1,
+	POST_G_BUFFER	= 0,
+};
+
 class Shader
 {
 public:

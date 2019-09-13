@@ -39,7 +39,8 @@ public:
 				const bool   isOutline,
 				const size_t renderingStage = 0) override;
 
-	BindlessTextureShader();
+	BindlessTextureShader(const ShouldRenderFunctor & shouldRender);
+
 	~BindlessTextureShader();
 
 	size_t setTextureSlot(const size_t textureSlot);

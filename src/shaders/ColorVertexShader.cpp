@@ -35,26 +35,26 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram     * shaderProgram   = nullptr;
-    ColorVertexShader * defaultInstance = nullptr;
+    ShaderProgram     * a_shaderProgram   = nullptr;
+    ColorVertexShader * a_defaultInstance = nullptr;
 
-    GLint vertInAttrLoc;
-    GLint vertColorInAttrLoc;
+    GLint a_vertInAttr;
+    GLint a_vertColorInAttr;
 
-    GLint MVP_Loc;
+    GLint a_MVP;
 }
 
 void ColorVertexShader::ensureShader()
 {
-    if(shaderProgram) { return ;}
+    if(a_shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorVertexShader.vs.glsl"	},
+	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"ColorVertexShader.vs.glsl"	},
 														{GL_FRAGMENT_SHADER,	"ColorVertexShader.fs.glsl"	}}),
-                                            Variables({	{"vertIn",				vertInAttrLoc				},
-														{"vertColorIn",			vertColorInAttrLoc			}}),
-                                            Variables({	{"MVP",					MVP_Loc						}}));
+                                            Variables({	{"vertIn",				a_vertInAttr				},
+														{"vertColorIn",			a_vertColorInAttr			}}),
+                                            Variables({	{"MVP",					a_MVP						}}));
 
-    defaultInstance = new ColorVertexShader();
+    a_defaultInstance = new ColorVertexShader();
 }
 
 ColorVertexShader::ColorVertexShader() : Shader("ColorVertexShader",
@@ -63,14 +63,14 @@ ColorVertexShader::ColorVertexShader() : Shader("ColorVertexShader",
 
 ColorVertexShader::~ColorVertexShader() {}
 
-ColorVertexShader * ColorVertexShader::getDefaultInstance() { return defaultInstance ;}
+ColorVertexShader * ColorVertexShader::getDefaultInstance() { return a_defaultInstance ;}
 
 void ColorVertexShader::bind(Canvas     * canvas,
                              const bool   isOutline,
                              const size_t renderingStage)
 {
-    shaderProgram->bind();
+    a_shaderProgram->bind();
 
-    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+    a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
 }
 

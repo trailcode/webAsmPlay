@@ -243,19 +243,19 @@ GLuint Canvas::render()
 	glClearBufferfv(GL_COLOR, 1, black);
 	glClearBufferfv(GL_DEPTH, 0, &one);
 
-	for(const auto r : m_rasters)	{ r->render(this, 1) ;}
-	for(const auto r : m_polygons)	{ r->render(this, 1) ;}
-    for(const auto r : m_meshes)	{ r->render(this, 1) ;}
+	for(const auto r : m_rasters)	{ r->render(this, G_BUFFER) ;}
+	for(const auto r : m_polygons)	{ r->render(this, G_BUFFER) ;}
+    for(const auto r : m_meshes)	{ r->render(this, G_BUFFER) ;}
 
 	m_drawBuffers = {{ GL_COLOR_ATTACHMENT0 }};
 
 	glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
 
-	for(const auto r : m_polygons)			  { r->render(this, 0) ;}
-    for(const auto r : m_lineStrings)         { r->render(this, 0) ;}
-    for(const auto r : m_points)              { r->render(this, 0) ;}
-    for(const auto r : m_deferredRenderables) { r->render(this, 0) ;} 
-    for(const auto r : m_meshes)              { r->render(this, 0) ;}
+	for(const auto r : m_polygons)			  { r->render(this, POST_G_BUFFER) ;}
+    for(const auto r : m_lineStrings)         { r->render(this, POST_G_BUFFER) ;}
+    for(const auto r : m_points)              { r->render(this, POST_G_BUFFER) ;}
+    for(const auto r : m_deferredRenderables) { r->render(this, POST_G_BUFFER) ;} 
+    for(const auto r : m_meshes)              { r->render(this, POST_G_BUFFER) ;}
 	
 	m_gBuffer->unbind();
 	
@@ -264,7 +264,7 @@ GLuint Canvas::render()
 	SsaoShader::getDefaultInstance()->setColorTextureID			(m_gBuffer->getTextureID(0));
 	SsaoShader::getDefaultInstance()->setNormalDepthTextureID	(m_gBuffer->getTextureID(1));
 
-	SsaoShader::getDefaultInstance()->bind(this, false, 0);
+	SsaoShader::getDefaultInstance()->bind(this, false, POST_G_BUFFER);
 
 	glBindVertexArray(quad_vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

@@ -35,29 +35,29 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram * shaderProgram   = nullptr;
-    ColorShader   * defaultInstance = nullptr;
+    ShaderProgram * a_shaderProgram   = nullptr;
+    ColorShader   * a_defaultInstance = nullptr;
 
-    GLint vertInAttrLoc;
-    GLint colorInUniformLoc;
+    GLint a_vertInAttr;
+    GLint a_colorInUniform;
 
-    GLint MVP_Loc;
+    GLint a_MVP;
 }
 
 void ColorShader::ensureShader()
 {
-    if(shaderProgram) { return ;}
+    if(a_shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"ColorShader.vs.glsl"	},
+	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"ColorShader.vs.glsl"	},
 														{GL_FRAGMENT_SHADER,	"ColorShader.fs.glsl"	}}),
-                                            Variables({	{"vertIn",				vertInAttrLoc			}}),
-                                            Variables({	{"MVP",					MVP_Loc					},
-														{"colorIn",				colorInUniformLoc		}}));
+                                            Variables({	{"vertIn",				a_vertInAttr			}}),
+                                            Variables({	{"MVP",					a_MVP					},
+														{"colorIn",				a_colorInUniform		}}));
 
-    defaultInstance = new ColorShader();
+    a_defaultInstance = new ColorShader();
 }
 
-ColorShader * ColorShader::getDefaultInstance() { return defaultInstance ;}
+ColorShader * ColorShader::getDefaultInstance() { return a_defaultInstance ;}
 
 ColorShader::ColorShader() :    Shader(	"ColorShader",
 										ColorSymbology::getInstance("defaultPolygon"),
@@ -76,9 +76,9 @@ void ColorShader::bind( Canvas     * canvas,
                         const bool   isOutline,
                         const size_t renderingStage)
 {
-    shaderProgram->bind();
+    a_shaderProgram->bind();
 
-    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+    a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -86,6 +86,6 @@ void ColorShader::bind( Canvas     * canvas,
 
 	glBlendFunc(GL_ONE, GL_ONE);
 
-    if(isOutline) { shaderProgram->setUniform(colorInUniformLoc, m_outlineColor) ;}
-    else          { shaderProgram->setUniform(colorInUniformLoc, m_fillColor)    ;}
+    if(isOutline) { a_shaderProgram->setUniform(a_colorInUniform, m_outlineColor) ;}
+    else          { a_shaderProgram->setUniform(a_colorInUniform, m_fillColor)    ;}
 }

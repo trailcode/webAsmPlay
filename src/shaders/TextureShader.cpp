@@ -33,35 +33,38 @@
 
 namespace
 {
-    ShaderProgram * shaderProgram   = nullptr;
-    TextureShader * defaultInstance = nullptr;
+    ShaderProgram * a_shaderProgram   = nullptr;
+    TextureShader * a_defaultInstance = nullptr;
 
-    GLint vertInAttrLoc;
-    GLint vertUV_InAttrLoc;
+    GLint a_vertInAttr;
+    GLint a_vertUV_InAttr;
 
-    GLint MVP_Loc;
-    GLint texLoc;
+    GLint a_MVP;
+    GLint a_tex;
 }
 
-TextureShader * TextureShader::getDefaultInstance() { return defaultInstance ;}
+TextureShader * TextureShader::getDefaultInstance() { return a_defaultInstance ;}
 
 void TextureShader::ensureShader()
 {
-    if(shaderProgram) { return ;}
+    if(a_shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"TextureShader.vs.glsl"	},
+	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"TextureShader.vs.glsl"	},
 														{GL_FRAGMENT_SHADER,	"TextureShader.fs.glsl"	}}),
-                                            Variables({	{"vertIn",				vertInAttrLoc			},
-														{"vertUV_In",			vertUV_InAttrLoc		}}),
-                                            Variables({	{"MVP",					MVP_Loc					},
-														{"tex",					texLoc					}}));
+                                            Variables({	{"vertIn",				a_vertInAttr			},
+														{"vertUV_In",			a_vertUV_InAttr			}}),
+                                            Variables({	{"MVP",					a_MVP					},
+														{"tex",					a_tex					}}));
 
-    defaultInstance = new TextureShader();
+    a_defaultInstance = new TextureShader([](const bool isOutline, const size_t renderingStage) -> bool
+	{
+		return renderingStage == G_BUFFER;
+	});
 }
 
-TextureShader::TextureShader() : Shader("TextureShader",
-										nullptr,
-										Shader::s_defaultShouldRender)
+TextureShader::TextureShader(const ShouldRenderFunctor & shouldRender) : Shader("TextureShader",
+																				nullptr,
+																				shouldRender)
 {
 
 }
@@ -77,13 +80,11 @@ void TextureShader::bind(   Canvas     * canvas,
                             const bool   isOutline,
                             const size_t renderingStage)
 {
-    shaderProgram->bind();
+    a_shaderProgram->bind();
 
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, m_textureID);
 
-	glBindTexture(GL_TEXTURE_2D, m_textureID);
+	a_shaderProgram->setUniformi(a_tex, 0);
 
-	shaderProgram->setUniformi(texLoc, 0);
-
-    shaderProgram->setUniform(MVP_Loc, canvas->getMVP_Ref());
+    a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
 }

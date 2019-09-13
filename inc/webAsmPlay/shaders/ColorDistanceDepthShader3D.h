@@ -53,8 +53,8 @@ public:
 
 private:
 
-    void bindStage0(Canvas * canvas, const bool isOutline);
-    void bindStage1(Canvas * canvas, const bool isOutline);
+    void bindStagePostG_Buffer(Canvas * canvas, const bool isOutline);
+    void bindStageG_Buffer(Canvas * canvas, const bool isOutline);
 
     float m_heightMultiplier = 1.0f;
 

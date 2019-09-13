@@ -216,7 +216,7 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
 			edge->getRenderable()->ensureVAO();
 
-            edge->getRenderable()->render(m_canvas);
+            edge->getRenderable()->render(m_canvas, POST_G_BUFFER);
 
             m_canvas->renderCursor(m_trans * dvec4(pointOnEdge, 0, 1));
 
@@ -231,11 +231,9 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
             glDisable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
 
-			//renderable->setShader(ColorShader::getDefaultInstance());
-
 			renderable->ensureVAO();
 
-			renderable->render(m_canvas);
+			renderable->render(m_canvas, POST_G_BUFFER);
 
             return attrs->toString();
         }
@@ -249,7 +247,7 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 
 			renderable->ensureVAO();
 
-			renderable->render(m_canvas);
+			renderable->render(m_canvas, POST_G_BUFFER);
 
             string attrsStr = attrs->toString();
 

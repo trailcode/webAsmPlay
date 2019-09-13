@@ -36,6 +36,7 @@
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/ZombiePlugin.h>
 #include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -204,7 +205,7 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
             canvas->getCamera()->update();
         }
 
-        if(openSteerGeom) { openSteerGeom->render(canvas) ;}
+        if(openSteerGeom) { openSteerGeom->render(canvas, POST_G_BUFFER) ;}
     });
 }
 

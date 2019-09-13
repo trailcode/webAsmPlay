@@ -33,27 +33,27 @@
 
 namespace
 {
-	ShaderProgram  * shaderProgram = nullptr;
+	ShaderProgram  * a_shaderProgram = nullptr;
 
-	GLint vertInAttrLoc;
+	GLint a_vertInAttr;
 	
-	GLint MVP_Loc;
-	GLint texLoc;
+	GLint a_MVP;
+	GLint a_tex;
 }
 
 void DepthToRGB_Shader::ensureShader()
 {
-	if(shaderProgram) { return ;}
+	if(a_shaderProgram) { return ;}
 
-	shaderProgram = ShaderProgram::create(  GLSL({		{GL_VERTEX_SHADER,		"DepthToRGB.vs.glsl"	},
+	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"DepthToRGB.vs.glsl"	},
 														{GL_FRAGMENT_SHADER,	"DepthToRGB.fs.glsl"	}}),
 											Variables(),
-											Variables({	{"tex",					texLoc					}}));
+											Variables({	{"tex",					a_tex					}}));
 }
 
 void DepthToRGB_Shader::bind(const GLuint textureID)
 {
-	shaderProgram->bind();
+	a_shaderProgram->bind();
 
 	glDisable(GL_BLEND);
 
@@ -61,5 +61,5 @@ void DepthToRGB_Shader::bind(const GLuint textureID)
 
 	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, textureID);
 
-	shaderProgram->setUniformi(texLoc, 0);
+	a_shaderProgram->setUniformi(a_tex, 0);
 }

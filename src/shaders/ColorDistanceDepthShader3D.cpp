@@ -42,77 +42,77 @@ using namespace glm;
 
 namespace
 {
-    ShaderProgram              * shaderProgramPre		= nullptr;
-    ShaderProgram              * shaderProgramFill		= nullptr;
-    ShaderProgram              * shaderProgramOutline	= nullptr;
-    ColorDistanceDepthShader3D * defaultInstance		= nullptr;
+    ShaderProgram              * a_shaderProgramPre		= nullptr;
+    ShaderProgram              * a_shaderProgramFill	= nullptr;
+    ShaderProgram              * a_shaderProgramOutline	= nullptr;
+    ColorDistanceDepthShader3D * a_defaultInstance		= nullptr;
 
-    GLint vertInAttrPre;
-    GLint heightMultiplierPre;
+    GLint a_vertInAttrPre;
+    GLint a_heightMultiplierPre;
     
-    GLint vertInAttrFill;
-    GLint normalInAttrFill;
-    GLint vertColorInAttrFill;
+    GLint a_vertInAttrFill;
+    GLint a_normalInAttrFill;
+    GLint a_vertColorInAttrFill;
 
-    GLint colorLookupOffsetFill;
-    GLint heightMultiplierFill;
-	GLint invPersMatrixFill;
-	GLint invViewMatrixFiLL;
-    GLint colorLookupTextureUniformFill;
-	GLint topDownTextureUniformFill;
-    GLint depthTexUniformFill;
-    GLint lightPosUniformFill;
+    GLint a_colorLookupOffsetFill;
+    GLint a_heightMultiplierFill;
+	GLint a_invPersMatrixFill;
+	GLint a_invViewMatrixFiLL;
+    GLint a_colorLookupTextureUniformFill;
+	GLint a_topDownTextureUniformFill;
+    GLint a_depthTexUniformFill;
+    GLint a_lightPosUniformFill;
    
-    GLint vertInAttrOutline;
-    GLint vertColorInAttrOutline;
-    GLint colorLookupOffsetOutline;
-    GLint texUniformOutline;
-    GLint depthTexUniformOutline;
-    GLint heightMultiplierOutline;
+    GLint a_vertInAttrOutline;
+    GLint a_vertColorInAttrOutline;
+    GLint a_colorLookupOffsetOutline;
+    GLint a_texUniformOutline;
+    GLint a_depthTexUniformOutline;
+    GLint a_heightMultiplierOutline;
 }
 
 void ColorDistanceDepthShader3D::ensureShader()
 {
-	if(defaultInstance) { return ;}
+	if(a_defaultInstance) { return ;}
 
-	shaderProgramPre = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_pre.vs.glsl"		},
+	a_shaderProgramPre = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_pre.vs.glsl"		},
 																{GL_FRAGMENT_SHADER,		"ColorDistanceDepthShader3D_pre.fs.glsl"		}}),
-													Variables({	{"vertIn",					vertInAttrPre									}}),
-													Variables({	{"heightMultiplier",		heightMultiplierPre								}}));
+													Variables({	{"vertIn",					a_vertInAttrPre									}}),
+													Variables({	{"heightMultiplier",		a_heightMultiplierPre							}}));
 
-	shaderProgramFill = ShaderProgram::create(		GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_fill.vs.glsl"		},
+	a_shaderProgramFill = ShaderProgram::create(	GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_fill.vs.glsl"		},
 																{GL_FRAGMENT_SHADER,		"ColorDistanceDepthShader3D_fill.fs.glsl"		}}),
-													Variables({	{"vertIn",					vertInAttrFill									},
-																{"vertColorIn",				vertColorInAttrFill								},
-																{"normalIn",				normalInAttrFill								}}),
-													Variables({	{"colorLookupTexture",		colorLookupTextureUniformFill					},
-																{"topDownTexture",			topDownTextureUniformFill						},
-																{"depthTex",				depthTexUniformFill								},
-																{"invPersMatrix",			invPersMatrixFill								},
-																{"invViewMatrix",			invViewMatrixFiLL								},
-																{"colorLookupOffset",		colorLookupOffsetFill							},
-																{"heightMultiplier",		heightMultiplierFill							},
-																{"lightPos",				lightPosUniformFill								}}));
+													Variables({	{"vertIn",					a_vertInAttrFill								},
+																{"vertColorIn",				a_vertColorInAttrFill							},
+																{"normalIn",				a_normalInAttrFill								}}),
+													Variables({	{"colorLookupTexture",		a_colorLookupTextureUniformFill					},
+																{"topDownTexture",			a_topDownTextureUniformFill						},
+																{"depthTex",				a_depthTexUniformFill							},
+																{"invPersMatrix",			a_invPersMatrixFill								},
+																{"invViewMatrix",			a_invViewMatrixFiLL								},
+																{"colorLookupOffset",		a_colorLookupOffsetFill							},
+																{"heightMultiplier",		a_heightMultiplierFill							},
+																{"lightPos",				a_lightPosUniformFill							}}));
 
-	shaderProgramOutline = ShaderProgram::create(   GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_outline.vs.glsl"	},
+	a_shaderProgramOutline = ShaderProgram::create( GLSL({		{GL_VERTEX_SHADER,			"ColorDistanceDepthShader3D_outline.vs.glsl"	},
 																{GL_FRAGMENT_SHADER,		"ColorDistanceDepthShader3D_outline.fs.glsl"	}}),
-                                                    Variables({	{"vertIn",					vertInAttrOutline								},
-																{"vertColorIn",				vertColorInAttrOutline							}}),
-                                                    Variables({	{"tex",						texUniformOutline								},
-																{"depthTex",				depthTexUniformOutline							},
-																{"colorLookupOffset",		colorLookupOffsetOutline						},
-																{"heightMultiplier",		heightMultiplierOutline							}}));
+                                                    Variables({	{"vertIn",					a_vertInAttrOutline								},
+																{"vertColorIn",				a_vertColorInAttrOutline						}}),
+                                                    Variables({	{"tex",						a_texUniformOutline								},
+																{"depthTex",				a_depthTexUniformOutline						},
+																{"colorLookupOffset",		a_colorLookupOffsetOutline						},
+																{"heightMultiplier",		a_heightMultiplierOutline						}}));
 
-    defaultInstance = new ColorDistanceDepthShader3D();
+    a_defaultInstance = new ColorDistanceDepthShader3D();
 }
 
 ColorDistanceDepthShader3D::ColorDistanceDepthShader3D(ColorSymbology * colorSymbology) : Shader	("ColorDistanceDepthShader3D",
 																									colorSymbology ? colorSymbology : ColorSymbology::getInstance("defaultMesh"),
 																									[](const bool isOutline, const size_t renderingStage) -> bool
 																									{
-																										if(renderingStage == 0) { return true ;}
+																										if(renderingStage == POST_G_BUFFER) { return true ;}
 
-																										if(renderingStage == 1 && !isOutline) { return true ;}
+																										if(renderingStage == G_BUFFER && !isOutline) { return true ;}
 
 																										return false;
 																									})
@@ -124,7 +124,7 @@ ColorDistanceDepthShader3D::~ColorDistanceDepthShader3D()
 
 }
 
-ColorDistanceDepthShader3D * ColorDistanceDepthShader3D::getDefaultInstance() { return defaultInstance ;}
+ColorDistanceDepthShader3D * ColorDistanceDepthShader3D::getDefaultInstance() { return a_defaultInstance ;}
 
 void ColorDistanceDepthShader3D::bind(Canvas     * canvas,
                                       const bool   isOutline,
@@ -132,34 +132,29 @@ void ColorDistanceDepthShader3D::bind(Canvas     * canvas,
 {
     switch(renderingStage)
     {
-        case 0: return bindStage0(canvas, isOutline);
-        case 1: return bindStage1(canvas, isOutline);
+        case POST_G_BUFFER: return bindStagePostG_Buffer(canvas, isOutline);
+        case G_BUFFER:		return bindStageG_Buffer	(canvas, isOutline);
         default: 
             dmessError("Error!");
     }
 }
 
-void ColorDistanceDepthShader3D::bindStage1(Canvas * canvas, const bool isOutline)
+void ColorDistanceDepthShader3D::bindStageG_Buffer(Canvas * canvas, const bool isOutline)
 {
-    //dmess("ColorDistanceDepthShader3D::bindStage1");
+    //dmess("ColorDistanceDepthShader3D::bindStageG_Buffer");
 
-    shaderProgramPre->bind();
+    a_shaderProgramPre->bind();
 
 	glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 
-    shaderProgramPre->setUniformf(heightMultiplierPre, m_heightMultiplier);
+    a_shaderProgramPre->setUniformf(a_heightMultiplierPre, m_heightMultiplier);
 }
 
-void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutline)
+void ColorDistanceDepthShader3D::bindStagePostG_Buffer(Canvas * canvas, const bool isOutline)
 {
-    glActiveTexture(GL_TEXTURE0);
-
-    glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID());
-
-    glActiveTexture(GL_TEXTURE1);
-
-	glBindTexture(GL_TEXTURE_2D, canvas->getG_FrameBuffer()->getTextureID(1));
+    glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, m_colorSymbology->getTextureID());
+    glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, canvas->getG_FrameBuffer()->getTextureID(1));
 
 	glActiveTexture(GL_TEXTURE2);
 
@@ -180,25 +175,25 @@ void ColorDistanceDepthShader3D::bindStage0(Canvas * canvas, const bool isOutlin
 	
     if(!isOutline)
     {
-        shaderProgramFill->bind();
+        a_shaderProgramFill->bind();
         
-        shaderProgramFill->setUniformi(colorLookupTextureUniformFill,   0);
-        shaderProgramFill->setUniformi(depthTexUniformFill,				1);
-		shaderProgramFill->setUniformi(topDownTextureUniformFill,		2);
-        shaderProgramFill->setUniformf(heightMultiplierFill,			m_heightMultiplier);
-		shaderProgramFill->setUniform(invPersMatrixFill,				inverse(canvas->getProjectionRef()));
-		shaderProgramFill->setUniform(invViewMatrixFiLL,				inverse(canvas->getViewRef()));
-        shaderProgramFill->setUniform (lightPosUniformFill,				m_lightPos);
-        shaderProgramFill->setUniformf(colorLookupOffsetFill,			0.0f);
+        a_shaderProgramFill->setUniformi(a_colorLookupTextureUniformFill,	0);
+        a_shaderProgramFill->setUniformi(a_depthTexUniformFill,				1);
+		a_shaderProgramFill->setUniformi(a_topDownTextureUniformFill,		2);
+        a_shaderProgramFill->setUniformf(a_heightMultiplierFill,			m_heightMultiplier);
+		a_shaderProgramFill->setUniform (a_invPersMatrixFill,				inverse(canvas->getProjectionRef()));
+		a_shaderProgramFill->setUniform (a_invViewMatrixFiLL,				inverse(canvas->getViewRef()));
+        a_shaderProgramFill->setUniform (a_lightPosUniformFill,				m_lightPos);
+        a_shaderProgramFill->setUniformf(a_colorLookupOffsetFill,			0.0f);
     }
     else
     {
-        shaderProgramOutline->bind();
+        a_shaderProgramOutline->bind();
         
-        shaderProgramOutline->setUniformf(heightMultiplierOutline,		m_heightMultiplier);
-        shaderProgramOutline->setUniformi(depthTexUniformOutline,		1);
-        shaderProgramOutline->setUniformi(texUniformOutline,			0);
-        shaderProgramOutline->setUniformf(colorLookupOffsetOutline,		1.0f);
+        a_shaderProgramOutline->setUniformf(a_heightMultiplierOutline,		m_heightMultiplier);
+        a_shaderProgramOutline->setUniformi(a_depthTexUniformOutline,		1);
+        a_shaderProgramOutline->setUniformi(a_texUniformOutline,			0);
+        a_shaderProgramOutline->setUniformf(a_colorLookupOffsetOutline,		1.0f);
     }
 }
 
