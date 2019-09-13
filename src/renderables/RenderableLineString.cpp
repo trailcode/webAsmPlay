@@ -131,10 +131,10 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
     {
         if(showProgress) { doProgress("(3/6) Creating geometry:", i, lineStrings.size(), startTime) ;}
 
-        const Geometry  * geom        = get<0>(lineStrings[i]);
-        const float       symbologyID = (float(get<1>(lineStrings[i]) * 4) + 0.5f) / 32.0f;
+        const auto	geom        = get<0>(lineStrings[i]);
+        const float symbologyID = (float(get<1>(lineStrings[i]) * 4) + 0.5f) / 32.0f;
 
-        const vector<Coordinate> & coords = *dynamic_cast<const LineString *>(geom)->getCoordinatesRO()->toVector();
+        const auto & coords = *dynamic_cast<const LineString *>(geom)->getCoordinatesRO()->toVector();
 
 		if(trans == dmat4(1.0)) { dmessError("Implement!") ;}
         else
@@ -165,7 +165,7 @@ Renderable * RenderableLineString::create(const ColoredGeometryVec & lineStrings
         }
     }
 
-    Renderable * ret = create(verts, indices, true);
+    auto ret = create(verts, indices, true);
 
     if(showProgress) { GUI::progress("", 1.0) ;}
 

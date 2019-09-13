@@ -75,15 +75,12 @@ void RenderableMesh::getTesselations(	Tessellations					 & tessellations,
     {
         if(showProgress) { doProgress("(6/6) Creating geometry:", i, polygons.size(), startTime) ;}
 
-        const Geometry  * geom        = get<0>(polygons[i]);
-        const GLuint      symbologyID = get<1>(polygons[i]);
-        const double      height      = get<2>(polygons[i]);
-        const double      minHeight   = get<3>(polygons[i]);
+        const auto geom        = get<0>(polygons[i]);
+        const auto symbologyID = get<1>(polygons[i]);
+        const auto height      = get<2>(polygons[i]);
+        const auto minHeight   = get<3>(polygons[i]);
         
-        const geom::Polygon  * poly;
-        const MultiPolygon   * multiPoly;
-
-        if((poly = dynamic_cast<const geom::Polygon *>(geom)))
+        if(auto poly = dynamic_cast<const geom::Polygon *>(geom))
         {
             tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID, height, minHeight));
             
@@ -94,8 +91,8 @@ void RenderableMesh::getTesselations(	Tessellations					 & tessellations,
                 tessellations.pop_back();
             }
         }
-        else if((multiPoly = dynamic_cast<const MultiPolygon *>(geom))) { dmessError("Have a multiPoly!")						;}
-        else															{ dmessError("Warning not a polygon or multi-polygon.") ;}
+        else if(auto multiPoly = dynamic_cast<const MultiPolygon *>(geom))	{ dmessError("Have a multiPoly!")						;}
+        else																{ dmessError("Warning not a polygon or multi-polygon.") ;}
     }
 
     if(showProgress) { GUI::progress("", 1.0) ;}
@@ -115,10 +112,7 @@ Renderable * RenderableMesh::create(const Tessellations & tessellations)
     return new RenderableMesh(vao);
 }
 
-RenderableMesh::~RenderableMesh()
-{
-    delete m_vertexArrayObject;
-}
+RenderableMesh::~RenderableMesh() { delete m_vertexArrayObject ;}
 
 RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderable( true,
                                                                                     GUI::s_renderSettingsFillPolygons,
@@ -130,17 +124,22 @@ RenderableMesh::RenderableMesh(VertexArrayObject * vertexArrayObject) : Renderab
 
 void RenderableMesh::render(Canvas * canvas, const size_t renderStage)
 {
+	const bool renderFill		= getRenderFill()		&& m_shader->m_shouldRender(false,	renderStage);
+	const bool renderOutline	= getRenderOutline()	&& m_shader->m_shouldRender(true,	renderStage);
+
+	if(!renderFill && !renderOutline) { return ;}
+
     m_vertexArrayObject->bind(m_shader);
     m_vertexArrayObject->bindTriangles();
 
-    if(getRenderFill() && m_shader->m_shouldRender(false, renderStage))
+    if(renderFill)
     {
         m_shader->bind(canvas, false, renderStage);
 
         m_vertexArrayObject->drawTriangles();
     }
 
-    if(getRenderOutline() && m_shader->m_shouldRender(true, renderStage))
+    if(renderOutline)
     {
         m_shader->bind(canvas, true, renderStage);
 
@@ -150,7 +149,4 @@ void RenderableMesh::render(Canvas * canvas, const size_t renderStage)
     }
 }
 
-void RenderableMesh::ensureVAO()
-{
-	m_vertexArrayObject->ensureVAO();
-}
+void RenderableMesh::ensureVAO() { m_vertexArrayObject->ensureVAO() ;}

@@ -53,6 +53,8 @@ public:
 
 	static bool s_useCache;
 
+	static bool s_useBindlessTextures;
+
 private:
 
     RenderableBingMap(const AABB2D & bounds, const glm::dmat4 & trans);
@@ -67,6 +69,8 @@ private:
 	static void fetchTile(const int ID, RasterTile* tile);
 
 	static void markTileNoData(RasterTile* tile);
+
+	static void renderBindlessTextures(Canvas* canvas, const std::vector<RasterTile*>& toRender, const size_t renderStage);
 
     const AABB2D m_bounds;
 

@@ -29,7 +29,7 @@
 #include <unordered_map>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/bing/BingTileSystem.h>
-#include <webAsmPlay/renderables/RasterTile.h>
+#include <webAsmPlay/bing/RasterTile.h>
 
 using namespace std;
 using namespace glm;
@@ -42,9 +42,7 @@ namespace
 	vector<uint> a_texturesToFree;
 }
 
-//atomic_size_t RasterTile::s_desiredMaxNumTiles = { 1500 };
 atomic_size_t RasterTile::s_desiredMaxNumTiles = { 4000 };
-//atomic_size_t RasterTile::s_desiredMaxNumTiles = { 10500 };
 
 GLuint RasterTile::s_NO_DATA = numeric_limits<GLuint>::max();
 
@@ -66,7 +64,7 @@ RasterTile* RasterTile::getTile(const dvec2& center, const size_t level, const s
 {
 	const string quadKey = tileToQuadKey(latLongToTile(center, level), level);
 
-	unordered_map<string, RasterTile*>::const_iterator i = a_currTileSet.find(quadKey);
+	auto i = a_currTileSet.find(quadKey);
 
 	RasterTile* tile;
 
