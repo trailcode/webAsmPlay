@@ -56,7 +56,7 @@ Edge::Edge( Renderable       * renderable,
                                              m_start		(getStartPoint(geom)),
                                              m_end			(getEndPoint  (geom))
 {
-    m_weight = geom->getLength() * 1000000 + 1;
+    m_weight = int(geom->getLength() * 1000000 + 1);
 }
 
 Renderable       * Edge::getRenderable() const { return m_renderable ;}
@@ -320,7 +320,7 @@ vector<Coordinate> * Network::findPath(const PointOnEdge & start, const PointOnE
                 goto done;
             }
 
-            const int weight = x.second->getWeight();
+            const int weight = int(x.second->getWeight());
 
             const int newDist = a_dist[u] + weight;
 

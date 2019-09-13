@@ -62,12 +62,12 @@ private:
 	GLuint m_colorTextureID			= 0;
 	GLuint m_normalDepthTextureID	= 0;
 
-	float m_SSAO_Radius = 0.005;
+	float m_SSAO_Radius = 0.005f;
 
 	GLuint m_numPoints = 64;
 
-	float m_minDepth = 0.001;
+	float m_minDepth = 0.001f;
 
-	float m_mixPercent = 1.0;
+	float m_mixPercent = 1.0f;
 	
 };

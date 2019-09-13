@@ -265,12 +265,18 @@ void GUI::showMainToolBar()
         ImVec2 uv1(1,1);
         //ImVec2 size(16,16);
         ImVec2 size(32,32);
-        toolbar.addButton(ImGui::Toolbutton("Normal Mode",						(void*)a_infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",			(void*)a_infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",			(void*)a_infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",	(void*)a_infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",				(void*)a_infoIcon,uv0,uv1,size));
-        toolbar.addButton(ImGui::Toolbutton("Find Path",						(void*)a_infoIcon,uv0,uv1,size));
+
+#pragma warning( push )
+#pragma warning( disable : 4312)
+
+        toolbar.addButton(ImGui::Toolbutton("Normal Mode",						(void*)(a_infoIcon),uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",			(void*)(a_infoIcon),uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",			(void*)(a_infoIcon),uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",	(void*)(a_infoIcon),uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",				(void*)(a_infoIcon),uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Find Path",						(void*)(a_infoIcon),uv0,uv1,size));
+
+#pragma warning( pop )
 
         toolbar.setProperties(false,false,true,ImVec2(0.5f,0.f));
 
@@ -497,7 +503,7 @@ void GUI::mainLoop(GLFWwindow * window)
     
     const double dist = distance(s_canvas->getCamera()->getCenter(), s_canvas->getCamera()->getEye());
 
-    s_canvas->getTrackBallInteractor()->setZoomScale(dist * 0.02);
+    s_canvas->getTrackBallInteractor()->setZoomScale(float(dist * 0.02));
 
     const dvec4 pos(s_canvas->getCursorPosWC(), 1.0);
 

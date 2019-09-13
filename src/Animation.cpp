@@ -101,10 +101,10 @@ namespace
 	// when t is 0, this will return B.  When t is 1, this will return C.
 	inline double cubicHermite (const double A, const double B, const double C, const double D, const double t)
 	{
-		float a = -A/2.0f + (3.0f*B)/2.0f - (3.0f*C)/2.0f + D/2.0f;
-		float b = A - (5.0f*B)/2.0f + 2.0f*C - D / 2.0f;
-		float c = -A/2.0f + C/2.0f;
-		float d = B;
+		double a = -A/2.0f + (3.0f*B)/2.0f - (3.0f*C)/2.0f + D/2.0f;
+		double b = A - (5.0f*B)/2.0f + 2.0f*C - D / 2.0f;
+		double c = -A/2.0f + C/2.0f;
+		double d = B;
  
 		return a*t*t*t + b*t*t + c*t + d;
 	}
@@ -141,7 +141,7 @@ void Animation::update(const float timeIndex)
 	auto cameraEye		= cubicHermite(prev2->m_cameraEye,		prev1->m_cameraEye,		next1->m_cameraEye,		next2->m_cameraEye,		t);
 	auto cameraUp		= cubicHermite(prev2->m_cameraUp,		prev1->m_cameraUp,		next1->m_cameraUp,		next2->m_cameraUp,		t);
 
-	if(cameraEye.z < 0.01) { cameraEye.z = 0.01 ;}
+	if(cameraEye.z < 0.01) { cameraEye.z = 0.01f ;}
 
 	GUI::getMainCamera()->setCenter	(cameraCenter);
 	GUI::getMainCamera()->setEye	(cameraEye);

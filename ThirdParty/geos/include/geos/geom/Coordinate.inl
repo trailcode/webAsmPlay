@@ -95,6 +95,9 @@ Coordinate::hashCode() const
 	return result;
 }
 
+#pragma warning( push )
+#pragma warning( disable : 4293)
+
 /*static*/
 INLINE int
 Coordinate::hashCode(double d)
@@ -102,6 +105,8 @@ Coordinate::hashCode(double d)
 	int64 f = (int64)(d);
 	return (int)(f^(f>>32));
 }
+
+#pragma warning( pop ) 
 
 INLINE bool
 CoordinateLessThen::operator()(const Coordinate* a, const Coordinate* b) const

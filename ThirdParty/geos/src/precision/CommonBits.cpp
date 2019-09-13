@@ -13,6 +13,8 @@
  *
  **********************************************************************/
 
+ #pragma warning( disable : 4293)
+
 #include <geos/platform.h> // for int64
 #include <geos/precision/CommonBits.h>
 

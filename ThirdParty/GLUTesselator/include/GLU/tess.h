@@ -56,8 +56,9 @@ typedef struct CachedVertex {
   void		*data;
 } CachedVertex;
 
-struct GLUtesselator {
-
+class GLUtesselator
+{
+public:
   /*** state needed for collecting the input data ***/
 
   enum TessState state;		/* what begin/end calls have we seen? */

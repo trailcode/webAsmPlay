@@ -42,9 +42,9 @@ using namespace geosUtil;
 
 Tessellation::Tessellation(const size_t symbologyID,
                            const double height,
-                           const double minHeight) : m_symbologyID(symbologyID),
-                                                     m_height     (height),
-                                                     m_minHeight  (minHeight) {}
+                           const double minHeight) : m_symbologyID(uint32_t	(symbologyID)),
+                                                     m_height				(height),
+                                                     m_minHeight			(minHeight) {}
     
 Tessellation::~Tessellation()
 {
@@ -95,7 +95,7 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
     }
 
     ret->m_counterVertIndices.push_back(0);
-    ret->m_counterVertIndices.push_back(verts.size());
+    ret->m_counterVertIndices.push_back(uint32_t(verts.size()));
 
     for(size_t i = 0; i < poly->getNumInteriorRing(); ++i)
     {
@@ -131,7 +131,7 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
             }
         }
 
-        ret->m_counterVertIndices.push_back(verts.size());
+        ret->m_counterVertIndices.push_back(uint32_t(verts.size()));
     }
 
     vector<const double *> counterVertPtrs;

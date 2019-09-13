@@ -128,7 +128,7 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             }
         }
 
-        for(size_t i = 0; i < tess->m_numTriangles * 3; ++i) { triangleIndices.push_back((uint32_t)tess->m_triangleIndices[i] + offset) ;}
+        for(size_t i = 0; i < tess->m_numTriangles * 3; ++i) { triangleIndices.push_back(uint32_t(tess->m_triangleIndices[i] + offset)) ;}
 
         size_t lastIndex = 0;
 

@@ -76,8 +76,8 @@ ivec2 bingTileSystem::latLongToPixel(const dvec2 & latLong, const size_t levelOf
 
     const size_t _mapSize = mapSize(levelOfDetail);  
 
-    return ivec2((int) clip(x * _mapSize + 0.5, 0, _mapSize - 1),
-                 (int) clip(y * _mapSize + 0.5, 0, _mapSize - 1));
+    return ivec2((int) clip(x * _mapSize + 0.5, 0, double(_mapSize) - 1),
+                 (int) clip(y * _mapSize + 0.5, 0, double(_mapSize) - 1));
 }
 
 ivec2 bingTileSystem::latLongToTile(const dvec2 & latLong, const size_t levelOfDetail)
@@ -87,7 +87,7 @@ ivec2 bingTileSystem::latLongToTile(const dvec2 & latLong, const size_t levelOfD
 
 dvec2 bingTileSystem::pixelToLatLong(const ivec2 & pixel, const size_t levelOfDetail)
 {
-    const double _mapSize = mapSize(levelOfDetail);  
+    const double _mapSize = double(mapSize(levelOfDetail));
     const double x = (clip(pixel.x, 0, _mapSize - 1) / _mapSize) - 0.5;  
     const double y = 0.5 - (clip(pixel.y, 0, _mapSize - 1) / _mapSize);  
 
@@ -107,7 +107,7 @@ string bingTileSystem::tileToQuadKey(const ivec2 & tile, const size_t levelOfDet
 {
     string quadKey;
 
-    for (int i = levelOfDetail; i > 0; i--)  
+    for (int i = int(levelOfDetail); i > 0; i--)  
     {  
         char digit = '0';  
         
@@ -136,7 +136,7 @@ pair<size_t, ivec2> bingTileSystem::quadKeyToTile(const string & quadKey)
     
     const size_t levelOfDetail = quadKey.length();
 
-    for (int i = levelOfDetail; i > 0; i--)  
+    for (int i = int(levelOfDetail); i > 0; i--)  
     {  
         int mask = 1 << (i - 1);  
 

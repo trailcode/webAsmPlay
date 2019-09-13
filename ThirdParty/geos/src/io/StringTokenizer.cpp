@@ -17,6 +17,8 @@
  *
  **********************************************************************/
 
+ #pragma warning( disable : 4996)
+
 #include <geos/io/StringTokenizer.h>
 
 #include <string>

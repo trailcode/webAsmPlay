@@ -279,13 +279,15 @@ inline std::string convertFrom10(size_t value, const size_t base)
     if(isNegative) { output += '-' ;}
     
     // Reverse the string - NOTE: could be done with std::reverse
-    const int len = output.size() - 1;
+    const int len = int(output.size()) - 1;
 
     for(int i = 0; i < len; ++i)
     {
         // Swap characters - NOTE: Could be done with std::swap
         char temp = output[i];
+
         output[i] = output[len-i];
+
         output[len-i] = temp;
     }
     

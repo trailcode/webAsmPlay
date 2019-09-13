@@ -139,7 +139,7 @@ void GUI::loadState()
 
     if(root.find(L"buildingHeightMultiplier") != root.end())
     {
-        ColorDistanceDepthShader3D::getDefaultInstance()->setHeightMultiplier(root[L"buildingHeightMultiplier"]->AsNumber());
+        ColorDistanceDepthShader3D::getDefaultInstance()->setHeightMultiplier(float(root[L"buildingHeightMultiplier"]->AsNumber()));
     }
 
 	Animation::loadFile("animation.json");

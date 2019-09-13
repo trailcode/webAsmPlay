@@ -42,7 +42,7 @@ namespace
 {
 	mutex a_loaderMutex;
 
-	unordered_map<int, CURL *> a_curlHandles;
+	unordered_map<size_t, CURL *> a_curlHandles;
 }
 
 BufferStruct::~BufferStruct()

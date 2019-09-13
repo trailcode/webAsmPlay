@@ -42,7 +42,7 @@ Renderable * RenderablePoint::create(const Point * point,
 Renderable * RenderablePoint::create(const dvec3 & _pos,
                                      const dmat4 & trans)
 {
-    const float size = 0.05;
+    const float size = 0.05f;
 
     const vec3 pos = trans * dvec4(_pos, 1);
 

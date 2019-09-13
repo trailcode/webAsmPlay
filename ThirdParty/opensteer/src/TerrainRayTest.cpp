@@ -20,6 +20,7 @@
 
 ---------------------------------------------------------------------------------
 */
+
 #include "TerrainRayTest.h"
 
 
@@ -136,8 +137,8 @@ void RayTester::LoadData( char *fname,	TRTScalar xMin, TRTScalar xMax,
 	for(y=0, curVert=0; y<height; y++)
 		for(x=0; x<width; x++, curVert++)
 			if( x<width-1 && y<height-1) {
-				data[curVert].maxy = OpenSteer::maxXXX( OpenSteer::maxXXX( data[curVert].pos[1], data[curVert+1].pos[1] ), 
-											OpenSteer::maxXXX( data[curVert+width].pos[1], data[curVert+width+1].pos[1] ) );
+				data[curVert].maxy = OpenSteer::maxXXX( OpenSteer::maxXXX( float(data[curVert].pos[1]),			float(data[curVert+1].pos[1]) ), 
+														OpenSteer::maxXXX( float(data[curVert+width].pos[1]),	float(data[curVert+width+1].pos[1]) ) );
 
 				#ifdef TRT_PRECOMPUTE_NORMALS
 					GetNormal( data[curVert].upLeftNorm, data[curVert].pos, data[curVert+width].pos, data[curVert+1].pos );

@@ -46,31 +46,31 @@ void GUI::renderSettingsPanel()
 
         if(ImGui::Checkbox("Fill Meshes", &s_renderSettingsFillMeshes))
         {
-            for(Renderable * r : s_canvas->getMeshesRef()) { r->setRenderFill(s_renderSettingsFillMeshes) ;}
+            for(auto r : s_canvas->getMeshesRef()) { r->setRenderFill(s_renderSettingsFillMeshes) ;}
         }
 
         if(ImGui::Checkbox("Mesh Outlines", &s_renderSettingsRenderMeshOutlines))
         {
-            for(Renderable * r : s_canvas->getMeshesRef()) { r->setRenderOutline(s_renderSettingsRenderMeshOutlines) ;}
+            for(auto r : s_canvas->getMeshesRef()) { r->setRenderOutline(s_renderSettingsRenderMeshOutlines) ;}
         }
 
         if(ImGui::Checkbox("Fill Polygons", &s_renderSettingsFillPolygons))
         {
-            for(Renderable * r : s_canvas->getPolygonsRef()) { r->setRenderFill(s_renderSettingsFillPolygons) ;}
+            for(auto r : s_canvas->getPolygonsRef()) { r->setRenderFill(s_renderSettingsFillPolygons) ;}
 
-            for(Renderable * r : s_geosTestCanvas->getPolygonsRef()) { r->setRenderFill(s_renderSettingsFillPolygons) ;}
+            for(auto r : s_geosTestCanvas->getPolygonsRef()) { r->setRenderFill(s_renderSettingsFillPolygons) ;}
         }
 
         if(ImGui::Checkbox("Polygon Outlines", &s_renderSettingsRenderPolygonOutlines))
         {
-            for(Renderable * r : s_canvas->getPolygonsRef()) { r->setRenderOutline(s_renderSettingsRenderPolygonOutlines) ;}
+            for(auto r : s_canvas->getPolygonsRef()) { r->setRenderOutline(s_renderSettingsRenderPolygonOutlines) ;}
 
-            for(Renderable * r : s_geosTestCanvas->getPolygonsRef()) { r->setRenderOutline(s_renderSettingsRenderPolygonOutlines) ;}
+            for(auto r : s_geosTestCanvas->getPolygonsRef()) { r->setRenderOutline(s_renderSettingsRenderPolygonOutlines) ;}
         }
 
         if(ImGui::Checkbox("Linear Features", &s_renderSettingsRenderLinearFeatures))
         {
-            for(Renderable * r : s_canvas->getLineStringsRef())
+            for(auto r : s_canvas->getLineStringsRef())
             {
                 r->setRenderFill    (s_renderSettingsRenderLinearFeatures);
                 r->setRenderOutline (s_renderSettingsRenderLinearFeatures);
@@ -85,13 +85,8 @@ void GUI::renderSettingsPanel()
         
         if(ImGui::Checkbox("BingMaps", &s_renderSettingsRenderBingMaps))
         {
-            for(Renderable * r : s_canvas->getRastersRef())
-            {
-                r->setRenderFill(s_renderSettingsRenderBingMaps);
-            }
+            for(auto r : s_canvas->getRastersRef()) { r->setRenderFill(s_renderSettingsRenderBingMaps) ;}
         }
-
-        //ImGui::Spacing();
 
         float heightMultiplier = ColorDistanceDepthShader3D::getDefaultInstance()->getHeightMultiplier();
 
@@ -103,8 +98,6 @@ void GUI::renderSettingsPanel()
         const char * items[] = { "TrackBall", "First Person", "Track Entity" };
         
         ImGui::Combo("Camera", &s_cameraMode, items, IM_ARRAYSIZE(items));
-
-        //ImGui::Text("Linestring Shader");
 
         const char * shaders[] = { "ColorDistanceShader", "ColorDistanceDepthShader3D", "ColorShader", "ColorVertexShader" };
 
@@ -134,7 +127,7 @@ void GUI::renderSettingsPanel()
 
 		if(s_canvas)
 		{
-			float perspectiveFOV = s_canvas->getPerspectiveFOV();
+			float perspectiveFOV = float(s_canvas->getPerspectiveFOV());
 
 			if(ImGui::SliderFloat("FOV", &perspectiveFOV, 30.0f, 50.0f, "%.3f")) // TODO Why does this not work?
 			{
@@ -144,14 +137,14 @@ void GUI::renderSettingsPanel()
 
 		if (ImGui::CollapsingHeader("SSAO", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			float ssaoRadius = SsaoShader::getDefaultInstance()->getSSAO_Radius() * 4000.0;
+			float ssaoRadius = SsaoShader::getDefaultInstance()->getSSAO_Radius() * 4000.0f;
 			int   numPoints  = SsaoShader::getDefaultInstance()->getNumPoints();
-			float minDepth   = SsaoShader::getDefaultInstance()->getMinDepth() * 1000.0;
-			float mixPercent = SsaoShader::getDefaultInstance()->getMixPercent() * 100.0;
+			float minDepth   = SsaoShader::getDefaultInstance()->getMinDepth() * 1000.0f;
+			float mixPercent = SsaoShader::getDefaultInstance()->getMixPercent() * 100.0f;
 
 			if (ImGui::SliderFloat("SSAO Radius", &ssaoRadius, 0.0f, 50.0f, "SSAO Radius: %.3f"))
 			{
-				SsaoShader::getDefaultInstance()->setSSAO_Radius(ssaoRadius / 4000.0);
+				SsaoShader::getDefaultInstance()->setSSAO_Radius(ssaoRadius / 4000.0f);
 			}
 
 			if (ImGui::SliderInt("Num Points:", &numPoints, 1, 256))
@@ -161,18 +154,14 @@ void GUI::renderSettingsPanel()
 
 			if (ImGui::SliderFloat("Min Depth", &minDepth, 0.0f, 50.0f, "Min Depth: %.3f"))
 			{
-				SsaoShader::getDefaultInstance()->setMinDepth(minDepth / 1000.0);
+				SsaoShader::getDefaultInstance()->setMinDepth(minDepth / 1000.0f);
 			}
 
 			if (ImGui::SliderFloat("Mix Percent", &mixPercent, 0.0f, 100.0f, "Mix Percent: %.3f"))
 			{
-				SsaoShader::getDefaultInstance()->setMixPercent(mixPercent / 100.0);
+				SsaoShader::getDefaultInstance()->setMixPercent(mixPercent / 100.0f);
 			}
 		}
 
-        //ImGui::SameLine(); ShowHelpMarker("Refer to the \"Combo\" section below for an explanation of the full BeginCombo/EndCombo API, and demonstration of various flags.\n");
-
     ImGui::End();
 }
-
-//float GUI::getHeightMultiplier() { return heightMultiplier ;}

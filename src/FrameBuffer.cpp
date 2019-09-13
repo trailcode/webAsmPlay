@@ -51,7 +51,7 @@ ivec2 FrameBuffer::initFrameBuffer(const ivec2& bufferSize)
 	glGenFramebuffers(1,				&m_renderFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER,	 m_renderFBO);
 
-	glGenTextures(m_components.size(), &m_textures[0]);
+	glGenTextures(GLsizei(m_components.size()), &m_textures[0]);
 
 	for (size_t i = 0; i < m_components.size(); ++i)
 	{
@@ -66,7 +66,7 @@ ivec2 FrameBuffer::initFrameBuffer(const ivec2& bufferSize)
 		if (m_components[i].m_type != GL_DEPTH_ATTACHMENT) { m_drawBuffers.push_back(m_components[i].m_type) ;}
 	}
 
-	glDrawBuffers(m_drawBuffers.size(), &m_drawBuffers[0]);
+	glDrawBuffers(GLsizei(m_drawBuffers.size()), &m_drawBuffers[0]);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_prevFB);
 
@@ -77,7 +77,7 @@ void FrameBuffer::cleanup()
 {
 	unbind();
 
-	glDeleteTextures(m_textures.size(), &m_textures[0]);
+	glDeleteTextures(GLsizei(m_textures.size()), &m_textures[0]);
 
 	glDeleteFramebuffers(1, &m_renderFBO);
 }

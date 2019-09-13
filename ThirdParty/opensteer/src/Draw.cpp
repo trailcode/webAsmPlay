@@ -1254,7 +1254,7 @@ namespace OpenSteer {
             const float phi = (1.0f + sqrt5) * 0.5f; // "golden ratio"
             // ratio of edge length to radius
             const float ratio = sqrtXXX (10.0f + (2.0f * sqrt5)) / (4.0f * phi);
-            const float a = (radius / ratio) * 0.5;
+            const float a = (radius / ratio) * 0.5f;
             const float b = (radius / ratio) / (2.0f * phi);
 
             // define the icosahedron's 12 vertices:

@@ -116,12 +116,12 @@ namespace rsmz
         float length2 = x*x + y*y;
 
         if (length2 <= .5) {
-            result.z = sqrt(1.0 - length2);
+            result.z = float(sqrt(1.0 - length2));
         } else {
-            result.z = 0.5 / sqrt(length2);
+            result.z = float(0.5 / sqrt(length2));
         }
 
-        float norm = 1.0 / sqrt(length2 + result.z*result.z);
+        float norm = float(1.0 / sqrt(length2 + result.z*result.z));
 
         result.x = x * norm;
         result.y = y * norm;
@@ -337,8 +337,8 @@ namespace rsmz
     void TrackBallInteractor::setClickPoint(double x, double y)
     {
         m_PrevClickPoint = m_ClickPoint;
-        m_ClickPoint.x = x;
-        m_ClickPoint.y = y;
+        m_ClickPoint.x = float(x);
+        m_ClickPoint.y = float(y);
     }
 
     void TrackBallInteractor::setLeftClicked(bool value)

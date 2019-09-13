@@ -17,6 +17,8 @@
  *
  **********************************************************************/
 
+ #pragma warning( disable : 4293)
+
 #include <geos/index/quadtree/DoubleBits.h>
 #include <geos/util/IllegalArgumentException.h>
 

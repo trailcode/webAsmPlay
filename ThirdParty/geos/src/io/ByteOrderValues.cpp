@@ -23,6 +23,8 @@
 #include <cstring>
 #include <cassert>
 
+#pragma warning( disable : 4293)
+
 #if DEBUG_BYTEORDER_VALUES
 #include <ios>
 #include <iostream>
