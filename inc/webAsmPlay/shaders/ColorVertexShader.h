@@ -35,12 +35,14 @@ public:
 
     static ColorVertexShader * getDefaultInstance();
 
+	ColorVertexShader();
+
+	~ColorVertexShader();
+
     void bind(  Canvas     * canvas,
                 const bool   isOutline,
                 const size_t renderingStage = 0) override;
 
 private:
 
-    ColorVertexShader();
-    ~ColorVertexShader();
 };

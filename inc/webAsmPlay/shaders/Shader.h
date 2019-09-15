@@ -67,11 +67,11 @@ public:
 
 	typedef std::function<bool(const bool isOutline, const size_t renderingStage)> ShouldRenderFunctor;
 
+	static ShouldRenderFunctor s_defaultShouldRender;
+
 	const ShouldRenderFunctor m_shouldRender;
 	
 protected:
-
-	static ShouldRenderFunctor s_defaultShouldRender;
 
     Shader(	const std::string			& shaderName,
 			ColorSymbology				* colorSymbology,

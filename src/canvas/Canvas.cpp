@@ -261,6 +261,8 @@ GLuint Canvas::render()
 	
 	if(m_skyBox) { m_skyBox->render(this) ;}
 
+	if(m_useFrameBuffer) { m_frameBuffer->bind() ;}
+
 	SsaoShader::getDefaultInstance()->setColorTextureID			(m_gBuffer->getTextureID(0));
 	SsaoShader::getDefaultInstance()->setNormalDepthTextureID	(m_gBuffer->getTextureID(1));
 
@@ -275,6 +277,8 @@ GLuint Canvas::render()
 GLuint Canvas::postRender()
 {
 	renderCursor(m_cursorPosWC);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	if(m_useFrameBuffer) { return m_frameBuffer->getTextureID() ;}
 

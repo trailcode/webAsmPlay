@@ -28,6 +28,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/shaders/ColorShader.h>
+#include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/canvas/GeosTestCanvas.h>
@@ -105,7 +106,15 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 	{
 		Renderable * renderable = Renderable::create(geom, trans);
 
-		renderable->setShader(ColorShader::getDefaultInstance());
+		static ColorVertexShader * shader = nullptr;
+
+		if(!shader)
+		{
+			shader = new ColorVertexShader();
+		}
+
+		renderable->setShader(shader);
+		//renderable->setShader(ColorVertexShader::getDefaultInstance());
 
 		addRenderable(renderable);
 

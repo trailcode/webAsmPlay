@@ -54,14 +54,14 @@ void ColorShader::ensureShader()
                                             Variables({	{"MVP",					a_MVP					},
 														{"colorIn",				a_colorInUniform		}}));
 
-    a_defaultInstance = new ColorShader();
+    a_defaultInstance = new ColorShader(Shader::s_defaultShouldRender);
 }
 
 ColorShader * ColorShader::getDefaultInstance() { return a_defaultInstance ;}
 
-ColorShader::ColorShader() :    Shader(	"ColorShader",
-										ColorSymbology::getInstance("defaultPolygon"),
-										Shader::s_defaultShouldRender),
+ColorShader::ColorShader(const ShouldRenderFunctor & shouldRenderFunctor) :    Shader(	"ColorShader",
+																						ColorSymbology::getInstance("defaultPolygon"),
+																						shouldRenderFunctor),
                                 m_fillColor		(0,1,0,0.5),
                                 m_outlineColor	(1,1,0,1)
 {

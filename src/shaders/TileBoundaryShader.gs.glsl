@@ -25,10 +25,19 @@
 */
 
 #version 330 core
-in vec3 vertIn;
-uniform mat4 MVP;
+//in vec3 vertIn;
+//uniform mat4 MVP;
+
+layout (points) in;
+layout (line_strip, max_vertices = 2) out;
 
 void main()
 {
-	gl_Position = MVP * vec4(vertIn.xyz, 1);
+	gl_Position = gl_in[0].gl_Position + vec4(-0.1, 0.0, 0.0, 0.0); 
+    EmitVertex();
+
+    gl_Position = gl_in[0].gl_Position + vec4( 0.1, 0.0, 0.0, 0.0);
+    EmitVertex();
+    
+    EndPrimitive();
 }

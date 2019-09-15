@@ -45,7 +45,7 @@ TileBoundaryShader * TileBoundaryShader::getDefaultInstance() { return a_default
 
 void TileBoundaryShader::ensureShader()
 {
-	return; // This one is not compiling!
+	//return; // This one is not compiling!
 
     if(a_shaderProgram) { return ;}
 

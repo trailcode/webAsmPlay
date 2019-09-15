@@ -32,7 +32,8 @@ class ColorShader : public Shader
 {
 public:
 
-    ColorShader();
+    ColorShader(const ShouldRenderFunctor & shouldRenderFunctor);
+
     ~ColorShader();
 
     static void ensureShader();
