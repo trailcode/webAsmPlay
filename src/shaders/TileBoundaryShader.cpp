@@ -74,5 +74,11 @@ void TileBoundaryShader::bind(  Canvas     * canvas,
                                 const bool   isOutline,
                                 const size_t renderingStage)
 {
+	glDisable(GL_BLEND);
 
+	glDisable(GL_DEPTH_TEST);
+
+	a_shaderProgram->bind();
+
+	a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
 }

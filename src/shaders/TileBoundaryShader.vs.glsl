@@ -25,10 +25,18 @@
 */
 
 #version 330 core
-in vec3 vertIn;
+
+layout(location = 0) in vec4 vertIn;
+
 uniform mat4 MVP;
+
+out float tileWidth;
+out float tileHeight;
 
 void main()
 {
-	gl_Position = MVP * vec4(vertIn.xyz, 1);
+	gl_Position = vec4(vertIn.xy, 0, 1);
+
+	tileWidth  = vertIn.z * 0.5;
+	tileHeight = vertIn.w * 0.5;
 }

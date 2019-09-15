@@ -25,10 +25,10 @@
 */
 
 #version 330 core
+
 out vec4 outColor;
-uniform sampler2D tex;
 
 void main()
 {
-	outColor = vec4(1,1,1,1);
+	outColor = vec4(0,1,0.5,1);
 }

@@ -70,7 +70,7 @@ private:
 
 	static void markTileNoData(RasterTile* tile);
 
-	static void renderBindlessTextures(Canvas* canvas, const std::vector<RasterTile*>& toRender, const size_t renderStage);
+	void renderBindlessTextures(Canvas* canvas, const std::vector<RasterTile*>& toRender, const size_t renderStage);
 
     const AABB2D m_bounds;
 

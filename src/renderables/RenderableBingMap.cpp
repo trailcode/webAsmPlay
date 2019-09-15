@@ -71,7 +71,7 @@ size_t RenderableBingMap::s_numRendered = 0;
 FrameBuffer * RenderableBingMap::s_textureBuffer = nullptr;
 
 bool RenderableBingMap::s_useCache				= true;
-bool RenderableBingMap::s_useBindlessTextures	= false;
+bool RenderableBingMap::s_useBindlessTextures	= true;
 
 namespace
 {
@@ -362,7 +362,7 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 	//m_tiles.push_back(tile);
 	m_tiles.insert(RasterTile::getTile(center, level, canvas->getFrameNumber()));
-	m_tiles.insert(RasterTile::getTile(tMin + dvec2(0.001, 0.001), level, canvas->getFrameNumber())); // Should not need to do this. Rounding errors?
+	//m_tiles.insert(RasterTile::getTile(tMin + dvec2(0.001, 0.001), level, canvas->getFrameNumber())); // Should not need to do this. Rounding errors?
 
 	return true;
 }
@@ -373,6 +373,8 @@ namespace
 
 	BindlessTextureShader a_bindlessShader();
 }
+
+#include <webAsmPlay/shaders/TileBoundaryShader.h>
 
 void RenderableBingMap::renderBindlessTextures(Canvas* canvas, const vector<RasterTile*>& toRender, const size_t renderStage)
 {
@@ -402,16 +404,86 @@ void RenderableBingMap::renderBindlessTextures(Canvas* canvas, const vector<Rast
 	{
 		auto tile = toRender[i];
 
-		if (s_useBindlessTextures)
-        {
-            tile->m_renderable->setShader(BindlessTextureShader::getDefaultInstance());
+        tile->m_renderable->setShader(BindlessTextureShader::getDefaultInstance());
 
-            BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
-        }
-		else { tile->m_renderable->setShader(TextureShader::getDefaultInstance()); }
-
+        BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
+        
 		tile->m_renderable->render(canvas, renderStage);
 	}
+	
+	vector<vec4> centers;
+
+	for (size_t i = 0; i < toRender.size(); ++i)
+	{
+		auto tile = toRender[i];
+
+		//tile->m_renderable->setShader(TileBoundaryShader::getDefaultInstance());
+
+		//tile->m_renderable->render(canvas, renderStage);
+
+		const ivec2 iTile = latLongToTile(tile->m_center, tile->m_level);
+
+		const dvec2 tMin = m_trans * vec4(tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), tile->m_level), 0, 1);
+		const dvec2 tMax = m_trans * vec4(tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), tile->m_level), 0, 1);
+
+		const auto width = tMax.x - tMin.x;
+		const auto height = tMax.y - tMin.y;
+
+		if(width != height)
+		{
+
+			//dmess("DIff! " << width << " " << height);
+		}
+
+		const auto center = m_trans * vec4(tile->m_center, 0, 1);
+
+		centers.push_back(vec4(center.x, center.y, width, height));
+
+		//tile->
+	}
+
+	//dmess("centers " << centers.size());
+
+	if(!centers.size()) { return ;}
+
+	//dmess("pos " << centers[0]);
+
+	TileBoundaryShader::getDefaultInstance()->bind(canvas, false, renderStage);
+
+	//GLuint ebo  = 0;
+    //GLuint ebo2 = 0;
+    GLuint vao = 0;
+	GLuint vbo  = 0;
+    
+	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+
+    glGenBuffers(1, &vbo);
+    //glGenBuffers(1, &ebo);
+    //glGenBuffers(1, &ebo2);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    glBufferData(GL_ARRAY_BUFFER, centers.size() * sizeof(vec4), &centers[0], GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	glEnableVertexAttribArray(0);
+
+	size_t sizeVertex = 4;
+	size_t totalSize = sizeVertex * sizeof(GLfloat);
+
+	glVertexAttribPointer(0, (GLint)sizeVertex, GL_FLOAT, GL_FALSE, (GLsizei)totalSize, 0);
+	glLineWidth(3.0);
+	glDrawArrays(GL_POINTS, 0, centers.size());
+	glLineWidth(1.0);
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo);
+
+	glBindVertexArray(0);
 }
 
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
