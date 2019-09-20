@@ -54,6 +54,8 @@ public:
 
 	void ensureVAO();
 
+	size_t getNumTriangles() const;
+
 private:
 
     template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS>

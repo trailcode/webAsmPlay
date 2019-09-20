@@ -44,6 +44,7 @@ void main()
 
     EndPrimitive();
 
+	/*
 	gl_Position = MVP * (gl_in[0].gl_Position + vec4(-tileWidth[0], -tileHeight[0], 0.0, 0.0)); EmitVertex();
 	gl_Position = MVP * (gl_in[0].gl_Position + vec4( tileWidth[0],  tileHeight[0], 0.0, 0.0)); EmitVertex();
 
@@ -53,4 +54,5 @@ void main()
 	gl_Position = MVP * (gl_in[0].gl_Position + vec4(-tileWidth[0],  tileHeight[0], 0.0, 0.0)); EmitVertex();
 
 	EndPrimitive();
+	*/
 }

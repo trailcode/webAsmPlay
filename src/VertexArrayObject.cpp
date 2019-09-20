@@ -337,3 +337,5 @@ void VertexArrayObject::ensureVAO()
 
 	glBindVertexArray(0);
 }
+
+size_t VertexArrayObject::getNumTriangles() const { return m_numTrianglesIndices / 3 ;}

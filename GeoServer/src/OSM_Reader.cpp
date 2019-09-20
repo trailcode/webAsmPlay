@@ -195,7 +195,7 @@ MapData OSM_Reader::import(const string & fileName)
     size_t numInvalidPoints    = 0;
     size_t geomOperationErrors = 0;
 
-    Geometry::Ptr bounds = makeBox(boundsMinX, boundsMinY, boundsMaxX, boundsMaxY);
+    Geometry::Ptr bounds = makeBox({boundsMinX, boundsMinY}, {boundsMaxX, boundsMaxY});
 
     for(const OSM_Relations::value_type & i : relations)
     {

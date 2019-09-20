@@ -58,11 +58,11 @@ namespace
 	{
 		vector<Geometry::Ptr> ret;
 
-		auto shape = makeBox(-0.5,-0.5,0.5,0.5);
+		auto shape = makeBox({-0.5,-0.5}, {0.5,0.5});
 
-		auto inside = unionPolygons({	makeBox(-0.1,-0.1,0.1,0.1),
-										makeBox(-0.05,-0.6,0.05,0.6),
-										makeBox(-0.6,-0.05,0.6,0.05)});
+		auto inside = unionPolygons({	makeBox({-0.1 ,-0.1 }, {0.1	,0.1}),
+										makeBox({-0.05,-0.6 }, {0.05,0.6}),
+										makeBox({-0.6 ,-0.05}, {0.6	,0.05})});
 
 		shape = Geometry::Ptr(shape->buffer(buffer1));
 

@@ -27,7 +27,7 @@
 #include <fstream>
 #include <geos/geom/Point.h>
 #include <geos/geom/Polygon.h>
-#include <geos/geom/LineString.h>
+#include <geos/geom/LinearRing.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/CoordinateSequence.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
@@ -43,31 +43,37 @@ using namespace geos::geom;
 using namespace geos::operation::geounion;
 using namespace geosUtil;
 
-Geometry::Ptr geosUtil::makeBox(const double xmin, const double ymin, const double xmax, const double ymax)
+namespace
 {
-    const GeometryFactory * geomFact = GeometryFactory::getDefaultInstance();
+	auto makeBoxHelper(const GeometryFactory * geomFact, const dvec2 & min, const dvec2 & max)
+	{
+		auto temp = geomFact->getCoordinateSequenceFactory()->create((size_t) 0, 0);
 
-    CoordinateSequence * temp = geomFact->getCoordinateSequenceFactory()->create((size_t) 0, 0);
-
-    temp->add(Coordinate(xmin, ymin));
-    temp->add(Coordinate(xmin, ymax));
-    temp->add(Coordinate(xmax, ymax));
-    temp->add(Coordinate(xmax, ymin));
+		temp->add(Coordinate(min.x, min.y));
+		temp->add(Coordinate(min.x, max.y));
+		temp->add(Coordinate(max.x, max.y));
+		temp->add(Coordinate(max.x, min.y));
 	
-    // Must close the linear ring or we will get an error:
-    // "Points of LinearRing do not form a closed linestring"
-    temp->add(Coordinate(xmin, ymin));
+		// Must close the linear ring or we will get an error:
+		// "Points of LinearRing do not form a closed linestring"
+		temp->add(Coordinate(min.x, min.y));
 
-    LinearRing * shell = geomFact->createLinearRing(temp);
-
-    // nullptr in this case could instead be a collection of one or more holes
-    // in the interior of the polygon
-    return Geometry::Ptr(geomFact->createPolygon(shell, nullptr));
+		return temp;
+	}
 }
 
 Geometry::Ptr geosUtil::makeBox(const dvec2 & min, const dvec2 & max)
 {
-    return makeBox(min.x, min.y, max.x, max.y);
+	const auto geomFact = GeometryFactory::getDefaultInstance();
+
+    return Geometry::Ptr(geomFact->createPolygon(geomFact->createLinearRing(makeBoxHelper(geomFact, min, max)), nullptr));
+}
+
+Geometry::Ptr geosUtil::makeWireBox(const dvec2 & min, const dvec2 & max)
+{
+	const auto geomFact = GeometryFactory::getDefaultInstance();
+
+    return Geometry::Ptr(geomFact->createLinearRing(makeBoxHelper(geomFact, min, max)));
 }
 
 Geometry::Ptr geosUtil::unionPolygons(const initializer_list<Geometry::Ptr> & polys)

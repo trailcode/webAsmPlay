@@ -39,16 +39,14 @@ using namespace glm;
 using namespace geos;
 using namespace geos::geom;
 
-RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable(			vertexArrayObject->isMulti(),
+RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable(			vertexArrayObject,
 																									GUI::s_renderSettingsFillPolygons,
-																									GUI::s_renderSettingsRenderPolygonOutlines),
-                                                                                m_vertexArrayObject(vertexArrayObject)
+																									GUI::s_renderSettingsRenderPolygonOutlines)
 {
 }
 
 RenderablePolygon::~RenderablePolygon()
 {
-    delete m_vertexArrayObject;
 }
 
 Renderable * RenderablePolygon::create( const Polygon * poly,
@@ -67,18 +65,14 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
 		const dvec2 min = trans * dvec4(get<0>(boxUV), get<1>(boxUV), 0, 1);
 		const dvec2 max = trans * dvec4(get<2>(boxUV), get<3>(boxUV), 0, 1);
 
-		VertexArrayObject * vao = VertexArrayObject::create(tesselations, AABB2D(min.x, min.y, max.x, max.y));
+		if (auto vao = VertexArrayObject::create(tesselations, AABB2D(min.x, min.y, max.x, max.y))) { return new RenderablePolygon(vao) ;}
 
-		if (!vao) { return nullptr ;}
-
-        return new RenderablePolygon(vao);
+        return nullptr;
     }
 
-	VertexArrayObject * vao = VertexArrayObject::create(tesselations);
+	if(auto vao = VertexArrayObject::create(tesselations)) { new RenderablePolygon(vao) ;}
 
-	if (!vao) { return nullptr; }
-
-    return new RenderablePolygon(vao);
+    return nullptr;
 }
 
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
@@ -148,10 +142,14 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
     if(renderFill)
     {
         m_shader->bind(canvas, false, renderStage);
-
+		
 		m_vertexArrayObject->bindTriangles();
 
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
         m_vertexArrayObject->drawTriangles();
+
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     if(renderOutline)

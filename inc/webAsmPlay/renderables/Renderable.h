@@ -32,6 +32,7 @@
 
 class Shader;
 class Canvas;
+class VertexArrayObject;
 
 class Renderable
 {
@@ -64,11 +65,17 @@ public:
 
 	virtual void ensureVAO();
 
+	size_t getNumTriangles() const;
+
 protected:
 
     Renderable( const bool isMulti          = false,
                 const bool renderFill       = false,
                 const bool renderOutline    = false);
+
+	Renderable( VertexArrayObject	* vertexArrayObject,
+                const bool			  renderFill			= false,
+                const bool			  renderOutline			= false);
 
     Renderable(const Renderable &)              = delete;
     Renderable(      Renderable &&)             = delete;
@@ -81,5 +88,7 @@ protected:
 	bool m_isMulti			= false;
     bool m_renderFill		= true;
     bool m_renderOutline	= true;
+
+	VertexArrayObject * m_vertexArrayObject = nullptr;
 };
 

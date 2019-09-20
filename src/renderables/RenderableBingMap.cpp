@@ -342,17 +342,19 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 											/* 6 */m_trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */m_trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */m_trans * dvec4(tMax.x, tMin.y,   0, 1)};
 
 		
-		bool gotTile = false;
+		size_t numSubTiles = 0;
 
-		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { gotTile |= getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
-		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { gotTile |= getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;}
-		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { gotTile |= getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;}
-		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { gotTile |= getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;}
+		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { numSubTiles += getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
+		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { numSubTiles += getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;}
+		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { numSubTiles += getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;}
+		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { numSubTiles += getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;}
 		// TODO try projecting into a different space and doing a simpler check.
 
 		//if (gotTile) { return true; }
 
-		return gotTile;
+		if(numSubTiles == 4) { return true ;}
+
+		//return gotTile;
 
 		//dmess("Here!"); // This Should not be happening
 	}
@@ -362,6 +364,8 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & tMin, co
 
 	//m_tiles.push_back(tile);
 	m_tiles.insert(RasterTile::getTile(center, level, canvas->getFrameNumber()));
+
+	//m_tiles.insert(RasterTile::getTile(center + dvec3(0.001, 0.001, 0), level, canvas->getFrameNumber())); // Should not need to do this. Rounding errors?
 	//m_tiles.insert(RasterTile::getTile(tMin + dvec2(0.001, 0.001), level, canvas->getFrameNumber())); // Should not need to do this. Rounding errors?
 
 	return true;
@@ -375,6 +379,7 @@ namespace
 }
 
 #include <webAsmPlay/shaders/TileBoundaryShader.h>
+#include <webAsmPlay/shaders/ColorVertexShader.h>
 
 void RenderableBingMap::renderBindlessTextures(Canvas* canvas, const vector<RasterTile*>& toRender, const size_t renderStage)
 {
@@ -406,9 +411,16 @@ void RenderableBingMap::renderBindlessTextures(Canvas* canvas, const vector<Rast
 
         tile->m_renderable->setShader(BindlessTextureShader::getDefaultInstance());
 
-        BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
+        //BindlessTextureShader::getDefaultInstance()->setTextureSlot(1);
+		BindlessTextureShader::getDefaultInstance()->setTextureSlot(i);
         
+		//tile->m_renderable->setShader(ColorVertexShader::getDefaultInstance());
+
+		//glDisable(GL_BLEND);
+		//glDisable(GL_DEPTH_TEST);
+
 		tile->m_renderable->render(canvas, renderStage);
+		//tile->m_renderable->render(canvas, 0);
 	}
 	
 	vector<vec4> centers;
@@ -435,7 +447,10 @@ void RenderableBingMap::renderBindlessTextures(Canvas* canvas, const vector<Rast
 			//dmess("DIff! " << width << " " << height);
 		}
 
+		auto nCenter = (tile->m_max + tile->m_min) * 0.5;
+
 		const auto center = m_trans * vec4(tile->m_center, 0, 1);
+		//const auto center = m_trans * vec4(nCenter, 0, 1);
 
 		centers.push_back(vec4(center.x, center.y, width, height));
 
@@ -576,7 +591,35 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 				const dvec2 tMin = tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), tile->m_level);
 				const dvec2 tMax = tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), tile->m_level);
 				
+				tile->m_min = tMin;
+				tile->m_max = tMax;
+
+				/*
+				{
+					dvec2 tMin = vec4(tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), tile->m_level), 0, 1);
+					dvec2 tMax = vec4(tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), tile->m_level), 0, 1);
+
+					const auto width = tMax.x - tMin.x;
+					const auto height = tMax.y - tMin.y;
+
+					if(width != height)
+					{
+
+						//dmess("DIff! " << width << " " << height);
+					}
+
+					auto nCenter = (tile->m_max + tile->m_min) * 0.5;
+
+					tMin = nCenter - dvec2(width * 0.5, height * 0.5);
+					tMax = nCenter + dvec2(width * 0.5, height * 0.5);
+
+					tile->m_renderable = Renderable::create(makeBox(tMin, tMax), m_trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
+					//tile->m_renderable = Renderable::create(makeWireBox(tMin, tMax), m_trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
+				}
+				*/
+
 				tile->m_renderable = Renderable::create(makeBox(tMin, tMax), m_trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
+				//tile->m_renderable = Renderable::create(makeWireBox(tMin, tMax), m_trans, AABB2D(tMin.x, tMin.y, tMax.x, tMax.y));
 
 				tile->m_renderable->ensureVAO();
 
@@ -584,6 +627,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 				else						{ tile->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
 
 				tile->m_renderable->setRenderOutline (false);
+				tile->m_renderable->setRenderOutline (true);
 				tile->m_renderable->setRenderFill    (true);
 			}
 

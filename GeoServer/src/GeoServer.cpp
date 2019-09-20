@@ -139,7 +139,7 @@ string GeoServer::addOsmFile(const string & osmFile)
 
     dmess("numPolygons " << polygons.size());
 
-	auto AOI = dynamic_cast<Polygon *>(makeBox(mapData.m_boundsMinX, mapData.m_boundsMinY, mapData.m_boundsMaxX, mapData.m_boundsMaxY).release());
+	auto AOI = dynamic_cast<Polygon *>(makeBox({mapData.m_boundsMinX, mapData.m_boundsMinY}, {mapData.m_boundsMaxX, mapData.m_boundsMaxY}).release());
 
 	polygons.push_back(AttributedPoligonalArea(new Attributes(), AOI, AOI->getArea()));
 

@@ -40,6 +40,7 @@
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
+#include <webAsmPlay/VertexArrayObject.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
 using namespace std;
@@ -85,9 +86,21 @@ Renderable::Renderable( const bool isMulti,
 {
 }
 
+Renderable::Renderable( VertexArrayObject	* vertexArrayObject,
+						const bool			  renderFill,
+						const bool			  renderOutline) :	m_vertexArrayObject	(vertexArrayObject),
+																m_isMulti			(vertexArrayObject->isMulti()),
+																m_renderFill		(renderFill),
+																m_renderOutline		(renderOutline),
+																m_shader			(ColorShader::getDefaultInstance())
+{
+}
+
 Renderable::~Renderable()
 {
     for(OnDelete & callback : m_DeleteCallbacks) { callback(this) ;}
+
+	delete m_vertexArrayObject;
 }
 
 void Renderable::addOnDeleteCallback(const OnDelete & callback) { m_DeleteCallbacks.push_back(callback) ;}
@@ -104,4 +117,11 @@ bool Renderable::setRenderOutline(const bool render) { return m_renderOutline = 
 void Renderable::ensureVAO()
 {
 	dmess("Implement me!");
+}
+
+size_t Renderable::getNumTriangles() const
+{
+	if(!m_vertexArrayObject) { return 0 ;}
+
+	return m_vertexArrayObject->getNumTriangles();
 }

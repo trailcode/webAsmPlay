@@ -62,14 +62,24 @@ RasterTile::~RasterTile()
 
 RasterTile* RasterTile::getTile(const dvec2& center, const size_t level, const size_t accessTime)
 {
-	const string quadKey = tileToQuadKey(latLongToTile(center, level), level);
+	const auto tileIndex = latLongToTile(center, level);
+
+	const string quadKey = tileToQuadKey(tileIndex, level);
 
 	auto i = a_currTileSet.find(quadKey);
 
 	RasterTile* tile;
 
 	if (i != a_currTileSet.end())	{ tile = i->second ;}
-	else							{ tile = a_currTileSet[quadKey] = new RasterTile(center, level) ;}
+	else
+	{
+		const dvec2 tMin = tileToLatLong(ivec2(tileIndex.x + 0, tileIndex.y + 1), level);
+		const dvec2 tMax = tileToLatLong(ivec2(tileIndex.x + 1, tileIndex.y + 0), level);
+
+		const auto snappedCenter = (tMin + tMax) * 0.5;
+
+		tile = a_currTileSet[quadKey] = new RasterTile(snappedCenter, level);
+	}
 
 	tile->m_lastAccessTime = accessTime;
 

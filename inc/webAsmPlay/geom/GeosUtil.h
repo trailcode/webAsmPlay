@@ -58,9 +58,9 @@ namespace geosUtil
 {
     // TODO Inline a these!
 
-    geos::geom::Geometry::Ptr makeBox(const double xmin, const double ymin, const double xmax, const double ymax);
-    
     geos::geom::Geometry::Ptr makeBox(const glm::dvec2 & min, const glm::dvec2 & max);
+
+    geos::geom::Geometry::Ptr makeWireBox(const glm::dvec2 & min, const glm::dvec2 & max);
 
     geos::geom::Geometry::Ptr unionPolygons(const std::initializer_list<geos::geom::Geometry::Ptr> & polys);
 

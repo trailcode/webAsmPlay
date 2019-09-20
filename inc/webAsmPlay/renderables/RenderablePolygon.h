@@ -38,8 +38,6 @@ namespace geos
     }
 }
 
-class VertexArrayObject;
-
 class RenderablePolygon : public Renderable
 {
 public:
@@ -67,7 +65,5 @@ public:
 private:
 
     RenderablePolygon(VertexArrayObject * vertexArrayObject);
-
-    VertexArrayObject * m_vertexArrayObject;
 }; 
 
