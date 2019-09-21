@@ -46,9 +46,10 @@ atomic_size_t RasterTile::s_desiredMaxNumTiles = { 4000 };
 
 GLuint RasterTile::s_NO_DATA = numeric_limits<GLuint>::max();
 
-RasterTile::RasterTile(const dvec2& center, const size_t level) : m_center(center), m_level(level)
+RasterTile::RasterTile(const dvec2& center, const dvec2& widthHeight, const size_t level) : m_center		(center),
+																							m_widthHeight	(widthHeight),
+																							m_level			(level)
 {
-	
 }
 
 RasterTile::~RasterTile()
@@ -76,9 +77,7 @@ RasterTile* RasterTile::getTile(const dvec2& center, const size_t level, const s
 		const dvec2 tMin = tileToLatLong(ivec2(tileIndex.x + 0, tileIndex.y + 1), level);
 		const dvec2 tMax = tileToLatLong(ivec2(tileIndex.x + 1, tileIndex.y + 0), level);
 
-		const auto snappedCenter = (tMin + tMax) * 0.5;
-
-		tile = a_currTileSet[quadKey] = new RasterTile(snappedCenter, level);
+		tile = a_currTileSet[quadKey] = new RasterTile((tMin + tMax) * 0.5, tMax - tMin, level);
 	}
 
 	tile->m_lastAccessTime = accessTime;

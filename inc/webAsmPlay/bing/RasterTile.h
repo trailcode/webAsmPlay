@@ -37,7 +37,7 @@ class RasterTile
 {
 public:
 
-	RasterTile(const glm::dvec2& center, const size_t level);
+	RasterTile(const glm::dvec2& center, const glm::dvec2& widthHeight, const size_t level);
 
 	~RasterTile();
 
@@ -52,8 +52,7 @@ public:
 	bool textureReady() const;
 
 	const glm::dvec2	m_center;
-	glm::dvec2	m_min;
-	glm::dvec2	m_max;
+	const glm::dvec2	m_widthHeight;
 	const size_t		m_level;
 
 	std::atomic_bool m_loading = { false };
