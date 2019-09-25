@@ -44,7 +44,7 @@ void GUI::openSteerPanel()
     
     ImGui::Begin("OpenSteer Settings", &s_showOpenSteerPanel);
 
-        static int lines = 1000;
+        static int lines = gPedestrianStartCount;
 
         if(ImGui::SliderInt("Zombies", &lines, 1, 6000))
         {
