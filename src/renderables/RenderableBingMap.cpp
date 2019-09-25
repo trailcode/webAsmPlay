@@ -79,7 +79,7 @@ namespace
 #ifndef __EMSCRIPTEN__
 
     thread_pool a_loaderPool	(64);
-    thread_pool a_uploaderPool(1);
+    thread_pool a_uploaderPool	(1);
 	thread_pool a_writerPool	(1);
 
 #endif
@@ -324,14 +324,12 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & min, con
 	const dvec3 screenP3 = project(transP3, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
 	const dvec3 screenP4 = project(transP4, canvas->getMV_Ref(), canvas->getProjectionRef(), viewport);
 
-	const double tileSize = 256.0 * resDelta;
-
 	const double D1 = distance(screenP1, screenP2);
 	const double D2 = distance(screenP2, screenP3);
 	const double D3 = distance(screenP3, screenP4);
 	const double D4 = distance(screenP4, screenP1);
 
-	const Frustum * frust = canvas->getCameraFrustum();
+	const double tileSize = 256.0 * resDelta;
 
 	if (level < 24 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	{
@@ -344,6 +342,8 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & min, con
 											/* 6 */m_trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */m_trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */m_trans * dvec4(tMax.x, tMin.y,   0, 1)};
 
 		size_t numSubTiles = 0;
+
+		const auto frust = canvas->getCameraFrustum();
 
 		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { numSubTiles += getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
 		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { numSubTiles += getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;}
@@ -409,6 +409,8 @@ void RenderableBingMap::renderBindlessTextures(Canvas* canvas, const vector<Rast
 		//tile->m_renderable->render(canvas, 0);
 	}
 	
+	return;
+
 	vector<vec4> centers;
 
 	for (size_t i = 0; i < toRender.size(); ++i)

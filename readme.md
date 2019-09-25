@@ -3,12 +3,9 @@ WebAsmPlay
 ----------------------
 
 WebAsmPlay was initially developed to evaluate web application development using Emscripten.
-
-Currently a handful of C++ libraries have been compiled with Emscripten in this project to run in the browser
-and run natively. The idea is to test a cross platform development environment where an application
-is developed and debugged both as a web application and a native application.
-Another goal is to discover the limitations and capabilities of Emscripten web application development.
-Cross platform development is achieved using cmake.
+At the time of writing the Emscripten part is not working. Hopefully in the future it will be. 
+To see the last Emscripten build working: https://trailcode.github.io/ZombiGeoSim/index.html
+Hold down the "alt" key and move the mouse to pan. Hold down the "shift" key and move the mouse to rotate the camera.
 
 ![Screenshot](docs/webAsmPlay.jpg)
 
@@ -30,31 +27,14 @@ In the near future this project is going to be renamed to ZombieGeoSim.
     * Multiple camera modes: TrackBall and zombie tracking camera mode.
     * User definable symbology color rendering supporting transparency for both fill and outlines.
         * Camera near and far symbology can be defined for each attribute allowing for interpolated symbology blending proportional to object to camera distance.
-    * Ability to render 3D buildings. 
+    * Ability to render 3D buildings.
+    * Project BingMaps raster tiles over scene. 
+    * Create and play camera animation tracks.
 
 * Geometry Server
     * ESRI Shapefile and OpenStreetMap XML GIS formats with linestring and polygon ingestion along with attribution.
     * Fast custom attributed transport protocol.
     * Ensures linear feature topology correctness. Breaks linestrings at intersections and connections. Removes overlapping linestrings.
-
-### Dependencies
-
-Unfortunately during development notes on build depends were not tracked. Development is currently
-being done on OSX. Macports (https://www.macports.org/) and Brew (https://brew.sh/) is being used to
-install third party dependencies. C++ 14 is being used. Currently emscripten is using clang 5.0 which
-does not fully support c++ 17. On windows it is recommended to use scoop (https://scoop.sh) to install third party requirements
-
-* Cmake: https://cmake.org
-* Emscripten: http://kripken.github.io/emscripten-site
-* Glfw3: https://www.glfw.org/
-* Glew: http://glew.sourceforge.net/
-* Boost: https://www.boost.org/
-* Websocketpp: https://www.zaphoyd.com/websocketpp
-* Gdal: https://www.gdal.org/ [[Must be built with Geos]]  For Windows: http://www.gisinternals.com
-* Geos: https://trac.osgeo.org/geos
-* SDL2_image: https://www.libsdl.org/
-* Intel TBB: https://www.threadingbuildingblocks.org/
-* Visual C++ Redistributable for Visual Studio 2012 Update 4: https://www.microsoft.com/en-us/download/details.aspx?id=30679
 
 ### Sources
 
@@ -72,79 +52,10 @@ and allow C++ 17 compilation:
 * Histogram: https://github.com/HDembinski/histogram
 * SimpleJSON: https://github.com/MJPA/SimpleJSON
 
-### Art and Data
-* https://www.iconfinder.com/iconsets/32x32-free-design-icons
-
 #### Building
 
-
-The web client:
-
-``` Bash
-$ git clone https://github.com/trailcode/webAsmPlay.git
-$ cd webAsmPlay
-$ mkdir buildEmscripten
-$ cd buildEmscripten
-$ emconfigure cmake ..
-$ emmake make -j8
-```
-
-The native client:
-
-``` Base
-$ cd ..
-$ mkdir buildNative
-$ cd buildNative
-$ cmake ..
-$ make -j8
-```
-
-The server:
-
-``` Base
-cd ..
-mkdir buildServer
-cd buildServer
-cmake ../GeoServer
-make -j8
-```
-
-#### Running
-
-Start the server:
-
-``` Bash
-cd ..
-cd buildServer
-./geoServer &
-```
-
-Run the web client:
-
-``` Bash
-cd ..
-cd buildEmscripten
-emrun --browser chrome index.html
-```
-
-// TODO The instructions are out of date!
-You will need to move the the matrix panels out of the way and resize the
-scene window panel. With the mouse in the scene window scrolling with the mouse
-zooms in and out. Holding down the left shift key and moving the mouse rotates
-the camera around the object. Holding down the left alt or option key pans the
-camera on the XY plane.
-
-Run the native client:
-
-``` Bash
-cd ..
-cd buildNative
-./webAsmPlay
-```
-
-### Notes
-
-No notes.
+### Art and Data
+* https://www.iconfinder.com/iconsets/32x32-free-design-icons
 
 ### Ideas
 
