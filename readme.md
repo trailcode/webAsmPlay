@@ -7,11 +7,13 @@ At the time of writing the Emscripten part is not working. Hopefully in the futu
 To see the last Emscripten build working: https://trailcode.github.io/ZombiGeoSim/index.html Be patient to let it load.
 Hold down the "alt" key and move the mouse to pan. Hold down the "shift" key and move the mouse to rotate the camera.
 
+{::nomarkdown}
 <div align="center">
     <iframe width="620" height="315"
         src="https://www.youtube.com/embed/OhlVBpEnjig">
     </iframe>
 </div>
+{:/}
 
 ![Screenshot](docs/webAsmPlay.jpg)
 
