@@ -3,7 +3,7 @@ WebAsmPlay
 ----------------------
 
 WebAsmPlay was initially developed to evaluate web application development using Emscripten.
-At the time of writing the Emscripten part is not working. Hopefully in the future it will be. 
+Currently the Emscripten part is not working. Hopefully in the future it will be. 
 
 [![Alt text](https://img.youtube.com/vi/s0unMIQUs1U/0.jpg)](https://www.youtube.com/watch?v=s0unMIQUs1U)<br/>
 YouTube video of current native development version.
