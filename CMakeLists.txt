@@ -14,6 +14,7 @@ set(EXPAT_INSTALL "/usr/local/Cellar/expat/2.2.6") # OSX
 #set(BOOST_VERSION "1.70.0.0")
 set(BOOST_VERSION "1.69.0.0")
 
+
 if(MSVC_VERSION)
 
 	find_program(NUGET nuget)
