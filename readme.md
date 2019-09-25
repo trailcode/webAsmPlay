@@ -4,39 +4,35 @@ WebAsmPlay
 
 WebAsmPlay was initially developed to evaluate web application development using Emscripten.
 At the time of writing the Emscripten part is not working. Hopefully in the future it will be. 
+
+[![Alt text](https://img.youtube.com/vi/s0unMIQUs1U/0.jpg)](https://www.youtube.com/watch?v=s0unMIQUs1U)<br/>
+YouTube video of current native development version.
+
 To see the last Emscripten build working: https://trailcode.github.io/ZombiGeoSim/index.html Be patient to let it load.
 Hold down the "alt" key and move the mouse to pan. Hold down the "shift" key and move the mouse to rotate the camera.
 
-[![Alt text](https://img.youtube.com/vi/k5w8P2pY7xo/0.jpg)](https://www.youtube.com/watch?v=k5w8P2pY7xo)
-
-![Screenshot](docs/webAsmPlay.jpg)
-
 The current goal of this project is morphing into a Real-Time Strategy game using
 OpenSteer (http://opensteer.sourceforge.net/) and OpenStreetMap (https://www.openstreetmap.org)
-To provide a starting point for non player character(NPC) zombie bots who roam Open Street Map cities.
-NPC positions will be calculated on a server and the client application running in the browser or natively
-can query bot positions and states for the given viewport. The server will also be responsible for geometry
-generalization, bot AI, navigation graphs generated from Open Street Map data and state persistence.
-In the near future this project is going to be renamed to ZombieGeoSim. 
-
+ 
 ### Features
 
 * Ability to run the client in a supported web browser or as a native client. 
     * Object Picking where the picked object under the mouse cursor is highlighted and it's attributes are displayed.
-    * Skybox Renderer.
+    * Skybox Render.
     * Path finding over linear features.
     * Autonomous zombies wonder on paths while steering to avoid each other.
     * Multiple camera modes: TrackBall and zombie tracking camera mode.
     * User definable symbology color rendering supporting transparency for both fill and outlines.
         * Camera near and far symbology can be defined for each attribute allowing for interpolated symbology blending proportional to object to camera distance.
     * Ability to render 3D buildings.
-    * Project BingMaps raster tiles over scene. 
-    * Create and play camera animation tracks.
+    * Projection of BingMaps raster tiles over scene geometry. 
+    * Create and play camera animation paths.
 
 * Geometry Server
     * ESRI Shapefile and OpenStreetMap XML GIS formats with linestring and polygon ingestion along with attribution.
     * Fast custom attributed transport protocol.
     * Ensures linear feature topology correctness. Breaks linestrings at intersections and connections. Removes overlapping linestrings.
+    * Discover polygon topographical relations. Child(contained), parent, and neighbors. 
 
 ### Sources
 
