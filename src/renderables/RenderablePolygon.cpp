@@ -70,7 +70,7 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
         return nullptr;
     }
 
-	if(auto vao = VertexArrayObject::create(tesselations)) { new RenderablePolygon(vao) ;}
+	if(auto vao = VertexArrayObject::create(tesselations)) { return new RenderablePolygon(vao) ;}
 
     return nullptr;
 }

@@ -92,7 +92,10 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
 {
     auto ret = new Tessellation(symbologyID, height, minHeight);
 
-    const auto & coords = *poly->getExteriorRing()->getCoordinatesRO()->toVector();
+    //const auto & coords = *poly->getExteriorRing()->getCoordinatesRO()->toVector();
+	const LineString * ring = poly->getExteriorRing();
+
+    const vector<Coordinate> & coords = *ring->getCoordinatesRO()->toVector();
 
     if(coords.size() < 4)
     {
