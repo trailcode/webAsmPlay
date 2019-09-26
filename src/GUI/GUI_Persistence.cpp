@@ -45,7 +45,8 @@ using namespace std;
 using namespace glm;
 using namespace nlohmann;
 
-bool GUI::s_showSceneViewPanel                   = false;
+bool GUI::s_showGeosTestPanel					 = false;
+bool GUI::s_showBoostGeomTestPanel				 = false;
 bool GUI::s_showPerformancePanel                 = false;
 bool GUI::s_showRenderSettingsPanel              = false;
 bool GUI::s_showLogPanel                         = false;
@@ -96,8 +97,8 @@ void GUI::loadState()
         if(root.find(key) != root.end()) { value = root[key]->AsNumber() ;}
     };
 
-    setBool(L"showSceneViewPanel",                  s_showSceneViewPanel);
-    setBool(L"showPerformancePanel",                s_showPerformancePanel);
+    setBool(L"showGeosTestPanel",                   s_showGeosTestPanel);
+	setBool(L"showBoostGeomTestPanel",				s_showBoostGeomTestPanel);
     setBool(L"showPerformancePanel",                s_showPerformancePanel);
     setBool(L"showRenderSettingsPanel",             s_showRenderSettingsPanel);
     setBool(L"showLogPanel",                        s_showLogPanel);
@@ -151,7 +152,8 @@ void GUI::saveState()
     JSONObject root;
 
     // Booleans
-    root[L"showSceneViewPanel"]                   = new JSONValue(s_showSceneViewPanel);
+    root[L"showGeosTestPanel"]                    = new JSONValue(s_showGeosTestPanel);
+	root[L"showBoostGeomTestPanel"]               = new JSONValue(s_showBoostGeomTestPanel);
     root[L"showPerformancePanel"]                 = new JSONValue(s_showPerformancePanel);
     root[L"showRenderSettingsPanel"]              = new JSONValue(s_showRenderSettingsPanel);
     root[L"showLogPanel"]                         = new JSONValue(s_showLogPanel);
@@ -201,7 +203,8 @@ void GUI::saveState()
 	/*
 	json state;
 
-	state["showSceneViewPanel"]						= s_showSceneViewPanel;
+	state["showGeosTestPanel"]						= s_showGeosTestPanel;
+	state["showBoostGeomTestPanel"]					= s_showBoostGeomTestPanel;
 	state["showPerformancePanel"]					= s_showPerformancePanel;
 	state["showRenderSettingsPanel"]				= s_showRenderSettingsPanel;
     state["showLogPanel"]							= s_showLogPanel;

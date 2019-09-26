@@ -52,17 +52,47 @@ Tessellation::~Tessellation()
     free(m_triangleIndices);
 }
 
+template<typename CoordVec>
+void Tessellation::tessellateRing(	const dmat4		& trans,
+									const CoordVec	& inVerts,
+									Tessellation	* tess,
+									vector<double>	& outVerts,
+									const bool		  isOuter)
+{
+	const size_t num = inVerts.size() - 1;
+
+	if(trans == dmat4(1.0))
+	{
+		for(size_t i = 0; i < num; ++i)
+		{
+			append2d(outVerts, inVerts[i]);
+
+			append2ui(tess->m_lineIndices, i, (i + 1) % num);
+		}
+	}
+	else
+	{
+		for(size_t i = 0; i < num; ++i)
+		{
+			append2d(outVerts, trans * __(inVerts[i], 0, 1));
+
+			append2ui(tess->m_lineIndices, i, (i + 1) % num);
+		}
+	}
+
+	tess->m_counterVertIndices.push_back(0);
+	tess->m_counterVertIndices.push_back(uint32_t(outVerts.size()));
+}
+
 Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
 														const dmat4   & trans,
 														const size_t    symbologyID,
 														const double    height,
 														const double    minHeight)
 {
-    Tessellation * ret = new Tessellation(symbologyID, height, minHeight);
+    auto ret = new Tessellation(symbologyID, height, minHeight);
 
-    const LineString * ring = poly->getExteriorRing();
-
-    const vector<Coordinate> & coords = *ring->getCoordinatesRO()->toVector();
+    const auto & coords = *poly->getExteriorRing()->getCoordinatesRO()->toVector();
 
     if(coords.size() < 4)
     {
@@ -71,31 +101,11 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
         return unique_ptr<const Tessellation>(ret);
     }
 
-    vector<double> verts;
-    
-    const size_t num = coords.size() - 1;
+	vector<double> verts;
 
-    if(trans == dmat4(1.0))
-    {
-        for(size_t i = 0; i < num; ++i)
-        {
-            append2d(verts, coords[i]);
+	tessellateRing(trans, coords, ret, verts, true);
 
-            append2ui(ret->m_lineIndices, i, (i + 1) % num);
-        }
-    }
-    else
-    {
-        for(size_t i = 0; i < num; ++i)
-        {
-            append2d(verts, trans * __(coords[i], 0, 1));
-
-            append2ui(ret->m_lineIndices, i, (i + 1) % num);
-        }
-    }
-
-    ret->m_counterVertIndices.push_back(0);
-    ret->m_counterVertIndices.push_back(uint32_t(verts.size()));
+	//if(poly->getNumInteriorRing())dmess("poly->getNumInteriorRing() " << poly->getNumInteriorRing());
 
     for(size_t i = 0; i < poly->getNumInteriorRing(); ++i)
     {
@@ -150,6 +160,19 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
     return unique_ptr<const Tessellation>(ret);
 }
 
+Tessellation::ConstPtr Tessellation::tessellatePolygon(	const boostGeomUtil::Polygon	& poly,
+														const dmat4						& trans,
+														const size_t					  symbologyID,
+														const double					  height,
+														const double					  minHeight)
+{
+	Tessellation * ret = new Tessellation(symbologyID, height, minHeight);
+
+	//poly.outer().
+
+	return unique_ptr<const Tessellation>(ret);
+}
+
 void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
                                             const dmat4         & trans,
                                             Tessellations       & tessellations,
@@ -168,6 +191,18 @@ void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
             tessellations.pop_back();
         }
     }
+}
+
+void Tessellation::tessellateMultiPolygon(	const boostGeomUtil::MultiPolygon	& multiPoly,
+											const dmat4							& trans,
+											Tessellations						& tessellations,
+											const size_t						  symbologyID)
+{
+	for(const auto & poly : multiPoly)
+	{
+		
+
+	}
 }
 
 bool Tessellation::isEmpty() const { return m_verts == nullptr ;}

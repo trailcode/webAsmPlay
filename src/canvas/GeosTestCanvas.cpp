@@ -25,8 +25,11 @@
 */
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/shaders/ColorShader.h>
 #include <webAsmPlay/shaders/ColorVertexShader.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
@@ -37,6 +40,8 @@ using namespace std;
 using namespace glm;
 using namespace geos::geom;
 using namespace geosUtil;
+
+//using bg = boost::geometry;
 
 GeosTestCanvas::GeosTestCanvas() :  m_buffer1(-1),
                                     m_buffer2(-1),
@@ -49,6 +54,9 @@ GeosTestCanvas::~GeosTestCanvas()
 {
 
 }
+
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/box.hpp>
 
 namespace
 {
@@ -83,6 +91,56 @@ namespace
 
 		return ret;
 	}
+
+	void boostMakeBox(const dvec2 & min, const dvec2 & max)
+	{
+		
+	}
+
+	void doBoostGeomTest1(const float buffer1,
+										const float buffer2,
+										const float buffer3)
+	{
+		using namespace boost::geometry;
+		using boostGeomUtil::CoordinateType;
+		using boostGeomUtil::Point;
+		using boostGeomUtil::Box;
+		using boostGeomUtil::Polygon;
+		using boostGeomUtil::MultiPolygon;
+		/*		
+		typedef double coordinate_type;
+		typedef boost::geometry::model::d2::point_xy<coordinate_type> Point;
+		typedef boost::geometry::model::box<Point> Box;
+		typedef boost::geometry::model::polygon<Point> Polygon;
+		*/
+
+		//auto bx = make<boost::geometry::model::box<Point>>(boost::geometry::model::d2::point_xy<coordinate_type>(-0.5, -0.5), boost::geometry::model::d2::point_xy<coordinate_type>(0.5, 0.5));
+		//Box bx = 
+		
+		Polygon bx;
+
+		convert(Box(Point(-0.5, -0.5), Point(0.5, 0.5)), bx);
+		
+		const double buffer_distance = 0.1;
+		const int points_per_circle = 36;
+
+		boost::geometry::strategy::buffer::distance_symmetric<CoordinateType> distance_strategy(buffer_distance);
+		boost::geometry::strategy::buffer::join_round join_strategy(points_per_circle);
+		boost::geometry::strategy::buffer::end_round end_strategy(points_per_circle);
+		boost::geometry::strategy::buffer::point_circle circle_strategy(points_per_circle);
+		boost::geometry::strategy::buffer::side_straight side_strategy;
+		
+		boost::geometry::model::multi_polygon<Polygon> result;
+
+		boost::geometry::model::linestring<Point> ls;
+		boost::geometry::read_wkt("LINESTRING(0 0,4 5,7 4,10 6)", ls);
+
+		boost::geometry::buffer(bx, result, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
+		//boost::geometry::buffer(ls, result, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
+
+		//return_buffer(bx, 0.1);
+
+	}
 }
 
 void GeosTestCanvas::setGeomParameters( const float buffer1,
@@ -104,7 +162,9 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
 	for (const auto& geom : doGeosTest1(buffer1, buffer2, buffer3))
 	{
-		Renderable * renderable = Renderable::create(geom, trans);
+		auto renderable = Renderable::create(geom, trans);
+
+		if(!renderable) { continue ;}
 
 		static ColorVertexShader * shader = nullptr;
 
@@ -115,6 +175,9 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
 		renderable->setShader(shader);
 		//renderable->setShader(ColorVertexShader::getDefaultInstance());
+
+		renderable->setRenderFill(true);
+		renderable->setRenderOutline(true);
 
 		addRenderable(renderable);
 

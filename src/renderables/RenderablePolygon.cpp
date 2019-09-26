@@ -130,6 +130,14 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
     return ret;
 }
 
+Renderable * RenderablePolygon::create( const boostGeomUtil::MultiPolygon	& multiPoly,
+										const dmat4							& trans,
+										const size_t						  symbologyID,
+										const AABB2D						& boxUV)
+{
+	return nullptr;
+}
+
 void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
 {
 	const bool renderFill		= getRenderFill()		&& m_shader->m_shouldRender(false,	renderStage);

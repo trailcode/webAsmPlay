@@ -366,7 +366,8 @@ void GUI::showMainMenuBar()
 
     if(ImGui::BeginMenu("View"))
     {
-        if (ImGui::MenuItem("Geos Tests"))				{ s_showSceneViewPanel					^= 1 ;}
+        if (ImGui::MenuItem("Geos Tests"))				{ s_showGeosTestPanel					^= 1 ;}
+		if (ImGui::MenuItem("Boost Geometry Tests"))	{ s_showBoostGeomTestPanel				^= 1 ;}
         if (ImGui::MenuItem("Performance"))				{ s_showPerformancePanel				^= 1 ;}
         if (ImGui::MenuItem("Render Settings"))			{ s_showRenderSettingsPanel				^= 1 ;}
         if (ImGui::MenuItem("Log"))						{ s_showLogPanel						^= 1 ;}

@@ -1,4 +1,4 @@
-/**
+﻿/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -21,7 +21,7 @@
 
   \author Matthew Tang
   \email trailcode@gmail.com
-  \copyright 2018
+  \copyright 2019
 */
 
 #include <webAsmPlay/Util.h>
@@ -30,40 +30,7 @@
 #include <webAsmPlay/canvas/GeosTestCanvas.h>
 #include <webAsmPlay/FrameBuffer.h>
 
-void GUI::geosTestPanel()
+void GUI::boostGeomTestPanel()
 {
-    s_geosTestCanvas->setEnabled(s_showGeosTestPanel);
-
-    if(!s_showGeosTestPanel) { return ;}
-    
-    ImGui::Begin("Geos Tests", &s_showGeosTestPanel);
-
-        const ImVec2 pos = ImGui::GetCursorScreenPos();
-
-        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
-
-		s_geosTestCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
-
-        s_geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
-
-        ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)s_geosTestCanvas->render(),
-                                                pos,
-                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-                                                ImVec2(0, 1),
-                                                ImVec2(1, 0));
-        
-        static float buffer1 = 0.1f;
-        static float buffer2 = 0.02f;
-        static float buffer3 = 0.22f;
-
-        ImGui::SliderFloat("buffer1", &buffer1, 0.0f, 0.3f, "buffer1 = %.3f");
-        ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");
-        ImGui::SliderFloat("buffer3", &buffer3, 0.0f, 0.3f, "buffer3 = %.3f");
-
-        s_geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
-
-		if (ImGui::Button("Export GeoJSON")) { s_geosTestCanvas->exportGeoJson(); }
-		
-    ImGui::End();
+	
 }
-

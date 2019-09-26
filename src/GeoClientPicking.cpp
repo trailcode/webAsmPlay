@@ -131,7 +131,12 @@ pair<Renderable *, Attributes *> GeoClient::pickPolygonRenderable(const vec3 & _
 			get<0>(*smallest)->setRenderFill   (true);
 			get<0>(*smallest)->setRenderOutline(true);
 		}
-		else { dmess("Warn! Could not create renderable!") ;}
+		else
+		{
+			//Renderable::create(get<1>(*smallest), m_trans);
+
+			dmess("Warn! Could not create renderable!");
+		}
 	}
 
     return make_pair(get<0>(*smallest), get<2>(*smallest));

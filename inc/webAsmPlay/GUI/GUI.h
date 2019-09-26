@@ -165,6 +165,7 @@ private:
     static void renderSettingsPanel();
     static void attributePanel(const std::string & attrsStr);
     static void geosTestPanel();
+	static void boostGeomTestPanel();
     static void GUI_Settings_Panel();
     static void symbologyPanel();
     static void openSteerTestPanel();
@@ -187,7 +188,8 @@ private:
     static void windowFocusCallback     (GLFWwindow * window, int focused);
     static void cursorEnterCallback     (GLFWwindow * window, int entered);
     
-    static bool s_showSceneViewPanel;
+    static bool s_showGeosTestPanel;
+	static bool s_showBoostGeomTestPanel;
     static bool s_showPerformancePanel;
     static bool s_showRenderSettingsPanel;
     static bool s_showLogPanel;
