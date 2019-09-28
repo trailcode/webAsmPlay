@@ -174,7 +174,7 @@ vector<Geometry::Ptr> __(const vector<const LineString *> & lineStrings)
     return ret;
 }
 
-Point * geosUtil::__(const dvec2 & pos)
+Point * geosUtil::getPoint(const dvec2 & pos)
 {
     return GeometryFactory::getDefaultInstance()->createPoint(Coordinate(pos.x, pos.y));
 }

@@ -25,13 +25,27 @@
 */
 #pragma once
 
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
 #include <boost/geometry.hpp>
 
-namespace boostGeomUtil
+namespace geos
+{
+	namespace geom
+	{
+		class Polygon;
+	}
+}
+
+namespace boostGeom
 {
 	typedef double CoordinateType;
 	typedef boost::geometry::model::d2::point_xy<CoordinateType> Point;
 	typedef boost::geometry::model::box<Point> Box;
 	typedef boost::geometry::model::polygon<Point> Polygon;
 	typedef boost::geometry::model::multi_polygon<Polygon> MultiPolygon;
+
+	Polygon convert(const geos::geom::Polygon * poly);
 }
+
+inline glm::dvec2 __(const boostGeom::Point & point) { return { point.x(), point.y() } ;}

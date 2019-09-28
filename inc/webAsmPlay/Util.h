@@ -204,6 +204,14 @@ inline glm::dvec4 append2d(std::vector<double> & data, const glm::dvec4 & value)
     return value;
 }
 
+inline glm::dvec2 append2d(std::vector<double> & data, const glm::dvec2 & value)
+{
+    data.push_back(value.x);
+    data.push_back(value.y);
+
+    return value;
+}
+
 template<typename T>
 inline void append2ui(std::vector<uint32_t> & data, const T A, const T B)
 {

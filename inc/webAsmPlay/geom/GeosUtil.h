@@ -72,8 +72,6 @@ namespace geosUtil
 
     std::vector<geos::geom::Geometry::Ptr> __(const std::vector<const geos::geom::LineString *> & lineStrings);
 
-    geos::geom::Point * __(const glm::dvec2 & pos);
-
     inline geos::geom::Coordinate ___(const glm::dvec2 & pos) { return geos::geom::Coordinate(pos.x, pos.y) ;}
 
     glm::dvec2 __(const geos::geom::Coordinate & point);
@@ -83,8 +81,6 @@ namespace geosUtil
     std::vector<glm::dvec2> __(const std::vector<geos::geom::Coordinate> * coords);
 
     std::vector<glm::dvec2> __(const std::unique_ptr<std::vector<geos::geom::Coordinate> > & coords);
-
-    geos::geom::Coordinate ___(const glm::dvec2 & point);
 
     inline glm::dvec4 __(const geos::geom::Coordinate & v, const double z, const double w) { return glm::dvec4(v.x, v.y, z, w) ;}
 
@@ -146,6 +142,8 @@ namespace geosUtil
 	std::string writeGeoJsonFile(const std::string& fileName, const geos::geom::Geometry * geom);
 
 	std::string writeGeoJsonFile(const std::string& fileName, geos::geom::Geometry::Ptr & geom);
+
+	geos::geom::Point * getPoint(const glm::dvec2 & pos);
 
 	inline geos::geom::Point		* geosPoint			(geos::geom::Geometry* geom) { return dynamic_cast<geos::geom::Point*>			(geom); }
 	inline geos::geom::LineString	* geosLineString	(geos::geom::Geometry* geom) { return dynamic_cast<geos::geom::LineString*>		(geom); }

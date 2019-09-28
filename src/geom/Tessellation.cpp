@@ -32,6 +32,7 @@
 
 #include <GLU/tessellate.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/Tessellation.h>
 
@@ -67,7 +68,7 @@ void Tessellation::tessellateRing(	const dmat4		& trans,
 	{
 		for(size_t i = 0; i < num; ++i)
 		{
-			append2d(outVerts, inVerts[i]);
+			append2d(outVerts, __(inVerts[i]));
 
 			append2ui(tess->m_lineIndices, i + offset, ((i + 1) % num) + offset);
 		}
@@ -76,7 +77,7 @@ void Tessellation::tessellateRing(	const dmat4		& trans,
 	{
 		for(size_t i = 0; i < num; ++i)
 		{
-			append2d(outVerts, trans * __(inVerts[i], 0, 1));
+			append2d(outVerts, trans * dvec4(__(inVerts[i]), 0, 1));
 
 			append2ui(tess->m_lineIndices, i + offset, ((i + 1) % num) + offset);
 		}
@@ -144,17 +145,39 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
     return unique_ptr<const Tessellation>(ret);
 }
 
-Tessellation::ConstPtr Tessellation::tessellatePolygon(	const boostGeomUtil::Polygon	& poly,
-														const dmat4						& trans,
-														const size_t					  symbologyID,
-														const double					  height,
-														const double					  minHeight)
+Tessellation::ConstPtr Tessellation::tessellatePolygon(	const boostGeom::Polygon	& poly,
+														const dmat4					& trans,
+														const size_t				  symbologyID,
+														const double				  height,
+														const double				  minHeight)
 {
-	Tessellation * ret = new Tessellation(symbologyID, height, minHeight);
+	auto ret = new Tessellation(symbologyID, height, minHeight);
 
-	//poly.outer().
+	if(poly.outer().size() < 4)
+	{
+		dmess("Bad geometry!");
 
-	return unique_ptr<const Tessellation>(ret);
+        return unique_ptr<const Tessellation>(ret);
+	}
+
+	vector<double> verts;
+
+	tessellateRing(trans, poly.outer(), ret, verts, true);
+
+	vector<const double *> counterVertPtrs;
+
+    for(size_t i = 0; i < ret->m_counterVertIndices.size(); ++i) { counterVertPtrs.push_back(&verts[0] + ret->m_counterVertIndices[i]) ;}
+
+    tessellate( &ret->m_verts,
+                &ret->m_numVerts,
+                &ret->m_triangleIndices,
+                &ret->m_numTriangles,
+                &counterVertPtrs[0],
+                &counterVertPtrs[0] + counterVertPtrs.size());
+
+    for(size_t i = 0; i < ret->m_counterVertIndices.size(); ++i) { ret->m_counterVertIndices[i] /= 2 ;}
+
+    return unique_ptr<const Tessellation>(ret);
 }
 
 void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
@@ -177,15 +200,21 @@ void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
     }
 }
 
-void Tessellation::tessellateMultiPolygon(	const boostGeomUtil::MultiPolygon	& multiPoly,
-											const dmat4							& trans,
-											Tessellations						& tessellations,
-											const size_t						  symbologyID)
+void Tessellation::tessellateMultiPolygon(	const boostGeom::MultiPolygon	& multiPoly,
+											const dmat4						& trans,
+											Tessellations					& tessellations,
+											const size_t					  symbologyID)
 {
 	for(const auto & poly : multiPoly)
 	{
-		
+		tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
+            
+        if(!(*tessellations.rbegin())->m_verts)
+        {
+            dmess("Warning tessellation failed!");
 
+            tessellations.pop_back();
+        }
 	}
 }
 

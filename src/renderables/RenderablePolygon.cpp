@@ -88,6 +88,32 @@ Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
     return new RenderablePolygon(VertexArrayObject::create(tessellations));
 }
 
+Renderable * RenderablePolygon::create( const boostGeom::Polygon	& polygon,
+										const dmat4					& trans,
+										const size_t				  symbologyID,
+										const AABB2D				& boxUV)
+{
+	Tessellations tesselations;
+
+    tesselations.push_back(Tessellation::tessellatePolygon(polygon, trans, symbologyID));
+
+	if((*tesselations.begin())->isEmpty()) { return nullptr ;}
+
+    return new RenderablePolygon(VertexArrayObject::create(tesselations));
+}
+
+Renderable * RenderablePolygon::create( const boostGeom::MultiPolygon	& multiPoly,
+										const dmat4						& trans,
+										const size_t					  symbologyID,
+										const AABB2D					& boxUV)
+{
+	Tessellations tessellations;
+
+    Tessellation::tessellateMultiPolygon(multiPoly, trans, tessellations, symbologyID);
+
+    return new RenderablePolygon(VertexArrayObject::create(tessellations));
+}
+
 Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
                                         const dmat4              & trans,
                                         const bool                 showProgress)
@@ -128,14 +154,6 @@ Renderable * RenderablePolygon::create( const ColoredGeometryVec & polygons,
     if(showProgress) { GUI::progress("", 1.0) ;}
 
     return ret;
-}
-
-Renderable * RenderablePolygon::create( const boostGeomUtil::MultiPolygon	& multiPoly,
-										const dmat4							& trans,
-										const size_t						  symbologyID,
-										const AABB2D						& boxUV)
-{
-	return nullptr;
 }
 
 void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)

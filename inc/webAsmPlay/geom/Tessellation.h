@@ -43,7 +43,7 @@ public:
                                         const double						  height      = 0.0,
                                         const double						  minHeight   = 0.0);
 
-	static ConstPtr tessellatePolygon(	const boostGeomUtil::Polygon		& poly,
+	static ConstPtr tessellatePolygon(	const boostGeom::Polygon			& poly,
                                         const glm::dmat4					& trans,
                                         const size_t						  symbologyID = 0,
                                         const double						  height      = 0.0,
@@ -54,7 +54,7 @@ public:
                                         Tessellations						& tessellations,
                                         const size_t						  symbologyID);
 
-	static void tessellateMultiPolygon( const boostGeomUtil::MultiPolygon	& multiPoly,
+	static void tessellateMultiPolygon( const boostGeom::MultiPolygon		& multiPoly,
                                         const glm::dmat4					& trans,
                                         Tessellations						& tessellations,
                                         const size_t						  symbologyID);

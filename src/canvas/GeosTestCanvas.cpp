@@ -97,16 +97,16 @@ namespace
 		
 	}
 
-	void doBoostGeomTest1(const float buffer1,
+	boostGeom::Polygon doBoostGeomTest1(const float buffer1,
 										const float buffer2,
 										const float buffer3)
 	{
 		using namespace boost::geometry;
-		using boostGeomUtil::CoordinateType;
-		using boostGeomUtil::Point;
-		using boostGeomUtil::Box;
-		using boostGeomUtil::Polygon;
-		using boostGeomUtil::MultiPolygon;
+		using boostGeom::CoordinateType;
+		using boostGeom::Point;
+		using boostGeom::Box;
+		using boostGeom::Polygon;
+		using boostGeom::MultiPolygon;
 		/*		
 		typedef double coordinate_type;
 		typedef boost::geometry::model::d2::point_xy<coordinate_type> Point;
@@ -139,7 +139,7 @@ namespace
 		//boost::geometry::buffer(ls, result, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
 
 		//return_buffer(bx, 0.1);
-
+		return bx;
 	}
 }
 
@@ -160,11 +160,17 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
 	const mat4 trans = scale(mat4(1.0), vec3(0.6, 0.6, 0.6));
 
-	for (const auto& geom : doGeosTest1(buffer1, buffer2, buffer3))
+	//for (const auto& geom : doGeosTest1(buffer1, buffer2, buffer3))
+	//for (const auto& geom : doBoostGeomTest1(buffer1, buffer2, buffer3))
 	{
-		auto renderable = Renderable::create(geom, trans);
+		auto geom = doBoostGeomTest1(buffer1, buffer2, buffer3);
+		
+		//auto renderable = Renderable::create(geom, trans);
 
-		if(!renderable) { continue ;}
+		auto renderable = RenderablePolygon::create(geom, trans);
+
+		//if(!renderable) { continue ;}
+		if(!renderable) { return ;}
 
 		static ColorVertexShader * shader = nullptr;
 

@@ -218,7 +218,7 @@ MapData OSM_Reader::import(const string & fileName)
                     }
 
                     // TODO, do we need to clip to the bounds?
-                    ret.m_geometry.push_back(AttributedGeometry(node->m_attrs.release(), __(node->m_pos)));
+                    ret.m_geometry.push_back(AttributedGeometry(node->m_attrs.release(), getPoint(node->m_pos)));
 
                     break;
                 }
@@ -337,7 +337,7 @@ MapData OSM_Reader::import(const string & fileName)
 		{
 			// Most of these seems to be trees
 			// TODO, do we need to clip to the bounds?
-            ret.m_geometry.push_back(AttributedGeometry(i.second->m_attrs.release(), __(i.second->m_pos)));
+            ret.m_geometry.push_back(AttributedGeometry(i.second->m_attrs.release(), getPoint(i.second->m_pos)));
 		}
     }
 
