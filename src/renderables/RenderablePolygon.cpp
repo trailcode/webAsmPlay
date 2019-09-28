@@ -39,9 +39,9 @@ using namespace glm;
 using namespace geos;
 using namespace geos::geom;
 
-RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable(			vertexArrayObject,
-																									GUI::s_renderSettingsFillPolygons,
-																									GUI::s_renderSettingsRenderPolygonOutlines)
+RenderablePolygon::RenderablePolygon(VertexArrayObject * vertexArrayObject) :   Renderable(	vertexArrayObject,
+																							GUI::s_renderSettingsFillPolygons,
+																							GUI::s_renderSettingsRenderPolygonOutlines)
 {
 }
 
