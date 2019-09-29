@@ -82,6 +82,10 @@ private:
 								std::vector<double>	& outVerts,
 								const bool			  isOuter);
 
+	static Tessellation::ConstPtr doTessellation(Tessellation * tess, const std::vector<double> & verts);
+
+	static void addTessellation(Tessellations & tessellations, ConstPtr tess);
+
     friend class VertexArrayObject;
 
     double    * m_verts           = nullptr; // TODO make object oriented 

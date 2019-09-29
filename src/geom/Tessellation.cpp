@@ -94,55 +94,78 @@ void Tessellation::tessellateRing(	const dmat4		& trans,
 	}
 }
 
+namespace
+{
+	template<typename CoordsType>
+	inline bool checkCoords(const CoordsType & coords)
+	{
+		if(coords.size() < 4)
+		{
+			dmess("Bad geometry!");
+
+			return false;
+		}
+
+		return true;
+	}
+}
+
+void Tessellation::addTessellation(Tessellations & tessellations, ConstPtr tess)
+{
+	tessellations.emplace_back(tess);
+            
+    if(!(*tessellations.rbegin())->m_verts)
+    {
+        dmess("Warning tessellation failed!");
+
+        tessellations.pop_back();
+    }
+}
+
+Tessellation::ConstPtr Tessellation::doTessellation(Tessellation * tess, const vector<double> & verts)
+{
+	vector<const double *> counterVertPtrs;
+
+	for(size_t i = 0; i < tess->m_counterVertIndices.size(); ++i) { counterVertPtrs.push_back(&verts[0] + tess->m_counterVertIndices[i]) ;}
+
+	tessellate( &tess->m_verts,
+				&tess->m_numVerts,
+				&tess->m_triangleIndices,
+				&tess->m_numTriangles,
+				&counterVertPtrs[0],
+				&counterVertPtrs[0] + counterVertPtrs.size());
+
+	for(size_t i = 0; i < tess->m_counterVertIndices.size(); ++i) { tess->m_counterVertIndices[i] /= 2 ;}
+
+	return unique_ptr<const Tessellation>(tess);
+}
+
 Tessellation::ConstPtr Tessellation::tessellatePolygon(	const Polygon * poly,
 														const dmat4   & trans,
 														const size_t    symbologyID,
 														const double    height,
 														const double    minHeight)
 {
-    auto ret = new Tessellation(symbologyID, height, minHeight);
+    auto tess = new Tessellation(symbologyID, height, minHeight);
 
     const auto & coords = *poly->getExteriorRing()->getCoordinatesRO()->toVector();
 	
-    if(coords.size() < 4)
-    {
-        dmess("Bad geometry!");
-
-        return unique_ptr<const Tessellation>(ret);
-    }
+	if(!checkCoords(coords)) { return unique_ptr<const Tessellation>(tess) ;}
 
 	vector<double> verts;
 
-	tessellateRing(trans, coords, ret, verts, true);
+	tessellateRing(trans, coords, tess, verts, true);
 
     for(size_t i = 0; i < poly->getNumInteriorRing(); ++i)
     {
         const auto & coords = *poly->getInteriorRingN(i)->getCoordinates()->toVector();
 
-        if(coords.size() < 4)
-        {
-            dmess("Bad geometry!");
+        if(!checkCoords(coords)) { return unique_ptr<const Tessellation>(tess) ;}
 
-            return unique_ptr<const Tessellation>(ret);
-        }
-
-		tessellateRing(trans, coords, ret, verts, false);
+		tessellateRing(trans, coords, tess, verts, false);
     }
 
-    vector<const double *> counterVertPtrs;
-
-    for(size_t i = 0; i < ret->m_counterVertIndices.size(); ++i) { counterVertPtrs.push_back(&verts[0] + ret->m_counterVertIndices[i]) ;}
-
-    tessellate( &ret->m_verts,
-                &ret->m_numVerts,
-                &ret->m_triangleIndices,
-                &ret->m_numTriangles,
-                &counterVertPtrs[0],
-                &counterVertPtrs[0] + counterVertPtrs.size());
-
-    for(size_t i = 0; i < ret->m_counterVertIndices.size(); ++i) { ret->m_counterVertIndices[i] /= 2 ;}
-
-    return unique_ptr<const Tessellation>(ret);
+	return doTessellation(tess, verts);
 }
 
 Tessellation::ConstPtr Tessellation::tessellatePolygon(	const boostGeom::Polygon	& poly,
@@ -151,33 +174,22 @@ Tessellation::ConstPtr Tessellation::tessellatePolygon(	const boostGeom::Polygon
 														const double				  height,
 														const double				  minHeight)
 {
-	auto ret = new Tessellation(symbologyID, height, minHeight);
+	auto tess = new Tessellation(symbologyID, height, minHeight);
 
-	if(poly.outer().size() < 4)
-	{
-		dmess("Bad geometry!");
-
-        return unique_ptr<const Tessellation>(ret);
-	}
+	if(!checkCoords(poly.outer())) { return unique_ptr<const Tessellation>(tess) ;}
 
 	vector<double> verts;
 
-	tessellateRing(trans, poly.outer(), ret, verts, true);
+	tessellateRing(trans, poly.outer(), tess, verts, true);
 
-	vector<const double *> counterVertPtrs;
+	for(const auto & ring : poly.inners())
+	{
+		if(!checkCoords(ring)) { return unique_ptr<const Tessellation>(tess) ;}
 
-    for(size_t i = 0; i < ret->m_counterVertIndices.size(); ++i) { counterVertPtrs.push_back(&verts[0] + ret->m_counterVertIndices[i]) ;}
+		tessellateRing(trans, ring, tess, verts, false);
+	}
 
-    tessellate( &ret->m_verts,
-                &ret->m_numVerts,
-                &ret->m_triangleIndices,
-                &ret->m_numTriangles,
-                &counterVertPtrs[0],
-                &counterVertPtrs[0] + counterVertPtrs.size());
-
-    for(size_t i = 0; i < ret->m_counterVertIndices.size(); ++i) { ret->m_counterVertIndices[i] /= 2 ;}
-
-    return unique_ptr<const Tessellation>(ret);
+	return doTessellation(tess, verts);
 }
 
 void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
@@ -187,16 +199,10 @@ void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
 {
     for(size_t i = 0; i < multiPoly->getNumGeometries(); ++i)
     {
-        const Polygon * poly = dynamic_cast<const Polygon *>(multiPoly->getGeometryN(i));
-
-        tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
-            
-        if(!(*tessellations.rbegin())->m_verts)
-        {
-            dmess("Warning tessellation failed!");
-
-            tessellations.pop_back();
-        }
+		addTessellation(tessellations,
+						Tessellation::tessellatePolygon(dynamic_cast<const Polygon *>(multiPoly->getGeometryN(i)),
+														trans,
+														symbologyID));
     }
 }
 
@@ -207,14 +213,10 @@ void Tessellation::tessellateMultiPolygon(	const boostGeom::MultiPolygon	& multi
 {
 	for(const auto & poly : multiPoly)
 	{
-		tessellations.push_back(Tessellation::tessellatePolygon(poly, trans, symbologyID));
-            
-        if(!(*tessellations.rbegin())->m_verts)
-        {
-            dmess("Warning tessellation failed!");
-
-            tessellations.pop_back();
-        }
+		addTessellation(tessellations,
+						Tessellation::tessellatePolygon(poly,
+														trans,
+														symbologyID));
 	}
 }
 

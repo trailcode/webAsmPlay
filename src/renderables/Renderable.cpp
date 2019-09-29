@@ -77,6 +77,22 @@ Renderable * Renderable::create(const Geometry * geom,
     return nullptr;
 }
 
+Renderable * Renderable::create(const boostGeom::Polygon		& polygon,
+								const dmat4						& trans,
+                                const size_t					  symbologyID,
+                                const AABB2D					& boxUV)
+{
+	return RenderablePolygon::create(polygon, trans, symbologyID, boxUV);
+}
+
+Renderable * Renderable::create(const boostGeom::MultiPolygon	& multiPoly,
+								const dmat4						& trans,
+								const size_t					  symbologyID,
+								const AABB2D					& boxUV)
+{
+	return RenderablePolygon::create(multiPoly, trans, symbologyID, boxUV);
+}
+
 Renderable::Renderable( const bool isMulti,
                         const bool renderFill,
                         const bool renderOutline) : m_isMulti       (isMulti),

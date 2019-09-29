@@ -3,6 +3,8 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/geom/BoostGeomUtil.h>
 
+using namespace glm;
+using namespace boost::geometry;
 using namespace boostGeom;
 
 Polygon boostGeom::convert(const geos::geom::Polygon * poly)
@@ -14,4 +16,41 @@ Polygon boostGeom::convert(const geos::geom::Polygon * poly)
 	dmessError("Implement innors!");
 
 	return ret;
+}
+
+MultiPolygon boostGeom::unionPolygons(const MultiPolygon & polys)
+{
+	MultiPolygon ret;
+
+	for(const auto & poly : polys)
+	{
+		MultiPolygon tmp;
+
+		union_(ret, poly, tmp);
+
+		ret = tmp;
+	}
+
+	return ret;
+}
+
+Polygon boostGeom::makePolygonBox(const dvec2 & min, const dvec2 & max)
+{
+	Polygon bx;
+
+	boost::geometry::convert(Box(Point(min.x, min.y), Point(max.x, max.y)), bx);
+
+	return bx;
+}
+
+Polygon boostGeom::makeTriangle(const dvec2 & A, const dvec2 & B, const dvec2 & C)
+{
+	Polygon tri;
+
+	tri.outer().push_back({A.x, A.y});
+	tri.outer().push_back({B.x, B.y});
+	tri.outer().push_back({C.x, C.y});
+	tri.outer().push_back({A.x, A.y});
+
+	return tri;
 }

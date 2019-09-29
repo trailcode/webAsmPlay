@@ -99,7 +99,9 @@ Renderable * RenderablePolygon::create( const boostGeom::Polygon	& polygon,
 
 	if((*tesselations.begin())->isEmpty()) { return nullptr ;}
 
-    return new RenderablePolygon(VertexArrayObject::create(tesselations));
+    if(auto vao = VertexArrayObject::create(tesselations)) { return new RenderablePolygon(vao) ;}
+
+	return nullptr;
 }
 
 Renderable * RenderablePolygon::create( const boostGeom::MultiPolygon	& multiPoly,

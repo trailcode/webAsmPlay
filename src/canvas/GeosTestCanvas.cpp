@@ -92,54 +92,53 @@ namespace
 		return ret;
 	}
 
+	// #define BOOST_GEOMETRY_DEBUG_HAS_SELF_INTERSECTIONS
+
 	void boostMakeBox(const dvec2 & min, const dvec2 & max)
 	{
 		
 	}
 
-	boostGeom::Polygon doBoostGeomTest1(const float buffer1,
-										const float buffer2,
-										const float buffer3)
+	boostGeom::MultiPolygon doBoostGeomTest1(const float buffer1,
+	//boostGeom::Polygon doBoostGeomTest1(const float buffer1,
+											const float buffer2,
+											const float buffer3)
 	{
+		
 		using namespace boost::geometry;
+		using namespace boostGeom;
 		using boostGeom::CoordinateType;
 		using boostGeom::Point;
 		using boostGeom::Box;
 		using boostGeom::Polygon;
 		using boostGeom::MultiPolygon;
-		/*		
-		typedef double coordinate_type;
-		typedef boost::geometry::model::d2::point_xy<coordinate_type> Point;
-		typedef boost::geometry::model::box<Point> Box;
-		typedef boost::geometry::model::polygon<Point> Polygon;
-		*/
-
-		//auto bx = make<boost::geometry::model::box<Point>>(boost::geometry::model::d2::point_xy<coordinate_type>(-0.5, -0.5), boost::geometry::model::d2::point_xy<coordinate_type>(0.5, 0.5));
-		//Box bx = 
 		
-		Polygon bx;
-
-		convert(Box(Point(-0.5, -0.5), Point(0.5, 0.5)), bx);
-		
-		const double buffer_distance = 0.1;
+		const double buffer_distance = buffer1;
 		const int points_per_circle = 36;
 
-		boost::geometry::strategy::buffer::distance_symmetric<CoordinateType> distance_strategy(buffer_distance);
-		boost::geometry::strategy::buffer::join_round join_strategy(points_per_circle);
-		boost::geometry::strategy::buffer::end_round end_strategy(points_per_circle);
-		boost::geometry::strategy::buffer::point_circle circle_strategy(points_per_circle);
-		boost::geometry::strategy::buffer::side_straight side_strategy;
-		
-		boost::geometry::model::multi_polygon<Polygon> result;
+		typedef strategy::buffer::distance_symmetric<CoordinateType> DistanceSymmetric;
 
-		boost::geometry::model::linestring<Point> ls;
-		boost::geometry::read_wkt("LINESTRING(0 0,4 5,7 4,10 6)", ls);
+		strategy::buffer::join_round join_strategy(points_per_circle);
+		strategy::buffer::end_round end_strategy(points_per_circle);
+		strategy::buffer::point_circle circle_strategy(points_per_circle);
+		strategy::buffer::side_straight side_strategy;
 
-		boost::geometry::buffer(bx, result, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
-		//boost::geometry::buffer(ls, result, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
+		auto startShape = makePolygonBox({-0.5,-0.5}, {0.5,0.5});
 
-		//return_buffer(bx, 0.1);
-		return bx;
+		MultiPolygon shape;
+		MultiPolygon insideBuffer;
+		MultiPolygon theDiff;
+
+		auto inside = unionPolygons({	makePolygonBox({-0.1 ,-0.1 }, {0.1	,0.1}),
+										makePolygonBox({-0.05,-0.6 }, {0.05,0.6}),
+										makePolygonBox({-0.6 ,-0.05}, {0.6	,0.05})});
+
+		buffer(startShape,	shape,			DistanceSymmetric(buffer1), side_strategy, join_strategy, end_strategy, circle_strategy);
+		buffer(inside,		insideBuffer, 	DistanceSymmetric(buffer2), side_strategy, join_strategy, end_strategy, circle_strategy);
+
+		difference(shape, insideBuffer, theDiff);
+
+		return theDiff;
 	}
 }
 

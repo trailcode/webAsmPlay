@@ -25,6 +25,7 @@
 */
 #pragma once
 
+#include <initializer_list>
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 #include <boost/geometry.hpp>
@@ -46,6 +47,12 @@ namespace boostGeom
 	typedef boost::geometry::model::multi_polygon<Polygon> MultiPolygon;
 
 	Polygon convert(const geos::geom::Polygon * poly);
+
+	MultiPolygon unionPolygons(const MultiPolygon & polys);
+
+	Polygon makePolygonBox(const glm::dvec2 & min, const glm::dvec2 & max);
+
+	Polygon makeTriangle(const glm::dvec2 & A, const glm::dvec2 & B, const glm::dvec2 & C);
 }
 
 inline glm::dvec2 __(const boostGeom::Point & point) { return { point.x(), point.y() } ;}
