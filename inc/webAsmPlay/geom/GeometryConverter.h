@@ -28,6 +28,7 @@
 #define __WEB_ASM_PLAY_POLYGON_H__
 
 #include <sstream>
+//#include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/Types.h>
 
 namespace geos

@@ -31,6 +31,7 @@
 #include <vector>
 #include <memory>
 #include <glm/vec2.hpp>
+#include <boost/geometry.hpp>
 
 #ifndef __EMSCRIPTEN__
 
@@ -100,3 +101,11 @@ typedef std::vector<std::string> StrVec;
 
 typedef std::function<void ()> Updatable;
 
+namespace boostGeom
+{
+	typedef double CoordinateType;
+	typedef boost::geometry::model::d2::point_xy<CoordinateType> Point;
+	typedef boost::geometry::model::box<Point> Box;
+	typedef boost::geometry::model::polygon<Point> Polygon;
+	typedef boost::geometry::model::multi_polygon<Polygon> MultiPolygon;
+}

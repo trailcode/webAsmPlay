@@ -25,10 +25,7 @@
 */
 #pragma once
 
-#include <initializer_list>
-#include <glm/vec2.hpp>
-#include <glm/vec4.hpp>
-#include <boost/geometry.hpp>
+#include <webAsmPlay/Types.h>
 
 namespace geos
 {
@@ -40,12 +37,6 @@ namespace geos
 
 namespace boostGeom
 {
-	typedef double CoordinateType;
-	typedef boost::geometry::model::d2::point_xy<CoordinateType> Point;
-	typedef boost::geometry::model::box<Point> Box;
-	typedef boost::geometry::model::polygon<Point> Polygon;
-	typedef boost::geometry::model::multi_polygon<Polygon> MultiPolygon;
-
 	Polygon convert(const geos::geom::Polygon * poly);
 
 	MultiPolygon unionPolygons(const MultiPolygon & polys);

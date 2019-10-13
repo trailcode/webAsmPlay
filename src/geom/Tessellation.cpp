@@ -32,7 +32,7 @@
 
 #include <GLU/tessellate.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/geom/BoostGeomUtil.h>
+//#include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/geom/GeosUtil.h>
 #include <webAsmPlay/geom/Tessellation.h>
 
@@ -110,9 +110,10 @@ namespace
 	}
 }
 
+/*
 void Tessellation::addTessellation(Tessellations & tessellations, ConstPtr tess)
 {
-	tessellations.emplace_back(tess);
+	tessellations.push_back(tess);
             
     if(!(*tessellations.rbegin())->m_verts)
     {
@@ -121,6 +122,7 @@ void Tessellation::addTessellation(Tessellations & tessellations, ConstPtr tess)
         tessellations.pop_back();
     }
 }
+*/
 
 Tessellation::ConstPtr Tessellation::doTessellation(Tessellation * tess, const vector<double> & verts)
 {
@@ -199,10 +201,23 @@ void Tessellation::tessellateMultiPolygon(  const MultiPolygon  * multiPoly,
 {
     for(size_t i = 0; i < multiPoly->getNumGeometries(); ++i)
     {
+		/*
 		addTessellation(tessellations,
 						Tessellation::tessellatePolygon(dynamic_cast<const Polygon *>(multiPoly->getGeometryN(i)),
 														trans,
 														symbologyID));
+														*/
+
+		tessellations.push_back(Tessellation::tessellatePolygon(dynamic_cast<const Polygon *>(multiPoly->getGeometryN(i)),
+																trans,
+																symbologyID));
+            
+		if(!(*tessellations.rbegin())->m_verts)
+		{
+			dmess("Warning tessellation failed!");
+
+			tessellations.pop_back();
+		}
     }
 }
 
@@ -213,10 +228,23 @@ void Tessellation::tessellateMultiPolygon(	const boostGeom::MultiPolygon	& multi
 {
 	for(const auto & poly : multiPoly)
 	{
+		/*
 		addTessellation(tessellations,
 						Tessellation::tessellatePolygon(poly,
 														trans,
 														symbologyID));
+														*/
+
+		tessellations.push_back(Tessellation::tessellatePolygon(poly,
+																trans,
+																symbologyID));
+            
+		if(!(*tessellations.rbegin())->m_verts)
+		{
+			dmess("Warning tessellation failed!");
+
+			tessellations.pop_back();
+		}
 	}
 }
 
