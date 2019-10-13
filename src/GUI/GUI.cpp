@@ -45,6 +45,7 @@
 #include <webAsmPlay/canvas/GeosTestCanvas.h>
 #include <webAsmPlay/canvas/OpenSteerCanvas.h>
 #include <webAsmPlay/canvas/AnimationCanvas.h>
+#include <webAsmPlay/canvas/ModelViewerCanvas.h>
 #include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/geom/GeosUtil.h>
@@ -78,20 +79,21 @@ using namespace glm;
 
 #define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
-GeosTestCanvas  * GUI::s_geosTestCanvas		= nullptr;
-OpenSteerCanvas * GUI::s_openSteerCanvas	= nullptr;
-AnimationCanvas * GUI::s_animationCanvas	= nullptr;
-Canvas          * GUI::s_canvas				= nullptr;
-SkyBox          * GUI::s_skyBox				= nullptr;
-GLFWwindow      * GUI::s_mainWindow			= nullptr;
-int               GUI::s_cameraMode			= GUI::CAMERA_TRACK_BALL;
-bool              GUI::s_shuttingDown		= false;
-GeoClient       * GUI::s_client				= nullptr;
-vector<Canvas *>  GUI::s_auxCanvases;
-EventQueue		  GUI::s_eventQueue;
-bool			  GUI::s_animationRunning	= false;
-float			  GUI::s_currAnimationTime	= 0;
-float			  GUI::s_animationDuration	= 42.0f;
+GeosTestCanvas		* GUI::s_geosTestCanvas		= nullptr;
+OpenSteerCanvas		* GUI::s_openSteerCanvas	= nullptr;
+AnimationCanvas		* GUI::s_animationCanvas	= nullptr;
+ModelViewerCanvas	* GUI::s_modelViewerCanvas	= nullptr;
+Canvas				* GUI::s_canvas				= nullptr;
+SkyBox				* GUI::s_skyBox				= nullptr;
+GLFWwindow			* GUI::s_mainWindow			= nullptr;
+int					  GUI::s_cameraMode			= GUI::CAMERA_TRACK_BALL;
+bool				  GUI::s_shuttingDown		= false;
+GeoClient			* GUI::s_client				= nullptr;
+vector<Canvas *>	  GUI::s_auxCanvases;
+EventQueue			  GUI::s_eventQueue;
+bool				  GUI::s_animationRunning	= false;
+float				  GUI::s_currAnimationTime	= 0;
+float				  GUI::s_animationDuration	= 42.0f;
 
 namespace
 {
@@ -626,9 +628,10 @@ void GUI::initOpenGL() // TODO, need some code refactor here
 
     s_auxCanvases = vector<Canvas *>(
     {
-        s_geosTestCanvas  = new GeosTestCanvas(),
-        s_openSteerCanvas = new OpenSteerCanvas(),
-		s_animationCanvas = new AnimationCanvas()
+        s_geosTestCanvas	= new GeosTestCanvas(),
+        s_openSteerCanvas	= new OpenSteerCanvas(),
+		s_animationCanvas	= new AnimationCanvas(),
+		s_modelViewerCanvas = new ModelViewerCanvas(),
     });
 }
 

@@ -495,12 +495,14 @@ else()
         set(DLLS_RELEASE	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Release/tbb.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/bin/x64/Release/libexpat.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl.dll)
+							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Release/assimp-vc140-mt.dll)
 
 		set(DLLS_DEBUG	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Debug/tbb_debug.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/bin/x64/Debug/libexpatd.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl_debug.dll)
+							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl_debug.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Debug/assimp-vc140-mtd.dll)
 
 
         foreach(dll ${DLLS_RELEASE} ${DLLS_COMMON})

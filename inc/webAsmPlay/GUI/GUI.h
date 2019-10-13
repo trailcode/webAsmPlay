@@ -35,6 +35,7 @@ class Canvas;
 class GeosTestCanvas;
 class OpenSteerCanvas;
 class AnimationCanvas;
+class ModelViewerCanvas;
 class SkyBox;
 class GeoClient;
 
@@ -209,12 +210,13 @@ private:
 
     static GLFWwindow * s_mainWindow;
 
-    static GeosTestCanvas  * s_geosTestCanvas;
-    static OpenSteerCanvas * s_openSteerCanvas;
-	static AnimationCanvas * s_animationCanvas;
-    static Canvas          * s_canvas;
-    static SkyBox          * s_skyBox;
-    static GeoClient       * s_client;
+    static GeosTestCanvas		* s_geosTestCanvas;
+    static OpenSteerCanvas		* s_openSteerCanvas;
+	static AnimationCanvas		* s_animationCanvas;
+	static ModelViewerCanvas	* s_modelViewerCanvas;
+    static Canvas				* s_canvas;
+    static SkyBox				* s_skyBox;
+    static GeoClient			* s_client;
 
     static std::vector<Canvas *> s_auxCanvases;
 

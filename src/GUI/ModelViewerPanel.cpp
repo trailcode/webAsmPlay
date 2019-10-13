@@ -24,6 +24,8 @@
   \copyright 2019
 */
 
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/canvas/ModelViewerCanvas.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 void GUI::modelViewerPanel()
@@ -31,6 +33,20 @@ void GUI::modelViewerPanel()
 	if(!s_showModelViewerPanel) { return ;}
 
 	ImGui::Begin("Model Viewer", &s_showModelViewerPanel);
+
+		const ImVec2 pos = ImGui::GetCursorScreenPos();
+
+        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+
+		s_modelViewerCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
+
+        s_modelViewerCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+
+        ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)s_modelViewerCanvas->render(),
+                                                pos,
+                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+                                                ImVec2(0, 1),
+                                                ImVec2(1, 0));
 
 	ImGui::End();
 }

@@ -24,13 +24,21 @@
   \copyright 2019
 */
 
+#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Model.h>
 #include <webAsmPlay/canvas/ModelViewerCanvas.h>
 
 using namespace glm;
 
+namespace
+{
+	Model * a_model = nullptr;
+}
+
 ModelViewerCanvas::ModelViewerCanvas(	const bool   useFrameBuffer,
 										const vec4 & clearColor)
 {
+	a_model = new Model("C:/build/LearnOpenGL/resources/objects/cartoon_lowpoly_trees_blend.obj");
 }
 
 ModelViewerCanvas::~ModelViewerCanvas()
@@ -39,5 +47,7 @@ ModelViewerCanvas::~ModelViewerCanvas()
 
 GLuint ModelViewerCanvas::render()
 {
+	dmess("ModelViewerCanvas::render");
+
 	return 0;
 }
