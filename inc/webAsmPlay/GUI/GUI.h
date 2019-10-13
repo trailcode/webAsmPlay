@@ -176,6 +176,7 @@ private:
 	static void bingMapsFrameBufferDebugPanel();
 	static void normalFrameBufferDebugPanel();
 	static void animationPanel();
+	static void modelViewerPanel();
 
     static void showHelpMarker(const char* desc);
 
@@ -204,6 +205,7 @@ private:
 	static bool s_showBingMapsFrameBufferDebugPanel;
 	static bool s_showNormalFrameBufferDebugPanel;
 	static bool s_showAnimationPanel;
+	static bool s_showModelViewerPanel;
 
     static GLFWwindow * s_mainWindow;
 
