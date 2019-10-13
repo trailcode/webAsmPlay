@@ -35,6 +35,7 @@ if(MSVC_VERSION)
 		execute_process(COMMAND ${NUGET} install unofficial-flayan-glew		-Version 2.1.0		-o thirdParty)
 		execute_process(COMMAND ${NUGET} install tbb_oss					-Version 9.107.0	-o thirdParty)
 		execute_process(COMMAND ${NUGET} install expat.v140					-Version 2.2.6		-o thirdParty)
+		execute_process(COMMAND ${NUGET} install assimp.v140				-Version 3.2.0		-o thirdParty)
 	
 		file(GLOB boost_files	${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc141.${BOOST_VERSION}/lib/native/*
 								${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc141.${BOOST_VERSION}/lib/native/*
@@ -64,6 +65,10 @@ if(MSVC_VERSION)
 	set(CURL_INCLUDE_DIR				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/include)
 	set(CURL_LIBRARY_RELEASE			${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl.lib)
 	set(CURL_LIBRARY_DEBUG				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl_debug.lib)
+	set(ASSIMP_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.3.2/build/native)
+	set(ASSIMP_INCLUDE_DIR				${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.3.2/build/native/include)
+	set(ASSIMP_LIBRARY_DEBUG			${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.3.2/build/native/lib/x64/Debug/assimp-vc140-mtd.lib)
+	set(ASSIMP_LIBRARY_RELEASE			${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.3.2/build/native/lib/x64/Release/assimp-vc140-mt.lib)
 
 else()
     set(CURL_LIBRARY_RELEASE ${CURL_LIBRARY})
@@ -278,7 +283,7 @@ else()
     find_package(TBB REQUIRED)
     find_package(curl REQUIRED)
 	find_package(Expat REQUIRED)
-
+	
 	include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${CURL_INCLUDE_DIR})
     include_directories(${Boost_INCLUDE_DIRS})
@@ -286,6 +291,7 @@ else()
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 	include_directories(${GLFW3_INCLUDE_PATH})
 	include_directories(${TBB_INCLUDE_DIRS})
+	include_directories(${ASSIMP_INCLUDE_DIR})
     include_directories(ThirdParty/ctpl)
     include_directories(./)
     
@@ -308,6 +314,7 @@ else()
 
         link_libraries(debug ${CURL_LIBRARY_DEBUG}		optimized ${CURL_LIBRARY_RELEASE})
         link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG}	optimized ${TBB_tbb_LIBRARY_RELEASE})
+		link_libraries(debug ${ASSIMP_LIBRARY_DEBUG}	optimized ${ASSIMP_LIBRARY_RELEASE})
 
     else()
 
