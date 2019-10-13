@@ -42,6 +42,32 @@ namespace
 		return str;
 	}
 
+	// utility function for checking shader compilation/linking errors.
+    // ------------------------------------------------------------------------
+    void checkCompileErrors(GLuint shader, std::string type)
+    {
+        GLint success;
+        GLchar infoLog[1024];
+        if (type != "PROGRAM")
+        {
+            glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+            if (!success)
+            {
+                glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+                dmess("ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- ");
+            }
+        }
+        else
+        {
+            glGetProgramiv(shader, GL_LINK_STATUS, &success);
+            if (!success)
+            {
+                glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+                dmess("ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- ");
+            }
+        }
+    }
+
 	bool compile(const pair<GLenum, const string> & typeAndFile, const GLuint program)
 	{
 		GLint success = 0;
@@ -56,6 +82,8 @@ namespace
 
 		glCompileShader(shader);
     
+		checkCompileErrors(shader, "COMPILE");
+
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
 		GLchar infoLog[2048];

@@ -27,7 +27,9 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/OpenGL_Util.h>
+#include <webAsmPlay/shaders/PhongShader.h>
 #include <webAsmPlay/Mesh.h>
 
 //#include <learnopengl/shader.h>
@@ -49,9 +51,7 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture
 }
 
 // render the mesh
-void Mesh::Draw(
-//Shader shader
-) 
+void Mesh::Draw(PhongShader * shader)
 {
     // bind appropriate textures
     unsigned int diffuseNr  = 1;
@@ -88,6 +88,7 @@ void Mesh::Draw(
 		shader.setVec3("material.specular", material.Specular);
 		shader.setFloat("material.shininess", material.Shininess);
 		*/
+		shader->setMaterial(material);
 	}
         
     // draw mesh
@@ -118,6 +119,8 @@ void Mesh::setupMesh()
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+	dmess("vertices.size() " << vertices.size() << " indices.size() " << indices.size());
 
     // set the vertex attribute pointers
     // vertex Positions

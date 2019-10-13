@@ -26,6 +26,8 @@
 
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Model.h>
+#include <webAsmPlay/shaders/PhongShader.h>
+#include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/canvas/ModelViewerCanvas.h>
 
 using namespace glm;
@@ -36,7 +38,7 @@ namespace
 }
 
 ModelViewerCanvas::ModelViewerCanvas(	const bool   useFrameBuffer,
-										const vec4 & clearColor)
+										const vec4 & clearColor) : Canvas(true, clearColor)
 {
 	a_model = new Model("C:/build/LearnOpenGL/resources/objects/cartoon_lowpoly_trees_blend.obj");
 }
@@ -49,5 +51,13 @@ GLuint ModelViewerCanvas::render()
 {
 	dmess("ModelViewerCanvas::render");
 
-	return 0;
+	preRender();
+
+	PhongShader::getDefaultInstance()->bind(this, false);
+
+	a_model->Draw(PhongShader::getDefaultInstance());
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	return m_frameBuffer->getTextureID();
 }

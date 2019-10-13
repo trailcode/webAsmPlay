@@ -23,39 +23,31 @@
 \email trailcode@gmail.com
 \copyright 2019
 */
-// Modified from: https://github.com/JoeyDeVries/LearnOpenGL
+
 #pragma once
 
-#include <webAsmPlay/Mesh.h>
+#include <webAsmPlay/shaders/Shader.h>
 
-struct aiNode;
-struct aiScene;
-struct aiMesh;
-struct aiMaterial;
+struct Material;
 
-class PhongShader;
-
-class Model 
+class PhongShader : public Shader
 {
 public:
 
-    /*  Model Data */
-    std::vector<Mesh> meshes;
-    std::string directory;
-    bool gammaCorrection;
-	
-    /*  Functions   */
-    // constructor, expects a filepath to a 3D model.
-    Model(std::string const &path, bool gamma = false);
-    
-    // draws the model, and thus all its meshes
-    void Draw(PhongShader * shader);
-    
+    static void ensureShader();
+
+    static PhongShader * getDefaultInstance();
+
+	PhongShader();
+
+	~PhongShader();
+
+    void bind(  Canvas     * canvas,
+                const bool   isOutline,
+                const size_t renderingStage = 0) override;
+
+	void setMaterial(const Material & mat) const;
+
 private:
-    /*  Functions   */
-    // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
-    void loadModel(std::string const &path);
-    
-    // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
-    void processNode(aiNode *node, const aiScene *scene, const std::string & directory);
+
 };

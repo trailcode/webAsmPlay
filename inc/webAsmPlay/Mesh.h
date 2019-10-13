@@ -60,6 +60,8 @@ struct Material
 	float Shininess;
 };
 
+class PhongShader;
+
 class Mesh {
 public:
     /*  Mesh Data  */
@@ -74,9 +76,7 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, Material material);
     
     // render the mesh
-    void Draw(
-	//Shader shader
-	);
+    void Draw(PhongShader * shader);
     
 private:
     /*  Render data  */
