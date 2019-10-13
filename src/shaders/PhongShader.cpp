@@ -128,8 +128,6 @@ void PhongShader::bind( Canvas     * canvas,
 						const bool   isOutline,
 						const size_t renderingStage)
 {
-	dmess("PhongShader::bind");
-
 	a_shaderProgram->bind();
 
 	glm::mat4 model = glm::mat4(1.0f);
@@ -152,6 +150,10 @@ void PhongShader::bind( Canvas     * canvas,
 	a_shaderProgram->setUniform(a_lightDiffuse,		vec3(1.0f, 1.0f, 1.0f));
 	a_shaderProgram->setUniform(a_lightSpecular,	vec3(1.0f, 1.0f, 1.0f));
 
+	glEnable(GL_DEPTH_TEST);
+
+	glDisable(GL_BLEND);
+
 }
 
 void PhongShader::setMaterial(const Material & mat) const
@@ -159,6 +161,10 @@ void PhongShader::setMaterial(const Material & mat) const
 	a_shaderProgram->setUniform(a_materialAmbient, mat.Ambient);
 	a_shaderProgram->setUniform(a_materialDiffuse, mat.Diffuse);
 	a_shaderProgram->setUniform(a_materialSpecular, mat.Specular);
-	a_shaderProgram->setUniformf(a_materialShininess, mat.Shininess);
-	
+	a_shaderProgram->setUniformf(a_materialShininess, mat.Shininess);	
+}
+
+void PhongShader::setModel(const mat4 & model) const
+{
+	a_shaderProgram->setUniform(a_model, model);
 }

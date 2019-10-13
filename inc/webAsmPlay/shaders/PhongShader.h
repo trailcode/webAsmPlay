@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <glm/mat4x4.hpp>
 #include <webAsmPlay/shaders/Shader.h>
 
 struct Material;
@@ -47,6 +48,8 @@ public:
                 const size_t renderingStage = 0) override;
 
 	void setMaterial(const Material & mat) const;
+
+	void setModel(const glm::mat4 & model) const;
 
 private:
 

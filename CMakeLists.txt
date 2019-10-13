@@ -75,7 +75,6 @@ else()
     set(CURL_LIBRARY_DEBUG   ${CURL_LIBRARY})
 endif()
 
-
 set (CMAKE_CXX_STANDARD 17)
 #set (CMAKE_CXX_STANDARD 14)
 
