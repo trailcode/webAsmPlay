@@ -26,7 +26,7 @@
 // Modified from: https://github.com/JoeyDeVries/LearnOpenGL
 #pragma once
 
-#include <webAsmPlay/Mesh.h>
+#include <webAsmPlay/renderables/Mesh.h>
 
 struct aiNode;
 struct aiScene;

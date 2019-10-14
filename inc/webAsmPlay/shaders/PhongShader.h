@@ -29,7 +29,7 @@
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/shaders/Shader.h>
 
-struct Material;
+class Material;
 
 class PhongShader : public Shader
 {

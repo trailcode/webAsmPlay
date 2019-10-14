@@ -30,7 +30,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/Model.h>
+#include <webAsmPlay/renderables/Model.h>
 
 using namespace std;
 

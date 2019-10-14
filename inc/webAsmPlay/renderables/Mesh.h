@@ -32,6 +32,7 @@
 #include <vector>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <webAsmPlay/shaders/Material.h>
 
 struct Vertex {
     // position
@@ -50,14 +51,6 @@ struct Texture {
     unsigned int id;
     std::string type;
     std::string path;
-};
-
-struct Material
-{
-	glm::vec3 Diffuse;
-	glm::vec3 Specular;
-	glm::vec3 Ambient;
-	float Shininess;
 };
 
 class PhongShader;

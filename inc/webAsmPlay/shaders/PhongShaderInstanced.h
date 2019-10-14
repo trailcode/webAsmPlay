@@ -24,3 +24,31 @@
 \copyright 2019
 */
 
+#pragma once
+
+#include <glm/mat4x4.hpp>
+#include <webAsmPlay/shaders/Shader.h>
+
+class Material;
+
+class PhongShaderInstanced : public Shader
+{
+public:
+
+    static void ensureShader();
+
+    static PhongShaderInstanced * getDefaultInstance();
+
+	PhongShaderInstanced();
+
+	~PhongShaderInstanced();
+
+    void bind(  Canvas     * canvas,
+                const bool   isOutline,
+                const size_t renderingStage = 0) override;
+
+	void setMaterial(const Material & mat) const;
+
+private:
+
+};

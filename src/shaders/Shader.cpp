@@ -38,6 +38,7 @@
 #include <webAsmPlay/shaders/DepthToRGB_Shader.h>
 #include <webAsmPlay/shaders/TileBoundaryShader.h>
 #include <webAsmPlay/shaders/PhongShader.h>
+#include <webAsmPlay/shaders/PhongShaderInstanced.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/Shader.h>
 
@@ -85,6 +86,7 @@ void Shader::ensureShaders()
 	DepthToRGB_Shader::ensureShader();
 	TileBoundaryShader::ensureShader();
 	PhongShader::ensureShader();
+	PhongShaderInstanced::ensureShader();
 
 	for (const auto& i : s_shadersToRegister)
 	{

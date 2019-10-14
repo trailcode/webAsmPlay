@@ -30,7 +30,7 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/shaders/PhongShader.h>
-#include <webAsmPlay/Mesh.h>
+#include <webAsmPlay/renderables/Mesh.h>
 
 //#include <learnopengl/shader.h>
 
@@ -81,13 +81,6 @@ void Mesh::Draw(PhongShader * shader)
 
 	if(!textures.size())
 	{	
-		//cout << "material.Diffuse " << material.Diffuse.x << " " << material.Diffuse.y << " " << material.Diffuse.z << endl;
-		/*
-		shader.setVec3("material.ambient", material.Ambient);
-		shader.setVec3("material.diffuse", material.Diffuse);
-		shader.setVec3("material.specular", material.Specular);
-		shader.setFloat("material.shininess", material.Shininess);
-		*/
 		shader->setMaterial(material);
 	}
         

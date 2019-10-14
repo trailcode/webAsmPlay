@@ -24,68 +24,16 @@
   \copyright 2019
 */
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <webAsmPlay/Debug.h>
-#include <webAsmPlay/FrameBuffer.h>
-#include <webAsmPlay/shaders/PhongShader.h>
-#include <webAsmPlay/renderables/Model.h>
-#include <webAsmPlay/canvas/ModelViewerCanvas.h>
+#pragma once
 
-using namespace glm;
+#include <glm/vec3.hpp>
 
-namespace
+class Material
 {
-	Model * a_model = nullptr;
+public:
 
-	mat4 * modelMatrices = nullptr;
-
-	size_t amount = 10000;
-}
-
-ModelViewerCanvas::ModelViewerCanvas(	const bool   useFrameBuffer,
-										const vec4 & clearColor) : Canvas(true, clearColor)
-{
-	a_model = new Model("C:/build/LearnOpenGL/resources/objects/cartoon_lowpoly_trees_blend.obj");
-
-    modelMatrices = new mat4[amount];
-
-	float offset = 3.0f;
-
-	for(size_t i = 0; i < amount; ++i)
-	{
-		auto model = mat4(1.0f);
-
-		float x = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float y = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-
-		model = translate(model, glm::vec3(x, y, 0));
-
-		model = scale(model, vec3(0.001, 0.001, 0.001));
-
-		model = rotate(model, radians(90.0f), vec3(1,0,0));
-
-		modelMatrices[i] = model;
-	}
-}
-
-ModelViewerCanvas::~ModelViewerCanvas()
-{
-}
-
-GLuint ModelViewerCanvas::render()
-{
-	preRender();
-
-	PhongShader::getDefaultInstance()->bind(this, false);
-
-	for(size_t i = 0; i < amount; ++i)
-	{
-		PhongShader::getDefaultInstance()->setModel(modelMatrices[i]);
-
-		a_model->Draw(PhongShader::getDefaultInstance());
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	return m_frameBuffer->getTextureID();
-}
+	glm::vec3 Diffuse;
+	glm::vec3 Specular;
+	glm::vec3 Ambient;
+	float Shininess;
+};
