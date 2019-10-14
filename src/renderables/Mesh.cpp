@@ -51,7 +51,7 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture
 }
 
 // render the mesh
-void Mesh::Draw(PhongShader * shader)
+void Mesh::Draw(const SetMaterialFunctor & onMaterial)
 {
     // bind appropriate textures
     unsigned int diffuseNr  = 1;
@@ -81,7 +81,8 @@ void Mesh::Draw(PhongShader * shader)
 
 	if(!textures.size())
 	{	
-		shader->setMaterial(material);
+		//shader->setMaterial(material);
+		onMaterial(material);
 	}
         
     // draw mesh

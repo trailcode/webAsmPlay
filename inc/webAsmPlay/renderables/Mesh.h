@@ -29,9 +29,9 @@
 //#include <glad/glad.h> // holds all OpenGL type declarations
 
 #include <string>
+#include <functional>
 #include <vector>
 #include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
 #include <webAsmPlay/shaders/Material.h>
 
 struct Vertex {
@@ -53,7 +53,7 @@ struct Texture {
     std::string path;
 };
 
-class PhongShader;
+typedef std::function<void(const Material & material)> SetMaterialFunctor;
 
 class Mesh {
 public:
@@ -69,7 +69,7 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, Material material);
     
     // render the mesh
-    void Draw(PhongShader * shader);
+    void Draw(const SetMaterialFunctor & onMaterial);
     
 private:
     /*  Render data  */

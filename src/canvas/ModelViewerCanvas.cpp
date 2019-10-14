@@ -55,8 +55,8 @@ ModelViewerCanvas::ModelViewerCanvas(	const bool   useFrameBuffer,
 	{
 		auto model = mat4(1.0f);
 
-		float x = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float y = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float x = (rand() % (int)(2 * offset * 10000)) / 10000.0f - offset;
+		float y = (rand() % (int)(2 * offset * 10000)) / 10000.0f - offset;
 
 		model = translate(model, glm::vec3(x, y, 0));
 
@@ -82,7 +82,10 @@ GLuint ModelViewerCanvas::render()
 	{
 		PhongShader::getDefaultInstance()->setModel(modelMatrices[i]);
 
-		a_model->Draw(PhongShader::getDefaultInstance());
+		a_model->Draw([](const Material & material)
+		{
+			PhongShader::getDefaultInstance()->setMaterial(material);
+		});
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

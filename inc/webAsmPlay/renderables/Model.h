@@ -33,8 +33,6 @@ struct aiScene;
 struct aiMesh;
 struct aiMaterial;
 
-class PhongShader;
-
 class Model 
 {
 public:
@@ -49,7 +47,7 @@ public:
     Model(std::string const &path, bool gamma = false);
     
     // draws the model, and thus all its meshes
-    void Draw(PhongShader * shader);
+    void Draw(const SetMaterialFunctor & onMaterial);
     
 private:
     /*  Functions   */
