@@ -42,7 +42,6 @@ namespace
 
 	GLint a_pos					= -1;
 	GLint a_normal				= -1;
-	GLint a_model				= -1;
 	GLint a_view				= -1;
 	GLint a_projection			= -1;
 	GLint a_viewPos				= -1;
@@ -67,7 +66,6 @@ void PhongShaderInstanced::ensureShader()
                                             Variables({ {"view",				a_view							},
 														{"projection",			a_projection					},
 														{"viewPos",				a_viewPos						},
-														{"model",				a_model							},
 														{"material.ambient",	a_materialAmbient				},
 														{"material.diffuse",	a_materialDiffuse				},
 														{"material.specular",	a_materialSpecular				},
@@ -82,9 +80,9 @@ void PhongShaderInstanced::ensureShader()
 
 PhongShaderInstanced * PhongShaderInstanced::getDefaultInstance() { return a_defaultInstance ;}
 
-PhongShaderInstanced::PhongShaderInstanced() : Shader("ColorVertexShader",
-									ColorSymbology::getInstance("defaultPolygon"),
-									Shader::s_defaultShouldRender) {}
+PhongShaderInstanced::PhongShaderInstanced() : Shader(	"ColorVertexShader",
+														ColorSymbology::getInstance("defaultPolygon"),
+														Shader::s_defaultShouldRender) {}
 
 PhongShaderInstanced::~PhongShaderInstanced()
 {
@@ -97,11 +95,11 @@ void PhongShaderInstanced::bind( Canvas     * canvas,
 {
 	a_shaderProgram->bind();
 
-	glm::mat4 model = glm::mat4(1.0f);
-    model = scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// it's a bit too big for our scene, so scale it down
+	//glm::mat4 model = glm::mat4(1.0f);
+    //model = scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// it's a bit too big for our scene, so scale it down
 
 	//a_shaderProgram->setUniform(a_model, canvas->getModelRef());
-	a_shaderProgram->setUniform(a_model, model);
+	//a_shaderProgram->setUniform(a_model, model);
 	a_shaderProgram->setUniform(a_view, canvas->getViewRef());
 	a_shaderProgram->setUniform(a_projection, canvas->getProjectionRef());
 
