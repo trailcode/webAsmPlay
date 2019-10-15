@@ -31,6 +31,9 @@
 #include <webAsmPlay/renderables/Model.h>
 #include <webAsmPlay/canvas/ModelViewerCanvas.h>
 
+#include <thread>
+
+using namespace std;
 using namespace glm;
 
 namespace
@@ -40,45 +43,55 @@ namespace
 	mat4 * modelMatrices = nullptr;
 
 	size_t amount = 10000;
+
+	bool a_gotVAO = false;
 }
 
 ModelViewerCanvas::ModelViewerCanvas(	const bool   useFrameBuffer,
 										const vec4 & clearColor) : Canvas(true, clearColor)
 {
-	a_model = new Model("C:/build/LearnOpenGL/resources/objects/cartoon_lowpoly_trees_blend.obj");
-
-    modelMatrices = new mat4[amount];
-
-	float offset = 3.0f;
-
-	for(size_t i = 0; i < amount; ++i)
+	thread worker([]()
 	{
-		auto model = mat4(1.0f);
+		OpenGL::ensureSharedContext();
 
-		float x = (rand() % (int)(2 * offset * 10000)) / 10000.0f - offset;
-		float y = (rand() % (int)(2 * offset * 10000)) / 10000.0f - offset;
+		a_model = new Model("C:/build/LearnOpenGL/resources/objects/cartoon_lowpoly_trees_blend.obj");
 
-		model = translate(model, glm::vec3(x, y, 0));
+		for (auto & mesh : a_model->meshes)
+		{
+			//mesh.ensureVAO();
+		}
 
-		model = scale(model, vec3(0.001, 0.001, 0.001));
+		modelMatrices = new mat4[amount];
 
-		model = rotate(model, radians(90.0f), vec3(1,0,0));
+		float offset = 3.0f;
 
-		modelMatrices[i] = model;
-	}
+		for(size_t i = 0; i < amount; ++i)
+		{
+			auto model = mat4(1.0f);
 
-	// configure instanced array
-    // -------------------------
-    unsigned int buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+			float x = (rand() % (int)(2 * offset * 10000)) / 10000.0f - offset;
+			float y = (rand() % (int)(2 * offset * 10000)) / 10000.0f - offset;
 
-	for (const auto & mesh : a_model->meshes)
+			model = translate(model, glm::vec3(x, y, 0));
+
+			model = scale(model, vec3(0.001, 0.001, 0.001));
+
+			model = rotate(model, radians(90.0f), vec3(1,0,0));
+
+			modelMatrices[i] = model;
+		}
+	});
+
+	worker.join();
+	/*
+	for (auto & mesh : a_model->meshes)
     {
+		//mesh.ensureVAO();
+
         unsigned int VAO = mesh.VAO;
 
         glBindVertexArray(VAO);
+		//glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
         // set attribute pointers for matrix (4 times vec4)
         glEnableVertexAttribArray(3);
         glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
@@ -96,6 +109,7 @@ ModelViewerCanvas::ModelViewerCanvas(	const bool   useFrameBuffer,
 
         glBindVertexArray(0);
     }
+	*/
 }
 
 ModelViewerCanvas::~ModelViewerCanvas()
@@ -104,6 +118,49 @@ ModelViewerCanvas::~ModelViewerCanvas()
 
 GLuint ModelViewerCanvas::render()
 {
+	if(!a_gotVAO)
+	{
+		a_gotVAO = true;
+
+		for (auto & mesh : a_model->meshes)
+		{
+			mesh.ensureVAO();
+		}
+
+		// configure instanced array
+		// -------------------------
+		unsigned int buffer;
+		glGenBuffers(1, &buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, buffer);
+		glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+
+		for (auto & mesh : a_model->meshes)
+		{
+			//mesh.ensureVAO();
+
+			unsigned int VAO = mesh.VAO;
+
+			glBindVertexArray(VAO);
+			//glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+			// set attribute pointers for matrix (4 times vec4)
+			glEnableVertexAttribArray(3);
+			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+			glEnableVertexAttribArray(4);
+			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+			glEnableVertexAttribArray(5);
+			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+			glEnableVertexAttribArray(6); 
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+			glVertexAttribDivisor(3, 1);
+			glVertexAttribDivisor(4, 1);
+			glVertexAttribDivisor(5, 1);
+			glVertexAttribDivisor(6, 1);
+
+			glBindVertexArray(0);
+		}
+	}
+
 	preRender();
 
 	PhongShaderInstanced::getDefaultInstance()->bind(this, false);
@@ -111,6 +168,9 @@ GLuint ModelViewerCanvas::render()
 	for (const auto & mesh : a_model->meshes)
     {
 		glBindVertexArray(mesh.VAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
 
 		PhongShaderInstanced::getDefaultInstance()->setMaterial(mesh.material);
 

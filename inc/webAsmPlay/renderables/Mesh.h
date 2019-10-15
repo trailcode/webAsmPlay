@@ -62,7 +62,9 @@ public:
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
 	Material material;
-    unsigned int VAO;
+    unsigned int VAO = 0;
+	/*  Render data  */
+    unsigned int VBO, EBO;
 
     /*  Functions  */
     // constructor
@@ -71,10 +73,10 @@ public:
     // render the mesh
     void Draw(const SetMaterialFunctor & onMaterial);
     
-private:
-    /*  Render data  */
-    unsigned int VBO, EBO;
+	void ensureVAO();
 
+private:
+    
     /*  Functions    */
     // initializes all the buffer objects/arrays
     void setupMesh();

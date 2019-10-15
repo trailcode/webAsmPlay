@@ -53,6 +53,8 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture
 // render the mesh
 void Mesh::Draw(const SetMaterialFunctor & onMaterial)
 {
+	ensureVAO();
+
     // bind appropriate textures
     unsigned int diffuseNr  = 1;
     unsigned int specularNr = 1;
@@ -99,11 +101,14 @@ void Mesh::Draw(const SetMaterialFunctor & onMaterial)
 void Mesh::setupMesh()
 {
     // create buffers/arrays
-    glGenVertexArrays(1, &VAO);
+    
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
-    glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);	
+    
     // load data into vertex buffers
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // A great thing about structs is that their memory layout is sequential for all its items.
@@ -111,8 +116,20 @@ void Mesh::setupMesh()
     // again translates to 3/2 floats which translates to a byte array.
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);  
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	// Flush is required if executing in a thread different from the main thread.
+	glFlush();
+
+	//ensureVAO();
+}
+
+void Mesh::ensureVAO()
+{
+	if(VAO) { return ;}
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     // set the vertex attribute pointers
     // vertex Positions

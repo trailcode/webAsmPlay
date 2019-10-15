@@ -26,7 +26,10 @@
 
 #pragma once
 
+#include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/renderables/Renderable.h>
+
+class Model;
 
 class RenderableModelInstanced : public Renderable
 {
@@ -41,6 +44,14 @@ public:
 private:
 
 	RenderableModelInstanced(const std::string & modelPath, const std::vector<glm::vec2> & modelPositions);
+
+	~RenderableModelInstanced();
+
+	Model * m_model = nullptr;
+
+	GLuint m_modelInstancedID = -1;
+
+	bool m_didVAO = false;
 };
 
 
