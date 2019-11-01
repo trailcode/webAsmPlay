@@ -26,6 +26,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/shaders/PhongShaderInstanced.h>
 #include <webAsmPlay/renderables/Model.h>
 #include <webAsmPlay/renderables/RenderableModelInstanced.h>
 
@@ -41,11 +42,13 @@ RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, con
 {
 	m_model = new Model(modelPath);
 
-	vector<mat4> modelMatrices(modelPositions.size());
+	m_numInstances = modelPositions.size();
 
-	for(size_t i = 0; i < modelPositions.size(); ++i)
+	vector<mat4> modelMatrices(m_numInstances);
+
+	for(size_t i = 0; i < m_numInstances; ++i)
 	{
-		modelMatrices[i] = translate(modelMatrices[i], glm::vec3(modelPositions[i], 0));
+		modelMatrices[i] = translate(mat4(1.0f), glm::vec3(modelPositions[i], 0));
 
 		modelMatrices[i] = scale(modelMatrices[i], vec3(0.001, 0.001, 0.001));
 
@@ -56,7 +59,9 @@ RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, con
 
     glBindBuffer(GL_ARRAY_BUFFER, m_modelInstancedID);
 
-    glBufferData(GL_ARRAY_BUFFER, modelPositions.size() * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_numInstances * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 RenderableModelInstanced::~RenderableModelInstanced()
@@ -68,7 +73,23 @@ RenderableModelInstanced::~RenderableModelInstanced()
 
 void RenderableModelInstanced::render(Canvas * canvas, const size_t renderStage)
 {
-	
+	ensureVAO();
+
+	PhongShaderInstanced::getDefaultInstance()->bind(canvas, false);
+
+	for (const auto & mesh : m_model->meshes)
+    {
+		glBindVertexArray(mesh.VAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+
+		PhongShaderInstanced::getDefaultInstance()->setMaterial(mesh.material);
+
+        glDrawElementsInstanced(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0, m_numInstances);
+
+        glBindVertexArray(0);
+	}
 }
 
 void RenderableModelInstanced::ensureVAO()
@@ -78,28 +99,44 @@ void RenderableModelInstanced::ensureVAO()
 	m_didVAO = true;
 
 	for (auto & mesh : m_model->meshes)
-    {
+	{
+		mesh.ensureVAO();
+	}
+
+	/*
+	// configure instanced array
+	// -------------------------
+	unsigned int buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+	*/
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_modelInstancedID);
+
+	for (auto & mesh : m_model->meshes)
+	{
 		//mesh.ensureVAO();
 
-        unsigned int VAO = mesh.VAO;
+		unsigned int VAO = mesh.VAO;
 
-        glBindVertexArray(VAO);
+		glBindVertexArray(VAO);
 		//glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-        // set attribute pointers for matrix (4 times vec4)
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
-        glEnableVertexAttribArray(6); 
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+		// set attribute pointers for matrix (4 times vec4)
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(6); 
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
 
-        glVertexAttribDivisor(3, 1);
-        glVertexAttribDivisor(4, 1);
-        glVertexAttribDivisor(5, 1);
-        glVertexAttribDivisor(6, 1);
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
 
-        glBindVertexArray(0);
-    }
+		glBindVertexArray(0);
+	}
 }

@@ -41,7 +41,7 @@ public:
 
 	void ensureVAO() override;
 
-private:
+//private:
 
 	RenderableModelInstanced(const std::string & modelPath, const std::vector<glm::vec2> & modelPositions);
 
@@ -52,6 +52,8 @@ private:
 	GLuint m_modelInstancedID = -1;
 
 	bool m_didVAO = false;
+
+	size_t m_numInstances = 0;
 };
 
 
