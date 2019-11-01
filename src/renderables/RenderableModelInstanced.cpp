@@ -38,6 +38,8 @@ Renderable * RenderableModelInstanced::create(const string & modelPath, const ve
 	return new RenderableModelInstanced(modelPath, modelPositions);
 }
 
+//vector<mat4> modelMatrices;
+
 RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, const vector<vec2> & modelPositions)
 {
 	m_model = new Model(modelPath);
@@ -45,13 +47,14 @@ RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, con
 	m_numInstances = modelPositions.size();
 
 	vector<mat4> modelMatrices(m_numInstances);
+	//modelMatrices.resize(m_numInstances);
 
 	for(size_t i = 0; i < m_numInstances; ++i)
 	{
 		modelMatrices[i] = translate(mat4(1.0f), glm::vec3(modelPositions[i], 0));
 
 		//modelMatrices[i] = scale(modelMatrices[i], vec3(0.001, 0.001, 0.001));
-		modelMatrices[i] = scale(modelMatrices[i], vec3(0.0001, 0.0001, 0.0001));
+		modelMatrices[i] = scale(modelMatrices[i], vec3(0.00003, 0.00003, 0.00003));
 
 		modelMatrices[i] = rotate(modelMatrices[i], radians(90.0f), vec3(1,0,0));
 	}
@@ -63,6 +66,8 @@ RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, con
     glBufferData(GL_ARRAY_BUFFER, m_numInstances * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glFlush(); // Is this required?
 }
 
 RenderableModelInstanced::~RenderableModelInstanced()
@@ -77,6 +82,8 @@ void RenderableModelInstanced::render(Canvas * canvas, const size_t renderStage)
 	ensureVAO();
 
 	PhongShaderInstanced::getDefaultInstance()->bind(canvas, false);
+
+	//dmess("m_numInstances " << m_numInstances);
 
 	for (const auto & mesh : m_model->meshes)
     {

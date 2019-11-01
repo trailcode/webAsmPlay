@@ -89,9 +89,9 @@ PhongShaderInstanced::~PhongShaderInstanced()
 
 }
 
-void PhongShaderInstanced::bind( Canvas     * canvas,
-						const bool   isOutline,
-						const size_t renderingStage)
+void PhongShaderInstanced::bind(	Canvas     * canvas,
+									const bool   isOutline,
+									const size_t renderingStage)
 {
 	a_shaderProgram->bind();
 

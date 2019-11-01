@@ -96,6 +96,7 @@ ModelViewerCanvas::ModelViewerCanvas(	const bool   useFrameBuffer,
 	//worker.join();
 	//*/
 
+	//*
 	thread worker([]()
 	{
 		OpenGL::ensureSharedContext();
@@ -119,6 +120,7 @@ ModelViewerCanvas::ModelViewerCanvas(	const bool   useFrameBuffer,
 	});
 
 	worker.join();
+	//*/
 }
 
 ModelViewerCanvas::~ModelViewerCanvas()

@@ -290,7 +290,13 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
 		const auto point = dynamic_cast<Point *>(geom);
 
-		pointPositions.push_back(m_trans * vec4(point->getX(), point->getY(), 0, 1));
+		if(point)
+		{
+			//if(pointPositions.size() < 10000)
+			{
+				pointPositions.push_back(m_trans * vec4(point->getX(), point->getY(), 0, 1));
+			}
+		}
     }
     
     GUI::progress("", 1.0);
@@ -301,9 +307,11 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 	
 	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     
+	//*
 	r = RenderableModelInstanced::create("C:/build/LearnOpenGL/resources/objects/cartoon_lowpoly_trees_blend.obj", pointPositions);
 
 	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
+	//*/
 
     dmess("Done creating renderable.");
 
