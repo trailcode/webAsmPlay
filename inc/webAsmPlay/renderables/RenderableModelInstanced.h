@@ -41,7 +41,7 @@ public:
 
 	void ensureVAO() override;
 
-//private:
+private:
 
 	RenderableModelInstanced(const std::string & modelPath, const std::vector<glm::vec2> & modelPositions);
 

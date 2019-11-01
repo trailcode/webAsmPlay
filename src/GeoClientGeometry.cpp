@@ -40,6 +40,7 @@
 #include <webAsmPlay/renderables/RenderableMesh.h>
 #include <webAsmPlay/renderables/RenderableLineString.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
+#include <webAsmPlay/renderables/RenderableModelInstanced.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
 #include <webAsmPlay/shaders/ColorDistanceDepthShader3D.h>
 #include <webAsmPlay/shaders/ColorSymbology.h>
@@ -271,6 +272,8 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     ColoredGeometryVec points;
 
+	vector<vec2> pointPositions;
+
     for(size_t i = 0; i < geoms.size(); ++i)
     {
         doProgress("(2/6) Indexing points:", i, geoms.size(), startTime);
@@ -284,6 +287,10 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
         m_quadTreePoints->insert(geom->getEnvelopeInternal(), new tuple{ r, geom, attrs });
 
         points.push_back(ColoredGeometry(geom->buffer(0.00001, 3), 1));
+
+		const auto point = dynamic_cast<Point *>(geom);
+
+		pointPositions.push_back(m_trans * vec4(point->getX(), point->getY(), 0, 1));
     }
     
     GUI::progress("", 1.0);
@@ -294,6 +301,10 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 	
 	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     
+	r = RenderableModelInstanced::create("C:/build/LearnOpenGL/resources/objects/cartoon_lowpoly_trees_blend.obj", pointPositions);
+
+	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
+
     dmess("Done creating renderable.");
 
 #ifndef __EMSCRIPTEN__

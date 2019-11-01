@@ -50,7 +50,8 @@ RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, con
 	{
 		modelMatrices[i] = translate(mat4(1.0f), glm::vec3(modelPositions[i], 0));
 
-		modelMatrices[i] = scale(modelMatrices[i], vec3(0.001, 0.001, 0.001));
+		//modelMatrices[i] = scale(modelMatrices[i], vec3(0.001, 0.001, 0.001));
+		modelMatrices[i] = scale(modelMatrices[i], vec3(0.0001, 0.0001, 0.0001));
 
 		modelMatrices[i] = rotate(modelMatrices[i], radians(90.0f), vec3(1,0,0));
 	}
@@ -87,9 +88,9 @@ void RenderableModelInstanced::render(Canvas * canvas, const size_t renderStage)
 		PhongShaderInstanced::getDefaultInstance()->setMaterial(mesh.material);
 
         glDrawElementsInstanced(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0, m_numInstances);
-
-        glBindVertexArray(0);
 	}
+
+	glBindVertexArray(0);
 }
 
 void RenderableModelInstanced::ensureVAO()
@@ -136,7 +137,9 @@ void RenderableModelInstanced::ensureVAO()
 		glVertexAttribDivisor(4, 1);
 		glVertexAttribDivisor(5, 1);
 		glVertexAttribDivisor(6, 1);
-
-		glBindVertexArray(0);
 	}
+
+	glBindVertexArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
