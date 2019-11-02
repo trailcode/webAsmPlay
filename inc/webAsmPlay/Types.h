@@ -63,6 +63,16 @@ namespace geos
     }
 }
 
+namespace boostGeom
+{
+	typedef double CoordinateType;
+	typedef boost::geometry::model::d2::point_xy<CoordinateType> Point;
+	typedef boost::geometry::model::box<Point> Box;
+	typedef boost::geometry::model::linestring<Point> LineString;
+	typedef boost::geometry::model::polygon<Point> Polygon;
+	typedef boost::geometry::model::multi_polygon<Polygon> MultiPolygon;
+}
+
 typedef std::tuple<double, double, double, double> AABB2D;
 
 typedef std::pair<Attributes *, geos::geom::Geometry   *> AttributedGeometry;
@@ -79,6 +89,9 @@ inline Attributes          * attrs(const AttributedPoligonalArea & v) { return s
 inline geos::geom::Polygon * poly (const AttributedPoligonalArea & v) { return std::get<1>(v) ;}
 inline double                area (const AttributedPoligonalArea & v) { return std::get<2>(v) ;}
 
+typedef std::tuple<Attributes *, boostGeom::Polygon,	double> AttributedPoligonalAreaBoost;
+typedef std::pair<Attributes *, boostGeom::LineString> AttributedLineStringBoost;
+
 typedef std::pair<const geos::geom::Geometry *, const size_t> ColoredGeometry;
 
 typedef std::pair<glm::dvec2, Edge *> PointOnEdge;
@@ -86,8 +99,6 @@ typedef std::pair<glm::dvec2, Edge *> PointOnEdge;
 typedef std::vector<ColoredGeometry> ColoredGeometryVec;
 
 typedef std::tuple<const geos::geom::Geometry *, const size_t, const double, const double> ColoredExtrudedGeometry;
-
-//inline const geos::geom::Geometry *& geom
 
 typedef std::vector<ColoredExtrudedGeometry> ColoredExtrudedGeometryVec; 
 
@@ -100,12 +111,3 @@ typedef std::vector<uint32_t> Uint32Vec;
 typedef std::vector<std::string> StrVec;
 
 typedef std::function<void ()> Updatable;
-
-namespace boostGeom
-{
-	typedef double CoordinateType;
-	typedef boost::geometry::model::d2::point_xy<CoordinateType> Point;
-	typedef boost::geometry::model::box<Point> Box;
-	typedef boost::geometry::model::polygon<Point> Polygon;
-	typedef boost::geometry::model::multi_polygon<Polygon> MultiPolygon;
-}

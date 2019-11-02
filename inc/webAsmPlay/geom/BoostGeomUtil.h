@@ -32,12 +32,17 @@ namespace geos
 	namespace geom
 	{
 		class Polygon;
+		class LineString;
 	}
 }
 
 namespace boostGeom
 {
 	Polygon convert(const geos::geom::Polygon * poly);
+
+	LineString convert(const geos::geom::LineString * lineString);
+
+	geos::geom::LineString * toGeos(const LineString & ls);
 
 	MultiPolygon unionPolygons(const MultiPolygon & polys);
 

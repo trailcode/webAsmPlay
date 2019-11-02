@@ -1,8 +1,11 @@
 #include <geos/geom/LineString.h>
 #include <geos/geom/Polygon.h>
+#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/geom/GeometryFactory.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/geom/BoostGeomUtil.h>
 
+using namespace std;
 using namespace glm;
 using namespace boost::geometry;
 using namespace boostGeom;
@@ -13,9 +16,29 @@ Polygon boostGeom::convert(const geos::geom::Polygon * poly)
 
 	for(const auto & P : *poly->getExteriorRing()->getCoordinatesRO()->toVector()) { ret.outer().push_back({ P.x, P.y }) ;}
 
-	dmessError("Implement innors!");
+	dmess("Implement innors!");
 
 	return ret;
+}
+
+LineString boostGeom::convert(const geos::geom::LineString * lineString)
+{
+	LineString ret;
+
+	for(const auto & P : *lineString->getCoordinatesRO()->toVector()) { ret.push_back({ P.x, P.y }) ;}
+
+	return ret;
+}
+
+geos::geom::LineString * boostGeom::toGeos(const LineString & ls)
+{
+	using namespace geos::geom;
+
+	auto coords = new vector<Coordinate>(ls.size());
+
+	for(size_t i = 0; i < ls.size(); ++i) { (*coords)[i] = {ls[i].x(), ls[i].y()} ;}
+
+	return GeometryFactory::getDefaultInstance()->createLineString(new CoordinateArraySequence(coords, 2));
 }
 
 MultiPolygon boostGeom::unionPolygons(const MultiPolygon & polys)

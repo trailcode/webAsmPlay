@@ -589,10 +589,27 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString>& lin
 	return ret;
 }
 
+#include <webAsmPlay/geom/BoostGeomUtil.h>
+
 void topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
 {
     AttributeStatistics::addLineStrings(lineStrings);
 
+	vector<AttributedLineStringBoost> lineStringsBoost;
+
+	for(const auto [attributes, lineString] : lineStrings)
+	{
+		lineStringsBoost.push_back({attributes, boostGeom::convert(lineString)});
+	}
+
+	lineStrings.clear();
+
+	for(const auto [attributes, lineString] : lineStringsBoost)
+	{
+		lineStrings.push_back({attributes, boostGeom::toGeos(lineString)});
+	}
+
+#ifdef WORKING
     vector<AttributedLineString> curr; // = lineStrings;
 
     size_t counter = 0;
@@ -634,4 +651,5 @@ void topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
     lineStrings.clear();
 
     lineStrings.insert(lineStrings.end(), nonSplitting.begin(), nonSplitting.end());
+#endif
 }
