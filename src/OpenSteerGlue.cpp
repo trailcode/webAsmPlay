@@ -59,6 +59,22 @@ extern bool gotoNextZombie; // TODO Un-globalize
 
 namespace
 {
+	class MyCleanUp
+	{
+	public:
+
+		~MyCleanUp()
+		{
+			if(!openSteerThread) { return ;}
+
+			if(openSteerThread->joinable()) { openSteerThread->join() ;}
+
+			delete openSteerThread;
+		}
+	};
+
+	static MyCleanUp s_myCleanup;
+
     const double a_scaleValue = 1.0 / (60.0 * 2.0);
 
     const dmat4 a_geomTrans(scale(dmat4(1.0), dvec3(a_scaleValue, a_scaleValue, a_scaleValue)));
