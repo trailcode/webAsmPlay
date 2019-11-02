@@ -257,7 +257,7 @@ GLuint Canvas::render()
     for(const auto r : m_points)              { r->render(this, POST_G_BUFFER) ;}
     for(const auto r : m_deferredRenderables) { r->render(this, POST_G_BUFFER) ;} 
     for(const auto r : m_meshes)              { r->render(this, POST_G_BUFFER) ;}
-	for(const auto r : m_hi)              { r->render(this, POST_G_BUFFER) ;}
+	for(const auto r : m_models)              { r->render(this, POST_G_BUFFER) ;}
 	
 	m_gBuffer->unbind();
 	
@@ -427,7 +427,7 @@ Renderable * Canvas::addRenderable(Renderable * renderiable, const bool ensureVA
     if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderable(m_meshes,              renderiable) ;}
     if(dynamic_cast<RenderableBingMap    *>(renderiable)) { return addRenderable(m_rasters,             renderiable) ;}
 
-	if(dynamic_cast<RenderableModelInstanced *>(renderiable)) { return addRenderable(m_hi,              renderiable) ;}
+	if(dynamic_cast<RenderableModelInstanced *>(renderiable)) { return addRenderable(m_models,              renderiable) ;}
 
     dmessError("Error! Implement!");
     

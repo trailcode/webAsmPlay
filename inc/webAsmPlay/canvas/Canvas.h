@@ -164,7 +164,7 @@ protected:
     std::list<Renderable *> m_meshes;
     std::list<Renderable *> m_deferredRenderables;
     std::list<Renderable *> m_rasters;
-	std::list<Renderable *> m_hi;
+	std::list<Renderable *> m_models;
 
     const bool m_useFrameBuffer;
 

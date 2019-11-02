@@ -274,6 +274,17 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
 	vector<vec2> pointPositions;
 
+	for(const auto [attrs, geom] : geoms)
+	{
+		const auto point = dynamic_cast<Point *>(geom);
+
+		if(point) { pointPositions.push_back(m_trans * vec4(point->getX(), point->getY(), 0, 1)) ;}
+	}
+
+	auto r = RenderableModelInstanced::create("C:/build/LearnOpenGL/resources/objects/cartoon_lowpoly_trees_blend.obj", pointPositions);
+
+	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
+
     for(size_t i = 0; i < geoms.size(); ++i)
     {
         doProgress("(2/6) Indexing points:", i, geoms.size(), startTime);
@@ -287,32 +298,16 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
         m_quadTreePoints->insert(geom->getEnvelopeInternal(), new tuple{ r, geom, attrs });
 
         points.push_back(ColoredGeometry(geom->buffer(0.00001, 3), 1));
-
-		const auto point = dynamic_cast<Point *>(geom);
-
-		if(point)
-		{
-			//if(pointPositions.size() < 10000)
-			{
-				pointPositions.push_back(m_trans * vec4(point->getX(), point->getY(), 0, 1));
-			}
-		}
     }
     
     GUI::progress("", 1.0);
 
-    Renderable * r = RenderablePolygon::create(points, m_trans, true);
+    r = RenderablePolygon::create(points, m_trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 	
 	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     
-	//*
-	r = RenderableModelInstanced::create("C:/build/LearnOpenGL/resources/objects/cartoon_lowpoly_trees_blend.obj", pointPositions);
-
-	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
-	//*/
-
     dmess("Done creating renderable.");
 
 #ifndef __EMSCRIPTEN__
