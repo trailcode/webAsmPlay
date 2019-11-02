@@ -227,11 +227,5 @@ int main(int, char**)
 
     GUI::shutdown();
 
-    dmess("Before join");
-
-	if (openSteerThread) { openSteerThread->join(); }
-
-    dmess("After join");
-
     return 0;
 }

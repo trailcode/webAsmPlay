@@ -82,6 +82,20 @@ namespace
     thread_pool a_uploaderPool	(1);
 	thread_pool a_writerPool	(1);
 
+	class MyCleanup
+	{
+	public:
+
+		~MyCleanup()
+		{
+			a_loaderPool.stop();
+			a_uploaderPool.stop();
+			a_writerPool.stop();
+		}
+	};
+
+	static MyCleanup s_cleanup;
+
 #endif
 
 	enum
