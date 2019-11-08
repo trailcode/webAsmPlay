@@ -79,7 +79,7 @@ endif()
 set (CMAKE_CXX_STANDARD 17)
 #set (CMAKE_CXX_STANDARD 14)
 
-if(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
+if (EMSCRIPTEN)
   message(" * C++ compiler: Emscripten")
   set(CMAKE_CXX_COMPILER_ID "Emscripten")
 else()
@@ -229,6 +229,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
                                 -s WASM=1 \
                                 -s USE_WEBGL2=1 \
                                 -s USE_GLFW=3 \
+								-s USE_BOOST_HEADERS=1 \
                                 --js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_glfw.js \
                                 --js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_gl.js \
                                 -s USE_SDL=2 \
@@ -239,6 +240,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
                                 -s DEMANGLE_SUPPORT=1 \
                                 --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/ \
                                 --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/config@/")
+
+	SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-s USE_BOOST_HEADERS=1 -s USE_WEBGL2=1")
 
     #-s DEMANGLE_SUPPORT=1 \
     #-s ASSERTIONS=2 \

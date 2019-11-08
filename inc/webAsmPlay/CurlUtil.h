@@ -45,3 +45,4 @@ namespace curlUtil
 
 	BufferStruct * download(const std::string & url, const size_t threadID = -1);
 }
+

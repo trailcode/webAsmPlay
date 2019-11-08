@@ -590,9 +590,95 @@ vector<AttributedLineString> _breakLineStrings(vector<AttributedLineString>& lin
 }
 
 #include <webAsmPlay/geom/BoostGeomUtil.h>
+#include <boost/geometry/index/rtree.hpp>
+#include <map>
+
+namespace bg = boost::geometry;
+namespace bgi = boost::geometry::index;
+
+namespace
+{
+	struct envelope_visitor : public boost::static_visitor<boostGeom::Box>
+	{
+		/*
+		box operator()(polygon const& g) const { return bg::return_envelope<box>(g); }
+		box operator()(ring const& g) const { return bg::return_envelope<box>(g); }
+		box operator()(linestring const& g) const { return bg::return_envelope<box>(g); }
+		*/
+
+		boostGeom::Box operator()(boostGeom::LineString const & g) const { return bg::return_envelope<boostGeom::Box>(g); }
+	};
+}
+
+#pragma optimize( "", off )
+vector<AttributedLineStringBoost> _breakLineStrings(vector<AttributedLineStringBoost>& lineStrings, vector<AttributedLineStringBoost>& nonSplitting)
+{
+	vector<AttributedLineStringBoost> ret;
+
+	//typedef std::map<unsigned, geometry> map;
+	typedef std::map<unsigned, boostGeom::LineString> map;
+	//typedef std::pair<boostGeom::Box, map::iterator> value;
+	typedef std::pair<boostGeom::Box, boostGeom::LineString *> value;
+
+	typedef boostGeom::Box box;
+
+	// create the rtree using default constructor
+    bgi::rtree< value, bgi::quadratic<16, 4> > rtree;
+
+	for(auto & [attrs, ls] : lineStrings)
+	{
+		//box b = boost::apply_visitor(envelope_visitor(), ls);
+		box b = bg::return_envelope<boostGeom::Box>(ls);
+
+		rtree.insert(std::make_pair(b, &ls));	
+	}
+
+	for(auto & [attrs, ls] : lineStrings)
+	{
+		box query_box = bg::return_envelope<boostGeom::Box>(ls);
+
+		std::vector<value> result_s;
+
+		rtree.query(bgi::intersects(query_box), std::back_inserter(result_s));
+
+		dmess("result_s " << result_s.size());
+
+		vector<boostGeom::Point> splitPoints;
+
+		for(auto [box, g] : result_s)
+		{
+			if(g == &ls) { continue ;}
+			//if(g == &ls || !bg::intersects(ls, *g)) { continue ;}
+
+			//if(!bg::touches(ls, *g)) { continue ;}
+
+			auto & gg  = *g;
+
+			vector<boostGeom::LineString> split;
+			
+			//bg::difference(*g, ls, split);
+			//bg::sym_difference(*g, ls, split);
+			//bg::union_(*g, ls, split);
+			bg::intersection(*g, ls, splitPoints);
+
+			//if(splitPoints.empty()) { continue ;}
+
+			if(g == &ls)
+			{
+				dmess("");
+			}
+		}
+
+		dmess(splitPoints.size());
+	}
+
+	return ret;
+}
+#pragma optimize( "", on )
 
 void topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
 {
+	/*
     AttributeStatistics::addLineStrings(lineStrings);
 
 	vector<AttributedLineStringBoost> lineStringsBoost;
@@ -602,14 +688,18 @@ void topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
 		lineStringsBoost.push_back({attributes, boostGeom::convert(lineString)});
 	}
 
+	vector<AttributedLineStringBoost> nonSplitting;
+
+	_breakLineStrings(lineStringsBoost, nonSplitting);
+
 	lineStrings.clear();
 
 	for(const auto [attributes, lineString] : lineStringsBoost)
 	{
 		lineStrings.push_back({attributes, boostGeom::toGeos(lineString)});
 	}
+	*/
 
-#ifdef WORKING
     vector<AttributedLineString> curr; // = lineStrings;
 
     size_t counter = 0;
@@ -651,5 +741,4 @@ void topology::breakLineStrings(vector<AttributedLineString> & lineStrings)
     lineStrings.clear();
 
     lineStrings.insert(lineStrings.end(), nonSplitting.begin(), nonSplitting.end());
-#endif
 }

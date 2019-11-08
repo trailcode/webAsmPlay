@@ -40,19 +40,29 @@ using namespace curlUtil;
 
 namespace
 {
+#ifndef __EMSCRIPTEN__
+
 	mutex a_loaderMutex;
 
 	unordered_map<size_t, CURL *> a_curlHandles;
+
+#endif
 }
 
 BufferStruct::~BufferStruct()
 {
+#ifndef __EMSCRIPTEN__
+
 	free(m_buffer);
+
+#endif
 }
 
 // This is the function we pass to LC, which writes the output to a BufferStruct
 size_t curlUtil::writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
 {
+#ifndef __EMSCRIPTEN__
+
 	const size_t realsize = size * nmemb;
 
 	struct BufferStruct * mem = (struct BufferStruct *) data;
@@ -66,10 +76,16 @@ size_t curlUtil::writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void 
 	mem->m_buffer[mem->m_size] = 0;
 
 	return realsize;
+
+#endif
+
+	return 0;
 }
 
 BufferStruct * curlUtil::download(const string & url, const size_t threadID)
 {
+#ifndef __EMSCRIPTEN__
+
 	CURL * myHandle = nullptr;
 
 	{
@@ -97,4 +113,8 @@ BufferStruct * curlUtil::download(const string & url, const size_t threadID)
 	}
 
 	return output;
+
+#endif
+
+	return nullptr;
 }
