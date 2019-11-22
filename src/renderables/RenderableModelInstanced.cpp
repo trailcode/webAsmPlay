@@ -78,6 +78,8 @@ RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, con
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glFlush(); // Is this required?
+
+	setRenderFill(true);
 }
 
 RenderableModelInstanced::~RenderableModelInstanced()

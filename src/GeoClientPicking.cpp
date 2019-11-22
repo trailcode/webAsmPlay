@@ -26,6 +26,7 @@
 */
 
 #include <geos/geom/GeometryFactory.h>
+#include <geos/geom/Point.h>
 #include <geos/algorithm/distance/DistanceToPoint.h>
 #include <geos/algorithm/distance/PointPairDistance.h>
 #include <geos/index/quadtree/Quadtree.h>
@@ -153,7 +154,7 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(cons
 
     for(const void * _data : query)
     {
-		auto & [renderable, geom, attributes] = *(tuple<Renderable *, const Geometry *, Attributes *> *)_data;
+		auto [renderable, geom, attributes] = *(tuple<Renderable *, const Geometry *, Attributes *> *)_data;
 
         if(!p->within(geom)) { continue ;}
 
@@ -161,8 +162,6 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(cons
 		{
 			if(renderable = Renderable::create(geom, m_trans))
 			{
-				dmess("Create " << renderable);
-
 				renderable->setRenderFill   (true);
 				renderable->setRenderOutline(true);
 			}
@@ -182,6 +181,42 @@ vector<pair<Renderable *, Attributes *> > GeoClient::pickPolygonRenderables(cons
     return ret;
 }
 
+pair<Renderable*, Attributes*> GeoClient::pickPointRenderable(const vec3& _pos) const
+{
+    vector<pair<Renderable*, Attributes*> > ret;
+
+    const vec4 pos = m_inverseTrans * vec4(_pos, 1.0);
+
+    vector< void* > query;
+
+    const Envelope bounds(pos.x, pos.x, pos.y, pos.y);
+
+    m_quadTreePoints->query(&bounds, query);
+
+    double bestDistSoFar = numeric_limits<double>::max();
+
+    Attributes* attrs = nullptr;
+    Renderable* renderable = nullptr;
+
+    for (const void* _data : query)
+    {
+        auto [_renderable, geom, attributes] = *(tuple<Renderable*, const Geometry*, Attributes*>*)_data;
+
+        const auto point = dynamic_cast<const Point *>(geom);
+
+        const auto dist = glm::distance(vec2(pos), { point->getX(), point->getY() });
+
+        if (dist >= bestDistSoFar) { continue; }
+
+        bestDistSoFar = dist;
+
+        attrs = attributes;
+
+        renderable = _renderable;
+    }
+
+    return { renderable, attrs };
+}
 
 string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 {
@@ -253,6 +288,14 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
             }
             
             return attrsStr;
+        }
+        case GUI::PICK_MODE_POINT:
+        {
+            auto [renderable, attrs] = pickPointRenderable(m_canvas->getCursorPosWC());
+
+            if (!attrs) { return ""; }
+
+            return attrs->toString();
         }
     }
 

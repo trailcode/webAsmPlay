@@ -63,6 +63,8 @@ public:
 
     std::vector<std::pair<Renderable *, Attributes *> > pickPolygonRenderables(const glm::vec3 & pos) const;
 
+    std::pair<Renderable*, Attributes*> pickPointRenderable(const glm::vec3& pos) const;
+
     glm::dmat4 getTrans() const;
     glm::dmat4 getInverseTrans() const;
 

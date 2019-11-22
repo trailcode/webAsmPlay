@@ -275,6 +275,7 @@ void GUI::showMainToolBar()
         toolbar.addButton(ImGui::Toolbutton("Get Info Linestring Mode",			(void*)(a_infoIcon),uv0,uv1,size));
         toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Mode",			(void*)(a_infoIcon),uv0,uv1,size));
         toolbar.addButton(ImGui::Toolbutton("Get Info Polygon Multiple Mode",	(void*)(a_infoIcon),uv0,uv1,size));
+        toolbar.addButton(ImGui::Toolbutton("Get Info Point Mode",              (void*)(a_infoIcon), uv0, uv1, size));
         toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",				(void*)(a_infoIcon),uv0,uv1,size));
         toolbar.addButton(ImGui::Toolbutton("Find Path",						(void*)(a_infoIcon),uv0,uv1,size));
 
@@ -293,8 +294,9 @@ void GUI::showMainToolBar()
         case 1: a_mode = PICK_MODE_LINESTRING;        break;
         case 2: a_mode = PICK_MODE_POLYGON_SINGLE;    break;
         case 3: a_mode = PICK_MODE_POLYGON_MULTIPLE;  break;
-        case 4: a_mode = SET_PATH_START_POINT;        break;
-        case 5: a_mode = FIND_PATH;                   break;
+        case 4: a_mode = PICK_MODE_POINT;             break;
+        case 5: a_mode = SET_PATH_START_POINT;        break;
+        case 6: a_mode = FIND_PATH;                   break;
     }
 }
 
