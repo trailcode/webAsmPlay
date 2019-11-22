@@ -469,6 +469,7 @@ const list<Renderable *> & Canvas::getPolygonsRef()             const { return m
 const list<Renderable *> & Canvas::getMeshesRef()               const { return m_meshes               ;}
 const list<Renderable *> & Canvas::getDeferredRenderablesRef()  const { return m_deferredRenderables  ;}
 const list<Renderable *> & Canvas::getRastersRef()              const { return m_rasters              ;}
+const list<Renderable *> & Canvas::getModelsRef()               const { return m_models               ;}
 
 vec4 Canvas::setClearColor(const vec4 & clearColor) { return this->m_clearColor = clearColor ;}
 

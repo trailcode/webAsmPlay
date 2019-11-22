@@ -80,17 +80,18 @@ RenderableModelInstanced::~RenderableModelInstanced()
 
 void RenderableModelInstanced::render(Canvas * canvas, const size_t renderStage)
 {
+	if (!m_renderFill) { return; }
+
 	ensureVAO();
 
 	PhongShaderInstanced::getDefaultInstance()->bind(canvas, false);
-
-	//dmess("m_numInstances " << m_numInstances);
 
 	for (const auto & mesh : m_model->meshes)
     {
 		glBindVertexArray(mesh.VAO);
 
 		glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
 
 		PhongShaderInstanced::getDefaultInstance()->setMaterial(mesh.material);

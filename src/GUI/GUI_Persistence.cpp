@@ -70,6 +70,7 @@ bool GUI::s_renderSettingsRenderPolygonOutlines  = true;
 bool GUI::s_renderSettingsRenderLinearFeatures   = true;
 bool GUI::s_renderSettingsRenderSkyBox           = true;
 bool GUI::s_renderSettingsRenderBingMaps         = true;
+bool GUI::s_renderSettingsRenderModels           = true;
 
 float GUI::s_lineWidthRender = 1.0;
 
@@ -123,6 +124,7 @@ void GUI::loadState()
     setBool(L"renderSettingsRenderLinearFeatures",  s_renderSettingsRenderLinearFeatures);
     setBool(L"renderSettingsRenderSkyBox",          s_renderSettingsRenderSkyBox);
     setBool(L"renderSettingsRenderBingMaps",        s_renderSettingsRenderBingMaps);
+    setBool(L"renderSettingsRenderModels",          s_renderSettingsRenderModels);
     setBool(L"OpenSteerAnnotation",                 OpenSteer::enableAnnotation);
 
     setNumber(L"cameraMode",                        s_cameraMode);
@@ -179,6 +181,7 @@ void GUI::saveState()
     root[L"renderSettingsRenderLinearFeatures"]   = new JSONValue(s_renderSettingsRenderLinearFeatures);
     root[L"renderSettingsRenderSkyBox"]           = new JSONValue(s_renderSettingsRenderSkyBox);
     root[L"renderSettingsRenderBingMaps"]         = new JSONValue(s_renderSettingsRenderBingMaps);
+    root[L"renderSettingsRenderModels"]           = new JSONValue(s_renderSettingsRenderModels);
 	root[L"buildingHeightMultiplier"]             = new JSONValue(ColorDistanceDepthShader3D::getDefaultInstance()->getHeightMultiplier());
 
     root[L"cameraEye"]                            = new JSONValue(s_canvas->getCamera()->getEyeConstRef());

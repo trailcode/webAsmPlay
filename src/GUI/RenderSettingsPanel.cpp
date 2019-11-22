@@ -77,6 +77,14 @@ void GUI::renderSettingsPanel()
             }
         }
 
+        if (ImGui::Checkbox("Models", &s_renderSettingsRenderModels))
+        {
+            for (auto r : s_canvas->getModelsRef())
+            {
+                r->setRenderFill(s_renderSettingsRenderModels);
+            }
+        }
+
         if(ImGui::Checkbox("SkyBox", &s_renderSettingsRenderSkyBox))
         {   
             if(s_renderSettingsRenderSkyBox)	{ s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor

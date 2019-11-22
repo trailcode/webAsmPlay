@@ -109,6 +109,7 @@ public:
     const std::list<Renderable *> & getMeshesRef() const;
     const std::list<Renderable *> & getDeferredRenderablesRef() const;
     const std::list<Renderable *> & getRastersRef() const;
+    const std::list<Renderable *> & getModelsRef() const;
 
     static std::vector<Canvas *> getInstances();
 

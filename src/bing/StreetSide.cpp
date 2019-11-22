@@ -164,5 +164,7 @@ vector<Bubble *> StreetSide::query(const double boundsMinX, const double boundsM
 		*/
 	}
 
+	dmess("Num bubbles: " << ret.size());
+
 	return ret;
 }

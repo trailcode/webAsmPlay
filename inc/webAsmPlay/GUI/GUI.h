@@ -78,6 +78,7 @@ public:
     static bool  s_renderSettingsRenderLinearFeatures;
     static bool  s_renderSettingsRenderSkyBox;
     static bool  s_renderSettingsRenderBingMaps;
+    static bool  s_renderSettingsRenderModels;
 	static float s_lineWidthRender;
 
     static void setupCallbacks(GLFWwindow* window);
