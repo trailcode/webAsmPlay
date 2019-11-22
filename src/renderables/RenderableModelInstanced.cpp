@@ -24,6 +24,7 @@
 \copyright 2019
 */
 
+#include <random>
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/shaders/PhongShaderInstanced.h>
@@ -49,6 +50,12 @@ RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, con
 	vector<mat4> modelMatrices(m_numInstances);
 	//modelMatrices.resize(m_numInstances);
 
+	random_device r;
+
+	default_random_engine e1(r());
+
+	uniform_int_distribution<int> uniformDist(0, 360.0);
+
 	for(size_t i = 0; i < m_numInstances; ++i)
 	{
 		modelMatrices[i] = translate(mat4(1.0f), glm::vec3(modelPositions[i], 0));
@@ -58,6 +65,8 @@ RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, con
 		//modelMatrices[i] = scale(modelMatrices[i], vec3(0.00003, 0.00003, 0.00003));
 
 		modelMatrices[i] = rotate(modelMatrices[i], radians(90.0f), vec3(1,0,0));
+
+		modelMatrices[i] = rotate(modelMatrices[i], radians(float(uniformDist(e1))), vec3(0, 1, 0));
 	}
 
 	glGenBuffers(1, &m_modelInstancedID);
