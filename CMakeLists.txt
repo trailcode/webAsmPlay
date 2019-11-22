@@ -340,7 +340,10 @@ else()
                         ypos.png
                         zneg.png
                         zpos.png
-                        if_Info_131908.png)
+                        if_Info_131908.png
+                        tree1.obj
+                        tree1.mtl
+                        )
 	
     foreach(assetFile ${ASSET_FILES})
 
@@ -355,12 +358,19 @@ else()
 			list(APPEND assetFileDestRelWithDebInfo "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}")
 			list(APPEND assetFileDestMinSizeRel		"${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}")
 			list(APPEND assetFileDestDebug			"${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}")
+
+            file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Release/tiles")
+            file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/tiles")
+            file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/tiles")
+            file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Debug/tiles")
 			
 		else()
 
 			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
 
 			list(APPEND assetFileDest "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}")
+
+            file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/tiles")
 			
 		endif()
 
