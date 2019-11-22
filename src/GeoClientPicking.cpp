@@ -222,7 +222,13 @@ string GeoClient::doPicking(const char mode, const dvec4 & pos) const
 {
     switch(mode)
     {
-        case GUI::PICK_MODE_LINESTRING:
+
+
+                
+
+
+
+    case GUI::PICK_MODE_LINESTRING:
         case GUI::SET_PATH_START_POINT:
         case GUI::FIND_PATH:
         {

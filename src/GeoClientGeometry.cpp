@@ -288,6 +288,8 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
 	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
 
+    unordered_map<string, size_t> pointTypes;
+
     for(size_t i = 0; i < geoms.size(); ++i)
     {
         doProgress("(2/6) Indexing points:", i, geoms.size(), startTime);
@@ -297,12 +299,22 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
         auto r = Renderable::create(geom, m_trans);
         
         if(!r) { dmess("!r"); continue ;}
+
+        for (const auto& [key, value] : attrs->m_strings)
+        {
+            ++pointTypes[key + " " + value];
+        }
         
         m_quadTreePoints->insert(geom->getEnvelopeInternal(), new tuple{ r, geom, attrs });
 
         points.push_back(ColoredGeometry(geom->buffer(0.00001, 3), 1));
     }
     
+    for (const auto& [type, count] : pointTypes)
+    {
+        dmess("type: " << type << " " << count);
+    }
+
     GUI::progress("", 1.0);
 
     r = RenderablePolygon::create(points, m_trans, true);
