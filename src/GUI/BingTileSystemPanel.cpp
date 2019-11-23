@@ -32,6 +32,7 @@
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/bing/StreetSide.h>
 #include <webAsmPlay/bing/RasterTile.h>
+#include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 #pragma warning( pop ) 
@@ -41,6 +42,11 @@ using namespace glm;
 using namespace bingTileSystem;
 
 extern float resDelta;
+
+namespace
+{
+	unique_ptr<Renderable> a_tileSystemGeom;
+}
 
 void GUI::bingTileSystemPanel()
 {
@@ -90,10 +96,16 @@ void GUI::bingTileSystemPanel()
 		//StreetSide::queryViewport();
 	}
 
-	const dvec3 P1 = dvec4(tMin.x, tMax.y, 0, 1);
-	const dvec3 P2 = dvec4(tMax.x, tMax.y, 0, 1);
-	const dvec3 P3 = dvec4(tMax.x, tMin.y, 0, 1);
-	const dvec3 P4 = dvec4(tMin.x, tMin.y, 0, 1);
+	const vec3 P1 = vec3(tMin.x, tMax.y, 0);
+	const vec3 P2 = vec3(tMax.x, tMax.y, 0);
+	const vec3 P3 = vec3(tMax.x, tMin.y, 0);
+	const vec3 P4 = vec3(tMin.x, tMin.y, 0);
+
+	DeferredRenderable::addLine(P1, P2, {0,1,0,1}, DeferredRenderable::GUI);
+	DeferredRenderable::addLine(P2, P3, {0,1,0,1}, DeferredRenderable::GUI);
+	DeferredRenderable::addLine(P3, P4, {0,1,0,1}, DeferredRenderable::GUI);
+	DeferredRenderable::addLine(P4, P1, {0,1,0,1}, DeferredRenderable::GUI);
+
 	/*
 	const dvec3 transP1 = m_trans * dvec4(P1, 1);
 	const dvec3 transP2 = m_trans * dvec4(P2, 1);
@@ -104,5 +116,20 @@ void GUI::bingTileSystemPanel()
 	*/
 
     ImGui::End();
+}
+
+void GUI::initBingTileSystemPanel(const dmat4 & trans)
+{
+	GUI::addUpdatable([trans]()
+    {
+		if (!a_tileSystemGeom) { a_tileSystemGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(DeferredRenderable::GUI, trans)); }
+		else
+		{
+			((DeferredRenderable*)a_tileSystemGeom.get())->setFromQueued(DeferredRenderable::GUI, trans);
+		}
+
+		if(a_tileSystemGeom) { a_tileSystemGeom->render(getMainCanvas(), POST_G_BUFFER) ;}
+
+	});
 }
 

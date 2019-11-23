@@ -86,11 +86,17 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const size_t slot, con
 
     glBufferData(GL_ARRAY_BUFFER, a_vertsAndColors[slot].size() * sizeof(GLfloat), &a_vertsAndColors[slot][0], GL_STATIC_DRAW);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_triangleIndices[slot].size(), &a_triangleIndices[slot][0], GL_STATIC_DRAW);
+	if(a_triangleIndices[slot].size())
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_triangleIndices[slot].size(), &a_triangleIndices[slot][0], GL_STATIC_DRAW);
+	}
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_lineIndices[slot].size(), &a_lineIndices[slot][0], GL_STATIC_DRAW);
+	if(a_lineIndices[slot].size())
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_lineIndices[slot].size(), &a_lineIndices[slot][0], GL_STATIC_DRAW);
+	}
 
     // TODO use VertexArrayObject
 
@@ -118,24 +124,37 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const size_t slot, con
 
 void DeferredRenderable::setFromQueued(const size_t slot, const glm::dmat4& trans)
 {
-	for (size_t i = 0; i < a_vertsAndColors[slot].size(); i += 7)
-	{
-		const vec3 pos(trans * dvec4(*(vec3*)& a_vertsAndColors[slot][i], 1.0));
+	auto & vertsAndColors = a_vertsAndColors[slot];
+	auto & triangleIndices = a_triangleIndices[slot];
+	auto & lineIndices = a_lineIndices[slot];
 
-		memcpy(&a_vertsAndColors[slot][i], &pos, sizeof(vec3));
+	for (size_t i = 0; i < vertsAndColors.size(); i += 7)
+	{
+		const vec3 pos(trans * dvec4(*(vec3*)&vertsAndColors[i], 1.0));
+
+		memcpy(&vertsAndColors[i], &pos, sizeof(vec3));
 	}
 
 	glBindVertexArray(m_vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-	glBufferData(GL_ARRAY_BUFFER, a_vertsAndColors[slot].size() * sizeof(GLfloat), &a_vertsAndColors[slot][0], GL_DYNAMIC_DRAW);
+	if(vertsAndColors.size())
+	{
+		glBufferData(GL_ARRAY_BUFFER, vertsAndColors.size() * sizeof(GLfloat), &vertsAndColors[0], GL_DYNAMIC_DRAW);
+	}
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_triangleIndices[slot].size(), &a_triangleIndices[slot][0], GL_DYNAMIC_DRAW);
+	if(triangleIndices.size())
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * triangleIndices.size(), &triangleIndices[0], GL_DYNAMIC_DRAW);
+	}
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_lineIndices[slot].size(), &a_lineIndices[slot][0], GL_DYNAMIC_DRAW);
+	if(lineIndices.size())
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * lineIndices.size(), &lineIndices[0], GL_DYNAMIC_DRAW);
+	}
 
 	const size_t sizeVertex = 3;
 	const size_t sizeColor = 4;
@@ -150,12 +169,12 @@ void DeferredRenderable::setFromQueued(const size_t slot, const glm::dmat4& tran
 
 	glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void*)((sizeVertex) * sizeof(GLfloat)));
 
-	m_numTriIndices		= (GLuint)a_triangleIndices [slot].size();
-	m_numLineIndices	= (GLuint)a_lineIndices		[slot].size();
+	m_numTriIndices		= (GLuint)triangleIndices	.size();
+	m_numLineIndices	= (GLuint)lineIndices		.size();
 
-	a_vertsAndColors [slot].clear();
-	a_triangleIndices[slot].clear();
-	a_lineIndices    [slot].clear();
+	vertsAndColors .clear();
+	triangleIndices.clear();
+	lineIndices    .clear();
 }
 
 DeferredRenderable::DeferredRenderable( const GLuint & vao,
@@ -188,13 +207,22 @@ namespace
 {
     inline void addVert(const vec3 & v, const vec4 & color, const size_t slot)
     {
-        a_vertsAndColors[slot].push_back(float(v.x * 0.1));
-        a_vertsAndColors[slot].push_back(float(v.y * 0.1));
-        a_vertsAndColors[slot].push_back(float(v.z * 0.1));
-        a_vertsAndColors[slot].push_back(float(color.x));
-        a_vertsAndColors[slot].push_back(float(color.y));
-        a_vertsAndColors[slot].push_back(float(color.z));
-        a_vertsAndColors[slot].push_back(float(color.w));
+		auto & vertsAndColors = a_vertsAndColors[slot];
+
+		/*
+        vertsAndColors.push_back(float(v.x * 0.1));
+        vertsAndColors.push_back(float(v.y * 0.1));
+        vertsAndColors.push_back(float(v.z * 0.1));
+		*/
+
+		vertsAndColors.push_back(float(v.x));
+        vertsAndColors.push_back(float(v.y));
+        vertsAndColors.push_back(float(v.z));
+
+        vertsAndColors.push_back(float(color.x));
+        vertsAndColors.push_back(float(color.y));
+        vertsAndColors.push_back(float(color.z));
+        vertsAndColors.push_back(float(color.w));
     }
 }
 
@@ -263,7 +291,11 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)
 
     glDisable(GL_DEPTH_TEST);
 
-    canvas->pushModel(rotate(canvas->getModelRef(), radians(-90.0), dvec3(1, 0, 0)));
+	//auto m = rotate(scale(dmat4(1.0), {0.1,0.1,0.1}), radians(-90.0), dvec3(1, 0, 0));
+
+    //canvas->pushModel(rotate(scale(canvas->getModelRef(), {0.1,0.1,0.1}), radians(-90.0), dvec3(1, 0, 0)));
+
+	//canvas->pushModel(m * canvas->getModelRef());
 
     m_shader->bind(canvas, false, renderStage);
     
@@ -273,5 +305,5 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)
 
     glDrawElements(GL_LINES, m_numLineIndices, GL_UNSIGNED_INT, nullptr);
 
-    canvas->popMVP();
+    //canvas->popMVP();
 }

@@ -76,6 +76,10 @@ void GeoClient::createWorld(const char * data)
 	GUI::guiASync([this]() { addBingMap(GUI::s_renderSettingsRenderBingMaps) ;});
 
 	addGeometry(data);
+
+	OpenSteerGlue::init(m_canvas, getNetwork());
+
+	GUI::initBingTileSystemPanel(m_trans);
 }
 
 void GeoClient::addGeometry(const char* data)
@@ -83,8 +87,6 @@ void GeoClient::addGeometry(const char* data)
 	createPolygonRenderiables   (GeometryConverter::getGeosPolygons   (data));
 	createLineStringRenderiables(GeometryConverter::getGeosLineStrings(data));
 	createPointRenderiables     (GeometryConverter::getGeosPoints     (data));
-
-	OpenSteerGlue::init(m_canvas, getNetwork());
 }
 
 namespace

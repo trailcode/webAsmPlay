@@ -28,6 +28,7 @@
 #include <future>
 #include <chrono>
 #include <thread>
+#include <glm/mat4x4.hpp>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Types.h>
 
@@ -85,6 +86,7 @@ public:
 
     static void setupCallbacks(GLFWwindow* window);
     static void initOpenGL();
+	static void initBingTileSystemPanel(const glm::dmat4 & trans);
     static void mainLoop(GLFWwindow * window);
     static void refresh();
 
