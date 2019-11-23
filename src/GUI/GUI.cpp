@@ -49,6 +49,7 @@
 #include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/geom/GeosUtil.h>
+#include <webAsmPlay/bing/StreetSide.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 // .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
@@ -278,6 +279,7 @@ void GUI::showMainToolBar()
         toolbar.addButton(ImGui::Toolbutton("Get Info Point Mode",              (void*)(a_infoIcon), uv0, uv1, size));
         toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",				(void*)(a_infoIcon),uv0,uv1,size));
         toolbar.addButton(ImGui::Toolbutton("Find Path",						(void*)(a_infoIcon),uv0,uv1,size));
+		toolbar.addButton(ImGui::Toolbutton("Pick Bing Tile",					(void*)(a_infoIcon),uv0,uv1,size));
 
 #pragma warning( pop )
 
@@ -297,6 +299,7 @@ void GUI::showMainToolBar()
         case 4: a_mode = PICK_MODE_POINT;             break;
         case 5: a_mode = SET_PATH_START_POINT;        break;
         case 6: a_mode = FIND_PATH;                   break;
+		case 7: a_mode = PICK_BING_TILE;              break;
     }
 }
 
@@ -517,6 +520,8 @@ void GUI::mainLoop(GLFWwindow * window)
     showCursorPositionOverlay(nullptr, s_client->getInverseTrans() * pos);
     
     string attrsStr = s_client->doPicking(a_mode, pos); // TODO move to a_updatables
+	
+	StreetSide::doPicking(a_mode, pos);
 
     for(auto & i : a_updatables) { i() ;}
 

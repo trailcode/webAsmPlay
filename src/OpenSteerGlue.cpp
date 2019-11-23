@@ -167,10 +167,10 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 
 		OpenSteerDemo::redraw();
 
-		if (!a_openSteerGeom) { a_openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(a_geomTrans)); }
+		if (!a_openSteerGeom) { a_openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(DeferredRenderable::OPEN_STEER, a_geomTrans)); }
 		else
 		{
-			((DeferredRenderable*)a_openSteerGeom.get())->setFromQueued(a_geomTrans);
+			((DeferredRenderable*)a_openSteerGeom.get())->setFromQueued(DeferredRenderable::OPEN_STEER, a_geomTrans);
 		}
 		
         if(GUI::getCameraMode() == GUI::CAMERA_FOLLOW_ENTITY)

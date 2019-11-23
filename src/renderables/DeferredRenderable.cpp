@@ -35,9 +35,9 @@ using namespace glm;
 
 namespace
 {
-    vector<GLfloat> a_vertsAndColors;
-    vector<GLuint>  a_triangleIndices;
-    vector<GLuint>  a_lineIndices;
+    vector<GLfloat> a_vertsAndColors	[2];
+    vector<GLuint>  a_triangleIndices	[2];
+    vector<GLuint>  a_lineIndices		[2];
 
     inline void addTriangle(const vec3  & A,
                             const vec3  & B,
@@ -59,20 +59,20 @@ namespace
     }
 }
 
-DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
+DeferredRenderable * DeferredRenderable::createFromQueued(const size_t slot, const dmat4 & trans)
 {
-	if (!a_vertsAndColors.size()) { return nullptr; }
+	if (!a_vertsAndColors[slot].size()) { return nullptr; }
 
     GLuint vao  = 0;
     GLuint ebo  = 0;
     GLuint ebo2 = 0;
     GLuint vbo  = 0;
     
-    for(size_t i = 0; i < a_vertsAndColors.size(); i += 7)
+    for(size_t i = 0; i < a_vertsAndColors[slot].size(); i += 7)
     {
-        const vec3 pos(trans * dvec4(*(vec3 *)&a_vertsAndColors[i], 1.0));
+        const vec3 pos(trans * dvec4(*(vec3 *)&a_vertsAndColors[slot][i], 1.0));
 
-        memcpy(&a_vertsAndColors[i], &pos, sizeof(vec3));
+        memcpy(&a_vertsAndColors[slot][i], &pos, sizeof(vec3));
     }
 
     glGenVertexArrays(1, &vao);
@@ -84,13 +84,13 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    glBufferData(GL_ARRAY_BUFFER, a_vertsAndColors.size() * sizeof(GLfloat), &a_vertsAndColors[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, a_vertsAndColors[slot].size() * sizeof(GLfloat), &a_vertsAndColors[slot][0], GL_STATIC_DRAW);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_triangleIndices.size(), &a_triangleIndices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_triangleIndices[slot].size(), &a_triangleIndices[slot][0], GL_STATIC_DRAW);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo2);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_lineIndices.size(), &a_lineIndices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_lineIndices[slot].size(), &a_lineIndices[slot][0], GL_STATIC_DRAW);
 
     // TODO use VertexArrayObject
 
@@ -107,35 +107,35 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const dmat4 & trans)
 
     glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex) * sizeof(GLfloat)));
 
-    auto ret = new DeferredRenderable(vao, ebo, ebo2, vbo, (GLuint)a_triangleIndices.size(), (GLuint)a_lineIndices.size());
+    auto ret = new DeferredRenderable(vao, ebo, ebo2, vbo, (GLuint)a_triangleIndices[slot].size(), (GLuint)a_lineIndices[slot].size());
 
-    a_vertsAndColors .clear();
-    a_triangleIndices.clear();
-    a_lineIndices    .clear();
+    a_vertsAndColors	[slot].clear();
+    a_triangleIndices	[slot].clear();
+    a_lineIndices		[slot].clear();
 
     return ret;
 }
 
-void DeferredRenderable::setFromQueued(const glm::dmat4& trans)
+void DeferredRenderable::setFromQueued(const size_t slot, const glm::dmat4& trans)
 {
-	for (size_t i = 0; i < a_vertsAndColors.size(); i += 7)
+	for (size_t i = 0; i < a_vertsAndColors[slot].size(); i += 7)
 	{
-		const vec3 pos(trans * dvec4(*(vec3*)& a_vertsAndColors[i], 1.0));
+		const vec3 pos(trans * dvec4(*(vec3*)& a_vertsAndColors[slot][i], 1.0));
 
-		memcpy(&a_vertsAndColors[i], &pos, sizeof(vec3));
+		memcpy(&a_vertsAndColors[slot][i], &pos, sizeof(vec3));
 	}
 
 	glBindVertexArray(m_vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-	glBufferData(GL_ARRAY_BUFFER, a_vertsAndColors.size() * sizeof(GLfloat), &a_vertsAndColors[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, a_vertsAndColors[slot].size() * sizeof(GLfloat), &a_vertsAndColors[slot][0], GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_triangleIndices.size(), &a_triangleIndices[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_triangleIndices[slot].size(), &a_triangleIndices[slot][0], GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_lineIndices.size(), &a_lineIndices[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * a_lineIndices[slot].size(), &a_lineIndices[slot][0], GL_DYNAMIC_DRAW);
 
 	const size_t sizeVertex = 3;
 	const size_t sizeColor = 4;
@@ -150,12 +150,12 @@ void DeferredRenderable::setFromQueued(const glm::dmat4& trans)
 
 	glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void*)((sizeVertex) * sizeof(GLfloat)));
 
-	m_numTriIndices		= (GLuint)a_triangleIndices.size();
-	m_numLineIndices	= (GLuint)a_lineIndices.size();
+	m_numTriIndices		= (GLuint)a_triangleIndices [slot].size();
+	m_numLineIndices	= (GLuint)a_lineIndices		[slot].size();
 
-	a_vertsAndColors .clear();
-	a_triangleIndices.clear();
-	a_lineIndices    .clear();
+	a_vertsAndColors [slot].clear();
+	a_triangleIndices[slot].clear();
+	a_lineIndices    [slot].clear();
 }
 
 DeferredRenderable::DeferredRenderable( const GLuint & vao,
@@ -186,68 +186,71 @@ DeferredRenderable::~DeferredRenderable()
 
 namespace
 {
-    inline void addVert(const vec3 & v, const vec4 & color)
+    inline void addVert(const vec3 & v, const vec4 & color, const size_t slot)
     {
-        a_vertsAndColors.push_back(float(v.x * 0.1));
-        a_vertsAndColors.push_back(float(v.y * 0.1));
-        a_vertsAndColors.push_back(float(v.z * 0.1));
-        a_vertsAndColors.push_back(float(color.x));
-        a_vertsAndColors.push_back(float(color.y));
-        a_vertsAndColors.push_back(float(color.z));
-        a_vertsAndColors.push_back(float(color.w));
+        a_vertsAndColors[slot].push_back(float(v.x * 0.1));
+        a_vertsAndColors[slot].push_back(float(v.y * 0.1));
+        a_vertsAndColors[slot].push_back(float(v.z * 0.1));
+        a_vertsAndColors[slot].push_back(float(color.x));
+        a_vertsAndColors[slot].push_back(float(color.y));
+        a_vertsAndColors[slot].push_back(float(color.z));
+        a_vertsAndColors[slot].push_back(float(color.w));
     }
 }
 
-void DeferredRenderable::addLine(const vec3 & A,
-                                 const vec3 & B,
-                                 const vec4 & color)
+void DeferredRenderable::addLine(const vec3		& A,
+                                 const vec3		& B,
+                                 const vec4		& color,
+								 const size_t	  slot)
 {
-    const size_t index = a_vertsAndColors.size() / 7;
+    const size_t index = a_vertsAndColors[slot].size() / 7;
 
-    addVert(A, color);
-    addVert(B, color);
+    addVert(A, color, slot);
+    addVert(B, color, slot);
     
-    a_lineIndices.push_back((uint32_t)index + 0);
-    a_lineIndices.push_back((uint32_t)index + 1);
+    a_lineIndices[slot].push_back((uint32_t)index + 0);
+    a_lineIndices[slot].push_back((uint32_t)index + 1);
 }
 
-void DeferredRenderable::addTriangle(const vec3 & A,
-                                     const vec3 & B,
-                                     const vec3 & C,
-                                     const vec4 & color)
+void DeferredRenderable::addTriangle(const vec3		& A,
+                                     const vec3		& B,
+                                     const vec3		& C,
+                                     const vec4		& color,
+									 const size_t	  slot)
 {
-    const size_t index = a_vertsAndColors.size() / 7;
+    const size_t index = a_vertsAndColors[slot].size() / 7;
 
-    addVert(A, color);
-    addVert(B, color);
-    addVert(C, color);
+    addVert(A, color, slot);
+    addVert(B, color, slot);
+    addVert(C, color, slot);
 
-    a_triangleIndices.push_back((uint32_t)index + 0);
-    a_triangleIndices.push_back((uint32_t)index + 1);
-    a_triangleIndices.push_back((uint32_t)index + 2);
+    a_triangleIndices[slot].push_back((uint32_t)index + 0);
+    a_triangleIndices[slot].push_back((uint32_t)index + 1);
+    a_triangleIndices[slot].push_back((uint32_t)index + 2);
 }
 
-void DeferredRenderable::addQuadrangle( const vec3 & A,
-                                        const vec3 & B,
-                                        const vec3 & C,
-                                        const vec3 & D,
-                                        const vec4 & color)
+void DeferredRenderable::addQuadrangle( const vec3		& A,
+                                        const vec3		& B,
+                                        const vec3		& C,
+                                        const vec3		& D,
+                                        const vec4		& color,
+										const size_t	  slot)
 {
-    addVert(A, color);
-    addVert(B, color);
-    addVert(C, color);
-    addVert(A, color);
-    addVert(C, color);
-    addVert(D, color);
+    addVert(A, color, slot);
+    addVert(B, color, slot);
+    addVert(C, color, slot);
+    addVert(A, color, slot);
+    addVert(C, color, slot);
+    addVert(D, color, slot);
 
-	const size_t index = a_vertsAndColors.size() / 7;
+	const size_t index = a_vertsAndColors[slot].size() / 7;
 
-    a_triangleIndices.push_back((uint32_t)index + 0);
-    a_triangleIndices.push_back((uint32_t)index + 1);
-    a_triangleIndices.push_back((uint32_t)index + 2);
-    a_triangleIndices.push_back((uint32_t)index + 3);
-    a_triangleIndices.push_back((uint32_t)index + 4);
-    a_triangleIndices.push_back((uint32_t)index + 5);
+    a_triangleIndices[slot].push_back((uint32_t)index + 0);
+    a_triangleIndices[slot].push_back((uint32_t)index + 1);
+    a_triangleIndices[slot].push_back((uint32_t)index + 2);
+    a_triangleIndices[slot].push_back((uint32_t)index + 3);
+    a_triangleIndices[slot].push_back((uint32_t)index + 4);
+    a_triangleIndices[slot].push_back((uint32_t)index + 5);
 }
 
 void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)

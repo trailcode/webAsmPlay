@@ -34,28 +34,37 @@ class DeferredRenderable : public Renderable
 {
 public:
 
+	enum
+	{
+		GUI = 0,
+		OPEN_STEER,
+	};
+
     virtual ~DeferredRenderable();
 
-    static DeferredRenderable * createFromQueued(const glm::dmat4 & trans = glm::dmat4(1.0)); 
+    static DeferredRenderable * createFromQueued(const size_t slot, const glm::dmat4 & trans = glm::dmat4(1.0)); 
 
     static void addQuadrangle(  const glm::vec3 & A,
                                 const glm::vec3 & B,
                                 const glm::vec3 & C,
                                 const glm::vec3 & D,
-                                const glm::vec4 & color);
+                                const glm::vec4 & color,
+								const size_t	  slot);
 
     static void addTriangle(const glm::vec3 & A,
                             const glm::vec3 & B,
                             const glm::vec3 & C,
-                            const glm::vec4 & color);
+                            const glm::vec4 & color,
+							const size_t	  slot);
 
     static void addLine(const glm::vec3 & A,
                         const glm::vec3 & B,
-                        const glm::vec4 & color);
+                        const glm::vec4 & color,
+						const size_t	  slot);
 
     void render(Canvas * canvas, const size_t renderStage = 0) override;
 
-	void setFromQueued(const glm::dmat4 & trans = glm::dmat4(1.0));
+	void setFromQueued(const size_t slot, const glm::dmat4 & trans = glm::dmat4(1.0));
 
 private:
 

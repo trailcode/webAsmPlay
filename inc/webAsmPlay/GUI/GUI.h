@@ -59,6 +59,7 @@ public:
         PICK_MODE_POLYGON_CHILDREN,
         SET_PATH_START_POINT,
         FIND_PATH,
+		PICK_BING_TILE,
     };
 
     enum

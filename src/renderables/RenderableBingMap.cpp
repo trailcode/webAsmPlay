@@ -314,7 +314,7 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & min, con
 {
 	const dvec2 center = (min + max) * 0.5;
 
-	const ivec2 iTile = latLongToTile((min + max) * 0.5, level);
+	const ivec2 iTile = latLongToTile(center, level);
 
 	const dvec2 tMin = tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), level);
 	const dvec2 tMax = tileToLatLong(ivec2(iTile.x + 1, iTile.y + 0), level);

@@ -110,7 +110,7 @@ namespace {
     {
         OpenSteer::warnIfInUpdatePhase ("iDrawLine");
 
-        DeferredRenderable::addLine(__(startPoint), __(endPoint), __(color));
+        DeferredRenderable::addLine(__(startPoint), __(endPoint), __(color), DeferredRenderable::OPEN_STEER);
     }
 
     // ----------------------------------------------------------------------------
@@ -126,7 +126,8 @@ namespace {
         DeferredRenderable::addTriangle(__(a),
                                         __(b),
                                         __(c),
-                                        __(color));
+                                        __(color),
+										DeferredRenderable::OPEN_STEER);
     }
 
 
@@ -145,7 +146,8 @@ namespace {
                                             __(b),
                                             __(c),
                                             __(d),
-                                            __(color));
+                                            __(color),
+											DeferredRenderable::OPEN_STEER);
     }
 
     // ------------------------------------------------------------------------
@@ -258,7 +260,7 @@ OpenSteer::drawLineAlpha (const Vec3& startPoint,
 
     const glm::vec4 c(color.r(), color.g(), color.b(), alpha);
 
-    DeferredRenderable::addLine(__(startPoint), __(endPoint), c);
+    DeferredRenderable::addLine(__(startPoint), __(endPoint), c, DeferredRenderable::OPEN_STEER);
 }
 
 void 
@@ -382,7 +384,7 @@ OpenSteer::drawCircleOrDisk (const float radius,
 
     for(size_t i = 0; i < points.size() - 1; ++i)
     {
-        DeferredRenderable::addLine(__(points[i]), __(points[i + 1]), __(color));
+        DeferredRenderable::addLine(__(points[i]), __(points[i + 1]), __(color), DeferredRenderable::OPEN_STEER);
     }
 
     // close drawing operation

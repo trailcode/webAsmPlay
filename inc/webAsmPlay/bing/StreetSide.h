@@ -37,6 +37,8 @@ public:
 
 	static std::vector<Bubble *> query(const double boundsMinX, const double boundsMaxX, const double boundsMinY, const double boundsMaxY);
 
+	static void doPicking(const char mode, const glm::dvec4 & pos);
+
 private:
 
 	StreetSide();

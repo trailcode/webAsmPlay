@@ -32,6 +32,7 @@
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/bing/StreetSide.h>
 #include <webAsmPlay/bing/RasterTile.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
 #pragma warning( pop ) 
 
@@ -49,12 +50,15 @@ void GUI::bingTileSystemPanel()
 
     pos = s_client->getInverseTrans() * pos;
 
-    const size_t zoomLevel = 16;
+    const size_t zoomLevel = 17;
 
 	const ivec2  pix	 = latLongToPixel(pos, zoomLevel);
 	const dvec2  pos2	 = pixelToLatLong(pix, zoomLevel);
 	const ivec2  tile	 = pixelToTile(pix);
     const string quadKey = tileToQuadKey(tile, zoomLevel);
+
+	const dvec2 tMin = tileToLatLong(ivec2(tile.x + 0, tile.y + 1), zoomLevel);
+	const dvec2 tMax = tileToLatLong(ivec2(tile.x + 1, tile.y + 0), zoomLevel);
 
     ImGui::Begin("Bing Tile System", &s_showBingTileSystemPanel);
 
@@ -85,6 +89,19 @@ void GUI::bingTileSystemPanel()
 	{
 		//StreetSide::queryViewport();
 	}
+
+	const dvec3 P1 = dvec4(tMin.x, tMax.y, 0, 1);
+	const dvec3 P2 = dvec4(tMax.x, tMax.y, 0, 1);
+	const dvec3 P3 = dvec4(tMax.x, tMin.y, 0, 1);
+	const dvec3 P4 = dvec4(tMin.x, tMin.y, 0, 1);
+	/*
+	const dvec3 transP1 = m_trans * dvec4(P1, 1);
+	const dvec3 transP2 = m_trans * dvec4(P2, 1);
+	const dvec3 transP3 = m_trans * dvec4(P3, 1);
+	const dvec3 transP4 = m_trans * dvec4(P4, 1);
+
+	DeferredRenderable::addLine();
+	*/
 
     ImGui::End();
 }

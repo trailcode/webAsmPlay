@@ -33,9 +33,11 @@
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/CurlUtil.h>
 #include <webAsmPlay/bing/Bubble.h>
+#include <webAsmPlay/bing/BingTileSystem.h>
 #include <webAsmPlay/bing/StreetSide.h>
 
 using namespace std;
+using namespace glm;
 using namespace nlohmann;
 using namespace curlUtil;
 
@@ -167,4 +169,9 @@ vector<Bubble *> StreetSide::query(const double boundsMinX, const double boundsM
 	dmess("Num bubbles: " << ret.size());
 
 	return ret;
+}
+
+void StreetSide::doPicking(const char mode, const dvec4 & pos)
+{
+	
 }
