@@ -261,7 +261,7 @@ string GeoServer::saveGeoFile(const string & fileName)
 	dmess("m_serializedPoints " << m_serializedPoints.size());
 	dmess("m_serializedRelations " << m_serializedRelations.size());
 
-	Bubble::save(fp, m_bubbles);
+	//Bubble::save(fp, m_bubbles);
 
     fclose(fp);
 

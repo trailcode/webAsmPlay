@@ -44,9 +44,9 @@ public:
 			const glm::dvec2	& rollPitch,
 			const double		  altitude);
 
-	static FILE * save(FILE * fp, const std::vector<Bubble *> & bubbles);
+	static void save(const std::string & fileName, const std::vector<Bubble *> & bubbles);
 
-	static std::vector<Bubble> load(FILE * fp);
+	static std::vector<Bubble *> load(const std::string & fileName);
 
 	std::string getQuadKey() const;
 

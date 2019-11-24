@@ -363,6 +363,11 @@ else()
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/tiles")
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/tiles")
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Debug/tiles")
+
+			file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Release/bubbles")
+            file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/bubbles")
+            file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/bubbles")
+            file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Debug/bubbles")
 			
 		else()
 
@@ -371,6 +376,7 @@ else()
 			list(APPEND assetFileDest "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}")
 
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/tiles")
+			file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bubbles")
 			
 		endif()
 

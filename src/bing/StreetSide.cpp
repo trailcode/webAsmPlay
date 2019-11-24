@@ -35,6 +35,7 @@
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/CurlUtil.h>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/bing/Bubble.h>
 #include <webAsmPlay/bing/BingTileSystem.h>
 #include <webAsmPlay/bing/StreetSide.h>
@@ -44,8 +45,9 @@ using namespace glm;
 using namespace nlohmann;
 using namespace curlUtil;
 using namespace boostGeom;
+using namespace bingTileSystem;
 
-namespace bg = boost::geometry;
+namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;
 
 namespace
@@ -84,6 +86,33 @@ StreetSide * StreetSide::getInstance()
 	if(!a_instance) { a_instance = new StreetSide ;}
 
 	return a_instance;
+}
+
+vector<Bubble *> StreetSide::query(const glm::dvec2 & pos, const size_t zoomLevel)
+{
+	const ivec2 pix	 = latLongToPixel	(pos, zoomLevel);
+	const dvec2 pos2 = pixelToLatLong	(pix, zoomLevel);
+	const ivec2 tile = pixelToTile		(pix);
+    
+	const dvec2 tMin = tileToLatLong(ivec2(tile.x + 0, tile.y + 1), zoomLevel);
+	const dvec2 tMax = tileToLatLong(ivec2(tile.x + 1, tile.y + 0), zoomLevel);
+
+	const string quadKey = tileToQuadKey(tile, zoomLevel);
+
+	const string bubbleTileCachePath = "./bubbles/tile_" + quadKey;
+
+	if(fileExists(bubbleTileCachePath))
+	{
+		dmess("Cached: " << bubbleTileCachePath);
+
+		return Bubble::load(bubbleTileCachePath);
+	}
+
+	const auto bubbles = StreetSide::query(tMin.y, tMax.y, tMin.x, tMax.x);
+
+	Bubble::save(bubbleTileCachePath, bubbles);
+
+	return bubbles;
 }
 
 vector<Bubble *> StreetSide::query(const double boundsMinX, const double boundsMaxX, const double boundsMinY, const double boundsMaxY)
@@ -202,15 +231,11 @@ void StreetSide::indexBubbles(const vector<pair<Bubble *, Renderable *>> & bubbl
 	}
 }
 
-pair<Bubble *, Renderable *> StreetSide::query(const dvec2 & pos)
+pair<Bubble *, Renderable *> StreetSide::closestBubble(const dvec2 & pos)
 {
-	Point p(pos.x, pos.y);
-
 	vector<Value> result;
 
-    a_rtree.query(bgi::nearest(p, 1), std::back_inserter(result));
-
-	dmess("result " << result.size());
+    a_rtree.query(bgi::nearest(Point(pos.x, pos.y), 1), std::back_inserter(result));
 
 	if(!result.size()) { return make_pair(nullptr, nullptr) ;}
 

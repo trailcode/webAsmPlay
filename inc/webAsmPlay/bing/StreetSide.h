@@ -26,6 +26,7 @@
 #pragma once
 
 #include <vector>
+#include <glm/vec2.hpp>
 
 class Bubble;
 class Renderable;
@@ -36,6 +37,8 @@ public:
 
 	static StreetSide * getInstance();
 
+	static std::vector<Bubble *> query(const glm::dvec2 & pos, const size_t zoomLevel = 17);
+
 	static std::vector<Bubble *> query(const double boundsMinX, const double boundsMaxX, const double boundsMinY, const double boundsMaxY);
 
 	static void doPicking(const char mode, const glm::dvec4 & pos);
@@ -44,7 +47,7 @@ public:
 
 	static void indexBubble(Bubble * bubble, Renderable * renderiable);
 
-	static std::pair<Bubble *, Renderable *> query(const glm::dvec2 & pos);
+	static std::pair<Bubble *, Renderable *> closestBubble(const glm::dvec2 & pos);
 
 private:
 

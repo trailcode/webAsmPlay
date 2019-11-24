@@ -75,7 +75,7 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 
 		//dmess("pos " << pos);
 
-		tie(a_bubble, a_renderable) = StreetSide::query(pos);
+		tie(a_bubble, a_renderable) = StreetSide::closestBubble(pos);
 
 		if(!a_bubble) { return ;}
 
@@ -83,7 +83,7 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 		{
 			const auto tex = a_bubble->getCubeFaceTexture(i);
 
-			dmess("tex " << tex);
+			//dmess("tex " << tex);
 
 			a_textIDs[i] = tex;
 		}

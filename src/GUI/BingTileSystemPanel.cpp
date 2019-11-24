@@ -98,11 +98,6 @@ void GUI::bingTileSystemPanel()
 	
 	ImGui::SliderFloat("###ResDelta", &resDelta, 0.125f, 5);
 	
-	if (ImGui::Button("StreetSide"))
-	{
-		//StreetSide::queryViewport();
-	}
-
 	const vec3 P1 = vec3(a_tMin.x, a_tMax.y, 0);
 	const vec3 P2 = vec3(a_tMax.x, a_tMax.y, 0);
 	const vec3 P3 = vec3(a_tMax.x, a_tMin.y, 0);
@@ -112,15 +107,6 @@ void GUI::bingTileSystemPanel()
 	DeferredRenderable::addLine(P2, P3, {0,1,0,1}, DeferredRenderable::GUI);
 	DeferredRenderable::addLine(P3, P4, {0,1,0,1}, DeferredRenderable::GUI);
 	DeferredRenderable::addLine(P4, P1, {0,1,0,1}, DeferredRenderable::GUI);
-
-	/*
-	const dvec3 transP1 = m_trans * dvec4(P1, 1);
-	const dvec3 transP2 = m_trans * dvec4(P2, 1);
-	const dvec3 transP3 = m_trans * dvec4(P3, 1);
-	const dvec3 transP4 = m_trans * dvec4(P4, 1);
-
-	DeferredRenderable::addLine();
-	*/
 
     ImGui::End();
 }
@@ -148,7 +134,7 @@ void GUI::initBingTileSystemPanel(const dmat4 & trans)
 	{
 		if(getMode() != PICK_BING_TILE) { return ;}
 
-		const auto bubbles = StreetSide::query(a_tMin.y, a_tMax.y, a_tMin.x, a_tMax.x);
+		const auto bubbles = StreetSide::query(getClient()->getInverseTrans() * dvec4(posWC, 1));
 
 		for(auto bubble : bubbles)
 		{

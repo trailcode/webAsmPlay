@@ -49,24 +49,15 @@ Bubble * Bubble::create(const json & bubble)
 
 		if(bubble.find("id") == bubble.end()) { return nullptr ;}
 
-		//*
+		/*
 		const auto id	= bubble["id"]; 
 		const auto lat	= bubble["la"]; // Latitude of the Streetside image
 		const auto lon	= bubble["lo"]; // Longitude of the Streetside image
 		const auto roll = bubble["ro"]; // Roll
 		const auto pitch = bubble["pi"]; // Pitch
 		const auto altitude = bubble["al"]; // The bubble altitude, in meters above the WGS84 ellipsoid
-		//*/
-
 		dmess("id " << id << " lat " << lat << " lon " << lon << " roll " << roll << " pitch " << pitch << " altitude " << altitude);
-		/*
-		https://t.ssl.ak.tiles.virtualearth.net/tiles/hs0011023230012333103.jpg?g=6338&n=z
-		https://t.ssl.ak.tiles.virtualearth.net/tiles/hs001102323001233202.jpg?g=6338&n=z
-														0201110111322330
-		https://t.ssl.ak.tiles.virtualearth.net/tiles/hs020323210121210001.jpg?g=6338&n=z
-		https://t.ssl.ak.tiles.virtualearth.net/tiles/hs020111030231301201.jpg?g=6338&n=z
-		https://t.ssl.ak.tiles.virtualearth.net/tiles/hs02011103023130120203.jpg?g=6338&n=z
-		*/
+		//*/
 
 		return new Bubble(			bubble["id"],
 							dvec2(	bubble["lo"],
@@ -98,20 +89,38 @@ Bubble::Bubble(	const size_t	  ID,
 {
 }
 
-FILE * Bubble::save(FILE * fp, const vector<Bubble *> & bubbles)
+void Bubble::save(const string & fileName, const vector<Bubble *> & bubbles)
 {
+	FILE * fp = fopen(fileName.c_str(), "wb");
+
+	if(!fp)
+	{
+		dmess("Warn could not open: " << fileName);
+
+		return;
+	}
+
 	const size_t numBubbles = bubbles.size();
 
 	fwrite(&numBubbles, sizeof(size_t), 1, fp);
 
 	for(const auto bubble : bubbles) { fwrite(bubble, sizeof(Bubble), 1, fp) ;}
 
-	return fp;
+	fclose(fp);
 }
 
-vector<Bubble> Bubble::load(FILE * fp)
+vector<Bubble *> Bubble::load(const string & fileName)
 {
-	vector<Bubble> ret;
+	vector<Bubble *> ret;
+
+	FILE * fp = fopen(fileName.c_str(), "rb");
+
+	if(!fp)
+	{
+		dmess("Warn could not open: " << fileName);
+
+		return ret;
+	}
 
 	size_t numBubbles;
 
@@ -119,7 +128,13 @@ vector<Bubble> Bubble::load(FILE * fp)
 
 	ret.resize(numBubbles);
 
-	fread(&ret[0], sizeof(Bubble), numBubbles, fp);
+	for(size_t i = 0; i < numBubbles; ++i)
+	{
+		// TODO Try and not new a lot of little objects
+		ret[i] = new Bubble();
+		
+		fread(ret[i], sizeof(Bubble), 1, fp);
+	}
 
 	return ret;
 }
