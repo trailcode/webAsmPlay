@@ -30,6 +30,9 @@
 #endif
 
 #include <fstream>
+#include <boost/geometry/geometries/point.hpp>
+#include <boost/geometry/index/rtree.hpp>
+#include <webAsmPlay/Types.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/CurlUtil.h>
 #include <webAsmPlay/bing/Bubble.h>
@@ -40,12 +43,20 @@ using namespace std;
 using namespace glm;
 using namespace nlohmann;
 using namespace curlUtil;
+using namespace boostGeom;
+
+namespace bg = boost::geometry;
+namespace bgi = boost::geometry::index;
 
 namespace
 {
 	StreetSide * a_instance = nullptr;
 
 	string a_key;
+
+	typedef std::tuple<Point, Bubble *, Renderable *> Value;
+
+	bgi::rtree<Value, bgi::quadratic<16>> a_rtree;
 }
 
 StreetSide::StreetSide()
@@ -175,3 +186,19 @@ void StreetSide::doPicking(const char mode, const dvec4 & pos)
 {
 	
 }
+
+void StreetSide::indexBubble(Bubble * bubble, Renderable * renderiable)
+{
+	const Point pos = {bubble->m_pos.y, bubble->m_pos.x};
+
+	a_rtree.insert({pos, bubble, renderiable});
+}
+
+void StreetSide::indexBubbles(const vector<pair<Bubble *, Renderable *>> & bubbles)
+{
+	for(auto [bubble, renderable] : bubbles)
+	{
+		
+	}
+}
+

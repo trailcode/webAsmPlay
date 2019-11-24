@@ -324,6 +324,17 @@ bool Canvas::setWantMouseCapture(const bool wantMouseCapture) { return m_wantMou
 void Canvas::onMouseButton(GLFWwindow * window, const int button, const int action, const int mods)
 {
     if(!m_enabled) { return ;}
+
+	dmess("onMouseButton " << button << " " << action << " " << mods << " this " << this);
+
+	switch(button)
+	{
+		case GLFW_MOUSE_BUTTON_LEFT: 
+
+		for(auto & listener : m_leftClickListeners) { listener(m_cursorPosWC) ;}
+
+		break;
+	};
 }
 
 void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
@@ -373,6 +384,11 @@ void Canvas::onMouseScroll(GLFWwindow * window, const vec2 & mouseScroll)
 
     m_trackBallInteractor->setScrollDirection(mouseScroll.y > 0);
     m_trackBallInteractor->update();
+}
+
+void Canvas::addLeftClickListener(const function<void(const dvec3 & posWC)> & listener)
+{
+	m_leftClickListeners.push_back(listener);
 }
 
 void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods)

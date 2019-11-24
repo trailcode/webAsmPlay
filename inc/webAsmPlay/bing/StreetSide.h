@@ -28,6 +28,7 @@
 #include <vector>
 
 class Bubble;
+class Renderable;
 
 class StreetSide
 {
@@ -38,6 +39,10 @@ public:
 	static std::vector<Bubble *> query(const double boundsMinX, const double boundsMaxX, const double boundsMinY, const double boundsMaxY);
 
 	static void doPicking(const char mode, const glm::dvec4 & pos);
+
+	static void indexBubbles(const std::vector<std::pair<Bubble *, Renderable *>> & bubbles);
+
+	static void indexBubble(Bubble * bubble, Renderable * renderiable);
 
 private:
 

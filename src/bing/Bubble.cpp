@@ -39,16 +39,26 @@ Bubble * Bubble::create(const json & bubble)
 	{
 		// https://github.com/microsoft/MicrosoftStreetsidePlugin/blob/master/src/org/openstreetmap/josm/plugins/streetside/StreetsideImage.java
 
-		/*
+		if(bubble.find("id") == bubble.end()) { return nullptr ;}
+
+		//*
 		const auto id	= bubble["id"]; 
 		const auto lat	= bubble["la"]; // Latitude of the Streetside image
 		const auto lon	= bubble["lo"]; // Longitude of the Streetside image
 		const auto roll = bubble["ro"]; // Roll
 		const auto pitch = bubble["pi"]; // Pitch
 		const auto altitude = bubble["al"]; // The bubble altitude, in meters above the WGS84 ellipsoid
-		*/
+		//*/
 
-		//dmess("id " << id << " lat " << lat << " lon " << lon << " roll " << roll << " pitch " << pitch << " altitude " << altitude << " blurring " << blurring);
+		dmess("id " << id << " lat " << lat << " lon " << lon << " roll " << roll << " pitch " << pitch << " altitude " << altitude);
+		/*
+		https://t.ssl.ak.tiles.virtualearth.net/tiles/hs0011023230012333103.jpg?g=6338&n=z
+		https://t.ssl.ak.tiles.virtualearth.net/tiles/hs001102323001233202.jpg?g=6338&n=z
+														0201110111322330
+		https://t.ssl.ak.tiles.virtualearth.net/tiles/hs020323210121210001.jpg?g=6338&n=z
+		https://t.ssl.ak.tiles.virtualearth.net/tiles/hs020111030231301201.jpg?g=6338&n=z
+		https://t.ssl.ak.tiles.virtualearth.net/tiles/hs02011103023130120203.jpg?g=6338&n=z
+		*/
 
 		return new Bubble(			bubble["id"],
 							dvec2(	bubble["lo"],

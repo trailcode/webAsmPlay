@@ -29,6 +29,7 @@
 #include <vector>
 #include <stack>
 #include <mutex>
+#include <functional>
 #include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
@@ -133,6 +134,8 @@ public:
 
 	size_t getFrameNumber() const;
 
+	void addLeftClickListener(const std::function<void(const glm::dvec3 & posWC)> & listener);
+
 protected:
 
     bool preRender();
@@ -199,4 +202,6 @@ protected:
 	Frustum * m_frustum = nullptr;
 
 	double m_perspectiveFOV = 45.0;
+
+	std::vector<std::function<void(const glm::dvec3 & posWC)>> m_leftClickListeners;
 };

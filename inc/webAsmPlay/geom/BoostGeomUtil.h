@@ -49,6 +49,8 @@ namespace boostGeom
 	Polygon makePolygonBox(const glm::dvec2 & min, const glm::dvec2 & max);
 
 	Polygon makeTriangle(const glm::dvec2 & A, const glm::dvec2 & B, const glm::dvec2 & C);
+
+	Polygon buffer(const glm::dvec2 & pos, const double radius);
 }
 
 inline glm::dvec2 __(const boostGeom::Point & point) { return { point.x(), point.y() } ;}

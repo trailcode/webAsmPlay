@@ -30,6 +30,8 @@
 
 void GUI::modelViewerPanel()
 {
+	s_modelViewerCanvas->setEnabled(s_showModelViewerPanel);
+
 	if(!s_showModelViewerPanel) { return ;}
 
 	ImGui::Begin("Model Viewer", &s_showModelViewerPanel);

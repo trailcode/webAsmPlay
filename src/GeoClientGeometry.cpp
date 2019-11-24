@@ -314,7 +314,7 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
     
     for (const auto& [type, count] : pointTypes)
     {
-        dmess("type: " << type << " " << count);
+        //dmess("type: " << type << " " << count);
     }
 
     GUI::progress("", 1.0);

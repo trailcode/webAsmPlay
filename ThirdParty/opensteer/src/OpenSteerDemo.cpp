@@ -453,7 +453,7 @@ OpenSteer::OpenSteerDemo::vehicleNearestToMouse (void)
 OpenSteer::AbstractVehicle* 
 OpenSteer::OpenSteerDemo::findVehicleNearestScreenPosition (int x, int y)
 {
-    dmess("Implement me!");
+    //dmess("Implement me!");
     /*
     // find the direction from the camera position to the given pixel
     const Vec3 direction = directionFromCameraToScreenPosition (x, y, glutGet (GLUT_WINDOW_HEIGHT));
