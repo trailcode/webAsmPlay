@@ -24,6 +24,7 @@
 \copyright 2019
 */
 
+#include <ctpl/ctpl.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GeoClient.h>
@@ -34,6 +35,7 @@
 
 using namespace std;
 using namespace glm;
+using namespace ctpl;
 
 namespace
 {
@@ -41,6 +43,10 @@ namespace
 	Renderable	* a_renderable	= nullptr;
 
 	vector<GLuint> a_textIDs(6);
+
+	thread_pool a_tileLoader(1);
+
+	bool a_clickToViewBubble = true;
 }
 
 void GUI::streetSidePanel()
@@ -48,6 +54,8 @@ void GUI::streetSidePanel()
 	if(!s_showStreetSidePanel) { return ;}
 
 	ImGui::Begin("Bing StreetSide", &s_showStreetSidePanel);
+
+	ImGui::Checkbox("Click to view Bubble", &a_clickToViewBubble);
 
 	if(a_bubble)
 	{
@@ -58,7 +66,11 @@ void GUI::streetSidePanel()
 
 		for(size_t i = 0; i < 6; ++i)
 		{
-			ImGui::Image((ImTextureID)a_textIDs[i], ImVec2(256, 256));
+			const auto tex = a_bubble->getCachedCubeFaceTexture(i);
+
+			//ImGui::Image((ImTextureID)a_textIDs[i], ImVec2(256, 256));
+
+			ImGui::Image((ImTextureID)tex, ImVec2(256, 256));
 		}
 
 	}
@@ -71,11 +83,9 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 	{
 		if(!s_showStreetSidePanel || getMode() != PICK_STREET_SIDE_BUBBLE) { return ;}
 
-		const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
+		//const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
 
-		//dmess("pos " << pos);
-
-		tie(a_bubble, a_renderable) = StreetSide::closestBubble(pos);
+		//tie(a_bubble, a_renderable) = StreetSide::closestBubble(pos);
 
 		if(!a_bubble) { return ;}
 
@@ -86,6 +96,35 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 			//dmess("tex " << tex);
 
 			a_textIDs[i] = tex;
+		}
+	});
+
+	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
+	{
+		if(!s_showStreetSidePanel) { return ;}
+
+		const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
+
+		//dmess("pos " << pos);
+
+		tie(a_bubble, a_renderable) = StreetSide::closestBubble(pos);
+
+		if(!a_bubble) { return ;}
+
+		static unordered_set<Bubble *> loadingBubbles;
+
+		if(loadingBubbles.find(a_bubble) != loadingBubbles.end()) { return ;}
+
+		loadingBubbles.insert(a_bubble);
+
+		auto bubble = a_bubble;
+
+		for(size_t i = 0; i < 6; ++i)
+		{
+			a_tileLoader.push([i, bubble](int ID)
+			{
+				bubble->getCubeFaceTexture(i);
+			});
 		}
 	});
 }

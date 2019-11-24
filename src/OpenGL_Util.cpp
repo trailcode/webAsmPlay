@@ -36,7 +36,8 @@ using namespace tbb;
 
 namespace
 {
-	const size_t a_numOpenGL_Contexts = 10;
+	//const size_t a_numOpenGL_Contexts = 10;
+	const size_t a_numOpenGL_Contexts = 128;
 	
 	concurrent_queue<GLFWwindow *> a_contextWindows;
 

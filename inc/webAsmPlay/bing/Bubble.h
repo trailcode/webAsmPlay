@@ -52,6 +52,8 @@ public:
 
 	GLuint getCubeFaceTexture(const size_t face) const;
 
+	GLuint getCachedCubeFaceTexture(const size_t face) const;
+
 	const size_t		m_ID;
 	const glm::dvec2	m_pos;
 	const glm::dvec2	m_rollPitch;

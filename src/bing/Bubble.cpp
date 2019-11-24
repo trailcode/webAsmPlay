@@ -27,12 +27,14 @@
 */
 
 #include <unordered_map>
+#include <tbb/concurrent_unordered_map.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/CurlUtil.h>
 #include <webAsmPlay/bing/Bubble.h>
 
 using namespace std;
+using namespace tbb;
 using namespace glm;
 using namespace nlohmann;
 using namespace curlUtil;
@@ -41,7 +43,7 @@ namespace
 {
 	const auto a_faceKeys = vector<string>{"01","02","03","10","11","12"};
 
-	unordered_map<string, size_t> a_bubbleTiles;
+	concurrent_unordered_map<string, size_t> a_bubbleTiles;
 }
 
 Bubble * Bubble::create(const json & bubble)
@@ -167,6 +169,8 @@ using namespace std::filesystem;
 
 GLuint Bubble::getCubeFaceTexture(const size_t face) const
 {
+	OpenGL::ensureSharedContext();
+
 	//const string streetsideImagesApi = "https://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
 	// TODO With https curl gives 60 error code. Try to fix.
 	const string streetsideImagesApi = "http://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
@@ -268,4 +272,15 @@ GLuint Bubble::getCubeFaceTexture(const size_t face) const
 	SDL_FreeSurface(img);
 
 	return ret;
+}
+
+GLuint Bubble::getCachedCubeFaceTexture(const size_t face) const
+{
+	const auto faceQuadKey = getQuadKey() + a_faceKeys[face];
+
+	const auto i = a_bubbleTiles.find(faceQuadKey);
+
+	if(i == a_bubbleTiles.end()) { return 0 ;}
+	
+	return i->second;
 }
