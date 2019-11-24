@@ -26,6 +26,7 @@
   \copyright 2019
 */
 
+#include <unordered_map>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/CurlUtil.h>
@@ -39,6 +40,8 @@ using namespace curlUtil;
 namespace
 {
 	const auto a_faceKeys = vector<string>{"01","02","03","10","11","12"};
+
+	unordered_map<string, size_t> a_bubbleTiles;
 }
 
 Bubble * Bubble::create(const json & bubble)
@@ -158,6 +161,9 @@ string Bubble::getQuadKey() const
 
 #include <SDL_image.h>
 #include <webAsmPlay/Textures.h>
+#include <filesystem>
+
+using namespace std::filesystem;
 
 GLuint Bubble::getCubeFaceTexture(const size_t face) const
 {
@@ -168,6 +174,43 @@ GLuint Bubble::getCubeFaceTexture(const size_t face) const
 	const string imgUrlSuffix = ".jpg?g=6338&n=z";
 
 	const auto faceQuadKey = getQuadKey() + a_faceKeys[face];
+
+	const auto i = a_bubbleTiles.find(faceQuadKey);
+
+	if(i != a_bubbleTiles.end())
+	{
+		dmess("Cache hit!");
+
+		return i->second;
+	}
+
+	const string tileCachePath = "./bubbles/face_" + faceQuadKey;
+
+	if(fileExists(tileCachePath))
+	{
+		if(!file_size(tileCachePath.c_str()))
+		{
+			dmess("Here!");
+
+			return 0;
+		}
+
+		auto img = IMG_Load(tileCachePath.c_str());
+
+		if (!img) { goto download ;}
+
+		auto ret = Textures::load(img);
+
+		SDL_FreeSurface(img);
+
+		dmess("Cached bubble face");
+
+		a_bubbleTiles[faceQuadKey] = ret;
+
+		return ret;
+	}
+
+	download:
 
 	const auto url = streetsideImagesApi + faceQuadKey + imgUrlSuffix;
 
@@ -206,7 +249,21 @@ GLuint Bubble::getCubeFaceTexture(const size_t face) const
 		return 0;
 	}
 
+	////////////////////////////
+	FILE * fp = fopen(tileCachePath.c_str(), "wb");
+
+	if(fp)
+	{
+		fwrite(tileBuffer->m_buffer, sizeof(char), tileBuffer->m_size, fp);
+
+		fclose(fp);
+	}
+	else { dmess("Warn could not write file: " << tileCachePath) ;}
+	///////////////////////////
+
 	const auto ret = Textures::load(img);
+
+	a_bubbleTiles[faceQuadKey] = ret;
 
 	SDL_FreeSurface(img);
 
