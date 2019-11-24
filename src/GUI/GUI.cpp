@@ -280,6 +280,8 @@ void GUI::showMainToolBar()
         toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",				(void*)(a_infoIcon),uv0,uv1,size));
         toolbar.addButton(ImGui::Toolbutton("Find Path",						(void*)(a_infoIcon),uv0,uv1,size));
 		toolbar.addButton(ImGui::Toolbutton("Pick Bing Tile",					(void*)(a_infoIcon),uv0,uv1,size));
+		toolbar.addButton(ImGui::Toolbutton("Pick StreetSide Bubble",			(void*)(a_infoIcon),uv0,uv1,size));
+
 
 #pragma warning( pop )
 
@@ -300,6 +302,7 @@ void GUI::showMainToolBar()
         case 5: a_mode = SET_PATH_START_POINT;        break;
         case 6: a_mode = FIND_PATH;                   break;
 		case 7: a_mode = PICK_BING_TILE;              break;
+		case 8: a_mode = PICK_STREET_SIDE_BUBBLE;	  break;
     }
 }
 

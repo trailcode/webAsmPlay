@@ -39,6 +39,8 @@ namespace
 {
 	Bubble		* a_bubble		= nullptr;
 	Renderable	* a_renderable	= nullptr;
+
+	vector<GLuint> a_textIDs(6);
 }
 
 void GUI::streetSidePanel()
@@ -53,15 +55,21 @@ void GUI::streetSidePanel()
 		ImGui::Text(("       Pos: " + toStr(a_bubble->m_pos)).c_str());
 		ImGui::Text(("Roll/Pitch: " + toStr(a_bubble->m_rollPitch)).c_str());
 		ImGui::Text(("  Altitude: " + toStr(a_bubble->m_altitude)).c_str());
+
+		for(size_t i = 0; i < 6; ++i)
+		{
+			ImGui::Image((ImTextureID)a_textIDs[i], ImVec2(256, 256));
+		}
+
 	}
 	ImGui::End();
 }
 
 void GUI::initBingStreetSidePanel(const dmat4 & trans)
 {
-	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
+	getMainCanvas()->addLeftClickListener([](const dvec3 & posWC)
 	{
-		if(!s_showStreetSidePanel) { return ;}
+		if(!s_showStreetSidePanel || getMode() != PICK_STREET_SIDE_BUBBLE) { return ;}
 
 		const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
 
@@ -69,6 +77,15 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 
 		tie(a_bubble, a_renderable) = StreetSide::query(pos);
 
-		dmess("a_bubble " << a_bubble);
+		if(!a_bubble) { return ;}
+
+		for(size_t i = 0; i < 6; ++i)
+		{
+			const auto tex = a_bubble->getCubeFaceTexture(i);
+
+			dmess("tex " << tex);
+
+			a_textIDs[i] = tex;
+		}
 	});
 }

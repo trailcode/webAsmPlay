@@ -61,6 +61,7 @@ public:
         SET_PATH_START_POINT,
         FIND_PATH,
 		PICK_BING_TILE,
+		PICK_STREET_SIDE_BUBBLE,
     };
 
     enum

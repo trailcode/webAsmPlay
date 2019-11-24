@@ -27,11 +27,19 @@
 */
 
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/CurlUtil.h>
 #include <webAsmPlay/bing/Bubble.h>
 
 using namespace std;
 using namespace glm;
 using namespace nlohmann;
+using namespace curlUtil;
+
+namespace
+{
+	const auto a_faceKeys = vector<string>{"01","02","03","10","11","12"};
+}
 
 Bubble * Bubble::create(const json & bubble)
 {
@@ -90,34 +98,6 @@ Bubble::Bubble(	const size_t	  ID,
 {
 }
 
-ostream & operator<< (ostream &out, Bubble const & b)
-{
-	out << "id " << b.m_ID << " lon " << b.m_pos.x << " lat " << b.m_pos.y << " roll " << b.m_rollPitch.x << " pitch " << b.m_rollPitch.y << " altitude " << b.m_altitude;
-
-	/*
-	auto base4 = convertFrom10(b.m_ID, 4);
-
-	const size_t paddingNeeded = 16 - base4.length();
-
-	string quadKey;
-
-	for(size_t i = 0; i < paddingNeeded; ++i) { quadKey += "0" ;}
-
-	quadKey += base4;
-
-	const string streetsideImagesApi = "https://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
-
-	const string imgUrlSuffix = ".jpg?g=6338&n=z";
-
-	// Cubemap face code order matters here: front=01, right=02, back=03, left=10, up=11, down=12
-    const auto faceKeys = vector<string>{"01","02","03","10","11","12"};
-
-	out << "base4: " << streetsideImagesApi + quadKey + faceKeys[0] + "0" + imgUrlSuffix;
-	*/
-	
-	return out;
-}
-
 FILE * Bubble::save(FILE * fp, const vector<Bubble *> & bubbles)
 {
 	const size_t numBubbles = bubbles.size();
@@ -140,6 +120,80 @@ vector<Bubble> Bubble::load(FILE * fp)
 	ret.resize(numBubbles);
 
 	fread(&ret[0], sizeof(Bubble), numBubbles, fp);
+
+	return ret;
+}
+
+string Bubble::getQuadKey() const
+{
+	auto base4 = convertFrom10(m_ID, 4);
+
+	const size_t paddingNeeded = 16 - base4.length();
+
+	//dmess("paddingNeeded " << paddingNeeded);
+
+	string quadKey;
+
+	for(size_t i = 0; i < paddingNeeded; ++i) { quadKey += "0" ;}
+
+	quadKey += base4;
+
+	return quadKey;
+}
+
+#include <SDL_image.h>
+#include <webAsmPlay/Textures.h>
+
+GLuint Bubble::getCubeFaceTexture(const size_t face) const
+{
+	//const string streetsideImagesApi = "https://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
+	// TODO With https curl gives 60 error code. Try to fix.
+	const string streetsideImagesApi = "http://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
+
+	const string imgUrlSuffix = ".jpg?g=6338&n=z";
+
+	const auto faceQuadKey = getQuadKey() + a_faceKeys[face];
+
+	const auto url = streetsideImagesApi + faceQuadKey + imgUrlSuffix;
+
+	dmess("url " << url);
+
+	// TODO code dup here.
+	auto tileBuffer = shared_ptr<BufferStruct>(download(url));
+
+	if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
+	{
+		dmess("No data!");
+
+		return 0;
+	}
+
+	auto img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
+
+	if(!img)
+	{
+		dmess("Bad data!");
+
+		return 0;
+	}
+
+	const auto bytesPerPixel = img->format->BytesPerPixel;
+
+	if(bytesPerPixel < 3)
+	{
+		SDL_FreeSurface(img);
+
+		// Must be the no data png image, mark as no data.
+		//return markTileNoData(tile);
+
+		dmess("No data!");
+
+		return 0;
+	}
+
+	const auto ret = Textures::load(img);
+
+	SDL_FreeSurface(img);
 
 	return ret;
 }

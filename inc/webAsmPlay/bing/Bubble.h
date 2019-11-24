@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <glm/vec2.hpp>
 #include <nlohmann/json.hpp>
+#include <webAsmPlay/OpenGL_Util.h>
 
 class Bubble
 {
@@ -47,7 +48,9 @@ public:
 
 	static std::vector<Bubble> load(FILE * fp);
 
-	friend std::ostream & operator<< (std::ostream &out, Bubble const &t);
+	std::string getQuadKey() const;
+
+	GLuint getCubeFaceTexture(const size_t face) const;
 
 	const size_t		m_ID;
 	const glm::dvec2	m_pos;

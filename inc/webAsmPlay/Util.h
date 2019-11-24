@@ -266,6 +266,7 @@ inline bool hasKey(const nlohmann::json & data, const std::string & key) { retur
 // - NOTE: this whole function could be done with itoa
 inline std::string convertFrom10(size_t value, const size_t base)
 {
+	/*
     if(base < 2 || base > 36) { return "0" ;}
     
     const bool isNegative = (value < 0);
@@ -306,4 +307,24 @@ inline std::string convertFrom10(size_t value, const size_t base)
     }
     
     return output;
+	*/
+
+	std::string ret;
+
+    while (value != 0){
+        int digit = value % base;
+
+        char stringDigit;
+        if (digit < 10) {
+            stringDigit = '0' + digit;
+        } else {
+            stringDigit = digit - 10 + 'A';
+        }
+
+        ret.insert(ret.begin(), stringDigit);
+
+        value /= base;
+    }
+
+    return ret;
 }

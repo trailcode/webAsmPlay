@@ -144,23 +144,18 @@ void GUI::initBingTileSystemPanel(const dmat4 & trans)
 
 	});
 
-	//*
 	getMainCanvas()->addLeftClickListener([](const dvec3 & posWC)
 	{
-		//auto bubbles = StreetSide::query(a_tMin.x, a_tMax.x, a_tMin.y, a_tMax.y);
-		const auto bubbles = StreetSide::query(a_tMin.y, a_tMax.y, a_tMin.x, a_tMax.x);
+		if(getMode() != PICK_BING_TILE) { return ;}
 
-		dmess("posWC " << posWC << " bubbles " << bubbles.size());
+		const auto bubbles = StreetSide::query(a_tMin.y, a_tMax.y, a_tMin.x, a_tMax.x);
 
 		for(auto bubble : bubbles)
 		{
 			const auto trans = getClient()->getTrans();
 
-			dmess("bubble->m_pos.y " << bubble->m_pos.y << " bubble->m_pos.x " << bubble->m_pos.x);
-
 			auto b = buffer({bubble->m_pos.y, bubble->m_pos.x}, 0.00001);
 
-			//auto r = RenderablePoint::create({bubble->m_pos.y, bubble->m_pos.x, 0}, trans);
 			auto r = Renderable::create(b, trans);
 
 			getMainCanvas()->addRenderable(r);
@@ -168,6 +163,5 @@ void GUI::initBingTileSystemPanel(const dmat4 & trans)
 			StreetSide::indexBubble(bubble, r);
 		}
 	});
-	//*/
 }
 
