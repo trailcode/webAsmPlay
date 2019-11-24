@@ -80,6 +80,7 @@ void GeoClient::createWorld(const char * data)
 	OpenSteerGlue::init(m_canvas, getNetwork());
 
 	GUI::initBingTileSystemPanel(m_trans);
+	GUI::initBingStreetSidePanel(m_trans);
 }
 
 void GeoClient::addGeometry(const char* data)

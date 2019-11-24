@@ -214,7 +214,5 @@ pair<Bubble *, Renderable *> StreetSide::query(const dvec2 & pos)
 
 	if(!result.size()) { return make_pair(nullptr, nullptr) ;}
 
-
-
-	return make_pair(nullptr, nullptr);
+	return make_pair(get<1>(result[0]), get<2>(result[0]));
 }

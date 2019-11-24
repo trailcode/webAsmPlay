@@ -87,6 +87,7 @@ public:
     static void setupCallbacks(GLFWwindow* window);
     static void initOpenGL();
 	static void initBingTileSystemPanel(const glm::dmat4 & trans);
+	static void initBingStreetSidePanel(const glm::dmat4 & trans);
     static void mainLoop(GLFWwindow * window);
     static void refresh();
 

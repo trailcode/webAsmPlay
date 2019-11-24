@@ -169,15 +169,5 @@ void GUI::initBingTileSystemPanel(const dmat4 & trans)
 		}
 	});
 	//*/
-
-	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
-	{
-		const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
-
-		//dmess("pos " << pos);
-
-		StreetSide::query(pos);
-
-	});
 }
 

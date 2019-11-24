@@ -24,7 +24,22 @@
 \copyright 2019
 */
 
+#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/GeoClient.h>
+#include <webAsmPlay/canvas/Canvas.h>
+#include <webAsmPlay/bing/StreetSide.h>
+#include <webAsmPlay/bing/Bubble.h>
 #include <webAsmPlay/GUI/GUI.h>
+
+using namespace std;
+using namespace glm;
+
+namespace
+{
+	Bubble		* a_bubble		= nullptr;
+	Renderable	* a_renderable	= nullptr;
+}
 
 void GUI::streetSidePanel()
 {
@@ -32,5 +47,28 @@ void GUI::streetSidePanel()
 
 	ImGui::Begin("Bing StreetSide", &s_showStreetSidePanel);
 
+	if(a_bubble)
+	{
+		ImGui::Text(("        ID: " + toStr(a_bubble->m_ID)).c_str());
+		ImGui::Text(("       Pos: " + toStr(a_bubble->m_pos)).c_str());
+		ImGui::Text(("Roll/Pitch: " + toStr(a_bubble->m_rollPitch)).c_str());
+		ImGui::Text(("  Altitude: " + toStr(a_bubble->m_altitude)).c_str());
+	}
 	ImGui::End();
+}
+
+void GUI::initBingStreetSidePanel(const dmat4 & trans)
+{
+	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
+	{
+		if(!s_showStreetSidePanel) { return ;}
+
+		const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
+
+		//dmess("pos " << pos);
+
+		tie(a_bubble, a_renderable) = StreetSide::query(pos);
+
+		dmess("a_bubble " << a_bubble);
+	});
 }

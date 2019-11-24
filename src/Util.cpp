@@ -36,6 +36,24 @@ using namespace std::chrono;
 using namespace glm;
 using namespace nlohmann;
 
+string toStr(const size_t v)
+{
+	char buf[1024];
+
+	sprintf(buf, "%i", v);
+
+	return buf;
+}
+
+string toStr(const double v)
+{
+	char buf[1024];
+
+	sprintf(buf, "% 2.9f", v);
+
+	return buf;
+}
+
 string toStr(const mat4 & m)
 {
     char buf[1024];
@@ -54,6 +72,15 @@ string toStr(const mat4 & m)
 }
 
 string toStr(const vec2 & v)
+{
+    char buf[1024];
+
+    sprintf(buf, "[% 2.9f, % 2.9f]\n", v.x, v.y);
+
+    return buf;
+}
+
+string toStr(const dvec2 & v)
 {
     char buf[1024];
 
