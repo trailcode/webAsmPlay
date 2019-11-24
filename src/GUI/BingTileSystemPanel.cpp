@@ -156,6 +156,8 @@ void GUI::initBingTileSystemPanel(const dmat4 & trans)
 		{
 			const auto trans = getClient()->getTrans();
 
+			dmess("bubble->m_pos.y " << bubble->m_pos.y << " bubble->m_pos.x " << bubble->m_pos.x);
+
 			auto b = buffer({bubble->m_pos.y, bubble->m_pos.x}, 0.00001);
 
 			//auto r = RenderablePoint::create({bubble->m_pos.y, bubble->m_pos.x, 0}, trans);
@@ -167,5 +169,15 @@ void GUI::initBingTileSystemPanel(const dmat4 & trans)
 		}
 	});
 	//*/
+
+	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
+	{
+		const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
+
+		//dmess("pos " << pos);
+
+		StreetSide::query(pos);
+
+	});
 }
 

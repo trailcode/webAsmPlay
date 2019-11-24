@@ -183,6 +183,7 @@ private:
 	static void normalFrameBufferDebugPanel();
 	static void animationPanel();
 	static void modelViewerPanel();
+	static void streetSidePanel();
 
     static void showHelpMarker(const char* desc);
 
@@ -212,6 +213,7 @@ private:
 	static bool s_showNormalFrameBufferDebugPanel;
 	static bool s_showAnimationPanel;
 	static bool s_showModelViewerPanel;
+	static bool s_showStreetSidePanel;
 
     static GLFWwindow * s_mainWindow;
 

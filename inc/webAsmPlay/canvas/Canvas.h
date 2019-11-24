@@ -136,6 +136,8 @@ public:
 
 	void addLeftClickListener(const std::function<void(const glm::dvec3 & posWC)> & listener);
 
+	void addMouseMoveListener(const std::function<void(const glm::dvec3 & posWC)> & listener);
+
 protected:
 
     bool preRender();
@@ -204,4 +206,5 @@ protected:
 	double m_perspectiveFOV = 45.0;
 
 	std::vector<std::function<void(const glm::dvec3 & posWC)>> m_leftClickListeners;
+	std::vector<std::function<void(const glm::dvec3 & posWC)>> m_mouseMoveListeners;
 };

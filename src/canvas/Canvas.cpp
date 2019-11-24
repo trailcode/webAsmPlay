@@ -331,7 +331,7 @@ void Canvas::onMouseButton(GLFWwindow * window, const int button, const int acti
 	{
 		case GLFW_MOUSE_BUTTON_LEFT: 
 
-		for(auto & listener : m_leftClickListeners) { listener(m_cursorPosWC) ;}
+		for(const auto & listener : m_leftClickListeners) { listener(m_cursorPosWC) ;}
 
 		break;
 	};
@@ -361,6 +361,8 @@ void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
     const double t = -dot(eye, n) / dot(rayWor, n);
 
     m_cursorPosWC = eye + rayWor * t;
+
+	for(const auto & listener : m_mouseMoveListeners) { listener(m_cursorPosWC) ;}
 }
 
 void Canvas::onMouseScroll(GLFWwindow * window, const vec2 & mouseScroll)
@@ -389,6 +391,11 @@ void Canvas::onMouseScroll(GLFWwindow * window, const vec2 & mouseScroll)
 void Canvas::addLeftClickListener(const function<void(const dvec3 & posWC)> & listener)
 {
 	m_leftClickListeners.push_back(listener);
+}
+
+void Canvas::addMouseMoveListener(const std::function<void(const glm::dvec3 & posWC)> & listener)
+{
+	m_mouseMoveListeners.push_back(listener);
 }
 
 void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods)

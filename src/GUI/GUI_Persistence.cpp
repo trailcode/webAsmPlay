@@ -62,6 +62,7 @@ bool GUI::s_showBingMapsFrameBufferDebugPanel	 = false;
 bool GUI::s_showNormalFrameBufferDebugPanel		 = false;
 bool GUI::s_showAnimationPanel					 = false;
 bool GUI::s_showModelViewerPanel				 = false;	
+bool GUI::s_showStreetSidePanel					 = false;
 
 bool GUI::s_renderSettingsFillMeshes             = true;
 bool GUI::s_renderSettingsRenderMeshOutlines     = true;
@@ -116,6 +117,7 @@ void GUI::loadState()
 	setBool(L"showNormalFrameBufferDebugPanel",		s_showNormalFrameBufferDebugPanel);
 	setBool(L"showAnimationPanel",					s_showAnimationPanel);
 	setBool(L"showModelViewerPanel",				s_showModelViewerPanel);
+	setBool(L"showStreetSidePanel",					s_showStreetSidePanel);
 
     setBool(L"renderSettingsFillMeshes",            s_renderSettingsFillMeshes);
     setBool(L"renderSettingsRenderMeshOutlines",    s_renderSettingsRenderMeshOutlines);
@@ -173,6 +175,7 @@ void GUI::saveState()
 	root[L"showNormalFrameBufferDebugPanel"]      = new JSONValue(s_showNormalFrameBufferDebugPanel);
 	root[L"showAnimationPanel"]					  = new JSONValue(s_showAnimationPanel);
 	root[L"showModelViewerPanel"]				  = new JSONValue(s_showModelViewerPanel);
+	root[L"showStreetSidePanel"]				  = new JSONValue(s_showStreetSidePanel);
 
     root[L"renderSettingsFillMeshes"]             = new JSONValue(s_renderSettingsFillMeshes);
     root[L"renderSettingsRenderMeshOutlines"]     = new JSONValue(s_renderSettingsRenderMeshOutlines);

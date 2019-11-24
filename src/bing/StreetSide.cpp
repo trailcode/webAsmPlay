@@ -202,3 +202,19 @@ void StreetSide::indexBubbles(const vector<pair<Bubble *, Renderable *>> & bubbl
 	}
 }
 
+pair<Bubble *, Renderable *> StreetSide::query(const dvec2 & pos)
+{
+	Point p(pos.x, pos.y);
+
+	vector<Value> result;
+
+    a_rtree.query(bgi::nearest(p, 1), std::back_inserter(result));
+
+	dmess("result " << result.size());
+
+	if(!result.size()) { return make_pair(nullptr, nullptr) ;}
+
+
+
+	return make_pair(nullptr, nullptr);
+}

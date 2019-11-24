@@ -44,6 +44,8 @@ public:
 
 	static void indexBubble(Bubble * bubble, Renderable * renderiable);
 
+	static std::pair<Bubble *, Renderable *> query(const glm::dvec2 & pos);
+
 private:
 
 	StreetSide();

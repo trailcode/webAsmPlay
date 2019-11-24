@@ -390,6 +390,7 @@ void GUI::showMainMenuBar()
 		if (ImGui::MenuItem("Normal Framebuffer"))		{ s_showNormalFrameBufferDebugPanel		^= 1 ;}
 		if (ImGui::MenuItem("Animation"))				{ s_showAnimationPanel					^= 1 ;}
 		if (ImGui::MenuItem("Model Viewer"))			{ s_showModelViewerPanel				^= 1 ;}
+		if (ImGui::MenuItem("Bing StreetSide"))			{ s_showStreetSidePanel					^= 1 ;}
 		if (ImGui::MenuItem("Full Screen"))				{ setFullScreen(!g_fullScreen) ;}
 
         ImGui::EndMenu();
@@ -545,6 +546,7 @@ void GUI::mainLoop(GLFWwindow * window)
 	normalFrameBufferDebugPanel();
 	animationPanel();
 	modelViewerPanel();
+	streetSidePanel();
 
 	//ImGui::ShowDemoWindow();
 
