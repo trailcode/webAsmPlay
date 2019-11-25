@@ -54,3 +54,7 @@ and allow C++ 17 compilation:
 
 The build system is based on CMake. 
 
+#### Bugs
+
+* Bingless textures for RenderableBingMaps is broken.
+

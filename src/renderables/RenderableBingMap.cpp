@@ -72,15 +72,14 @@ size_t RenderableBingMap::s_numRendered = 0;
 FrameBuffer * RenderableBingMap::s_textureBuffer = nullptr;
 
 bool RenderableBingMap::s_useCache				= true;
-bool RenderableBingMap::s_useBindlessTextures	= true;
+bool RenderableBingMap::s_useBindlessTextures	= false; // TODO Appears to be broken!
 
 namespace
 {
 #ifndef __EMSCRIPTEN__
 
-    //thread_pool a_loaderPool	(64);
-    thread_pool a_uploaderPool	(1);
-	thread_pool a_writerPool	(1);
+    thread_pool a_loaderPool(1);
+	thread_pool a_writerPool(1);
 
 	class MyCleanup
 	{
@@ -88,8 +87,7 @@ namespace
 
 		~MyCleanup()
 		{
-			//a_loaderPool.stop();
-			a_uploaderPool.stop();
+			a_loaderPool.stop();
 			a_writerPool.stop();
 		}
 	};
@@ -100,8 +98,8 @@ namespace
 
 	enum
 	{
-		//NUM_TEXTURES  = 2048,
-		NUM_TEXTURES  = 4096,
+		NUM_TEXTURES  = 2048,
+		//NUM_TEXTURES  = 4096,
 	};
 
 	struct
@@ -113,21 +111,13 @@ namespace
 
 void RenderableBingMap::fetchTile(RasterTile * tile)
 {
-	if(tile->m_textureID == RasterTile::s_NO_DATA)
-	{
-		//dmess("No Data " << tile);
+	tile->m_stillNeeded = true;
 
-		//return;
-	}
-
-	if(tile->m_loading) { return ;}
-	
 	tile->m_loading = true;
 
 	++s_numLoading;
 
-	//a_loaderPool.push([tile](int ID) { fetchTile(ID, tile) ;});
-	a_uploaderPool.push([tile](int ID) { fetchTile(ID, tile) ;});
+	a_loaderPool.push([tile](int ID) { fetchTile(ID, tile) ;});
 }
 
 void RenderableBingMap::markTileNoData(RasterTile* tile)
@@ -156,12 +146,7 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 	{
 		--s_numLoading;
 
-		if(!file_size(tileCachePath.c_str()))
-		{
-			dmess("Cached no data!");
-
-			return markTileNoData(tile);
-		}
+		if(!file_size(tileCachePath.c_str())) { return markTileNoData(tile) ;}
 
 		auto img = IMG_Load(tileCachePath.c_str());
 
@@ -169,13 +154,13 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 		++s_numUploading;
 
-		a_uploaderPool.push([tile, img, tileCachePath](int ID)
+		a_loaderPool.push([tile, img, tileCachePath](int ID)
 		{
+			--s_numUploading;
+
 			if (!tile->m_stillNeeded)
 			{
 				tile->m_loading = false;
-
-				--s_numUploading;
 
 				SDL_FreeSurface(img);
 
@@ -190,8 +175,6 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 			if(s_useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
 
-			--s_numUploading;
-
 			tile->m_loading = false;
 		});
 
@@ -200,8 +183,6 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 	
 	download:
 
-	//auto tileBuffer = shared_ptr<BufferStruct>(download("http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A", ID));
-
 	const auto url = "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A"; 
 
 	download(url, 
@@ -209,25 +190,22 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 		{
 			--s_numLoading;
 
+			if(!tile->m_stillNeeded) { tile->m_loading = false ;}
+
 			return tile->m_stillNeeded;
 		},
 		[tile, tileCachePath, url](BufferStruct * tileBuffer)
 		{
 			if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
 			{
-				dmess("tileBuffer->m_size " << tileBuffer->m_size << " tileBuffer->m_buffer " << tileBuffer->m_buffer);
-				dmess("url " << url);
-
 				markTileNoData(tile);
 
 				if (!s_useCache) { return ;}
 
 				FILE * fp = fopen(tileCachePath.c_str(), "wb");
 
-				if(fp)
-				{
-					fclose(fp);
-				}
+				if(fp) { fclose(fp) ;}
+
 				else { dmess("Warn could not write file: " << tileCachePath) ;}
 
 				return;
@@ -235,25 +213,20 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 			++s_numUploading;
 
-			a_uploaderPool.push([tile, tileBuffer, tileCachePath, url](int ID)
+			a_loaderPool.push([tile, tileBuffer, tileCachePath, url](int ID)
 			{
+				--s_numUploading;
+
 				if (!tile->m_stillNeeded)
 				{
 					tile->m_loading = false;
 				
-					--s_numUploading;
-
 					return;
 				}
 
 				auto img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
 
-				if(!img)
-				{
-					dmess("No data here! " << url);
-
-					return markTileNoData(tile);
-				}
+				if(!img) { return markTileNoData(tile) ;}
 
 				const auto bytesPerPixel = img->format->BytesPerPixel;
 
@@ -272,8 +245,6 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 				SDL_FreeSurface(img);
 
 				if(s_useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
-
-				--s_numUploading;
 
 				tile->m_loading = false;
 
@@ -339,6 +310,20 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & min, con
 {
 	const dvec2 center = (min + max) * 0.5;
 
+	auto tile = RasterTile::getTile(center, level, canvas->getFrameNumber());
+
+	if(level >= 24)
+	{
+		tile->m_textureID = RasterTile::s_NO_DATA;
+
+		return false;
+	}
+
+	if(tile->m_textureID == RasterTile::s_NO_DATA)
+	{
+		return false;
+	}
+
 	const ivec2 iTile = latLongToTile(center, level);
 
 	const dvec2 tMin = tileToLatLong(ivec2(iTile.x + 0, iTile.y + 1), level);
@@ -370,7 +355,7 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & min, con
 
 	const double tileSize = 256.0 * resDelta;
 
-	if (level < 24 && (D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
+	if ((D1 >= tileSize || D2 >= tileSize || D3 >= tileSize || D4 >= tileSize))
 	{
 		const dvec3 subPoints[] = {	/* 0 */dvec3(tMin.x, tMax.y,	0),		/* 1 */dvec3(center.x, tMax.y,   0), /* 2 */dvec3(tMax.x, tMax.y,   0),
 									/* 3 */dvec3(tMin.x, center.y,  0),		/* 4 */dvec3(center.x, center.y, 0), /* 5 */dvec3(tMax.x, center.y, 0),
@@ -380,20 +365,20 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & min, con
 											/* 3 */m_trans * dvec4(tMin.x, center.y, 0, 1), /* 4 */m_trans * dvec4(center.x, center.y, 0, 1), /* 5 */m_trans * dvec4(tMax.x, center.y, 0, 1),
 											/* 6 */m_trans * dvec4(tMin.x, tMin.y,   0, 1), /* 7 */m_trans * dvec4(center.x, tMin.y,   0, 1), /* 8 */m_trans * dvec4(tMax.x, tMin.y,   0, 1)};
 
-		size_t numSubTiles = 0;
-
 		const auto frust = canvas->getCameraFrustum();
+		
+		size_t numSubTiles		= 0;
+		size_t numIntersecting	= 0;
 
-		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { numSubTiles += getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
-		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { numSubTiles += getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;}
-		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { numSubTiles += getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;}
-		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { numSubTiles += getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;}
+		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { ++numIntersecting; numSubTiles += getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
+		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { ++numIntersecting; numSubTiles += getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;}
+		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { ++numIntersecting; numSubTiles += getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;}
+		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { ++numIntersecting; numSubTiles += getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;}
 
-		//if(numSubTiles == 4) { return true ;}
-		return true;
+		if(numSubTiles == numIntersecting) { return true ;}
 	}
 	
-	m_tiles.insert(RasterTile::getTile(center, level, canvas->getFrameNumber()));
+	m_tiles.insert(tile);
 
 	return true;
 }
@@ -449,7 +434,7 @@ void RenderableBingMap::renderBindlessTextures(Canvas* canvas, const vector<Rast
 		//tile->m_renderable->render(canvas, 0);
 	}
 	
-	return;
+	//return;
 
 	vector<vec4> centers;
 
@@ -565,12 +550,14 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	for (auto i : prevTiles)
 	{
-		if(tileSet.find(i) == tileSet.end()) { i->m_stillNeeded = false ;}
+		if(tileSet.find(i) == tileSet.end())
+		{
+			i->m_stillNeeded = false;
+		}
 	}
 
 	unordered_set<RasterTile*> fallBackTiles;
 
-	//*
 	for (const auto tile : m_tiles)
 	{
 		if (tile->textureReady()) { continue; }
@@ -598,16 +585,11 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 		}
 	}
 
-	//dmess("fallBackTiles " << fallBackTiles.size());
-	//*/
-
 	for (const auto tile : fallBackTiles) { m_tiles.insert(tile) ;}
 
 	auto tiles = toVec(m_tiles);
 
 	sort(tiles.begin(), tiles.end(), [](const RasterTile * A, const RasterTile * B) { return A->m_level < B->m_level ;});
-
-	size_t numRendered = 0;
 
 	vector<RasterTile*> toRender;
 
@@ -638,8 +620,6 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 			}
 
 			toRender.push_back(tile);
-
-			++numRendered;
 		}
 		else if(tile->m_textureID != RasterTile::s_NO_DATA) { fetchTile(tile) ;}
 	}
