@@ -48,6 +48,7 @@ namespace
 	unordered_map<size_t, CURL *> a_curlHandles;
 
 	thread_pool a_loaderPool(64);
+	//thread_pool a_loaderPool(1);
 
 #endif
 }

@@ -169,9 +169,6 @@ using namespace std::filesystem;
 
 GLuint Bubble::getCubeFaceTexture(const size_t face) const
 {
-	return 0;
-
-#ifdef WORKING
 	OpenGL::ensureSharedContext();
 
 	//const string streetsideImagesApi = "https://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
@@ -181,6 +178,12 @@ GLuint Bubble::getCubeFaceTexture(const size_t face) const
 	const string imgUrlSuffix = ".jpg?g=6338&n=z";
 
 	const auto faceQuadKey = getQuadKey() + a_faceKeys[face];
+
+	static unordered_set<string> checkedBubbleFaces;
+
+	if(checkedBubbleFaces.find(faceQuadKey) != checkedBubbleFaces.end()) { return 0;}
+
+	checkedBubbleFaces.insert(faceQuadKey);
 
 	const auto i = a_bubbleTiles.find(faceQuadKey);
 
@@ -221,62 +224,69 @@ GLuint Bubble::getCubeFaceTexture(const size_t face) const
 
 	const auto url = streetsideImagesApi + faceQuadKey + imgUrlSuffix;
 
-	dmess("url " << url);
+	//dmess("url " << url);
 
-	// TODO code dup here.
-	auto tileBuffer = shared_ptr<BufferStruct>(download(url));
-
-	if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
+	download(url, [faceQuadKey, tileCachePath](BufferStruct * buf)
 	{
-		dmess("No data!");
+		// TODO code dup here.
+		//auto tileBuffer = shared_ptr<BufferStruct>(download(url));
+		auto tileBuffer = shared_ptr<BufferStruct>(buf);
 
-		return 0;
-	}
+		if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
+		{
+			dmess("No data!");
 
-	auto img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
+			return 0;
+		}
 
-	if(!img)
-	{
-		dmess("Bad data!");
+		auto img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
 
-		return 0;
-	}
+		if(!img)
+		{
+			dmess("Bad data!");
 
-	const auto bytesPerPixel = img->format->BytesPerPixel;
+			return 0;
+		}
 
-	if(bytesPerPixel < 3)
-	{
-		SDL_FreeSurface(img);
+		const auto bytesPerPixel = img->format->BytesPerPixel;
 
-		// Must be the no data png image, mark as no data.
-		//return markTileNoData(tile);
+		if(bytesPerPixel < 3)
+		{
+			SDL_FreeSurface(img);
 
-		dmess("No data!");
+			// Must be the no data png image, mark as no data.
+			//return markTileNoData(tile);
 
-		return 0;
-	}
+			dmess("No data!");
 
-	////////////////////////////
-	FILE * fp = fopen(tileCachePath.c_str(), "wb");
+			return 0;
+		}
 
-	if(fp)
-	{
-		fwrite(tileBuffer->m_buffer, sizeof(char), tileBuffer->m_size, fp);
+		////////////////////////////
+		FILE * fp = fopen(tileCachePath.c_str(), "wb");
 
-		fclose(fp);
-	}
-	else { dmess("Warn could not write file: " << tileCachePath) ;}
-	///////////////////////////
+		if(fp)
+		{
+			fwrite(tileBuffer->m_buffer, sizeof(char), tileBuffer->m_size, fp);
 
-	const auto ret = Textures::load(img);
+			fclose(fp);
+		}
+		else { dmess("Warn could not write file: " << tileCachePath) ;}
+		///////////////////////////
 
-	a_bubbleTiles[faceQuadKey] = ret;
+		Textures::s_queue.push([img, faceQuadKey](int ID)
+		{
+			const auto ret = Textures::load(img);
 
-	SDL_FreeSurface(img);
+			a_bubbleTiles[faceQuadKey] = ret;
 
-	return ret;
+			SDL_FreeSurface(img);
+		});
+	});
 
-#endif
+	
+
+	return 0;
 }
 
 GLuint Bubble::getCachedCubeFaceTexture(const size_t face) const

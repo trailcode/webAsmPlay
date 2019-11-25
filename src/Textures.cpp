@@ -31,11 +31,14 @@
 
 using namespace std;
 using namespace glm;
+using namespace ctpl;
 
 namespace
 {
     Textures * a_instance = nullptr;
 } 
+
+thread_pool Textures::s_queue(1);
 
 Textures * Textures::getInstance()
 {

@@ -156,7 +156,7 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 		++s_numUploading;
 
-		a_loaderPool.push([tile, img, tileCachePath](int ID)
+		Textures::s_queue.push([tile, img, tileCachePath](int ID)
 		{
 			--s_numUploading;
 
@@ -215,7 +215,7 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 			++s_numUploading;
 
-			a_loaderPool.push([tile, tileBuffer, tileCachePath, url](int ID)
+			Textures::s_queue.push([tile, tileBuffer, tileCachePath, url](int ID)
 			{
 				--s_numUploading;
 

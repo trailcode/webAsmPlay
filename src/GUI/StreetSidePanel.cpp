@@ -121,10 +121,7 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 
 		for(size_t i = 0; i < 6; ++i)
 		{
-			a_tileLoader.push([i, bubble](int ID)
-			{
-				bubble->getCubeFaceTexture(i);
-			});
+			 bubble->getCubeFaceTexture(i);
 		}
 	});
 }

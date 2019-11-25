@@ -28,6 +28,7 @@
 #include <vector>
 #include <string>
 #include <glm/vec4.hpp>
+#include <ctpl/ctpl.h>
 #include <webAsmPlay/OpenGL_Util.h>
 
 struct SDL_Surface;
@@ -47,6 +48,8 @@ public:
     static GLuint create(const glm::vec4 * values, const size_t num);
 
     static GLuint set1D(const GLuint texture, const glm::vec4 * values, const size_t num);
+
+	static ctpl::thread_pool s_queue;
 
 private:
 

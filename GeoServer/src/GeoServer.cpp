@@ -186,10 +186,6 @@ string GeoServer::addOsmFile(const string & osmFile)
 	boundsMaxY = mapData.boundsMaxY;
 	*/
 
-	m_bubbles = StreetSide::query(m_boundsMinX, m_boundsMaxX, m_boundsMinY, m_boundsMaxY);
-
-	dmess("m_bubbles " << m_bubbles.size());
-
     const dmat4 s = scale(dmat4(1.0), dvec3(30.0, 30.0, 30.0));
 
     // TODO code dup!

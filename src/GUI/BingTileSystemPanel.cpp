@@ -62,7 +62,7 @@ void GUI::bingTileSystemPanel()
 
     pos = s_client->getInverseTrans() * pos;
 
-    const size_t zoomLevel = 17;
+    const size_t zoomLevel = 16;
 
 	const ivec2  pix	 = latLongToPixel(pos, zoomLevel);
 	const dvec2  pos2	 = pixelToLatLong(pix, zoomLevel);

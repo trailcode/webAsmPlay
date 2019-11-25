@@ -37,9 +37,7 @@ public:
 
 	static StreetSide * getInstance();
 
-	static std::vector<Bubble *> query(const glm::dvec2 & pos, const size_t zoomLevel = 17);
-
-	static std::vector<Bubble *> query(const double boundsMinX, const double boundsMaxX, const double boundsMinY, const double boundsMaxY);
+	static std::vector<Bubble *> query(const glm::dvec2 & pos, const size_t zoomLevel = 16);
 
 	static void doPicking(const char mode, const glm::dvec4 & pos);
 
