@@ -56,5 +56,5 @@ The build system is based on CMake.
 
 #### Bugs
 
-* Bingless textures for RenderableBingMaps is broken.
+
 
