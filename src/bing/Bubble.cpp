@@ -169,6 +169,9 @@ using namespace std::filesystem;
 
 GLuint Bubble::getCubeFaceTexture(const size_t face) const
 {
+	return 0;
+
+#ifdef WORKING
 	OpenGL::ensureSharedContext();
 
 	//const string streetsideImagesApi = "https://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
@@ -272,6 +275,8 @@ GLuint Bubble::getCubeFaceTexture(const size_t face) const
 	SDL_FreeSurface(img);
 
 	return ret;
+
+#endif
 }
 
 GLuint Bubble::getCachedCubeFaceTexture(const size_t face) const

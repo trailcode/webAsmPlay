@@ -100,13 +100,15 @@ void GeoClient::loadGeometry(const string fileName)
 
 	if (!fileName.rfind("http", 1))
 	{
+		dmessError("Fix!")
+		/*
 		CURLcode result; // We’ll store the result of CURL’s webpage retrieval, for simple error checking.
 		
 		BufferStruct output; // Create an instance of out BufferStruct to accept LCs output
 		
 		if (!myHandle) { myHandle = curl_easy_init(); }
 
-		/* Notice the lack of major error checking, for brevity */
+		// Notice the lack of major error checking, for brevity 
 
 		curl_easy_setopt(myHandle, CURLOPT_WRITEFUNCTION, writeMemoryCallback); // Passing the function pointer to LC
 		curl_easy_setopt(myHandle, CURLOPT_WRITEDATA, &output); // Passing our BufferStruct to LC
@@ -119,6 +121,7 @@ void GeoClient::loadGeometry(const string fileName)
 		GUI::progress("", 1.0);
 
 		if (output.m_buffer) { free(output.m_buffer) ;}
+		*/
 
 		return;
 	}

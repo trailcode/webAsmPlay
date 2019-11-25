@@ -27,6 +27,7 @@
 #pragma once
 
 #include <string>
+#include <future>
 
 namespace curlUtil
 {
@@ -41,8 +42,14 @@ namespace curlUtil
 		~BufferStruct();
 	};
 
-	size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data);	
+	//size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data);	
 
-	BufferStruct * download(const std::string & url, const size_t threadID = -1);
+	//BufferStruct * download(const std::string & url, const size_t threadID = -1);
+
+	std::future<BufferStruct *> download(const std::string & url);
+
+	void download(const std::string & url, const std::function<void(BufferStruct *)> & doneCallback);
+
+	void download(const std::string & url, const std::function<bool()> & stillNeeded, const std::function<void(BufferStruct *)> & doneCallback);
 }
 

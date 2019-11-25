@@ -36,6 +36,7 @@
 #include <webAsmPlay/CurlUtil.h>
 
 using namespace std;
+using namespace ctpl;
 using namespace curlUtil;
 
 namespace
@@ -45,6 +46,8 @@ namespace
 	mutex a_loaderMutex;
 
 	unordered_map<size_t, CURL *> a_curlHandles;
+
+	thread_pool a_loaderPool(1);
 
 #endif
 }
@@ -59,7 +62,8 @@ BufferStruct::~BufferStruct()
 }
 
 // This is the function we pass to LC, which writes the output to a BufferStruct
-size_t curlUtil::writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
+//size_t curlUtil::writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
+size_t writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
 {
 #ifndef __EMSCRIPTEN__
 
@@ -82,7 +86,7 @@ size_t curlUtil::writeMemoryCallback(void *ptr, size_t size, size_t nmemb, void 
 	return 0;
 }
 
-BufferStruct * curlUtil::download(const string & url, const size_t threadID)
+BufferStruct * _download(const string & url, const size_t threadID)
 {
 #ifndef __EMSCRIPTEN__
 
@@ -119,4 +123,34 @@ BufferStruct * curlUtil::download(const string & url, const size_t threadID)
 #endif
 
 	return nullptr;
+}
+
+future<BufferStruct *> curlUtil::download(const string & url)
+{
+	return a_loaderPool.push([url](int threadID)
+	{
+		return _download(url, threadID);
+	});
+}
+
+void curlUtil::download(const string & url, const function<void(BufferStruct *)> & doneCallback)
+{
+	a_loaderPool.push([url, doneCallback](int threadID)
+	{
+		auto ret = _download(url, threadID);
+
+		doneCallback(ret);
+	});
+}
+
+void curlUtil::download(const string & url, const function<bool()> & stillNeeded, const function<void(BufferStruct *)> & doneCallback)
+{
+	a_loaderPool.push([url, stillNeeded, doneCallback](int threadID)
+	{
+		if(!stillNeeded()) { return ;}
+
+		auto ret = _download(url, threadID);
+
+		doneCallback(ret);
+	});
 }
