@@ -31,11 +31,14 @@
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/bing/StreetSide.h>
 #include <webAsmPlay/bing/Bubble.h>
+#include <webAsmPlay/geom/BoostGeomUtil.h>
+#include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
 using namespace glm;
 using namespace ctpl;
+using namespace boostGeom;
 
 namespace
 {
@@ -68,8 +71,6 @@ void GUI::streetSidePanel()
 		{
 			const auto tex = a_bubble->getCachedCubeFaceTexture(i);
 
-			//ImGui::Image((ImTextureID)a_textIDs[i], ImVec2(256, 256));
-
 			ImGui::Image((ImTextureID)tex, ImVec2(256, 256));
 		}
 
@@ -79,33 +80,9 @@ void GUI::streetSidePanel()
 
 void GUI::initBingStreetSidePanel(const dmat4 & trans)
 {
-	getMainCanvas()->addLeftClickListener([](const dvec3 & posWC)
+	const auto requestBubbleFaces = [](const dvec3 & posWC)
 	{
-		if(!s_showStreetSidePanel || getMode() != PICK_STREET_SIDE_BUBBLE) { return ;}
-
-		//const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
-
-		//tie(a_bubble, a_renderable) = StreetSide::closestBubble(pos);
-
-		if(!a_bubble) { return ;}
-
-		for(size_t i = 0; i < 6; ++i)
-		{
-			const auto tex = a_bubble->getCubeFaceTexture(i);
-
-			//dmess("tex " << tex);
-
-			a_textIDs[i] = tex;
-		}
-	});
-
-	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
-	{
-		if(!s_showStreetSidePanel) { return ;}
-
 		const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
-
-		//dmess("pos " << pos);
 
 		tie(a_bubble, a_renderable) = StreetSide::closestBubble(pos);
 
@@ -119,9 +96,42 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 
 		auto bubble = a_bubble;
 
-		for(size_t i = 0; i < 6; ++i)
+		for(size_t i = 0; i < 6; ++i) { bubble->requestCubeFaceTexture(i) ;}
+	};
+
+	getMainCanvas()->addLeftClickListener([requestBubbleFaces](const dvec3 & posWC)
+	{
+		switch(getMode())
 		{
-			 bubble->getCubeFaceTexture(i);
+			case PICK_STREET_SIDE_BUBBLE:
+				
+				if(a_clickToViewBubble && s_showStreetSidePanel) { requestBubbleFaces(posWC) ;}
+
+			break;
+
+			case PICK_BING_TILE:
+
+				for(auto bubble : StreetSide::query(getClient()->getInverseTrans() * dvec4(posWC, 1)))
+				{
+					const auto trans = getClient()->getTrans();
+
+					auto b = buffer({bubble->m_pos.y, bubble->m_pos.x}, 0.00001);
+
+					auto r = Renderable::create(b, trans);
+
+					getMainCanvas()->addRenderable(r);
+
+					StreetSide::indexBubble(bubble, r);
+				}
+
+				break;
 		}
+	});
+
+	getMainCanvas()->addMouseMoveListener([requestBubbleFaces](const dvec3 & posWC)
+	{
+		if(!s_showStreetSidePanel || a_clickToViewBubble) { return ;}
+
+		requestBubbleFaces(posWC);
 	});
 }

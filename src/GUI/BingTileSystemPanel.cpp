@@ -111,11 +111,6 @@ void GUI::bingTileSystemPanel()
     ImGui::End();
 }
 
-#include <webAsmPlay/renderables/RenderablePoint.h>
-#include <webAsmPlay/geom/BoostGeomUtil.h>
-
-using namespace boostGeom;
-
 void GUI::initBingTileSystemPanel(const dmat4 & trans)
 {
 	GUI::addUpdatable([trans]()
@@ -128,26 +123,6 @@ void GUI::initBingTileSystemPanel(const dmat4 & trans)
 
 		if(a_tileSystemGeom) { a_tileSystemGeom->render(getMainCanvas(), POST_G_BUFFER) ;}
 
-	});
-
-	getMainCanvas()->addLeftClickListener([](const dvec3 & posWC)
-	{
-		if(getMode() != PICK_BING_TILE) { return ;}
-
-		const auto bubbles = StreetSide::query(getClient()->getInverseTrans() * dvec4(posWC, 1));
-
-		for(auto bubble : bubbles)
-		{
-			const auto trans = getClient()->getTrans();
-
-			auto b = buffer({bubble->m_pos.y, bubble->m_pos.x}, 0.00001);
-
-			auto r = Renderable::create(b, trans);
-
-			getMainCanvas()->addRenderable(r);
-
-			StreetSide::indexBubble(bubble, r);
-		}
 	});
 }
 

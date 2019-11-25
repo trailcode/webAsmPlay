@@ -167,7 +167,7 @@ string Bubble::getQuadKey() const
 
 using namespace std::filesystem;
 
-GLuint Bubble::getCubeFaceTexture(const size_t face) const
+GLuint Bubble::requestCubeFaceTexture(const size_t face) const
 {
 	OpenGL::ensureSharedContext();
 
@@ -212,8 +212,6 @@ GLuint Bubble::getCubeFaceTexture(const size_t face) const
 		auto ret = Textures::load(img);
 
 		SDL_FreeSurface(img);
-
-		dmess("Cached bubble face");
 
 		a_bubbleTiles[faceQuadKey] = ret;
 

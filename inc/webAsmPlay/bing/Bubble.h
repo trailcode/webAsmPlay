@@ -50,7 +50,7 @@ public:
 
 	std::string getQuadKey() const;
 
-	GLuint getCubeFaceTexture(const size_t face) const;
+	GLuint requestCubeFaceTexture(const size_t face) const;
 
 	GLuint getCachedCubeFaceTexture(const size_t face) const;
 
