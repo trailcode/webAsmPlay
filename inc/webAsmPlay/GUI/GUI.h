@@ -34,6 +34,7 @@
 
 class Canvas;
 class GeosTestCanvas;
+class BubbleFaceTestCanvas;
 class OpenSteerCanvas;
 class AnimationCanvas;
 class ModelViewerCanvas;
@@ -186,6 +187,7 @@ private:
 	static void animationPanel();
 	static void modelViewerPanel();
 	static void streetSidePanel();
+	static void bubbleFaceTestPanel();
 
     static void showHelpMarker(const char* desc);
 
@@ -216,6 +218,7 @@ private:
 	static bool s_showAnimationPanel;
 	static bool s_showModelViewerPanel;
 	static bool s_showStreetSidePanel;
+	static bool s_showBubbleFaceTestPanel;
 
     static GLFWwindow * s_mainWindow;
 
@@ -223,6 +226,7 @@ private:
     static OpenSteerCanvas		* s_openSteerCanvas;
 	static AnimationCanvas		* s_animationCanvas;
 	static ModelViewerCanvas	* s_modelViewerCanvas;
+	static BubbleFaceTestCanvas * s_bubbleFaceTestCanvas;
     static Canvas				* s_canvas;
     static SkyBox				* s_skyBox;
     static GeoClient			* s_client;

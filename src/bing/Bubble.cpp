@@ -26,14 +26,18 @@
   \copyright 2019
 */
 
+#include <filesystem>
 #include <unordered_map>
+#include <SDL_image.h>
 #include <tbb/concurrent_unordered_map.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/CurlUtil.h>
+#include <webAsmPlay/Textures.h>
 #include <webAsmPlay/bing/Bubble.h>
 
 using namespace std;
+using namespace std::filesystem;
 using namespace tbb;
 using namespace glm;
 using namespace nlohmann;
@@ -50,6 +54,7 @@ Bubble * Bubble::create(const json & bubble)
 {
 	try
 	{
+		// https://github.com/openstreetmap/iD/blob/76ffb5ef972b27b2a5658f0465282999da836b0f/modules/services/streetside.js#L372
 		// https://github.com/microsoft/MicrosoftStreetsidePlugin/blob/master/src/org/openstreetmap/josm/plugins/streetside/StreetsideImage.java
 
 		if(bubble.find("id") == bubble.end()) { return nullptr ;}
@@ -161,13 +166,7 @@ string Bubble::getQuadKey() const
 	return quadKey;
 }
 
-#include <SDL_image.h>
-#include <webAsmPlay/Textures.h>
-#include <filesystem>
-
-using namespace std::filesystem;
-
-GLuint Bubble::requestCubeFaceTexture(const size_t face) const
+void Bubble::requestCubeFaceTexture(const size_t face) const
 {
 	OpenGL::ensureSharedContext();
 
@@ -181,29 +180,19 @@ GLuint Bubble::requestCubeFaceTexture(const size_t face) const
 
 	static unordered_set<string> checkedBubbleFaces;
 
-	if(checkedBubbleFaces.find(faceQuadKey) != checkedBubbleFaces.end()) { return 0;}
+	if(checkedBubbleFaces.find(faceQuadKey) != checkedBubbleFaces.end()) { return ;}
 
 	checkedBubbleFaces.insert(faceQuadKey);
 
 	const auto i = a_bubbleTiles.find(faceQuadKey);
 
-	if(i != a_bubbleTiles.end())
-	{
-		dmess("Cache hit!");
-
-		return i->second;
-	}
+	if(i != a_bubbleTiles.end()) { return ;}
 
 	const string tileCachePath = "./bubbles/face_" + faceQuadKey;
 
 	if(fileExists(tileCachePath))
 	{
-		if(!file_size(tileCachePath.c_str()))
-		{
-			dmess("Here!");
-
-			return 0;
-		}
+		if(!file_size(tileCachePath.c_str())) { return ;}
 
 		auto img = IMG_Load(tileCachePath.c_str());
 
@@ -215,14 +204,14 @@ GLuint Bubble::requestCubeFaceTexture(const size_t face) const
 
 		a_bubbleTiles[faceQuadKey] = ret;
 
-		return ret;
+		return;
 	}
 
 	download:
 
 	const auto url = streetsideImagesApi + faceQuadKey + imgUrlSuffix;
 
-	//dmess("url " << url);
+	dmess("url " << url);
 
 	download(url, [faceQuadKey, tileCachePath](BufferStruct * buf)
 	{
@@ -234,7 +223,7 @@ GLuint Bubble::requestCubeFaceTexture(const size_t face) const
 		{
 			dmess("No data!");
 
-			return 0;
+			return;
 		}
 
 		auto img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
@@ -243,7 +232,7 @@ GLuint Bubble::requestCubeFaceTexture(const size_t face) const
 		{
 			dmess("Bad data!");
 
-			return 0;
+			return;
 		}
 
 		const auto bytesPerPixel = img->format->BytesPerPixel;
@@ -257,7 +246,7 @@ GLuint Bubble::requestCubeFaceTexture(const size_t face) const
 
 			dmess("No data!");
 
-			return 0;
+			return;
 		}
 
 		////////////////////////////
@@ -281,10 +270,6 @@ GLuint Bubble::requestCubeFaceTexture(const size_t face) const
 			SDL_FreeSurface(img);
 		});
 	});
-
-	
-
-	return 0;
 }
 
 GLuint Bubble::getCachedCubeFaceTexture(const size_t face) const

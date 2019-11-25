@@ -1,6 +1,4 @@
-﻿#pragma once
-
-/**
+﻿/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -25,40 +23,17 @@
   \email trailcode@gmail.com
   \copyright 2019
 */
+#pragma once
 
-#include <cstdlib>
-#include <glm/vec2.hpp>
-#include <nlohmann/json.hpp>
-#include <webAsmPlay/OpenGL_Util.h>
+#include <webAsmPlay/canvas/Canvas.h>
 
-class Bubble
+class BubbleFaceTestCanvas : public Canvas
 {
 public:
 
-	static Bubble * create(const nlohmann::json & bubble);
-
-	Bubble();
-
-	Bubble(	const size_t		  ID,
-			const glm::dvec2	& pos,
-			const glm::dvec2	& rollPitch,
-			const double		  altitude);
-
-	static void save(const std::string & fileName, const std::vector<Bubble *> & bubbles);
-
-	static std::vector<Bubble *> load(const std::string & fileName);
-
-	std::string getQuadKey() const;
-
-	void requestCubeFaceTexture(const size_t face) const;
-
-	GLuint getCachedCubeFaceTexture(const size_t face) const;
-
-	const size_t		m_ID;
-	const glm::dvec2	m_pos;
-	const glm::dvec2	m_rollPitch;
-	const double		m_altitude;
+    BubbleFaceTestCanvas();
+    ~BubbleFaceTestCanvas();
 
 private:
+    
 };
-

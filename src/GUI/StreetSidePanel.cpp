@@ -49,7 +49,7 @@ namespace
 
 	thread_pool a_tileLoader(1);
 
-	bool a_clickToViewBubble = true;
+	bool a_clickToViewBubble = false;
 }
 
 void GUI::streetSidePanel()
@@ -105,7 +105,9 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 		{
 			case PICK_STREET_SIDE_BUBBLE:
 				
-				if(a_clickToViewBubble && s_showStreetSidePanel) { requestBubbleFaces(posWC) ;}
+				if(!a_clickToViewBubble || !s_showStreetSidePanel) {  break ;}
+
+				requestBubbleFaces(posWC);
 
 			break;
 
