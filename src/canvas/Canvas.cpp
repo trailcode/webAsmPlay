@@ -271,6 +271,7 @@ GLuint Canvas::render()
 	SsaoShader::getDefaultInstance()->bind(this, false, POST_G_BUFFER);
 
 	glBindVertexArray(quad_vao);
+
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     return postRender();

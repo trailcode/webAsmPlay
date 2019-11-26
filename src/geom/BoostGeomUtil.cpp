@@ -59,9 +59,14 @@ MultiPolygon boostGeom::unionPolygons(const MultiPolygon & polys)
 
 Polygon boostGeom::makePolygonBox(const dvec2 & min, const dvec2 & max)
 {
+	return toPolygon(Box(Point(min.x, min.y), Point(max.x, max.y)));
+}
+
+Polygon boostGeom::toPolygon(const Box & b)
+{
 	Polygon bx;
 
-	boost::geometry::convert(Box(Point(min.x, min.y), Point(max.x, max.y)), bx);
+	boost::geometry::convert(b, bx);
 
 	return bx;
 }
@@ -95,4 +100,48 @@ Polygon boostGeom::buffer(const dvec2 & pos, const double radius)
 	boost::geometry::buffer(p, result, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
 
 	return result[0];
+}
+
+vector<Box> boostGeom::quadBox(const Box & b)
+{
+	vector<Box> ret(4);
+
+	const auto center = getCentroid(b);
+
+	const auto min_x = get<min_corner, 0>(b);
+	const auto min_y = get<min_corner, 1>(b);
+	const auto max_x = get<max_corner, 0>(b);
+	const auto max_y = get<max_corner, 1>(b);
+
+	ret[0] = {	{min_x,			max_y		},		center					};
+	ret[1] = {	{center.x(),	max_y		},	{	max_x,		center.y()	}};
+	ret[2] = {	{min_x,			center.y()	},	{	center.x(), min_y		}};
+	ret[3] = {	 center,						{	max_x,		max_y		}};
+
+	return ret;
+}
+
+void boostGeom::quadBox(const Box & b, vector<Box> & out)
+{
+	const auto center = getCentroid(b);
+
+	const auto min_x = get<min_corner, 0>(b);
+	const auto min_y = get<min_corner, 1>(b);
+	const auto max_x = get<max_corner, 0>(b);
+	const auto max_y = get<max_corner, 1>(b);
+
+	out.emplace_back(Box{	{min_x,			max_y		},		center					});
+	out.emplace_back(Box{	{center.x(),	max_y		},	{	max_x,		center.y()	}});
+	out.emplace_back(Box{	{min_x,			center.y()	},	{	center.x(), min_y		}});
+	out.emplace_back(Box{	 center,						{	max_x,		max_y		}});
+}
+
+void boostGeom::subdevideBox(const Box & b, const size_t dim, const vector<Box> & out)
+{
+
+}
+
+void boostGeom::subdevideBox(const Box & b, const size_t dimX, const size_t dimY, const vector<Box> & out)
+{
+
 }

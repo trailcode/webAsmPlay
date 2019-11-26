@@ -35,7 +35,7 @@ void GUI::bubbleFaceTestPanel()
 
 	if(!s_showBubbleFaceTestPanel) { return ;}
 
-	ImGui::Begin("Bubble Face Test", &s_showGeosTestPanel);
+	ImGui::Begin("Bubble Face Test", &s_showBubbleFaceTestPanel);
 
         const ImVec2 pos = ImGui::GetCursorScreenPos();
 

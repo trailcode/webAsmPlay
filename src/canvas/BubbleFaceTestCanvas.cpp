@@ -24,12 +24,39 @@
   \copyright 2019
 */
 
-#include <webAsmPlay/renderables/Renderable.h>
+#include <webAsmPlay/geom/BoostGeomUtil.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/canvas/BubbleFaceTestCanvas.h>
+
+using namespace std;
+using namespace boost::geometry;
+using namespace boostGeom;
+
+namespace
+{
+	
+}
 
 BubbleFaceTestCanvas::BubbleFaceTestCanvas()
 {
+	Box b = Box{{-1,-1},{1,1}};
 
+	auto r = Renderable::create(toPolygon(b));
+
+	r->setRenderFill(false);
+
+	addRenderable(r);
+
+	auto quad = quadBox(b);
+
+	for(auto & b : quad)
+	{
+		auto r = Renderable::create(toPolygon(b));
+
+		r->setRenderFill(false);
+
+		addRenderable(r);
+	}
 }
 
 BubbleFaceTestCanvas::~BubbleFaceTestCanvas()

@@ -51,6 +51,26 @@ namespace boostGeom
 	Polygon makeTriangle(const glm::dvec2 & A, const glm::dvec2 & B, const glm::dvec2 & C);
 
 	Polygon buffer(const glm::dvec2 & pos, const double radius);
+
+	Polygon toPolygon(const boostGeom::Box & b);
+
+	template<typename GeomType>
+	Point getCentroid(const GeomType & g)
+	{
+		Point center;
+
+		boost::geometry::centroid(g, center);
+
+		return center;
+	}
+
+	std::vector<boostGeom::Box> quadBox(const boostGeom::Box & b);
+
+	void quadBox(const boostGeom::Box & b, std::vector<boostGeom::Box> & out);
+
+	void subdevideBox(const boostGeom::Box & b, const size_t dim, const std::vector<boostGeom::Box> & out);
+
+	void subdevideBox(const boostGeom::Box & b, const size_t dimX, const size_t dimY, const std::vector<boostGeom::Box> & out);
 }
 
 inline glm::dvec2 __(const boostGeom::Point & point) { return { point.x(), point.y() } ;}
