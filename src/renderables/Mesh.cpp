@@ -51,7 +51,7 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture
 }
 
 // render the mesh
-void Mesh::Draw(const SetMaterialFunctor & onMaterial)
+void Mesh::draw(const SetMaterialFunctor & onMaterial)
 {
 	ensureVAO();
 

@@ -238,16 +238,15 @@ namespace
 
 /*  Functions   */
 // constructor, expects a filepath to a 3D model.
-Model::Model(string const &path, bool gamma) : gammaCorrection(gamma)
+Model::Model(string const &path, bool gamma) : m_gammaCorrection(gamma)
 {
     loadModel(path);
 }
 
 // draws the model, and thus all its meshes
-void Model::Draw(const SetMaterialFunctor & onMaterial)
+void Model::draw(const SetMaterialFunctor & onMaterial)
 {
-    for(unsigned int i = 0; i < meshes.size(); i++)
-        meshes[i].Draw(onMaterial);
+	for(auto & m : m_meshes) { m.draw(onMaterial) ;}
 }
     
 /*  Functions   */
@@ -261,13 +260,14 @@ void Model::loadModel(string const &path)
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
     {
         dmess("ERROR::ASSIMP:: " << importer.GetErrorString());
+
         return;
     }
     // retrieve the directory path of the filepath
-    directory = path.substr(0, path.find_last_of('/'));
+    m_directory = path.substr(0, path.find_last_of('/'));
 
     // process ASSIMP's root node recursively
-    processNode(scene->mRootNode, scene, directory);
+    processNode(scene->mRootNode, scene, m_directory);
 }
 
 // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
@@ -279,7 +279,8 @@ void Model::processNode(aiNode *node, const aiScene *scene, const string & direc
         // the node object only contains indices to index the actual objects in the scene. 
         // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(processMesh(mesh, scene, directory));
+
+        m_meshes.push_back(processMesh(mesh, scene, directory));
     }
     // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
     for(unsigned int i = 0; i < node->mNumChildren; i++)

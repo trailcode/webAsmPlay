@@ -38,16 +38,18 @@ class Model
 public:
 
     /*  Model Data */
-    std::vector<Mesh> meshes;
-    std::string directory;
-    bool gammaCorrection;
+    std::vector<Mesh> m_meshes;
+
+    std::string m_directory;
+
+    bool m_gammaCorrection;
 	
     /*  Functions   */
     // constructor, expects a filepath to a 3D model.
     Model(std::string const &path, bool gamma = false);
     
     // draws the model, and thus all its meshes
-    void Draw(const SetMaterialFunctor & onMaterial);
+    void draw(const SetMaterialFunctor & onMaterial);
     
 private:
     /*  Functions   */

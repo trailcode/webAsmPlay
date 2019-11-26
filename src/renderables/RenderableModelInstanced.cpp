@@ -48,7 +48,6 @@ RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, con
 	m_numInstances = modelPositions.size();
 
 	vector<mat4> modelMatrices(m_numInstances);
-	//modelMatrices.resize(m_numInstances);
 
 	random_device r;
 
@@ -97,7 +96,7 @@ void RenderableModelInstanced::render(Canvas * canvas, const size_t renderStage)
 
 	PhongShaderInstanced::getDefaultInstance()->bind(canvas, false);
 
-	for (const auto & mesh : m_model->meshes)
+	for (const auto & mesh : m_model->m_meshes)
     {
 		glBindVertexArray(mesh.VAO);
 
@@ -119,31 +118,14 @@ void RenderableModelInstanced::ensureVAO()
 
 	m_didVAO = true;
 
-	for (auto & mesh : m_model->meshes)
-	{
-		mesh.ensureVAO();
-	}
-
-	/*
-	// configure instanced array
-	// -------------------------
-	unsigned int buffer;
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
-	*/
+	for (auto & mesh : m_model->m_meshes) { mesh.ensureVAO() ;}
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_modelInstancedID);
 
-	for (auto & mesh : m_model->meshes)
+	for (auto & mesh : m_model->m_meshes)
 	{
-		//mesh.ensureVAO();
+		glBindVertexArray(mesh.VAO);
 
-		unsigned int VAO = mesh.VAO;
-
-		glBindVertexArray(VAO);
-		//glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-		// set attribute pointers for matrix (4 times vec4)
 		glEnableVertexAttribArray(3);
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
 		glEnableVertexAttribArray(4);
