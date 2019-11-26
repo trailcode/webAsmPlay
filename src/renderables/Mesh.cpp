@@ -28,24 +28,22 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Debug.h>
-#include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/shaders/PhongShader.h>
 #include <webAsmPlay/renderables/Mesh.h>
-
-//#include <learnopengl/shader.h>
 
 using namespace std;
 
 
 /*  Functions  */
 // constructor
-Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures, Material material)
+Mesh::Mesh(	const vector<Vertex>		& vertices,
+			const vector<unsigned int>	& indices,
+			const vector<Texture>		& textures,
+			const Material				& material) :	m_vertices	(vertices),
+														m_indices	(indices),
+														m_textures	(textures),
+														m_material	(material)
 {
-    this->vertices = vertices;
-    this->indices = indices;
-    this->textures = textures;
-	this->material = material;
-
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
 }
@@ -60,12 +58,12 @@ void Mesh::draw(const SetMaterialFunctor & onMaterial)
     unsigned int specularNr = 1;
     unsigned int normalNr   = 1;
     unsigned int heightNr   = 1;
-    for(unsigned int i = 0; i < textures.size(); i++)
+    for(unsigned int i = 0; i < m_textures.size(); i++)
     {
         glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
         // retrieve texture number (the N in diffuse_textureN)
         string number;
-        string name = textures[i].type;
+        string name = m_textures[i].m_type;
         if(name == "texture_diffuse")
 			number = std::to_string(diffuseNr++);
 		else if(name == "texture_specular")
@@ -75,21 +73,18 @@ void Mesh::draw(const SetMaterialFunctor & onMaterial)
             else if(name == "texture_height")
 			number = std::to_string(heightNr++); // transfer unsigned int to stream
 
-													// now set the sampler to the correct texture unit
-        //glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+		// now set the sampler to the correct texture unit
         // and finally bind the texture
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        glBindTexture(GL_TEXTURE_2D, m_textures[i].m_ID);
     }
 
-	if(!textures.size())
-	{	
-		//shader->setMaterial(material);
-		onMaterial(material);
-	}
+	if(!m_textures.size()) { onMaterial(m_material) ;}
         
     // draw mesh
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(m_VAO);
+
+    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+
     glBindVertexArray(0);
 
     // always good practice to set everything back to defaults once configured.
@@ -102,34 +97,32 @@ void Mesh::setupMesh()
 {
     // create buffers/arrays
     
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    glGenBuffers(1, &m_VBO);
+    glGenBuffers(1, &m_EBO);
 
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);	
     
     // load data into vertex buffers
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     // A great thing about structs is that their memory layout is sequential for all its items.
     // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
     // again translates to 3/2 floats which translates to a byte array.
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);  
+    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);  
 
 	// Flush is required if executing in a thread different from the main thread.
 	glFlush();
-
-	//ensureVAO();
 }
 
 void Mesh::ensureVAO()
 {
-	if(VAO) { return ;}
+	if(m_VAO) { return ;}
 
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	glGenVertexArrays(1, &m_VAO);
+
+	glBindVertexArray(m_VAO);
 	
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
     // set the vertex attribute pointers
     // vertex Positions

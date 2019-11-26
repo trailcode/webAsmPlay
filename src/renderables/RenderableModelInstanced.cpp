@@ -98,15 +98,15 @@ void RenderableModelInstanced::render(Canvas * canvas, const size_t renderStage)
 
 	for (const auto & mesh : m_model->m_meshes)
     {
-		glBindVertexArray(mesh.VAO);
+		glBindVertexArray(mesh.m_VAO);
 
-		glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_VBO);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_EBO);
 
-		PhongShaderInstanced::getDefaultInstance()->setMaterial(mesh.material);
+		PhongShaderInstanced::getDefaultInstance()->setMaterial(mesh.m_material);
 
-        glDrawElementsInstanced(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0, m_numInstances);
+        glDrawElementsInstanced(GL_TRIANGLES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0, m_numInstances);
 	}
 
 	glBindVertexArray(0);
@@ -124,7 +124,7 @@ void RenderableModelInstanced::ensureVAO()
 
 	for (auto & mesh : m_model->m_meshes)
 	{
-		glBindVertexArray(mesh.VAO);
+		glBindVertexArray(mesh.m_VAO);
 
 		glEnableVertexAttribArray(3);
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);

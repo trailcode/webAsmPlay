@@ -32,6 +32,7 @@
 #include <functional>
 #include <vector>
 #include <glm/vec2.hpp>
+#include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/shaders/Material.h>
 
 struct Vertex {
@@ -47,28 +48,39 @@ struct Vertex {
     glm::vec3 Bitangent;
 };
 
-struct Texture {
-    unsigned int id;
-    std::string type;
-    std::string path;
+struct Texture
+{
+    GLuint m_ID;
+
+    std::string m_type;
+
+    std::string m_path;
 };
 
 typedef std::function<void(const Material & material)> SetMaterialFunctor;
 
-class Mesh {
+class Mesh
+{
 public:
     /*  Mesh Data  */
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    std::vector<Texture> textures;
-	Material material;
-    unsigned int VAO = 0;
+    std::vector<Vertex> m_vertices;
+
+    std::vector<unsigned int> m_indices;
+
+    std::vector<Texture> m_textures;
+
+	Material m_material;
+
+    GLuint m_VAO = 0;
+
 	/*  Render data  */
-    unsigned int VBO, EBO;
+    GLuint m_VBO = 0;
+	
+	GLuint m_EBO = 0;
 
     /*  Functions  */
     // constructor
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, Material material);
+    Mesh(const std::vector<Vertex> & vertices, const std::vector<unsigned int> & indices, const std::vector<Texture> & textures, const Material & material);
     
     // render the mesh
     void draw(const SetMaterialFunctor & onMaterial);

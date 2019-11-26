@@ -87,8 +87,6 @@ namespace
     {
         vector<Texture> textures;
 
-		//cout << "mat->GetTextureCount(type) " << mat->GetTextureCount(type) << endl;
-
         for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
         {
             aiString str;
@@ -97,19 +95,20 @@ namespace
             bool skip = false;
             for(unsigned int j = 0; j < textures_loaded.size(); j++)
             {
-                if(std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
+                if(std::strcmp(textures_loaded[j].m_path.data(), str.C_Str()) == 0)
                 {
                     textures.push_back(textures_loaded[j]);
                     skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
                     break;
                 }
             }
+
             if(!skip)
             {   // if texture hasn't been loaded already, load it
                 Texture texture;
-                texture.id = TextureFromFile(str.C_Str(), directory, false);
-                texture.type = typeName;
-                texture.path = str.C_Str();
+                texture.m_ID = TextureFromFile(str.C_Str(), directory, false);
+                texture.m_type = typeName;
+                texture.m_path = str.C_Str();
                 textures.push_back(texture);
                 textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
             }
