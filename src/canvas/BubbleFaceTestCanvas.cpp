@@ -57,7 +57,6 @@ namespace
 				void main()
 				{
 					gl_Position = viewProjMatrix * worldMatrix * position;
-					//gl_Position = viewProjMatrix * position;
 					uv0 = texCoord0;
 				}
 			)";
@@ -89,6 +88,8 @@ namespace
 
 	dmat4 theProjM;
 
+	vec3 theTrans;
+
 	class Demo
 	{
 	public:
@@ -119,19 +120,11 @@ namespace
 
 		struct
 		{
-			GLuint vao = 0;
-			GLuint vertexBuffer = 0;
-			GLuint uvBuffer = 0;
-			float time = 0;
-		} atlasQuad;
-
-		struct
-		{
 			const uint32_t size = 80; // 40;
 			const uint32_t atlasWidth = 1024 * 3;
 			const uint32_t atlasHeight = 1024 * 3;
-			const uint32_t oversampleX = 2;
-			const uint32_t oversampleY = 2;
+			const uint32_t oversampleX = 1; // 2
+			const uint32_t oversampleY = 1; // 2
 			const uint32_t firstChar = ' ';
 			const uint32_t charCount = '~' - ' ';
 			std::unique_ptr<stbtt_packedchar[]> charInfo;
@@ -142,7 +135,6 @@ namespace
 		{
 			initFont();
 			initRotatingLabel();
-			initAtlasQuad();
 			initProgram();
 			initUniforms();
 		}
@@ -153,9 +145,7 @@ namespace
 			glDeleteBuffers(1, &rotatingLabel.vertexBuffer);
 			glDeleteBuffers(1, &rotatingLabel.uvBuffer);
 			glDeleteBuffers(1, &rotatingLabel.indexBuffer);
-			glDeleteVertexArrays(1, &atlasQuad.vao);
-			glDeleteBuffers(1, &atlasQuad.vertexBuffer);
-			glDeleteBuffers(1, &atlasQuad.uvBuffer);
+			
 			glDeleteTextures(1, &font.texture);
 			glDeleteProgram(program.handle);
 		}
@@ -189,11 +179,13 @@ namespace
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
 			*/
 			
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 			glUniform1i(program.uniforms.texture, 9);
 
 			//const auto dt = device.getTimeDelta();
 			renderRotatingLabel(0.001);
-			renderAtlasQuad(0.001);
 		}
 
 		auto compileShader(GLenum type, const char* src) -> GLuint
@@ -276,33 +268,13 @@ namespace
 			file.close();
     
 			return bytes;
-
-			/*
-			FILE * fp = fopen(path, "rb");
-
-			if(!fp)
-			{
-				dmessError("Could not open: " << path);
-			}
-
-			fseek(fp, 0, SEEK_END);
-			int size = ftell(fp);
-			fseek(fp, 0, SEEK_SET);
-
-			auto bytes = std::vector<uint8_t>(size);
-
-			fread(&bytes[0], sizeof(uint8_t), size, fp);
-
-			fclose(fp);
-
-			return bytes;
-			*/
 		}
 
 		void initFont()
 		{
 			//auto fontData = readFile("C:/build/webAsmPlay/ThirdParty/imgui/misc/fonts/ProggyClean.ttf");
-			auto fontData = readFile("C:/windows/fonts/arial.ttf");
+			auto fontData = readFile("C:/build/webAsmPlay/ThirdParty/imgui/misc/fonts/DroidSans.ttf");
+			//auto fontData = readFile("C:/windows/fonts/arial.ttf");
 			//auto fontData = readFile("C:\\build\\webAsmPlay\\readme.md");
 			//auto fontData = readFile("ProggyClean.ttf");
 
@@ -401,42 +373,53 @@ namespace
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * rotatingLabel.indexElementCount, indexes.data(), GL_STATIC_DRAW);
 		}
 
-		void initAtlasQuad()
+		void setText(const string & text)
 		{
-			const float vertices[] =
+			std::vector<glm::vec3> vertices;
+			std::vector<glm::vec2> uvs;
+			std::vector<uint16_t> indexes;
+
+			uint16_t lastIndex = 0;
+			float offsetX = 0, offsetY = 0;
+			for (auto c : text)
 			{
-				-1, -1, 0,
-				-1, 1, 0,
-				1, 1, 0,
-				-1, -1, 0,
-				1, 1, 0,
-				1, -1, 0,
-			};
+				const auto glyphInfo = getGlyphInfo(c, offsetX, offsetY);
+				offsetX = glyphInfo.offsetX;
+				offsetY = glyphInfo.offsetY;
 
-			const float uvs[] =
-			{
-				0, 1,
-				0, 0,
-				1, 0,
-				0, 1,
-				1, 0,
-				1, 1,
-			};
+				vertices.emplace_back(glyphInfo.positions[0]);
+				vertices.emplace_back(glyphInfo.positions[1]);
+				vertices.emplace_back(glyphInfo.positions[2]);
+				vertices.emplace_back(glyphInfo.positions[3]);
+				uvs.emplace_back(glyphInfo.uvs[0]);
+				uvs.emplace_back(glyphInfo.uvs[1]);
+				uvs.emplace_back(glyphInfo.uvs[2]);
+				uvs.emplace_back(glyphInfo.uvs[3]);
+				indexes.push_back(lastIndex);
+				indexes.push_back(lastIndex + 1);
+				indexes.push_back(lastIndex + 2);
+				indexes.push_back(lastIndex);
+				indexes.push_back(lastIndex + 2);
+				indexes.push_back(lastIndex + 3);
 
-			glGenVertexArrays(1, &atlasQuad.vao);
-			glBindVertexArray(atlasQuad.vao);
+				lastIndex += 4;
+			}
 
-			glGenBuffers(1, &atlasQuad.vertexBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, atlasQuad.vertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * 18, vertices, GL_STATIC_DRAW);
+			glBindVertexArray(rotatingLabel.vao);
+
+			glBindBuffer(GL_ARRAY_BUFFER, rotatingLabel.vertexBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 			glEnableVertexAttribArray(0);
 
-			glGenBuffers(1, &atlasQuad.uvBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, atlasQuad.uvBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * 12, uvs, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, rotatingLabel.uvBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * uvs.size(), uvs.data(), GL_STATIC_DRAW);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 			glEnableVertexAttribArray(1);
+
+			rotatingLabel.indexElementCount = indexes.size();
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rotatingLabel.indexBuffer);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * rotatingLabel.indexElementCount, indexes.data(), GL_STATIC_DRAW);
 		}
 
 		void renderRotatingLabel(float dt)
@@ -453,7 +436,7 @@ namespace
 				{0.05f, 0.05f, 1});
 				*/
 
-			const auto worldMatrix = glm::scale(glm::mat4(1.0f), {1, 1, 1});
+			const auto worldMatrix = glm::translate(glm::scale(glm::mat4(1.0f), {1, 1, 1}), theTrans);
 
 			glUniformMatrix4fv(program.uniforms.worldMatrix, 1, GL_FALSE, glm::value_ptr(worldMatrix));
 
@@ -462,24 +445,12 @@ namespace
 			glDrawElements(GL_TRIANGLES, rotatingLabel.indexElementCount, GL_UNSIGNED_SHORT, nullptr);
 		}
 
-		void renderAtlasQuad(float dt)
-		{
-			atlasQuad.time += dt;
-			const auto distance = -10 - 5 * sinf(atlasQuad.time);
-
-			const auto worldMatrix = glm::scale(glm::translate(glm::mat4{}, {0, -6, distance}), {6, 6, 1});
-			glUniformMatrix4fv(program.uniforms.worldMatrix, 1, GL_FALSE, glm::value_ptr(worldMatrix));
-
-			glBindVertexArray(atlasQuad.vao);
-			glDrawArrays(GL_TRIANGLES, 0, 6); // 6 vertices
-		}
-
 		auto getGlyphInfo(uint32_t character, float offsetX, float offsetY) -> GlyphInfo
 		{
 			stbtt_aligned_quad quad;
 
 			stbtt_GetPackedQuad(font.charInfo.get(), font.atlasWidth, font.atlasHeight,
-				character - font.firstChar, &offsetX, &offsetY, &quad, 1);
+				character - font.firstChar, &offsetX, &offsetY, &quad, 0);
 
 			const float scale = 0.001;
 
@@ -546,24 +517,6 @@ extern GLuint quad_vao;
 
 GLuint BubbleFaceTestCanvas::render()
 {
-	/*
-	//ImGui::Begin("test", 0, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoSavedSettings|ImGuiWindowFlags_NoInputs);
-
-	theProjM = getProjectionRef();
-
-	//ImGui::End();
-
-	//auto ret = Canvas::render();
-
-	Canvas::preRender();
-
-	demo.render();
-
-	//ImGui::GetWindowDrawList()->AddText( ImVec2(1000, 1000), ImColor(1.0f,1.0f,1.0f,1.0f), "Text in Background Layer" );
-
-	return ret;
-	*/
-
 	if(!preRender()) { return 0 ;}
 
     lock_guard<mutex> _(m_renderiablesMutex);
@@ -597,6 +550,14 @@ GLuint BubbleFaceTestCanvas::render()
 	for(const auto r : m_models)              { r->render(this, POST_G_BUFFER) ;}
 
 	auto m = getProjectionRef() * getViewRef();
+
+	char buf[1024];
+
+	sprintf(buf, "pos: %f,%f", getCursorPosWC().x, getCursorPosWC().y);
+
+	demo.setText(buf);
+
+	//theTrans = getCursorPosWC();
 
 	demo.render(m);
 	//demo.render(getMVP_Ref());
