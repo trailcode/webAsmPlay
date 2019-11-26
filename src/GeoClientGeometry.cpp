@@ -275,21 +275,27 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     ColoredGeometryVec points;
 
-	vector<vec2> pointPositions;
+	vector<vec2> treePositions;
 
 	for(const auto [attrs, geom] : geoms)
 	{
 		const auto point = dynamic_cast<Point *>(geom);
 
-		if(point) { pointPositions.push_back(m_trans * vec4(point->getX(), point->getY(), 0, 1)) ;}
+		if(!point) { continue ;}
+
+		// Check if this point is a tree
+		if(attrs->hasStringKeyValue("natural", "tree")) { treePositions.push_back(m_trans * vec4(point->getX(), point->getY(), 0, 1)) ;}
 	}
 
-    dmess("pointPositions " << pointPositions.size());
+    dmess("treePositions " << treePositions.size());
 
-    // TODO need to get executable path.
-	auto r = RenderableModelInstanced::create("tree1.obj", pointPositions);
+	if(treePositions.size())
+	{
+		// TODO need to get executable path.
+		auto r = RenderableModelInstanced::create("tree1.obj", treePositions);
 
-	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
+		GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
+	}
 
     unordered_map<string, size_t> pointTypes;
 
@@ -320,7 +326,7 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     GUI::progress("", 1.0);
 
-    r = RenderablePolygon::create(points, m_trans, true);
+    auto r = RenderablePolygon::create(points, m_trans, true);
 
     r->setShader(ColorDistanceShader::getDefaultInstance());
 	

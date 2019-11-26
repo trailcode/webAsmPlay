@@ -36,6 +36,7 @@ if(MSVC_VERSION)
 		execute_process(COMMAND ${NUGET} install tbb_oss					-Version 9.107.0	-o thirdParty)
 		execute_process(COMMAND ${NUGET} install expat.v140					-Version 2.2.6		-o thirdParty)
 		execute_process(COMMAND ${NUGET} install assimp.v140				-Version 3.2.0		-o thirdParty)
+		execute_process(COMMAND ${NUGET} install freetype					-Version 2.8.0.1	-o thirdParty)
 	
 		file(GLOB boost_files	${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc141.${BOOST_VERSION}/lib/native/*
 								${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc141.${BOOST_VERSION}/lib/native/*
@@ -71,6 +72,10 @@ if(MSVC_VERSION)
 	set(ASSIMP_LIBRARY_DEBUG			${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.3.2/build/native/lib/x64/Debug/assimp-vc140-mtd.lib)
 	set(ASSIMP_LIBRARY_RELEASE			${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.3.2/build/native/lib/x64/Release/assimp-vc140-mt.lib)
 
+	set(FREETYPE_INCLUDE_DIRS			${webAsmPlay_BINARY_DIR}/thirdParty/freetype.2.8.0.1/build/native/include)
+	set(FREETYPE_LIBRARY	optimized	${webAsmPlay_BINARY_DIR}/thirdParty/freetype.2.8.0.1/build/native/lib/x64/v141/dynamic/Release/freetype28.lib
+							debug		${webAsmPlay_BINARY_DIR}/thirdParty/freetype.2.8.0.1/build/native/lib/x64/v141/dynamic/Debug/freetype28d.lib)
+	
 else()
     set(CURL_LIBRARY_RELEASE ${CURL_LIBRARY})
     set(CURL_LIBRARY_DEBUG   ${CURL_LIBRARY})
@@ -277,15 +282,16 @@ else()
 
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
 
-	find_package(OpenGL)
-    find_package(glfw3 REQUIRED)
-    find_package(Boost COMPONENTS filesystem random REQUIRED)
-    find_package(SDL2 REQUIRED)
-    find_package(SDL2_image REQUIRED)
-	find_package(GLEW REQUIRED)
-    find_package(TBB REQUIRED)
-    find_package(curl REQUIRED)
-	find_package(Expat REQUIRED)
+	find_package(Boost COMPONENTS filesystem random REQUIRED)
+	find_package(OpenGL			REQUIRED)
+    find_package(glfw3			REQUIRED)
+    find_package(SDL2			REQUIRED)
+    find_package(SDL2_image		REQUIRED)
+	find_package(GLEW			REQUIRED)
+    find_package(TBB			REQUIRED)
+    find_package(curl			REQUIRED)
+	find_package(Expat			REQUIRED)
+	find_package(Freetype		REQUIRED)
 	
 	include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${CURL_INCLUDE_DIR})
@@ -295,6 +301,7 @@ else()
 	include_directories(${GLFW3_INCLUDE_PATH})
 	include_directories(${TBB_INCLUDE_DIRS})
 	include_directories(${ASSIMP_INCLUDE_DIR})
+	include_directories(${FREETYPE_INCLUDE_DIRS})
     include_directories(ThirdParty/ctpl)
     include_directories(./)
     
@@ -312,7 +319,8 @@ else()
     link_libraries(${SDL2_LIBRARY})
 	link_libraries(${OPENGL_gl_LIBRARY})
 	link_libraries(${GLEW_LIBRARY})
-    
+	link_libraries(${FREETYPE_LIBRARY})
+	
     if(MSVC_VERSION)
 
         link_libraries(debug ${CURL_LIBRARY_DEBUG}		optimized ${CURL_LIBRARY_RELEASE})
@@ -515,13 +523,15 @@ else()
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Release/tbb.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/bin/x64/Release/libexpat.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Release/assimp-vc140-mt.dll)
+							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Release/assimp-vc140-mt.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Release/freetype28.dll)
 
 		set(DLLS_DEBUG	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Debug/tbb_debug.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/bin/x64/Debug/libexpatd.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl_debug.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Debug/assimp-vc140-mtd.dll)
+							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Debug/assimp-vc140-mtd.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Debug/freetype28d.dll)
 
 
         foreach(dll ${DLLS_RELEASE} ${DLLS_COMMON})

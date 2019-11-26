@@ -28,6 +28,9 @@
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/canvas/BubbleFaceTestCanvas.h>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 using namespace std;
 using namespace boost::geometry;
 using namespace boostGeom;
@@ -39,6 +42,14 @@ namespace
 
 BubbleFaceTestCanvas::BubbleFaceTestCanvas()
 {
+	FT_Library ft;
+	if (FT_Init_FreeType(&ft))
+		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+
+	FT_Face face;
+	if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face))
+		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;  
+
 	Box b = Box{{-1,-1},{1,1}};
 
 	auto r = Renderable::create(toPolygon(b));
