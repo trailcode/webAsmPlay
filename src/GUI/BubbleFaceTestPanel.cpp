@@ -50,6 +50,20 @@ void GUI::bubbleFaceTestPanel()
                                                 ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
                                                 ImVec2(0, 1),
                                                 ImVec2(1, 0));
-		
+
+		//ImGui::GetWindowDrawList()->AddText( ImVec2(pos.x + 60, pos.y + 60), ImColor(1.0f,1.0f,1.0f,1.0f), "Text in Background Layer" );
+	
+	/*
+	auto dl = ImGui::GetWindowDrawList();
+
+	dl->AddText(ImVec2(100,100),  ImGui::ColorConvertFloat4ToU32(ImVec4(1.f,1.f,1.f,1)), "Hello World");
+	*/
+	
     ImGui::End();
+	/*
+	ImGui::SetNextWindowPos( ImVec2(0,0) );
+	ImGui::Begin("BCKGND", NULL, ImGui::GetIO().DisplaySize, 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus );
+	ImGui::GetWindowDrawList()->AddText( ImVec2(400,400), ImColor(1.0f,1.0f,1.0f,1.0f), "Text in Background Layer" );
+	ImGui::End();
+	*/
 }

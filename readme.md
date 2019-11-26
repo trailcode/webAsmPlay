@@ -56,5 +56,7 @@ The build system is based on CMake.
 
 #### Bugs
 
+* ~~dmessError does not flush output~~
+
 
 
