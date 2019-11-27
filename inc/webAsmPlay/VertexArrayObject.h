@@ -36,7 +36,7 @@ public:
 
     static VertexArrayObject * create(const Tessellations & tessellations);
 
-    static VertexArrayObject * create(const Tessellations & tessellations, const AABB2D & boxUV);
+    static VertexArrayObject * create(const Tessellations & tessellations, const AABB2D & boxUV, const bool swapUV_Axis = false);
 
     ~VertexArrayObject();
 
@@ -58,7 +58,7 @@ public:
 
 private:
 
-    template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS>
+    template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS, bool SWAP_UV_AXIS>
     static VertexArrayObject * _create(const Tessellations & tessellations, const AABB2D & boxUV);
 
     VertexArrayObject(  const GLuint        ebo,

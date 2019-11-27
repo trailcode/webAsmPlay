@@ -608,11 +608,8 @@ BubbleFaceTestCanvas::BubbleFaceTestCanvas()
 		auto min = dvec2(b.min_corner().x(), b.min_corner().y());
 		auto max = dvec2(b.max_corner().x(), b.max_corner().y());
 
-		auto r = Renderable::create(geosUtil::makeBox(min, max), mat4(1.0f), AABB2D(min.x, min.y, max.x, max.y));
-		//auto r = Renderable::create(geosUtil::makeBox(min, max), mat4(1.0f), AABB2D(max.x, max.y, min.x, min.y));
-		//auto r = Renderable::create(geosUtil::makeBox(max, min), mat4(1.0f), AABB2D(max.x, max.y, min.x, min.y));
-		//auto r = Renderable::create(geosUtil::makeBox(max, min), mat4(1.0f), AABB2D(min.x, min.y, max.x, max.y));
-
+		auto r = Renderable::create(geosUtil::makeBox(min, max), mat4(1.0f), AABB2D(min.x, min.y, max.x, max.y), true);
+		
 		r->setRenderFill(true);
 		r->setRenderOutline(false);
 

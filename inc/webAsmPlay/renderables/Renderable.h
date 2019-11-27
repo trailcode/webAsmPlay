@@ -47,21 +47,25 @@ public:
 
     static Renderable * create( const geos::geom::Geometry::Ptr		& geom,
                                 const glm::dmat4					& trans			= glm::mat4(1.0),
-                                const AABB2D						& boxUV			= AABB2D());
+                                const AABB2D						& boxUV			= AABB2D(),
+								const bool							  swapUV_Axis   = false);
 
     static Renderable * create( const geos::geom::Geometry			* geom,
                                 const glm::dmat4					& trans			= glm::mat4(1.0),
-                                const AABB2D						& boxUV			= AABB2D());
+                                const AABB2D						& boxUV			= AABB2D(),
+								const bool							  swapUV_Axis   = false);
 
 	static Renderable * create( const boostGeom::Polygon			& polygon,
 								const glm::dmat4					& trans         = glm::dmat4(1.0),
                                 const size_t						  symbologyID   = 0,
-                                const AABB2D						& boxUV         = AABB2D());
+                                const AABB2D						& boxUV         = AABB2D(),
+								const bool							  swapUV_Axis   = false);
 
 	static Renderable * create( const boostGeom::MultiPolygon		& multiPoly,
 								const glm::dmat4					& trans         = glm::dmat4(1.0),
                                 const size_t						  symbologyID   = 0,
-                                const AABB2D						& boxUV         = AABB2D());
+                                const AABB2D						& boxUV         = AABB2D(),
+								const bool							  swapUV_Axis   = false);
 
     void addOnDeleteCallback(const OnDelete & callback);
 

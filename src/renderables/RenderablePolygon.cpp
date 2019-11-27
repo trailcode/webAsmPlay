@@ -52,7 +52,8 @@ RenderablePolygon::~RenderablePolygon()
 Renderable * RenderablePolygon::create( const Polygon * poly,
                                         const dmat4   & trans,
                                         const size_t    symbologyID,
-                                        const AABB2D  & boxUV)
+                                        const AABB2D  & boxUV,
+										const bool		swapUV_Axis)
 {
     Tessellations tesselations;
 
@@ -65,7 +66,7 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
 		const dvec2 min = trans * dvec4(get<0>(boxUV), get<1>(boxUV), 0, 1);
 		const dvec2 max = trans * dvec4(get<2>(boxUV), get<3>(boxUV), 0, 1);
 
-		if (auto vao = VertexArrayObject::create(tesselations, AABB2D(min.x, min.y, max.x, max.y))) { return new RenderablePolygon(vao) ;}
+		if (auto vao = VertexArrayObject::create(tesselations, AABB2D(min.x, min.y, max.x, max.y), swapUV_Axis)) { return new RenderablePolygon(vao) ;}
 
         return nullptr;
     }
@@ -78,7 +79,8 @@ Renderable * RenderablePolygon::create( const Polygon * poly,
 Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
                                         const dmat4         & trans,
                                         const size_t          symbologyID,
-                                        const AABB2D        & boxUV // TODO Implement!
+                                        const AABB2D        & boxUV, // TODO Implement!
+										const bool			  swapUV_Axis
                                         )
 {
     Tessellations tessellations;
@@ -91,7 +93,8 @@ Renderable * RenderablePolygon::create( const MultiPolygon  * multiPoly,
 Renderable * RenderablePolygon::create( const boostGeom::Polygon	& polygon,
 										const dmat4					& trans,
 										const size_t				  symbologyID,
-										const AABB2D				& boxUV)
+										const AABB2D				& boxUV,
+										const bool					  swapUV_Axis)
 {
 	Tessellations tesselations;
 
@@ -107,7 +110,8 @@ Renderable * RenderablePolygon::create( const boostGeom::Polygon	& polygon,
 Renderable * RenderablePolygon::create( const boostGeom::MultiPolygon	& multiPoly,
 										const dmat4						& trans,
 										const size_t					  symbologyID,
-										const AABB2D					& boxUV)
+										const AABB2D					& boxUV, // TODO Implement!
+										const bool						  swapUV_Axis)
 {
 	Tessellations tessellations;
 

@@ -50,25 +50,27 @@ using namespace geos::geom;
 
 Renderable * Renderable::create(const Geometry::Ptr & geom,
                                 const dmat4         & trans,
-                                const AABB2D        & boxUV)
+                                const AABB2D        & boxUV,
+								const bool			  swapUV_Axis)
 {
-    return create(geom.get(), trans, boxUV);
+    return create(geom.get(), trans, boxUV, swapUV_Axis);
 }
 
 Renderable * Renderable::create(const Geometry * geom,
                                 const dmat4    & trans,
-                                const AABB2D   & boxUV)
+                                const AABB2D   & boxUV,
+								const bool		 swapUV_Axis)
 {
     switch(geom->getGeometryTypeId())
     {
         case GEOS_POINT:				return RenderablePoint::create(dynamic_cast<const Point *>(geom), trans);
         case GEOS_LINESTRING:           
         case GEOS_LINEARRING:           return RenderableLineString::create(dynamic_cast<const LineString *>(geom), trans);
-		case GEOS_POLYGON:              return RenderablePolygon   ::create(dynamic_cast<const Polygon    *>(geom), trans, 0, boxUV);
+		case GEOS_POLYGON:              return RenderablePolygon   ::create(dynamic_cast<const Polygon    *>(geom), trans, 0, boxUV, swapUV_Axis);
 
         case GEOS_MULTIPOINT:           dmess("Implement me!"); return nullptr;
         case GEOS_MULTILINESTRING:      dmess("Implement me!"); return nullptr;
-        case GEOS_MULTIPOLYGON:         return RenderablePolygon::create(   dynamic_cast<const MultiPolygon *>(geom), trans, 0, boxUV);
+        case GEOS_MULTIPOLYGON:         return RenderablePolygon::create(   dynamic_cast<const MultiPolygon *>(geom), trans, 0, boxUV, swapUV_Axis);
 
         case GEOS_GEOMETRYCOLLECTION:   dmess("Implement me!"); return nullptr;
         default: dmessError("Error!");
@@ -80,17 +82,19 @@ Renderable * Renderable::create(const Geometry * geom,
 Renderable * Renderable::create(const boostGeom::Polygon		& polygon,
 								const dmat4						& trans,
                                 const size_t					  symbologyID,
-                                const AABB2D					& boxUV)
+                                const AABB2D					& boxUV,
+								const bool						  swapUV_Axis)
 {
-	return RenderablePolygon::create(polygon, trans, symbologyID, boxUV);
+	return RenderablePolygon::create(polygon, trans, symbologyID, boxUV, swapUV_Axis);
 }
 
 Renderable * Renderable::create(const boostGeom::MultiPolygon	& multiPoly,
 								const dmat4						& trans,
 								const size_t					  symbologyID,
-								const AABB2D					& boxUV)
+								const AABB2D					& boxUV,
+								const bool						  swapUV_Axis)
 {
-	return RenderablePolygon::create(multiPoly, trans, symbologyID, boxUV);
+	return RenderablePolygon::create(multiPoly, trans, symbologyID, boxUV, swapUV_Axis);
 }
 
 Renderable::Renderable( const bool isMulti,

@@ -36,24 +36,38 @@ VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellation
 {
     if(tessellations[0]->getHeight() != 0.0)
     {
-        return _create< true, // 3D extrude
-                        true, // Use symbology ID
-                        false // Use UV coords
+        return _create< true,  // 3D extrude
+                        true,  // Use symbology ID
+                        false, // Use UV coords
+						false  // Swap UV Axis
                       > (tessellations, AABB2D());
     }
 
     return _create< false, // 3D extrude
                     true,  // Use symbology ID
-                    false  // Use UV coords
+                    false, // Use UV coords
+					false  // Swap UV Axis
                   > (tessellations, AABB2D());
 }
 
-VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations, const AABB2D & boxUV)
+VertexArrayObject * VertexArrayObject::create(const Tessellations & tessellations, const AABB2D & boxUV, const bool swapUV_Axis)
 {
-    return _create< false, // 3D extrude
-                    false, // Use symbology ID
-                    true   // Use UV coords
-					> (tessellations, boxUV);
+	if(swapUV_Axis)
+	{
+		return _create< false, // 3D extrude
+						false, // Use symbology ID
+						true,  // Use UV coords
+						true   // Swap UV Axis
+						> (tessellations, boxUV);
+	}
+	else
+	{
+		return _create< false, // 3D extrude
+						false, // Use symbology ID
+						true,  // Use UV coords
+						false  // Swap UV Axis
+						> (tessellations, boxUV);
+	}
 }
 
 namespace
@@ -76,7 +90,7 @@ namespace
     }
 }
 
-template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS>
+template<bool IS_3D, bool USE_SYMBOLOGY_ID, bool USE_UV_COORDS, bool SWAP_UV_AXIS>
 VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellations, const AABB2D & boxUV)
 {
     if(!tessellations.size()) { return nullptr ;}
@@ -123,13 +137,16 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
                 const dvec2 uv = (P - min) / (max - min);
 
-				/*
-                verts.push_back(float(uv.y));
-                verts.push_back(float(1 - uv.x));
-				*/
-
-				verts.push_back(float(uv.x));
-                verts.push_back(float(1 - uv.y));
+				if(SWAP_UV_AXIS)
+				{
+					verts.push_back(float(uv.x));
+					verts.push_back(float(1 - uv.y));
+				}
+				else
+				{
+					verts.push_back(float(uv.y));
+					verts.push_back(float(1 - uv.x));
+				}
             }
         }
 
