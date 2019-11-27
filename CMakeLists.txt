@@ -9,13 +9,9 @@ set(Boost_USE_STATIC_LIBS       OFF)
 set(Boost_USE_MULTITHREADED     ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
-set(EXPAT_INSTALL "/usr/local/Cellar/expat/2.2.6") # OSX
-
-#set(BOOST_VERSION "1.70.0.0")
-set(BOOST_VERSION "1.69.0.0")
-
-
 if(MSVC_VERSION)
+
+    set(BOOST_VERSION "1.69.0.0")
 
 	find_program(NUGET nuget)
 	if(NOT NUGET)
@@ -285,7 +281,8 @@ else()
 	find_package(GLEW			REQUIRED)
     find_package(TBB			REQUIRED)
     find_package(curl			REQUIRED)
-	find_package(Expat			REQUIRED)
+    find_package(Expat			REQUIRED)
+    find_package(Assimp         REQUIRED)
 	
 	include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${CURL_INCLUDE_DIR})

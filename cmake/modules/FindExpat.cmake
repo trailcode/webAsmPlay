@@ -76,18 +76,21 @@ SET (EXPAT_DEBUG 0)
 SET(EXPAT_INCLUDE_SEARCH_DIRS
     ${EXPAT_INCLUDE_SEARCH_DIRS}
     ${EXPAT_INSTALL}/include
-  $ENV{EXPAT_INSTALL}/include 
+  $ENV{EXPAT_INSTALL}/include
+  /usr/local/opt/expat/include
 ) 
 
 SET (EXPAT_LIB_SEARCH_DIRS 
     ${EXPAT_LIB_SEARCH_DIRS}
     ${EXPAT_INSTALL}/lib
-  $ENV{EXPAT_INSTALL}/lib 
+  $ENV{EXPAT_INSTALL}/lib
+  /usr/local/opt/expat/lib
   ) 
 
 SET (EXPAT_BIN_SEARCH_DIRS
     ${EXPAT_INSTALL}/bin
-  $ENV{EXPAT_INSTALL}/bin 
+  $ENV{EXPAT_INSTALL}/bin
+  /usr/local/opt/expat/bin
 ) 
 
 FIND_PATH(EXPAT_INCLUDE_DIR 
