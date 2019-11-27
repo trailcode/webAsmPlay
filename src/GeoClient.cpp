@@ -156,11 +156,8 @@ void GeoClient::loadGeometry(const string fileName)
 
 void GeoClient::addBingMap(bool enabled)
 {
-    auto r = RenderableBingMap::create(getBounds(), m_trans);
-
-    r->setRenderFill(enabled);
-
-    getCanvas()->addRenderable(r);
+    getCanvas()->addRenderable(RenderableBingMap::create(getBounds(), m_trans)
+									->setRenderFill(enabled));
 }
 
 AABB2D		GeoClient::getBounds()			const { return m_bounds			;}

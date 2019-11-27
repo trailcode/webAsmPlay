@@ -43,7 +43,7 @@ public:
               const bool   isOutline,
               const size_t renderingStage = 0) override;
 
-    GLuint setTextureID(const GLuint textureID);
+    TextureShader * setTextureID(const GLuint textureID);
 	
 private:
 

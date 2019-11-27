@@ -34,8 +34,6 @@ public:
     BubbleFaceTestCanvas();
     ~BubbleFaceTestCanvas();
 
-	GLuint render() override;
-
 private:
     
 };

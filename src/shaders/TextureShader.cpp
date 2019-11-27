@@ -74,7 +74,12 @@ TextureShader::~TextureShader()
 
 }
 
-GLuint TextureShader::setTextureID(const GLuint textureID) { return m_textureID = textureID ;}
+TextureShader * TextureShader::setTextureID(const GLuint textureID)
+{
+	m_textureID = textureID;
+
+	return this;
+}
 
 void TextureShader::bind(   Canvas     * canvas,
                             const bool   isOutline,

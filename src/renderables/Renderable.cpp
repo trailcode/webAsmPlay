@@ -125,14 +125,31 @@ Renderable::~Renderable()
 
 void Renderable::addOnDeleteCallback(const OnDelete & callback) { m_DeleteCallbacks.push_back(callback) ;}
 
-Shader * Renderable::getShader() const			{ return m_shader			;}
-Shader * Renderable::setShader(Shader * shader) { return m_shader = shader	;}
+Shader * Renderable::getShader() const { return m_shader ;}
+
+Renderable * Renderable::setShader(Shader * shader)
+{
+	m_shader = shader;
+
+	return this;
+}
 
 bool Renderable::getRenderFill()    const { return m_renderFill ;}
 bool Renderable::getRenderOutline() const { return m_renderOutline ;}
 
-bool Renderable::setRenderFill   (const bool render) { return m_renderFill    = render ;}
-bool Renderable::setRenderOutline(const bool render) { return m_renderOutline = render ;}
+Renderable * Renderable::setRenderFill   (const bool render)
+{
+	m_renderFill = render;
+
+	return this;
+}
+
+Renderable * Renderable::setRenderOutline(const bool render)
+{
+	m_renderOutline = render;
+
+	return this;
+}
 
 void Renderable::ensureVAO()
 {

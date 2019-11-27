@@ -70,13 +70,14 @@ public:
     void addOnDeleteCallback(const OnDelete & callback);
 
     Shader * getShader() const;
-    Shader * setShader(Shader * shader);
+    
+	Renderable * setShader(Shader * shader);
 
     bool getRenderFill() const;
     bool getRenderOutline() const;
 
-    bool setRenderFill(const bool render);
-    bool setRenderOutline(const bool render);
+    Renderable * setRenderFill(const bool render);
+    Renderable * setRenderOutline(const bool render);
 
 	virtual void ensureVAO();
 
