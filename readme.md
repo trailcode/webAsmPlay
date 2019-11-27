@@ -54,6 +54,12 @@ and allow C++ 17 compilation:
 
 The build system is based on CMake. 
 
+### OSX
+
+* brew install boost
+* brew install expat keg-only does not link in /usr/local
+* brew install assimp
+
 #### Bugs
 
 * ~~dmessError does not flush output~~
