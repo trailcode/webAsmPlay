@@ -112,11 +112,20 @@ vector<Box> boostGeom::quadBox(const Box & b)
 	const auto min_y = get<min_corner, 1>(b);
 	const auto max_x = get<max_corner, 0>(b);
 	const auto max_y = get<max_corner, 1>(b);
+	
+	/*
+	.     max
+	min   .
 
-	ret[0] = {	{min_x,			max_y		},		center					};
-	ret[1] = {	{center.x(),	max_y		},	{	max_x,		center.y()	}};
-	ret[2] = {	{min_x,			center.y()	},	{	center.x(), min_y		}};
-	ret[3] = {	 center,						{	max_x,		max_y		}};
+	min_x,max_y     center,max_y     max_x,max_y
+	min_x,center    center,center    max_x,center
+	min_x,min_y     center,min_y     max_x,min_y
+
+	*/
+	ret[0] = {	{min_x,			center.y()	},	{	center.x(), max_y		}};
+	ret[1] = {	 center,						{	max_x,		max_y		}};
+	ret[2] = {	{min_x,			min_y		},		center					};
+	ret[3] = {	{center.x(),	min_y},			{	max_x,		center.y()	}};
 
 	return ret;
 }
@@ -130,10 +139,10 @@ void boostGeom::quadBox(const Box & b, vector<Box> & out)
 	const auto max_x = get<max_corner, 0>(b);
 	const auto max_y = get<max_corner, 1>(b);
 
-	out.emplace_back(Box{	{min_x,			max_y		},		center					});
-	out.emplace_back(Box{	{center.x(),	max_y		},	{	max_x,		center.y()	}});
-	out.emplace_back(Box{	{min_x,			center.y()	},	{	center.x(), min_y		}});
+	out.emplace_back(Box{	{min_x,			center.y()	},	{	center.x(), max_y		}});
 	out.emplace_back(Box{	 center,						{	max_x,		max_y		}});
+	out.emplace_back(Box{	{min_x,			min_y		},		center					});
+	out.emplace_back(Box{	{center.x(),	min_y},			{	max_x,		center.y()	}});
 }
 
 void boostGeom::subdevideBox(const Box & b, const size_t dim, const vector<Box> & out)

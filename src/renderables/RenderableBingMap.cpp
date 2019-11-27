@@ -627,7 +627,6 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 				else						{ tile->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
 
 				tile->m_renderable->setRenderOutline (false);
-				tile->m_renderable->setRenderOutline (true);
 				tile->m_renderable->setRenderFill    (true);
 			}
 

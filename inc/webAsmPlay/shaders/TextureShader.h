@@ -35,7 +35,7 @@ public:
 
     static void ensureShader();
 
-    TextureShader(const ShouldRenderFunctor & shouldRender);
+    TextureShader(const ShouldRenderFunctor & shouldRender = s_defaultShouldRender);
 
     ~TextureShader();
 

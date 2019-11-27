@@ -44,6 +44,8 @@ public:
 
 	std::string setText(const std::string & text);
 
+	glm::dvec3 setPos(const glm::dvec3 & pos);
+
 private:
 
     RenderableText();
@@ -58,4 +60,6 @@ private:
 	GLuint uvBuffer = 0;
 	GLuint indexBuffer = 0;
 	uint16_t indexElementCount = 0;
+
+	glm::dvec3 m_pos;
 };

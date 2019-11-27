@@ -502,14 +502,46 @@ namespace
 		}
 	};
 
-	Demo demo;
+	//Demo demo;
 }
 
 Renderable * ren = nullptr;
 
+namespace
+{
+	void doQuadBox(const string & prefix, const Box & b, vector<pair<string, Box> > & out)
+	{
+		const auto quad = quadBox(b);
+
+		for(size_t i = 0; i < 4; ++i)
+		{
+			string s = prefix + to_string(i);
+
+			auto p = make_pair(s, quad[i]);
+
+			//out.emplace_back(p);
+			out.push_back(p);
+		}
+	}
+
+	void doQuadBox(const vector<pair<string, Box> > & in, vector<pair<string, Box> > & out)
+	{
+		for(const auto & [prefix, b] : in)
+		{
+			doQuadBox(prefix, b, out);
+		}
+	}
+}
+
+#include <webAsmPlay/CurlUtil.h>
+#include <webAsmPlay/Textures.h>
+#include <webAsmPlay/shaders/TextureShader.h>
+#include <webAsmPlay/geom/GeosUtil.h>
+#include <SDL_image.h>
+
 BubbleFaceTestCanvas::BubbleFaceTestCanvas()
 {
-	demo.init();
+	//demo.init();
 
 	Box b = Box{{-1,-1},{1,1}};
 
@@ -517,22 +549,166 @@ BubbleFaceTestCanvas::BubbleFaceTestCanvas()
 
 	r->setRenderFill(false);
 
-	addRenderable(r);
+	//addRenderable(r);
 
+	vector<pair<string, Box> > curr[2];
+
+	curr[0].push_back({"", b});
+
+	//http://t.ssl.ak.tiles.virtualearth.net/tiles/hs020101231322332110.jpg?g=6338&n=z
+
+	size_t i;
+
+	for(i = 0; i < 4; ++i)
+	//for(i = 0; i < 1; ++i)
+	{
+		auto & in = curr[i % 2];
+		auto & out = curr[(i + 1) % 2];
+
+		doQuadBox(in, out);
+
+		in.clear();
+
+		/*
+		for(const auto & [id, b] : out)
+		{
+			auto r = Renderable::create(toPolygon(b));
+
+			r->setRenderFill(false);
+
+			addRenderable(r);
+
+			const auto pos = getCentroid(b);
+
+			addRenderable(RenderableText::create(id, {pos.x(), pos.y(), 0}));
+		}
+		//*/
+	}
+
+	for(const auto & [id, b] : curr[i % 2])
+	{
+		const string url = "http://t.ssl.ak.tiles.virtualearth.net/tiles/hs020101231322332110" + id + ".jpg?g=6338&n=z";
+
+		dmess("url " << url);
+
+		curlUtil::BufferStruct * buf = curlUtil::download(url).get();
+
+		auto img = IMG_LoadJPG_RW(SDL_RWFromConstMem(buf->m_buffer, buf->m_size));
+
+		dmess("img " << img);
+
+		auto tex = Textures::load(img);
+
+		dmess("tex " << tex);
+
+		auto bb = AABB2D(0.0,0.0,1.0,1.0);
+
+		//auto r = Renderable::create(toPolygon(b), mat4(1.0f), 0, bb); // TODO Get this to work!
+
+		auto min = dvec2(b.min_corner().x(), b.min_corner().y());
+		auto max = dvec2(b.max_corner().x(), b.max_corner().y());
+
+		auto r = Renderable::create(geosUtil::makeBox(min, max), mat4(1.0f), AABB2D(min.x, min.y, max.x, max.y));
+		//auto r = Renderable::create(geosUtil::makeBox(min, max), mat4(1.0f), AABB2D(max.x, max.y, min.x, min.y));
+		//auto r = Renderable::create(geosUtil::makeBox(max, min), mat4(1.0f), AABB2D(max.x, max.y, min.x, min.y));
+		//auto r = Renderable::create(geosUtil::makeBox(max, min), mat4(1.0f), AABB2D(min.x, min.y, max.x, max.y));
+
+		r->setRenderFill(true);
+		r->setRenderOutline(false);
+
+		auto s = new TextureShader();
+
+		s->setTextureID(tex);
+
+		r->setShader(s);
+
+		addRenderable(r);
+
+		const auto pos = getCentroid(b);
+
+		addRenderable(RenderableText::create(id, {pos.x(), pos.y(), 0}));
+	}
+
+	/*
 	auto quad = quadBox(b);
 
-	for(auto & b : quad)
+	for(size_t i = 0; i < 4; ++i)
+	{ 
+		const auto & b = quad[i];
+
+		to_string(i);
+	}
+
+	for(size_t i = 0; i < 4; ++i)
 	{
+		const auto & b = quad[i];
+
 		auto r = Renderable::create(toPolygon(b));
 
 		r->setRenderFill(false);
 
 		addRenderable(r);
+
+		const auto pos = getCentroid(b);
+
+		char buf[1024];
+
+		sprintf(buf, "a: %i", i);
+
+		dmess("Pos: " << pos.x() << " " << pos.y());
+
+		addRenderable(RenderableText::create(buf, {pos.x(), pos.y(), 0}));
+
+		auto quad2 = quadBox(b);
+
+		for(size_t j = 0; j < 4; ++j)
+		{
+			const auto & b = quad2[j];
+
+			auto r = Renderable::create(toPolygon(b));
+
+			r->setRenderFill(false);
+
+			addRenderable(r);
+
+			const auto pos = getCentroid(b);
+
+			char buf[1024];
+
+			sprintf(buf, "b: %i%i", i, j);
+
+			dmess("Pos: " << pos.x() << " " << pos.y());
+
+			addRenderable(RenderableText::create(buf, {pos.x(), pos.y(), 0}));
+		}
 	}
+	*/
 
-	ren = RenderableText::create("This is a test", dvec3(0,0,0));
+	/*
+	//for(auto & b : quad)
+	for(size_t i = 0; i < 4; ++i)
+	{
+		const auto & b = quad[i];
 
-	addRenderable(ren);
+		auto r = Renderable::create(toPolygon(b));
+
+		r->setRenderFill(false);
+
+		addRenderable(r);
+
+		const auto pos = getCentroid(b);
+
+		char buf[1024];
+
+		sprintf(buf, "q: %i", i);
+
+		dmess("Pos: " << pos.x() << " " << pos.y());
+
+		addRenderable(RenderableText::create(buf, {pos.x(), pos.y(), 0}));
+	}
+	*/
+
+	//addRenderable(RenderableText::create("This is a test", dvec3(0,0,0)));
 }
 
 BubbleFaceTestCanvas::~BubbleFaceTestCanvas()
@@ -552,6 +728,7 @@ GLuint BubbleFaceTestCanvas::render()
 {
 	return Canvas::render();
 
+	/*
 	if(!preRender()) { return 0 ;}
 
     lock_guard<mutex> _(m_renderiablesMutex);
@@ -613,4 +790,5 @@ GLuint BubbleFaceTestCanvas::render()
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     return postRender();
+	*/
 }

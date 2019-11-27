@@ -123,8 +123,13 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
                 const dvec2 uv = (P - min) / (max - min);
 
+				/*
                 verts.push_back(float(uv.y));
                 verts.push_back(float(1 - uv.x));
+				*/
+
+				verts.push_back(float(uv.x));
+                verts.push_back(float(1 - uv.y));
             }
         }
 

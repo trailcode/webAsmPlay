@@ -301,6 +301,8 @@ Renderable * RenderableText::create(const string	& text,
 
 	ret->setText(text);
 
+	ret->setPos(pos);
+
 	return ret;
 }
 
@@ -308,7 +310,7 @@ RenderableText::RenderableText() : Renderable(	false,
 																GUI::s_renderSettingsFillPolygons,
 																GUI::s_renderSettingsRenderPolygonOutlines)
 {
-	initFont();
+	if(!font.texture) { initFont() ;}
 }
 
 RenderableText::~RenderableText()
@@ -350,7 +352,7 @@ void RenderableText::render(Canvas * canvas, const size_t renderStage)
 
 	const vec3 theTrans(0,0,0);
 
-	const auto worldMatrix = glm::translate(glm::scale(glm::mat4(1.0f), {1, 1, 1}), theTrans);
+	const auto worldMatrix = glm::translate(glm::scale(glm::mat4(1.0f), {1, 1, 1}), vec3(m_pos));
 
 	glUniformMatrix4fv(program.uniforms.worldMatrix, 1, GL_FALSE, glm::value_ptr(worldMatrix));
 
@@ -366,8 +368,6 @@ void RenderableText::ensureVAO()
 		program.handle = createProgram(shaders.vertex.font, shaders.fragment.font);
 
 		initUniforms();
-
-		setText("This is a test.");
 	}
 }
 
@@ -426,3 +426,5 @@ string RenderableText::setText(const string & text)
 
 	return text;
 }
+
+dvec3 RenderableText::setPos(const dvec3 & pos) { return m_pos = pos ;}
