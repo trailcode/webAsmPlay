@@ -84,17 +84,17 @@ public:
 
     glm::vec4 setClearColor(const glm::vec4 & clearColor);
 
-    glm::dmat4 getView() const;
-    glm::dmat4 getModel() const;
-    glm::dmat4 getProjection() const;
-    glm::dmat4 getMVP() const;
-    glm::dmat4 getMV() const;
+    glm::dmat4 getView()		const;
+    glm::dmat4 getModel()		const;
+    glm::dmat4 getProjection()	const;
+    glm::dmat4 getMVP()			const;
+    glm::dmat4 getMV()			const;
 
-    const glm::dmat4 & getViewRef() const;
-    const glm::dmat4 & getModelRef() const;
-    const glm::dmat4 & getProjectionRef() const;
-    const glm::dmat4 & getMVP_Ref() const;
-    const glm::dmat4 & getMV_Ref() const;
+    const glm::dmat4 & getViewRef()			const;
+    const glm::dmat4 & getModelRef()		const;
+    const glm::dmat4 & getProjectionRef()	const;
+    const glm::dmat4 & getMVP_Ref()			const;
+    const glm::dmat4 & getMV_Ref()			const;
 
     void pushModel(const glm::dmat4 & model);
     void popMVP();
@@ -104,13 +104,14 @@ public:
 
     std::vector<Renderable *> getRenderiables() const;
 
-    const std::list<Renderable *> & getPointsRef() const;
-    const std::list<Renderable *> & getLineStringsRef() const;
-    const std::list<Renderable *> & getPolygonsRef() const;
-    const std::list<Renderable *> & getMeshesRef() const;
+    const std::list<Renderable *> & getPointsRef()				const;
+    const std::list<Renderable *> & getLineStringsRef()			const;
+    const std::list<Renderable *> & getPolygonsRef()			const;
+    const std::list<Renderable *> & getMeshesRef()				const;
     const std::list<Renderable *> & getDeferredRenderablesRef() const;
-    const std::list<Renderable *> & getRastersRef() const;
-    const std::list<Renderable *> & getModelsRef() const;
+    const std::list<Renderable *> & getRastersRef()				const;
+    const std::list<Renderable *> & getModelsRef()				const;
+	const std::list<Renderable *> & getTextLablesRef()			const;
 
     static std::vector<Canvas *> getInstances();
 
@@ -171,6 +172,7 @@ protected:
     std::list<Renderable *> m_deferredRenderables;
     std::list<Renderable *> m_rasters;
 	std::list<Renderable *> m_models;
+	std::list<Renderable *> m_textLabels;
 
     const bool m_useFrameBuffer;
 

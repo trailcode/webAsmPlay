@@ -42,12 +42,20 @@ public:
 
 	void ensureVAO() override;
 
+	std::string setText(const std::string & text);
+
 private:
 
     RenderableText();
 
-    GLuint m_vao = 0;
+    //GLuint m_vao = 0;
 
     //const GLuint m_ebo;
     //const GLuint m_vbo;
+
+	GLuint vao = 0;
+	GLuint vertexBuffer = 0;
+	GLuint uvBuffer = 0;
+	GLuint indexBuffer = 0;
+	uint16_t indexElementCount = 0;
 };

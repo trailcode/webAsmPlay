@@ -24,11 +24,38 @@
   \copyright 2019
 */
 
+//#define STB_TRUETYPE_IMPLEMENTATION
+//#include <imgui/imstb_truetype.h>
+
+#include <webAsmPlay/GUI/ImguiInclude.h>
+
+#ifndef STB_TRUETYPE_IMPLEMENTATION                         // in case the user already have an implementation in the _same_ compilation unit (e.g. unity builds)
+#ifndef IMGUI_DISABLE_STB_TRUETYPE_IMPLEMENTATION
+#define STBTT_malloc(x,u)   ((void)(u), IM_ALLOC(x))
+#define STBTT_free(x,u)     ((void)(u), IM_FREE(x))
+#define STBTT_assert(x)     IM_ASSERT(x)
+#define STBTT_fmod(x,y)     ImFmod(x,y)
+#define STBTT_sqrt(x)       ImSqrt(x)
+#define STBTT_pow(x,y)      ImPow(x,y)
+#define STBTT_fabs(x)       ImFabs(x)
+#define STBTT_ifloor(x)     ((int)ImFloorStd(x))
+#define STBTT_iceil(x)      ((int)ImCeil(x))
+#define STBTT_STATIC
 #define STB_TRUETYPE_IMPLEMENTATION
-#include <imgui/imstb_truetype.h>
+#else
+#define STBTT_DEF extern
+#endif
+#ifdef IMGUI_STB_TRUETYPE_FILENAME
+#include IMGUI_STB_TRUETYPE_FILENAME
+#else
+#include "imstb_truetype.h"
+#endif
+#endif
+
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
+#include <webAsmPlay/renderables/RenderableText.h>
 #include <webAsmPlay/canvas/BubbleFaceTestCanvas.h>
 
 using namespace std;
@@ -478,6 +505,8 @@ namespace
 	Demo demo;
 }
 
+Renderable * ren = nullptr;
+
 BubbleFaceTestCanvas::BubbleFaceTestCanvas()
 {
 	demo.init();
@@ -500,6 +529,10 @@ BubbleFaceTestCanvas::BubbleFaceTestCanvas()
 
 		addRenderable(r);
 	}
+
+	ren = RenderableText::create("This is a test", dvec3(0,0,0));
+
+	addRenderable(ren);
 }
 
 BubbleFaceTestCanvas::~BubbleFaceTestCanvas()
@@ -517,6 +550,8 @@ extern GLuint quad_vao;
 
 GLuint BubbleFaceTestCanvas::render()
 {
+	return Canvas::render();
+
 	if(!preRender()) { return 0 ;}
 
     lock_guard<mutex> _(m_renderiablesMutex);

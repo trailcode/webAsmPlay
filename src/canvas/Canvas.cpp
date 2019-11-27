@@ -38,6 +38,7 @@
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/renderables/RenderablePolygon.h>
 #include <webAsmPlay/renderables/RenderableBingMap.h>
+#include <webAsmPlay/renderables/RenderableText.h>
 #include <webAsmPlay/renderables/SkyBox.h>
 #include <webAsmPlay/shaders/ColorSymbology.h>
 #include <webAsmPlay/shaders/ColorDistanceShader.h>
@@ -258,6 +259,7 @@ GLuint Canvas::render()
     for(const auto r : m_deferredRenderables) { r->render(this, POST_G_BUFFER) ;} 
     for(const auto r : m_meshes)              { r->render(this, POST_G_BUFFER) ;}
 	for(const auto r : m_models)              { r->render(this, POST_G_BUFFER) ;}
+	for(const auto r : m_textLabels)		  { r->render(this, POST_G_BUFFER) ;}
 	
 	m_gBuffer->unbind();
 	
@@ -444,14 +446,14 @@ Renderable * Canvas::addRenderable(Renderable * renderiable, const bool ensureVA
 		GUI::guiSync([renderiable]() { renderiable->ensureVAO(); }, true);
 	}
 
-    if(dynamic_cast<DeferredRenderable   *>(renderiable)) { return addRenderable(m_deferredRenderables, renderiable) ;}
-    if(dynamic_cast<RenderableLineString *>(renderiable)) { return addRenderable(m_lineStrings,         renderiable) ;}
-    if(dynamic_cast<RenderablePolygon    *>(renderiable)) { return addRenderable(m_polygons,            renderiable) ;}
-    if(dynamic_cast<RenderablePoint      *>(renderiable)) { return addRenderable(m_points,              renderiable) ;}
-    if(dynamic_cast<RenderableMesh       *>(renderiable)) { return addRenderable(m_meshes,              renderiable) ;}
-    if(dynamic_cast<RenderableBingMap    *>(renderiable)) { return addRenderable(m_rasters,             renderiable) ;}
-
-	if(dynamic_cast<RenderableModelInstanced *>(renderiable)) { return addRenderable(m_models,              renderiable) ;}
+    if(dynamic_cast<DeferredRenderable			*>(renderiable)) { return addRenderable(m_deferredRenderables, renderiable) ;}
+    if(dynamic_cast<RenderableLineString		*>(renderiable)) { return addRenderable(m_lineStrings,         renderiable) ;}
+    if(dynamic_cast<RenderablePolygon			*>(renderiable)) { return addRenderable(m_polygons,            renderiable) ;}
+    if(dynamic_cast<RenderablePoint				*>(renderiable)) { return addRenderable(m_points,              renderiable) ;}
+    if(dynamic_cast<RenderableMesh				*>(renderiable)) { return addRenderable(m_meshes,              renderiable) ;}
+    if(dynamic_cast<RenderableBingMap			*>(renderiable)) { return addRenderable(m_rasters,             renderiable) ;}
+	if(dynamic_cast<RenderableModelInstanced	*>(renderiable)) { return addRenderable(m_models,              renderiable) ;}
+	if(dynamic_cast<RenderableText				*>(renderiable)) { return addRenderable(m_textLabels,          renderiable) ;}
 
     dmessError("Error! Implement!");
     
@@ -483,6 +485,8 @@ vector<Renderable *> Canvas::getRenderiables() const
     ret.insert(ret.end(), m_polygons.begin(),     m_polygons.end());
     ret.insert(ret.end(), m_meshes.begin(),       m_meshes.end());
     ret.insert(ret.end(), m_rasters.begin(),      m_rasters.end());
+	ret.insert(ret.end(), m_models.begin(),       m_models.end());
+	ret.insert(ret.end(), m_textLabels.begin(),   m_textLabels.end());
 
     return ret;
 }
@@ -494,6 +498,7 @@ const list<Renderable *> & Canvas::getMeshesRef()               const { return m
 const list<Renderable *> & Canvas::getDeferredRenderablesRef()  const { return m_deferredRenderables  ;}
 const list<Renderable *> & Canvas::getRastersRef()              const { return m_rasters              ;}
 const list<Renderable *> & Canvas::getModelsRef()               const { return m_models               ;}
+const list<Renderable *> & Canvas::getTextLablesRef()			const { return m_textLabels           ;}
 
 vec4 Canvas::setClearColor(const vec4 & clearColor) { return this->m_clearColor = clearColor ;}
 
