@@ -70,26 +70,39 @@ void GUI::streetSidePanel()
 		ImGui::Text(("Roll/Pitch: " + toStr(a_bubble->m_rollPitch)).c_str());
 		ImGui::Text(("  Altitude: " + toStr(a_bubble->m_altitude)).c_str());
 
-		static FrameBuffer * fb = nullptr;
+		static FrameBuffer ** fb = nullptr;
+
+		const size_t bubbleFaceSize = 256 * 4;
 
 		if(!fb)
 		{
 			glfwMakeContextCurrent(getMainWindow()); // TODO Try to make this more clean.
 
-			fb = new FrameBuffer({512, 512},
-									{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
-										{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
-											TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
+			// TODO Memory leak!
+			fb = new FrameBuffer*[6];
+
+			for(size_t i = 1; i < 6; ++i)
+			{
+				fb[i] = new FrameBuffer({bubbleFaceSize, bubbleFaceSize},
+										{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
+											{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+												TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
+			}
 		}
 
-		ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(fb, a_bubble, 0), ImVec2(512, 512));
+		for(size_t i = 1; i < 6; ++i)
+		{
+			ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(fb[i], a_bubble, i), ImVec2(bubbleFaceSize, bubbleFaceSize));
+		}
 
+		/*
 		for(size_t i = 1; i < 6; ++i)
 		{
 			const auto tex = a_bubble->getCachedCubeFaceTexture(i);
 
 			ImGui::Image((ImTextureID)tex, ImVec2(256, 256));
 		}
+		*/
 
 	}
 	ImGui::End();

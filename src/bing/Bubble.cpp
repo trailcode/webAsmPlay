@@ -211,7 +211,7 @@ void Bubble::requestCubeFaceTexture(const size_t face) const
 
 	const auto url = streetsideImagesApi + faceQuadKey + imgUrlSuffix;
 
-	dmess("url " << url);
+	//dmess("url " << url);
 
 	download(url, [faceQuadKey, tileCachePath](BufferStruct * buf)
 	{

@@ -101,7 +101,7 @@ namespace
 
 		const auto url = streetsideImagesApi + faceQuadKey + imgUrlSuffix;
 
-		dmess("url " << url);
+		//dmess("url " << url);
 
 		download(url, [faceQuadKey, tileCachePath](BufferStruct * buf)
 		{
@@ -190,8 +190,8 @@ namespace
 
 		size_t i;
 
-		//for(i = 0; i < 4; ++i)
-		for(i = 0; i < 2; ++i)
+		for(i = 0; i < 4; ++i)
+		//for(i = 0; i < 2; ++i)
 		//for(i = 0; i < 1; ++i)
 		{
 			auto & in = curr[i % 2];
@@ -261,45 +261,6 @@ GLuint BubbleFaceRender::renderBubbleFace(FrameBuffer * frameBuffer, const strin
 
 		r->m_vertexArrayObject->drawTriangles();
 	}
-
-	/*
-	auto tex = requestBubbleTile(bubbleQuadKey, face, "0");
-
-	//dmess("a_bubbleTiles " << a_bubbleTiles.size() << " " << tex);
-
-	auto bb = AABB2D(0.0,0.0,1.0,1.0);
-
-		//auto r = Renderable::create(toPolygon(b), mat4(1.0f), 0, bb); // TODO Get this to work!
-
-	Box b({-1,-1},{1,1});
-
-	const auto min = dvec2(b.min_corner().x(), b.min_corner().y());
-	const auto max = dvec2(b.max_corner().x(), b.max_corner().y());
-
-	auto r = (RenderablePolygon *)Renderable::create(geosUtil::makeBox(min, max), mat4(1.0f), AABB2D(min.x, min.y, max.x, max.y), true)->
-										setRenderFill	(true)->
-										setRenderOutline(false)->
-										setShader		(TextureShader::getDefaultInstance());
-
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-
-	r->ensureVAO();
-
-	r->m_vertexArrayObject->bind(r->m_shader);
-
-	auto MVP = dmat4(1.0);
-
-	TextureShader::getDefaultInstance()->setTextureID(tex);
-
-	TextureShader::getDefaultInstance()->bind(MVP);
-
-	r->m_vertexArrayObject->bindTriangles();
-
-    r->m_vertexArrayObject->drawTriangles();
-
-	delete r;
-	*/
 
 	frameBuffer->unbind();
 
