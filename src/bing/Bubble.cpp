@@ -26,29 +26,15 @@
   \copyright 2019
 */
 
-#include <filesystem>
-#include <unordered_map>
-#include <SDL_image.h>
-#include <tbb/concurrent_unordered_map.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/CurlUtil.h>
-#include <webAsmPlay/Textures.h>
 #include <webAsmPlay/bing/Bubble.h>
 
 using namespace std;
-using namespace std::filesystem;
-using namespace tbb;
 using namespace glm;
 using namespace nlohmann;
-using namespace curlUtil;
 
 const array<string, 6> Bubble::s_faceKeys = { "01","02","03","10","11","12" };
-
-namespace
-{
-	concurrent_unordered_map<string, size_t> a_bubbleTiles;
-}
 
 Bubble * Bubble::create(const json & bubble)
 {
@@ -166,119 +152,3 @@ string Bubble::getQuadKey() const
 	return quadKey;
 }
 
-void Bubble::requestCubeFaceTexture(const size_t face) const
-{
-	OpenGL::ensureSharedContext();
-
-	//const string streetsideImagesApi = "https://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
-	// TODO With https curl gives 60 error code. Try to fix.
-	const string streetsideImagesApi = "http://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
-
-	const string imgUrlSuffix = ".jpg?g=6338&n=z";
-
-	const auto faceQuadKey = getQuadKey() + s_faceKeys[face];
-
-	static unordered_set<string> checkedBubbleFaces;
-
-	if(checkedBubbleFaces.find(faceQuadKey) != checkedBubbleFaces.end()) { return ;}
-
-	checkedBubbleFaces.insert(faceQuadKey);
-
-	const auto i = a_bubbleTiles.find(faceQuadKey);
-
-	if(i != a_bubbleTiles.end()) { return ;}
-
-	const string tileCachePath = "./bubbles/face_" + faceQuadKey;
-
-	if(fileExists(tileCachePath))
-	{
-		if(!file_size(tileCachePath.c_str())) { return ;}
-
-		auto img = IMG_Load(tileCachePath.c_str());
-
-		if (!img) { goto download ;}
-
-		auto ret = Textures::load(img);
-
-		SDL_FreeSurface(img);
-
-		a_bubbleTiles[faceQuadKey] = ret;
-
-		return;
-	}
-
-	download:
-
-	const auto url = streetsideImagesApi + faceQuadKey + imgUrlSuffix;
-
-	//dmess("url " << url);
-
-	download(url, [faceQuadKey, tileCachePath](BufferStruct * buf)
-	{
-		// TODO code dup here.
-		//auto tileBuffer = shared_ptr<BufferStruct>(download(url));
-		auto tileBuffer = shared_ptr<BufferStruct>(buf);
-
-		if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
-		{
-			dmess("No data!");
-
-			return;
-		}
-
-		auto img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
-
-		if(!img)
-		{
-			dmess("Bad data!");
-
-			return;
-		}
-
-		const auto bytesPerPixel = img->format->BytesPerPixel;
-
-		if(bytesPerPixel < 3)
-		{
-			SDL_FreeSurface(img);
-
-			// Must be the no data png image, mark as no data.
-			//return markTileNoData(tile);
-
-			dmess("No data!");
-
-			return;
-		}
-
-		////////////////////////////
-		FILE * fp = fopen(tileCachePath.c_str(), "wb");
-
-		if(fp)
-		{
-			fwrite(tileBuffer->m_buffer, sizeof(char), tileBuffer->m_size, fp);
-
-			fclose(fp);
-		}
-		else { dmess("Warn could not write file: " << tileCachePath) ;}
-		///////////////////////////
-
-		Textures::s_queue.push([img, faceQuadKey](int ID)
-		{
-			const auto ret = Textures::load(img);
-
-			a_bubbleTiles[faceQuadKey] = ret;
-
-			SDL_FreeSurface(img);
-		});
-	});
-}
-
-GLuint Bubble::getCachedCubeFaceTexture(const size_t face) const
-{
-	const auto faceQuadKey = getQuadKey() + s_faceKeys[face];
-
-	const auto i = a_bubbleTiles.find(faceQuadKey);
-
-	if(i == a_bubbleTiles.end()) { return 0 ;}
-	
-	return i->second;
-}

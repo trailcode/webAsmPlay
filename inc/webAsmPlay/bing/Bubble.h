@@ -51,10 +51,6 @@ public:
 
 	std::string getQuadKey() const;
 
-	void requestCubeFaceTexture(const size_t face) const;
-
-	GLuint getCachedCubeFaceTexture(const size_t face) const;
-
 	static const std::array<std::string, 6> s_faceKeys;
 
 	const size_t		m_ID;

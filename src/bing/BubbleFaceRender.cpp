@@ -26,13 +26,8 @@
 */
 
 #include <filesystem>
-#include <unordered_set>
-#include <tbb/concurrent_unordered_map.h>
 #include <glm/gtc/matrix_transform.hpp>
-#include <ctpl/ctpl.h>
-#include <SDL_image.h>
 #include <webAsmPlay/Util.h>
-#include <webAsmPlay/CurlUtil.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/Textures.h>
 #include <webAsmPlay/VertexArrayObject.h>
@@ -45,10 +40,7 @@
 
 using namespace std;
 using namespace std::filesystem;
-using namespace tbb;
 using namespace glm;
-using namespace ctpl;
-using namespace curlUtil;
 using namespace boostGeom;
 
 namespace

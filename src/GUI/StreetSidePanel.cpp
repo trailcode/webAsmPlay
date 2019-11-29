@@ -34,9 +34,8 @@
 #include <webAsmPlay/bing/BubbleFaceRender.h>
 #include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
-#include <webAsmPlay/GUI/GUI.h>
-
 #include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
 using namespace glm;
@@ -96,42 +95,14 @@ void GUI::streetSidePanel()
 		{
 			ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(fb[i], a_bubble, i), ImVec2(bubbleFaceSize, bubbleFaceSize));
 		}
-
-		/*
-		for(size_t i = 1; i < 6; ++i)
-		{
-			const auto tex = a_bubble->getCachedCubeFaceTexture(i);
-
-			ImGui::Image((ImTextureID)tex, ImVec2(256, 256));
-		}
-		*/
-
 	}
+
 	ImGui::End();
 }
 
 void GUI::initBingStreetSidePanel(const dmat4 & trans)
 {
-	const auto requestBubbleFaces = [](const dvec3 & posWC)
-	{
-		const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
-
-		tie(a_bubble, a_renderable) = StreetSide::closestBubble(pos);
-
-		if(!a_bubble) { return ;}
-
-		static unordered_set<Bubble *> loadingBubbles;
-
-		if(loadingBubbles.find(a_bubble) != loadingBubbles.end()) { return ;}
-
-		loadingBubbles.insert(a_bubble);
-
-		auto bubble = a_bubble;
-
-		for(size_t i = 0; i < 6; ++i) { bubble->requestCubeFaceTexture(i) ;}
-	};
-
-	getMainCanvas()->addLeftClickListener([requestBubbleFaces](const dvec3 & posWC)
+	getMainCanvas()->addLeftClickListener([](const dvec3 & posWC)
 	{
 		switch(getMode())
 		{
@@ -139,7 +110,7 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 				
 				if(!a_clickToViewBubble || !s_showStreetSidePanel) {  break ;}
 
-				requestBubbleFaces(posWC);
+				tie(a_bubble, a_renderable) = StreetSide::closestBubble(getClient()->getInverseTrans() * dvec4(posWC, 1));
 
 			break;
 
@@ -162,10 +133,10 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 		}
 	});
 
-	getMainCanvas()->addMouseMoveListener([requestBubbleFaces](const dvec3 & posWC)
+	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
 	{
 		if(!s_showStreetSidePanel || a_clickToViewBubble) { return ;}
 
-		requestBubbleFaces(posWC);
+		tie(a_bubble, a_renderable) = StreetSide::closestBubble(getClient()->getInverseTrans() * dvec4(posWC, 1));
 	});
 }
