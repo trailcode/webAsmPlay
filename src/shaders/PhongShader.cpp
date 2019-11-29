@@ -24,6 +24,7 @@
 \copyright 2019
 */
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/canvas/Camera.h>
@@ -90,8 +91,6 @@ PhongShader::~PhongShader()
 
 }
 
-#include <glm/gtc/matrix_transform.hpp>
-
 void PhongShader::bind( Canvas     * canvas,
 						const bool   isOutline,
 						const size_t renderingStage)
@@ -102,12 +101,10 @@ void PhongShader::bind( Canvas     * canvas,
     //model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
     model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// it's a bit too big for our scene, so scale it down
 
-	//a_shaderProgram->setUniform(a_model, canvas->getModelRef());
-	a_shaderProgram->setUniform(a_model, model);
-	a_shaderProgram->setUniform(a_view, canvas->getViewRef());
-	a_shaderProgram->setUniform(a_projection, canvas->getProjectionRef());
-
-	a_shaderProgram->setUniform(a_viewPos, canvas->getCamera()->getCenterConstRef());
+	a_shaderProgram->setUniform(a_model,		model);
+	a_shaderProgram->setUniform(a_view,			canvas->getViewRef());
+	a_shaderProgram->setUniform(a_projection,	canvas->getProjectionRef());
+	a_shaderProgram->setUniform(a_viewPos,		canvas->getCamera()->getCenterConstRef());
 
 	// lighting
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f); 

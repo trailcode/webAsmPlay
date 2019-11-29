@@ -67,11 +67,9 @@ Renderable * Renderable::create(const Geometry * geom,
         case GEOS_LINESTRING:           
         case GEOS_LINEARRING:           return RenderableLineString::create(dynamic_cast<const LineString *>(geom), trans);
 		case GEOS_POLYGON:              return RenderablePolygon   ::create(dynamic_cast<const Polygon    *>(geom), trans, 0, boxUV, swapUV_Axis);
-
         case GEOS_MULTIPOINT:           dmess("Implement me!"); return nullptr;
         case GEOS_MULTILINESTRING:      dmess("Implement me!"); return nullptr;
         case GEOS_MULTIPOLYGON:         return RenderablePolygon::create(   dynamic_cast<const MultiPolygon *>(geom), trans, 0, boxUV, swapUV_Axis);
-
         case GEOS_GEOMETRYCOLLECTION:   dmess("Implement me!"); return nullptr;
         default: dmessError("Error!");
     }
@@ -151,14 +149,17 @@ Renderable * Renderable::setRenderOutline(const bool render)
 	return this;
 }
 
-void Renderable::ensureVAO()
-{
-	dmess("Implement me!");
-}
-
 size_t Renderable::getNumTriangles() const
 {
 	if(!m_vertexArrayObject) { return 0 ;}
 
 	return m_vertexArrayObject->getNumTriangles();
+}
+
+void Renderable::render(const mat4		& model,
+						const mat4		& view,
+						const mat4		& projection,
+						const size_t	  renderStage)
+{
+	dmessError("Implement me!");
 }

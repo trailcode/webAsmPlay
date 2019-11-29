@@ -45,16 +45,14 @@ using namespace boostGeom;
 
 namespace
 {
-	void doQuadBox(const string & prefix, const Box & b, vector<pair<string, Box> > & out)
+	void doQuadBoxs(const vector<pair<string, Box> > & in, vector<pair<string, Box> > & out)
 	{
-		const auto quad = quadBox(b);
+		for(const auto & [prefix, b] : in)
+		{
+			const auto quad = quadBox(b);
 
-		for(size_t i = 0; i < 4; ++i) { out.push_back(make_pair(prefix + to_string(i), quad[i])) ;}
-	}
-
-	void doQuadBox(const vector<pair<string, Box> > & in, vector<pair<string, Box> > & out)
-	{
-		for(const auto & [prefix, b] : in) { doQuadBox(prefix, b, out) ;}
+			for(size_t i = 0; i < 4; ++i) { out.push_back(make_pair(prefix + to_string(i), quad[i])) ;}
+		}
 	}
 
 	unordered_map<string, Renderable *> a_tileGrid;
@@ -76,12 +74,9 @@ namespace
 		for(i = 0; i < 2; ++i)
 		//for(i = 0; i < 1; ++i)
 		{
-			auto & in = curr[i % 2];
-			auto & out = curr[(i + 1) % 2];
+			doQuadBoxs(curr[i % 2], curr[(i + 1) % 2]);
 
-			doQuadBox(in, out);
-
-			in.clear();
+			curr[i % 2].clear();
 		}
 
 		for(const auto & [id, b] : curr[i % 2])

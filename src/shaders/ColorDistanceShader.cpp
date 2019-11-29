@@ -101,6 +101,25 @@ void ColorDistanceShader::bind(Canvas     * canvas,
                                const bool   isOutline,
                                const size_t renderingStage)
 {
+	bind(canvas->getMV_Ref(), canvas->getMVP_Ref(), isOutline);
+}
+
+void ColorDistanceShader::bind(	const mat4		& model,
+								const mat4		& view,
+								const mat4		& projection,
+								const bool		  isOutline,
+								const size_t	  renderingStage)
+{
+	const auto MV	= view		 * model;
+    const auto MVP	= projection * MV;
+
+	bind(MV, MVP, isOutline);
+}
+
+void ColorDistanceShader::bind(	const mat4		& MV,
+								const mat4		& MVP,
+								const bool		  isOutline)
+{
 	glDisable(GL_DEPTH_TEST);
 
 	glDisable(GL_BLEND);
@@ -122,8 +141,8 @@ void ColorDistanceShader::bind(Canvas     * canvas,
 
 	a_shaderProgram->bind();
 
-	a_shaderProgram->setUniform(a_MV,  canvas->getMV_Ref());
-	a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
+	a_shaderProgram->setUniform(a_MV,  MV);
+	a_shaderProgram->setUniform(a_MVP, MVP);
 
 	a_shaderProgram->setUniformi(a_texUniform,				0);
 	a_shaderProgram->setUniformi(a_topDownTextureUniform,	1);

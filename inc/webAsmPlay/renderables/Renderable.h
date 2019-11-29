@@ -41,10 +41,6 @@ public:
 
     typedef std::function<void (Renderable *)> OnDelete;
 
-    virtual ~Renderable();
-
-    virtual void render(Canvas * canvas, const size_t renderStage) = 0;
-
     static Renderable * create( const geos::geom::Geometry::Ptr		& geom,
                                 const glm::dmat4					& trans			= glm::mat4(1.0),
                                 const AABB2D						& boxUV			= AABB2D(),
@@ -67,6 +63,15 @@ public:
                                 const AABB2D						& boxUV         = AABB2D(),
 								const bool							  swapUV_Axis   = false);
 
+	virtual ~Renderable();
+
+    virtual void render(Canvas * canvas, const size_t renderStage) = 0;
+
+	virtual void render(const glm::mat4 & model,
+						const glm::mat4 & view,
+						const glm::mat4 & projection,
+						const size_t	  renderStage);
+
     void addOnDeleteCallback(const OnDelete & callback);
 
     Shader * getShader() const;
@@ -79,7 +84,7 @@ public:
     Renderable * setRenderFill(const bool render);
     Renderable * setRenderOutline(const bool render);
 
-	virtual void ensureVAO();
+	virtual void ensureVAO() {}
 
 	size_t getNumTriangles() const;
 

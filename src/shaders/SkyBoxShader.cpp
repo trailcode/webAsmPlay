@@ -44,7 +44,7 @@ namespace
 	GLint a_MVP;
 	GLint a_cubeTexture;
 
-	const mat4 model = rotate(radians(90.0f), vec3(1.0f,0.0f,0.0f));
+	const mat4 a_model = rotate(radians(90.0f), vec3(1.0f,0.0f,0.0f));
 }
 
 void SkyBoxShader::ensureShader()
@@ -74,6 +74,21 @@ void SkyBoxShader::bind(Canvas     * canvas,
 						const bool   isOutline,
 						const size_t renderingStage)
 {
+	bind(canvas->getViewRef(), canvas->getProjectionRef());
+}
+
+void SkyBoxShader::bind(const mat4		& model,
+						const mat4		& view,
+						const mat4		& projection,
+						const bool		  isOutline,
+						const size_t	  renderingStage)
+{
+	bind(view, projection);
+}
+
+void SkyBoxShader::bind(const mat4 & view,
+						const mat4 & projection)
+{
 	a_shaderProgram->bind();
 	
 	glDisable(GL_DEPTH_TEST);
@@ -82,12 +97,12 @@ void SkyBoxShader::bind(Canvas     * canvas,
 	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	mat4 centeredView = mat4(canvas->getViewRef());
+	mat4 centeredView = mat4(view);
 
 	value_ptr(centeredView)[12] = 0;
 	value_ptr(centeredView)[13] = 0;
 	value_ptr(centeredView)[14] = 0;
 
-	a_shaderProgram->setUniform (a_MVP,         mat4(canvas->getProjectionRef()) * centeredView * model);
+	a_shaderProgram->setUniform (a_MVP,         mat4(projection) * centeredView * a_model);
 	a_shaderProgram->setUniformi(a_cubeTexture, 0);
 }

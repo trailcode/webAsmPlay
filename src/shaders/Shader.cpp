@@ -65,31 +65,40 @@ size_t Shader::getNumRenderingStages() const { return 1 ;}
 ColorSymbology * Shader::setColorSymbology(ColorSymbology * colorSymbology) { return m_colorSymbology = colorSymbology	;}
 ColorSymbology * Shader::getColorSymbology() const							{ return m_colorSymbology					;}
 
-RegisterShader::RegisterShader(const function<void()> & registerFunction)
+void Shader::bind(	const mat4		& model,
+					const mat4		& view,
+					const mat4		& projection,
+					const bool		  isOutline,
+					const size_t	  renderingStage)
 {
-	dmess("RegisterShader");
-
-	Shader::s_shadersToRegister.push_back(registerFunction);
+	dmessError("Implement me!");
 }
 
 void Shader::ensureShaders()
 {
-	BindlessTextureShader::ensureShader();
-	ColorDistanceDepthShader3D::ensureShader();
-	ColorDistanceShader::ensureShader();
-	ColorShader::ensureShader();
-	ColorVertexShader::ensureShader();
-	SkyBoxShader::ensureShader();
-	SsaoShader::ensureShader();
-	TextureShader::ensureShader();
-	NormalToRGB_Shader::ensureShader();
-	DepthToRGB_Shader::ensureShader();
-	TileBoundaryShader::ensureShader();
-	PhongShader::ensureShader();
-	PhongShaderInstanced::ensureShader();
+	BindlessTextureShader		::ensureShader();
+	ColorDistanceDepthShader3D	::ensureShader();
+	ColorDistanceShader			::ensureShader();
+	ColorShader					::ensureShader();
+	ColorVertexShader			::ensureShader();
+	SkyBoxShader				::ensureShader();
+	SsaoShader					::ensureShader();
+	TextureShader				::ensureShader();
+	NormalToRGB_Shader			::ensureShader();
+	DepthToRGB_Shader			::ensureShader();
+	TileBoundaryShader			::ensureShader();
+	PhongShader					::ensureShader();
+	PhongShaderInstanced		::ensureShader();
 
 	for (const auto& i : s_shadersToRegister)
 	{
 		// i(); // This does not seem to work.
 	}
+}
+
+RegisterShader::RegisterShader(const function<void()> & registerFunction)
+{
+	dmess("RegisterShader");
+
+	Shader::s_shadersToRegister.push_back(registerFunction);
 }

@@ -76,9 +76,24 @@ void ColorShader::bind( Canvas     * canvas,
                         const bool   isOutline,
                         const size_t renderingStage)
 {
-    a_shaderProgram->bind();
+	bind(canvas->getMVP_Ref(), isOutline);
+}
 
-    a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
+void ColorShader::bind(	const mat4		& model,
+						const mat4		& view,
+						const mat4		& projection,
+						const bool		  isOutline,
+						const size_t	  renderingStage)
+{
+	bind(projection * view * model, isOutline);
+}
+
+void ColorShader::bind(	const mat4	& MVP,
+						const bool	  isOutline)
+{
+	a_shaderProgram->bind();
+
+    a_shaderProgram->setUniform(a_MVP, MVP);
 
 	glDisable(GL_DEPTH_TEST);
 
