@@ -64,6 +64,11 @@ public:
 
     void render(Canvas * canvas, const size_t renderStage = 0) override;
 
+	void render(const glm::mat4	& model,
+				const glm::mat4	& view,
+				const glm::mat4	& projection,
+				const size_t	  renderStage) override;
+
 	void setFromQueued(const size_t slot, const glm::dmat4 & trans = glm::dmat4(1.0));
 
 private:
@@ -74,6 +79,8 @@ private:
                         const GLuint & vbo,
                         const GLuint & numTriIndices,
                         const GLuint & numLineIndices);
+
+	void render() const;
 
     const GLuint m_vao;
     const GLuint m_ebo;

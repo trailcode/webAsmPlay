@@ -369,16 +369,6 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & min, con
 
 		const auto frust = canvas->getCameraFrustum();
 		
-		size_t numSubTiles		= 0;
-		size_t numIntersecting	= 0;
-
-		/*
-		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { ++numIntersecting; numSubTiles += getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
-		if(frust->intersects(subPointsTrans[1], subPointsTrans[2], subPointsTrans[5], subPointsTrans[4])) { ++numIntersecting; numSubTiles += getTilesToRender(canvas, subPoints[4], subPoints[2], level + 1) ;}
-		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { ++numIntersecting; numSubTiles += getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;}
-		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { ++numIntersecting; numSubTiles += getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;}
-		*/
-
 		bool good = true;
 
 		if(frust->intersects(subPointsTrans[0], subPointsTrans[1], subPointsTrans[4], subPointsTrans[3])) { good &= getTilesToRender(canvas, subPoints[3], subPoints[1], level + 1) ;}
@@ -386,7 +376,6 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & min, con
 		if(frust->intersects(subPointsTrans[3], subPointsTrans[4], subPointsTrans[7], subPointsTrans[6])) { good &= getTilesToRender(canvas, subPoints[6], subPoints[4], level + 1) ;}
 		if(frust->intersects(subPointsTrans[4], subPointsTrans[5], subPointsTrans[8], subPointsTrans[7])) { good &= getTilesToRender(canvas, subPoints[7], subPoints[5], level + 1) ;}
 
-		//if(numSubTiles == numIntersecting) { return true ;}
 		if(good) { return true ;}
 	}
 	

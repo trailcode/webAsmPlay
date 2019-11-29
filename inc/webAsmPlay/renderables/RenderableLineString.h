@@ -52,9 +52,14 @@ public:
 
     static Renderable * create( const ColoredGeometryVec & lineStrings,
                                 const glm::dmat4         & trans          = glm::dmat4(1.0),
-                                const bool                showProgress   = false);
+                                const bool                 showProgress   = false);
 
     void render(Canvas * canvas, const size_t renderStage = 0) override;
+
+	void render(const glm::mat4 & model,
+				const glm::mat4 & view,
+				const glm::mat4 & projection,
+				const size_t	  renderStage) override;
 
     static void ensureShaders();
 

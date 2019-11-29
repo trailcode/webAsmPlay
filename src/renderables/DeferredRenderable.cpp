@@ -209,12 +209,6 @@ namespace
     {
 		auto & vertsAndColors = a_vertsAndColors[slot];
 
-		/*
-        vertsAndColors.push_back(float(v.x * 0.1));
-        vertsAndColors.push_back(float(v.y * 0.1));
-        vertsAndColors.push_back(float(v.z * 0.1));
-		*/
-
 		vertsAndColors.push_back(float(v.x));
         vertsAndColors.push_back(float(v.y));
         vertsAndColors.push_back(float(v.z));
@@ -285,25 +279,34 @@ void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)
 {
     if(!m_shader->m_shouldRender(false, renderStage)) { return ;}
 
-    glBindVertexArray(					  m_vao);
+	m_shader->bind(canvas, false, renderStage);
+
+    render();
+}
+
+void DeferredRenderable::render(const mat4		& model,
+								const mat4		& view,
+								const mat4		& projection,
+								const size_t	  renderStage)
+{
+	if(!m_shader->m_shouldRender(false, renderStage)) { return ;}
+
+	m_shader->bind(model, view, projection, false, renderStage);
+
+    render();
+}
+
+void DeferredRenderable::render() const
+{
+	glBindVertexArray(					  m_vao);
     glBindBuffer(GL_ARRAY_BUFFER,         m_vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 
     glDisable(GL_DEPTH_TEST);
 
-	//auto m = rotate(scale(dmat4(1.0), {0.1,0.1,0.1}), radians(-90.0), dvec3(1, 0, 0));
-
-    //canvas->pushModel(rotate(scale(canvas->getModelRef(), {0.1,0.1,0.1}), radians(-90.0), dvec3(1, 0, 0)));
-
-	//canvas->pushModel(m * canvas->getModelRef());
-
-    m_shader->bind(canvas, false, renderStage);
-    
     glDrawElements(GL_TRIANGLES, m_numTriIndices, GL_UNSIGNED_INT, nullptr);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo2);
 
     glDrawElements(GL_LINES, m_numLineIndices, GL_UNSIGNED_INT, nullptr);
-
-    //canvas->popMVP();
 }
