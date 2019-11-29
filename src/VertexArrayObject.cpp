@@ -139,12 +139,12 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
 				if(SWAP_UV_AXIS)
 				{
-					verts.push_back(float(uv.x));
+					verts.push_back(float(	  uv.x));
 					verts.push_back(float(1 - uv.y));
 				}
 				else
 				{
-					verts.push_back(float(uv.y));
+					verts.push_back(float(	  uv.y));
 					verts.push_back(float(1 - uv.x));
 				}
             }

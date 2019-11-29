@@ -31,9 +31,12 @@
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/bing/StreetSide.h>
 #include <webAsmPlay/bing/Bubble.h>
+#include <webAsmPlay/bing/BubbleFaceRender.h>
 #include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/GUI/GUI.h>
+
+#include <webAsmPlay/FrameBuffer.h>
 
 using namespace std;
 using namespace glm;
@@ -67,7 +70,21 @@ void GUI::streetSidePanel()
 		ImGui::Text(("Roll/Pitch: " + toStr(a_bubble->m_rollPitch)).c_str());
 		ImGui::Text(("  Altitude: " + toStr(a_bubble->m_altitude)).c_str());
 
-		for(size_t i = 0; i < 6; ++i)
+		static FrameBuffer * fb = nullptr;
+
+		if(!fb)
+		{
+			glfwMakeContextCurrent(getMainWindow()); // TODO Try to make this more clean.
+
+			fb = new FrameBuffer({512, 512},
+									{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
+										{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+											TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
+		}
+
+		ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(fb, a_bubble, 0), ImVec2(512, 512));
+
+		for(size_t i = 1; i < 6; ++i)
 		{
 			const auto tex = a_bubble->getCachedCubeFaceTexture(i);
 

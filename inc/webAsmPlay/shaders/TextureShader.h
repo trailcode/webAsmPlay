@@ -25,6 +25,7 @@
 */
 #pragma once
 
+#include <glm/mat4x4.hpp>
 #include <webAsmPlay/shaders/Shader.h>
 
 class TextureShader : public Shader
@@ -42,6 +43,8 @@ public:
     void bind(Canvas     * canvas,
               const bool   isOutline,
               const size_t renderingStage = 0) override;
+
+	void bind(const glm::dmat4 & MVP);
 
     TextureShader * setTextureID(const GLuint textureID);
 	

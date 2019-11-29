@@ -25,14 +25,23 @@
 */
 #pragma once
 
+#include <string>
+#include <webAsmPlay/OpenGL_Util.h>
+
+class Bubble;
+class FrameBuffer;
+
 class BubbleFaceRender
 {
 public:
 
-	BubbleFaceRender();
+	static GLuint renderBubbleFace(FrameBuffer * frameBuffer, const Bubble * bubble, const size_t face);
 
-	virtual ~BubbleFaceRender();
+	static GLuint renderBubbleFace(FrameBuffer * frameBuffer, const std::string & bubbleQuadKey, const size_t face);
 
 private:
+
+	BubbleFaceRender() {}
+	~BubbleFaceRender() {}
 
 };

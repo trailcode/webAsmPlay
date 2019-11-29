@@ -93,3 +93,16 @@ void TextureShader::bind(   Canvas     * canvas,
 
     a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
 }
+
+using namespace glm;
+
+void TextureShader::bind(const dmat4 & MVP)
+{
+	a_shaderProgram->bind();
+
+	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, m_textureID);
+
+	a_shaderProgram->setUniformi(a_tex, 0);
+
+    a_shaderProgram->setUniform(a_MVP, MVP);
+}

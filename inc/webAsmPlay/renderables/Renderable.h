@@ -83,7 +83,7 @@ public:
 
 	size_t getNumTriangles() const;
 
-protected:
+//protected:
 
     Renderable( const bool isMulti          = false,
                 const bool renderFill       = false,

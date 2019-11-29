@@ -177,11 +177,7 @@ void RenderablePolygon::render(Canvas * canvas, const size_t renderStage)
 		
 		m_vertexArrayObject->bindTriangles();
 
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
         m_vertexArrayObject->drawTriangles();
-
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     if(renderOutline)
