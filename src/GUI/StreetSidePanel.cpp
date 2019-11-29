@@ -79,9 +79,9 @@ void GUI::streetSidePanel()
 			glfwMakeContextCurrent(getMainWindow()); // TODO Try to make this more clean.
 
 			// TODO Memory leak!
-			fb = new FrameBuffer*[6];
+			fb = new FrameBuffer*[5];
 
-			for(size_t i = 1; i < 6; ++i)
+			for(size_t i = 1; i < 5; ++i)
 			{
 				fb[i] = new FrameBuffer({bubbleFaceSize, bubbleFaceSize},
 										{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
@@ -90,7 +90,9 @@ void GUI::streetSidePanel()
 			}
 		}
 
-		for(size_t i = 1; i < 6; ++i)
+		//dmess("==============================================================");
+
+		for(size_t i = 0; i < 5; ++i)
 		{
 			ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(fb[i], a_bubble, i), ImVec2(bubbleFaceSize, bubbleFaceSize));
 		}
