@@ -43,10 +43,10 @@ using namespace glm;
 using namespace nlohmann;
 using namespace curlUtil;
 
+const array<string, 6> Bubble::s_faceKeys = { "01","02","03","10","11","12" };
+
 namespace
 {
-	const auto a_faceKeys = vector<string>{"01","02","03","10","11","12"};
-
 	concurrent_unordered_map<string, size_t> a_bubbleTiles;
 }
 
@@ -176,7 +176,7 @@ void Bubble::requestCubeFaceTexture(const size_t face) const
 
 	const string imgUrlSuffix = ".jpg?g=6338&n=z";
 
-	const auto faceQuadKey = getQuadKey() + a_faceKeys[face];
+	const auto faceQuadKey = getQuadKey() + s_faceKeys[face];
 
 	static unordered_set<string> checkedBubbleFaces;
 
@@ -274,7 +274,7 @@ void Bubble::requestCubeFaceTexture(const size_t face) const
 
 GLuint Bubble::getCachedCubeFaceTexture(const size_t face) const
 {
-	const auto faceQuadKey = getQuadKey() + a_faceKeys[face];
+	const auto faceQuadKey = getQuadKey() + s_faceKeys[face];
 
 	const auto i = a_bubbleTiles.find(faceQuadKey);
 

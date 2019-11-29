@@ -81,7 +81,7 @@ void GUI::streetSidePanel()
 			// TODO Memory leak!
 			fb = new FrameBuffer*[5];
 
-			for(size_t i = 1; i < 5; ++i)
+			for(size_t i = 0; i < 5; ++i)
 			{
 				fb[i] = new FrameBuffer({bubbleFaceSize, bubbleFaceSize},
 										{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,

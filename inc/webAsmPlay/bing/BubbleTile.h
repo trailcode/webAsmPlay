@@ -1,6 +1,4 @@
-﻿#pragma once
-
-/**
+﻿/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -26,42 +24,19 @@
   \copyright 2019
 */
 
-#include <cstdlib>
-#include <array>
-#include <glm/vec2.hpp>
-#include <nlohmann/json.hpp>
+#pragma once
+
+#include <string>
 #include <webAsmPlay/OpenGL_Util.h>
 
-class Bubble
+class BubbleTile
 {
 public:
 
-	static Bubble * create(const nlohmann::json & bubble);
-
-	Bubble();
-
-	Bubble(	const size_t		  ID,
-			const glm::dvec2	& pos,
-			const glm::dvec2	& rollPitch,
-			const double		  altitude);
-
-	static void save(const std::string & fileName, const std::vector<Bubble *> & bubbles);
-
-	static std::vector<Bubble *> load(const std::string & fileName);
-
-	std::string getQuadKey() const;
-
-	void requestCubeFaceTexture(const size_t face) const;
-
-	GLuint getCachedCubeFaceTexture(const size_t face) const;
-
-	static const std::array<std::string, 6> s_faceKeys;
-
-	const size_t		m_ID;
-	const glm::dvec2	m_pos;
-	const glm::dvec2	m_rollPitch;
-	const double		m_altitude;
+	static GLuint requestBubbleTile(const std::string & bubbleQuadKey, const size_t face, const std::string & tileID);
 
 private:
-};
 
+	BubbleTile() {}
+	~BubbleTile() {}
+};
