@@ -69,5 +69,9 @@ The build system is based on CMake.
 * Replace curlUtil::BufferStruct with a std::pair
 * Remove the model component from the canvas, simplify the shaders.
 
+#### Notes
+
+* https://docs.microsoft.com/en-us/bingmaps/articles/getting-streetside-tiles-from-imagery-metadata
+
 
 
