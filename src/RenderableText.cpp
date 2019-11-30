@@ -1,4 +1,4 @@
-﻿/**
+/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -246,10 +246,10 @@ namespace
 	void initFont()
 	{
 		//auto fontData = readFile("C:/build/webAsmPlay/ThirdParty/imgui/misc/fonts/ProggyClean.ttf");
-		auto fontData = readFile("C:/build/webAsmPlay/ThirdParty/imgui/misc/fonts/DroidSans.ttf");
+		//auto fontData = readFile("C:/build/webAsmPlay/ThirdParty/imgui/misc/fonts/DroidSans.ttf");
 		//auto fontData = readFile("C:/windows/fonts/arial.ttf");
 		//auto fontData = readFile("C:\\build\\webAsmPlay\\readme.md");
-		//auto fontData = readFile("ProggyClean.ttf");
+		auto fontData = readFile("ProggyClean.ttf");
 
 		auto atlasData = std::make_unique<uint8_t[]>(font.atlasWidth * font.atlasHeight);
 
