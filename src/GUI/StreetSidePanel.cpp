@@ -31,8 +31,10 @@
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/bing/StreetSide.h>
 #include <webAsmPlay/bing/Bubble.h>
+#include <webAsmPlay/bing/BubbleFaceRender.h>
 #include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
+#include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
@@ -67,39 +69,40 @@ void GUI::streetSidePanel()
 		ImGui::Text(("Roll/Pitch: " + toStr(a_bubble->m_rollPitch)).c_str());
 		ImGui::Text(("  Altitude: " + toStr(a_bubble->m_altitude)).c_str());
 
-		for(size_t i = 0; i < 6; ++i)
-		{
-			const auto tex = a_bubble->getCachedCubeFaceTexture(i);
+		static FrameBuffer ** fb = nullptr;
 
-			ImGui::Image((ImTextureID)tex, ImVec2(256, 256));
+		const size_t bubbleFaceSize = 256 * 4;
+
+		if(!fb)
+		{
+			glfwMakeContextCurrent(getMainWindow()); // TODO Try to make this more clean.
+
+			// TODO Memory leak!
+			fb = new FrameBuffer*[5];
+
+			for(size_t i = 0; i < 5; ++i)
+			{
+				fb[i] = new FrameBuffer({bubbleFaceSize, bubbleFaceSize},
+										{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
+											{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+												TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
+			}
 		}
 
+		//dmess("==============================================================");
+
+		for(size_t i = 0; i < 5; ++i)
+		{
+			ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(fb[i], a_bubble, i), ImVec2(bubbleFaceSize, bubbleFaceSize));
+		}
 	}
+
 	ImGui::End();
 }
 
 void GUI::initBingStreetSidePanel(const dmat4 & trans)
 {
-	const auto requestBubbleFaces = [](const dvec3 & posWC)
-	{
-		const auto pos = getClient()->getInverseTrans() * dvec4(posWC, 1);
-
-		tie(a_bubble, a_renderable) = StreetSide::closestBubble(pos);
-
-		if(!a_bubble) { return ;}
-
-		static unordered_set<Bubble *> loadingBubbles;
-
-		if(loadingBubbles.find(a_bubble) != loadingBubbles.end()) { return ;}
-
-		loadingBubbles.insert(a_bubble);
-
-		auto bubble = a_bubble;
-
-		for(size_t i = 0; i < 6; ++i) { bubble->requestCubeFaceTexture(i) ;}
-	};
-
-	getMainCanvas()->addLeftClickListener([requestBubbleFaces](const dvec3 & posWC)
+	getMainCanvas()->addLeftClickListener([](const dvec3 & posWC)
 	{
 		switch(getMode())
 		{
@@ -107,7 +110,7 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 				
 				if(!a_clickToViewBubble || !s_showStreetSidePanel) {  break ;}
 
-				requestBubbleFaces(posWC);
+				tie(a_bubble, a_renderable) = StreetSide::closestBubble(getClient()->getInverseTrans() * dvec4(posWC, 1));
 
 			break;
 
@@ -130,10 +133,10 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 		}
 	});
 
-	getMainCanvas()->addMouseMoveListener([requestBubbleFaces](const dvec3 & posWC)
+	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
 	{
 		if(!s_showStreetSidePanel || a_clickToViewBubble) { return ;}
 
-		requestBubbleFaces(posWC);
+		tie(a_bubble, a_renderable) = StreetSide::closestBubble(getClient()->getInverseTrans() * dvec4(posWC, 1));
 	});
 }

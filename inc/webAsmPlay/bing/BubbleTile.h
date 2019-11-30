@@ -1,4 +1,4 @@
-/**
+﻿/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -21,36 +21,22 @@
 
   \author Matthew Tang
   \email trailcode@gmail.com
-  \copyright 2018
+  \copyright 2019
 */
+
 #pragma once
 
-#include <webAsmPlay/shaders/Shader.h>
+#include <string>
+#include <webAsmPlay/OpenGL_Util.h>
 
-class ColorVertexShader : public Shader
+class BubbleTile
 {
 public:
 
-    static void ensureShader();
-
-    static ColorVertexShader * getDefaultInstance();
-
-	ColorVertexShader();
-
-	~ColorVertexShader();
-
-    void bind(  Canvas     * canvas,
-                const bool   isOutline,
-                const size_t renderingStage = 0) override;
-
-	void bind(	const glm::mat4 & model,
-				const glm::mat4 & view,
-				const glm::mat4 & projection,
-				const bool		  isOutline,
-				const size_t	  renderingStage) override;
-
-	void bind(	const glm::mat4 & MVP);
+	static GLuint requestBubbleTile(const std::string & bubbleQuadKey, const size_t face, const std::string & tileID);
 
 private:
 
+	BubbleTile() {}
+	~BubbleTile() {}
 };

@@ -328,8 +328,6 @@ void Canvas::onMouseButton(GLFWwindow * window, const int button, const int acti
 {
     if(!m_enabled) { return ;}
 
-	dmess("onMouseButton " << button << " " << action << " " << mods << " this " << this);
-
 	switch(button)
 	{
 		case GLFW_MOUSE_BUTTON_LEFT: 

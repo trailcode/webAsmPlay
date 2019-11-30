@@ -257,3 +257,33 @@ void RenderableLineString::render(Canvas * canvas, const size_t renderStage)
     glBindVertexArray(0);
 }
 
+void RenderableLineString::render(	const mat4		& model,
+									const mat4		& view,
+									const mat4		& projection,
+									const size_t	  renderStage)
+{
+	if(!m_shader->m_shouldRender(true, renderStage)) { return ;}
+
+    if(!getRenderOutline()) { return ;}
+
+    glBindVertexArray(                    m_vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+
+	glLineWidth(GUI::s_lineWidthRender);
+
+    if(!m_isMulti)
+    {
+        m_shader->bind(model, view, projection, true, renderStage);
+
+        glDrawElements(GL_LINE_STRIP, (GLsizei)m_numElements, GL_UNSIGNED_INT, nullptr);
+    }
+    else
+    {
+        m_shader->bind(model, view, projection, true, renderStage);
+
+        glDrawElements(GL_LINES, (GLsizei)m_numElements, GL_UNSIGNED_INT, nullptr);
+    }
+
+    glBindVertexArray(0);
+}
+

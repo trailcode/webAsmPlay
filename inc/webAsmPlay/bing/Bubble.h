@@ -27,6 +27,7 @@
 */
 
 #include <cstdlib>
+#include <array>
 #include <glm/vec2.hpp>
 #include <nlohmann/json.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
@@ -50,9 +51,7 @@ public:
 
 	std::string getQuadKey() const;
 
-	void requestCubeFaceTexture(const size_t face) const;
-
-	GLuint getCachedCubeFaceTexture(const size_t face) const;
+	static const std::array<std::string, 6> s_faceKeys;
 
 	const size_t		m_ID;
 	const glm::dvec2	m_pos;

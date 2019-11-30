@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <glm/mat4x4.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 
 class Canvas;
@@ -55,6 +56,12 @@ class Shader
 public:
 
     virtual void bind(Canvas * canvas, const bool isOutline, const size_t renderingStage) = 0;
+
+	virtual void bind(	const glm::mat4 & model,
+						const glm::mat4 & view,
+						const glm::mat4 & projection,
+						const bool		  isOutline,
+						const size_t	  renderingStage);
 
     std::string getName() const;
 

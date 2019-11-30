@@ -39,6 +39,16 @@ public:
               const bool   isOutline,
               const size_t renderingStage = 0) override;
 
+	void bind(	const glm::mat4 & model,
+				const glm::mat4 & view,
+				const glm::mat4 & projection,
+				const bool		  isOutline,
+				const size_t	  renderingStage) override;
+
+	void bind(	const glm::mat4 & MV,
+				const glm::mat4 & MVP,
+				const bool		  isOutline);
+
     ColorDistanceShader();
 	ColorDistanceShader(ColorSymbology * colorSymbology, const ShouldRenderFunctor & shouldRenderFunctor);
     ~ColorDistanceShader();

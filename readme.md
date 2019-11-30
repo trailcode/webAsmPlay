@@ -67,5 +67,10 @@ The build system is based on CMake.
 
 * ~~dmessError does not flush output~~
 
+#### Todo
+
+* Replace curlUtil::BufferStruct with a std::pair
+* Remove the model component from the canvas, simplify the shaders.
+
 
 

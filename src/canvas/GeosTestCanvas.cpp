@@ -168,23 +168,15 @@ void GeosTestCanvas::setGeomParameters( const float buffer1,
 
 		auto renderable = RenderablePolygon::create(geom, trans);
 
-		//if(!renderable) { continue ;}
 		if(!renderable) { return ;}
 
 		static ColorVertexShader * shader = nullptr;
 
-		if(!shader)
-		{
-			shader = new ColorVertexShader();
-		}
+		if(!shader) { shader = new ColorVertexShader() ;}
 
-		renderable->setShader(shader);
-		//renderable->setShader(ColorVertexShader::getDefaultInstance());
-
-		renderable->setRenderFill(true);
-		renderable->setRenderOutline(true);
-
-		addRenderable(renderable);
+		addRenderable(renderable->setShader			(shader)
+								->setRenderFill		(true)
+								->setRenderOutline	(true));
 
 		m_geoms.push_back(unique_ptr<Renderable>(renderable));
 	}

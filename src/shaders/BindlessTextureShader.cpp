@@ -31,6 +31,8 @@
 
 //REGISTER_SHADER(BindlessTextureShader)
 
+using namespace glm;
+
 namespace
 {
 	ShaderProgram			* a_shaderProgram   = nullptr;
@@ -71,6 +73,19 @@ void BindlessTextureShader::bind(	Canvas		* canvas,
 	a_shaderProgram->setUniformi(a_texID, m_textureSlot);
 
 	a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
+}
+
+void BindlessTextureShader::bind(	const mat4		& model,
+									const mat4		& view,
+									const mat4		& projection,
+									const bool		  isOutline,
+									const size_t	  renderingStage)
+{
+	a_shaderProgram->bind();
+
+	a_shaderProgram->setUniformi(a_texID, m_textureSlot);
+
+	a_shaderProgram->setUniform(a_MVP, projection * view * model);
 }
 
 BindlessTextureShader::BindlessTextureShader(const ShouldRenderFunctor & shouldRender) : Shader("BindlessTextureShader",
