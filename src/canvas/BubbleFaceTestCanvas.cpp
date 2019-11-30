@@ -1,4 +1,4 @@
-﻿/**
+/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -27,6 +27,7 @@
 //#define STB_TRUETYPE_IMPLEMENTATION
 //#include <imgui/imstb_truetype.h>
 
+#include <unordered_map>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 
 #ifndef STB_TRUETYPE_IMPLEMENTATION                         // in case the user already have an implementation in the _same_ compilation unit (e.g. unity builds)
@@ -542,6 +543,7 @@ namespace
 BubbleFaceTestCanvas::BubbleFaceTestCanvas()
 {
 	//demo.init();
+    return;
 
 	Box b = Box{{-1,-1},{1,1}};
 

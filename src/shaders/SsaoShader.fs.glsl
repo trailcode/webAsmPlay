@@ -1,4 +1,4 @@
-﻿/**
+/**
 ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
 ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
 ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -24,7 +24,8 @@
 \copyright 2019
 */
 
-#version 420 core
+//#version 420 core
+#version 410 core
 
 // Various uniforms controlling SSAO effect
 /*

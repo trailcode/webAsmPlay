@@ -283,7 +283,9 @@ else()
     find_package(curl			REQUIRED)
     find_package(Expat			REQUIRED)
     find_package(Assimp         REQUIRED)
-	
+    
+    message(GLFW3_INCLUDE_PATH ${GLFW3_INCLUDE_PATH})
+    
 	include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${CURL_INCLUDE_DIR})
     include_directories(${Boost_INCLUDE_DIRS})
@@ -294,14 +296,6 @@ else()
 	include_directories(${ASSIMP_INCLUDE_DIR})
     include_directories(ThirdParty/ctpl)
     include_directories(./)
-    
-    if(APPLE) # TODO Try to remove.
-
-        link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG}	optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
-        link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG}		optimized ${Boost_RANDOM_LIBRARY_RELEASE})
-        link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG}		optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
-
-    endif() 
 
 	link_libraries(${GLFW3_LIBRARY})
     link_libraries(${SDL2_IMAGE_LIBRARY})
@@ -318,8 +312,13 @@ else()
 
     else()
 
+        # The boost libs seem to not be needed on OSX, same for Linux?
+        #link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG}	optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
+        #link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG}		optimized ${Boost_RANDOM_LIBRARY_RELEASE})
+        #link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG}		optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
         link_libraries(${TBB_tbb_LIBRARY_RELEASE})
         link_libraries(${CURL_LIBRARY})
+        link_libraries(${assimp_LIBRARIES})
 
     endif()
     

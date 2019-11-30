@@ -57,8 +57,11 @@ The build system is based on CMake.
 ### OSX
 
 * brew install boost
+* brew install glfw3
+    * brew link glfw
 * brew install expat keg-only does not link in /usr/local
 * brew install assimp
+* brew install sdl2_image
 
 #### Bugs
 
