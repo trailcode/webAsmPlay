@@ -25,6 +25,7 @@
 */
 
 #include <array>
+#include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/bing/BubbleFaceRender.h>
 #include <webAsmPlay/bing/StreetSide.h>
@@ -62,7 +63,19 @@ void GUI::bubbleFacePanels()
 
 		ImGui::Begin(buf, &show);
 
-			ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::s_closestBubble, i), ImVec2(a_bubbleFaceSize, a_bubbleFaceSize));
+			const ImVec2 pos = ImGui::GetCursorScreenPos();
+
+			const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+
+			a_frameBuffers[i]->setBufferSize(__(sceneWindowSize));
+
+			//ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::s_closestBubble, i), ImVec2(a_bubbleFaceSize, a_bubbleFaceSize));
+
+			ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::s_closestBubble, i),
+													pos,
+													ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+													ImVec2(1, 0),
+													ImVec2(0, 1));
 
 		ImGui::End();
 	}

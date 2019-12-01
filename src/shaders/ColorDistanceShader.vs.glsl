@@ -75,7 +75,8 @@ void main(void)
 
 	// Calculate normal in view-space
 	//vs_out.N = mat3(mv_matrix) * normal;
-	vs_out.N = mat3(modelView) * vec3(0, 0, 1);
+	//vs_out.N = mat3(modelView) * vec3(0, 0, 1);
+	vs_out.N = mat3(modelView) * vec3(0, 0, -1);
 
 	// Calculate light vector
 	vs_out.L = light_pos - P.xyz;

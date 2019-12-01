@@ -121,7 +121,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
             if(IS_3D)  
             {
-                verts.push_back((float)tess->m_height);
+                //verts.push_back((float)tess->m_height);
+				verts.push_back(-(float)tess->m_height);
 
                 verts.push_back(0);
                 verts.push_back(0);
@@ -180,12 +181,20 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
             const vec2 A(tess->m_verts[a * 2], tess->m_verts[a * 2 + 1]);
             const vec2 B(tess->m_verts[b * 2], tess->m_verts[b * 2 + 1]);
 
+			/*
             const vec3 p1(A, tess->m_height);
             const vec3 p2(B, tess->m_height);
             const vec3 p3(B, tess->m_minHeight);
             const vec3 p4(A, tess->m_minHeight);
+			*/
 
-			const vec3 normal = -normalize(triangleNormal(p1, p2, p3)); // Why is this backwards on different system? Winding wrong.
+			const vec3 p1(A, -tess->m_height);
+            const vec3 p2(B, -tess->m_height);
+            const vec3 p3(B, -tess->m_minHeight);
+            const vec3 p4(A, -tess->m_minHeight);
+
+			//const vec3 normal = -normalize(triangleNormal(p1, p2, p3)); // Why is this backwards on different system? Winding wrong.
+			const vec3 normal = normalize(triangleNormal(p1, p2, p3)); // Why is this backwards on different system? Winding wrong.
 
             addVert<USE_SYMBOLOGY_ID>(verts, p1, normal, symbologyWallID_value);
             addVert<USE_SYMBOLOGY_ID>(verts, p2, normal, symbologyWallID_value);
