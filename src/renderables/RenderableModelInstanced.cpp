@@ -64,6 +64,7 @@ RenderableModelInstanced::RenderableModelInstanced(const string & modelPath, con
 		//modelMatrices[i] = scale(modelMatrices[i], vec3(0.00003, 0.00003, 0.00003));
 
 		modelMatrices[i] = rotate(modelMatrices[i], radians(90.0f), vec3(1,0,0));
+		modelMatrices[i] = rotate(modelMatrices[i], radians(180.0f), vec3(0,0,1));
 
 		modelMatrices[i] = rotate(modelMatrices[i], radians(float(uniformDist(e1))), vec3(0, 1, 0));
 	}
