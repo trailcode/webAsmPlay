@@ -554,6 +554,7 @@ void GUI::mainLoop(GLFWwindow * window)
 	modelViewerPanel();
 	streetSidePanel();
 	bubbleFaceTestPanel();
+	bubbleFacePanels();
 
 	//ImGui::ShowDemoWindow();
 

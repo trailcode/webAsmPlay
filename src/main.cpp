@@ -183,9 +183,7 @@ int main(int, char**)
 	
     GUI::setupCallbacks(window);
     GUI::initOpenGL();
-	
-	//StreetSide::queryViewport(); return 0;
-
+	GUI::initBubbleFacePanels();
     GUI::loadState();
     GUI::createWorld();
 

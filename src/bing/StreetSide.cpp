@@ -50,6 +50,8 @@ using namespace bingTileSystem;
 namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;
 
+Bubble * StreetSide::s_closestBubble = nullptr;
+
 namespace
 {
 	StreetSide * a_instance = nullptr;
@@ -201,5 +203,5 @@ pair<Bubble *, Renderable *> StreetSide::closestBubble(const dvec2 & pos)
 
 	if(!result.size()) { return make_pair(nullptr, nullptr) ;}
 
-	return make_pair(get<1>(result[0]), get<2>(result[0]));
+	return make_pair(s_closestBubble = get<1>(result[0]), get<2>(result[0]));
 }

@@ -339,6 +339,7 @@ else()
                         if_Info_131908.png
                         tree1.obj
                         tree1.mtl
+						ProggyClean.ttf
                         )
 	
     foreach(assetFile ${ASSET_FILES})

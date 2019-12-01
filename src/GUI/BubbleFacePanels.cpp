@@ -24,20 +24,46 @@
 \copyright 2019
 */
 
-#version 420 core
+#include <array>
+#include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/bing/BubbleFaceRender.h>
+#include <webAsmPlay/bing/StreetSide.h>
+#include <webAsmPlay/GUI/GUI.h>
 
-out VS_OUT
+using namespace std;
+
+namespace
 {
-	vec3 E;
-} vs_out;
+	array<FrameBuffer *, 6> a_frameBuffers;
 
-void main(void)
+	const size_t a_bubbleFaceSize = 256 * 4;
+}
+
+void GUI::initBubbleFacePanels()
 {
-	const vec4 vertices[] = vec4[]( vec4(-1.0, -1.0, 0.5, 1.0),
-									vec4( 1.0, -1.0, 0.5, 1.0),
-									vec4(-1.0,  1.0, 0.5, 1.0),
-									vec4( 1.0,  1.0, 0.5, 1.0) );
+	for(size_t i = 0; i < 6; ++i)
+	{
+		a_frameBuffers[i] = new FrameBuffer({a_bubbleFaceSize, a_bubbleFaceSize},
+											{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
+												{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
+													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
+	}
+}
 
-	gl_Position = vertices[gl_VertexID];
-	vs_out.E	= vertices[gl_VertexID].xyz;
+void GUI::bubbleFacePanels()
+{
+	char buf[1024];
+
+	for(size_t i = 0; i < 6; ++i)
+	{
+		sprintf(buf, "Bubble Face: %zi", i);
+
+		bool show = true;
+
+		ImGui::Begin(buf, &show);
+
+			ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::s_closestBubble, i), ImVec2(a_bubbleFaceSize, a_bubbleFaceSize));
+
+		ImGui::End();
+	}
 }

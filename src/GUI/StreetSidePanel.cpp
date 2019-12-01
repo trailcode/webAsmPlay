@@ -44,13 +44,6 @@ using namespace boostGeom;
 
 namespace
 {
-	Bubble		* a_bubble		= nullptr;
-	Renderable	* a_renderable	= nullptr;
-
-	vector<GLuint> a_textIDs(6);
-
-	thread_pool a_tileLoader(1);
-
 	bool a_clickToViewBubble = false;
 }
 
@@ -62,39 +55,12 @@ void GUI::streetSidePanel()
 
 	ImGui::Checkbox("Click to view Bubble", &a_clickToViewBubble);
 
-	if(a_bubble)
+	if(const auto bubble = StreetSide::s_closestBubble)
 	{
-		ImGui::Text(("        ID: " + toStr(a_bubble->m_ID)).c_str());
-		ImGui::Text(("       Pos: " + toStr(a_bubble->m_pos)).c_str());
-		ImGui::Text(("Roll/Pitch: " + toStr(a_bubble->m_rollPitch)).c_str());
-		ImGui::Text(("  Altitude: " + toStr(a_bubble->m_altitude)).c_str());
-
-		static FrameBuffer ** fb = nullptr;
-
-		const size_t bubbleFaceSize = 256 * 4;
-
-		if(!fb)
-		{
-			glfwMakeContextCurrent(getMainWindow()); // TODO Try to make this more clean.
-
-			// TODO Memory leak!
-			fb = new FrameBuffer*[5];
-
-			for(size_t i = 0; i < 5; ++i)
-			{
-				fb[i] = new FrameBuffer({bubbleFaceSize, bubbleFaceSize},
-										{ FB_Component(GL_COLOR_ATTACHMENT0, GL_RGBA32F,
-											{	TexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST),
-												TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
-			}
-		}
-
-		//dmess("==============================================================");
-
-		for(size_t i = 0; i < 5; ++i)
-		{
-			ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(fb[i], a_bubble, i), ImVec2(bubbleFaceSize, bubbleFaceSize));
-		}
+		ImGui::Text(("        ID: " + toStr(bubble->m_ID)).c_str());
+		ImGui::Text(("       Pos: " + toStr(bubble->m_pos)).c_str());
+		ImGui::Text(("Roll/Pitch: " + toStr(bubble->m_rollPitch)).c_str());
+		ImGui::Text(("  Altitude: " + toStr(bubble->m_altitude)).c_str());
 	}
 
 	ImGui::End();
@@ -110,7 +76,7 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 				
 				if(!a_clickToViewBubble || !s_showStreetSidePanel) {  break ;}
 
-				tie(a_bubble, a_renderable) = StreetSide::closestBubble(getClient()->getInverseTrans() * dvec4(posWC, 1));
+				StreetSide::closestBubble(getClient()->getInverseTrans() * dvec4(posWC, 1));
 
 			break;
 
@@ -137,6 +103,6 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 	{
 		if(!s_showStreetSidePanel || a_clickToViewBubble) { return ;}
 
-		tie(a_bubble, a_renderable) = StreetSide::closestBubble(getClient()->getInverseTrans() * dvec4(posWC, 1));
+		StreetSide::closestBubble(getClient()->getInverseTrans() * dvec4(posWC, 1));
 	});
 }

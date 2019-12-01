@@ -47,6 +47,8 @@ public:
 
 	static std::pair<Bubble *, Renderable *> closestBubble(const glm::dvec2 & pos);
 
+	static Bubble * s_closestBubble;
+
 private:
 
 	StreetSide();

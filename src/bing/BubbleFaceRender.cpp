@@ -96,6 +96,8 @@ namespace
 
 GLuint BubbleFaceRender::renderBubbleFace(FrameBuffer * frameBuffer, const Bubble * bubble, const size_t face)
 {
+	if(!bubble) { return 0 ;}
+
 	return renderBubbleFace(frameBuffer, bubble->getQuadKey(), face);
 }
 

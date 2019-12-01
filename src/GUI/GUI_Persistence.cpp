@@ -74,6 +74,8 @@ bool GUI::s_renderSettingsRenderSkyBox           = true;
 bool GUI::s_renderSettingsRenderBingMaps         = true;
 bool GUI::s_renderSettingsRenderModels           = true;
 
+bool GUI::s_showBubbleFacePanel[6] = { true, true, true, true, true, true };
+
 float GUI::s_lineWidthRender = 1.0;
 
 void GUI::loadState()

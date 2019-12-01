@@ -90,6 +90,7 @@ public:
     static void initOpenGL();
 	static void initBingTileSystemPanel(const glm::dmat4 & trans);
 	static void initBingStreetSidePanel(const glm::dmat4 & trans);
+	static void initBubbleFacePanels();
     static void mainLoop(GLFWwindow * window);
     static void refresh();
 
@@ -188,6 +189,7 @@ private:
 	static void modelViewerPanel();
 	static void streetSidePanel();
 	static void bubbleFaceTestPanel();
+	static void bubbleFacePanels();
 
     static void showHelpMarker(const char* desc);
 
@@ -219,6 +221,7 @@ private:
 	static bool s_showModelViewerPanel;
 	static bool s_showStreetSidePanel;
 	static bool s_showBubbleFaceTestPanel;
+	static bool s_showBubbleFacePanel[6];
 
     static GLFWwindow * s_mainWindow;
 
