@@ -83,8 +83,8 @@ void main()
 	normal = mat3(transpose(inverse(model))) * normalIn;
 
 	// Calculate normal in view-space
-	//vs_out.N = mat3(MV) * normalIn;
-	vs_out.N = normalIn;
+	vs_out.N = mat3(modelView) * normalIn;
+	//vs_out.N = normalIn;
 
 	// Calculate light vector
 	vs_out.L = lightPos - position_in_view_space.xyz;

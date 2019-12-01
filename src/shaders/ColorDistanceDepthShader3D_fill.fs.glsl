@@ -127,7 +127,8 @@ void main()
 
 	p.xyz *= vec3(0.5);
 	
-	if(dot(normal, vec3(0,0,1)) > 0.001)
+	//if(dot(normal, vec3(0,0,1)) > 0.001)
+	if(dot(normal, vec3(0,0,-1)) > 0.001)
 	{
 		vec4 texColor = vec4(textureLod(topDownTexture, p.xy, 0).xyz, 0);
 		

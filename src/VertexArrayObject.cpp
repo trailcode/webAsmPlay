@@ -126,7 +126,8 @@ VertexArrayObject * VertexArrayObject::_create(const Tessellations & tessellatio
 
                 verts.push_back(0);
                 verts.push_back(0);
-                verts.push_back(1);
+                //verts.push_back(1);
+				verts.push_back(-1);
             }
 
             if(USE_SYMBOLOGY_ID) { verts.push_back(symbologyID_value) ;}

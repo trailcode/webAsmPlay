@@ -75,7 +75,8 @@ void Camera::reset()
 
     m_eye.x = 0.f;
     m_eye.y = 0.f;
-    m_eye.z = 1.f;
+    //m_eye.z = 1.f;
+	m_eye.z = -1.f;
     m_center.x = 0.f;
     m_center.y = 0.f;
     m_center.z = 0.f;

@@ -58,7 +58,8 @@ out vec4 posViewSpace;
 noperspective out vec4 fragCoord2D;
 
 // Position of light
-uniform vec3 light_pos = vec3(100.0, 100.0, 100.0);
+//uniform vec3 light_pos = vec3(100.0, 100.0, 100.0);
+uniform vec3 light_pos = vec3(100.0, 100.0, -100.0);
 
 void main(void)
 {
