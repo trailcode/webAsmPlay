@@ -30,6 +30,7 @@
 #include <future>
 #include <mutex>
 #include <boost/lockfree/queue.hpp>
+#include <boost/lockfree/stack.hpp>
 
 
 #ifndef _ctplThreadPoolLength_
@@ -45,6 +46,8 @@
 
 namespace ctpl {
 
+    //template<typename Container = boost::lockfree::queue<std::function<void(int id)> *>>
+    template<typename Container = boost::lockfree::stack<std::function<void(int id)> *>>
     class thread_pool {
 
     public:
@@ -225,7 +228,8 @@ namespace ctpl {
 
         std::vector<std::unique_ptr<std::thread>> threads;
         std::vector<std::shared_ptr<std::atomic<bool>>> flags;
-        mutable boost::lockfree::queue<std::function<void(int id)> *> q;
+        //mutable boost::lockfree::queue<std::function<void(int id)> *> q;
+        mutable Container q;
         std::atomic<bool> isDone;
         std::atomic<bool> isStop;
         std::atomic<int> nWaiting;  // how many threads are waiting

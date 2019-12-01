@@ -35,6 +35,8 @@ public:
 
 	static GLuint requestBubbleTile(const std::string & bubbleQuadKey, const size_t face, const std::string & tileID);
 
+	static size_t getNumLoading();
+
 private:
 
 	BubbleTile() {}

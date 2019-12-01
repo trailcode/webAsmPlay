@@ -38,7 +38,7 @@ namespace
     Textures * a_instance = nullptr;
 } 
 
-thread_pool Textures::s_queue(1);
+thread_pool<boost::lockfree::queue<std::function<void(int id)> *>> Textures::s_queue(1);
 
 Textures * Textures::getInstance()
 {

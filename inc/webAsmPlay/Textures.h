@@ -49,7 +49,7 @@ public:
 
     static GLuint set1D(const GLuint texture, const glm::vec4 * values, const size_t num);
 
-	static ctpl::thread_pool s_queue;
+	static ctpl::thread_pool<boost::lockfree::queue<std::function<void(int id)> *>> s_queue;
 
 private:
 

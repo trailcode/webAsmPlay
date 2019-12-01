@@ -24,6 +24,7 @@
   \copyright 2019
 */
 
+#include <atomic>
 #include <unordered_set>
 #include <filesystem>
 #include <tbb/concurrent_unordered_map.h>
@@ -46,6 +47,8 @@ namespace
 	concurrent_unordered_map<string, size_t> a_bubbleTiles; // TODO also in Bubble!
 
 	thread_pool a_loaderQueue(1);
+
+	std::atomic<int> a_numLoading = {0};
 }
 
 GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t face, const string & tileID)
@@ -64,13 +67,20 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 
 	const string tileCachePath = "./bubbles/face_" + faceQuadKey;
 
+	++a_numLoading;
+
 	a_loaderQueue.push([tileCachePath, faceQuadKey](int id)
 	{
 		//OpenGL::ensureSharedContext();
 
 		if(fileExists(tileCachePath))
 		{
-			if(!file_size(tileCachePath.c_str())) { return ;}
+			if(!file_size(tileCachePath.c_str()))
+			{
+				--a_numLoading;
+
+				return;
+			}
 
 			auto img = IMG_Load(tileCachePath.c_str());
 
@@ -83,6 +93,8 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 			SDL_FreeSurface(img);
 
 			a_bubbleTiles[faceQuadKey] = ret;
+
+			--a_numLoading;
 
 			return;
 		}
@@ -107,6 +119,8 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 			{
 				dmess("No data!");
 
+				--a_numLoading;
+
 				return;
 			}
 
@@ -115,6 +129,8 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 			if(!img)
 			{
 				dmess("Bad data!");
+
+				--a_numLoading;
 
 				return;
 			}
@@ -129,6 +145,8 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 				//return markTileNoData(tile);
 
 				dmess("No data!");
+
+				--a_numLoading;
 
 				return;
 			}
@@ -151,10 +169,17 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 
 				a_bubbleTiles[faceQuadKey] = ret;
 
+				--a_numLoading;
+
 				SDL_FreeSurface(img);
 			});
 		});
 	});
 
 	return 0;
+}
+
+size_t BubbleTile::getNumLoading()
+{
+	return a_numLoading;
 }

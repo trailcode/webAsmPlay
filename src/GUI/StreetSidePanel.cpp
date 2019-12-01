@@ -31,6 +31,7 @@
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/bing/StreetSide.h>
 #include <webAsmPlay/bing/Bubble.h>
+#include <webAsmPlay/bing/BubbleTile.h>
 #include <webAsmPlay/bing/BubbleFaceRender.h>
 #include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
@@ -54,6 +55,8 @@ void GUI::streetSidePanel()
 	ImGui::Begin("Bing StreetSide", &s_showStreetSidePanel);
 
 	ImGui::Checkbox("Click to view Bubble", &a_clickToViewBubble);
+
+	ImGui::Text(("Tiles Loading: " + toStr(BubbleTile::getNumLoading())).c_str());
 
 	if(const auto bubble = StreetSide::s_closestBubble)
 	{
