@@ -52,6 +52,7 @@ public:
 	std::string getQuadKey() const;
 
 	static const std::array<std::string, 6> s_faceKeys;
+	static const std::array<std::string, 6> s_faceNames;
 
 	const size_t		m_ID;
 	const glm::dvec2	m_pos;

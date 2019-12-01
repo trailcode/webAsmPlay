@@ -34,7 +34,8 @@ using namespace std;
 using namespace glm;
 using namespace nlohmann;
 
-const array<string, 6> Bubble::s_faceKeys = { "01","02","03","10","11","12" };
+const array<string, 6> Bubble::s_faceKeys  = { "01",      "02",    "03",   "10",   "11",  "12"		};
+const array<string, 6> Bubble::s_faceNames = { "forward", "right", "back", "left", "top", "bottom"	};
 
 Bubble * Bubble::create(const json & bubble)
 {

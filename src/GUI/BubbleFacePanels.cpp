@@ -27,6 +27,7 @@
 #include <array>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/bing/Bubble.h>
 #include <webAsmPlay/bing/BubbleFaceRender.h>
 #include <webAsmPlay/bing/StreetSide.h>
 #include <webAsmPlay/GUI/GUI.h>
@@ -57,11 +58,11 @@ void GUI::bubbleFacePanels()
 
 	for(size_t i = 0; i < 6; ++i)
 	{
-		sprintf(buf, "Bubble Face: %zi", i);
+		if(!s_showBubbleFacePanel[i]) { continue ;}
 
-		bool show = true;
+		const string title = "Bubble face: " + Bubble::s_faceNames[i];
 
-		ImGui::Begin(buf, &show);
+		ImGui::Begin(title.c_str(), &s_showBubbleFacePanel[i]);
 
 			const ImVec2 pos = ImGui::GetCursorScreenPos();
 

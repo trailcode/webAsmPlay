@@ -63,6 +63,11 @@ void GUI::streetSidePanel()
 		ImGui::Text(("  Altitude: " + toStr(bubble->m_altitude)).c_str());
 	}
 
+	if(ImGui::CollapsingHeader("Face Panels"))
+	{
+		for(size_t i = 0; i < 6; ++i) { ImGui::Checkbox(Bubble::s_faceNames[i].c_str(), &s_showBubbleFacePanel[i]) ;}
+	}
+
 	ImGui::End();
 }
 
