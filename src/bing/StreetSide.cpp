@@ -99,7 +99,10 @@ bool StreetSide::ensureBubbleCollectionTile(const dmat4 & trans, const dvec2 & p
 	}
 	*/
 
-	query(trans, quadKey, tMin, tMax);
+	GUI::queue([trans, quadKey, tMin, tMax](int ID)
+	{
+		query(trans, quadKey, tMin, tMax);
+	});
 
 	return true;
 }
@@ -123,10 +126,7 @@ void StreetSide::query(const dmat4 & trans, const string & quadKey, const dvec2 
 	{
 		dmess("Cache: " << bubbleTileCachePath);
 
-		GUI::queue([trans, bubbleTileCachePath](int ID)
-		{
-			indexBubbles(trans, Bubble::load(bubbleTileCachePath));
-		});
+		indexBubbles(trans, Bubble::load(bubbleTileCachePath));
 
 		return;
 	}

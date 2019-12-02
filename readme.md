@@ -78,6 +78,8 @@ The build system is based on CMake.
 * Create dedicated threadpools for file IO.
 * Search for thread_pool and ensure correct implementation for stack or queue depending on usage
   * Consider priority queue system for bing tiles and street side tiles
+  * Ensure thread pools are shutting down currectly.
+* Create a performance watchdog to break if a frame is taking too long to render.
 
 
 #### Notes

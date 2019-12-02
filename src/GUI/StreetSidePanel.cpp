@@ -75,6 +75,8 @@ void GUI::streetSidePanel()
 		for(size_t i = 0; i < 6; ++i) { ImGui::Checkbox(Bubble::s_faceNames[i].c_str(), &s_showBubbleFacePanel[i]) ;}
 	}
 
+	if(ImGui::Button("Free Tiles")) { BubbleTile::freeAllTiles() ;}
+
 	ImGui::End();
 }
 

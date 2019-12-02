@@ -51,6 +51,8 @@ public:
 
 	static ctpl::thread_pool<boost::lockfree::queue<std::function<void(int id)> *>> s_queue;
 
+	static void deleteTextures(const std::vector<GLuint> & IDs);
+
 private:
 
     Textures();

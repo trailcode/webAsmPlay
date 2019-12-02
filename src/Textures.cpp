@@ -84,6 +84,7 @@ GLuint Textures::load(const SDL_Surface* img)
     int format = GL_RGB;
 	
 	//int internalformat = GL_COMPRESSED_RGB;
+	//int internalformat = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
 	int internalformat = GL_RGB;
 
     if(img->format->BytesPerPixel == 4)
@@ -91,6 +92,7 @@ GLuint Textures::load(const SDL_Surface* img)
 		format = GL_RGBA;
 		
 		//internalformat = GL_COMPRESSED_RGBA;
+		//internalformat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 		internalformat = GL_RGBA;
 	}
 
@@ -115,7 +117,9 @@ GLuint Textures::load(const SDL_Surface* img)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Needed?
+	//glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Needed?
+
+	//glHint(GL_TEXTURE_COMPRESSION_HINT, GL_FASTEST);
 
 	glFlush();
 
@@ -196,3 +200,4 @@ GLuint Textures::set1D(const GLuint texture, const glm::vec4 * values, const siz
     return texture;
 }
 
+void Textures::deleteTextures(const vector<GLuint> & IDs) { glDeleteTextures(IDs.size(), &IDs[0]) ;}

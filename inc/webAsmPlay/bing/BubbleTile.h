@@ -41,6 +41,8 @@ public:
 
 	static size_t getNumTiles();
 
+	static void freeAllTiles();
+
 private:
 
 	BubbleTile() {}

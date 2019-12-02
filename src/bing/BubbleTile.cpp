@@ -44,7 +44,7 @@ using namespace curlUtil;
 
 namespace
 {
-	concurrent_unordered_map<string, size_t> a_bubbleTiles; // TODO also in Bubble!
+	concurrent_unordered_map<string, size_t> a_bubbleTiles;
 
 	thread_pool a_loaderQueue(16);
 
@@ -57,15 +57,11 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 {
 	const auto faceQuadKey = bubbleQuadKey + Bubble::s_faceKeys[face] + tileID;
 
-	static unordered_set<string> checkedBubbleTiles;
-
-	if(checkedBubbleTiles.find(faceQuadKey) != checkedBubbleTiles.end()) { return a_bubbleTiles[faceQuadKey] ;}
-
-	checkedBubbleTiles.insert(faceQuadKey);
-
 	const auto i = a_bubbleTiles.find(faceQuadKey);
 
 	if(i != a_bubbleTiles.end()) { return i->second ;}
+
+	a_bubbleTiles[faceQuadKey] = 0;
 
 	const string tileCachePath = "./bubbles/face_" + faceQuadKey;
 
@@ -193,3 +189,14 @@ size_t BubbleTile::getNumLoading() { return a_numLoading ;}
 size_t BubbleTile::getNumDownloading() { return a_numDownloading ;}
 
 size_t BubbleTile::getNumTiles() { return a_bubbleTiles.size() ;}
+
+void BubbleTile::freeAllTiles()
+{
+	vector<GLuint> IDs;
+
+	for(const auto & [quadKey, ID] : a_bubbleTiles) { IDs.push_back(ID) ;}
+
+	a_bubbleTiles.clear();
+
+	Textures::deleteTextures(IDs);
+}
