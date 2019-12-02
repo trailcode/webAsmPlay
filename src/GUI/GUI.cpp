@@ -71,6 +71,7 @@
 //'      `--'      `.-'      `--'      `--'      `--'      `-.'      `--'      `
 
 using namespace std;
+using namespace ctpl;
 using namespace geos::geom;
 using namespace rsmz;
 using namespace glm;
@@ -98,6 +99,8 @@ bool				   GUI::s_animationRunning		= false;
 float				   GUI::s_currAnimationTime		= 0;
 float				   GUI::s_animationDuration		= 42.0f;
 
+thread_pool<boost::lockfree::queue<function<void(int id)> *>> GUI::s_generalWorkPool(1);
+
 namespace
 {
     bool a_doShowProgressBar = false;
@@ -113,12 +116,6 @@ namespace
     static char a_mode = GUI::NORMAL_MODE;
 
     list<Updatable> a_updatables;
-
-#ifndef __EMSCRIPTEN__
-
-    ctpl::thread_pool a_pool(1);
-
-#endif
 }
 
 void GUI::refresh()
@@ -524,12 +521,15 @@ void GUI::mainLoop(GLFWwindow * window)
 
     const dvec4 pos(s_canvas->getCursorPosWC(), 1.0);
 
-    showCursorPositionOverlay(nullptr, s_client->getInverseTrans() * pos);
-    
-    string attrsStr = s_client->doPicking(a_mode, pos); // TODO move to a_updatables
-	
-	StreetSide::doPicking(a_mode, pos);
+	string attrsStr = "";
 
+	if(s_client)
+	{
+		showCursorPositionOverlay(nullptr, s_client->getInverseTrans() * pos);
+    
+		attrsStr= s_client->doPicking(a_mode, pos); // TODO move to a_updatables
+	}
+	
     for(auto & i : a_updatables) { i() ;}
 
     if(s_showLogPanel) { logPanel.Draw("Log", &s_showLogPanel) ;}
@@ -667,7 +667,7 @@ void GUI::createWorld()
     if(s_renderSettingsRenderSkyBox) { s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor
     else                             { s_canvas->setSkyBox(nullptr)  ;}
 
-    a_pool.push([](int ID) {
+    s_generalWorkPool.push([](int ID) {
         
 		OpenGL::ensureSharedContext();
 

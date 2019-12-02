@@ -30,6 +30,8 @@
 #endif
 
 #include <fstream>
+#include <mutex>
+#include <unordered_set>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <glm/gtx/norm.hpp>
@@ -38,6 +40,8 @@
 #include <webAsmPlay/CurlUtil.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/geom/BoostGeomUtil.h>
+#include <webAsmPlay/renderables/Renderable.h>
+#include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/bing/Bubble.h>
 #include <webAsmPlay/bing/BubbleTile.h>
 #include <webAsmPlay/bing/BubbleFaceRender.h>
@@ -65,36 +69,13 @@ namespace
 	typedef std::tuple<Point, Bubble *, Renderable *> Value;
 
 	bgi::rtree<Value, bgi::quadratic<16>> a_rtree;
+
+	mutex a_rtreeMutex;
+
+	unordered_set<string> a_bubbleCollectionTiles;
 }
 
-StreetSide::StreetSide()
-{
-	ifstream keyFile("bingMapsKey.txt");
-
-	if(!keyFile.is_open())
-	{
-		dmess("Could not open Bing Maps keyt file: bingMapsKey.txt");
-
-		return;
-	}
-
-	if(!getline(keyFile, a_key)) { dmessError("Key file: bingMapsKey.txt is not valid!") ;}
-
-	dmess("Key: " << a_key);
-	
-	keyFile.close();
-}
-
-StreetSide::~StreetSide() {}
-
-StreetSide * StreetSide::getInstance()
-{
-	if(!a_instance) { a_instance = new StreetSide ;}
-
-	return a_instance;
-}
-
-vector<Bubble *> StreetSide::query(const glm::dvec2 & pos, const size_t zoomLevel)
+bool StreetSide::ensureBubbleCollectionTile(const dmat4 & trans, const dvec2 & pos, const size_t zoomLevel)
 {
 	const ivec2 pix	 = latLongToPixel	(pos, zoomLevel);
 	const dvec2 pos2 = pixelToLatLong	(pix, zoomLevel);
@@ -105,97 +86,140 @@ vector<Bubble *> StreetSide::query(const glm::dvec2 & pos, const size_t zoomLeve
 
 	const string quadKey = tileToQuadKey(tile, zoomLevel);
 
+	if(a_bubbleCollectionTiles.find(quadKey) != a_bubbleCollectionTiles.end()) { return true ;}
+
+	a_bubbleCollectionTiles.insert(quadKey);
+
+	/*
+	for(auto bubble : query(quadKey, tMin, tMax))
+	{
+		auto b = buffer({bubble->m_pos.y, bubble->m_pos.x}, 0.00001);
+
+		StreetSide::indexBubble(bubble, Renderable::create(b, trans));
+	}
+	*/
+
+	query(trans, quadKey, tMin, tMax);
+
+	return true;
+}
+
+void StreetSide::query(const dmat4 & trans, const string & quadKey, const dvec2 & tMin, const dvec2 & tMax)
+{
+	/*
+	const ivec2 pix	 = latLongToPixel	(pos, zoomLevel);
+	const dvec2 pos2 = pixelToLatLong	(pix, zoomLevel);
+	const ivec2 tile = pixelToTile		(pix);
+    
+	const dvec2 tMin = tileToLatLong(ivec2(tile.x + 0, tile.y + 1), zoomLevel);
+	const dvec2 tMax = tileToLatLong(ivec2(tile.x + 1, tile.y + 0), zoomLevel);
+
+	const string quadKey = tileToQuadKey(tile, zoomLevel);
+	*/
+
 	const string bubbleTileCachePath = "./bubbles/tile_" + quadKey;
 
 	if(fileExists(bubbleTileCachePath))
 	{
-		dmess("Cached: " << bubbleTileCachePath);
+		dmess("Cache: " << bubbleTileCachePath);
 
-		return Bubble::load(bubbleTileCachePath);
+		GUI::queue([trans, bubbleTileCachePath](int ID)
+		{
+			indexBubbles(trans, Bubble::load(bubbleTileCachePath));
+		});
+
+		return;
 	}
 
 	char url[2048];
 	
 	sprintf(url, "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?c=2000&e=%f&n=%f&s=%f&w=%f", tMax.y, tMax.x, tMin.x, tMin.y);
 
-	unique_ptr<BufferStruct> buf(download(url).get());
+	dmess("Download " << bubbleTileCachePath);
 
-	struct Membuf : streambuf
+	download(url, [trans, bubbleTileCachePath](BufferStruct * _buf)
 	{
-		Membuf(char* begin, char* end) { setg(begin, begin, end) ;}
-	};
+		//unique_ptr<BufferStruct> buf(download(url).get());
 
-	Membuf sbuf(buf->m_buffer, buf->m_buffer + buf->m_size);
+		unique_ptr<BufferStruct> buf(_buf);
 
-	istream in(&sbuf);
+		struct Membuf : streambuf
+		{
+			Membuf(char* begin, char* end) { setg(begin, begin, end) ;}
+		};
 
-	json j;
+		Membuf sbuf(buf->m_buffer, buf->m_buffer + buf->m_size);
 
-	j << in;
+		istream in(&sbuf);
 
-	//dmess("j " << j.dump(4));
+		json j;
 
-	vector<Bubble *> bubbles;
+		j << in;
 
-	for(const auto & bubble : j)
+		//dmess("j " << j.dump(4));
+
+		vector<Bubble *> bubbles;
+
+		for(const auto & bubble : j)
+		{
+			//dmess(bubble.dump(4));
+
+			//continue;
+
+			auto _bubble = Bubble::create(bubble);
+
+			if(!_bubble) { continue ;}
+
+			bubbles.push_back(_bubble);
+
+			//dmess(*_bubble);
+
+			/*
+			try
+			{
+				const auto id	= bubble["id"]; 
+				const auto lat	= bubble["la"]; // Latitude of the Streetside image
+				const auto lon	= bubble["lo"]; // Longitude of the Streetside image
+				const auto roll = bubble["ro"]; // Roll
+				const auto pitch = bubble["pi"]; // Pitch
+				//const auto blurring = bubble["bl"]; // Blurring instructions
+				const string blurring = "";
+				const auto altitude = bubble["al"]; // The bubble altitude, in meters above the WGS84 ellipsoid
+
+				dmess("id " << id << " lat " << lat << " lon " << lon << " roll " << roll << " pitch " << pitch << " altitude " << altitude << " blurring " << blurring);
+			}
+			catch (const std::exception&)
+			{
+
+			}
+			*/
+		}
+
+		GUI::queue([trans, bubbleTileCachePath, bubbles](int ID)
+		{
+			indexBubbles(trans, bubbles);
+
+			Bubble::save(bubbleTileCachePath, bubbles);
+		});
+	});
+}
+
+void StreetSide::indexBubbles(const dmat4 & trans, const vector<Bubble *> & bubbles)
+{
+	vector<Renderable *> renderables(bubbles.size());
+
+	for(size_t i = 0; i < bubbles.size(); ++i)
 	{
-		//dmess(bubble.dump(4));
+		auto b = buffer({ bubbles[i]->m_pos.y, bubbles[i]->m_pos.x }, 0.00001);
 
-		//continue;
-
-		auto _bubble = Bubble::create(bubble);
-
-		if(!_bubble) { continue ;}
-
-		bubbles.push_back(_bubble);
-
-		//dmess(*_bubble);
-
-		/*
-		try
-		{
-			const auto id	= bubble["id"]; 
-			const auto lat	= bubble["la"]; // Latitude of the Streetside image
-			const auto lon	= bubble["lo"]; // Longitude of the Streetside image
-			const auto roll = bubble["ro"]; // Roll
-			const auto pitch = bubble["pi"]; // Pitch
-			//const auto blurring = bubble["bl"]; // Blurring instructions
-			const string blurring = "";
-			const auto altitude = bubble["al"]; // The bubble altitude, in meters above the WGS84 ellipsoid
-
-			dmess("id " << id << " lat " << lat << " lon " << lon << " roll " << roll << " pitch " << pitch << " altitude " << altitude << " blurring " << blurring);
-		}
-		catch (const std::exception&)
-		{
-
-		}
-		*/
+		renderables[i] = Renderable::create(b, trans);
 	}
 
-	dmess("Num bubbles: " << bubbles.size());
+	lock_guard<mutex> _(a_rtreeMutex);
 
-	Bubble::save(bubbleTileCachePath, bubbles);
-
-	return bubbles;
-}
-
-void StreetSide::doPicking(const char mode, const dvec4 & pos)
-{
-	
-}
-
-void StreetSide::indexBubble(Bubble * bubble, Renderable * renderiable)
-{
-	const Point pos = {bubble->m_pos.y, bubble->m_pos.x};
-
-	a_rtree.insert({pos, bubble, renderiable});
-}
-
-void StreetSide::indexBubbles(const vector<pair<Bubble *, Renderable *>> & bubbles)
-{
-	for(auto [bubble, renderable] : bubbles)
+	for(size_t i = 0; i < bubbles.size(); ++i)
 	{
-		
+		a_rtree.insert({{ bubbles[i]->m_pos.y, bubbles[i]->m_pos.x}, bubbles[i], renderables[i]});
 	}
 }
 
@@ -205,7 +229,11 @@ void StreetSide::queryClosestBubbles(const dvec2 & pos, const size_t num)
 
 	vector<Value> result;
 
-    a_rtree.query(bgi::nearest(Point(pos.x, pos.y), num), std::back_inserter(result));
+	{
+		lock_guard<mutex> _(a_rtreeMutex);
+
+		a_rtree.query(bgi::nearest(Point(pos.x, pos.y), num), std::back_inserter(result));
+	}
 
 	if(!result.size()) { return ;}
 

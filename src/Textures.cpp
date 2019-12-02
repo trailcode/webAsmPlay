@@ -83,13 +83,15 @@ GLuint Textures::load(const SDL_Surface* img)
 
     int format = GL_RGB;
 	
-	int internalformat = GL_COMPRESSED_RGB;
+	//int internalformat = GL_COMPRESSED_RGB;
+	int internalformat = GL_RGB;
 
     if(img->format->BytesPerPixel == 4)
 	{
 		format = GL_RGBA;
 		
-		internalformat = GL_COMPRESSED_RGBA;
+		//internalformat = GL_COMPRESSED_RGBA;
+		internalformat = GL_RGBA;
 	}
 
     /* Generate The Texture */

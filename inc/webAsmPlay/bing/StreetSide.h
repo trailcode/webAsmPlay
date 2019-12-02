@@ -26,7 +26,7 @@
 #pragma once
 
 #include <vector>
-#include <glm/vec2.hpp>
+#include <glm/mat4x4.hpp>
 
 class Bubble;
 class Renderable;
@@ -35,15 +35,7 @@ class StreetSide
 {
 public:
 
-	static StreetSide * getInstance();
-
-	static std::vector<Bubble *> query(const glm::dvec2 & pos, const size_t zoomLevel = 16);
-
-	static void doPicking(const char mode, const glm::dvec4 & pos);
-
-	static void indexBubbles(const std::vector<std::pair<Bubble *, Renderable *>> & bubbles);
-
-	static void indexBubble(Bubble * bubble, Renderable * renderiable);
+	static bool ensureBubbleCollectionTile(const glm::dmat4 & trans, const glm::dvec2 & pos, const size_t zoomLevel = 16);
 
 	static void queryClosestBubbles(const glm::dvec2 & pos, const size_t num);
 
@@ -57,6 +49,10 @@ public:
 
 private:
 
-	StreetSide();
-	~StreetSide();
+	static void query(const glm::dmat4 & trans, const std::string & quadKey, const glm::dvec2 & tMin, const glm::dvec2 & tMax);
+
+	static void indexBubbles(const glm::dmat4 & trans, const std::vector<Bubble *> & bubbles);
+
+	StreetSide() {}
+	~StreetSide() {}
 };

@@ -28,6 +28,7 @@
 #include <future>
 #include <chrono>
 #include <thread>
+#include <ctpl/ctpl.h>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/Types.h>
@@ -153,6 +154,12 @@ public:
 		return pck->get_future();
 	}
 
+	template<typename F, typename... Rest>
+	static auto queue(F && f, Rest&&... rest) ->std::future<decltype(f(0, rest...))>
+	{
+		return s_generalWorkPool.push(f, rest...);
+	}
+
 	static void doQueue();
 
 	static bool s_animationRunning;
@@ -241,4 +248,6 @@ private:
     static bool s_shuttingDown;
 
 	static EventQueue s_eventQueue;
+
+	static ctpl::thread_pool<boost::lockfree::queue<std::function<void(int id)> *>> s_generalWorkPool;
 };

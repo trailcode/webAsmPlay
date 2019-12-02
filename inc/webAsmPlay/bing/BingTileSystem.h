@@ -55,4 +55,6 @@ namespace bingTileSystem
     std::string tileToQuadKey(const glm::ivec2 & tile, const size_t levelOfDetail);
 
     std::pair<size_t, glm::ivec2> quadKeyToTile(const std::string & quadKey);
+
+	std::string positionToQuadKey(const glm::dvec2 & pos, const size_t zoomLevel);
 }

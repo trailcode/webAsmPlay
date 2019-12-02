@@ -94,6 +94,11 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 
 			case PICK_BING_TILE:
 
+				StreetSide::ensureBubbleCollectionTile(getClient()->getTrans(), getClient()->getInverseTrans() * dvec4(posWC, 1));
+
+				const auto trans = getClient()->getTrans();
+
+				/*
 				for(auto bubble : StreetSide::query(getClient()->getInverseTrans() * dvec4(posWC, 1)))
 				{
 					const auto trans = getClient()->getTrans();
@@ -106,6 +111,7 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 
 					StreetSide::indexBubble(bubble, r);
 				}
+				*/
 
 				break;
 		}
@@ -114,6 +120,8 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
 	{
 		if(!s_showStreetSidePanel || a_clickToViewBubble) { return ;}
+
+		StreetSide::ensureBubbleCollectionTile(getClient()->getTrans(), getClient()->getInverseTrans() * dvec4(posWC, 1));
 
 		StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * dvec4(posWC, 1), 10);
 

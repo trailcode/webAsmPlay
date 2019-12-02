@@ -74,6 +74,11 @@ The build system is based on CMake.
 * Light pos for PhongShader, PhongShaderInstanced, ColorDistanceDepthShader3D and ColorDistanceShader is inconsistent. 
 * Unify textures. Bing map tiles and bubble tiles. Create mechanism to prune tile textures from GPU.
 * Models need to work with SSAO pipeline.
+* Add ctpl thread pool to CMakeLists.txt so it is editable.
+* Create dedicated threadpools for file IO.
+* Search for thread_pool and ensure correct implementation for stack or queue depending on usage
+  * Consider priority queue system for bing tiles and street side tiles
+
 
 #### Notes
 

@@ -18,6 +18,7 @@
  // 2. Altered source versions must be plainly marked as such, and must not be
  //    misrepresented as being the original software.
  // 3. This notice may not be removed or altered from any source distribution.
+ // Modified From: https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
 
   \author Matthew Tang
   \email trailcode@gmail.com
@@ -34,8 +35,6 @@
 
 using namespace std;
 using namespace glm;
-
-// From: https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
 
 namespace
 {
@@ -142,21 +141,30 @@ pair<size_t, ivec2> bingTileSystem::quadKeyToTile(const string & quadKey)
 
         switch (quadKey[levelOfDetail - i])  
         {  
-        case '0':  break;  
-        case '1':  tile.x |= mask; break;  
-        case '2':  tile.y |= mask; break;  
+			case '0':  break;  
+			case '1':  tile.x |= mask; break;  
+			case '2':  tile.y |= mask; break;  
 
-        case '3':  
-            tile.x |= mask;  
-            tile.y |= mask;  
-            break;  
+			case '3':  
+				tile.x |= mask;  
+				tile.y |= mask;  
+				break;  
 
-        default:  
-            //throw new ArgumentException("Invalid QuadKey digit sequence.");  
-            dmess("Error!");
-            abort();
+			default: dmessError("Error!");
         }  
     }
 
     return make_pair(levelOfDetail, tile);
+}
+
+string bingTileSystem::positionToQuadKey(const dvec2 & pos, const size_t zoomLevel)
+{
+	const ivec2 pix	 = latLongToPixel	(pos, zoomLevel);
+	const dvec2 pos2 = pixelToLatLong	(pix, zoomLevel);
+	const ivec2 tile = pixelToTile		(pix);
+    
+	const dvec2 tMin = tileToLatLong(ivec2(tile.x + 0, tile.y + 1), zoomLevel);
+	const dvec2 tMax = tileToLatLong(ivec2(tile.x + 1, tile.y + 0), zoomLevel);
+
+	return tileToQuadKey(tile, zoomLevel);
 }
