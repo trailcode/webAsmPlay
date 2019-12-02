@@ -46,7 +46,7 @@ namespace
 {
 	concurrent_unordered_map<string, size_t> a_bubbleTiles; // TODO also in Bubble!
 
-	thread_pool a_loaderQueue(1);
+	thread_pool a_loaderQueue(16);
 
 	std::atomic<int> a_numLoading = {0};
 }
@@ -86,15 +86,16 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 
 			if (!img) { goto doDownload ;}
 
-			OpenGL::ensureSharedContext();
+			Textures::s_queue.push([img, faceQuadKey](int ID)
+			{
+				const auto ret = Textures::load(img);
 
-			const auto ret = Textures::load(img);
+				SDL_FreeSurface(img);
 
-			SDL_FreeSurface(img);
+				a_bubbleTiles[faceQuadKey] = ret;
 
-			a_bubbleTiles[faceQuadKey] = ret;
-
-			--a_numLoading;
+				--a_numLoading;
+			});
 
 			return;
 		}
@@ -111,8 +112,6 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 
 		download(url, [faceQuadKey, tileCachePath](BufferStruct * buf)
 		{
-			// TODO code dup here.
-			//auto tileBuffer = shared_ptr<BufferStruct>(download(url));
 			auto tileBuffer = shared_ptr<BufferStruct>(buf);
 
 			if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)

@@ -45,9 +45,13 @@ public:
 
 	static void indexBubble(Bubble * bubble, Renderable * renderiable);
 
-	static std::pair<Bubble *, Renderable *> closestBubble(const glm::dvec2 & pos);
+	static void queryClosestBubbles(const glm::dvec2 & pos, const size_t num);
 
-	static Bubble * s_closestBubble;
+	static std::vector<std::pair<Bubble *, Renderable *>> s_closestBubbles;
+	
+	static Bubble * closestBubble();
+
+	static void preFetchBubbleTiles();
 
 private:
 

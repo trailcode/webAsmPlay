@@ -32,11 +32,15 @@
 #include <fstream>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/index/rtree.hpp>
+#include <glm/gtx/norm.hpp>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/CurlUtil.h>
 #include <webAsmPlay/Util.h>
+#include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/bing/Bubble.h>
+#include <webAsmPlay/bing/BubbleTile.h>
+#include <webAsmPlay/bing/BubbleFaceRender.h>
 #include <webAsmPlay/bing/BingTileSystem.h>
 #include <webAsmPlay/bing/StreetSide.h>
 
@@ -50,7 +54,7 @@ using namespace bingTileSystem;
 namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;
 
-Bubble * StreetSide::s_closestBubble = nullptr;
+vector<pair<Bubble *, Renderable *>> StreetSide::s_closestBubbles;
 
 namespace
 {
@@ -195,13 +199,52 @@ void StreetSide::indexBubbles(const vector<pair<Bubble *, Renderable *>> & bubbl
 	}
 }
 
-pair<Bubble *, Renderable *> StreetSide::closestBubble(const dvec2 & pos)
+void StreetSide::queryClosestBubbles(const dvec2 & pos, const size_t num)
 {
+	s_closestBubbles.clear();
+
 	vector<Value> result;
 
-    a_rtree.query(bgi::nearest(Point(pos.x, pos.y), 1), std::back_inserter(result));
+    a_rtree.query(bgi::nearest(Point(pos.x, pos.y), num), std::back_inserter(result));
 
-	if(!result.size()) { return make_pair(nullptr, nullptr) ;}
+	if(!result.size()) { return ;}
 
-	return make_pair(s_closestBubble = get<1>(result[0]), get<2>(result[0]));
+	vector<pair<Value, double> > distValues(result.size());
+
+	for(size_t i = 0; i < result.size(); ++i)
+	{
+		distValues[i] = { result[i], glm::distance2(__(get<0>(result[i])), pos) };
+	}
+
+	sort(distValues.begin(), distValues.end(), [](const auto & A, const auto & B) { return get<1>(A) > get<1>(B) ;});
+
+	s_closestBubbles.resize(result.size());
+
+	for(size_t i = 0; i < result.size(); ++i)
+	{
+		s_closestBubbles[i] = { get<1>(get<0>(distValues[i])), get<2>(get<0>(distValues[i])) };
+	}
+
+	preFetchBubbleTiles();
+}
+
+Bubble * StreetSide::closestBubble()
+{
+	if(!s_closestBubbles.size()) { return nullptr ;}
+
+	return get<0>(*s_closestBubbles.rbegin());
+}
+
+void StreetSide::preFetchBubbleTiles()
+{
+	for(const auto [bubble, renderable] : s_closestBubbles)
+	{
+		for(size_t i = 0; i < 6; ++i)
+		{
+			for(const auto & tileID : BubbleFaceRender::getTileIDs())
+			{
+				BubbleTile::requestBubbleTile(bubble->getQuadKey(), i, tileID);
+			}
+		}
+	}
 }

@@ -72,7 +72,7 @@ void GUI::bubbleFacePanels()
 
 			//ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::s_closestBubble, i), ImVec2(a_bubbleFaceSize, a_bubbleFaceSize));
 
-			ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::s_closestBubble, i),
+			ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::closestBubble(), i),
 													pos,
 													ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
 													ImVec2(1, 0),

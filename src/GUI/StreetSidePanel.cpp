@@ -58,7 +58,7 @@ void GUI::streetSidePanel()
 
 	ImGui::Text(("Tiles Loading: " + toStr(BubbleTile::getNumLoading())).c_str());
 
-	if(const auto bubble = StreetSide::s_closestBubble)
+	if(const auto bubble = StreetSide::closestBubble())
 	{
 		ImGui::Text(("        ID: " + toStr(bubble->m_ID)).c_str());
 		ImGui::Text(("       Pos: " + toStr(bubble->m_pos)).c_str());
@@ -84,7 +84,7 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 				
 				if(!a_clickToViewBubble || !s_showStreetSidePanel) {  break ;}
 
-				StreetSide::closestBubble(getClient()->getInverseTrans() * dvec4(posWC, 1));
+				 StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * dvec4(posWC, 1), 10);
 
 			break;
 
@@ -111,6 +111,6 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 	{
 		if(!s_showStreetSidePanel || a_clickToViewBubble) { return ;}
 
-		StreetSide::closestBubble(getClient()->getInverseTrans() * dvec4(posWC, 1));
+		StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * dvec4(posWC, 1), 10);
 	});
 }

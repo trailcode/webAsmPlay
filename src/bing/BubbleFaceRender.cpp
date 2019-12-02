@@ -57,6 +57,8 @@ namespace
 
 	unordered_map<string, Renderable *> a_tileGrid;
 
+	vector<string> a_tileIDs;
+
 	const unordered_map<string, Renderable *> & ensureTileGrid()
 	{
 		if(a_tileGrid.size()) { return a_tileGrid ;}
@@ -88,6 +90,8 @@ namespace
 											setRenderFill	(true)->
 											setRenderOutline(false)->
 											setShader		(TextureShader::getDefaultInstance());
+
+			a_tileIDs.push_back(id);
 		}
 
 		return a_tileGrid;
@@ -144,3 +148,9 @@ GLuint BubbleFaceRender::renderBubbleFace(FrameBuffer * frameBuffer, const strin
 	return frameBuffer->getTextureID();
 }
 
+const vector<string> & BubbleFaceRender::getTileIDs()
+{
+	ensureTileGrid();
+
+	return a_tileIDs;
+}
