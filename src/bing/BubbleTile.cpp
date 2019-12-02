@@ -49,6 +49,8 @@ namespace
 	thread_pool a_loaderQueue(16);
 
 	std::atomic<int> a_numLoading = {0};
+
+	std::atomic<int> a_numDownloading = {0};
 }
 
 GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t face, const string & tileID)
@@ -71,8 +73,6 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 
 	a_loaderQueue.push([tileCachePath, faceQuadKey](int id)
 	{
-		//OpenGL::ensureSharedContext();
-
 		if(fileExists(tileCachePath))
 		{
 			if(!file_size(tileCachePath.c_str()))
@@ -110,6 +110,8 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 
 		const auto url = streetsideImagesApi + faceQuadKey + imgUrlSuffix;
 
+		++a_numDownloading;
+
 		download(url, [faceQuadKey, tileCachePath](BufferStruct * buf)
 		{
 			auto tileBuffer = shared_ptr<BufferStruct>(buf);
@@ -119,6 +121,8 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 				dmess("No data!");
 
 				--a_numLoading;
+
+				--a_numDownloading;
 
 				return;
 			}
@@ -130,6 +134,8 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 				dmess("Bad data!");
 
 				--a_numLoading;
+
+				--a_numDownloading;
 
 				return;
 			}
@@ -147,6 +153,8 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 
 				--a_numLoading;
 
+				--a_numDownloading;
+
 				return;
 			}
 
@@ -161,6 +169,8 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 			}
 			else { dmess("Warn could not write file: " << tileCachePath) ;}
 			///////////////////////////
+
+			--a_numDownloading;
 
 			Textures::s_queue.push([img, faceQuadKey](int ID)
 			{
@@ -178,7 +188,6 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 	return 0;
 }
 
-size_t BubbleTile::getNumLoading()
-{
-	return a_numLoading;
-}
+size_t BubbleTile::getNumLoading() { return a_numLoading ;}
+
+size_t BubbleTile::getNumDownloading() { return a_numDownloading ;}

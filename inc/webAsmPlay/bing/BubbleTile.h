@@ -37,6 +37,8 @@ public:
 
 	static size_t getNumLoading();
 
+	static size_t getNumDownloading();
+
 private:
 
 	BubbleTile() {}

@@ -56,7 +56,8 @@ void GUI::streetSidePanel()
 
 	ImGui::Checkbox("Click to view Bubble", &a_clickToViewBubble);
 
-	ImGui::Text(("Tiles Loading: " + toStr(BubbleTile::getNumLoading())).c_str());
+	ImGui::Text(("    Tiles Loading: " + toStr(BubbleTile::getNumLoading())).c_str());
+	ImGui::Text(("Tiles Downloading: " + toStr(BubbleTile::getNumDownloading())).c_str());
 
 	if(const auto bubble = StreetSide::closestBubble())
 	{
