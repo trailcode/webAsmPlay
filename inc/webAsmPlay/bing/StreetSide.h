@@ -51,6 +51,8 @@ public:
 	
 	static Bubble * closestBubble();
 
+	static Renderable * closestBubbleRenderable();
+
 	static void preFetchBubbleTiles();
 
 private:

@@ -439,6 +439,8 @@ void Canvas::onChar(GLFWwindow * window, const size_t c)
 
 Renderable * Canvas::addRenderable(Renderable * renderiable, const bool ensureVAO)
 {
+	if(!renderiable) { return nullptr ;}
+
 	if (ensureVAO)
 	{
 		GUI::guiSync([renderiable]() { renderiable->ensureVAO(); }, true);
@@ -472,6 +474,22 @@ Renderable * Canvas::addRenderable(list<Renderable *> & container, Renderable * 
     });
 
     return renderiable;
+}
+
+Renderable * Canvas::removeRenderable(Renderable * renderiable)
+{
+	if(!renderiable) { return nullptr ;}
+
+	     if(dynamic_cast<DeferredRenderable			*>(renderiable)) { m_deferredRenderables .remove(renderiable) ;}
+    else if(dynamic_cast<RenderableLineString		*>(renderiable)) { m_lineStrings         .remove(renderiable) ;}
+    else if(dynamic_cast<RenderablePolygon			*>(renderiable)) { m_polygons            .remove(renderiable) ;}
+    else if(dynamic_cast<RenderablePoint			*>(renderiable)) { m_points              .remove(renderiable) ;}
+    else if(dynamic_cast<RenderableMesh				*>(renderiable)) { m_meshes              .remove(renderiable) ;}
+    else if(dynamic_cast<RenderableBingMap			*>(renderiable)) { m_rasters             .remove(renderiable) ;}
+	else if(dynamic_cast<RenderableModelInstanced	*>(renderiable)) { m_models              .remove(renderiable) ;}
+	else if(dynamic_cast<RenderableText				*>(renderiable)) { m_textLabels          .remove(renderiable) ;}
+	
+	else { dmessError("Error! Implement!") ;}
 }
 
 vector<Renderable *> Canvas::getRenderiables() const

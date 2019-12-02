@@ -235,6 +235,13 @@ Bubble * StreetSide::closestBubble()
 	return get<0>(*s_closestBubbles.rbegin());
 }
 
+Renderable * StreetSide::closestBubbleRenderable()
+{
+	if(!s_closestBubbles.size()) { return nullptr ;}
+
+	return get<1>(*s_closestBubbles.rbegin());
+}
+
 void StreetSide::preFetchBubbleTiles()
 {
 	for(const auto [bubble, renderable] : s_closestBubbles)

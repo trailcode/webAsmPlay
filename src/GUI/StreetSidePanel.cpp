@@ -46,6 +46,8 @@ using namespace boostGeom;
 namespace
 {
 	bool a_clickToViewBubble = false;
+
+	Renderable * a_closestBubble = nullptr;
 }
 
 void GUI::streetSidePanel()
@@ -114,5 +116,11 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 		if(!s_showStreetSidePanel || a_clickToViewBubble) { return ;}
 
 		StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * dvec4(posWC, 1), 10);
+
+		getMainCanvas()->removeRenderable(a_closestBubble);
+
+		getMainCanvas()->addRenderable(a_closestBubble = StreetSide::closestBubbleRenderable());
 	});
+
+	
 }

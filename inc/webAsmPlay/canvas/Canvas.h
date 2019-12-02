@@ -82,6 +82,8 @@ public:
 
     Renderable * addRenderable(Renderable * renderiable, const bool ensureVAO = true);
 
+	Renderable * removeRenderable(Renderable * renderiable);
+
     glm::vec4 setClearColor(const glm::vec4 & clearColor);
 
     glm::dmat4 getView()		const;
