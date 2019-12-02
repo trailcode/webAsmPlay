@@ -285,6 +285,8 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
 		// Check if this point is a tree
 		if(attrs->hasStringKeyValue("natural", "tree")) { treePositions.push_back(m_trans * vec4(point->getX(), point->getY(), 0, 1)) ;}
+
+		else { points.push_back(ColoredGeometry(geom->buffer(0.00001, 3), 1)) ;}
 	}
 
     dmess("treePositions " << treePositions.size());
@@ -315,8 +317,6 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
         }
         
         m_quadTreePoints->insert(geom->getEnvelopeInternal(), new tuple{ r, geom, attrs });
-
-        points.push_back(ColoredGeometry(geom->buffer(0.00001, 3), 1));
     }
     
     for (const auto& [type, count] : pointTypes)

@@ -81,18 +81,25 @@ GLuint Textures::load(const SDL_Surface* img)
 
 	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, texture);
 
-    int mode = GL_RGB;
+    int format = GL_RGB;
+	
+	int internalformat = GL_COMPRESSED_RGB;
 
-    if(img->format->BytesPerPixel == 4) { mode = GL_RGBA ;}
+    if(img->format->BytesPerPixel == 4)
+	{
+		format = GL_RGBA;
+		
+		internalformat = GL_COMPRESSED_RGBA;
+	}
 
     /* Generate The Texture */
     glTexImage2D(	GL_TEXTURE_2D,
 					0,
-					mode,
+					internalformat,
 					img->w,
                     img->h,
 					0,
-					mode,
+					format,
                     GL_UNSIGNED_BYTE,
 					img->pixels);
 

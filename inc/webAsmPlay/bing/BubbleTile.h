@@ -39,6 +39,8 @@ public:
 
 	static size_t getNumDownloading();
 
+	static size_t getNumTiles();
+
 private:
 
 	BubbleTile() {}

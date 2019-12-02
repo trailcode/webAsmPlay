@@ -58,6 +58,7 @@ void GUI::streetSidePanel()
 
 	ImGui::Text(("    Tiles Loading: " + toStr(BubbleTile::getNumLoading())).c_str());
 	ImGui::Text(("Tiles Downloading: " + toStr(BubbleTile::getNumDownloading())).c_str());
+	ImGui::Text(("        Num tiles: " + toStr(BubbleTile::getNumTiles())).c_str());
 
 	if(const auto bubble = StreetSide::closestBubble())
 	{
@@ -99,7 +100,7 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 
 					auto r = Renderable::create(b, trans);
 
-					getMainCanvas()->addRenderable(r);
+					//getMainCanvas()->addRenderable(r);
 
 					StreetSide::indexBubble(bubble, r);
 				}

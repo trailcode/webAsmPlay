@@ -100,7 +100,7 @@ void PhongShaderInstanced::bind(	Canvas     * canvas,
 	a_shaderProgram->setUniform(a_viewPos,		canvas->getCamera()->getCenterConstRef());
 
 	// lighting
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f); 
+	glm::vec3 lightPos(1.2f, 1.0f, -2.0f); 
 
 	a_shaderProgram->setUniform(a_lightPosition, lightPos);
 

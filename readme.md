@@ -72,6 +72,8 @@ The build system is based on CMake.
 * Replace curlUtil::BufferStruct with a std::pair
 * Remove the model component from the canvas, simplify the shaders.
 * Light pos for PhongShader, PhongShaderInstanced, ColorDistanceDepthShader3D and ColorDistanceShader is inconsistent. 
+* Unify textures. Bing map tiles and bubble tiles. Create mechanism to prune tile textures from GPU.
+* Models need to work with SSAO pipeline.
 
 #### Notes
 

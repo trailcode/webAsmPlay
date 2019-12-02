@@ -191,3 +191,5 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 size_t BubbleTile::getNumLoading() { return a_numLoading ;}
 
 size_t BubbleTile::getNumDownloading() { return a_numDownloading ;}
+
+size_t BubbleTile::getNumTiles() { return a_bubbleTiles.size() ;}
