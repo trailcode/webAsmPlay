@@ -89,6 +89,15 @@ string toStr(const dvec2 & v)
     return buf;
 }
 
+string toStr(const dvec3& v)
+{
+    char buf[1024];
+
+    sprintf(buf, "[% 2.9f, % 2.9f, % 2.9f]\n", v.x, v.y, v.z);
+
+    return buf;
+}
+
 string toStr(const ivec2 & v)
 {
     char buf[1024];

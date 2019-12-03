@@ -80,11 +80,12 @@ The build system is based on CMake.
   * Consider priority queue system for bing tiles and street side tiles
   * Ensure thread pools are shutting down currectly.
 * Create a performance watchdog to break if a frame is taking too long to render.
+* Look into https://www.bing.com/api/maps/sdk/mapcontrol/isdk/birdseyev2 for projecting onto the sides of buildings. 
 
 
 #### Notes
 
 * https://docs.microsoft.com/en-us/bingmaps/articles/getting-streetside-tiles-from-imagery-metadata
-
+* https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/imagery-metadata
 
 

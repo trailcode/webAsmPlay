@@ -59,8 +59,9 @@ Bubble * Bubble::create(const json & bubble)
 		return new Bubble(			bubble["id"],
 							dvec2(	bubble["lo"],
 									bubble["la"]),
-							dvec2(	bubble["ro"],
-									bubble["pi"]),
+							dvec3(	bubble["ro"],
+									bubble["pi"],
+									bubble["he"]),
 									bubble["al"]);
 	}
 	catch (const std::exception&)
@@ -71,18 +72,18 @@ Bubble * Bubble::create(const json & bubble)
 	}
 }
 
-Bubble::Bubble() :	m_ID		(0),
-					m_pos		(),
-					m_rollPitch	(),
-					m_altitude	(0) {}
+Bubble::Bubble() :	m_ID				(0),
+					m_pos				(),
+					m_rollPitchHeading	(),
+					m_altitude			(0) {}
 
 Bubble::Bubble(	const size_t	  ID,
 				const dvec2		& pos,
-				const dvec2		& rollPitch,
-				const double	  altitude) :	m_ID		(ID),
-												m_pos		(pos),
-												m_rollPitch	(rollPitch),
-												m_altitude	(altitude)
+				const dvec3		& rollPitchHeading,
+				const double	  altitude) :	m_ID				(ID),
+												m_pos				(pos),
+												m_rollPitchHeading	(rollPitchHeading),
+												m_altitude			(altitude)
 {
 }
 

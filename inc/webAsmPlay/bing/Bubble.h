@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <array>
 #include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 #include <nlohmann/json.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 
@@ -42,7 +43,7 @@ public:
 
 	Bubble(	const size_t		  ID,
 			const glm::dvec2	& pos,
-			const glm::dvec2	& rollPitch,
+			const glm::dvec3	& rollPitchHeading,
 			const double		  altitude);
 
 	static void save(const std::string & fileName, const std::vector<Bubble *> & bubbles);
@@ -56,7 +57,7 @@ public:
 
 	const size_t		m_ID;
 	const glm::dvec2	m_pos;
-	const glm::dvec2	m_rollPitch;
+	const glm::dvec3	m_rollPitchHeading;
 	const double		m_altitude;
 
 private:

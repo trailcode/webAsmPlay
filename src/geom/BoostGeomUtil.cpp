@@ -154,3 +154,5 @@ void boostGeom::subdevideBox(const Box & b, const size_t dimX, const size_t dimY
 {
 
 }
+
+Point boostGeom::toPoint(const dvec2& P) { return Point(P.x, P.y) ;}

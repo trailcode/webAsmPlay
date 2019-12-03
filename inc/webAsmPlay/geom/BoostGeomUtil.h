@@ -54,6 +54,8 @@ namespace boostGeom
 
 	Polygon toPolygon(const boostGeom::Box & b);
 
+	Point toPoint(const glm::dvec2& P);
+	
 	template<typename GeomType>
 	Point getCentroid(const GeomType & g)
 	{

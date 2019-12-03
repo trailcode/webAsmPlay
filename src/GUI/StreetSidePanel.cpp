@@ -64,10 +64,10 @@ void GUI::streetSidePanel()
 
 	if(const auto bubble = StreetSide::closestBubble())
 	{
-		ImGui::Text(("        ID: " + toStr(bubble->m_ID)).c_str());
-		ImGui::Text(("       Pos: " + toStr(bubble->m_pos)).c_str());
-		ImGui::Text(("Roll/Pitch: " + toStr(bubble->m_rollPitch)).c_str());
-		ImGui::Text(("  Altitude: " + toStr(bubble->m_altitude)).c_str());
+		ImGui::Text(("                ID: " + toStr(bubble->m_ID)).c_str());
+		ImGui::Text(("               Pos: " + toStr(bubble->m_pos)).c_str());
+		ImGui::Text(("Roll/Pitch/Heading: " + toStr(bubble->m_rollPitchHeading)).c_str());
+		ImGui::Text(("          Altitude: " + toStr(bubble->m_altitude)).c_str());
 	}
 
 	if(ImGui::CollapsingHeader("Face Panels"))
@@ -90,7 +90,15 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 				
 				if(!a_clickToViewBubble || !s_showStreetSidePanel) {  break ;}
 
-				 StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * dvec4(posWC, 1), 10);
+				 //StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * dvec4(posWC, 1), 10);
+
+				StreetSide::ensureBubbleCollectionTile(getClient()->getTrans(), getClient()->getInverseTrans() * dvec4(posWC, 1));
+
+				StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * dvec4(posWC, 1), 10);
+
+				getMainCanvas()->removeRenderable(a_closestBubble);
+
+				getMainCanvas()->addRenderable(a_closestBubble = StreetSide::closestBubbleRenderable());
 
 			break;
 

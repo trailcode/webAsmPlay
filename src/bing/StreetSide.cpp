@@ -35,6 +35,7 @@
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <glm/gtx/norm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/CurlUtil.h>
@@ -210,9 +211,29 @@ void StreetSide::indexBubbles(const dmat4 & trans, const vector<Bubble *> & bubb
 
 	for(size_t i = 0; i < bubbles.size(); ++i)
 	{
-		auto b = buffer({ bubbles[i]->m_pos.y, bubbles[i]->m_pos.x }, 0.00001);
+		const double radius = 0.00001;
 
-		renderables[i] = Renderable::create(b, trans);
+		const auto circle = buffer({ bubbles[i]->m_pos.y, bubbles[i]->m_pos.x }, radius);
+
+		dvec4 A( radius,	0,				0, 1);
+		dvec4 B(-radius,	0,				0, 1);
+		dvec4 C( 0,			radius * 2.0,	0, 1);
+
+		const auto trans2 = glm::translate(glm::dmat4(1.0), glm::dvec3(bubbles[i]->m_pos.y, bubbles[i]->m_pos.x, 0));
+		
+		const auto rot = glm::rotate(trans2, radians(bubbles[i]->m_rollPitchHeading.z - 90.0), glm::dvec3(0, 0, 1));
+
+		A = rot * A;
+		B = rot * B;
+		C = rot * C;
+
+		boostGeom::Polygon poly{ { toPoint(A), toPoint(B), toPoint(C), toPoint(A) }, {}};
+
+		boostGeom::MultiPolygon result;
+
+		boost::geometry::union_(poly, circle, result);
+
+		renderables[i] = Renderable::create(result, trans);
 	}
 
 	lock_guard<mutex> _(a_rtreeMutex);
