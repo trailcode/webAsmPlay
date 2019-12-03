@@ -50,6 +50,9 @@ namespace
 	Renderable * a_closestBubble = nullptr;
 }
 
+#include <webAsmPlay/canvas/Camera.h>
+#include <glm/gtc/matrix_transform.hpp>
+
 void GUI::streetSidePanel()
 {
 	if(!s_showStreetSidePanel) { return ;}
@@ -76,6 +79,43 @@ void GUI::streetSidePanel()
 	}
 
 	if(ImGui::Button("Free Tiles")) { BubbleTile::freeAllTiles() ;}
+
+	const auto bubble = StreetSide::closestBubble();
+
+	if (getClient() && bubble && ImGui::Button("Camera to Bubble Front"))
+	{
+		const auto pos = getClient()->getTrans() * dvec4(bubble->m_pos.y, bubble->m_pos.x, -0.00001, 1);
+
+		const auto rot = glm::rotate(glm::dmat4(1.0), radians(bubble->m_rollPitchHeading.z), glm::dvec3(0, 0, 1));
+
+		auto forward = rot * dvec4(-0.0001, 0, 0, 0);
+		
+		getMainCamera()->setCenter(pos);
+		getMainCamera()->setUp({ 0, 0, -1 });
+		getMainCamera()->setEye(pos + forward);
+
+		getMainCamera()->update();
+	}
+
+	if (getClient() && bubble && ImGui::Button("Camera to Bubble Back"))
+	{
+
+	}
+
+	if (getClient() && bubble && ImGui::Button("Camera to Bubble Right"))
+	{
+
+	}
+
+	if (getClient() && bubble && ImGui::Button("Camera to Bubble Left"))
+	{
+
+	}
+
+	if (getClient() && bubble && ImGui::Button("Camera to Bubble Top"))
+	{
+
+	}
 
 	ImGui::End();
 }
