@@ -47,10 +47,18 @@ public:
 	static size_t pruneTiles();
 
 	static size_t getNumTiles();
+	static size_t getNumLoading();
+	static size_t getNumDownloading();
+	static size_t getNumUploading();
+	static size_t getNumWriting();
 
 	static GLuint s_NO_DATA;
 
 	static std::atomic_size_t s_desiredMaxNumTiles;
+
+	static bool s_useCache;
+
+	static bool s_useBindlessTextures;
 
 	std::atomic<GLuint> m_textureID = { 0 };
 

@@ -80,22 +80,8 @@ void GUI::bingTileSystemPanel()
     ImGui::Text(("            pix: " + toStr(pix)).c_str());
     ImGui::Text(("           tile: " + toStr(tile)).c_str());
     ImGui::Text(("        quadKey: " + a_quadKey).c_str());
-	ImGui::Text(("      num tiles: " + to_string(RasterTile::getNumTiles())).c_str());
-	ImGui::Text(("    num loading: " + to_string(RenderableBingMap::s_numLoading)).c_str());
-	ImGui::Text(("num downloading: " + to_string(RenderableBingMap::s_numDownloading)).c_str());
-	ImGui::Text(("  num uploading: " + to_string(RenderableBingMap::s_numUploading)).c_str());
-	ImGui::Text(("    num writing: " + to_string(RenderableBingMap::s_numWriting)).c_str());
-	ImGui::Text(("   num rendered: " + to_string(RenderableBingMap::s_numRendered)).c_str());
+	ImGui::Text((" Tiles rendered: " + to_string(RenderableBingMap::s_numRendered)).c_str());
 
-	int maxDesiredNumTiles = (int)RasterTile::s_desiredMaxNumTiles;
-
-	if (ImGui::SliderInt("Max Tile Cache Size", &maxDesiredNumTiles, 150, 6000))
-	{
-		dmess("maxDesiredNumTiles " << maxDesiredNumTiles);
-
-		RasterTile::s_desiredMaxNumTiles = (size_t)maxDesiredNumTiles; 
-	}
-	
 	ImGui::SliderFloat("###ResDelta", &resDelta, 0.125f, 5);
 	
 	const vec3 P1 = vec3(a_tMin.x, a_tMax.y, 0);

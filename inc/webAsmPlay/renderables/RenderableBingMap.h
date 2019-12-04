@@ -53,10 +53,6 @@ public:
 
 	static FrameBuffer* getFrameBuffer();
 
-	static bool s_useCache;
-
-	static bool s_useBindlessTextures;
-
 private:
 
     RenderableBingMap(const AABB2D & bounds, const glm::dmat4 & trans);

@@ -24,7 +24,11 @@
   \copyright 2019
 */
 
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/Texture.h>
 #include <webAsmPlay/GUI/GUI.h>
+
+using namespace std;
 
 void GUI::textureSystemPanel()
 {
@@ -32,7 +36,21 @@ void GUI::textureSystemPanel()
 
 	ImGui::Begin("Texture System", &s_showTextureSystemPanel);
 	{
-		
+		ImGui::Text(("      num tiles: " + to_string(Texture::getNumTiles())).c_str());
+		ImGui::Text(("    num loading: " + to_string(Texture::getNumLoading())).c_str());
+		ImGui::Text(("num downloading: " + to_string(Texture::getNumDownloading())).c_str());
+		ImGui::Text(("  num uploading: " + to_string(Texture::getNumUploading())).c_str());
+		ImGui::Text(("    num writing: " + to_string(Texture::getNumWriting())).c_str());
+		//ImGui::Text(("   num rendered: " + to_string(Texture::getNumRendered())).c_str());
+
+		int maxDesiredNumTiles = (int)Texture::s_desiredMaxNumTiles;
+
+		if (ImGui::SliderInt("Max Tile Cache Size", &maxDesiredNumTiles, 150, 6000))
+		{
+			dmess("maxDesiredNumTiles " << maxDesiredNumTiles);
+
+			Texture::s_desiredMaxNumTiles = (size_t)maxDesiredNumTiles; 
+		}
 	}
 	ImGui::End();
 }

@@ -71,9 +71,6 @@ size_t RenderableBingMap::s_numRendered = 0;
 
 FrameBuffer * RenderableBingMap::s_textureBuffer = nullptr;
 
-bool RenderableBingMap::s_useCache				= true;
-bool RenderableBingMap::s_useBindlessTextures	= false;
-
 namespace
 {
 #ifndef __EMSCRIPTEN__
@@ -109,184 +106,6 @@ namespace
 	} buffers;
 }
 
-#ifdef WORKING
-
-void RenderableBingMap::fetchTile(Texture * tile)
-{
-	tile->m_stillNeeded = true;
-
-	if(tile->m_loading) { return ;}
-
-	tile->m_loading = true;
-
-	++s_numLoading;
-
-	a_loaderPool.push([tile](int ID) { fetchTile(ID, tile) ;});
-}
-
-void RenderableBingMap::markTileNoData(Texture* tile)
-{
-	tile->m_loading = false;
-
-	tile->m_textureID = RasterTile::s_NO_DATA;
-}
-
-void RenderableBingMap::fetchTile(const int ID, Texture * tile)
-{
-	if (!tile->m_stillNeeded)
-	{
-		tile->m_loading = false;
-
-		--s_numLoading;
-
-		return;
-	}
-
-	/*
-	const string quadKey = tileToQuadKey(latLongToTile(tile->m_center, tile->m_level), tile->m_level);
-	
-	const string tileCachePath = "./tiles/" + quadKey + ".jpg";
-	*/
-
-	const string tileCachePath = "./tiles/" + tile->m_ID + ".jpg";
-
-	if(s_useCache && fileExists(tileCachePath))
-	{
-		--s_numLoading;
-
-		if(!file_size(tileCachePath.c_str())) { return markTileNoData(tile) ;}
-
-		auto img = IMG_Load(tileCachePath.c_str());
-
-		if (!img) { goto download ;}
-
-		++s_numUploading;
-
-		Textures::s_queue.push([tile, img, tileCachePath](int ID)
-		{
-			--s_numUploading;
-
-			if (!tile->m_stillNeeded)
-			{
-				tile->m_loading = false;
-
-				SDL_FreeSurface(img);
-
-				return;
-			}
-
-			OpenGL::ensureSharedContext();
-
-			tile->m_textureID = Textures::load(img);
-
-			SDL_FreeSurface(img);
-
-			if(s_useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
-
-			tile->m_loading = false;
-		});
-
-		return;
-	}
-	
-	download:
-
-	//const auto url = "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A"; 
-
-	//const auto url = tile->getDownloadURL
-
-	download(tile->getDownloadURL(), 
-	//url, 
-		[tile]() -> bool
-		{
-			--s_numLoading;
-
-			if(!tile->m_stillNeeded) { tile->m_loading = false ;}
-
-			return tile->m_stillNeeded;
-		},
-		[tile, tileCachePath
-		//, url
-		](BufferStruct * tileBuffer)
-		{
-			if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
-			{
-				markTileNoData(tile);
-
-				if (!s_useCache) { return ;}
-
-				FILE * fp = fopen(tileCachePath.c_str(), "wb");
-
-				if(fp) { fclose(fp) ;}
-
-				else { dmess("Warn could not write file: " << tileCachePath) ;}
-
-				return;
-			}
-
-			++s_numUploading;
-
-			Textures::s_queue.push([tile, tileBuffer, tileCachePath
-			//, url
-			](int ID)
-			{
-				--s_numUploading;
-
-				if (!tile->m_stillNeeded)
-				{
-					tile->m_loading = false;
-				
-					return;
-				}
-
-				auto img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
-
-				if(!img) { return markTileNoData(tile) ;}
-
-				const auto bytesPerPixel = img->format->BytesPerPixel;
-
-				if(bytesPerPixel < 3)
-				{
-					SDL_FreeSurface(img);
-
-					// Must be the no data png image, mark as no data.
-					return markTileNoData(tile);
-				}
-
-				OpenGL::ensureSharedContext();
-
-				tile->m_textureID = Textures::load(img);
-
-				SDL_FreeSurface(img);
-
-				if(s_useBindlessTextures) { tile->m_handle = glGetTextureHandleARB(tile->m_textureID) ;}
-
-				tile->m_loading = false;
-
-				if (!s_useCache) { return ;}
-
-				++s_numWriting;
-
-				a_writerPool.push([tileCachePath, tileBuffer](int ID)
-				{
-					FILE * fp = fopen(tileCachePath.c_str(), "wb");
-
-					if(fp)
-					{
-						fwrite(tileBuffer->m_buffer, sizeof(char), tileBuffer->m_size, fp);
-
-						fclose(fp);
-					}
-					else { dmess("Warn could not write file: " << tileCachePath) ;}
-
-					--s_numWriting;
-				});
-			});
-		});
-}
-
-#endif
-
 void RenderableBingMap::getStartLevel()
 {
 	for (int i = 0; i <= 24; ++i)
@@ -308,7 +127,7 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 {
 	getStartLevel();
 	
-	if(!s_useBindlessTextures) { return ;}
+	if(!Texture::s_useBindlessTextures) { return ;}
 	
 	glGenBuffers(1,					&buffers.m_textureHandleBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER,  buffers.m_textureHandleBuffer);
@@ -336,10 +155,7 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & min, con
 		return false;
 	}
 
-	if(tile->m_textureID == RasterTile::s_NO_DATA)
-	{
-		return false;
-	}
+	if(tile->m_textureID == RasterTile::s_NO_DATA) { return false ;}
 
 	const ivec2 iTile = latLongToTile(center, level);
 
@@ -590,8 +406,6 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 			if (!textureID)
 			{
-				//fetchTile(currTile);
-
 				currTile->readyTexture();
 
 				continue;
@@ -629,8 +443,8 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 				tile->m_renderable->ensureVAO();
 
-				if(s_useBindlessTextures)	{ tile->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
-				else						{ tile->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
+				if(Texture::s_useBindlessTextures)	{ tile->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
+				else								{ tile->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
 
 				tile->m_renderable->setRenderOutline (false);
 				tile->m_renderable->setRenderFill    (true);
@@ -638,14 +452,10 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 			toRender.push_back(tile);
 		}
-		else if(tile->m_textureID != RasterTile::s_NO_DATA)
-		{
-			//fetchTile(tile);
-			tile->readyTexture();
-		}
+		else if(tile->m_textureID != RasterTile::s_NO_DATA) { tile->readyTexture() ;}
 	}
 
-	if(s_useBindlessTextures) { renderBindlessTextures(canvas, toRender, renderStage) ;}
+	if(Texture::s_useBindlessTextures) { renderBindlessTextures(canvas, toRender, renderStage) ;}
 	else
 	{
         for(auto tile : toRender)

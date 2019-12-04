@@ -46,21 +46,26 @@ atomic_size_t Texture::s_desiredMaxNumTiles = { 4000 };
 
 GLuint Texture::s_NO_DATA = numeric_limits<GLuint>::max();
 
-unordered_map<string, Texture *> Texture::s_textures;
+unordered_map<string, Texture *> Texture::s_textures; // TODO Use an array! No newsing and deleting all the time.
+
+bool Texture::s_useCache			= true;
+bool Texture::s_useBindlessTextures	= true;
 
 namespace
 {
 	vector<GLuint> a_texturesToFree;
 
-	//unordered_set<Texture *> a_currTextures; // TODO Use an array! No newsing and deleting all the time.
-
 	thread_pool a_loaderPool(1);
 	thread_pool a_writerPool(1);
+
+	atomic<size_t> a_numLoading;
+	atomic<size_t> a_numDownloading;
+	atomic<size_t> a_numUploading;
+	atomic<size_t> a_numWriting;
 }
 
 Texture::Texture(const string & ID) : m_ID(ID)
 {
-	//a_currTextures.insert(this);
 	s_textures[ID] = this;
 }
 
@@ -86,13 +91,9 @@ void Texture::readyTexture()
 
 	m_loading = true;
 
-	//++s_numLoading;
+	++a_numLoading;
 
-	a_loaderPool.push([this](int ID)
-	{
-		//fetchTile(ID, tile);
-		readyTexture(ID);
-	});
+	a_loaderPool.push([this](int ID) { readyTexture(ID) ;});
 }
 
 bool s_useCache = true;
@@ -104,40 +105,34 @@ void Texture::readyTexture(const int ID)
 	{
 		m_loading = false;
 
-		//--s_numLoading;
+		--a_numLoading;
 
 		return;
 	}
-
-	/*
-	const string quadKey = tileToQuadKey(latLongToTile(tile->m_center, tile->m_level), tile->m_level);
-	
-	const string tileCachePath = "./tiles/" + quadKey + ".jpg";
-	*/
 
 	const string tileCachePath = "./tiles/" + m_ID + ".jpg";
 
 	if(s_useCache && fileExists(tileCachePath))
 	{
-		//--s_numLoading;
+		--a_numLoading;
 
 		if(!file_size(tileCachePath.c_str())) { return markTileNoData() ;}
 
 		auto img = IMG_Load(tileCachePath.c_str());
 
-		if (!img) { goto download ;}
+		if (!img) { goto doDownload ;}
 
-		//++s_numUploading;
+		++a_numUploading;
 
 		Textures::s_queue.push([this, img, tileCachePath](int ID)
 		{
-			//--s_numUploading;
-
 			if (!m_stillNeeded)
 			{
 				m_loading = false;
 
 				SDL_FreeSurface(img);
+
+				--a_numUploading;
 
 				return;
 			}
@@ -151,34 +146,37 @@ void Texture::readyTexture(const int ID)
 			if(s_useBindlessTextures) { m_handle = glGetTextureHandleARB(m_textureID) ;}
 
 			m_loading = false;
+
+			--a_numUploading;
 		});
 
 		return;
 	}
 	
-	download:
+	doDownload:
 
-	//const auto url = "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A"; 
+	++a_numDownloading;
 
-	//const auto url = tile->getDownloadURL
+	download(	getDownloadURL(), 
+				[this]() -> bool
+				{
+					--a_numLoading;
 
-	download(getDownloadURL(), 
-	//url, 
-	[this]() -> bool
+					if(!m_stillNeeded)
+					{
+						--a_numDownloading;
+
+						m_loading = false;
+					}
+
+					return m_stillNeeded;
+				},
+				[this, tileCachePath](BufferStruct * tileBuffer)
 	{
-		//--s_numLoading;
+		--a_numDownloading;
 
-		if(!m_stillNeeded) { m_loading = false ;}
-
-		return m_stillNeeded;
-	},
-	[this, tileCachePath
-	//, url
-	](BufferStruct * tileBuffer)
-	{
 		if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
 		{
-			//markTileNoData(tile);
 			markTileNoData();
 
 			if (!s_useCache) { return ;}
@@ -192,30 +190,35 @@ void Texture::readyTexture(const int ID)
 			return;
 		}
 
-		//++s_numUploading;
+		++a_numUploading;
 
-		Textures::s_queue.push([this, tileBuffer, tileCachePath
-		//, url
-		](int ID)
+		Textures::s_queue.push([this, tileBuffer, tileCachePath](int ID)
 		{
-			//--s_numUploading;
-
 			if (!m_stillNeeded)
 			{
 				m_loading = false;
-				
+		
+				--a_numUploading;
+		
 				return;
 			}
 
 			auto img = IMG_LoadJPG_RW(SDL_RWFromConstMem(tileBuffer->m_buffer, tileBuffer->m_size));
 
-			if(!img) { return markTileNoData() ;}
+			if(!img)
+			{
+				--a_numUploading;
+
+				return markTileNoData();
+			}
 
 			const auto bytesPerPixel = img->format->BytesPerPixel;
 
 			if(bytesPerPixel < 3)
 			{
 				SDL_FreeSurface(img);
+
+				--a_numUploading;
 
 				// Must be the no data png image, mark as no data.
 				return markTileNoData();
@@ -231,9 +234,11 @@ void Texture::readyTexture(const int ID)
 
 			m_loading = false;
 
+			--a_numUploading;
+
 			if (!s_useCache) { return ;}
 
-			//++s_numWriting;
+			++a_numWriting;
 
 			a_writerPool.push([tileCachePath, tileBuffer](int ID)
 			{
@@ -247,7 +252,7 @@ void Texture::readyTexture(const int ID)
 				}
 				else { dmess("Warn could not write file: " << tileCachePath) ;}
 
-				//--s_numWriting;
+				--a_numWriting;
 			});
 		});
 	});
@@ -255,7 +260,9 @@ void Texture::readyTexture(const int ID)
 
 void Texture::markTileNoData()
 {
+	m_loading = false;
 
+	m_textureID = s_NO_DATA;
 }
 
 size_t Texture::pruneTiles()
@@ -291,4 +298,8 @@ size_t Texture::pruneTiles()
 	return numFreed;
 }
 
-size_t Texture::getNumTiles() { return s_textures.size() ;}
+size_t Texture::getNumTiles()		{ return s_textures.size()	;}
+size_t Texture::getNumLoading()		{ return a_numLoading		;}
+size_t Texture::getNumDownloading() { return a_numDownloading	;}
+size_t Texture::getNumUploading()	{ return a_numUploading		;}
+size_t Texture::getNumWriting()		{ return a_numWriting		;}
