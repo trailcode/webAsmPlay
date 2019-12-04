@@ -28,12 +28,13 @@
 
 #include <string>
 #include <webAsmPlay/OpenGL_Util.h>
+#include <webAsmPlay/Texture.h>
 
-class BubbleTile
+class BubbleTile : public Texture
 {
 public:
 
-	static GLuint requestBubbleTile(const std::string & bubbleQuadKey, const size_t face, const std::string & tileID);
+	static BubbleTile * requestBubbleTile(const std::string & bubbleQuadKey, const size_t face, const std::string & tileID);
 
 	static size_t getNumLoading();
 
@@ -43,8 +44,10 @@ public:
 
 	static void freeAllTiles();
 
+	std::string getDownloadURL() const override;
+
 private:
 
-	BubbleTile() {}
-	~BubbleTile() {}
+	BubbleTile(const std::string & ID);
+	~BubbleTile();
 };

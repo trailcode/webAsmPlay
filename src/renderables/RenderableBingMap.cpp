@@ -72,7 +72,7 @@ size_t RenderableBingMap::s_numRendered = 0;
 FrameBuffer * RenderableBingMap::s_textureBuffer = nullptr;
 
 bool RenderableBingMap::s_useCache				= true;
-bool RenderableBingMap::s_useBindlessTextures	= true;
+bool RenderableBingMap::s_useBindlessTextures	= false;
 
 namespace
 {
@@ -109,7 +109,9 @@ namespace
 	} buffers;
 }
 
-void RenderableBingMap::fetchTile(RasterTile * tile)
+#ifdef WORKING
+
+void RenderableBingMap::fetchTile(Texture * tile)
 {
 	tile->m_stillNeeded = true;
 
@@ -122,14 +124,14 @@ void RenderableBingMap::fetchTile(RasterTile * tile)
 	a_loaderPool.push([tile](int ID) { fetchTile(ID, tile) ;});
 }
 
-void RenderableBingMap::markTileNoData(RasterTile* tile)
+void RenderableBingMap::markTileNoData(Texture* tile)
 {
 	tile->m_loading = false;
 
 	tile->m_textureID = RasterTile::s_NO_DATA;
 }
 
-void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
+void RenderableBingMap::fetchTile(const int ID, Texture * tile)
 {
 	if (!tile->m_stillNeeded)
 	{
@@ -140,9 +142,13 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 		return;
 	}
 
+	/*
 	const string quadKey = tileToQuadKey(latLongToTile(tile->m_center, tile->m_level), tile->m_level);
-
+	
 	const string tileCachePath = "./tiles/" + quadKey + ".jpg";
+	*/
+
+	const string tileCachePath = "./tiles/" + tile->m_ID + ".jpg";
 
 	if(s_useCache && fileExists(tileCachePath))
 	{
@@ -185,9 +191,12 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 	
 	download:
 
-	const auto url = "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A"; 
+	//const auto url = "http://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-GB&it=A"; 
 
-	download(url, 
+	//const auto url = tile->getDownloadURL
+
+	download(tile->getDownloadURL(), 
+	//url, 
 		[tile]() -> bool
 		{
 			--s_numLoading;
@@ -196,7 +205,9 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 			return tile->m_stillNeeded;
 		},
-		[tile, tileCachePath, url](BufferStruct * tileBuffer)
+		[tile, tileCachePath
+		//, url
+		](BufferStruct * tileBuffer)
 		{
 			if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
 			{
@@ -215,7 +226,9 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 
 			++s_numUploading;
 
-			Textures::s_queue.push([tile, tileBuffer, tileCachePath, url](int ID)
+			Textures::s_queue.push([tile, tileBuffer, tileCachePath
+			//, url
+			](int ID)
 			{
 				--s_numUploading;
 
@@ -271,6 +284,8 @@ void RenderableBingMap::fetchTile(const int ID, RasterTile * tile)
 			});
 		});
 }
+
+#endif
 
 void RenderableBingMap::getStartLevel()
 {
@@ -575,7 +590,9 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 			if (!textureID)
 			{
-				fetchTile(currTile);
+				//fetchTile(currTile);
+
+				currTile->readyTexture();
 
 				continue;
 			}
@@ -621,7 +638,11 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 			toRender.push_back(tile);
 		}
-		else if(tile->m_textureID != RasterTile::s_NO_DATA) { fetchTile(tile) ;}
+		else if(tile->m_textureID != RasterTile::s_NO_DATA)
+		{
+			//fetchTile(tile);
+			tile->readyTexture();
+		}
 	}
 
 	if(s_useBindlessTextures) { renderBindlessTextures(canvas, toRender, renderStage) ;}

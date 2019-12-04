@@ -34,6 +34,8 @@ class Frustum;
 class RasterTile;
 class FrameBuffer;
 
+class Texture;
+
 class RenderableBingMap : public Renderable
 {
 public:
@@ -64,11 +66,11 @@ private:
 
 	bool getTilesToRender(Canvas * canvas, const glm::dvec2 & tMin, const glm::dvec2 & tMax, const size_t level);
 
-	static void fetchTile(RasterTile* tile);
+	//static void fetchTile(Texture* tile);
 
-	static void fetchTile(const int ID, RasterTile* tile);
+	//static void fetchTile(const int ID, Texture* tile);
 
-	static void markTileNoData(RasterTile* tile);
+	//static void markTileNoData(Texture* tile);
 
 	void renderBindlessTextures(Canvas* canvas, const std::vector<RasterTile*>& toRender, const size_t renderStage);
 

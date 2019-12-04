@@ -37,15 +37,17 @@ class RasterTile : public Texture
 {
 public:
 
-	RasterTile(const glm::dvec2& center, const glm::dvec2& widthHeight, const size_t level);
+	RasterTile(const std::string & ID, const glm::dvec2& center, const glm::dvec2& widthHeight, const size_t level);
 
 	~RasterTile();
 
 	static RasterTile* getTile(const glm::dvec2& center, const size_t level, const size_t accessTime);
 
+	std::string getDownloadURL() const override;
+
 	//static size_t pruneTiles();
 
-	static size_t getNumTiles();
+	//static size_t getNumTiles();
 
 	RasterTile* getParentTile(const size_t accessTime) const;
 

@@ -44,7 +44,7 @@ using namespace curlUtil;
 
 namespace
 {
-	concurrent_unordered_map<string, size_t> a_bubbleTiles;
+	//concurrent_unordered_map<string, size_t> a_bubbleTiles;
 
 	thread_pool a_loaderQueue(16);
 
@@ -53,21 +53,28 @@ namespace
 	std::atomic<int> a_numDownloading = {0};
 }
 
-GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t face, const string & tileID)
+BubbleTile::BubbleTile(const string & ID) : Texture(ID) {}
+
+BubbleTile::~BubbleTile() { }
+
+BubbleTile * BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t face, const string & tileID)
 {
-	const auto faceQuadKey = bubbleQuadKey + Bubble::s_faceKeys[face] + tileID;
+	return nullptr;
 
-	const auto i = a_bubbleTiles.find(faceQuadKey);
+	/*
+	const auto faceQuadKey = "s" + bubbleQuadKey + Bubble::s_faceKeys[face] + tileID;
 
-	if(i != a_bubbleTiles.end()) { return i->second ;}
+	const auto i = s_textures.find(faceQuadKey);
 
-	a_bubbleTiles[faceQuadKey] = 0;
+	if(i != s_textures.end()) { return (BubbleTile *)i->second ;}
+
+	auto bubbleTile = s_textures[faceQuadKey] = new BubbleTile(faceQuadKey);
 
 	const string tileCachePath = "./bubbles/face_" + faceQuadKey;
 
 	++a_numLoading;
 
-	a_loaderQueue.push([tileCachePath, faceQuadKey](int id)
+	a_loaderQueue.push([bubbleTile, tileCachePath, faceQuadKey](int id)
 	{
 		if(fileExists(tileCachePath))
 		{
@@ -182,16 +189,21 @@ GLuint BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t 
 	});
 
 	return 0;
+	*/
 }
 
 size_t BubbleTile::getNumLoading() { return a_numLoading ;}
 
 size_t BubbleTile::getNumDownloading() { return a_numDownloading ;}
 
-size_t BubbleTile::getNumTiles() { return a_bubbleTiles.size() ;}
+size_t BubbleTile::getNumTiles() { 
+return 0;
+//return a_bubbleTiles.size();
+}
 
 void BubbleTile::freeAllTiles()
 {
+	/*
 	vector<GLuint> IDs;
 
 	for(const auto & [quadKey, ID] : a_bubbleTiles) { IDs.push_back(ID) ;}
@@ -199,4 +211,10 @@ void BubbleTile::freeAllTiles()
 	a_bubbleTiles.clear();
 
 	Textures::deleteTextures(IDs);
+	*/
+}
+
+string BubbleTile::getDownloadURL() const
+{
+	return "";
 }

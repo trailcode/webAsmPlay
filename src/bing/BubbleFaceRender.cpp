@@ -109,6 +109,7 @@ GLuint BubbleFaceRender::renderBubbleFace(FrameBuffer * frameBuffer, const strin
 {
 	frameBuffer->bind();
 
+	/*
 	for(const auto [tileID, tileRenderable] : ensureTileGrid())
 	{
 		const auto tex = BubbleTile::requestBubbleTile(bubbleQuadKey, face, tileID);
@@ -142,6 +143,7 @@ GLuint BubbleFaceRender::renderBubbleFace(FrameBuffer * frameBuffer, const strin
 
 		r->m_vertexArrayObject->drawTriangles();
 	}
+	*/
 
 	frameBuffer->unbind();
 

@@ -26,19 +26,31 @@
 #pragma once
 
 #include <atomic>
+#include <string>
+#include <unordered_map>
 #include <webAsmPlay/OpenGL_Util.h>
 
 class Texture
 {
 public:
 
-	Texture();
+	Texture(const std::string & ID);
 
 	virtual ~Texture();
 
 	bool textureReady() const;
 
+	virtual std::string getDownloadURL() const = 0;
+
+	void readyTexture();
+
 	static size_t pruneTiles();
+
+	static size_t getNumTiles();
+
+	static GLuint s_NO_DATA;
+
+	static std::atomic_size_t s_desiredMaxNumTiles;
 
 	std::atomic<GLuint> m_textureID = { 0 };
 
@@ -50,9 +62,17 @@ public:
 
 	GLuint64 m_handle = 0;
 
-	static GLuint s_NO_DATA;
-
-	static std::atomic_size_t s_desiredMaxNumTiles;
-
 	bool m_textureResident = false;
+
+	const std::string m_ID;
+
+protected:
+
+	static std::unordered_map<std::string, Texture *> s_textures;
+
+private:
+
+	void readyTexture(const int ID);
+
+	void markTileNoData();
 };
