@@ -112,7 +112,7 @@ void Camera::setCenter(const vec3 & c)
 {
     m_center = c;
 
-    m_center.z = 0; // TODO This is a hack
+    //m_center.z = 0; // TODO This is a hack
 }
 
 void Camera::setUp(float x, float y, float z)

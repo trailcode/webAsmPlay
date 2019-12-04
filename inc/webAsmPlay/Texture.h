@@ -23,53 +23,36 @@
   \email trailcode@gmail.com
   \copyright 2019
 */
-
 #pragma once
 
 #include <atomic>
-#include <mutex>
-#include <glm/vec2.hpp>
-#include <webAsmPlay/Texture.h>
+#include <webAsmPlay/OpenGL_Util.h>
 
-class Renderable;
-
-class RasterTile : public Texture
+class Texture
 {
 public:
 
-	RasterTile(const glm::dvec2& center, const glm::dvec2& widthHeight, const size_t level);
+	Texture();
 
-	~RasterTile();
+	virtual ~Texture();
 
-	static RasterTile* getTile(const glm::dvec2& center, const size_t level, const size_t accessTime);
+	bool textureReady() const;
 
-	//static size_t pruneTiles();
+	static size_t pruneTiles();
 
-	static size_t getNumTiles();
+	std::atomic<GLuint> m_textureID = { 0 };
 
-	RasterTile* getParentTile(const size_t accessTime) const;
+	std::atomic_bool m_loading = { false };
 
-	//bool textureReady() const;
+	std::atomic_bool m_stillNeeded = { true };
 
-	const glm::dvec2	m_center;
-	const glm::dvec2	m_widthHeight;
-	const size_t		m_level;
+	size_t m_lastAccessTime = 0;
 
-	//std::atomic_bool m_loading = { false };
+	GLuint64 m_handle = 0;
 
-	//std::atomic_bool m_stillNeeded = { true };
+	static GLuint s_NO_DATA;
 
-	Renderable* m_renderable = nullptr;
+	static std::atomic_size_t s_desiredMaxNumTiles;
 
-	//static GLuint s_NO_DATA;
-
-	//std::atomic<GLuint> m_textureID = { 0 };
-
-	//GLuint64 m_handle = 0;
-
-	//bool m_textureResident = false;
-
-	//size_t m_lastAccessTime = 0;
-
-	//static std::atomic_size_t s_desiredMaxNumTiles;
+	bool m_textureResident = false;
 };

@@ -24,52 +24,74 @@
   \copyright 2019
 */
 
-#pragma once
-
-#include <atomic>
-#include <mutex>
-#include <glm/vec2.hpp>
+#include <algorithm>
+#include <unordered_set>
+#include <limits>
+#include <vector>
 #include <webAsmPlay/Texture.h>
 
-class Renderable;
+using namespace std;
 
-class RasterTile : public Texture
+atomic_size_t Texture::s_desiredMaxNumTiles = { 4000 };
+
+GLuint Texture::s_NO_DATA = numeric_limits<GLuint>::max();
+
+namespace
 {
-public:
+	vector<GLuint> a_texturesToFree;
 
-	RasterTile(const glm::dvec2& center, const glm::dvec2& widthHeight, const size_t level);
+	unordered_set<Texture *> a_currTextures; // TODO Use an array! No newsing and deleting all the time.
+}
 
-	~RasterTile();
+Texture::Texture()
+{
+	a_currTextures.insert(this);
+}
 
-	static RasterTile* getTile(const glm::dvec2& center, const size_t level, const size_t accessTime);
+Texture::~Texture()
+{
+	if(textureReady()) { a_texturesToFree.push_back(m_textureID) ;}
 
-	//static size_t pruneTiles();
+	a_currTextures.erase(this);
+}
 
-	static size_t getNumTiles();
+bool Texture::textureReady() const
+{
+	const GLuint textureID = m_textureID;
 
-	RasterTile* getParentTile(const size_t accessTime) const;
+	return textureID != 0 && textureID != s_NO_DATA;
+}
 
-	//bool textureReady() const;
+size_t Texture::pruneTiles()
+{
+	vector<Texture*> tiles;
 
-	const glm::dvec2	m_center;
-	const glm::dvec2	m_widthHeight;
-	const size_t		m_level;
+	for (const auto tile : a_currTextures)
+	{
+		if(!tile->m_loading) { tiles.push_back(tile) ;}
+	}
 
-	//std::atomic_bool m_loading = { false };
+	sort(tiles.begin(), tiles.end(), [](const Texture* A, const Texture* B) { return A->m_lastAccessTime < B->m_lastAccessTime ;});
 
-	//std::atomic_bool m_stillNeeded = { true };
+	const size_t cacheSize = s_desiredMaxNumTiles;
 
-	Renderable* m_renderable = nullptr;
+	if (tiles.size() < cacheSize) { return 0; }
 
-	//static GLuint s_NO_DATA;
+	size_t numFreed = 0;
 
-	//std::atomic<GLuint> m_textureID = { 0 };
+	for (size_t i = 0; i < tiles.size() - cacheSize; ++i)
+	{
+		// Deleting the tile removes it from a_currTileSet and adds the texture ID to a_texturesToFree
+		delete tiles[i];
 
-	//GLuint64 m_handle = 0;
+		++numFreed;
+	}
 
-	//bool m_textureResident = false;
+	if(a_texturesToFree.size()) { glDeleteTextures((GLsizei)a_texturesToFree.size(), &a_texturesToFree[0]) ;}
 
-	//size_t m_lastAccessTime = 0;
+	a_texturesToFree.clear();
 
-	//static std::atomic_size_t s_desiredMaxNumTiles;
-};
+	//dmess("numFreed " << numFreed << " " << tiles.size() - cacheSize << " a_currTileSet " << a_currTileSet.size() << " cacheSize " << cacheSize);
+
+	return numFreed;
+}

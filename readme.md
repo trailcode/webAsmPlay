@@ -78,9 +78,10 @@ The build system is based on CMake.
 * Create dedicated threadpools for file IO.
 * Search for thread_pool and ensure correct implementation for stack or queue depending on usage
   * Consider priority queue system for bing tiles and street side tiles
-  * Ensure thread pools are shutting down currectly.
+  * Ensure thread pools are shutting down correctly.
 * Create a performance watchdog to break if a frame is taking too long to render.
 * Look into https://www.bing.com/api/maps/sdk/mapcontrol/isdk/birdseyev2 for projecting onto the sides of buildings. 
+* // TODO Use an array! No newsing and deleting all the time.
 
 
 #### Notes
