@@ -197,6 +197,7 @@ private:
 	static void streetSidePanel();
 	static void bubbleFaceTestPanel();
 	static void bubbleFacePanels();
+	static void textureSystemPanel();
 
     static void showHelpMarker(const char* desc);
 
@@ -229,6 +230,7 @@ private:
 	static bool s_showStreetSidePanel;
 	static bool s_showBubbleFaceTestPanel;
 	static bool s_showBubbleFacePanel[6];
+	static bool s_showTextureSystemPanel;
 
     static GLFWwindow * s_mainWindow;
 
