@@ -52,5 +52,7 @@ public:
 
     static OpenSteer::PolylineSegmentedPathwaySingleRadius * getPath(const std::vector<glm::dvec2> & path);
 
+	static glm::vec4 s_cameraTarget;
+
 private:
 };

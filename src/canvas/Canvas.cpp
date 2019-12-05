@@ -221,6 +221,8 @@ bool Canvas::preRender()
 
 	++m_frameNumber;
 
+	for(auto & f : m_preRenderFunctors) { f() ;}
+
     return true;
 }
 
@@ -394,9 +396,14 @@ void Canvas::addLeftClickListener(const function<void(const dvec3 & posWC)> & li
 	m_leftClickListeners.push_back(listener);
 }
 
-void Canvas::addMouseMoveListener(const std::function<void(const glm::dvec3 & posWC)> & listener)
+void Canvas::addMouseMoveListener(const function<void(const dvec3 & posWC)> & listener)
 {
 	m_mouseMoveListeners.push_back(listener);
+}
+
+void Canvas::addPreRenderFunctor(const function<void()> & functor)
+{
+	m_preRenderFunctors.push_back(functor);
 }
 
 void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods)

@@ -141,6 +141,8 @@ public:
 
 	void addMouseMoveListener(const std::function<void(const glm::dvec3 & posWC)> & listener);
 
+	void addPreRenderFunctor(const std::function<void()> & functor);
+
 protected:
 
     bool preRender();
@@ -211,4 +213,6 @@ protected:
 
 	std::vector<std::function<void(const glm::dvec3 & posWC)>> m_leftClickListeners;
 	std::vector<std::function<void(const glm::dvec3 & posWC)>> m_mouseMoveListeners;
+
+	std::vector<std::function<void()>> m_preRenderFunctors;
 };

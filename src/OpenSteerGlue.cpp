@@ -57,6 +57,8 @@ thread * openSteerThread = nullptr; // TODO make a thread waiting collection.
 
 extern bool gotoNextZombie; // TODO Un-globalize
 
+vec4 OpenSteerGlue::s_cameraTarget;
+
 namespace
 {
 	class MyCleanUp
@@ -85,7 +87,6 @@ namespace
 
     mutex a_openSteerMutex;
 
-    vec4 a_lookat;
     vec4 a_pos;   
     vec4 a_up;
 
@@ -95,15 +96,16 @@ namespace
             
         const dmat4 rotate = glm::rotate(radians(-90.0), dvec3(1, 0, 0));
 
-        a_lookat = rotate * a_geomTrans * vec4(__(OpenSteerDemo::camera.target)     * scale, 1);
+        OpenSteerGlue::s_cameraTarget = rotate * a_geomTrans * vec4(__(OpenSteerDemo::camera.target)     * scale, 1);
+
         a_pos    = rotate * a_geomTrans * vec4(__(OpenSteerDemo::camera.position()) * scale, 1);
         a_pos.z *= -1;
         a_up     = rotate * vec4(__(OpenSteer::OpenSteerDemo::camera.up()), 1);
-        a_up.z  *= -1;
+        //a_up.z  *= -1;
 
-        a_pos = vec4(vec3(a_lookat) + normalize(vec3(a_pos) - vec3(a_lookat)) * GUI::s_openSteerCameraDist, 1);
+        a_pos = vec4(vec3(OpenSteerGlue::s_cameraTarget) + normalize(vec3(a_pos) - vec3(OpenSteerGlue::s_cameraTarget)) * GUI::s_openSteerCameraDist, 1);
 
-        a_pos.z = glm::max(float(GUI::s_openSteerCameraDist * 0.5f), float(a_pos.z)); // When switching camera to next Zombie, keep camera above ground.
+        a_pos.z = -glm::max(float(GUI::s_openSteerCameraDist * 0.5f), float(a_pos.z)); // When switching camera to next Zombie, keep camera above ground.
     }
 
     void updateOpenSteer()
@@ -179,7 +181,7 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
         if(GUI::getCameraMode() == GUI::CAMERA_FOLLOW_ENTITY)
         {
             // TODO this will be one frame behind!
-            canvas->getCamera()->setCenter(a_lookat);
+            canvas->getCamera()->setCenter(OpenSteerGlue::s_cameraTarget);
             canvas->getCamera()->setEye   (a_pos);
             canvas->getCamera()->setUp    (a_up);
 

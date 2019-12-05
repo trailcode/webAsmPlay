@@ -38,6 +38,7 @@
 #include <webAsmPlay/geom/BoostGeomUtil.h>
 #include <webAsmPlay/renderables/RenderablePoint.h>
 #include <webAsmPlay/FrameBuffer.h>
+#include <webAsmPlay/OpenSteerGlue.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
@@ -141,6 +142,8 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 {
 	getMainCanvas()->addLeftClickListener([](const dvec3 & posWC)
 	{
+		if(s_cameraMode == CAMERA_FOLLOW_ENTITY) { return ;}
+
 		if(!a_clickToViewBubble || !s_showStreetSidePanel) { return ;}
 
 		StreetSide::ensureBubbleCollectionTile(getClient()->getTrans(), getClient()->getInverseTrans() * dvec4(posWC, 1));
@@ -154,6 +157,8 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 
 	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
 	{
+		if(s_cameraMode == CAMERA_FOLLOW_ENTITY) { return ;}
+
 		if(!s_showStreetSidePanel || a_clickToViewBubble) { return ;}
 
 		StreetSide::ensureBubbleCollectionTile(getClient()->getTrans(), getClient()->getInverseTrans() * dvec4(posWC, 1));
@@ -165,5 +170,21 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 		getMainCanvas()->addRenderable(a_closestBubble = StreetSide::closestBubbleRenderable());
 	});
 
-	
+	getMainCanvas()->addPreRenderFunctor([]()
+	{
+		if(!s_showStreetSidePanel || s_cameraMode != CAMERA_FOLLOW_ENTITY) { return ;}
+
+		StreetSide::ensureBubbleCollectionTile(getClient()->getTrans(), getClient()->getInverseTrans() * OpenSteerGlue::s_cameraTarget);
+
+		StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * OpenSteerGlue::s_cameraTarget, 10);
+
+		getMainCanvas()->removeRenderable(a_closestBubble);
+
+		getMainCanvas()->addRenderable(a_closestBubble = StreetSide::closestBubbleRenderable());
+	});
+
+	GUI::addUpdatable([]()
+    {
+
+	});
 }
