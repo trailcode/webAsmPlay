@@ -97,6 +97,8 @@ void SkyBoxShader::bind(const mat4 & view,
 	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 	mat4 centeredView = mat4(view);
 
 	value_ptr(centeredView)[12] = 0;

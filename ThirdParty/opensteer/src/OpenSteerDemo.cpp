@@ -296,7 +296,7 @@ OpenSteer::OpenSteerDemo::redrawSelectedPlugIn (const float currentTime,
                                                 const float elapsedTime)
 {
     // switch to Draw phase
-    pushPhase (drawPhase);
+    //pushPhase (drawPhase);
 
     // invoke selected PlugIn's Draw method
     selectedPlugIn->redraw (currentTime, elapsedTime);
@@ -306,7 +306,7 @@ OpenSteer::OpenSteerDemo::redrawSelectedPlugIn (const float currentTime,
     drawAllDeferredCirclesOrDisks ();
 
     // return to previous phase
-    popPhase ();
+    //popPhase ();
 }
 
 

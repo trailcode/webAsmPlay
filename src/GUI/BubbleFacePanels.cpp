@@ -63,21 +63,17 @@ void GUI::bubbleFacePanels()
 		const string title = "Bubble face: " + Bubble::s_faceNames[i];
 
 		ImGui::Begin(title.c_str(), &s_showBubbleFacePanel[i]);
-
+		{
 			const ImVec2 pos = ImGui::GetCursorScreenPos();
 
 			const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
 			a_frameBuffers[i]->setBufferSize(__(sceneWindowSize));
 
-			//ImGui::Image((ImTextureID)BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::s_closestBubble, i), ImVec2(a_bubbleFaceSize, a_bubbleFaceSize));
-
 			ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::closestBubble(), i),
 													pos,
-													ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
-													ImVec2(1, 0),
-													ImVec2(0, 1));
-
+													ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y));
+		}
 		ImGui::End();
 	}
 }
