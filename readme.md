@@ -89,4 +89,5 @@ The build system is based on CMake.
 * https://docs.microsoft.com/en-us/bingmaps/articles/getting-streetside-tiles-from-imagery-metadata
 * https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/imagery-metadata
 
+* https://gamedev.stackexchange.com/questions/19461/opengl-glsl-render-to-cube-map
 

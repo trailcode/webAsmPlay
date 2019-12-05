@@ -101,8 +101,7 @@ namespace
         a_pos    = rotate * a_geomTrans * vec4(__(OpenSteerDemo::camera.position()) * scale, 1);
         a_pos.z *= -1;
         a_up     = rotate * vec4(__(OpenSteer::OpenSteerDemo::camera.up()), 1);
-        //a_up.z  *= -1;
-
+        
         a_pos = vec4(vec3(OpenSteerGlue::s_cameraTarget) + normalize(vec3(a_pos) - vec3(OpenSteerGlue::s_cameraTarget)) * GUI::s_openSteerCameraDist, 1);
 
         a_pos.z = -glm::max(float(GUI::s_openSteerCameraDist * 0.5f), float(a_pos.z)); // When switching camera to next Zombie, keep camera above ground.
