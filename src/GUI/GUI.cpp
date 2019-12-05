@@ -279,9 +279,6 @@ void GUI::showMainToolBar()
         toolbar.addButton(ImGui::Toolbutton("Get Info Point Mode",              (void*)(a_infoIcon), uv0, uv1, size));
         toolbar.addButton(ImGui::Toolbutton("Set Path Start Point",				(void*)(a_infoIcon),uv0,uv1,size));
         toolbar.addButton(ImGui::Toolbutton("Find Path",						(void*)(a_infoIcon),uv0,uv1,size));
-		toolbar.addButton(ImGui::Toolbutton("Pick Bing Tile",					(void*)(a_infoIcon),uv0,uv1,size));
-		toolbar.addButton(ImGui::Toolbutton("Pick StreetSide Bubble",			(void*)(a_infoIcon),uv0,uv1,size));
-
 
 #pragma warning( pop )
 
@@ -301,8 +298,6 @@ void GUI::showMainToolBar()
         case 4: a_mode = PICK_MODE_POINT;             break;
         case 5: a_mode = SET_PATH_START_POINT;        break;
         case 6: a_mode = FIND_PATH;                   break;
-		case 7: a_mode = PICK_BING_TILE;              break;
-		case 8: a_mode = PICK_STREET_SIDE_BUBBLE;	  break;
     }
 }
 
@@ -396,7 +391,7 @@ void GUI::showMainMenuBar()
 		if (ImGui::MenuItem("Bing StreetSide"))			{ s_showStreetSidePanel					^= 1 ;}
 		if (ImGui::MenuItem("Bubble Face Test"))		{ s_showBubbleFaceTestPanel				^= 1 ;}
 		if (ImGui::MenuItem("Texture System"))			{ s_showTextureSystemPanel				^= 1 ;}
-		if (ImGui::MenuItem("Full Screen"))				{ setFullScreen(!g_fullScreen) ;}
+		if (ImGui::MenuItem("Full Screen"))				{ setFullScreen(!g_fullScreen)				 ;}
 
         ImGui::EndMenu();
     }

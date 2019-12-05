@@ -25,10 +25,12 @@
 */
 
 #include <ctpl/ctpl.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/canvas/Canvas.h>
+#include <webAsmPlay/canvas/Camera.h>
 #include <webAsmPlay/bing/StreetSide.h>
 #include <webAsmPlay/bing/Bubble.h>
 #include <webAsmPlay/bing/BubbleTile.h>
@@ -49,9 +51,6 @@ namespace
 
 	Renderable * a_closestBubble = nullptr;
 }
-
-#include <webAsmPlay/canvas/Camera.h>
-#include <glm/gtc/matrix_transform.hpp>
 
 void GUI::streetSidePanel()
 {
@@ -142,47 +141,15 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 {
 	getMainCanvas()->addLeftClickListener([](const dvec3 & posWC)
 	{
-		switch(getMode())
-		{
-			case PICK_STREET_SIDE_BUBBLE:
-				
-				if(!a_clickToViewBubble || !s_showStreetSidePanel) {  break ;}
+		if(!a_clickToViewBubble || !s_showStreetSidePanel) { return ;}
 
-				 //StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * dvec4(posWC, 1), 10);
+		StreetSide::ensureBubbleCollectionTile(getClient()->getTrans(), getClient()->getInverseTrans() * dvec4(posWC, 1));
 
-				StreetSide::ensureBubbleCollectionTile(getClient()->getTrans(), getClient()->getInverseTrans() * dvec4(posWC, 1));
+		StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * dvec4(posWC, 1), 10);
 
-				StreetSide::queryClosestBubbles(getClient()->getInverseTrans() * dvec4(posWC, 1), 10);
+		getMainCanvas()->removeRenderable(a_closestBubble);
 
-				getMainCanvas()->removeRenderable(a_closestBubble);
-
-				getMainCanvas()->addRenderable(a_closestBubble = StreetSide::closestBubbleRenderable());
-
-			break;
-
-			case PICK_BING_TILE:
-
-				StreetSide::ensureBubbleCollectionTile(getClient()->getTrans(), getClient()->getInverseTrans() * dvec4(posWC, 1));
-
-				const auto trans = getClient()->getTrans();
-
-				/*
-				for(auto bubble : StreetSide::query(getClient()->getInverseTrans() * dvec4(posWC, 1)))
-				{
-					const auto trans = getClient()->getTrans();
-
-					auto b = buffer({bubble->m_pos.y, bubble->m_pos.x}, 0.00001);
-
-					auto r = Renderable::create(b, trans);
-
-					//getMainCanvas()->addRenderable(r);
-
-					StreetSide::indexBubble(bubble, r);
-				}
-				*/
-
-				break;
-		}
+		getMainCanvas()->addRenderable(a_closestBubble = StreetSide::closestBubbleRenderable());
 	});
 
 	getMainCanvas()->addMouseMoveListener([](const dvec3 & posWC)
