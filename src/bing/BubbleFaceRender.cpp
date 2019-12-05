@@ -100,18 +100,22 @@ namespace
 
 GLuint BubbleFaceRender::renderBubbleFace(FrameBuffer * frameBuffer, const Bubble * bubble, const size_t face)
 {
-	if(!bubble) { return 0 ;}
+	frameBuffer->bind();
 
-	return renderBubbleFace(frameBuffer, bubble->getQuadKey(), face);
+	renderBubbleFace(bubble, face);
+
+	frameBuffer->unbind();
+
+	return frameBuffer->getTextureID();
 }
 
-GLuint BubbleFaceRender::renderBubbleFace(FrameBuffer * frameBuffer, const string & bubbleQuadKey, const size_t face)
+void BubbleFaceRender::renderBubbleFace(const Bubble * bubble, const size_t face)
 {
-	frameBuffer->bind();
+	if(!bubble) { return ;}
 
 	for(const auto [tileID, tileRenderable] : ensureTileGrid())
 	{
-		const auto tile = BubbleTile::getTile(bubbleQuadKey, face, tileID);
+		const auto tile = BubbleTile::getTile(bubble->getQuadKey(), face, tileID);
 
 		const GLuint tex = tile->m_textureID;
 
@@ -144,10 +148,6 @@ GLuint BubbleFaceRender::renderBubbleFace(FrameBuffer * frameBuffer, const strin
 
 		r->m_vertexArrayObject->drawTriangles();
 	}
-
-	frameBuffer->unbind();
-
-	return frameBuffer->getTextureID();
 }
 
 const vector<string> & BubbleFaceRender::getTileIDs()

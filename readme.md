@@ -82,6 +82,11 @@ The build system is based on CMake.
 * Create a performance watchdog to break if a frame is taking too long to render.
 * Look into https://www.bing.com/api/maps/sdk/mapcontrol/isdk/birdseyev2 for projecting onto the sides of buildings. 
 * // TODO Use an array! No newsing and deleting all the time.
+* Look into https://www.mapillary.com/
+  * https://mapillary.github.io/mapillary_solutions/data-request/
+  * OSM ID editor shows "Map Features" and "Traffic Signs"
+* Look into https://openstreetcam.org/
+* Think about using street signs.
 
 
 #### Notes

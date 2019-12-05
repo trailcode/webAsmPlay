@@ -38,7 +38,7 @@ public:
 
 	static GLuint renderBubbleFace(FrameBuffer * frameBuffer, const Bubble * bubble, const size_t face);
 
-	static GLuint renderBubbleFace(FrameBuffer * frameBuffer, const std::string & bubbleQuadKey, const size_t face);
+	static void renderBubbleFace(const Bubble * bubble, const size_t face);
 
 	static const std::vector<std::string> & getTileIDs();
 
