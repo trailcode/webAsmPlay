@@ -299,7 +299,8 @@ void StreetSide::preFetchBubbleTiles()
 		{
 			for(const auto & tileID : BubbleFaceRender::getTileIDs())
 			{
-				BubbleTile::requestBubbleTile(bubble->getQuadKey(), i, tileID);
+				//BubbleTile::requestBubbleTile(bubble->getQuadKey(), i, tileID);
+				BubbleTile::getTile(bubble->getQuadKey(), i, tileID)->readyTexture();
 			}
 		}
 	}

@@ -57,19 +57,27 @@ BubbleTile::BubbleTile(const string & ID) : Texture(ID) {}
 
 BubbleTile::~BubbleTile() { }
 
-BubbleTile * BubbleTile::requestBubbleTile(const string & bubbleQuadKey, const size_t face, const string & tileID)
+BubbleTile * BubbleTile::getTile(const string & bubbleQuadKey, const size_t face, const string & tileID)
 {
-	return nullptr;
-
-	/*
 	const auto faceQuadKey = "s" + bubbleQuadKey + Bubble::s_faceKeys[face] + tileID;
 
 	const auto i = s_textures.find(faceQuadKey);
 
-	if(i != s_textures.end()) { return (BubbleTile *)i->second ;}
+	Texture * tile;
 
-	auto bubbleTile = s_textures[faceQuadKey] = new BubbleTile(faceQuadKey);
+	if(i != s_textures.end()) { tile = i->second ;}
 
+	else
+	{
+		tile = s_textures[faceQuadKey] = new BubbleTile(faceQuadKey);
+	}
+
+	tile->m_lastAccessTime = getFrameNumber();
+
+	return (BubbleTile*)tile;
+
+
+	/*
 	const string tileCachePath = "./bubbles/face_" + faceQuadKey;
 
 	++a_numLoading;
@@ -216,5 +224,11 @@ void BubbleTile::freeAllTiles()
 
 string BubbleTile::getDownloadURL() const
 {
-	return "";
+	//const string streetsideImagesApi = "https://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
+	// TODO With https curl gives 60 error code. Try to fix.
+	const string streetsideImagesApi = "http://t.ssl.ak.tiles.virtualearth.net/tiles/hs";
+
+	const string imgUrlSuffix = ".jpg?g=6338&n=z";
+
+	return streetsideImagesApi + m_ID.substr(1) + imgUrlSuffix;
 }

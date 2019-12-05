@@ -40,6 +40,7 @@
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/Textures.h>
+#include <webAsmPlay/Texture.h>
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/Animation.h>
 #include <webAsmPlay/canvas/GeosTestCanvas.h>
@@ -500,6 +501,8 @@ void GUI::mainLoop(GLFWwindow * window)
     ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), opt_flags);
     
+	Texture::incrementFrameNumber();
+
     // Rendering
     int screenWidth, screenHeight;
 

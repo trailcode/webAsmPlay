@@ -146,7 +146,7 @@ bool RenderableBingMap::getTilesToRender(Canvas * canvas, const dvec2 & min, con
 {
 	const dvec2 center = (min + max) * 0.5;
 
-	auto tile = RasterTile::getTile(center, level, canvas->getFrameNumber());
+	auto tile = RasterTile::getTile(center, level);
 
 	if(level >= 24)
 	{
@@ -398,7 +398,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 		for (int parentLevel = int(currTile->m_level) - 1; parentLevel >= m_startLevel; --parentLevel)
 		{
-			currTile = currTile->getParentTile(canvas->getFrameNumber());
+			currTile = currTile->getParentTile();
 
 			const size_t textureID = currTile->m_textureID;
 

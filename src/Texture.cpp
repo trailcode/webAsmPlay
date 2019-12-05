@@ -63,7 +63,9 @@ namespace
 	atomic<size_t> a_numUploading;
 	atomic<size_t> a_numWriting;
 	atomic<size_t> a_numCacheHits;
-	atomic<size_t> a_numCacheMises;
+	atomic<size_t> a_numCacheMisses;
+
+	atomic<size_t> a_frameNumber = {0};
 }
 
 Texture::Texture(const string & ID) : m_ID(ID)
@@ -89,7 +91,7 @@ void Texture::readyTexture()
 {
 	m_stillNeeded = true;
 
-	if(m_loading) { return ;}
+	if(m_loading || m_textureID) { return ;}
 
 	m_loading = true;
 
@@ -97,9 +99,6 @@ void Texture::readyTexture()
 
 	a_loaderPool.push([this](int ID) { readyTexture(ID) ;});
 }
-
-bool s_useCache = true;
-bool s_useBindlessTextures = false;
 
 void Texture::readyTexture(const int ID)
 {
@@ -161,7 +160,7 @@ void Texture::readyTexture(const int ID)
 
 	++a_numDownloading;
 
-	++a_numCacheMises;
+	++a_numCacheMisses;
 
 	download(	getDownloadURL(), 
 				[this]() -> bool
@@ -310,4 +309,8 @@ size_t Texture::getNumDownloading() { return a_numDownloading	;}
 size_t Texture::getNumUploading()	{ return a_numUploading		;}
 size_t Texture::getNumWriting()		{ return a_numWriting		;}
 size_t Texture::getNumCacheHits()	{ return a_numCacheHits		;}
-size_t Texture::getNumCacheMises()	{ return a_numCacheMises	;}
+size_t Texture::getNumCacheMisses()	{ return a_numCacheMisses	;}
+
+void Texture::incrementFrameNumber() { ++a_frameNumber ;}
+
+size_t Texture::getFrameNumber() { return a_frameNumber ;}

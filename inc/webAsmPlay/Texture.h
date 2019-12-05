@@ -52,7 +52,11 @@ public:
 	static size_t getNumUploading();
 	static size_t getNumWriting();
 	static size_t getNumCacheHits();
-	static size_t getNumCacheMises();
+	static size_t getNumCacheMisses();
+
+	static void incrementFrameNumber();
+
+	static size_t getFrameNumber();
 
 	static GLuint s_NO_DATA;
 

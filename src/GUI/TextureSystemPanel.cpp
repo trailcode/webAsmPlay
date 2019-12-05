@@ -36,13 +36,13 @@ void GUI::textureSystemPanel()
 
 	ImGui::Begin("Texture System", &s_showTextureSystemPanel);
 	{
-		ImGui::Text(("   Textures: " + to_string(Texture::getNumTextures())).c_str());
-		ImGui::Text(("    Loading: " + to_string(Texture::getNumLoading())).c_str());
-		ImGui::Text(("Downloading: " + to_string(Texture::getNumDownloading())).c_str());
-		ImGui::Text(("  Uploading: " + to_string(Texture::getNumUploading())).c_str());
-		ImGui::Text(("    Writing: " + to_string(Texture::getNumWriting())).c_str());
-		ImGui::Text((" Cache Hits: " + to_string(Texture::getNumCacheHits())).c_str());
-		ImGui::Text(("Cache Mises: " + to_string(Texture::getNumCacheMises())).c_str());
+		ImGui::Text(("    Textures: " + to_string(Texture::getNumTextures	())).c_str());
+		ImGui::Text(("     Loading: " + to_string(Texture::getNumLoading	())).c_str());
+		ImGui::Text((" Downloading: " + to_string(Texture::getNumDownloading())).c_str());
+		ImGui::Text(("   Uploading: " + to_string(Texture::getNumUploading	())).c_str());
+		ImGui::Text(("     Writing: " + to_string(Texture::getNumWriting	())).c_str());
+		ImGui::Text(("  Cache Hits: " + to_string(Texture::getNumCacheHits	())).c_str());
+		ImGui::Text(("Cache Misses: " + to_string(Texture::getNumCacheMisses())).c_str());
 
 		int maxDesiredNumTextures = (int)Texture::s_desiredMaxNumTextures;
 

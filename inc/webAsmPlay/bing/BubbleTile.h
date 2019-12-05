@@ -34,7 +34,7 @@ class BubbleTile : public Texture
 {
 public:
 
-	static BubbleTile * requestBubbleTile(const std::string & bubbleQuadKey, const size_t face, const std::string & tileID);
+	static BubbleTile * getTile(const std::string & bubbleQuadKey, const size_t face, const std::string & tileID);
 
 	static size_t getNumLoading();
 

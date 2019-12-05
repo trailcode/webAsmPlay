@@ -109,12 +109,13 @@ GLuint BubbleFaceRender::renderBubbleFace(FrameBuffer * frameBuffer, const strin
 {
 	frameBuffer->bind();
 
-	/*
 	for(const auto [tileID, tileRenderable] : ensureTileGrid())
 	{
-		const auto tex = BubbleTile::requestBubbleTile(bubbleQuadKey, face, tileID);
+		const auto tile = BubbleTile::getTile(bubbleQuadKey, face, tileID);
 
-		if(!tex) { continue ;}
+		const GLuint tex = tile->m_textureID;
+
+		if(!tex || tex == Texture::s_NO_DATA) { continue ;}
 
 		auto r = (RenderablePolygon *)tileRenderable;
 
@@ -143,7 +144,6 @@ GLuint BubbleFaceRender::renderBubbleFace(FrameBuffer * frameBuffer, const strin
 
 		r->m_vertexArrayObject->drawTriangles();
 	}
-	*/
 
 	frameBuffer->unbind();
 

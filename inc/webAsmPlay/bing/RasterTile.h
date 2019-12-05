@@ -41,11 +41,11 @@ public:
 
 	~RasterTile();
 
-	static RasterTile* getTile(const glm::dvec2& center, const size_t level, const size_t accessTime);
+	static RasterTile* getTile(const glm::dvec2& center, const size_t level);
 
 	std::string getDownloadURL() const override;
 
-	RasterTile* getParentTile(const size_t accessTime) const;
+	RasterTile* getParentTile() const;
 
 	const glm::dvec2	m_center;
 	const glm::dvec2	m_widthHeight;
