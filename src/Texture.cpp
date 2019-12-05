@@ -42,7 +42,7 @@ using namespace std::filesystem;
 using namespace ctpl;
 using namespace curlUtil;
 
-atomic_size_t Texture::s_desiredMaxNumTiles = { 4000 };
+atomic_size_t Texture::s_desiredMaxNumTextures = { 4000 };
 
 GLuint Texture::s_NO_DATA = numeric_limits<GLuint>::max();
 
@@ -62,6 +62,8 @@ namespace
 	atomic<size_t> a_numDownloading;
 	atomic<size_t> a_numUploading;
 	atomic<size_t> a_numWriting;
+	atomic<size_t> a_numCacheHits;
+	atomic<size_t> a_numCacheMises;
 }
 
 Texture::Texture(const string & ID) : m_ID(ID)
@@ -114,9 +116,11 @@ void Texture::readyTexture(const int ID)
 
 	if(s_useCache && fileExists(tileCachePath))
 	{
+		++a_numCacheHits;
+
 		--a_numLoading;
 
-		if(!file_size(tileCachePath.c_str())) { return markTileNoData() ;}
+		if(!file_size(tileCachePath.c_str())) { return markNoData() ;}
 
 		auto img = IMG_Load(tileCachePath.c_str());
 
@@ -157,6 +161,8 @@ void Texture::readyTexture(const int ID)
 
 	++a_numDownloading;
 
+	++a_numCacheMises;
+
 	download(	getDownloadURL(), 
 				[this]() -> bool
 				{
@@ -177,7 +183,7 @@ void Texture::readyTexture(const int ID)
 
 		if (!tileBuffer->m_buffer || tileBuffer->m_size == 11)
 		{
-			markTileNoData();
+			markNoData();
 
 			if (!s_useCache) { return ;}
 
@@ -209,7 +215,7 @@ void Texture::readyTexture(const int ID)
 			{
 				--a_numUploading;
 
-				return markTileNoData();
+				return markNoData();
 			}
 
 			const auto bytesPerPixel = img->format->BytesPerPixel;
@@ -221,7 +227,7 @@ void Texture::readyTexture(const int ID)
 				--a_numUploading;
 
 				// Must be the no data png image, mark as no data.
-				return markTileNoData();
+				return markNoData();
 			}
 
 			OpenGL::ensureSharedContext();
@@ -258,14 +264,14 @@ void Texture::readyTexture(const int ID)
 	});
 }
 
-void Texture::markTileNoData()
+void Texture::markNoData()
 {
 	m_loading = false;
 
 	m_textureID = s_NO_DATA;
 }
 
-size_t Texture::pruneTiles()
+size_t Texture::pruneTextures()
 {
 	vector<Texture*> tiles;
 
@@ -276,7 +282,7 @@ size_t Texture::pruneTiles()
 
 	sort(tiles.begin(), tiles.end(), [](const Texture* A, const Texture* B) { return A->m_lastAccessTime < B->m_lastAccessTime ;});
 
-	const size_t cacheSize = s_desiredMaxNumTiles;
+	const size_t cacheSize = s_desiredMaxNumTextures;
 
 	if (tiles.size() < cacheSize) { return 0; }
 
@@ -293,13 +299,15 @@ size_t Texture::pruneTiles()
 
 	a_texturesToFree.clear();
 
-	dmess("numFreed " << numFreed << " " << tiles.size() - cacheSize << " s_textures " << s_textures.size() << " cacheSize " << cacheSize);
+	//dmess("numFreed " << numFreed << " " << tiles.size() - cacheSize << " s_textures " << s_textures.size() << " cacheSize " << cacheSize);
 
 	return numFreed;
 }
 
-size_t Texture::getNumTiles()		{ return s_textures.size()	;}
+size_t Texture::getNumTextures()	{ return s_textures.size()	;}
 size_t Texture::getNumLoading()		{ return a_numLoading		;}
 size_t Texture::getNumDownloading() { return a_numDownloading	;}
 size_t Texture::getNumUploading()	{ return a_numUploading		;}
 size_t Texture::getNumWriting()		{ return a_numWriting		;}
+size_t Texture::getNumCacheHits()	{ return a_numCacheHits		;}
+size_t Texture::getNumCacheMises()	{ return a_numCacheMises	;}

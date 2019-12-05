@@ -36,20 +36,21 @@ void GUI::textureSystemPanel()
 
 	ImGui::Begin("Texture System", &s_showTextureSystemPanel);
 	{
-		ImGui::Text(("      num tiles: " + to_string(Texture::getNumTiles())).c_str());
-		ImGui::Text(("    num loading: " + to_string(Texture::getNumLoading())).c_str());
-		ImGui::Text(("num downloading: " + to_string(Texture::getNumDownloading())).c_str());
-		ImGui::Text(("  num uploading: " + to_string(Texture::getNumUploading())).c_str());
-		ImGui::Text(("    num writing: " + to_string(Texture::getNumWriting())).c_str());
-		//ImGui::Text(("   num rendered: " + to_string(Texture::getNumRendered())).c_str());
+		ImGui::Text(("   Textures: " + to_string(Texture::getNumTextures())).c_str());
+		ImGui::Text(("    Loading: " + to_string(Texture::getNumLoading())).c_str());
+		ImGui::Text(("Downloading: " + to_string(Texture::getNumDownloading())).c_str());
+		ImGui::Text(("  Uploading: " + to_string(Texture::getNumUploading())).c_str());
+		ImGui::Text(("    Writing: " + to_string(Texture::getNumWriting())).c_str());
+		ImGui::Text((" Cache Hits: " + to_string(Texture::getNumCacheHits())).c_str());
+		ImGui::Text(("Cache Mises: " + to_string(Texture::getNumCacheMises())).c_str());
 
-		int maxDesiredNumTiles = (int)Texture::s_desiredMaxNumTiles;
+		int maxDesiredNumTextures = (int)Texture::s_desiredMaxNumTextures;
 
-		if (ImGui::SliderInt("Max Tile Cache Size", &maxDesiredNumTiles, 150, 6000))
+		if (ImGui::SliderInt("Max Tile Cache Size", &maxDesiredNumTextures, 150, 6000))
 		{
-			dmess("maxDesiredNumTiles " << maxDesiredNumTiles);
+			dmess("maxDesiredNumTiles " << maxDesiredNumTextures);
 
-			Texture::s_desiredMaxNumTiles = (size_t)maxDesiredNumTiles; 
+			Texture::s_desiredMaxNumTextures = (size_t)maxDesiredNumTextures; 
 		}
 	}
 	ImGui::End();

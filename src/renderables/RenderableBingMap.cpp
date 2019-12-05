@@ -470,7 +470,7 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 	s_textureBuffer->unbind();
 
-	RasterTile::pruneTiles();
+	RasterTile::pruneTextures();
 }
 
 FrameBuffer* RenderableBingMap::getFrameBuffer() { return s_textureBuffer ;}

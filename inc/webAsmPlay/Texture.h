@@ -44,17 +44,19 @@ public:
 
 	void readyTexture();
 
-	static size_t pruneTiles();
+	static size_t pruneTextures();
 
-	static size_t getNumTiles();
+	static size_t getNumTextures();
 	static size_t getNumLoading();
 	static size_t getNumDownloading();
 	static size_t getNumUploading();
 	static size_t getNumWriting();
+	static size_t getNumCacheHits();
+	static size_t getNumCacheMises();
 
 	static GLuint s_NO_DATA;
 
-	static std::atomic_size_t s_desiredMaxNumTiles;
+	static std::atomic_size_t s_desiredMaxNumTextures;
 
 	static bool s_useCache;
 
@@ -82,5 +84,5 @@ private:
 
 	void readyTexture(const int ID);
 
-	void markTileNoData();
+	void markNoData();
 };
