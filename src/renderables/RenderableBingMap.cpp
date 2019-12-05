@@ -73,26 +73,6 @@ FrameBuffer * RenderableBingMap::s_textureBuffer = nullptr;
 
 namespace
 {
-#ifndef __EMSCRIPTEN__
-
-    thread_pool a_loaderPool(1);
-	thread_pool a_writerPool(1);
-
-	class MyCleanup
-	{
-	public:
-
-		~MyCleanup()
-		{
-			a_loaderPool.stop();
-			a_writerPool.stop();
-		}
-	};
-
-	static MyCleanup s_cleanup;
-
-#endif
-
 	enum
 	{
 		NUM_TEXTURES  = 2048,

@@ -80,39 +80,57 @@ void GUI::streetSidePanel()
 
 	if(ImGui::Button("Free Tiles")) { BubbleTile::freeAllTiles() ;}
 
+	static float bubbleCameraHeight = 100.0f;
+
 	const auto bubble = StreetSide::closestBubble();
 
-	if (getClient() && bubble && ImGui::Button("Camera to Bubble Front"))
+	static dmat4 lastLookDir(1.0);
+
+	auto cameraToBubble = [bubble](const dmat4 & lookDir)
 	{
-		const auto pos = getClient()->getTrans() * dvec4(bubble->m_pos.y, bubble->m_pos.x, -0.00001, 1);
+		lastLookDir = lookDir;
 
-		const auto rot = glm::rotate(glm::dmat4(1.0), radians(bubble->m_rollPitchHeading.z), glm::dvec3(0, 0, 1));
+		if(!getClient() || !bubble) { return ;}
 
-		auto forward = rot * dvec4(-0.0001, 0, 0, 0);
+		const auto pos = getClient()->getTrans() * dvec4(bubble->m_pos.y, bubble->m_pos.x, -bubbleCameraHeight * 0.0000001, 1);
+
+		const auto rot = rotate(lookDir, radians(bubble->m_rollPitchHeading.z), dvec3(0, 0, 1));
+
+		const auto forward = rot * dvec4(-0.0001, 0, 0, 0);
 		
 		getMainCamera()->setCenter(pos);
 		getMainCamera()->setUp({ 0, 0, -1 });
 		getMainCamera()->setEye(pos + forward);
 
 		getMainCamera()->update();
-	}
+	};
 
-	if (getClient() && bubble && ImGui::Button("Camera to Bubble Back"))
+	if(ImGui::SliderFloat("Camera Height", &bubbleCameraHeight, 0.0f, 1000.0f))
 	{
-
+		cameraToBubble(lastLookDir);
 	}
 
-	if (getClient() && bubble && ImGui::Button("Camera to Bubble Right"))
+	if (ImGui::Button("Camera to Bubble Front"))
 	{
-
+		cameraToBubble(dmat4(1.0));
 	}
 
-	if (getClient() && bubble && ImGui::Button("Camera to Bubble Left"))
+	if (ImGui::Button("Camera to Bubble Back"))
 	{
-
+		cameraToBubble(rotate(dmat4(1.0), radians(180.0), dvec3(0, 0, 1)));
 	}
 
-	if (getClient() && bubble && ImGui::Button("Camera to Bubble Top"))
+	if (ImGui::Button("Camera to Bubble Right"))
+	{
+		cameraToBubble(rotate(dmat4(1.0), radians(90.0), dvec3(0, 0, 1)));
+	}
+
+	if (ImGui::Button("Camera to Bubble Left"))
+	{
+		cameraToBubble(rotate(dmat4(1.0), radians(-90.0), dvec3(0, 0, 1)));
+	}
+
+	if (ImGui::Button("Camera to Bubble Top"))
 	{
 
 	}

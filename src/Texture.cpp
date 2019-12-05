@@ -55,8 +55,8 @@ namespace
 {
 	vector<GLuint> a_texturesToFree;
 
-	thread_pool a_loaderPool(1);
-	thread_pool a_writerPool(1);
+	thread_pool a_loaderPool(8);
+	thread_pool a_writerPool(8);
 
 	atomic<size_t> a_numLoading;
 	atomic<size_t> a_numDownloading;
@@ -66,6 +66,19 @@ namespace
 	atomic<size_t> a_numCacheMisses;
 
 	atomic<size_t> a_frameNumber = {0};
+
+	class MyCleanup
+	{
+	public:
+
+		~MyCleanup()
+		{
+			a_loaderPool.stop();
+			a_writerPool.stop();
+		}
+	};
+
+	static MyCleanup s_cleanup;
 }
 
 Texture::Texture(const string & ID) : m_ID(ID)
