@@ -154,7 +154,7 @@ void Canvas::popMVP()
 void Canvas::updateMVP()
 {
     m_currMVP.m_view        = m_trackBallInteractor->getCamera()->getMatrix();
-    m_currMVP.m_projection  = perspective(m_perspectiveFOV, double(m_size.x) / double(m_size.y), 0.0001, 30.0);
+    m_currMVP.m_projection  = perspective(radians(m_perspectiveFOV), double(m_size.x) / double(m_size.y), 0.0001, 30.0);
 	m_currMVP.m_MV			= m_currMVP.m_view			* m_currMVP.m_model;
     m_currMVP.m_MVP			= m_currMVP.m_projection	* m_currMVP.m_MV;
 

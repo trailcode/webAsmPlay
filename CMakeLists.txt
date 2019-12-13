@@ -11,7 +11,16 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 
 if(MSVC_VERSION)
 
-    set(BOOST_VERSION "1.69.0.0")
+    #set(BOOST_VERSION "1.69.0.0")
+	set(BOOST_VERSION   "1.71.0.0")
+    set(GLFW_VERSION    "3.3.0.1")
+    set(GLEW_VERSION    "2.1.0")
+    set(EXPAT_VERSION   "2.2.9")
+	set(VC_VERSION      "142")
+
+	set(CURL_VC_VERSION "141") # Still only version 141?
+
+    set(Boost_COMPILER -vc${VC_VERSION})
 
 	find_program(NUGET nuget)
 	if(NOT NUGET)
@@ -20,24 +29,26 @@ if(MSVC_VERSION)
 
 		execute_process(COMMAND ${NUGET} install vii.SDL2_image				-Version 2.0.3		-o thirdParty)
 		
-        execute_process(COMMAND ${NUGET} install boost_filesystem-vc141		-Version ${BOOST_VERSION}	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_random-vc141			-Version ${BOOST_VERSION}	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_date_time-vc141		-Version ${BOOST_VERSION}	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_regex-vc141			-Version ${BOOST_VERSION}	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_system-vc141			-Version ${BOOST_VERSION}	-o thirdParty)
+        execute_process(COMMAND ${NUGET} install boost_filesystem-vc${VC_VERSION}		-Version ${BOOST_VERSION}	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_random-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_date_time-vc${VC_VERSION}		-Version ${BOOST_VERSION}	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install boost_regex-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
+        execute_process(COMMAND ${NUGET} install boost_system-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
+        execute_process(COMMAND ${NUGET} install boost_python37-vc${VC_VERSION}		-Version ${BOOST_VERSION}	-o thirdParty)
 
-		execute_process(COMMAND ${NUGET} install curl-vc141-dynamic-x86_64	-Version 7.59.0		-o thirdParty)
-		execute_process(COMMAND ${NUGET} install glfw						-Version 3.3.0.1	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install unofficial-flayan-glew		-Version 2.1.0		-o thirdParty)
-		execute_process(COMMAND ${NUGET} install tbb_oss					-Version 9.107.0	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install expat.v140					-Version 2.2.6		-o thirdParty)
+		execute_process(COMMAND ${NUGET} install curl-vc${CURL_VC_VERSION}-dynamic-x86_64	-Version 7.59.0		-o thirdParty)
+		execute_process(COMMAND ${NUGET} install glfw						-Version ${GLFW_VERSION}	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install unofficial-flayan-glew		-Version ${GLEW_VERSION}		-o thirdParty)
+		execute_process(COMMAND ${NUGET} install tbb_oss					-Version 9.107.0.0	-o thirdParty)
+		execute_process(COMMAND ${NUGET} install expat.v${VC_VERSION}		-Version ${EXPAT_VERSION}		-o thirdParty)
 		execute_process(COMMAND ${NUGET} install assimp.v140				-Version 3.2.0		-o thirdParty)
 	
-		file(GLOB boost_files	${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc141.${BOOST_VERSION}/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc141.${BOOST_VERSION}/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_random-vc141.${BOOST_VERSION}/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_date_time-vc141.${BOOST_VERSION}/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_regex-vc141.${BOOST_VERSION}/lib/native/*)
+		file(GLOB boost_files	${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_random-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_date_time-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_regex-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
+								${webAsmPlay_BINARY_DIR}/thirdParty/boost_python37-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*)
 
 		foreach(file ${boost_files})
 			execute_process(COMMAND cmake -E copy ${file} ${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/)
@@ -50,17 +61,17 @@ if(MSVC_VERSION)
 	set(BOOST_LIBRARYDIR				${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/)
 	set(SDL2_PATH SDL2_SEARCH_PATHS		${webAsmPlay_BINARY_DIR}/thirdParty/sdl2.new.2.0.8/build/native)
 	set(SDL2_IMAGE_PATH					${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.2.0.3/build/native)
-	set(GLEW_LOCATION					${webAsmPlay_BINARY_DIR}/thirdParty/unofficial-flayan-glew.2.1.0/build/native)
-	set(GLFW_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/glfw.3.3.0.1/build/native)
+	set(GLEW_LOCATION					${webAsmPlay_BINARY_DIR}/thirdParty/unofficial-flayan-glew.${GLEW_VERSION}/build/native)
+	set(GLFW_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/glfw.${GLFW_VERSION}/build/native)
 	set(TBB_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.9.107.0.0/build/native)
 	set(TBB_tbb_debug_LIBRARY			${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.9.107.0.0/build/native/lib/x64/Debug/)
 	set(TBB_tbb_LIBRARY					${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.9.107.0.0/build/native/lib/x64/Release/)
-	set(EXPAT_INCLUDE_SEARCH_DIRS		${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/include)
-    set(EXPAT_LIB_SEARCH_DIRS			${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/lib/x64/Debug/
-										${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/lib/x64/Release/)
-	set(CURL_INCLUDE_DIR				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/include)
-	set(CURL_LIBRARY_RELEASE			${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl.lib)
-	set(CURL_LIBRARY_DEBUG				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl_debug.lib)
+	set(EXPAT_INCLUDE_SEARCH_DIRS		${webAsmPlay_BINARY_DIR}/thirdParty/expat.v${VC_VERSION}.${EXPAT_VERSION}/build/native/include)
+    set(EXPAT_LIB_SEARCH_DIRS			${webAsmPlay_BINARY_DIR}/thirdParty/expat.v${VC_VERSION}.${EXPAT_VERSION}/build/native/lib/x64/Debug/
+										${webAsmPlay_BINARY_DIR}/thirdParty/expat.v${VC_VERSION}.${EXPAT_VERSION}/build/native/lib/x64/Release/)
+	set(CURL_INCLUDE_DIR				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc${CURL_VC_VERSION}-dynamic-x86_64.7.59.0/build/native/include)
+	set(CURL_LIBRARY_RELEASE			${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc${CURL_VC_VERSION}-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl.lib)
+	set(CURL_LIBRARY_DEBUG				${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc${CURL_VC_VERSION}-dynamic-x86_64.7.59.0/build/native/lib/x64/static/libcurl_debug.lib)
 	set(ASSIMP_ROOT_DIR					${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.3.2/build/native)
 	set(ASSIMP_INCLUDE_DIR				${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.3.2/build/native/include)
 	set(ASSIMP_LIBRARY_DEBUG			${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.3.2/build/native/lib/x64/Debug/assimp-vc140-mtd.lib)
@@ -272,7 +283,7 @@ else()
 
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
 
-	find_package(Boost COMPONENTS filesystem random REQUIRED)
+	find_package(Boost COMPONENTS filesystem random python37 REQUIRED)
 	find_package(OpenGL			REQUIRED)
     find_package(glfw3			REQUIRED)
     find_package(SDL2			REQUIRED)
@@ -282,6 +293,7 @@ else()
     find_package(curl			REQUIRED)
     find_package(Expat			REQUIRED)
     find_package(Assimp         REQUIRED)
+    find_package(PythonLibs 3   REQUIRED)
     
     message(GLFW3_INCLUDE_PATH ${GLFW3_INCLUDE_PATH})
     
@@ -292,7 +304,8 @@ else()
     include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 	include_directories(${GLFW3_INCLUDE_PATH})
 	include_directories(${TBB_INCLUDE_DIRS})
-	include_directories(${ASSIMP_INCLUDE_DIR})
+    include_directories(${ASSIMP_INCLUDE_DIR})
+    include_directories(${PYTHON_INCLUDE_DIR})
     include_directories(ThirdParty/ctpl)
     include_directories(./)
 
@@ -302,7 +315,8 @@ else()
     link_libraries(${SDL2_LIBRARY})
 	link_libraries(${OPENGL_gl_LIBRARY})
 	link_libraries(${GLEW_LIBRARY})
-	
+    link_libraries(${PYTHON_LIBRARY})
+    
     if(MSVC_VERSION)
 
         link_libraries(debug ${CURL_LIBRARY_DEBUG}		optimized ${CURL_LIBRARY_RELEASE})
@@ -497,7 +511,7 @@ else()
         #RelWithDebInfo
         #)
 
-		set(DLLS_COMMON		${webAsmPlay_BINARY_DIR}/thirdParty/unofficial-flayan-glew.redist.2.1.0/build/native/bin/x64/dynamic/glew32.dll
+		set(DLLS_COMMON		${webAsmPlay_BINARY_DIR}/thirdParty/unofficial-flayan-glew.redist.${GLEW_VERSION}/build/native/bin/x64/dynamic/glew32.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/sdl2.new.redist.2.0.8/build/native/bin/x64/SDL2.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/libjpeg-9.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/libpng16-16.dll
@@ -505,29 +519,32 @@ else()
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/libwebp-7.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/SDL2_image.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/zlib1.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/glfw.3.3.0.1/build/native/bin/dynamic/v140/x64/glfw3.dll)
+							${webAsmPlay_BINARY_DIR}/thirdParty/glfw.${GLFW_VERSION}/build/native/bin/dynamic/v140/x64/glfw3.dll)
 
         set(DLLS_RELEASE	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Release/tbb.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/bin/x64/Release/libexpat.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v${VC_VERSION}.${EXPAT_VERSION}/build/native/bin/x64/Release/libexpat.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc${CURL_VC_VERSION}-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Release/assimp-vc140-mt.dll
 							#${webAsmPlay_BINARY_DIR}/thirdParty/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Release/freetype28.dll
 							)
 
 		set(DLLS_DEBUG	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Debug/tbb_debug.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v140.2.2.6/build/native/bin/x64/Debug/libexpatd.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc141-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl_debug.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v${VC_VERSION}.${EXPAT_VERSION}/build/native/bin/x64/Debug/libexpatd.dll
+							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc${CURL_VC_VERSION}-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl_debug.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Debug/assimp-vc140-mtd.dll
 							#${webAsmPlay_BINARY_DIR}/thirdParty/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Debug/freetype28d.dll
 							)
 
 
         foreach(dll ${DLLS_RELEASE} ${DLLS_COMMON})
-            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
-			add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
-			add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel")
+            #add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
+			#add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
+			#add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel")
+			file(COPY "${dll}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Release")
+			file(COPY "${dll}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
+			file(COPY "${dll}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel")
         endforeach(dll)
 		
         foreach(dll ${DLLS_DEBUG} ${DLLS_COMMON})

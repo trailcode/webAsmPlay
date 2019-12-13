@@ -139,7 +139,8 @@ void GUI::renderSettingsPanel()
 
 			// 43.994f Seems to be the smallest value before things get strange.
 			// 46.7f Seems to be the max.
-			if(ImGui::SliderFloat("FOV", &perspectiveFOV, 43.994f, 46.7f, "%.3f"))
+			//if(ImGui::SliderFloat("FOV", &perspectiveFOV, 43.994f, 46.7f, "%.3f"))
+			if(ImGui::SliderFloat("FOV", &perspectiveFOV, 43.994f, 90.0f, "%.3f"))
 			{
 				s_canvas->setPerspectiveFOV(perspectiveFOV);
 			}
