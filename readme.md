@@ -50,6 +50,9 @@ and allow C++ 17 compilation:
 * Histogram: https://github.com/HDembinski/histogram
 * SimpleJSON: https://github.com/MJPA/SimpleJSON
 
+#### CUDA
+* https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html
+
 #### Building
 
 The build system is based on CMake. 

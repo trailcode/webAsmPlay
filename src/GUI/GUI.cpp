@@ -391,6 +391,7 @@ void GUI::showMainMenuBar()
 		if (ImGui::MenuItem("Bing StreetSide"))			{ s_showStreetSidePanel					^= 1 ;}
 		if (ImGui::MenuItem("Bubble Face Test"))		{ s_showBubbleFaceTestPanel				^= 1 ;}
 		if (ImGui::MenuItem("Texture System"))			{ s_showTextureSystemPanel				^= 1 ;}
+		if (ImGui::MenuItem("Python Console"))			{ s_showPythonConsolePanel				^= 1 ;}
 		if (ImGui::MenuItem("Full Screen"))				{ setFullScreen(!g_fullScreen)				 ;}
 
         ImGui::EndMenu();
@@ -555,6 +556,7 @@ void GUI::mainLoop(GLFWwindow * window)
 	bubbleFaceTestPanel();
 	bubbleFacePanels();
 	textureSystemPanel();
+	pythonConsolePanel();
 
 	//ImGui::ShowDemoWindow();
 

@@ -196,6 +196,7 @@ private:
 	static void bubbleFaceTestPanel();
 	static void bubbleFacePanels();
 	static void textureSystemPanel();
+	static void pythonConsolePanel();
 
     static void showHelpMarker(const char* desc);
 
@@ -229,6 +230,7 @@ private:
 	static bool s_showBubbleFaceTestPanel;
 	static bool s_showBubbleFacePanel[6];
 	static bool s_showTextureSystemPanel;
+	static bool s_showPythonConsolePanel;
 
     static GLFWwindow * s_mainWindow;
 

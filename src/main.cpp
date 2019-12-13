@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/GeoClient.h>
+#include <webAsmPlay/Python.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions 
@@ -52,8 +53,35 @@ void errorCallback(int error, const char* description);
 
 extern std::thread * openSteerThread;
 
+using namespace boost::python;
+
+void my_exePy(const std::string command)
+{
+	try {
+      //Py_Initialize();
+   
+      object main_module((
+      handle<>(borrowed(PyImport_AddModule("__main__")))));
+  
+    object main_namespace = main_module.attr("__dict__");
+  
+    handle<> ignored(( PyRun_String( command.c_str(),
+                                     Py_file_input,
+                                     main_namespace.ptr(),
+                                     main_namespace.ptr() ) ));
+
+	
+
+  } catch( error_already_set ) {
+    PyErr_Print();
+  }
+}
+
 int main(int, char**)
 {
+	//exit(0);
+	Python::initPython();
+
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())

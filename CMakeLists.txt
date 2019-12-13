@@ -55,6 +55,7 @@ if(MSVC_VERSION)
 		endforeach(file)
 	endif()
 
+
 	set(TBB_LIB_PATH_SUFFIX /lib/x64/Debug /lib/x64/Release)
 
 	set(BOOST_INCLUDEDIR				${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/native/include)
@@ -177,6 +178,26 @@ file(GLOB webAsmPlayGUI_SRC	        "src/GUI/*.cpp"			"inc/webAsmPlay/GUI/*.h")
 file(GLOB webAsmPlayCanvas_SRC      "src/canvas/*.cpp"		"inc/webAsmPLay/canvas/*.h")
 file(GLOB webAsmPlayBing_SRC		"src/bing/*.cpp"		"inc/webAsmPlay/bing/*.h")
 file(GLOB geoServer_SRC             "GeoServer/src/*.cpp"	"GeoServer/inc/geoServer/*.h")
+
+set(ASSET_FILES     ${CMAKE_CURRENT_SOURCE_DIR}/assets/back.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/bot.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/front.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/left.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/right.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/top.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/xneg.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/xpos.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/yneg.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/ypos.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/zneg.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/zpos.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/if_Info_131908.png
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/tree1.obj
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/tree1.mtl
+					${CMAKE_CURRENT_SOURCE_DIR}/assets/ProggyClean.ttf)
+
+set(config_files	${CMAKE_CURRENT_SOURCE_DIR}/config/imgui.ini
+					${CMAKE_CURRENT_SOURCE_DIR}/config/config.json)
                   
 file(GLOB sources   ${webAsmPlay_SRC}
 					${webAsmPlayShaders_SRC}
@@ -191,6 +212,8 @@ file(GLOB sources   ${webAsmPlay_SRC}
                     ${simpleJSON_SRC}
                     ${opensteerSrc}
 					${imguiSrc}
+					${ASSET_FILES}
+					${config_files}
 					readme.md
                     )
 				  
@@ -324,11 +347,7 @@ else()
 		link_libraries(debug ${ASSIMP_LIBRARY_DEBUG}	optimized ${ASSIMP_LIBRARY_RELEASE})
 
     else()
-
-        # The boost libs seem to not be needed on OSX, same for Linux?
-        #link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG}	optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
-        #link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG}		optimized ${Boost_RANDOM_LIBRARY_RELEASE})
-        #link_libraries(debug ${Boost_SYSTEM_LIBRARY_DEBUG}		optimized ${Boost_SYSTEM_LIBRARY_RELEASE})
+        
         link_libraries(${TBB_tbb_LIBRARY_RELEASE})
         link_libraries(${CURL_LIBRARY})
         link_libraries(${assimp_LIBRARIES})
@@ -337,76 +356,55 @@ else()
     
 	link_directories(${Boost_LIBRARY_DIRS})
 
-    set(ASSET_FILES     back.png
-                        bot.png
-                        front.png
-                        left.png
-                        right.png
-                        top.png
-                        xneg.png
-                        xpos.png
-                        yneg.png
-                        ypos.png
-                        zneg.png
-                        zpos.png
-                        if_Info_131908.png
-                        tree1.obj
-                        tree1.mtl
-						ProggyClean.ttf
-                        )
+    foreach(assetFilePath ${ASSET_FILES})
 	
-    foreach(assetFile ${ASSET_FILES})
+		get_filename_component(assetFile ${assetFilePath} NAME)
 
 		if(MSVC_VERSION)
-
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}"	DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-
+	
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"		COMMAND cmake -E copy "${assetFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}"			MAIN_DEPENDENCY "${assetFilePath}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}" COMMAND cmake -E copy "${assetFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}"	MAIN_DEPENDENCY "${assetFilePath}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		COMMAND cmake -E copy "${assetFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}"		MAIN_DEPENDENCY "${assetFilePath}")
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}"			COMMAND cmake -E copy "${assetFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}"			MAIN_DEPENDENCY "${assetFilePath}")
+	
 			list(APPEND assetFileDestRelease		"${CMAKE_CURRENT_BINARY_DIR}/Release/${assetFile}")
 			list(APPEND assetFileDestRelWithDebInfo "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${assetFile}")
 			list(APPEND assetFileDestMinSizeRel		"${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${assetFile}")
 			list(APPEND assetFileDestDebug			"${CMAKE_CURRENT_BINARY_DIR}/Debug/${assetFile}")
-
+	
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Release/tiles")
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/tiles")
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/tiles")
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Debug/tiles")
-
+	
 			file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Release/bubbles")
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/bubbles")
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/bubbles")
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Debug/bubbles")
 			
 		else()
-
-			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
-
+	
+			ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}" "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}" MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/assets/${assetFile}")
+	
 			list(APPEND assetFileDest "${CMAKE_CURRENT_BINARY_DIR}/${assetFile}")
-
+	
             file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/tiles")
 			file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bubbles")
 			
 		endif()
-
+	
     endforeach(assetFile)
 	
-    set(config_files imgui.ini config.json)
+    foreach(configFilePath ${config_files})
 
-    foreach(configFile ${config_files})
+		get_filename_component(configFile ${configFilePath} NAME)
 
 		if(MSVC_VERSION)
 
-			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-			#ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			COMMAND cmake -E copy "${configFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}"			MAIN_DEPENDENCY ${configFilePath})
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	COMMAND cmake -E copy "${configFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}"	MAIN_DEPENDENCY ${configFilePath})
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		COMMAND cmake -E copy "${configFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${configFile}"		MAIN_DEPENDENCY ${configFilePath})
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"			COMMAND cmake -E copy "${configFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${configFile}"				MAIN_DEPENDENCY ${configFilePath})
 
 			list(APPEND configFileDestRelease			"${CMAKE_CURRENT_BINARY_DIR}/Release/${configFile}")
 			list(APPEND configFileDestRelWithDebInfo	"${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${configFile}")
@@ -415,7 +413,7 @@ else()
 
 		else()
 
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}" "${CMAKE_CURRENT_BINARY_DIR}/${configFile}" MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/config/${configFile}")
 
 			list(APPEND configFileDest "${CMAKE_CURRENT_BINARY_DIR}/${configFile}")
 
@@ -429,10 +427,10 @@ else()
 
 		if(MSVC_VERSION)
 
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			MAIN_DEPENDENCY "${shaderFilePath}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	MAIN_DEPENDENCY "${shaderFilePath}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		MAIN_DEPENDENCY "${shaderFilePath}")
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"				MAIN_DEPENDENCY "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}"			MAIN_DEPENDENCY ${shaderFilePath})
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}"	MAIN_DEPENDENCY ${shaderFilePath})
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel/${shaderFile}"		MAIN_DEPENDENCY ${shaderFilePath})
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"			COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/Debug/${shaderFile}"				MAIN_DEPENDENCY ${shaderFilePath})
 
 			list(APPEND shaderFileDestRelease			"${CMAKE_CURRENT_BINARY_DIR}/Release/${shaderFile}")
 			list(APPEND shaderFileDestRelWithDebInfo	"${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo/${shaderFile}")
@@ -441,7 +439,7 @@ else()
 
 		else()
 
-			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" DEPENDS "${shaderFilePath}")
+			ADD_CUSTOM_COMMAND(	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" COMMAND cmake -E copy "${shaderFilePath}" "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}" MAIN_DEPENDENCY "${shaderFilePath}")
 
 			list(APPEND shaderFileDest "${CMAKE_CURRENT_BINARY_DIR}/${shaderFile}")
 
@@ -489,10 +487,7 @@ else()
 	target_include_directories(geoServer PRIVATE ${EXPAT_INCLUDE_DIRS})
 
 	target_link_libraries(geoServer libWebAsmPlay)
-    target_link_libraries(geoServer debug ${EXPAT_LIBRARY_DEBUG} optimized ${EXPAT_LIBRARY_RELEASE}
-                            #debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE}
-                            #debug ${Boost_SYSTEM_LIBRARY_DEBUG} optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
-							)
+    target_link_libraries(geoServer debug ${EXPAT_LIBRARY_DEBUG} optimized ${EXPAT_LIBRARY_RELEASE})
 
 	if(MSVC_VERSION)
 
@@ -502,14 +497,6 @@ else()
 		set_property(TARGET webAsmPlay PROPERTY VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR})
 
 	    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc /std:c++latest /MP")
-
-        #install(FILES	${BOOST_FILESYSTEM_PATH_RELEASE}/${BOOST_FILE AME2}.dll
-                        #"${SDL2_IMAGE_LIBRARY_PATH}/SDL2_image.dll"
-                        #"${SDL2MAIN_LIBRARY_PATH}/SDL2.dll"
-        #DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release
-        #CONFIGURATIONS Release 
-        #RelWithDebInfo
-        #)
 
 		set(DLLS_COMMON		${webAsmPlay_BINARY_DIR}/thirdParty/unofficial-flayan-glew.redist.${GLEW_VERSION}/build/native/bin/x64/dynamic/glew32.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/sdl2.new.redist.2.0.8/build/native/bin/x64/SDL2.dll
@@ -521,42 +508,34 @@ else()
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/zlib1.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/glfw.${GLFW_VERSION}/build/native/bin/dynamic/v140/x64/glfw3.dll)
 
+        file(GLOB boost_python_dlls_release ${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/boost_python37-vc${VC_VERSION}-mt-x64-*.dll)
+        file(GLOB boost_python_dlls_debug   ${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/boost_python37-vc${VC_VERSION}-mt-gd-x64-*.dll)
+
         set(DLLS_RELEASE	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Release/tbb.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v${VC_VERSION}.${EXPAT_VERSION}/build/native/bin/x64/Release/libexpat.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc${CURL_VC_VERSION}-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Release/assimp-vc140-mt.dll
-							#${webAsmPlay_BINARY_DIR}/thirdParty/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Release/freetype28.dll
-							)
+							${boost_python_dlls_release})
 
 		set(DLLS_DEBUG	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Debug/tbb_debug.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v${VC_VERSION}.${EXPAT_VERSION}/build/native/bin/x64/Debug/libexpatd.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc${CURL_VC_VERSION}-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl_debug.dll
-							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Debug/assimp-vc140-mtd.dll
-							#${webAsmPlay_BINARY_DIR}/thirdParty/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Debug/freetype28d.dll
-							)
+                            ${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Debug/assimp-vc140-mtd.dll
+                            ${boost_python_dlls_debug})
 
 
         foreach(dll ${DLLS_RELEASE} ${DLLS_COMMON})
-            #add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Release")
-			#add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
-			#add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel")
 			file(COPY "${dll}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Release")
 			file(COPY "${dll}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo")
 			file(COPY "${dll}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel")
         endforeach(dll)
 		
         foreach(dll ${DLLS_DEBUG} ${DLLS_COMMON})
-            add_custom_command(TARGET webAsmPlay POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+            file(COPY "${dll}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Debug")
         endforeach(dll)
 
-
-        #get_filename_component(UTF_BASE_NAME_DEBUG ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG} NAME_WE)
-        #install(FILES ${UTF_PATH}/${UTF_BASE_NAME_DEBUG}.dll
-        #  DESTINATION ../bin
-        #  CONFIGURATIONS Debug
-        #)
 	endif()
 
 endif()

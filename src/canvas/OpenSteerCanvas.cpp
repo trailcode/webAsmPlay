@@ -85,7 +85,7 @@ void openSteerKeyboardFunc (unsigned char key);
 
 void OpenSteerCanvas::onChar(GLFWwindow * window, const size_t c)
 {
-    dmess("OpenSteerCanvas::onChar " << (char)c);
+    //dmess("OpenSteerCanvas::onChar " << (char)c);
 
     //openSteerKeyboardFunc((char)c);
 }

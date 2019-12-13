@@ -42,6 +42,6 @@ layout (binding = 6, std140) uniform TEXTURE_BLOCK
 void main()
 {
 	outColor = texture( tex[texID], UV );
-
 	outColor.a = 1.0;
+
 }
