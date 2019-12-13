@@ -25,12 +25,16 @@
 */
 
 #include <boost/python.hpp>
+#include <boost/python/numpy.hpp>
 #include <boost/circular_buffer.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Python.h>
 
 using namespace std;
 using namespace boost::python;
+
+namespace p = boost::python;
+namespace np = boost::python::numpy;
 
 namespace
 {
@@ -70,6 +74,14 @@ namespace
 		void set(std::string msg) { this->msg = msg; }
 		std::string greet() { return msg; }
 		std::string msg;
+		np::ndarray getArray()
+		{
+			p::tuple shape = p::make_tuple(3, 3);
+			np::dtype dtype = np::dtype::get_builtin<float>();
+			np::ndarray a = np::zeros(shape, dtype);
+
+			return a;
+		}
 	};
 }
 
@@ -80,6 +92,7 @@ BOOST_PYTHON_MODULE(webAsmPlay)
 	class_<World>("World")
         .def("greet", &World::greet)
         .def("set", &World::set)
+		.def("getArray", &World::getArray)
     ;
 }
 
@@ -87,13 +100,11 @@ void Python::initPython()
 {
 	try
 	{
-
-		//PyImport_AppendInittab( "webAsmPlay", &init_module_webAsmPlay );
-		// Register the module with the interpreter
-		
 		if (PyImport_AppendInittab("webAsmPlay", &PyInit_webAsmPlay) == -1) { dmessError("Failed to add webAsmPlay to the interpreter's builtin modules") ;}
 
 		Py_Initialize();
+
+		np::initialize();
 
 		object main_module((handle<>(borrowed(PyImport_AddModule("__main__")))));
 

@@ -55,6 +55,12 @@ and allow C++ 17 compilation:
 
 #### Building
 
+* Install Python38
+  * pip install numpy
+* Install boost
+  * Build with python support, must find numpy when building
+    * b2.exe address-model=64 architecture=x86 link=shared threading=multi runtime-link=shared --with-chrono --with-date_time --with-filesystem --with-system --with-atomic --with-thread --with-timer --with-program_options --with-python --with-numpy --variant=release,debug --build-type=minimal stage -j8
+
 The build system is based on CMake. 
 
 ### OSX

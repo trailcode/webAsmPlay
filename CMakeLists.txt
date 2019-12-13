@@ -29,12 +29,13 @@ if(MSVC_VERSION)
 
 		execute_process(COMMAND ${NUGET} install vii.SDL2_image				-Version 2.0.3		-o thirdParty)
 		
-        execute_process(COMMAND ${NUGET} install boost_filesystem-vc${VC_VERSION}		-Version ${BOOST_VERSION}	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_random-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_date_time-vc${VC_VERSION}		-Version ${BOOST_VERSION}	-o thirdParty)
-		execute_process(COMMAND ${NUGET} install boost_regex-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
-        execute_process(COMMAND ${NUGET} install boost_system-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
-        execute_process(COMMAND ${NUGET} install boost_python37-vc${VC_VERSION}		-Version ${BOOST_VERSION}	-o thirdParty)
+        #execute_process(COMMAND ${NUGET} install boost_filesystem-vc${VC_VERSION}		-Version ${BOOST_VERSION}	-o thirdParty)
+		#execute_process(COMMAND ${NUGET} install boost_random-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
+		#execute_process(COMMAND ${NUGET} install boost_date_time-vc${VC_VERSION}		-Version ${BOOST_VERSION}	-o thirdParty)
+		#execute_process(COMMAND ${NUGET} install boost_regex-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
+        #execute_process(COMMAND ${NUGET} install boost_system-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
+        #execute_process(COMMAND ${NUGET} install boost_python37-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
+		#execute_process(COMMAND ${NUGET} install boost_numpy37-vc${VC_VERSION}			-Version ${BOOST_VERSION}	-o thirdParty)
 
 		execute_process(COMMAND ${NUGET} install curl-vc${CURL_VC_VERSION}-dynamic-x86_64	-Version 7.59.0		-o thirdParty)
 		execute_process(COMMAND ${NUGET} install glfw						-Version ${GLFW_VERSION}	-o thirdParty)
@@ -43,23 +44,27 @@ if(MSVC_VERSION)
 		execute_process(COMMAND ${NUGET} install expat.v${VC_VERSION}		-Version ${EXPAT_VERSION}		-o thirdParty)
 		execute_process(COMMAND ${NUGET} install assimp.v140				-Version 3.2.0		-o thirdParty)
 	
-		file(GLOB boost_files	${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_random-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_date_time-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_regex-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
-								${webAsmPlay_BINARY_DIR}/thirdParty/boost_python37-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*)
-
-		foreach(file ${boost_files})
-			execute_process(COMMAND cmake -E copy ${file} ${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/)
-		endforeach(file)
+		#file(GLOB boost_files	${webAsmPlay_BINARY_DIR}/thirdParty/boost_filesystem-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
+		#						${webAsmPlay_BINARY_DIR}/thirdParty/boost_system-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
+		#						${webAsmPlay_BINARY_DIR}/thirdParty/boost_random-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
+		#						${webAsmPlay_BINARY_DIR}/thirdParty/boost_date_time-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
+		#						${webAsmPlay_BINARY_DIR}/thirdParty/boost_regex-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*
+		#						${webAsmPlay_BINARY_DIR}/thirdParty/boost_python37-vc${VC_VERSION}.${BOOST_VERSION}/lib/native/*)
+		#
+		#foreach(file ${boost_files})
+		#	execute_process(COMMAND cmake -E copy ${file} ${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/)
+		#endforeach(file)
 	endif()
 
 
 	set(TBB_LIB_PATH_SUFFIX /lib/x64/Debug /lib/x64/Release)
 
-	set(BOOST_INCLUDEDIR				${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/native/include)
-	set(BOOST_LIBRARYDIR				${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/)
+	set(BOOST_INCLUDEDIR				C:/boost_1_72_0)
+    #set(BOOST_LIBRARYDIR				C:/boost_1_72_0/lib64-msvc-14.2)
+    set(BOOST_LIBRARYDIR				C:/boost_1_72_0/stage/lib)
+
+	#set(BOOST_INCLUDEDIR				${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/native/include)
+	#set(BOOST_LIBRARYDIR				${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/)
 	set(SDL2_PATH SDL2_SEARCH_PATHS		${webAsmPlay_BINARY_DIR}/thirdParty/sdl2.new.2.0.8/build/native)
 	set(SDL2_IMAGE_PATH					${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.2.0.3/build/native)
 	set(GLEW_LOCATION					${webAsmPlay_BINARY_DIR}/thirdParty/unofficial-flayan-glew.${GLEW_VERSION}/build/native)
@@ -244,6 +249,10 @@ add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 add_definitions(-DGLM_FORCE_RADIANS)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
+#add_definitions(-DBOOST_PYTHON_STATIC_LIB)
+#add_definitions(-DBOOST_NUMPY_STATIC_LIB)
+add_definitions(-DBOOST_LIB_DIAGNOSTIC)
+#add_definitions(-DBOOST_ALL_NO_LIB)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     
@@ -306,7 +315,8 @@ else()
 
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
 
-	find_package(Boost COMPONENTS filesystem random python37 REQUIRED)
+    #find_package(Boost COMPONENTS filesystem random python38 REQUIRED)
+    find_package(Boost COMPONENTS filesystem python38 REQUIRED)
 	find_package(OpenGL			REQUIRED)
     find_package(glfw3			REQUIRED)
     find_package(SDL2			REQUIRED)
@@ -345,6 +355,9 @@ else()
         link_libraries(debug ${CURL_LIBRARY_DEBUG}		optimized ${CURL_LIBRARY_RELEASE})
         link_libraries(debug ${TBB_tbb_LIBRARY_DEBUG}	optimized ${TBB_tbb_LIBRARY_RELEASE})
 		link_libraries(debug ${ASSIMP_LIBRARY_DEBUG}	optimized ${ASSIMP_LIBRARY_RELEASE})
+		#link_libraries(debug ${Boost_FILESYSTEM_LIBRARY_DEBUG}	optimized ${Boost_FILESYSTEM_LIBRARY_RELEASE})
+		#link_libraries(debug ${Boost_PYTHON38_LIBRARY_DEBUG}	optimized ${Boost_PYTHON38_LIBRARY_RELEASE})
+		#link_libraries(debug ${Boost_RANDOM_LIBRARY_DEBUG}	optimized ${Boost_RANDOM_LIBRARY_RELEASE})
 
     else()
         
@@ -508,22 +521,27 @@ else()
 							${webAsmPlay_BINARY_DIR}/thirdParty/vii.SDL2_image.redist.2.0.3/build/native/bin/x64/zlib1.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/glfw.${GLFW_VERSION}/build/native/bin/dynamic/v140/x64/glfw3.dll)
 
-        file(GLOB boost_python_dlls_release ${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/boost_python37-vc${VC_VERSION}-mt-x64-*.dll)
-        file(GLOB boost_python_dlls_debug   ${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/boost_python37-vc${VC_VERSION}-mt-gd-x64-*.dll)
+        #file(GLOB boost_python_dlls_release ${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/boost_python37-vc${VC_VERSION}-mt-x64-*.dll
+		#									#${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/boost_python37-vc${VC_VERSION}-mt-x64-*.dll
+		#									)
+		#
+        #file(GLOB boost_python_dlls_debug   ${webAsmPlay_BINARY_DIR}/thirdParty/boost.${BOOST_VERSION}/lib/boost_python37-vc${VC_VERSION}-mt-gd-x64-*.dll)
 
         set(DLLS_RELEASE	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Release/tbb.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v${VC_VERSION}.${EXPAT_VERSION}/build/native/bin/x64/Release/libexpat.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc${CURL_VC_VERSION}-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Release/assimp-vc140-mt.dll
-							${boost_python_dlls_release})
+							#${boost_python_dlls_release}
+							)
 
 		set(DLLS_DEBUG	
 							${webAsmPlay_BINARY_DIR}/thirdParty/tbb_oss.redist.9.107.0.0/build/native/bin/x64/Debug/tbb_debug.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/expat.v${VC_VERSION}.${EXPAT_VERSION}/build/native/bin/x64/Debug/libexpatd.dll
 							${webAsmPlay_BINARY_DIR}/thirdParty/curl-vc${CURL_VC_VERSION}-dynamic-x86_64.7.59.0/build/native/lib/x64/dynamic/libcurl_debug.dll
                             ${webAsmPlay_BINARY_DIR}/thirdParty/assimp.v140.redist.3.2/build/native/bin/x64/Debug/assimp-vc140-mtd.dll
-                            ${boost_python_dlls_debug})
+                            #${boost_python_dlls_debug}
+							)
 
 
         foreach(dll ${DLLS_RELEASE} ${DLLS_COMMON})
