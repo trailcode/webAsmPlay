@@ -105,3 +105,9 @@ The build system is based on CMake.
 
 * https://gamedev.stackexchange.com/questions/19461/opengl-glsl-render-to-cube-map
 
+* TensorFlow Notes
+  * https://medium.com/@WuStangDan/step-by-step-tensorflow-object-detection-api-tutorial-part-1-selecting-a-model-a02b6aabe39e
+  * pycocotools windows: ```pip install pycocotools``` fails
+    * pip install --upgrade cython
+    * pip install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI"
+
