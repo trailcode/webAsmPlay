@@ -5,7 +5,7 @@ import numpy as np
 import os
 import six.moves.urllib as urllib
 import sys
-sys.path.extend(["C:/src/models/research/slim"])
+#sys.path.extend(["C:/src/models/research/slim"])
 import tarfile
 import tensorflow as tf
 import zipfile
@@ -19,6 +19,19 @@ from IPython.display import display
 from object_detection.utils import ops as utils_ops
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
+
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+  # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
+  try:
+    tf.config.experimental.set_virtual_device_configuration(
+        gpus[0],
+        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024*5)])
+    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+  except RuntimeError as e:
+    # Virtual devices must be set before GPUs have been initialized
+    print(e)
 
 from webAsmPlay import Texture
 
@@ -94,56 +107,31 @@ def run_inference_for_single_image(model, image):
     output_dict['detection_masks_reframed'] = detection_masks_reframed.numpy()
     
   return output_dict
-
-def show_inference(model, image_path):
-  # the array based representation of the image will be used later in order to prepare the
-  # result image with boxes and labels on it.
-  image_np = np.array(Image.open(image_path))
-
-  print(image_np)
   
-  # Actual detection.
-  output_dict = run_inference_for_single_image(model, image_np)
-  # Visualization of the results of a detection.
-  vis_util.visualize_boxes_and_labels_on_image_array(
-      image_np,
-      output_dict['detection_boxes'],
-      output_dict['detection_classes'],
-      output_dict['detection_scores'],
-      category_index,
-      instance_masks=output_dict.get('detection_masks_reframed', None),
-      use_normalized_coordinates=True,
-      line_thickness=8)
+model_name = "mask_rcnn_inception_resnet_v2_atrous_coco_2018_01_28"
+masking_model = load_model("mask_rcnn_inception_resnet_v2_atrous_coco_2018_01_28") # Segmentation
 
-  print(type(image_np))
+def detectObjects(id):
+	t = Texture.textureToNdArray(id)
+	image_np = (t * 255).astype(np.uint8)
+	#image_np = Image.fromarray(t)
 
-  display(Image.fromarray(image_np))
-  Image.fromarray(image_np).show()
+	#output_dict = run_inference_for_single_image(detection_model, image_np)
+	output_dict = run_inference_for_single_image(masking_model, image_np)
+	print('output_dict', output_dict)
+	# Visualization of the results of a detection.
+	vis_util.visualize_boxes_and_labels_on_image_array(	image_np,
+														output_dict['detection_boxes'],
+														output_dict['detection_classes'],
+														output_dict['detection_scores'],
+														category_index,
+														instance_masks=output_dict.get('detection_masks_reframed', None),
+														use_normalized_coordinates=True,
+														line_thickness=8)
 
-#for image_path in TEST_IMAGE_PATHS:
-#  show_inference(detection_model, image_path)
-  
-def doIt(id):
-    t = Texture.textureToNdArray(id)
-    image_np = (t * 255).astype(np.uint8)
-    #image_np = Image.fromarray(t)
+	for i in output_dict['detection_boxes']: print(i)
 
-    output_dict = run_inference_for_single_image(detection_model, image_np)
-    # Visualization of the results of a detection.
-    vis_util.visualize_boxes_and_labels_on_image_array(
-      image_np,
-      output_dict['detection_boxes'],
-      output_dict['detection_classes'],
-      output_dict['detection_scores'],
-      category_index,
-      instance_masks=output_dict.get('detection_masks_reframed', None),
-      use_normalized_coordinates=True,
-      line_thickness=8)
+	print(type(image_np))
 
-    for i in output_dict['detection_boxes']:
-      print(i)
-
-    print(type(image_np))
-
-    display(Image.fromarray(image_np))
-    Image.fromarray(image_np).show()
+	display(Image.fromarray(image_np))
+	Image.fromarray(image_np).show()

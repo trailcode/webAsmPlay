@@ -143,6 +143,8 @@ public:
 
 	void addPreRenderFunctor(const std::function<void()> & functor);
 
+	void addKeyListener(const std::function<void(const int key, const int scancode, const int action, const int mods)> & listener);
+
 protected:
 
     bool preRender();
@@ -215,4 +217,6 @@ protected:
 	std::vector<std::function<void(const glm::dvec3 & posWC)>> m_mouseMoveListeners;
 
 	std::vector<std::function<void()>> m_preRenderFunctors;
+
+	std::vector<std::function<void(const int key, const int scancode, const int action, const int mods)>> m_keyListeners;
 };

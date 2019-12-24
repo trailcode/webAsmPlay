@@ -118,4 +118,5 @@ The build system is based on CMake.
     * pip install --upgrade cython
     * pip install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI"
   * set PYTHONPATH=%PYTHONPATH%;C:\src\models\research;C:\src\models\research\slim
+  * Read and try this: https://github.com/Allopart/Maritme_Mask_RCNN
 

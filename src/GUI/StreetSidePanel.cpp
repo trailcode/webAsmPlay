@@ -184,8 +184,15 @@ void GUI::initBingStreetSidePanel(const dmat4 & trans)
 		getMainCanvas()->addRenderable(a_closestBubble = StreetSide::closestBubbleRenderable());
 	});
 
+	getMainCanvas()->addKeyListener([](const int key, const int scancode, const int action, const int mods)
+	{
+		a_clickToViewBubble ^= action && key == GLFW_KEY_B;
+	});
+
+	/*
 	GUI::addUpdatable([]()
     {
 
 	});
+	*/
 }

@@ -82,7 +82,7 @@ void GUI::bubbleFacePanels()
 			{
 				dmess("texID " << texID);
 
-				dmess(Python::execute("doIt(" + toStr((size_t)texID) + ")"));
+				dmess(Python::execute("detectObjects(" + toStr((size_t)texID) + ")"));
 			}
 		}
 		ImGui::End();

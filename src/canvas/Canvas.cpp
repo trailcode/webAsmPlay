@@ -406,9 +406,16 @@ void Canvas::addPreRenderFunctor(const function<void()> & functor)
 	m_preRenderFunctors.push_back(functor);
 }
 
+void Canvas::addKeyListener(const function<void(const int key, const int scancode, const int action, const int mods)> & listener)
+{
+	m_keyListeners.push_back(listener);
+}
+
 void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods)
 {
     if(!m_enabled || !m_wantMouseCapture) { return ;}
+
+	dmess("key " << key << " scancode " << scancode << " action " << action << " mods " << mods);
 
     switch(key)
     {
@@ -437,6 +444,8 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
         case GLFW_KEY_LEFT_ALT:		m_trackBallInteractor->setMotionLeftClick(PAN);  break;
 		case GLFW_KEY_LEFT_CONTROL: m_trackBallInteractor->setMotionLeftClick(ZOOM); break;
     }
+
+	for(const auto & listener : m_keyListeners) { listener(key, scancode, action, mods) ;}
 }
 
 void Canvas::onChar(GLFWwindow * window, const size_t c)
