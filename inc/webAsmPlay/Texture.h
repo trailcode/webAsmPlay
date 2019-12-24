@@ -25,6 +25,7 @@
 */
 #pragma once
 
+#include <boost/python/numpy.hpp>
 #include <atomic>
 #include <string>
 #include <unordered_map>
@@ -57,6 +58,8 @@ public:
 	static void incrementFrameNumber();
 
 	static size_t getFrameNumber();
+
+	static boost::python::numpy::ndarray textureToNdArray(const GLuint texID);
 
 	static GLuint s_NO_DATA;
 

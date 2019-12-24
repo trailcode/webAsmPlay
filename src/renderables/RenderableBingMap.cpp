@@ -33,6 +33,7 @@
 #include <functional>
 #include <unordered_map>
 #include <filesystem>
+#include <boost/python.hpp>
 #include <SDL_image.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Util.h>

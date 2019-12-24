@@ -40,7 +40,7 @@ string toStr(const size_t v)
 {
 	char buf[1024];
 
-	sprintf(buf, "%i", v);
+	sprintf(buf, "%zi", v);
 
 	return buf;
 }
@@ -179,7 +179,7 @@ bool fileExists(const string & fileName)
 #endif
 }
 
-string readFile(const string fileName)
+string readFile(const string & fileName)
 {
 	ifstream t(fileName);
 

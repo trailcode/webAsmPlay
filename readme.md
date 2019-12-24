@@ -55,11 +55,17 @@ and allow C++ 17 compilation:
 
 #### Building
 
-* Install Python38
-  * pip install numpy
+* Install Python37
+  * pip install --user numpy
+    * The --user flag is required for permission issues. 
 * Install boost
   * Build with python support, must find numpy when building
-    * b2.exe address-model=64 architecture=x86 link=shared threading=multi runtime-link=shared --with-chrono --with-date_time --with-filesystem --with-system --with-atomic --with-thread --with-timer --with-program_options --with-python --with-numpy --variant=release,debug --build-type=minimal stage -j8
+    * b2.exe address-model=64 architecture=x86 link=shared threading=multi runtime-link=shared --with-chrono --with-date_time --with-filesystem --with-system --with-atomic --with-thread --with-timer --with-program_options --with-python --variant=release,debug --build-type=minimal stage -j8
+* pip3 install tensorflow-gpu // Cannot get this one to work. 
+  * pip3 install tf-nightly-gpu 
+* pip3 install matplotlib
+* pip3 install Pillow
+* pip3 install ipython
 
 The build system is based on CMake. 
 
@@ -107,7 +113,9 @@ The build system is based on CMake.
 
 * TensorFlow Notes
   * https://medium.com/@WuStangDan/step-by-step-tensorflow-object-detection-api-tutorial-part-1-selecting-a-model-a02b6aabe39e
+  * At time of writing requires this CUDA toolkit: https://developer.nvidia.com/cuda-10.0-download-archive
   * pycocotools windows: ```pip install pycocotools``` fails
     * pip install --upgrade cython
     * pip install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI"
+  * set PYTHONPATH=%PYTHONPATH%;C:\src\models\research;C:\src\models\research\slim
 

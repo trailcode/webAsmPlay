@@ -28,6 +28,7 @@
 #include <boost/python/numpy.hpp>
 #include <boost/circular_buffer.hpp>
 #include <webAsmPlay/Debug.h>
+#include <webAsmPlay/Texture.h>
 #include <webAsmPlay/Python.h>
 
 using namespace std;
@@ -85,6 +86,16 @@ namespace
 	};
 }
 
+namespace
+{
+	struct TextureWrap : Texture, wrapper<Texture>
+	{
+		TextureWrap(const string & ID) : Texture(ID) {}
+
+		string getDownloadURL() const { return this->get_override("getDownloadURL")() ;}
+	};
+}
+
 BOOST_PYTHON_MODULE(webAsmPlay)
 {
 	PyEval_InitThreads();
@@ -94,6 +105,10 @@ BOOST_PYTHON_MODULE(webAsmPlay)
         .def("set", &World::set)
 		.def("getArray", &World::getArray)
     ;
+
+	class_<TextureWrap, boost::noncopyable>("Texture", init<string>())
+		.def("textureToNdArray", &Texture::textureToNdArray).staticmethod("textureToNdArray");
+	;
 }
 
 void Python::initPython()
@@ -124,6 +139,8 @@ void Python::initPython()
 	{
 		PyErr_Print();
 	}
+
+	dmess(Python::execute("from webAsmPlay import *"));
 }
 
 string Python::execute(const string & command)

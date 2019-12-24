@@ -113,6 +113,8 @@ std::wstring stringToWstring(const std::string& t_str);
 
 std::string wstringToString(const std::wstring& t_str);
 
+std::string readFile(const std::string & file);
+
 template<typename T>
 inline std::unordered_set<T> toSet(const std::vector<T>& elms)
 {
@@ -255,8 +257,6 @@ inline char * appendChar(std::vector<char> & data, const char value)
 }
 
 bool fileExists(const std::string& fileName);
-
-std::string readFile(const std::string fileName);
 
 nlohmann::json loadJson(const std::string & fileName);
 

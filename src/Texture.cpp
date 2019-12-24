@@ -29,6 +29,7 @@
 #include <limits>
 #include <vector>
 #include <filesystem>
+#include <boost/python.hpp>
 #include <ctpl/ctpl.h>
 #include <SDL_image.h>
 #include <webAsmPlay/Util.h>
@@ -41,6 +42,9 @@ using namespace std;
 using namespace std::filesystem;
 using namespace ctpl;
 using namespace curlUtil;
+
+namespace p		= boost::python;
+namespace np	= boost::python::numpy;
 
 atomic_size_t Texture::s_desiredMaxNumTextures = { 4000 };
 
@@ -327,3 +331,26 @@ size_t Texture::getNumCacheMisses()	{ return a_numCacheMisses	;}
 void Texture::incrementFrameNumber() { ++a_frameNumber ;}
 
 size_t Texture::getFrameNumber() { return a_frameNumber ;}
+
+np::ndarray Texture::textureToNdArray(const GLuint texID)
+{
+	int w, h;
+
+	glBindTexture(GL_TEXTURE_2D, texID);
+
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH,	&w);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT,	&h);
+
+	dmess("w " << w << " h " << h);
+
+	p::tuple shape = p::make_tuple(h, w, 3);
+	np::dtype dtype = np::dtype::get_builtin<float>();
+	np::ndarray a = np::zeros(shape, dtype);
+
+	glBindTexture(GL_TEXTURE_2D, texID);
+
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, (GLvoid *)a.get_data());
+
+	return a;
+}
+

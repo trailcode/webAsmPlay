@@ -27,6 +27,7 @@
 #include <atomic>
 #include <unordered_set>
 #include <filesystem>
+#include <boost/python.hpp>
 #include <tbb/concurrent_unordered_map.h>
 #include <ctpl/ctpl.h>
 #include <SDL_image.h>

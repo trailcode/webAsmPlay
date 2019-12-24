@@ -184,6 +184,8 @@ file(GLOB webAsmPlayCanvas_SRC      "src/canvas/*.cpp"		"inc/webAsmPLay/canvas/*
 file(GLOB webAsmPlayBing_SRC		"src/bing/*.cpp"		"inc/webAsmPlay/bing/*.h")
 file(GLOB geoServer_SRC             "GeoServer/src/*.cpp"	"GeoServer/inc/geoServer/*.h")
 
+file(GLOB webAsmPlayPython_SRC "py/*.py")
+
 set(ASSET_FILES     ${CMAKE_CURRENT_SOURCE_DIR}/assets/back.png
                     ${CMAKE_CURRENT_SOURCE_DIR}/assets/bot.png
                     ${CMAKE_CURRENT_SOURCE_DIR}/assets/front.png
@@ -212,6 +214,7 @@ file(GLOB sources   ${webAsmPlay_SRC}
 					${webAsmPlayGUI_SRC}
 					${webAsmPlayCanvas_SRC}
 					${webAsmPlayBing_SRC}
+					${webAsmPlayPython_SRC}
                     ${geosSrc}
                     ${GLUTesselatorSrc}
                     ${simpleJSON_SRC}
@@ -316,7 +319,7 @@ else()
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
 
     #find_package(Boost COMPONENTS filesystem random python38 REQUIRED)
-    find_package(Boost COMPONENTS filesystem python38 REQUIRED)
+    find_package(Boost COMPONENTS filesystem python37 REQUIRED)
 	find_package(OpenGL			REQUIRED)
     find_package(glfw3			REQUIRED)
     find_package(SDL2			REQUIRED)
@@ -326,7 +329,7 @@ else()
     find_package(curl			REQUIRED)
     find_package(Expat			REQUIRED)
     find_package(Assimp         REQUIRED)
-    find_package(PythonLibs 3   REQUIRED)
+    find_package(PythonLibs 3.7 EXACT REQUIRED)
     
     message(GLFW3_INCLUDE_PATH ${GLFW3_INCLUDE_PATH})
     
@@ -369,7 +372,7 @@ else()
     
 	link_directories(${Boost_LIBRARY_DIRS})
 
-    foreach(assetFilePath ${ASSET_FILES})
+    foreach(assetFilePath ${ASSET_FILES} ${webAsmPlayPython_SRC})
 	
 		get_filename_component(assetFile ${assetFilePath} NAME)
 
@@ -571,6 +574,7 @@ source_group("webAsmPlay\\canvas"			FILES ${webAsmPlayCanvas_SRC})
 source_group("webAsmPlay\\geom"				FILES ${webAsmPlayGeom_SRC})
 source_group("webAsmPlay\\GUI"				FILES ${webAsmPlayGUI_SRC})
 source_group("webAsmPlay\\Bing"				FILES ${webAsmPlayBing_SRC})
+source_group("webAsmPlay\\Python"			FILES ${webAsmPlayPython_SRC})
 
 
 

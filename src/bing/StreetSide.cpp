@@ -32,6 +32,7 @@
 #include <fstream>
 #include <mutex>
 #include <unordered_set>
+#include <boost/python.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <glm/gtx/norm.hpp>

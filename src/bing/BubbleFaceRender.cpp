@@ -26,6 +26,7 @@
 */
 
 #include <filesystem>
+#include <boost/python.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
@@ -73,8 +74,8 @@ namespace
 
 		//for(i = 0; i < 4; ++i)
 		//for(i = 0; i < 3; ++i)
-		//for(i = 0; i < 2; ++i)
-		for(i = 0; i < 1; ++i)
+		for(i = 0; i < 2; ++i)
+		//for(i = 0; i < 1; ++i)
 		{
 			doQuadBoxs(curr[i % 2], curr[(i + 1) % 2]);
 

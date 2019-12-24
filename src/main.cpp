@@ -77,6 +77,8 @@ void my_exePy(const std::string command)
   }
 }
 
+#include <webAsmPlay/Util.h> 
+
 int main(int, char**)
 {
 	//exit(0);
@@ -216,6 +218,13 @@ int main(int, char**)
 	GUI::initBubbleFacePanels();
     GUI::loadState();
     GUI::createWorld();
+
+	//auto testa = readFile("C:/src/test1.py");
+	auto testa = readFile("C:/src/test.py");
+
+	//dmess("Here " << Python::execute(testa));
+	
+	dmess(Python::execute(readFile("objectDetection.py")));
 
     #ifdef __EMSCRIPTEN__
         

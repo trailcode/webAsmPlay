@@ -25,11 +25,13 @@
 */
 
 #include <array>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>
 #include <webAsmPlay/bing/Bubble.h>
 #include <webAsmPlay/bing/BubbleFaceRender.h>
 #include <webAsmPlay/bing/StreetSide.h>
+#include <webAsmPlay/Python.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
@@ -70,9 +72,18 @@ void GUI::bubbleFacePanels()
 
 			a_frameBuffers[i]->setBufferSize(__(sceneWindowSize));
 
-			ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::closestBubble(), i),
+			const auto texID = BubbleFaceRender::renderBubbleFace(a_frameBuffers[i], StreetSide::closestBubble(), i);
+
+			ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)texID,
 													pos,
 													ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y));
+
+			if(ImGui::Button("Copy"))
+			{
+				dmess("texID " << texID);
+
+				dmess(Python::execute("doIt(" + toStr((size_t)texID) + ")"));
+			}
 		}
 		ImGui::End();
 	}

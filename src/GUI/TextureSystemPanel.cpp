@@ -24,6 +24,7 @@
   \copyright 2019
 */
 
+#include <boost/python.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Texture.h>
 #include <webAsmPlay/GUI/GUI.h>

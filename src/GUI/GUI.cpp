@@ -33,6 +33,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include <imguitoolbar.h>
+#include <boost/python.hpp>
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/canvas/TrackBallInteractor.h>
 #include <webAsmPlay/canvas/Camera.h>

@@ -24,6 +24,7 @@
 \copyright 2019
 */
 
+#include <boost/python.hpp>
 #include <ctpl/ctpl.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Debug.h>
