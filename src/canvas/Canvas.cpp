@@ -415,7 +415,7 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
 {
     if(!m_enabled || !m_wantMouseCapture) { return ;}
 
-	dmess("key " << key << " scancode " << scancode << " action " << action << " mods " << mods);
+	//dmess("key " << key << " scancode " << scancode << " action " << action << " mods " << mods);
 
     switch(key)
     {

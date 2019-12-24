@@ -216,6 +216,7 @@ int main(int, char**)
     GUI::setupCallbacks(window);
     GUI::initOpenGL();
 	GUI::initBubbleFacePanels();
+	GUI::initRenderSettingsPanel();
     GUI::loadState();
     GUI::createWorld();
 

@@ -176,3 +176,14 @@ void GUI::renderSettingsPanel()
 
     ImGui::End();
 }
+
+void GUI::initRenderSettingsPanel()
+{
+	getMainCanvas()->addKeyListener([](const int key, const int scancode, const int action, const int mods)
+	{
+		//a_clickToViewBubble ^= action && key == GLFW_KEY_B;
+		if(!action || key != GLFW_KEY_C) { return ;}
+
+		s_cameraMode = (s_cameraMode + 1) % 3;
+	});
+}

@@ -90,6 +90,7 @@ public:
 	static void initBingTileSystemPanel(const glm::dmat4 & trans);
 	static void initBingStreetSidePanel(const glm::dmat4 & trans);
 	static void initBubbleFacePanels();
+	static void initRenderSettingsPanel();
     static void mainLoop(GLFWwindow * window);
     static void refresh();
 
