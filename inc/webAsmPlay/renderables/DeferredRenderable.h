@@ -25,21 +25,22 @@
 */
 #pragma once
 
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/renderables/Renderable.h>
 
+enum
+{
+	DEFER_GUI = 0,
+	DEFER_OPEN_STEER,
+	DEFER_FEATURES,
+};
+
 class DeferredRenderable : public Renderable
 {
 public:
-
-	enum
-	{
-		GUI = 0,
-		OPEN_STEER,
-		FEATURES,
-	};
 
     virtual ~DeferredRenderable();
 
@@ -60,6 +61,11 @@ public:
 
     static void addLine(const glm::vec3 & A,
                         const glm::vec3 & B,
+                        const glm::vec4 & color,
+						const size_t	  slot);
+
+	static void addLine(const glm::vec2 & A,
+                        const glm::vec2 & B,
                         const glm::vec4 & color,
 						const size_t	  slot);
 

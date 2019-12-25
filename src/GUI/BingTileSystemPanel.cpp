@@ -90,10 +90,10 @@ void GUI::bingTileSystemPanel()
 	const vec3 P3 = vec3(a_tMax.x, a_tMin.y, 0);
 	const vec3 P4 = vec3(a_tMin.x, a_tMin.y, 0);
 
-	DeferredRenderable::addLine(P1, P2, {0,1,0,1}, DeferredRenderable::GUI);
-	DeferredRenderable::addLine(P2, P3, {0,1,0,1}, DeferredRenderable::GUI);
-	DeferredRenderable::addLine(P3, P4, {0,1,0,1}, DeferredRenderable::GUI);
-	DeferredRenderable::addLine(P4, P1, {0,1,0,1}, DeferredRenderable::GUI);
+	DeferredRenderable::addLine(P1, P2, {0,1,0,1}, DEFER_GUI);
+	DeferredRenderable::addLine(P2, P3, {0,1,0,1}, DEFER_GUI);
+	DeferredRenderable::addLine(P3, P4, {0,1,0,1}, DEFER_GUI);
+	DeferredRenderable::addLine(P4, P1, {0,1,0,1}, DEFER_GUI);
 
     ImGui::End();
 }
@@ -102,10 +102,10 @@ void GUI::initBingTileSystemPanel(const dmat4 & trans)
 {
 	GUI::addUpdatable([trans]()
     {
-		if (!a_tileSystemGeom) { a_tileSystemGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(DeferredRenderable::GUI, trans)); }
+		if (!a_tileSystemGeom) { a_tileSystemGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(DEFER_GUI, trans)); }
 		else
 		{
-			((DeferredRenderable*)a_tileSystemGeom.get())->setFromQueued(DeferredRenderable::GUI, trans);
+			((DeferredRenderable*)a_tileSystemGeom.get())->setFromQueued(DEFER_GUI, trans);
 		}
 
 		if(a_tileSystemGeom) { a_tileSystemGeom->render(getMainCanvas(), POST_G_BUFFER) ;}

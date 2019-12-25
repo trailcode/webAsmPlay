@@ -242,6 +242,14 @@ void DeferredRenderable::addLine(const vec3		& A,
     a_lineIndices[slot].push_back((uint32_t)index + 1);
 }
 
+void DeferredRenderable::addLine(const vec2		& A,
+                                 const vec2		& B,
+                                 const vec4		& color,
+								 const size_t	  slot)
+{
+	addLine(vec3(A, 0), vec3(B, 0), color, slot);
+}
+
 void DeferredRenderable::addTriangle(const vec3		& A,
                                      const vec3		& B,
                                      const vec3		& C,

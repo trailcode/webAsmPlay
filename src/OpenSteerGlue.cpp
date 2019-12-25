@@ -171,10 +171,10 @@ void OpenSteerGlue::init(Canvas * canvas, Network * network)
 		// TODO Try and put this just in a_geomTrans
 		const auto m = rotate(scale(dmat4(1.0), {0.1,0.1,0.1}), radians(-90.0), dvec3(1, 0, 0));
 
-		if (!a_openSteerGeom) { a_openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(DeferredRenderable::OPEN_STEER, m * a_geomTrans)); }
+		if (!a_openSteerGeom) { a_openSteerGeom = unique_ptr<Renderable>(DeferredRenderable::createFromQueued(DEFER_OPEN_STEER, m * a_geomTrans)); }
 		else
 		{
-			((DeferredRenderable*)a_openSteerGeom.get())->setFromQueued(DeferredRenderable::OPEN_STEER, m * a_geomTrans);
+			((DeferredRenderable*)a_openSteerGeom.get())->setFromQueued(DEFER_OPEN_STEER, m * a_geomTrans);
 		}
 		
         if(GUI::getCameraMode() == GUI::CAMERA_FOLLOW_ENTITY)

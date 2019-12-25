@@ -88,97 +88,39 @@ void GUI::bubbleFacePanels()
 				for(size_t i = 0; i < features->m_scores.size(); ++i)
 				{
 					//if(features->m_scores[i] < 0.5) { break ;}
-					if(features->m_scores[i] < 0.2) { continue ;} // Are they sorted?
+					if(features->m_scores[i] < 0.5) { continue ;} // Are they sorted?
 
 					const auto data = (const float *)features->m_bounds[i].get_data();
-
-					/*
-					const auto min = vec3(data[0], data[1], 0);
-					const auto max = vec3(data[2], data[3], 0);
-					*/
 
 					const auto min = vec3(data[1] * 2.0, (1.0 - data[0]) * 2.0, 0);
 					const auto max = vec3(data[3] * 2.0, (1.0 - data[2]) * 2.0, 0);
 
-					//const auto min = vec3(0,0, 0);
-					//const auto max = vec3(1,1, 0);
-
-					//DeferredRenderable::addLine(min, max, vec4(1, 1, 1, 1), DeferredRenderable::FEATURES);
-					DeferredRenderable::addLine(vec3(min.x, max.y, 0), vec3(max.x, max.y, 0), vec4(1, 1, 1, 1), DeferredRenderable::FEATURES);
-					DeferredRenderable::addLine(vec3(max.x, max.y, 0), vec3(max.x, min.y, 0), vec4(1, 1, 1, 1), DeferredRenderable::FEATURES);
-					DeferredRenderable::addLine(vec3(max.x, min.y, 0), vec3(min.x, min.y, 0), vec4(1, 1, 1, 1), DeferredRenderable::FEATURES);
-					DeferredRenderable::addLine(vec3(min.x, min.y, 0), vec3(min.x, max.y, 0), vec4(1, 1, 1, 1), DeferredRenderable::FEATURES);
+					DeferredRenderable::addLine({min.x, max.y}, {max.x, max.y}, {1, 1, 1, 1}, DEFER_FEATURES);
+					DeferredRenderable::addLine({max.x, max.y}, {max.x, min.y}, {1, 1, 1, 1}, DEFER_FEATURES);
+					DeferredRenderable::addLine({max.x, min.y}, {min.x, min.y}, {1, 1, 1, 1}, DEFER_FEATURES);
+					DeferredRenderable::addLine({min.x, min.y}, {min.x, max.y}, {1, 1, 1, 1}, DEFER_FEATURES);
 				}
 
-				/*
-				const auto min = vec3(0,0, 0);
-					const auto max = vec3(1,1, 0);
-
-					DeferredRenderable::addLine(min, max, vec4(1, 1, 1, 1), DeferredRenderable::FEATURES);
-					*/
-
-					/*
-				a_frameBuffers[i]->bind(false);
-
-				static DeferredRenderable * r = nullptr;
-				//auto r = DeferredRenderable::createFromQueued(DeferredRenderable::FEATURES);
-				if(!r) { r = DeferredRenderable::createFromQueued(DeferredRenderable::FEATURES) ;}
-				else
-				{
-					r->setFromQueued(DeferredRenderable::FEATURES);
-				}
-
-				glDisable(GL_DEPTH_TEST);
-				glDisable(GL_BLEND);
-
-				const auto projection = glm::ortho(-1.f, 1.f, 1.f, -1.f, -10.0f, 10.0f);
-
-				const auto view = lookAt(vec3(0,0,1),vec3(0,0,0),vec3(0,1,0));
-
-				const auto model = mat4(1.0);
-
-				r->render(model, view, projection, POST_G_BUFFER);
-
-				a_frameBuffers[i]->unbind();
-				*/
-			}
-
-			const auto min = vec3(0,0, 0);
-					const auto max = vec3(0.5,0.5, 0);
-
-					DeferredRenderable::addLine(min, max, vec4(1, 1, 1, 1), DeferredRenderable::FEATURES);
-					//*
-			a_frameBuffers[i]->bind(false);
-			//a_frameBuffers[i]->bind(true);
+							a_frameBuffers[i]->bind(false);
 
 				static DeferredRenderable * r = nullptr;
 				
-				//const auto transa = glm::translate(glm::scale(dmat4(1.0), dvec3(2,2,1)), dvec3(-1,-1,0));
-				//const auto transa = dmat4(1.0);
 				const auto transa = glm::translate(dmat4(1.0), dvec3(-1,-1,0));
 
-				if(!r) { r = DeferredRenderable::createFromQueued(DeferredRenderable::FEATURES, transa) ;}
-				else
-				{
-					r->setFromQueued(DeferredRenderable::FEATURES, transa);
-				}
+				if(!r)	{ r = DeferredRenderable::createFromQueued(DEFER_FEATURES, transa) ;}
+				else	{ r->setFromQueued(DEFER_FEATURES, transa);}
 
 				glDisable(GL_DEPTH_TEST);
 				glDisable(GL_BLEND);
-				//glDisable(GL_TEXTURE_2D);
 
 				const auto projection = glm::ortho(-1.f, 1.f, 1.f, -1.f, -10.0f, 10.0f);
-				//const auto projection = mat4(1.0);
 				const auto view = lookAt(vec3(0,0,1),vec3(0,0,0),vec3(0,1,0));
-				//const auto view = mat4(1.0);
-
 				const auto model = mat4(1.0);
 
 				r->render(model, view, projection, POST_G_BUFFER);
-				//*/
 
 				a_frameBuffers[i]->unbind();
-				
+			}
 
 			ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)texID,
 													pos,

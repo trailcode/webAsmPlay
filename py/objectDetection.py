@@ -151,5 +151,5 @@ def detectObjects(textureID, imageID):
 
 	ImageFeatures.addFeatures(imageID, f)
 
-	display(Image.fromarray(image_np))
-	Image.fromarray(image_np).show()
+	#display(Image.fromarray(image_np))
+	#Image.fromarray(image_np).show()
