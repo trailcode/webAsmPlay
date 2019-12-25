@@ -307,8 +307,8 @@ Renderable * RenderableText::create(const string	& text,
 }
 
 RenderableText::RenderableText() : Renderable(	false,
-																GUI::s_renderSettingsFillPolygons,
-																GUI::s_renderSettingsRenderPolygonOutlines)
+												GUI::s_renderSettingsFillPolygons,
+												GUI::s_renderSettingsRenderPolygonOutlines)
 {
 	if(!font.texture) { initFont() ;}
 }

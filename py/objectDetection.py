@@ -1,8 +1,7 @@
-import os
 import pathlib
-
 import numpy as np
 import os
+os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 import six.moves.urllib as urllib
 import sys
 #sys.path.extend(["C:/src/models/research/slim"])
@@ -20,20 +19,22 @@ from object_detection.utils import ops as utils_ops
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-  # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
-  try:
-    tf.config.experimental.set_virtual_device_configuration(
-        gpus[0],
-        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024*5)])
-    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-  except RuntimeError as e:
-    # Virtual devices must be set before GPUs have been initialized
-    print(e)
+#gpus = tf.config.experimental.list_physical_devices('GPU')
+#if gpus:
+#  # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
+#  try:
+#    tf.config.experimental.set_virtual_device_configuration(
+#        gpus[0],
+#        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024*5)])
+#    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+#    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+#  except RuntimeError as e:
+#    # Virtual devices must be set before GPUs have been initialized
+#    print(e)
 
 from webAsmPlay import Texture
+from webAsmPlay import ImageFeature
+from webAsmPlay import ImageFeatures
 
 # patch tf1 into `utils.ops`
 utils_ops.tf = tf.compat.v1
@@ -60,6 +61,7 @@ def load_model(model_name):
 
 # List of the strings that is used to add correct label for each box.
 PATH_TO_LABELS = 'c:/src/models/research/object_detection/data/mscoco_label_map.pbtxt'
+global category_index
 category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
 
 # If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
@@ -111,14 +113,15 @@ def run_inference_for_single_image(model, image):
 model_name = "mask_rcnn_inception_resnet_v2_atrous_coco_2018_01_28"
 masking_model = load_model("mask_rcnn_inception_resnet_v2_atrous_coco_2018_01_28") # Segmentation
 
-def detectObjects(id):
-	t = Texture.textureToNdArray(id)
+def detectObjects(textureID, imageID):
+	t = Texture.textureToNdArray(textureID)
 	image_np = (t * 255).astype(np.uint8)
 	#image_np = Image.fromarray(t)
 
-	#output_dict = run_inference_for_single_image(detection_model, image_np)
-	output_dict = run_inference_for_single_image(masking_model, image_np)
-	print('output_dict', output_dict)
+	global output_dict;
+	output_dict = run_inference_for_single_image(detection_model, image_np)
+	#output_dict = run_inference_for_single_image(masking_model, image_np)
+	
 	# Visualization of the results of a detection.
 	vis_util.visualize_boxes_and_labels_on_image_array(	image_np,
 														output_dict['detection_boxes'],
@@ -127,11 +130,26 @@ def detectObjects(id):
 														category_index,
 														instance_masks=output_dict.get('detection_masks_reframed', None),
 														use_normalized_coordinates=True,
-														line_thickness=8)
+														line_thickness=1)
 
-	for i in output_dict['detection_boxes']: print(i)
+	features = []
 
-	print(type(image_np))
+	for i in output_dict['detection_boxes']:
+		print('box ', i)
+		features += [ImageFeature(i)]
+
+	print('num ', len(output_dict['detection_boxes']), len(features))
+
+	f = ImageFeatures()
+
+	for i in range(len(output_dict['detection_scores'])):
+		#if output_dict['detection_scores'][i] <= 0.5: break
+		print('score ', output_dict['detection_scores'][i], 'class', output_dict['detection_classes'][i], 'box', output_dict['detection_boxes'][i])
+		f.add(output_dict['detection_scores'][i], category_index[output_dict['detection_classes'][i]]['name'], output_dict['detection_boxes'][i])
+
+	print('imageID ', imageID)
+
+	ImageFeatures.addFeatures(imageID, f)
 
 	display(Image.fromarray(image_np))
 	Image.fromarray(image_np).show()

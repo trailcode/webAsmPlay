@@ -102,6 +102,7 @@ The build system is based on CMake.
   * OSM ID editor shows "Map Features" and "Traffic Signs"
 * Look into https://openstreetcam.org/
 * Think about using street signs.
+* DeferredRenderable::createFromQueued needs cleanup
 
 
 #### Notes

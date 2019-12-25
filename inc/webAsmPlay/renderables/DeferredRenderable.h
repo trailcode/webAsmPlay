@@ -38,6 +38,7 @@ public:
 	{
 		GUI = 0,
 		OPEN_STEER,
+		FEATURES,
 	};
 
     virtual ~DeferredRenderable();

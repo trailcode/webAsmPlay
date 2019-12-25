@@ -131,15 +131,13 @@ void BubbleFaceRender::renderBubbleFace(const Bubble * bubble, const size_t face
 
 		r->m_vertexArrayObject->bind(r->m_shader);
 
-		glm::mat4 projection = glm::ortho(
-			-1.f, 1.f, 1.f, -1.f, -10.0f, 10.0f
-        );
+		const auto projection = glm::ortho(-1.f, 1.f, 1.f, -1.f, -10.0f, 10.0f);
 
-        glm::mat4 view = lookAt(vec3(0,0,1),vec3(0,0,0),vec3(0,1,0));
+        const auto view = lookAt(vec3(0,0,1),vec3(0,0,0),vec3(0,1,0));
 
-        glm::mat4 model = mat4(1.0);
+        const auto model = mat4(1.0);
 
-		auto MVP = model * view * projection;
+		const auto MVP = model * view * projection;
 
 		TextureShader::getDefaultInstance()->setTextureID(tex);
 

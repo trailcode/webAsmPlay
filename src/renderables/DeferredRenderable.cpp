@@ -35,9 +35,9 @@ using namespace glm;
 
 namespace
 {
-    vector<GLfloat> a_vertsAndColors	[2];
-    vector<GLuint>  a_triangleIndices	[2];
-    vector<GLuint>  a_lineIndices		[2];
+    vector<GLfloat> a_vertsAndColors	[3];
+    vector<GLuint>  a_triangleIndices	[3];
+    vector<GLuint>  a_lineIndices		[3];
 
     inline void addTriangle(const vec3  & A,
                             const vec3  & B,
@@ -62,26 +62,29 @@ namespace
 DeferredRenderable * DeferredRenderable::createFromQueued(const size_t slot, const dmat4 & trans)
 {
 	if (!a_vertsAndColors[slot].size()) { return nullptr; }
-
+	
     GLuint vao  = 0;
     GLuint ebo  = 0;
     GLuint ebo2 = 0;
     GLuint vbo  = 0;
     
+	/*
     for(size_t i = 0; i < a_vertsAndColors[slot].size(); i += 7)
     {
         const vec3 pos(trans * dvec4(*(vec3 *)&a_vertsAndColors[slot][i], 1.0));
 
         memcpy(&a_vertsAndColors[slot][i], &pos, sizeof(vec3));
     }
+	*/
 
     glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    //glBindVertexArray(vao);
 
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
     glGenBuffers(1, &ebo2);
 
+	/*
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     glBufferData(GL_ARRAY_BUFFER, a_vertsAndColors[slot].size() * sizeof(GLfloat), &a_vertsAndColors[slot][0], GL_STATIC_DRAW);
@@ -112,12 +115,17 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const size_t slot, con
     glEnableVertexAttribArray(1);
 
     glVertexAttribPointer(1, sizeColor, GL_FLOAT, GL_FALSE, totalSize, (void *)((sizeVertex) * sizeof(GLfloat)));
+	*/
 
     auto ret = new DeferredRenderable(vao, ebo, ebo2, vbo, (GLuint)a_triangleIndices[slot].size(), (GLuint)a_lineIndices[slot].size());
 
+	ret->setFromQueued(slot, trans);
+
+	/*
     a_vertsAndColors	[slot].clear();
     a_triangleIndices	[slot].clear();
     a_lineIndices		[slot].clear();
+	*/
 
     return ret;
 }
@@ -303,6 +311,7 @@ void DeferredRenderable::render() const
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 
     glDisable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 
     glDrawElements(GL_TRIANGLES, m_numTriIndices, GL_UNSIGNED_INT, nullptr);
 

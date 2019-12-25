@@ -225,7 +225,7 @@ int main(int, char**)
 
 	//dmess("Here " << Python::execute(testa));
 	
-	//dmess(Python::execute(readFile("objectDetection.py")));
+	dmess(Python::execute(readFile("objectDetection.py")));
 
     #ifdef __EMSCRIPTEN__
         
