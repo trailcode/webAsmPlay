@@ -54,6 +54,8 @@ namespace
 	Renderable * a_closestBubble = nullptr;
 }
 
+float g_featureConfidence = 0.5;
+
 void GUI::streetSidePanel()
 {
 	if(!s_showStreetSidePanel) { return ;}
@@ -106,35 +108,17 @@ void GUI::streetSidePanel()
 		getMainCamera()->update();
 	};
 
-	if(ImGui::SliderFloat("Camera Height", &bubbleCameraHeight, 0.0f, 1000.0f))
-	{
-		cameraToBubble(lastLookDir);
-	}
+	ImGui::SliderInt("Bubble Level", &BubbleFaceRender::m_level, 1, 4);
 
-	if (ImGui::Button("Camera to Bubble Front"))
-	{
-		cameraToBubble(dmat4(1.0));
-	}
+	if(ImGui::SliderFloat("Camera Height", &bubbleCameraHeight, 0.0f, 1000.0f)) { cameraToBubble(lastLookDir) ;}
 
-	if (ImGui::Button("Camera to Bubble Back"))
-	{
-		cameraToBubble(rotate(dmat4(1.0), radians(180.0), dvec3(0, 0, 1)));
-	}
+	if (ImGui::Button("Camera to Bubble Front"))	{ cameraToBubble(dmat4(1.0)) ;}
+	if (ImGui::Button("Camera to Bubble Back"))		{ cameraToBubble(rotate(dmat4(1.0), radians(180.0), dvec3(0, 0, 1))) ;}
+	if (ImGui::Button("Camera to Bubble Right"))	{ cameraToBubble(rotate(dmat4(1.0), radians(90.0), dvec3(0, 0, 1))) ;}
+	if (ImGui::Button("Camera to Bubble Left"))		{ cameraToBubble(rotate(dmat4(1.0), radians(-90.0), dvec3(0, 0, 1))) ;}
+	if (ImGui::Button("Camera to Bubble Top"))		{ }
 
-	if (ImGui::Button("Camera to Bubble Right"))
-	{
-		cameraToBubble(rotate(dmat4(1.0), radians(90.0), dvec3(0, 0, 1)));
-	}
-
-	if (ImGui::Button("Camera to Bubble Left"))
-	{
-		cameraToBubble(rotate(dmat4(1.0), radians(-90.0), dvec3(0, 0, 1)));
-	}
-
-	if (ImGui::Button("Camera to Bubble Top"))
-	{
-
-	}
+	ImGui::SliderFloat("Feature Confidence", &g_featureConfidence, 0.0f, 1.0f);
 
 	ImGui::End();
 }

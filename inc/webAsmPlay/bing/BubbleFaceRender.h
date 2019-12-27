@@ -42,6 +42,8 @@ public:
 
 	static const std::vector<std::string> & getTileIDs();
 
+	static int m_level;
+
 private:
 
 	BubbleFaceRender() {}

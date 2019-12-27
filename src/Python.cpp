@@ -29,7 +29,6 @@
 #include <boost/circular_buffer.hpp>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Texture.h>
-#include <webAsmPlay/ImageFeature.h>
 #include <webAsmPlay/ImageFeatures.h>
 #include <webAsmPlay/Python.h>
 
@@ -110,10 +109,6 @@ BOOST_PYTHON_MODULE(webAsmPlay)
 
 	class_<TextureWrap, boost::noncopyable>("Texture", init<string>())
 		.def("textureToNdArray", &Texture::textureToNdArray).staticmethod("textureToNdArray");
-	;
-
-	class_<ImageFeature>("ImageFeature", init<const boost::python::numpy::ndarray &>())
-
 	;
 
 	class_<ImageFeatures>("ImageFeatures")

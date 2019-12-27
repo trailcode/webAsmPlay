@@ -33,7 +33,6 @@ from object_detection.utils import visualization_utils as vis_util
 #    print(e)
 
 from webAsmPlay import Texture
-from webAsmPlay import ImageFeature
 from webAsmPlay import ImageFeatures
 
 # patch tf1 into `utils.ops`
@@ -132,19 +131,11 @@ def detectObjects(textureID, imageID):
 														use_normalized_coordinates=True,
 														line_thickness=1)
 
-	features = []
-
-	for i in output_dict['detection_boxes']:
-		print('box ', i)
-		features += [ImageFeature(i)]
-
-	print('num ', len(output_dict['detection_boxes']), len(features))
-
 	f = ImageFeatures()
 
 	for i in range(len(output_dict['detection_scores'])):
 		#if output_dict['detection_scores'][i] <= 0.5: break
-		print('score ', output_dict['detection_scores'][i], 'class', output_dict['detection_classes'][i], 'box', output_dict['detection_boxes'][i])
+		#print('score ', output_dict['detection_scores'][i], 'class', output_dict['detection_classes'][i], 'box', output_dict['detection_boxes'][i])
 		f.add(output_dict['detection_scores'][i], category_index[output_dict['detection_classes'][i]]['name'], output_dict['detection_boxes'][i])
 
 	print('imageID ', imageID)

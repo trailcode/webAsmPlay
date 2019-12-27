@@ -85,15 +85,7 @@ void GUI::bingTileSystemPanel()
 
 	ImGui::SliderFloat("###ResDelta", &resDelta, 0.125f, 5);
 	
-	const vec3 P1 = vec3(a_tMin.x, a_tMax.y, 0);
-	const vec3 P2 = vec3(a_tMax.x, a_tMax.y, 0);
-	const vec3 P3 = vec3(a_tMax.x, a_tMin.y, 0);
-	const vec3 P4 = vec3(a_tMin.x, a_tMin.y, 0);
-
-	DeferredRenderable::addLine(P1, P2, {0,1,0,1}, DEFER_GUI);
-	DeferredRenderable::addLine(P2, P3, {0,1,0,1}, DEFER_GUI);
-	DeferredRenderable::addLine(P3, P4, {0,1,0,1}, DEFER_GUI);
-	DeferredRenderable::addLine(P4, P1, {0,1,0,1}, DEFER_GUI);
+	DeferredRenderable::addWireBox(a_tMin, a_tMax, {0,1,0,1}, DEFER_GUI);
 
     ImGui::End();
 }

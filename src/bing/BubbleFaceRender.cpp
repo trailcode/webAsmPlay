@@ -44,6 +44,8 @@ using namespace std::filesystem;
 using namespace glm;
 using namespace boostGeom;
 
+int BubbleFaceRender::m_level = 1;
+
 namespace
 {
 	void doQuadBoxs(const vector<pair<string, Box> > & in, vector<pair<string, Box> > & out)
@@ -60,9 +62,15 @@ namespace
 
 	vector<string> a_tileIDs;
 
+	int lastLevel = -1;
+
 	const unordered_map<string, Renderable *> & ensureTileGrid()
 	{
-		if(a_tileGrid.size()) { return a_tileGrid ;}
+		if(lastLevel != BubbleFaceRender::m_level) { a_tileGrid.clear() ;}
+		
+		else if(a_tileGrid.size()) { return a_tileGrid ;}
+		
+		lastLevel = BubbleFaceRender::m_level;
 
 		Box b = Box{{-1,-1},{1,1}};
 
@@ -74,8 +82,8 @@ namespace
 
 		//for(i = 0; i < 4; ++i)
 		//for(i = 0; i < 3; ++i)
-		for(i = 0; i < 2; ++i)
-		//for(i = 0; i < 1; ++i)
+		//for(i = 0; i < 2; ++i)
+		for(i = 0; i < BubbleFaceRender::m_level; ++i)
 		{
 			doQuadBoxs(curr[i % 2], curr[(i + 1) % 2]);
 

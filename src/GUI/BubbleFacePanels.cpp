@@ -48,6 +48,8 @@ namespace
 	array<FrameBuffer *, 6> a_frameBuffers;
 
 	const size_t a_bubbleFaceSize = 256 * 4;
+
+	bool a_autoDetectFeratures[6] = {false, false, false, false, false, false};
 }
 
 void GUI::initBubbleFacePanels()
@@ -60,6 +62,8 @@ void GUI::initBubbleFacePanels()
 													TexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST)})});
 	}
 }
+
+extern float g_featureConfidence;
 
 void GUI::bubbleFacePanels()
 {
@@ -83,12 +87,14 @@ void GUI::bubbleFacePanels()
 
 			const auto imageID = "bing_" + StreetSide::closestBubble()->getQuadKey() + "_" + toStr(i);
 
-			if(const auto features = ImageFeatures::getFeatures(imageID))
+			const ImageFeatures * features = nullptr;
+
+			if(features = ImageFeatures::getFeatures(imageID))
 			{
 				for(size_t i = 0; i < features->m_scores.size(); ++i)
 				{
 					//if(features->m_scores[i] < 0.5) { break ;}
-					if(features->m_scores[i] < 0.5) { continue ;} // Are they sorted?
+					if(features->m_scores[i] < g_featureConfidence) { continue ;} // Are they sorted?
 
 					const auto data = (const float *)features->m_bounds[i].get_data();
 
@@ -101,7 +107,7 @@ void GUI::bubbleFacePanels()
 					DeferredRenderable::addLine({min.x, min.y}, {min.x, max.y}, {1, 1, 1, 1}, DEFER_FEATURES);
 				}
 
-							a_frameBuffers[i]->bind(false);
+				a_frameBuffers[i]->bind(false);
 
 				static DeferredRenderable * r = nullptr;
 				
@@ -126,12 +132,16 @@ void GUI::bubbleFacePanels()
 													pos,
 													ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y));
 
-			
-			if(ImGui::Button("Copy"))
-			{
-				dmess("texID " << texID << " " << StreetSide::closestBubble()->getQuadKey() << " " << i);
+			ImGui::Checkbox("Auto Detect", &a_autoDetectFeratures[i]);														
 
-				dmess(Python::execute("detectObjects(" + toStr((size_t)texID) + ", '" + imageID + "')"));
+			if(!features)
+			{
+				if(ImGui::Button("Copy") || a_autoDetectFeratures[i])
+				{
+					dmess("texID " << texID << " " << StreetSide::closestBubble()->getQuadKey() << " " << i);
+
+					dmess(Python::execute("detectObjects(" + toStr((size_t)texID) + ", '" + imageID + "')"));
+				}
 			}
 		}
 		ImGui::End();

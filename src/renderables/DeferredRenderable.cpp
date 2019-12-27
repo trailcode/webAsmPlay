@@ -250,6 +250,22 @@ void DeferredRenderable::addLine(const vec2		& A,
 	addLine(vec3(A, 0), vec3(B, 0), color, slot);
 }
 
+void DeferredRenderable::addWireBox(const vec2		& min,
+									const vec2		& max,
+									const vec4		& color,
+									const size_t	  slot)
+{
+	const auto P1 = vec2(min.x, max.y);
+	const auto P2 = vec2(max.x, max.y);
+	const auto P3 = vec2(max.x, min.y);
+	const auto P4 = vec2(min.x, min.y);
+
+	addLine(P1, P2, color, slot);
+	addLine(P2, P3, color, slot);
+	addLine(P3, P4, color, slot);
+	addLine(P4, P1, color, slot);
+}
+
 void DeferredRenderable::addTriangle(const vec3		& A,
                                      const vec3		& B,
                                      const vec3		& C,

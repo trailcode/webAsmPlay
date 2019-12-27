@@ -69,6 +69,11 @@ public:
                         const glm::vec4 & color,
 						const size_t	  slot);
 
+	static void addWireBox(	const glm::vec2 & min,
+							const glm::vec2 & max,
+							const glm::vec4 & color,
+							const size_t	  slot);
+
     void render(Canvas * canvas, const size_t renderStage = 0) override;
 
 	void render(const glm::mat4	& model,
