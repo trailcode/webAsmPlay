@@ -91,6 +91,7 @@ namespace
 
 BubbleFaceTestCanvas::BubbleFaceTestCanvas()
 {
+	/*
 	Box b = Box{{-1,-1},{1,1}};
 
 	vector<pair<string, Box> > curr[2];
@@ -138,6 +139,7 @@ BubbleFaceTestCanvas::BubbleFaceTestCanvas()
 
 		addRenderable(RenderableText::create(id, {pos.x(), pos.y(), 0}));
 	}
+	*/
 }
 
 BubbleFaceTestCanvas::~BubbleFaceTestCanvas()

@@ -57,7 +57,7 @@ namespace
 
 void GUI::bingTileSystemPanel()
 {
-    if(!s_showBingTileSystemPanel) { return ;}
+    if(!s_showBingTileSystemPanel || !s_client) { return ;}
 
     dvec4 pos(s_canvas->getCursorPosWC(), 1.0);
 

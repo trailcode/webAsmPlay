@@ -670,6 +670,7 @@ void GUI::createWorld()
     if(s_renderSettingsRenderSkyBox) { s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor
     else                             { s_canvas->setSkyBox(nullptr)  ;}
 
+	/*
     s_generalWorkPool.push([](int ID) {
         
 		OpenGL::ensureSharedContext();
@@ -679,6 +680,7 @@ void GUI::createWorld()
         //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
         s_client->loadGeometry("data.geo");
     });
+	*/
 }
 
 int GUI::getCameraMode() { return s_cameraMode ;}

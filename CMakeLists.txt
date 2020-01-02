@@ -330,6 +330,7 @@ else()
     find_package(Expat			REQUIRED)
     find_package(Assimp         REQUIRED)
     find_package(PythonLibs 3.7 EXACT REQUIRED)
+	#find_package(LIBIGL			REQUIRED)
     
     message(GLFW3_INCLUDE_PATH ${GLFW3_INCLUDE_PATH})
     

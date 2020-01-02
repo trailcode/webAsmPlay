@@ -221,11 +221,11 @@ int main(int, char**)
     GUI::createWorld();
 
 	//auto testa = readFile("C:/src/test1.py");
-	auto testa = readFile("C:/src/test.py");
+	//auto testa = readFile("C:/src/test.py");
 
 	//dmess("Here " << Python::execute(testa));
 	
-	dmess(Python::execute(readFile("objectDetection.py")));
+	//dmess(Python::execute(readFile("objectDetection.py")));
 
     #ifdef __EMSCRIPTEN__
         
