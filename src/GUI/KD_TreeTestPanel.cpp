@@ -72,6 +72,8 @@ namespace
 		double m_queryDist = 0.0;
 	};
 
+	MyPoint a_dummyPoint(dvec2{nan(""), nan("")});
+
 	vector<MyPoint> points;
 
 	std::vector<std::unique_ptr<Renderable> > a_geoms;
@@ -82,6 +84,7 @@ namespace
 	{
 		switch(splitAxis)
 		{
+			// Could use partial sort here
 			case SPLIT_X: sort(begin, end, [](const MyPoint & A, const MyPoint & B) { return A.m_pos.x < B.m_pos.x ;}); break;
 			case SPLIT_Y: sort(begin, end, [](const MyPoint & A, const MyPoint & B) { return A.m_pos.y < B.m_pos.y ;}); break;
 
@@ -89,8 +92,6 @@ namespace
 		}
 
 		auto & middle = begin[(end - begin) / 2];
-
-		// I guess the question here is to use a leaf based tree where all the points are in the leafs, or have points in the nodes.
 
 		const int leftSize	= &middle - begin   - 1;
 		const int rightSize = end	  - &middle - 1;  
@@ -150,17 +151,8 @@ namespace
 
 		node->m_queryDist = dist;
 
-		const auto heap = &a_results[0];
-		/*
-		for(size_t i = 0; i < used; ++i)
-		{
-			if(heap[i] == c)
-			{
-				dmess("Here!");
-			}
-		}
-		*/
-
+		const auto heap = &a_results[1];
+		
 		heap[a_numResults++] = node;
 
 		const MyPoint ** A = heap + a_numResults - 2;
@@ -181,7 +173,6 @@ namespace
 
 		a_largestDist = (*(heap + a_numResults - 1))->m_queryDist; 
 	}
-
 	
 	void query(	MyPoint * node)
 	{
@@ -199,15 +190,11 @@ namespace
 
 					tryBubbleInsert(node);
 					
-					if(a_numResults)
-					{
-						const auto furthest = a_results[a_numResults - 1];
+					const auto furthest = a_results[a_numResults];
 
-						const auto newRadius = distance(furthest->m_pos, a_queryPoint);
+					const auto newRadius = distance(furthest->m_pos, a_queryPoint);
 
-						if (a_queryPoint.x + newRadius >= node->m_pos.x) { query(node->m_right) ;}
-					}
-
+					if (a_queryPoint.x + newRadius >= node->m_pos.x) { query(node->m_right) ;}
 				}
 				else if(a_queryPoint.x > node->m_pos.x)
 				{
@@ -215,16 +202,12 @@ namespace
 
 					tryBubbleInsert(node);
 					
-					if(a_numResults)
-					{
-						const auto furthest = a_results[a_numResults - 1];
+					const auto furthest = a_results[a_numResults];
 
-						const auto newRadius = distance(furthest->m_pos, a_queryPoint);
+					const auto newRadius = distance(furthest->m_pos, a_queryPoint);
 
-						if (a_queryPoint.x - newRadius <= node->m_pos.x) { query(node->m_left) ;}
-					}
+					if (a_queryPoint.x - newRadius <= node->m_pos.x) { query(node->m_left) ;}
 				}
-
 				else
 				{
 					query(node->m_left);
@@ -243,32 +226,24 @@ namespace
 
 					tryBubbleInsert(node);
 
-					if(a_numResults)
-					{
-						const auto furthest = a_results[a_numResults - 1];
+					const auto furthest = a_results[a_numResults];
 
-						const auto newRadius = distance(furthest->m_pos, a_queryPoint);
+					const auto newRadius = distance(furthest->m_pos, a_queryPoint);
 
-						if (a_queryPoint.y + newRadius >= node->m_pos.y) { query(node->m_right) ;}
-					}
+					if (a_queryPoint.y + newRadius >= node->m_pos.y) { query(node->m_right) ;}
 				}
-
 				else if(a_queryPoint.y > node->m_pos.y)
 				{
 					query(node->m_right);
 
 					tryBubbleInsert(node);
 
-					if(a_numResults)
-					{
-						const auto furthest = a_results[a_numResults - 1];
+					const auto furthest = a_results[a_numResults];
 
-						const auto newRadius = distance(furthest->m_pos, a_queryPoint);
+					const auto newRadius = distance(furthest->m_pos, a_queryPoint);
 
-						if (a_queryPoint.y - newRadius <= node->m_pos.y) { query(node->m_left) ;}
-					}
+					if (a_queryPoint.y - newRadius <= node->m_pos.y) { query(node->m_left) ;}
 				}
-
 				else
 				{
 					query(node->m_left);
@@ -281,10 +256,7 @@ namespace
 
 			case SPLIT_LEAF:
 
-				for(auto p = node->m_left; p != node->m_right; ++p)
-				{
-					tryBubbleInsert(p);
-				}
+				for(auto p = node->m_left; p != node->m_right; ++p) { tryBubbleInsert(p) ;}
 				
 				break;
 
@@ -322,7 +294,9 @@ namespace
 
 		canvas->addRenderable(r);
 
-		a_results.resize(maxNum);
+		a_results.resize(maxNum + 1);
+
+		a_results[0] = &a_dummyPoint;
 
 		canvas->addMouseMoveListener([canvas](const dvec3 & posWC)
 		{
@@ -342,7 +316,7 @@ namespace
 
 			unordered_set<const MyPoint *> seen;
 
-			for(size_t i = 0; i < a_numResults; ++i)
+			for(size_t i = 1; i <= a_numResults; ++i)
 			{
 				if(seen.find(a_results[i]) != seen.end())
 				{
@@ -405,7 +379,10 @@ void GUI::KD_TreeTestPanel()
 
 		if(ImGui::SliderInt("Max Num", &maxNum, 0, 128))
 		{
-			a_results.resize(maxNum);
+			// Need an extra slot for the dummy result to avoid a if statement per each node visited.
+			a_results.resize(maxNum + 1);
+
+			a_results[0] = &a_dummyPoint;
 		}
 
 		ImGui::LabelText("Found", "Found: %i", a_numResults);
