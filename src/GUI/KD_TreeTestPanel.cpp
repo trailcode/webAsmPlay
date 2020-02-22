@@ -38,8 +38,6 @@ using namespace glm;
 
 namespace
 {
-	float bufferKD_Tree = 0.1f;
-
 	int maxNum = 10;
 
 	enum
@@ -76,6 +74,9 @@ namespace
 		MyPoint	* m_right	= nullptr;
 
 		double m_queryDist = 0.0;
+
+		// There must be a way to not use this marker
+		bool m_seen = false;
 	};
 
 	vector<MyPoint> points;
@@ -136,42 +137,50 @@ namespace
 		return &middle;
 	}
 
-	template<typename PointType>
-	inline double bubbleInsert(const PointType ** heap, const size_t size, size_t & used, const PointType * c)
+	vector<const MyPoint *> a_results;
+
+	size_t a_numResults = 0;
+	
+	dvec2 a_queryPoint;
+
+	double a_queryRadius = 0.1;
+
+	double a_largestDist = 0.0;
+
+	void bubbleInsert(const MyPoint ** heap, const size_t size, size_t & used, const MyPoint * c)
 	{
+		for(size_t i = 0; i < used; ++i)
+		{
+			if(heap[i] == c)
+			{
+				dmess("Here!");
+			}
+		}
+
 		heap[used++] = c;
 
-		const PointType ** c0 = heap + used - 2;
+		const MyPoint ** A = heap + used - 2;
 
-		const PointType ** c1 = c0 + 1;
+		const MyPoint ** B = A + 1;
 
-		while(c1 != heap)
+		while(B != heap)
 		{
-			if((*c0)->m_queryDist < (*c1)->m_queryDist) { break ;}
-			//if((*c0)->m_queryDist >= (*c1)->m_queryDist) { break ;}
+			if((*A)->m_queryDist < (*B)->m_queryDist) { break ;}
+			//if((*A)->m_queryDist <= (*B)->m_queryDist) { break ;}
+			
+			swap(*A, *B);
 
-			auto t = *c0;
-			*c0 = *c1;
-			*c1 = t;
-
-			--c0;
-			--c1;
+			--A;
+			--B;
 		}
 
 		if(used > size) { used = size ;}
 
-		// Return the lowest rank
-		return (*(heap + used - 1))->m_queryDist; 
+		a_largestDist = (*(heap + used - 1))->m_queryDist; 
 	}
 
-	void query(	MyPoint * node,
-				const double queryX,
-				const double queryY,
-				const double radius,
-				const size_t maxNum,
-				vector<const MyPoint *> & results,
-				size_t & numResults,
-				double & largestDist)
+	
+	void query(	MyPoint * node)
 	{
 		if(node == nullptr) { return ;} // Should be done above to prevent a recursive call.
 
@@ -181,86 +190,79 @@ namespace
 		{
 			case SPLIT_X:
 
-				/*
-				if (queryX - radius <= node->m_x) { query(node->m_left, queryX, queryY, radius, maxNum, results, numResults, largestDist) ;}
-
-				if (queryX + radius >= node->m_x) { query(node->m_right, queryX, queryY, radius, maxNum, results, numResults, largestDist) ;}
-				*/
-
-				//*
-				if(queryX < node->m_x)
+				if(a_queryPoint.x < node->m_x)
 				{
-					query(node->m_left, queryX, queryY, radius, maxNum, results, numResults, largestDist);
+					query(node->m_left);
 
 					/// -------------
-					const auto dist = distance(dvec2(node->m_x, node->m_y), dvec2(queryX, queryY));
+					const auto dist = distance(dvec2(node->m_x, node->m_y), a_queryPoint);
 
-					DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
+					//DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
 
-					if(dist <= radius)
+					if(dist <= a_queryRadius)
 					{
 						node->m_queryDist = dist;
 
-						largestDist = bubbleInsert(&results[0], maxNum, numResults, node);
+						bubbleInsert(&a_results[0], maxNum, a_numResults, node);
 					}
 					/// -------------
 
-					if(numResults)
+					if(a_numResults)
 					{
-						const auto furthest = results[numResults - 1];
+						const auto furthest = a_results[a_numResults - 1];
 
-						const auto newRadius = distance(dvec2(furthest->m_x, furthest->m_y), dvec2(queryX, queryY));
+						const auto newRadius = distance(dvec2(furthest->m_x, furthest->m_y), a_queryPoint);
 
 						//dmess("newRadius " << newRadius << " radius " << radius);
 
-						if (queryX + newRadius >= node->m_x) { query(node->m_right, queryX, queryY, radius, maxNum, results, numResults, largestDist) ;}
+						if (a_queryPoint.x + newRadius >= node->m_x) { query(node->m_right) ;}
 					}
 
 				}
-				else if(queryX > node->m_x)
+				else if(a_queryPoint.x > node->m_x)
 				{
-					query(node->m_right, queryX, queryY, radius, maxNum, results, numResults, largestDist);
+					query(node->m_right);
 
 					/// -------------
-					const auto dist = distance(dvec2(node->m_x, node->m_y), dvec2(queryX, queryY));
+					const auto dist = distance(dvec2(node->m_x, node->m_y), a_queryPoint);
 
-					DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
+					//DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
 
-					if(dist <= radius)
+					if(dist <= a_queryRadius)
 					{
 						node->m_queryDist = dist;
 
-						largestDist = bubbleInsert(&results[0], maxNum, numResults, node);
+						bubbleInsert(&a_results[0], maxNum, a_numResults, node);
 					}
 					/// -------------
 
-					if(numResults)
+					if(a_numResults)
 					{
-						const auto furthest = results[numResults - 1];
+						const auto furthest = a_results[a_numResults - 1];
 
-						const auto newRadius = distance(dvec2(furthest->m_x, furthest->m_y), dvec2(queryX, queryY));
+						const auto newRadius = distance(dvec2(furthest->m_x, furthest->m_y), a_queryPoint);
 
 						//dmess("newRadius " << newRadius << " radius " << radius << " numResults " << numResults);
 
-						if (queryX - newRadius <= node->m_x) { query(node->m_left, queryX, queryY, radius, maxNum, results, numResults, largestDist) ;}
+						if (a_queryPoint.x - newRadius <= node->m_x) { query(node->m_left) ;}
 					}
 				}
 
 				else
 				{
-					query(node->m_left, queryX, queryY, radius, maxNum, results, numResults, largestDist);
-					query(node->m_right, queryX, queryY, radius, maxNum, results, numResults, largestDist);
+					query(node->m_left);
+					query(node->m_right);
 
 					/// -------------
-					const auto dist = distance(dvec2(node->m_x, node->m_y), dvec2(queryX, queryY));
+					const auto dist = distance(dvec2(node->m_x, node->m_y), a_queryPoint);
 
-					DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
+					//DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
 
-					if(dist <= radius)
+					if(dist <= a_queryRadius)
 					{
 						node->m_queryDist = dist;
 
-						largestDist = bubbleInsert(&results[0], maxNum, numResults, node);
+						bubbleInsert(&a_results[0], maxNum, a_numResults, node);
 					}
 					/// -------------
 				}
@@ -270,84 +272,77 @@ namespace
 
 			case SPLIT_Y:
 
-				/*
-				if (queryY - radius <= node->m_y) { query(node->m_left, queryX, queryY, radius, maxNum, results, numResults, largestDist) ;}
-
-				if (queryY + radius >= node->m_y) { query(node->m_right, queryX, queryY, radius, maxNum, results, numResults, largestDist) ;}
-				*/
-
-				//*
-				if(queryY < node->m_y)
+				if(a_queryPoint.y < node->m_y)
 				{
-					query(node->m_left, queryX, queryY, radius, maxNum, results, numResults, largestDist);
+					query(node->m_left);
 
 					/// -------------
-					const auto dist = distance(dvec2(node->m_x, node->m_y), dvec2(queryX, queryY));
+					const auto dist = distance(dvec2(node->m_x, node->m_y), a_queryPoint);
 
-					DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
+					//DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
 
-					if(dist <= radius)
+					if(dist <= a_queryRadius)
 					{
 						node->m_queryDist = dist;
 
-						largestDist = bubbleInsert(&results[0], maxNum, numResults, node);
+						bubbleInsert(&a_results[0], maxNum, a_numResults, node);
 					}
 					/// -------------
 
-					if(numResults)
+					if(a_numResults)
 					{
-						const auto furthest = results[numResults - 1];
+						const auto furthest = a_results[a_numResults - 1];
 
-						const auto newRadius = distance(dvec2(furthest->m_x, furthest->m_y), dvec2(queryX, queryY));
+						const auto newRadius = distance(dvec2(furthest->m_x, furthest->m_y), a_queryPoint);
 
 						//dmess("newRadius " << newRadius << " radius " << radius << " numResults " << numResults);
 
-						if (queryY + newRadius >= node->m_y) { query(node->m_right, queryX, queryY, radius, maxNum, results, numResults, largestDist) ;}
+						if (a_queryPoint.y + newRadius >= node->m_y) { query(node->m_right) ;}
 					}
 				}
 
-				else if(queryY > node->m_y)
+				else if(a_queryPoint.y > node->m_y)
 				{
-					query(node->m_right, queryX, queryY, radius, maxNum, results, numResults, largestDist);
+					query(node->m_right);
 
 					/// -------------
-					const auto dist = distance(dvec2(node->m_x, node->m_y), dvec2(queryX, queryY));
+					const auto dist = distance(dvec2(node->m_x, node->m_y), a_queryPoint);
 
-					DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
+					//DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
 
-					if(dist <= radius)
+					if(dist <= a_queryRadius)
 					{
 						node->m_queryDist = dist;
 
-						largestDist = bubbleInsert(&results[0], maxNum, numResults, node);
+						bubbleInsert(&a_results[0], maxNum, a_numResults, node);
 					}
 					/// -------------
 
-					if(numResults)
+					if(a_numResults)
 					{
-						const auto furthest = results[numResults - 1];
+						const auto furthest = a_results[a_numResults - 1];
 
-						const auto newRadius = distance(dvec2(furthest->m_x, furthest->m_y), dvec2(queryX, queryY));
+						const auto newRadius = distance(dvec2(furthest->m_x, furthest->m_y), a_queryPoint);
 
-						if (queryY - newRadius <= node->m_y) { query(node->m_left, queryX, queryY, radius, maxNum, results, numResults, largestDist) ;}
+						if (a_queryPoint.y - newRadius <= node->m_y) { query(node->m_left) ;}
 					}
 				}
 
 				else
 				{
-					query(node->m_left, queryX, queryY, radius, maxNum, results, numResults, largestDist);
-					query(node->m_right, queryX, queryY, radius, maxNum, results, numResults, largestDist);
+					query(node->m_left);
+					query(node->m_right);
 
 					/// -------------
-					const auto dist = distance(dvec2(node->m_x, node->m_y), dvec2(queryX, queryY));
+					const auto dist = distance(dvec2(node->m_x, node->m_y), a_queryPoint);
 
-					DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
+					//DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
 
-					if(dist <= radius)
+					if(dist <= a_queryRadius)
 					{
 						node->m_queryDist = dist;
 
-						largestDist = bubbleInsert(&results[0], maxNum, numResults, node);
+						bubbleInsert(&a_results[0], maxNum, a_numResults, node);
 					}
 					/// -------------
 				}
@@ -359,30 +354,33 @@ namespace
 
 				for(auto p = node->m_left; p != node->m_right; ++p)
 				{
-					const auto dist = distance(dvec2(p->m_x, p->m_y), dvec2(queryX, queryY));
+					const auto dist = distance(dvec2(p->m_x, p->m_y), a_queryPoint);
 
-					if(dist <= largestDist)
+					if(dist <= a_largestDist)
 					{
 						p->m_queryDist = dist;
 
-						largestDist = bubbleInsert(&results[0], maxNum, numResults, p);
+						bubbleInsert(&a_results[0], maxNum, a_numResults, p);
 					}
 				}
 				
+				/*
 				{
 					/// -------------
-					const auto dist = distance(dvec2(node->m_x, node->m_y), dvec2(queryX, queryY));
+					const auto dist = distance(dvec2(node->m_x, node->m_y), a_queryPoint);
 
-					DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
+					//DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
 
-					if(dist <= radius)
+					if(dist <= a_queryRadius)
 					{
 						node->m_queryDist = dist;
 
-						largestDist = bubbleInsert(&results[0], maxNum, numResults, node);
+						bubbleInsert(&a_results[0], maxNum, a_numResults, node);
 					}
 					/// -------------
 				}
+				*/
+
 				break;
 
 			default:
@@ -391,6 +389,7 @@ namespace
 		}
 	}
 
+	
 	void fillPoints(Canvas * canvas)
 	{
 		if(points.size()) { return ;}
@@ -414,11 +413,11 @@ namespace
 
 		auto r = RenderablePolygon::create(pointCircles);
 
-		r->setRenderOutline(false);
+		r->setRenderOutline(false); 
 
 		canvas->addRenderable(r);
 
-		//RenderablePoint::create()
+		a_results.resize(maxNum);
 
 		canvas->addMouseMoveListener([canvas](const dvec3 & posWC)
 		{
@@ -426,31 +425,31 @@ namespace
 
 			a_geoms.clear();
 
-			vector<const MyPoint *> results(maxNum);
+			//vector<const MyPoint *> results(maxNum);
 
-			size_t found = 0;
+			a_numResults = 0;
 
-			double largestDist = bufferKD_Tree;
+			a_largestDist = a_queryRadius;
 
-			//double largestDist = numeric_limits<double>::max();
-			//double largestDist = 10000000.0;
+			a_queryPoint = posWC;
 
-			//dmess("-------------------------");
+			query(a_root);
 
-			query(a_root, posWC.x, posWC.y, bufferKD_Tree, maxNum, results, found, largestDist);
+			unordered_set<const MyPoint *> seen;
 
-			//dmess("found " << found);
-
-			for(size_t i = 0; i < found; ++i)
+			for(size_t i = 0; i < a_numResults; ++i)
 			{
-				DeferredRenderable::addCrossHair({results[i]->m_x, results[i]->m_y}, 0.03, {1,0,1,1}, DEFER_FEATURES);
+				if(seen.find(a_results[i]) != seen.end())
+				{
+					//dmess("Seen!");
+				}
 
-				//dmess("results[i] " << results[i]->m_queryDist);
+				seen.insert(a_results[i]);
+
+				DeferredRenderable::addCrossHair({a_results[i]->m_x, a_results[i]->m_y}, 0.03, {1,0,1,1}, DEFER_FEATURES);
 			}
 
-			//DeferredRenderable::addCrossHair(posWC, 0.105, {1,0,1,1}, DEFER_FEATURES);
-
-			DeferredRenderable::addCircle(posWC, bufferKD_Tree, {1, 0.5, 0, 1}, DEFER_FEATURES, 33);
+			DeferredRenderable::addCircle(posWC, a_queryRadius, {1, 0.5, 0, 1}, DEFER_FEATURES, 33);
 
 			const mat4 trans = mat4(1.0);
 
@@ -493,10 +492,16 @@ void GUI::KD_TreeTestPanel()
                                                 ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
                                                 ImVec2(0, 1),
                                                 ImVec2(1, 0));
-
+		float bufferKD_Tree = a_queryRadius;
 		ImGui::SliderFloat("buffer1", &bufferKD_Tree, 0.001f, 1.5f, "buffer1 = %.3f");
+		a_queryRadius = bufferKD_Tree;
 
-		ImGui::SliderInt("Max Num", &maxNum, 0, 128);
+		if(ImGui::SliderInt("Max Num", &maxNum, 0, 128))
+		{
+			a_results.resize(maxNum);
+		}
+
+		ImGui::LabelText("Found", "Found: %i", a_numResults);
 
 	ImGui::End();
 }
