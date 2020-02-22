@@ -59,11 +59,11 @@ void ColorShader::ensureShader()
 
 ColorShader * ColorShader::getDefaultInstance() { return a_defaultInstance ;}
 
-ColorShader::ColorShader(const ShouldRenderFunctor & shouldRenderFunctor) :    Shader(	"ColorShader",
-																						ColorSymbology::getInstance("defaultPolygon"),
-																						shouldRenderFunctor),
-                                m_fillColor		(0,1,0,0.5),
-                                m_outlineColor	(1,1,0,1)
+ColorShader::ColorShader(const ShouldRenderFunctor & shouldRenderFunctor) : Shader(	"ColorShader",
+																					ColorSymbology::getInstance("defaultPolygon"),
+																					shouldRenderFunctor),
+																			m_fillColor		(0,1,0,0.5),
+																			m_outlineColor	(1,1,0,1)
 {
 }
 

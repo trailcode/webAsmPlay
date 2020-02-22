@@ -1,4 +1,4 @@
-/**
+﻿/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -21,36 +21,25 @@
 
   \author Matthew Tang
   \email trailcode@gmail.com
-  \copyright 2018
+  \copyright 2020
 */
+
 #pragma once
+
 
 #include <memory>
 #include <vector>
+#include <webAsmPlay/renderables/Renderable.h>
 #include <webAsmPlay/canvas/Canvas.h>
 
-class GeosTestCanvas : public Canvas
+class KD_TreeTestCanvas : public Canvas
 {
 public:
 
-    GeosTestCanvas();
-    ~GeosTestCanvas();
-
-    void setGeomParameters( const float buffer1,
-                            const float buffer2,
-                            const float buffer3,
-							const float buffer4,
-							const float buffer5);
-
-	void exportGeoJson() const;
+    KD_TreeTestCanvas();
+    ~KD_TreeTestCanvas();
 
 private:
 
     std::vector<std::unique_ptr<Renderable> > m_geoms;
-
-    float m_buffer1 = -1;
-    float m_buffer2 = -1;
-    float m_buffer3 = -1;
-	float m_buffer4 = -1;
-	float m_buffer5 = -1;
 };

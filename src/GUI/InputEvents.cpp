@@ -80,6 +80,8 @@ void GUI::cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 {
     for(auto c : s_auxCanvases)
 	{
+		//dmess("upper left " << vec2(c->getUpperLeft()).x << "," << vec2(c->getUpperLeft()).y << " pos " << xpos << "," << ypos);
+
 		const auto localPos = vec2(xpos, ypos) - vec2(c->getUpperLeft());
 
 		c->onMousePosition(window, localPos);

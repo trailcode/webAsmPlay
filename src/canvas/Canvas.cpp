@@ -283,6 +283,8 @@ GLuint Canvas::render()
 
 GLuint Canvas::postRender()
 {
+	//dmess("m_cursorPosWC " << m_cursorPosWC);
+
 	renderCursor(m_cursorPosWC);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -347,6 +349,8 @@ void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
     m_trackBallInteractor->setClickPoint(mousePos.x, mousePos.y);
     m_trackBallInteractor->update();
 
+	//dmess("m_size " << m_size.x << "," << m_size.y << " mousePos " << mousePos.x << "," << mousePos.y);
+
     // From: http://antongerdelan.net/opengl/raycasting.html
     const vec4 rayClip = vec4(		   (2.0f * mousePos.x) / m_size.x - 1.0f,
                                 1.0f - (2.0f * mousePos.y) / m_size.y, -1.0, 1.0);
@@ -364,6 +368,8 @@ void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
     const double t = -dot(eye, n) / dot(rayWor, n);
 
     m_cursorPosWC = eye + rayWor * t;
+
+	//m_cursorPosWC = {2,0,0};
 
 	for(const auto & listener : m_mouseMoveListeners) { listener(m_cursorPosWC) ;}
 }

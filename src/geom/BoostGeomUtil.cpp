@@ -83,21 +83,21 @@ Polygon boostGeom::makeTriangle(const dvec2 & A, const dvec2 & B, const dvec2 & 
 	return tri;
 }
 
-Polygon boostGeom::buffer(const dvec2 & pos, const double radius)
+Polygon boostGeom::makeCircle(const dvec2 & pos, const double radius, const size_t pointsPerCircle)
 {
-    const int points_per_circle = 10;
+	using namespace boost::geometry::strategy::buffer;
 
-    boost::geometry::strategy::buffer::distance_symmetric<CoordinateType> distance_strategy(radius);
-    boost::geometry::strategy::buffer::join_round join_strategy(points_per_circle);
-    boost::geometry::strategy::buffer::end_round end_strategy(points_per_circle);
-    boost::geometry::strategy::buffer::point_circle circle_strategy(points_per_circle);
-    boost::geometry::strategy::buffer::side_straight side_strategy;
+	MultiPolygon result;
 
-	Point p(pos.x, pos.y);
+	boost::geometry::buffer(Point{pos.x, pos.y},
+							result,
+							distance_symmetric<CoordinateType>	(radius),
+							side_straight(),
+							join_round							(pointsPerCircle),
+							end_round							(pointsPerCircle),
+							point_circle						(pointsPerCircle));
 
-	boost::geometry::model::multi_polygon<Polygon> result;
-
-	boost::geometry::buffer(p, result, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
+	if(result.empty()) { return Polygon() ;}
 
 	return result[0];
 }

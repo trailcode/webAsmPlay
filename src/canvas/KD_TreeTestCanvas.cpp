@@ -1,4 +1,4 @@
-/**
+﻿/**
  ╭━━━━╮╱╱╱╱╱╱╱╱╱╭╮╱╭━━━╮╱╱╱╱╱╱╭╮
  ┃╭╮╭╮┃╱╱╱╱╱╱╱╱╱┃┃╱┃╭━╮┃╱╱╱╱╱╱┃┃
  ╰╯┃┃╰╯╭━╮╭━━╮╭╮┃┃╱┃┃╱╰╯╭━━╮╭━╯┃╭━━╮
@@ -21,36 +21,29 @@
 
   \author Matthew Tang
   \email trailcode@gmail.com
-  \copyright 2018
+  \copyright 2020
 */
-#pragma once
 
-#include <memory>
-#include <vector>
-#include <webAsmPlay/canvas/Canvas.h>
+#include <glm/gtc/random.hpp>
+#include <webAsmPlay/Debug.h>
+#include <webAsmPlay/renderables/RenderablePolygon.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
+#include <webAsmPlay/canvas/KD_TreeTestCanvas.h>
 
-class GeosTestCanvas : public Canvas
+using namespace std;
+using namespace glm;
+
+
+
+extern float bufferKD_Tree;
+
+KD_TreeTestCanvas::KD_TreeTestCanvas()
 {
-public:
+	
+}
 
-    GeosTestCanvas();
-    ~GeosTestCanvas();
+KD_TreeTestCanvas::~KD_TreeTestCanvas()
+{
 
-    void setGeomParameters( const float buffer1,
-                            const float buffer2,
-                            const float buffer3,
-							const float buffer4,
-							const float buffer5);
+}
 
-	void exportGeoJson() const;
-
-private:
-
-    std::vector<std::unique_ptr<Renderable> > m_geoms;
-
-    float m_buffer1 = -1;
-    float m_buffer2 = -1;
-    float m_buffer3 = -1;
-	float m_buffer4 = -1;
-	float m_buffer5 = -1;
-};

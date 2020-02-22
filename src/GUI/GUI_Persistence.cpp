@@ -46,6 +46,7 @@ using namespace glm;
 using namespace nlohmann;
 
 bool GUI::s_showGeosTestPanel					 = false;
+bool GUI::s_showKD_TreeTestPanel				 = false;
 bool GUI::s_showBoostGeomTestPanel				 = false;
 bool GUI::s_showPerformancePanel                 = false;
 bool GUI::s_showRenderSettingsPanel              = false;
@@ -106,6 +107,7 @@ void GUI::loadState()
     };
 
     setBool(L"showGeosTestPanel",                   s_showGeosTestPanel);
+	setBool(L"showKD_TreeTestPanel",                s_showKD_TreeTestPanel);
 	setBool(L"showBoostGeomTestPanel",				s_showBoostGeomTestPanel);
     setBool(L"showPerformancePanel",                s_showPerformancePanel);
     setBool(L"showRenderSettingsPanel",             s_showRenderSettingsPanel);
@@ -167,6 +169,7 @@ void GUI::saveState()
 
     // Booleans
     root[L"showGeosTestPanel"]                    = new JSONValue(s_showGeosTestPanel);
+	root[L"showKD_TreeTestPanel"]                 = new JSONValue(s_showKD_TreeTestPanel);
 	root[L"showBoostGeomTestPanel"]               = new JSONValue(s_showBoostGeomTestPanel);
     root[L"showPerformancePanel"]                 = new JSONValue(s_showPerformancePanel);
     root[L"showRenderSettingsPanel"]              = new JSONValue(s_showRenderSettingsPanel);

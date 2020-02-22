@@ -214,7 +214,7 @@ void StreetSide::indexBubbles(const dmat4 & trans, const vector<Bubble *> & bubb
 	{
 		const double radius = 0.00001;
 
-		const auto circle = buffer({ bubbles[i]->m_pos.y, bubbles[i]->m_pos.x }, radius);
+		const auto circle = makeCircle({ bubbles[i]->m_pos.y, bubbles[i]->m_pos.x }, radius);
 
 		dvec4 A( radius,	0,				0, 1);
 		dvec4 B(-radius,	0,				0, 1);

@@ -50,7 +50,7 @@ namespace boostGeom
 
 	Polygon makeTriangle(const glm::dvec2 & A, const glm::dvec2 & B, const glm::dvec2 & C);
 
-	Polygon buffer(const glm::dvec2 & pos, const double radius);
+	Polygon makeCircle(const glm::dvec2 & pos, const double radius, const size_t pointsPerCircle = 10);
 
 	Polygon toPolygon(const boostGeom::Box & b);
 

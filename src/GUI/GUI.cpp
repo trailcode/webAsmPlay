@@ -45,6 +45,7 @@
 #include <webAsmPlay/GeoClient.h>
 #include <webAsmPlay/Animation.h>
 #include <webAsmPlay/canvas/GeosTestCanvas.h>
+#include <webAsmPlay/canvas/KD_TreeTestCanvas.h>
 #include <webAsmPlay/canvas/BubbleFaceTestCanvas.h>
 #include <webAsmPlay/canvas/OpenSteerCanvas.h>
 #include <webAsmPlay/canvas/AnimationCanvas.h>
@@ -85,6 +86,7 @@ using namespace glm;
 #define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
 GeosTestCanvas		 * GUI::s_geosTestCanvas		= nullptr;
+KD_TreeTestCanvas	 * GUI::s_KD_TreeTestCanvas		= nullptr;
 OpenSteerCanvas		 * GUI::s_openSteerCanvas		= nullptr;
 AnimationCanvas		 * GUI::s_animationCanvas		= nullptr;
 ModelViewerCanvas	 * GUI::s_modelViewerCanvas		= nullptr;
@@ -373,6 +375,7 @@ void GUI::showMainMenuBar()
     if(ImGui::BeginMenu("View"))
     {
         if (ImGui::MenuItem("Geos Tests"))				{ s_showGeosTestPanel					^= 1 ;}
+		if (ImGui::MenuItem("KD Tree Tests"))			{ s_showKD_TreeTestPanel				^= 1 ;}
 		if (ImGui::MenuItem("Boost Geometry Tests"))	{ s_showBoostGeomTestPanel				^= 1 ;}
         if (ImGui::MenuItem("Performance"))				{ s_showPerformancePanel				^= 1 ;}
         if (ImGui::MenuItem("Render Settings"))			{ s_showRenderSettingsPanel				^= 1 ;}
@@ -544,6 +547,7 @@ void GUI::mainLoop(GLFWwindow * window)
     symbologyPanel();
     attributePanel(attrsStr);
     geosTestPanel();
+	KD_TreeTestPanel();
     openSteerTestPanel();
     openSteerPanel();
     cameraInfoPanel();
@@ -649,6 +653,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
     s_auxCanvases = vector<Canvas *>(
     {
         s_geosTestCanvas		= new GeosTestCanvas(),
+		s_KD_TreeTestCanvas		= new KD_TreeTestCanvas(),
         s_openSteerCanvas		= new OpenSteerCanvas(),
 		s_animationCanvas		= new AnimationCanvas(),
 		s_modelViewerCanvas		= new ModelViewerCanvas(),

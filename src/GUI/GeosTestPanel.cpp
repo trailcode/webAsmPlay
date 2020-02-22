@@ -38,11 +38,31 @@ void GUI::geosTestPanel()
     
     ImGui::Begin("Geos Tests", &s_showGeosTestPanel);
 
+		// Yellow is content region min/max
+		
+			ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+			ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+
+			vMin.x += ImGui::GetWindowPos().x;
+			vMin.y += ImGui::GetWindowPos().y;
+			vMax.x += ImGui::GetWindowPos().x;
+			vMax.y += ImGui::GetWindowPos().y;
+
+			ImGui::GetForegroundDrawList()->AddRect( vMin, vMax, IM_COL32( 255, 255, 0, 255 ) );
+		
+
         const ImVec2 pos = ImGui::GetCursorScreenPos();
+
+		//
+
+		const auto startPos = vMin;
+
+		//dmess("Posa " << startPos.x << "," << startPos.y);
 
         const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
 
-		s_geosTestCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
+		//s_geosTestCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
+		s_geosTestCanvas->setFrameBufferSize(__(sceneWindowSize), __(startPos) - __(pos));
 
         s_geosTestCanvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
@@ -52,15 +72,19 @@ void GUI::geosTestPanel()
                                                 ImVec2(0, 1),
                                                 ImVec2(1, 0));
         
-        static float buffer1 = 0.1f;
-        static float buffer2 = 0.02f;
-        static float buffer3 = 0.22f;
+        static float buffer1 = 0.5f;
+        static float buffer2 = 0.25f;
+        static float buffer3 = 2.0f;
+		static float buffer4 = 0.0f;
+		static float buffer5 = 0.0f;
 
-        ImGui::SliderFloat("buffer1", &buffer1, 0.0f, 0.3f, "buffer1 = %.3f");
-        ImGui::SliderFloat("buffer2", &buffer2, 0.0f, 0.3f, "buffer2 = %.3f");
-        ImGui::SliderFloat("buffer3", &buffer3, 0.0f, 0.3f, "buffer3 = %.3f");
+        ImGui::SliderFloat("buffer1", &buffer1, 0.01f, 1.5f, "buffer1 = %.3f");
+        ImGui::SliderFloat("buffer2", &buffer2, 0.01f, 1.5f, "buffer2 = %.3f");
+        ImGui::SliderFloat("buffer3", &buffer3, 0.01f, 3.0f, "buffer3 = %.3f");
+		ImGui::SliderFloat("buffer4", &buffer4, -4.0f, 4.0f, "buffer4 = %.3f");
+		ImGui::SliderFloat("buffer5", &buffer5, -4.0f, 4.0f, "buffer5 = %.3f");
 
-        s_geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3);
+        s_geosTestCanvas->setGeomParameters(buffer1, buffer2, buffer3, buffer4, buffer5);
 
 		if (ImGui::Button("Export GeoJSON")) { s_geosTestCanvas->exportGeoJson(); }
 		

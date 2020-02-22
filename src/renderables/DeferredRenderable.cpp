@@ -266,6 +266,23 @@ void DeferredRenderable::addWireBox(const vec2		& min,
 	addLine(P4, P1, color, slot);
 }
 
+void DeferredRenderable::addCrossHair(	const vec2		& pos,
+										const float		  size,
+										const vec4		& color,
+										const size_t	  slot)
+{
+	DeferredRenderable::addLine(pos - vec2(size, 0), pos + vec2(size, 0), color, slot);
+	DeferredRenderable::addLine(pos - vec2(0, size), pos + vec2(0, size), color, slot);
+}
+
+void DeferredRenderable::addCrossHairs(	const vector<vec2>	& positions,
+										const float			  size,
+										const glm::vec4		& color,
+										const size_t		  slot)
+{
+	for(const auto & i : positions) { addCrossHair(i, size, color, slot); }
+}
+
 void DeferredRenderable::addTriangle(const vec3		& A,
                                      const vec3		& B,
                                      const vec3		& C,
@@ -305,6 +322,30 @@ void DeferredRenderable::addQuadrangle( const vec3		& A,
     a_triangleIndices[slot].push_back((uint32_t)index + 3);
     a_triangleIndices[slot].push_back((uint32_t)index + 4);
     a_triangleIndices[slot].push_back((uint32_t)index + 5);
+}
+
+void DeferredRenderable::addCircle(	const vec2		& pos,
+									const float		  radius,
+									const vec4		& color,
+									const size_t	  slot,
+									const size_t	  numPoints)
+{
+	auto fullCircle = radians(360.0);
+	
+	const auto step = fullCircle / double(numPoints);
+	
+	fullCircle += step;
+
+	for(double i = 0; i < fullCircle ;)
+	{
+		const auto A = pos + (vec2(cos(i), sin(i)) * vec2(radius, radius));
+
+		i += step;
+
+		const auto B = pos + (vec2(cos(i), sin(i)) * vec2(radius, radius));
+
+		addLine(A, B, color, slot);
+	}
 }
 
 void DeferredRenderable::render(Canvas * canvas, const size_t renderStage)

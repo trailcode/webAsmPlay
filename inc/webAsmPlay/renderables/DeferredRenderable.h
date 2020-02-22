@@ -74,6 +74,22 @@ public:
 							const glm::vec4 & color,
 							const size_t	  slot);
 
+	static void addCrossHair(	const glm::vec2	& pos,
+								const float		  size,
+								const glm::vec4 & color,
+								const size_t	  slot);
+
+	static void addCrossHairs(	const std::vector<glm::vec2>	& positions,
+								const float						  size,
+								const glm::vec4					& color,
+								const size_t					  slot);
+
+	static void addCircle(	const glm::vec2	& pos,
+							const float		  radius,
+							const glm::vec4 & color,
+							const size_t	  slot,
+							const size_t	  numPoints = 64);
+
     void render(Canvas * canvas, const size_t renderStage = 0) override;
 
 	void render(const glm::mat4	& model,

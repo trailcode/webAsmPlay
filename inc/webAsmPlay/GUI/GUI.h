@@ -35,6 +35,7 @@
 
 class Canvas;
 class GeosTestCanvas;
+class KD_TreeTestCanvas;
 class BubbleFaceTestCanvas;
 class OpenSteerCanvas;
 class AnimationCanvas;
@@ -181,6 +182,7 @@ private:
     static void renderSettingsPanel();
     static void attributePanel(const std::string & attrsStr);
     static void geosTestPanel();
+	static void KD_TreeTestPanel();
 	static void boostGeomTestPanel();
     static void GUI_Settings_Panel();
     static void symbologyPanel();
@@ -211,6 +213,7 @@ private:
     static void cursorEnterCallback     (GLFWwindow * window, int entered);
     
     static bool s_showGeosTestPanel;
+	static bool s_showKD_TreeTestPanel;
 	static bool s_showBoostGeomTestPanel;
     static bool s_showPerformancePanel;
     static bool s_showRenderSettingsPanel;
@@ -236,6 +239,7 @@ private:
     static GLFWwindow * s_mainWindow;
 
     static GeosTestCanvas		* s_geosTestCanvas;
+	static KD_TreeTestCanvas	* s_KD_TreeTestCanvas;
     static OpenSteerCanvas		* s_openSteerCanvas;
 	static AnimationCanvas		* s_animationCanvas;
 	static ModelViewerCanvas	* s_modelViewerCanvas;
