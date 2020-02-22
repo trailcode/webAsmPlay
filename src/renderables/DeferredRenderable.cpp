@@ -300,6 +300,15 @@ void DeferredRenderable::addTriangle(const vec3		& A,
     a_triangleIndices[slot].push_back((uint32_t)index + 2);
 }
 
+void DeferredRenderable::addTriangle(const vec2		& A,
+                                     const vec2		& B,
+                                     const vec2		& C,
+                                     const vec4		& color,
+									 const size_t	  slot)
+{
+	addTriangle(vec3(A,0), vec3(B,0), vec3(C,0), color, slot);
+}
+
 void DeferredRenderable::addQuadrangle( const vec3		& A,
                                         const vec3		& B,
                                         const vec3		& C,
@@ -345,6 +354,30 @@ void DeferredRenderable::addCircle(	const vec2		& pos,
 		const auto B = pos + (vec2(cos(i), sin(i)) * vec2(radius, radius));
 
 		addLine(A, B, color, slot);
+	}
+}
+
+void DeferredRenderable::addCircleFilled(	const vec2		& pos,
+											const float		  radius,
+											const vec4		& color,
+											const size_t	  slot,
+											const size_t	  numPoints)
+{
+	auto fullCircle = radians(360.0);
+	
+	const auto step = fullCircle / double(numPoints);
+	
+	fullCircle += step;
+
+	for(double i = 0; i < fullCircle ;)
+	{
+		const auto A = pos + (vec2(cos(i), sin(i)) * vec2(radius, radius));
+
+		i += step;
+
+		const auto B = pos + (vec2(cos(i), sin(i)) * vec2(radius, radius));
+
+		addTriangle(A, B, pos, color, slot);
 	}
 }
 

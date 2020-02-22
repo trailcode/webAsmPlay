@@ -59,6 +59,12 @@ public:
                             const glm::vec4 & color,
 							const size_t	  slot);
 
+	static void addTriangle(const glm::vec2 & A,
+                            const glm::vec2 & B,
+                            const glm::vec2 & C,
+                            const glm::vec4 & color,
+							const size_t	  slot);
+
     static void addLine(const glm::vec3 & A,
                         const glm::vec3 & B,
                         const glm::vec4 & color,
@@ -89,6 +95,12 @@ public:
 							const glm::vec4 & color,
 							const size_t	  slot,
 							const size_t	  numPoints = 64);
+
+	static void addCircleFilled(	const glm::vec2	& pos,
+									const float		  radius,
+									const glm::vec4 & color,
+									const size_t	  slot,
+									const size_t	  numPoints = 64);
 
     void render(Canvas * canvas, const size_t renderStage = 0) override;
 

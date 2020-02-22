@@ -74,9 +74,6 @@ namespace
 		MyPoint	* m_right	= nullptr;
 
 		double m_queryDist = 0.0;
-
-		// There must be a way to not use this marker
-		bool m_seen = false;
 	};
 
 	vector<MyPoint> points;
@@ -149,6 +146,7 @@ namespace
 
 	void bubbleInsert(const MyPoint ** heap, const size_t size, size_t & used, const MyPoint * c)
 	{
+		/*
 		for(size_t i = 0; i < used; ++i)
 		{
 			if(heap[i] == c)
@@ -156,6 +154,7 @@ namespace
 				dmess("Here!");
 			}
 		}
+		*/
 
 		heap[used++] = c;
 
@@ -166,7 +165,6 @@ namespace
 		while(B != heap)
 		{
 			if((*A)->m_queryDist < (*B)->m_queryDist) { break ;}
-			//if((*A)->m_queryDist <= (*B)->m_queryDist) { break ;}
 			
 			swap(*A, *B);
 
@@ -364,23 +362,6 @@ namespace
 					}
 				}
 				
-				/*
-				{
-					/// -------------
-					const auto dist = distance(dvec2(node->m_x, node->m_y), a_queryPoint);
-
-					//DeferredRenderable::addCrossHair({node->m_x, node->m_y}, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
-
-					if(dist <= a_queryRadius)
-					{
-						node->m_queryDist = dist;
-
-						bubbleInsert(&a_results[0], maxNum, a_numResults, node);
-					}
-					/// -------------
-				}
-				*/
-
 				break;
 
 			default:
@@ -441,12 +422,16 @@ namespace
 			{
 				if(seen.find(a_results[i]) != seen.end())
 				{
-					//dmess("Seen!");
+					dmess("Seen!");
 				}
 
 				seen.insert(a_results[i]);
 
-				DeferredRenderable::addCrossHair({a_results[i]->m_x, a_results[i]->m_y}, 0.03, {1,0,1,1}, DEFER_FEATURES);
+				//DeferredRenderable::addCrossHair({a_results[i]->m_x, a_results[i]->m_y}, 0.03, {1,0,1,1}, DEFER_FEATURES);
+
+				DeferredRenderable::addCircleFilled({a_results[i]->m_x, a_results[i]->m_y}, 0.0052, {1,0,1,1}, DEFER_FEATURES);
+
+				DeferredRenderable::addCircle({a_results[i]->m_x, a_results[i]->m_y}, 0.0052, {1,1,0,1}, DEFER_FEATURES);
 			}
 
 			DeferredRenderable::addCircle(posWC, a_queryRadius, {1, 0.5, 0, 1}, DEFER_FEATURES, 33);
