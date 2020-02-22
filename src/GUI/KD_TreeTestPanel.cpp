@@ -38,8 +38,6 @@ using namespace glm;
 
 namespace
 {
-	int maxNum = 10;
-
 	enum
 	{
 		SPLIT_X = 0,
@@ -74,11 +72,23 @@ namespace
 
 	MyPoint a_dummyPoint(dvec2{nan(""), nan("")});
 
-	vector<MyPoint> points;
+	vector<MyPoint> a_points;
 
 	std::vector<std::unique_ptr<Renderable> > a_geoms;
 
 	MyPoint * a_root = nullptr;
+
+	int a_maxNum = 10;
+
+	vector<const MyPoint *> a_results;
+
+	size_t a_numResults = 0;
+	
+	dvec2 a_queryPoint;
+
+	double a_queryRadius = 0.1;
+
+	double a_largestDist = 0.0;
 
 	MyPoint * buildTree(MyPoint * begin, MyPoint * end, const uint32_t splitAxis)
 	{
@@ -131,16 +141,6 @@ namespace
 		return &middle;
 	}
 
-	vector<const MyPoint *> a_results;
-
-	size_t a_numResults = 0;
-	
-	dvec2 a_queryPoint;
-
-	double a_queryRadius = 0.1;
-
-	double a_largestDist = 0.0;
-
 	inline void tryBubbleInsert(MyPoint * node)
 	{
 		const auto dist = distance(node->m_pos, a_queryPoint);
@@ -169,90 +169,56 @@ namespace
 			--B;
 		}
 
-		if(a_numResults > maxNum) { a_numResults = maxNum ;}
+		if(a_numResults > a_maxNum) { a_numResults = a_maxNum ;}
 
 		a_largestDist = (*(heap + a_numResults - 1))->m_queryDist; 
 	}
+
+	template<size_t AXIS>
+	inline void traverseSplitAxis(MyPoint * node)
+	{
+		if(a_queryPoint[AXIS] < node->m_pos[AXIS])
+		{
+			query(node->m_left);
+
+			tryBubbleInsert(node);
+					
+			const auto furthest = a_results[a_numResults];
+
+			const auto newRadius = distance(furthest->m_pos, a_queryPoint);
+
+			if (a_queryPoint[AXIS] + newRadius >= node->m_pos[AXIS]) { query(node->m_right) ;}
+		}
+		else if(a_queryPoint[AXIS] > node->m_pos[AXIS])
+		{
+			query(node->m_right);
+
+			tryBubbleInsert(node);
+					
+			const auto furthest = a_results[a_numResults];
+
+			const auto newRadius = distance(furthest->m_pos, a_queryPoint);
+
+			if (a_queryPoint[AXIS] - newRadius <= node->m_pos[AXIS]) { query(node->m_left) ;}
+		}
+		else
+		{
+			query(node->m_left);
+			query(node->m_right);
+
+			tryBubbleInsert(node);
+		}
+	}
 	
-	void query(	MyPoint * node)
+	void query(MyPoint * node)
 	{
 		if(node == nullptr) { return ;} // Should be done above to prevent a recursive call.
 
-		// Need to figure out if split, on the left or the right.
-
 		switch(node->m_splitAxis)
 		{
-			case SPLIT_X:
+			case SPLIT_X: traverseSplitAxis<SPLIT_X>(node); break;
 
-				if(a_queryPoint.x < node->m_pos.x)
-				{
-					query(node->m_left);
-
-					tryBubbleInsert(node);
-					
-					const auto furthest = a_results[a_numResults];
-
-					const auto newRadius = distance(furthest->m_pos, a_queryPoint);
-
-					if (a_queryPoint.x + newRadius >= node->m_pos.x) { query(node->m_right) ;}
-				}
-				else if(a_queryPoint.x > node->m_pos.x)
-				{
-					query(node->m_right);
-
-					tryBubbleInsert(node);
-					
-					const auto furthest = a_results[a_numResults];
-
-					const auto newRadius = distance(furthest->m_pos, a_queryPoint);
-
-					if (a_queryPoint.x - newRadius <= node->m_pos.x) { query(node->m_left) ;}
-				}
-				else
-				{
-					query(node->m_left);
-					query(node->m_right);
-
-					tryBubbleInsert(node);
-				}
-
-				break;
-
-			case SPLIT_Y:
-
-				if(a_queryPoint.y < node->m_pos.y)
-				{
-					query(node->m_left);
-
-					tryBubbleInsert(node);
-
-					const auto furthest = a_results[a_numResults];
-
-					const auto newRadius = distance(furthest->m_pos, a_queryPoint);
-
-					if (a_queryPoint.y + newRadius >= node->m_pos.y) { query(node->m_right) ;}
-				}
-				else if(a_queryPoint.y > node->m_pos.y)
-				{
-					query(node->m_right);
-
-					tryBubbleInsert(node);
-
-					const auto furthest = a_results[a_numResults];
-
-					const auto newRadius = distance(furthest->m_pos, a_queryPoint);
-
-					if (a_queryPoint.y - newRadius <= node->m_pos.y) { query(node->m_left) ;}
-				}
-				else
-				{
-					query(node->m_left);
-					query(node->m_right);
-
-					tryBubbleInsert(node);
-				}
-
-				break;
+			case SPLIT_Y: traverseSplitAxis<SPLIT_Y>(node); break;
 
 			case SPLIT_LEAF:
 
@@ -269,7 +235,7 @@ namespace
 	
 	void fillPoints(Canvas * canvas)
 	{
-		if(points.size()) { return ;}
+		if(a_points.size()) { return ;}
 
 		vector<dvec2> _points;
 	
@@ -284,9 +250,9 @@ namespace
 			pointCircles.push_back(boostGeom::makeCircle(p, 0.005, 10));
 		}
 
-		points.assign(_points.begin(), _points.end());
+		a_points.assign(_points.begin(), _points.end());
 
-		a_root = buildTree(&points[0], &points[0] + points.size(), SPLIT_X);
+		a_root = buildTree(&a_points[0], &a_points[0] + a_points.size(), SPLIT_X);
 
 		auto r = RenderablePolygon::create(pointCircles);
 
@@ -294,7 +260,7 @@ namespace
 
 		canvas->addRenderable(r);
 
-		a_results.resize(maxNum + 1);
+		a_results.resize(a_maxNum + 1);
 
 		a_results[0] = &a_dummyPoint;
 
@@ -377,10 +343,10 @@ void GUI::KD_TreeTestPanel()
 		ImGui::SliderFloat("buffer1", &bufferKD_Tree, 0.001f, 1.5f, "buffer1 = %.3f");
 		a_queryRadius = bufferKD_Tree;
 
-		if(ImGui::SliderInt("Max Num", &maxNum, 0, 128))
+		if(ImGui::SliderInt("Max Num", &a_maxNum, 0, 128))
 		{
 			// Need an extra slot for the dummy result to avoid a if statement per each node visited.
-			a_results.resize(maxNum + 1);
+			a_results.resize(a_maxNum + 1);
 
 			a_results[0] = &a_dummyPoint;
 		}
