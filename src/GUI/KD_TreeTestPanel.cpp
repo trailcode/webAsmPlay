@@ -141,6 +141,51 @@ namespace
 		return &middle;
 	}
 
+	inline size_t getQuadrant(const dvec2 & center, const dvec2 & P, const size_t expected = 0)
+	{
+		size_t ret = 3;
+		if (P.x > 0 && P.y > 0) {
+			//cout << "lies in First quadrant"; 
+			ret = 0;
+		}
+		else if (P.x < 0 && P.y > 0) {
+			//cout << "lies in Second quadrant"; 
+			ret = 1;
+		}
+		else if (P.x < 0 && P.y < 0) {
+			//cout << "lies in Third quadrant"; 
+			ret = 2;
+		}
+		else if (P.x > 0 && P.y < 0) {
+			//cout << "lies in Fourth quadrant"; 
+			ret = 3;
+		}
+		else if (P.x == 0 && P.y > 0) {
+			//cout << "lies at positive y axis"; 
+			ret = 1;
+		}  
+		else if (P.x == 0 && P.y < 0) {
+			//cout << "lies at negative y axis"; 
+			ret = 3;
+		}
+		else if (P.y == 0 && P.x < 0) {
+			//cout << "lies at negative x axis"; 
+			ret = 2;
+		}
+		else if (P.y == 0 && P.x > 0) {
+			//cout << "lies at positive x axis"; 
+			ret = 0;
+		}
+		else {
+			//cout << "lies at origin"; 
+			ret = 0;
+		}
+
+		//dmess("ret " << ret << " expected " << expected);
+
+		return ret;
+	}
+
 	inline void tryBubbleInsert(MyPoint * node)
 	{
 		const auto dist = distance(node->m_pos, a_queryPoint);
@@ -232,7 +277,6 @@ namespace
 		}
 	}
 
-	
 	void fillPoints(Canvas * canvas)
 	{
 		if(a_points.size()) { return ;}
@@ -297,6 +341,24 @@ namespace
 			}
 
 			DeferredRenderable::addCircle(posWC, a_queryRadius, {1, 0.5, 0, 1}, DEFER_FEATURES, 33);
+
+			//const auto p = dvec2{0.1,-0.2};
+			const auto p = dvec2{0,0};
+
+			//DeferredRenderable::addCrossHair(p, 1.0, {1,1,0,1}, DEFER_FEATURES);
+			DeferredRenderable::addCrossHair(posWC, 1.0, {1,1,0,1}, DEFER_FEATURES);
+
+			//getQuadrant(p, posWC);
+
+			/*
+			dmess("--------------------------");
+
+			getQuadrant(p, {-1,0}, 2); // 2
+			getQuadrant(p, {0,1}, 1); // 1
+			getQuadrant(p, {0,0}, 0); // 0
+			getQuadrant(p, {1,0}, 0); // 0
+			getQuadrant(p, {0,-1}, 3); // 3
+			*/
 
 			const mat4 trans = mat4(1.0);
 
