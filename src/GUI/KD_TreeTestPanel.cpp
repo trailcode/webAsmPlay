@@ -25,6 +25,8 @@
 */
 
 #include <glm/gtc/random.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/GUI/ImguiInclude.h>
@@ -67,7 +69,7 @@ namespace
 		MyPoint	* m_left	= nullptr;
 		MyPoint	* m_right	= nullptr;
 
-		double m_queryDist = 0.0;
+		double m_queryDist = nan("");
 	};
 
 	MyPoint a_dummyPoint(dvec2{nan(""), nan("")});
@@ -88,7 +90,12 @@ namespace
 	
 	dvec2 a_queryPoint;
 
-	double a_queryRadius = 0.1;
+	double a_scale = 1.0 / 1000.0;
+
+	//double a_queryRadius = 0.1 / a_scale;
+	double a_queryRadius = 195.6846828;
+
+	dmat4 a_trans;
 
 	MyPoint * buildTree(MyPoint * begin, MyPoint * end, const uint32_t splitAxis)
 	{
@@ -143,7 +150,8 @@ namespace
 
 	inline size_t getQuadrant(const dvec2 & center, const dvec2 & P, const size_t expected = 0)
 	{
-		size_t ret = 3;
+		size_t ret;
+
 		if (P.x > center.x && P.y > center.y) {
 			//cout << "lies in First quadrant"; 
 			ret = 0;
@@ -192,7 +200,7 @@ namespace
 
 		//DeferredRenderable::addCrossHair(node->m_pos, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
 
-		if(dist > a_queryRadius) { return ;}
+		
 
 		const auto quadrant = getQuadrant(a_queryPoint, node->m_pos);
 
@@ -200,13 +208,15 @@ namespace
 
 		switch(quadrant)
 		{
-			case 0: DeferredRenderable::addCrossHair(node->m_pos, 0.02, {0.2,0,1,1}, DEFER_FEATURES); break;
-			case 1: DeferredRenderable::addCrossHair(node->m_pos, 0.02, {1,0,0,1}, DEFER_FEATURES); break;
-			case 2: DeferredRenderable::addCrossHair(node->m_pos, 0.02, {0,1,0,1}, DEFER_FEATURES); break;
-			case 3: DeferredRenderable::addCrossHair(node->m_pos, 0.02, {0,1,1,1}, DEFER_FEATURES); break;
+			case 0: DeferredRenderable::addCrossHair(node->m_pos, 0.02 / a_scale, {0.2,0,1,1}, DEFER_FEATURES); break;
+			case 1: DeferredRenderable::addCrossHair(node->m_pos, 0.02 / a_scale, {1,0,0,1}, DEFER_FEATURES); break;
+			case 2: DeferredRenderable::addCrossHair(node->m_pos, 0.02 / a_scale, {0,1,0,1}, DEFER_FEATURES); break;
+			case 3: DeferredRenderable::addCrossHair(node->m_pos, 0.02 / a_scale, {0,1,1,1}, DEFER_FEATURES); break;
 			default:
 				dmess("Error!");
 		}
+
+		if(dist > a_queryRadius) { return ;}
 
 		node->m_queryDist = dist;
 
@@ -233,13 +243,11 @@ namespace
 		a_largestDist[quadrant] = (*(heap + a_numResults[quadrant] - 1))->m_queryDist; 
 	}
 
-	const MyPoint * getFurthest()
+	inline double getFurthestDistance()
 	{
-		double furthestDist = -1.0;
+		double furthestDist = a_results[0][a_numResults[0]]->m_queryDist;
 
-		const MyPoint * furthest;
-
-		for(size_t i = 0; i < 4; ++i)
+		for(size_t i = 1; i < 4; ++i)
 		{
 			const auto p = a_results[i][a_numResults[i]];
 
@@ -248,16 +256,9 @@ namespace
 			if(dist < furthestDist) { continue ;}
 
 			furthestDist = dist;
-
-			furthest = p;
 		}
-
-		/*
-		if(furthestDist > 0.5)
-		dmess("furthestDist " << furthestDist);
-		*/
-
-		return furthest;
+		
+		return furthestDist;
 	}
 
 	template<size_t AXIS>
@@ -269,11 +270,7 @@ namespace
 
 			tryBubbleInsert(node);
 					
-			//const auto furthest = a_results[a_numResults];
-
-			const auto furthest = getFurthest();
-
-			const auto newRadius = distance(furthest->m_pos, a_queryPoint);
+			const auto newRadius = getFurthestDistance();
 
 			if (a_queryPoint[AXIS] + newRadius >= node->m_pos[AXIS]) { query(node->m_right) ;}
 		}
@@ -283,10 +280,7 @@ namespace
 
 			tryBubbleInsert(node);
 					
-			//const auto furthest = a_results[a_numResults];
-			const auto furthest = getFurthest();
-
-			const auto newRadius = distance(furthest->m_pos, a_queryPoint);
+			const auto newRadius = getFurthestDistance();
 
 			if (a_queryPoint[AXIS] - newRadius <= node->m_pos[AXIS]) { query(node->m_left) ;}
 		}
@@ -329,6 +323,7 @@ namespace
 	
 		boostGeom::MultiPolygon pointCircles;
 
+		/*
 		for(size_t i = 0; i < 5000; ++i)
 		{
 			const auto p = dvec2(linearRand(-1.0f, 1.0f), linearRand(-1.0f, 1.0f));
@@ -337,12 +332,34 @@ namespace
 
 			pointCircles.push_back(boostGeom::makeCircle(p, 0.005, 10));
 		}
+		*/
+
+		FILE * fp = fopen("points.bin", "rb");
+
+		uint32_t num;
+
+		fread(&num, sizeof(uint32_t), 1, fp);
+
+		dmess("num " << num);
+
+		_points.resize(num);
+
+		fread(&_points[0], sizeof(dvec2), num, fp);
+
+		for(const auto & p : _points)
+		{
+			pointCircles.push_back(boostGeom::makeCircle(p, 10.005, 10));
+		}
+
+		fclose(fp);
 
 		a_points.assign(_points.begin(), _points.end());
 
 		a_root = buildTree(&a_points[0], &a_points[0] + a_points.size(), SPLIT_X);
 
-		auto r = RenderablePolygon::create(pointCircles);
+		a_trans = glm::scale(dvec3(a_scale, a_scale, 1.0));
+
+		auto r = RenderablePolygon::create(pointCircles, a_trans);
 
 		r->setRenderOutline(false); 
 
@@ -355,9 +372,19 @@ namespace
 			a_results[i][0] = &a_dummyPoint;
 		}
 
-		canvas->addMouseMoveListener([canvas](const dvec3 & posWC)
+		canvas->addMouseMoveListener([canvas](const dvec3 & _posWC)
 		{
 			//dmess("Pos " << posWC.x << " " << posWC.y);
+
+			dvec3 posWC = a_trans / dvec4(_posWC, 1);
+
+			const auto pp = a_trans / dvec4(_posWC, 1);
+
+			dmess("pp " << pp.x << " " << pp.y);
+
+			posWC = {-336.4085818,964.5771661, 0};
+
+			a_maxNum = 2;
 
 			a_geoms.clear();
 
@@ -370,9 +397,11 @@ namespace
 				a_largestDist[i] = a_queryRadius;
 			}
 
+			a_dummyPoint.m_queryDist = a_queryRadius;
+
 			a_queryPoint = posWC;
 
-			dmess("-----------------------------------------------");
+			//dmess("-----------------------------------------------");
 
 			query(a_root);
 
@@ -389,19 +418,21 @@ namespace
 
 					seen.insert(a_results[i][j]);
 
-					DeferredRenderable::addCircleFilled(a_results[i][j]->m_pos, 0.0052, {1,0,1,1}, DEFER_FEATURES);
+					DeferredRenderable::addCircleFilled(a_results[i][j]->m_pos, 0.0052 / a_scale, {1,0,1,1}, DEFER_FEATURES);
 
-					DeferredRenderable::addCircle(a_results[i][j]->m_pos, 0.0052, {1,1,0,1}, DEFER_FEATURES);
+					DeferredRenderable::addCircle(a_results[i][j]->m_pos, 0.0052 / a_scale, {1,1,0,1}, DEFER_FEATURES);
 				}
 			}
 
-			DeferredRenderable::addCircle(posWC, a_queryRadius, {1, 0.5, 0, 1}, DEFER_FEATURES, 33);
+			DeferredRenderable::addCircle(posWC, a_queryRadius, {1, 0.5, 0, 1}, DEFER_FEATURES, 128);
 
 			//const auto p = dvec2{0.1,-0.2};
 			const auto p = dvec2{0,0};
 
 			//DeferredRenderable::addCrossHair(p, 1.0, {1,1,0,1}, DEFER_FEATURES);
-			DeferredRenderable::addCrossHair(posWC, 1.0, {1,1,0,1}, DEFER_FEATURES);
+			DeferredRenderable::addCrossHair(posWC, 1.0 / a_scale, {1,1,0,1}, DEFER_FEATURES);
+
+			DeferredRenderable::addCrossHair({-216.5898618, 974.9137852}, 0.4 / a_scale, {1,0,0,1}, DEFER_FEATURES);
 
 			//getQuadrant(p, posWC);
 
@@ -415,9 +446,7 @@ namespace
 			getQuadrant(p, {0,-1}, 3); // 3
 			*/
 
-			const mat4 trans = mat4(1.0);
-
-			auto r3 = DeferredRenderable::createFromQueued(DEFER_FEATURES, trans);
+			auto r3 = DeferredRenderable::createFromQueued(DEFER_FEATURES, a_trans);
 		
 			canvas->addRenderable(r3);
 
@@ -457,8 +486,8 @@ void GUI::KD_TreeTestPanel()
                                                 ImVec2(0, 1),
                                                 ImVec2(1, 0));
 		float bufferKD_Tree = a_queryRadius;
-		ImGui::SliderFloat("buffer1", &bufferKD_Tree, 0.001f, 1.5f, "buffer1 = %.3f");
-		a_queryRadius = bufferKD_Tree;
+		ImGui::SliderFloat("buffer1", &bufferKD_Tree, 0.001f, 1.5f / a_scale, "buffer1 = %.3f");
+		//a_queryRadius = bufferKD_Tree;
 
 		if(ImGui::SliderInt("Max Num", &a_maxNum, 0, 128))
 		{
