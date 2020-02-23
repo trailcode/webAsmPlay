@@ -80,15 +80,15 @@ namespace
 
 	int a_maxNum = 10;
 
-	vector<const MyPoint *> a_results;
+	vector<const MyPoint *> a_results[4];
 
-	size_t a_numResults = 0;
+	size_t a_numResults[4] = {0, 0, 0, 0};
+
+	double a_largestDist[4] = {0.0, 0.0, 0.0, 0.0};
 	
 	dvec2 a_queryPoint;
 
 	double a_queryRadius = 0.1;
-
-	double a_largestDist = 0.0;
 
 	MyPoint * buildTree(MyPoint * begin, MyPoint * end, const uint32_t splitAxis)
 	{
@@ -144,35 +144,35 @@ namespace
 	inline size_t getQuadrant(const dvec2 & center, const dvec2 & P, const size_t expected = 0)
 	{
 		size_t ret = 3;
-		if (P.x > 0 && P.y > 0) {
+		if (P.x > center.x && P.y > center.y) {
 			//cout << "lies in First quadrant"; 
 			ret = 0;
 		}
-		else if (P.x < 0 && P.y > 0) {
+		else if (P.x < center.x && P.y > center.y) {
 			//cout << "lies in Second quadrant"; 
 			ret = 1;
 		}
-		else if (P.x < 0 && P.y < 0) {
+		else if (P.x < center.x && P.y < center.y) {
 			//cout << "lies in Third quadrant"; 
 			ret = 2;
 		}
-		else if (P.x > 0 && P.y < 0) {
+		else if (P.x > center.x && P.y < center.y) {
 			//cout << "lies in Fourth quadrant"; 
 			ret = 3;
 		}
-		else if (P.x == 0 && P.y > 0) {
+		else if (P.x == center.x && P.y > center.y) {
 			//cout << "lies at positive y axis"; 
 			ret = 1;
 		}  
-		else if (P.x == 0 && P.y < 0) {
+		else if (P.x == center.x && P.y < center.y) {
 			//cout << "lies at negative y axis"; 
 			ret = 3;
 		}
-		else if (P.y == 0 && P.x < 0) {
+		else if (P.y == center.y && P.x < center.x) {
 			//cout << "lies at negative x axis"; 
 			ret = 2;
 		}
-		else if (P.y == 0 && P.x > 0) {
+		else if (P.y == center.y && P.x > center.x) {
 			//cout << "lies at positive x axis"; 
 			ret = 0;
 		}
@@ -190,17 +190,31 @@ namespace
 	{
 		const auto dist = distance(node->m_pos, a_queryPoint);
 
-		DeferredRenderable::addCrossHair(node->m_pos, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
+		//DeferredRenderable::addCrossHair(node->m_pos, 0.02, {0.2,0,1,1}, DEFER_FEATURES);
 
 		if(dist > a_queryRadius) { return ;}
 
+		const auto quadrant = getQuadrant(a_queryPoint, node->m_pos);
+
+		//dmess("quadrant " << quadrant);
+
+		switch(quadrant)
+		{
+			case 0: DeferredRenderable::addCrossHair(node->m_pos, 0.02, {0.2,0,1,1}, DEFER_FEATURES); break;
+			case 1: DeferredRenderable::addCrossHair(node->m_pos, 0.02, {1,0,0,1}, DEFER_FEATURES); break;
+			case 2: DeferredRenderable::addCrossHair(node->m_pos, 0.02, {0,1,0,1}, DEFER_FEATURES); break;
+			case 3: DeferredRenderable::addCrossHair(node->m_pos, 0.02, {0,1,1,1}, DEFER_FEATURES); break;
+			default:
+				dmess("Error!");
+		}
+
 		node->m_queryDist = dist;
 
-		const auto heap = &a_results[1];
+		const auto heap = &a_results[quadrant][1];
 		
-		heap[a_numResults++] = node;
+		heap[a_numResults[quadrant]++] = node;
 
-		const MyPoint ** A = heap + a_numResults - 2;
+		const MyPoint ** A = heap + a_numResults[quadrant] - 2;
 
 		const MyPoint ** B = A + 1;
 
@@ -214,9 +228,36 @@ namespace
 			--B;
 		}
 
-		if(a_numResults > a_maxNum) { a_numResults = a_maxNum ;}
+		if(a_numResults[quadrant] > a_maxNum) { a_numResults[quadrant] = a_maxNum ;}
 
-		a_largestDist = (*(heap + a_numResults - 1))->m_queryDist; 
+		a_largestDist[quadrant] = (*(heap + a_numResults[quadrant] - 1))->m_queryDist; 
+	}
+
+	const MyPoint * getFurthest()
+	{
+		double furthestDist = -1.0;
+
+		const MyPoint * furthest;
+
+		for(size_t i = 0; i < 4; ++i)
+		{
+			const auto p = a_results[i][a_numResults[i]];
+
+			const auto dist = p->m_queryDist;
+
+			if(dist < furthestDist) { continue ;}
+
+			furthestDist = dist;
+
+			furthest = p;
+		}
+
+		/*
+		if(furthestDist > 0.5)
+		dmess("furthestDist " << furthestDist);
+		*/
+
+		return furthest;
 	}
 
 	template<size_t AXIS>
@@ -228,7 +269,9 @@ namespace
 
 			tryBubbleInsert(node);
 					
-			const auto furthest = a_results[a_numResults];
+			//const auto furthest = a_results[a_numResults];
+
+			const auto furthest = getFurthest();
 
 			const auto newRadius = distance(furthest->m_pos, a_queryPoint);
 
@@ -240,7 +283,8 @@ namespace
 
 			tryBubbleInsert(node);
 					
-			const auto furthest = a_results[a_numResults];
+			//const auto furthest = a_results[a_numResults];
+			const auto furthest = getFurthest();
 
 			const auto newRadius = distance(furthest->m_pos, a_queryPoint);
 
@@ -304,9 +348,12 @@ namespace
 
 		canvas->addRenderable(r);
 
-		a_results.resize(a_maxNum + 1);
+		for(size_t i = 0; i < 4; ++i)
+		{
+			a_results[i].resize(a_maxNum + 1);
 
-		a_results[0] = &a_dummyPoint;
+			a_results[i][0] = &a_dummyPoint;
+		}
 
 		canvas->addMouseMoveListener([canvas](const dvec3 & posWC)
 		{
@@ -316,28 +363,36 @@ namespace
 
 			//vector<const MyPoint *> results(maxNum);
 
-			a_numResults = 0;
+			for(size_t i = 0; i < 4; ++i)
+			{
+				a_numResults[i] = 0;
 
-			a_largestDist = a_queryRadius;
+				a_largestDist[i] = a_queryRadius;
+			}
 
 			a_queryPoint = posWC;
+
+			dmess("-----------------------------------------------");
 
 			query(a_root);
 
 			unordered_set<const MyPoint *> seen;
 
-			for(size_t i = 1; i <= a_numResults; ++i)
+			for(size_t i = 0; i < 4; ++i)
 			{
-				if(seen.find(a_results[i]) != seen.end())
+				for(size_t j = 1; j <= a_numResults[i]; ++j)
 				{
-					dmess("Seen!");
+					if(seen.find(a_results[i][j]) != seen.end())
+					{
+						dmess("Seen!");
+					}
+
+					seen.insert(a_results[i][j]);
+
+					DeferredRenderable::addCircleFilled(a_results[i][j]->m_pos, 0.0052, {1,0,1,1}, DEFER_FEATURES);
+
+					DeferredRenderable::addCircle(a_results[i][j]->m_pos, 0.0052, {1,1,0,1}, DEFER_FEATURES);
 				}
-
-				seen.insert(a_results[i]);
-
-				DeferredRenderable::addCircleFilled(a_results[i]->m_pos, 0.0052, {1,0,1,1}, DEFER_FEATURES);
-
-				DeferredRenderable::addCircle(a_results[i]->m_pos, 0.0052, {1,1,0,1}, DEFER_FEATURES);
 			}
 
 			DeferredRenderable::addCircle(posWC, a_queryRadius, {1, 0.5, 0, 1}, DEFER_FEATURES, 33);
@@ -408,12 +463,19 @@ void GUI::KD_TreeTestPanel()
 		if(ImGui::SliderInt("Max Num", &a_maxNum, 0, 128))
 		{
 			// Need an extra slot for the dummy result to avoid a if statement per each node visited.
-			a_results.resize(a_maxNum + 1);
+			for(size_t i = 0; i < 4; ++i)
+			{
+				a_results[i].resize(a_maxNum + 1);
 
-			a_results[0] = &a_dummyPoint;
+				a_results[i][0] = &a_dummyPoint;
+			}
 		}
 
-		ImGui::LabelText("Found", "Found: %i", a_numResults);
+		size_t found = 0;
+
+		for(size_t i = 0; i < 4; ++i) { found += a_numResults[i] ;}
+
+		ImGui::LabelText("Found", "Found: %i %i %i %i Pos: %f %f", a_numResults[0], a_numResults[1], a_numResults[2], a_numResults[3], a_queryPoint.x, a_queryPoint.y);
 
 	ImGui::End();
 }
