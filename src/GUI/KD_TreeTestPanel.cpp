@@ -69,7 +69,8 @@ namespace
 		MyPoint	* m_left	= nullptr;
 		MyPoint	* m_right	= nullptr;
 
-		double m_queryDist = nan("");
+		//double m_queryDist = nan("");
+		double m_queryDist = 0;
 	};
 
 	MyPoint a_dummyPoint(dvec2{nan(""), nan("")});
@@ -247,34 +248,52 @@ namespace
 	size_t a_count1 = 0;
 	size_t a_count2 = 0;
 
+	double a_furthestDist = 0;
+
+	inline bool gotFullResults()
+	{
+		for(size_t i = 0; i < 4; ++i)
+		{
+			if(a_numResults[i] != a_maxNum) { return false ;}
+		}
+
+		return true;
+	}
+
 	inline double getFurthestDistance()
 	{
 		//double furthestDist = a_results[0][a_numResults[0]]->m_queryDist;
-		double furthestDist = 0;
+		//double furthestDist = 0;
+
+		if(gotFullResults()) { a_furthestDist = 0 ;}
 
 		for(size_t i = 0; i < 4; ++i)
 		{
 			const auto numResults = a_numResults[i];
 
+			/*
 			if(numResults != a_maxNum)
 			{
 				++a_count1;
 
-				return a_queryRadius;
+				return a_queryRadius * 0.5;
 			}
+			//*/
 
 			const auto p = a_results[i][numResults];
 
 			const auto dist = p->m_queryDist;
 
-			if(dist < furthestDist) { continue ;}
+			if(dist < a_furthestDist) { continue ;}
 
-			furthestDist = dist;
+			a_furthestDist = dist;
 		}
 		
 		++a_count2;
 
-		return furthestDist;
+		//dmess("furthestDist " << furthestDist);
+
+		return a_furthestDist;
 	}
 
 	template<size_t AXIS>
@@ -289,7 +308,14 @@ namespace
 			const auto newRadius = getFurthestDistance();
 			//const auto newRadius = a_queryRadius;
 
-			if (a_queryPoint[AXIS] + newRadius >= node->m_pos[AXIS]) { query(node->m_right) ;}
+			if (a_queryPoint[AXIS] + newRadius >= node->m_pos[AXIS])
+			{
+				query(node->m_right);
+			}
+			else
+			{
+			 
+			}
 		}
 		else if(a_queryPoint[AXIS] > node->m_pos[AXIS])
 		{
@@ -300,7 +326,14 @@ namespace
 			const auto newRadius = getFurthestDistance();
 			//const auto newRadius = a_queryRadius;
 
-			if (a_queryPoint[AXIS] - newRadius <= node->m_pos[AXIS]) { query(node->m_left) ;}
+			if (a_queryPoint[AXIS] - newRadius <= node->m_pos[AXIS])
+			{
+				query(node->m_left);
+			}
+			else
+			{
+				
+			}
 		}
 		else
 		{
@@ -422,6 +455,8 @@ namespace
 			//a_dummyPoint.m_queryDist = a_queryRadius;
 
 			a_queryPoint = posWC;
+
+			a_furthestDist = 0;
 
 			//dmess("-----------------------------------------------");
 
