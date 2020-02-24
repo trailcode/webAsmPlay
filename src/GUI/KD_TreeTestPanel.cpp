@@ -90,10 +90,11 @@ namespace
 	
 	dvec2 a_queryPoint;
 
-	double a_scale = 1.0 / 1000.0;
+	//double a_scale = 1.0 / 1000.0;
+	double a_scale = 1.0;
 
-	//double a_queryRadius = 0.1 / a_scale;
-	double a_queryRadius = 195.6846828;
+	double a_queryRadius = 0.1 / a_scale;
+	//double a_queryRadius = 195.6846828;
 
 	dmat4 a_trans;
 
@@ -243,13 +244,26 @@ namespace
 		a_largestDist[quadrant] = (*(heap + a_numResults[quadrant] - 1))->m_queryDist; 
 	}
 
+	size_t a_count1 = 0;
+	size_t a_count2 = 0;
+
 	inline double getFurthestDistance()
 	{
-		double furthestDist = a_results[0][a_numResults[0]]->m_queryDist;
+		//double furthestDist = a_results[0][a_numResults[0]]->m_queryDist;
+		double furthestDist = 0;
 
-		for(size_t i = 1; i < 4; ++i)
+		for(size_t i = 0; i < 4; ++i)
 		{
-			const auto p = a_results[i][a_numResults[i]];
+			const auto numResults = a_numResults[i];
+
+			if(numResults != a_maxNum)
+			{
+				++a_count1;
+
+				return a_queryRadius;
+			}
+
+			const auto p = a_results[i][numResults];
 
 			const auto dist = p->m_queryDist;
 
@@ -258,6 +272,8 @@ namespace
 			furthestDist = dist;
 		}
 		
+		++a_count2;
+
 		return furthestDist;
 	}
 
@@ -271,6 +287,7 @@ namespace
 			tryBubbleInsert(node);
 					
 			const auto newRadius = getFurthestDistance();
+			//const auto newRadius = a_queryRadius;
 
 			if (a_queryPoint[AXIS] + newRadius >= node->m_pos[AXIS]) { query(node->m_right) ;}
 		}
@@ -281,6 +298,7 @@ namespace
 			tryBubbleInsert(node);
 					
 			const auto newRadius = getFurthestDistance();
+			//const auto newRadius = a_queryRadius;
 
 			if (a_queryPoint[AXIS] - newRadius <= node->m_pos[AXIS]) { query(node->m_left) ;}
 		}
@@ -323,7 +341,7 @@ namespace
 	
 		boostGeom::MultiPolygon pointCircles;
 
-		/*
+		//*
 		for(size_t i = 0; i < 5000; ++i)
 		{
 			const auto p = dvec2(linearRand(-1.0f, 1.0f), linearRand(-1.0f, 1.0f));
@@ -332,8 +350,9 @@ namespace
 
 			pointCircles.push_back(boostGeom::makeCircle(p, 0.005, 10));
 		}
-		*/
+		//*/
 
+		/*
 		FILE * fp = fopen("points.bin", "rb");
 
 		uint32_t num;
@@ -352,6 +371,7 @@ namespace
 		}
 
 		fclose(fp);
+		*/
 
 		a_points.assign(_points.begin(), _points.end());
 
@@ -382,7 +402,7 @@ namespace
 
 			dmess("pp " << pp.x << " " << pp.y);
 
-			posWC = {-336.4085818,964.5771661, 0};
+			//posWC = {-336.4085818,964.5771661, 0};
 
 			a_maxNum = 2;
 
@@ -397,7 +417,9 @@ namespace
 				a_largestDist[i] = a_queryRadius;
 			}
 
-			a_dummyPoint.m_queryDist = a_queryRadius;
+			a_count1 = a_count2 = 0;
+
+			//a_dummyPoint.m_queryDist = a_queryRadius;
 
 			a_queryPoint = posWC;
 
@@ -487,7 +509,7 @@ void GUI::KD_TreeTestPanel()
                                                 ImVec2(1, 0));
 		float bufferKD_Tree = a_queryRadius;
 		ImGui::SliderFloat("buffer1", &bufferKD_Tree, 0.001f, 1.5f / a_scale, "buffer1 = %.3f");
-		//a_queryRadius = bufferKD_Tree;
+		a_queryRadius = bufferKD_Tree;
 
 		if(ImGui::SliderInt("Max Num", &a_maxNum, 0, 128))
 		{
@@ -504,7 +526,7 @@ void GUI::KD_TreeTestPanel()
 
 		for(size_t i = 0; i < 4; ++i) { found += a_numResults[i] ;}
 
-		ImGui::LabelText("Found", "Found: %i %i %i %i Pos: %f %f", a_numResults[0], a_numResults[1], a_numResults[2], a_numResults[3], a_queryPoint.x, a_queryPoint.y);
+		ImGui::LabelText("Found", "Found: %i %i %i %i Pos: %f %f fur counts: %i %i", a_numResults[0], a_numResults[1], a_numResults[2], a_numResults[3], a_queryPoint.x, a_queryPoint.y, a_count1, a_count2);
 
 	ImGui::End();
 }
