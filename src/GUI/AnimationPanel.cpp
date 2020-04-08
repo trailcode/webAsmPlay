@@ -35,6 +35,8 @@ using namespace std;
 
 void GUI::animationPanel()
 {
+	if(!s_animationCanvas) { return ;}
+
 	s_animationCanvas->setEnabled(s_showAnimationPanel);
 
 	if (!s_showAnimationPanel) { return; }

@@ -78,6 +78,8 @@ void GUI::mouseButtonCallback(GLFWwindow * window, int button, int action, int m
 
 void GUI::cursorPosCallback(GLFWwindow * window, double xpos, double ypos)
 {
+	//dmess(xpos << " " << ypos);
+
     for(auto c : s_auxCanvases)
 	{
 		//dmess("upper left " << vec2(c->getUpperLeft()).x << "," << vec2(c->getUpperLeft()).y << " pos " << xpos << "," << ypos);

@@ -27,7 +27,11 @@
 #include <limits>
 #include <algorithm>
 #include <unordered_map>
+
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
+#endif
+
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/bing/BingTileSystem.h>
 #include <webAsmPlay/bing/RasterTile.h>

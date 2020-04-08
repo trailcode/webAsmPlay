@@ -24,6 +24,8 @@
 \copyright 2018
 */
 
+#ifndef __EMSCRIPTEN__
+
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/shaders/ShaderProgram.h>
 #include <webAsmPlay/shaders/ColorSymbology.h>
@@ -104,3 +106,5 @@ size_t BindlessTextureShader::setTextureSlot(const size_t textureSlot)
 {
 	return m_textureSlot = (GLuint)textureSlot;
 }
+
+#endif

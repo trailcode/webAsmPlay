@@ -31,6 +31,8 @@
 
 void GUI::bubbleFaceTestPanel()
 {
+	if(!s_bubbleFaceTestCanvas) { return ;}
+
 	s_bubbleFaceTestCanvas->setEnabled(s_showBubbleFaceTestPanel);
 
 	if(!s_showBubbleFaceTestPanel) { return ;}

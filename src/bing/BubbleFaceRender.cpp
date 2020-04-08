@@ -26,7 +26,11 @@
 */
 
 #include <filesystem>
+
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
+#endif
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/FrameBuffer.h>

@@ -25,6 +25,8 @@
 */
 #pragma once
 
+#ifndef __EMSCRIPTEN__
+
 #include <webAsmPlay/shaders/Shader.h>
 
 class BindlessTextureShader : public Shader
@@ -55,3 +57,5 @@ private:
 
 	GLuint m_textureSlot = 0;
 };
+
+#endif

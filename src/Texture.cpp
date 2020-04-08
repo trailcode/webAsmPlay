@@ -29,8 +29,12 @@
 #include <limits>
 #include <vector>
 #include <filesystem>
+
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
 #include <ctpl/ctpl.h>
+#endif
+
 #include <SDL_image.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/CurlUtil.h>
@@ -40,11 +44,14 @@
 
 using namespace std;
 using namespace std::filesystem;
-using namespace ctpl;
 using namespace curlUtil;
+
+#ifndef __EMSCRIPTEN__
+using namespace ctpl;
 
 namespace p		= boost::python;
 namespace np	= boost::python::numpy;
+#endif
 
 atomic_size_t Texture::s_desiredMaxNumTextures = { 4000 };
 
@@ -59,8 +66,12 @@ namespace
 {
 	vector<GLuint> a_texturesToFree;
 
+#ifndef __EMSCRIPTEN__
+
 	thread_pool a_loaderPool(8);
 	thread_pool a_writerPool(8);
+
+#endif
 
 	atomic<size_t> a_numLoading;
 	atomic<size_t> a_numDownloading;
@@ -77,8 +88,12 @@ namespace
 
 		~MyCleanup()
 		{
+#ifndef __EMSCRIPTEN__
+
 			a_loaderPool.stop();
 			a_writerPool.stop();
+
+#endif
 		}
 	};
 
@@ -114,7 +129,15 @@ void Texture::readyTexture()
 
 	++a_numLoading;
 
+#ifndef __EMSCRIPTEN__
+
 	a_loaderPool.push([this](int ID) { readyTexture(ID) ;});
+
+#else
+
+	readyTexture(0);
+
+#endif
 }
 
 void Texture::readyTexture(const int ID)
@@ -144,6 +167,7 @@ void Texture::readyTexture(const int ID)
 
 		++a_numUploading;
 
+#ifndef __EMSCRIPTEN__
 		Textures::s_queue.push([this, img, tileCachePath](int ID)
 		{
 			if (!m_stillNeeded)
@@ -163,12 +187,40 @@ void Texture::readyTexture(const int ID)
 
 			SDL_FreeSurface(img);
 
-			if(s_useBindlessTextures) { m_handle = glGetTextureHandleARB(m_textureID) ;}
+			if(s_useBindlessTextures)
+			{
+				m_handle = glGetTextureHandleARB(m_textureID);
+			}
 
 			m_loading = false;
 
 			--a_numUploading;
 		});
+
+#else
+		
+		if (!m_stillNeeded)
+		{
+			m_loading = false;
+
+			SDL_FreeSurface(img);
+
+			--a_numUploading;
+
+			return;
+		}
+
+		OpenGL::ensureSharedContext();
+
+		m_textureID = Textures::load(img);
+
+		SDL_FreeSurface(img);
+
+		m_loading = false;
+
+		--a_numUploading;
+
+#endif
 
 		return;
 	}
@@ -214,6 +266,8 @@ void Texture::readyTexture(const int ID)
 
 		++a_numUploading;
 
+#ifndef __EMSCRIPTEN__
+
 		Textures::s_queue.push([this, tileBuffer, tileCachePath](int ID)
 		{
 			if (!m_stillNeeded)
@@ -252,7 +306,10 @@ void Texture::readyTexture(const int ID)
 
 			SDL_FreeSurface(img);
 
-			if(s_useBindlessTextures) { m_handle = glGetTextureHandleARB(m_textureID) ;}
+			if(s_useBindlessTextures)
+			{
+				m_handle = glGetTextureHandleARB(m_textureID);
+			}
 
 			m_loading = false;
 
@@ -277,6 +334,13 @@ void Texture::readyTexture(const int ID)
 				--a_numWriting;
 			});
 		});
+
+#else
+
+		dmessError("Implement me!");
+
+#endif
+
 	});
 }
 
@@ -332,6 +396,7 @@ void Texture::incrementFrameNumber() { ++a_frameNumber ;}
 
 size_t Texture::getFrameNumber() { return a_frameNumber ;}
 
+#ifndef __EMSCRIPTEN__
 np::ndarray Texture::textureToNdArray(const GLuint texID)
 {
 	int w, h;
@@ -353,4 +418,5 @@ np::ndarray Texture::textureToNdArray(const GLuint texID)
 
 	return a;
 }
+#endif
 

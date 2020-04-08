@@ -90,9 +90,9 @@ void GeoClient::loadGeometry(const string fileName)
     emscripten_fetch_attr_init(&attr);
     strcpy(attr.requestMethod, "GET");
     attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
-    attr.onsuccess = downloadSucceeded;
-    attr.onerror = downloadFailed;
-    attr.onprogress = downloadProgress;
+    //attr.onsuccess = downloadSucceeded;
+    //attr.onerror = downloadFailed;
+    //attr.onprogress = downloadProgress;
     attr.userData = this;
     emscripten_fetch(&attr, fileName.c_str());
 

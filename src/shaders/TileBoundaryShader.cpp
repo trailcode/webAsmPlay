@@ -46,6 +46,7 @@ TileBoundaryShader * TileBoundaryShader::getDefaultInstance() { return a_default
 void TileBoundaryShader::ensureShader()
 {
 	//return; // This one is not compiling!
+#ifndef __EMSCRIPTEN__
 
     if(a_shaderProgram) { return ;}
 
@@ -56,6 +57,10 @@ void TileBoundaryShader::ensureShader()
                                             Variables({	{"MVP",					a_MVP							}}));
 
     a_defaultInstance = new TileBoundaryShader();
+
+	#else
+	dmess("Fix!");
+	#endif
 }
 
 TileBoundaryShader::TileBoundaryShader() : Shader(	"TileBoundaryShader",
@@ -74,6 +79,7 @@ void TileBoundaryShader::bind(  Canvas     * canvas,
                                 const bool   isOutline,
                                 const size_t renderingStage)
 {
+#ifndef __EMSCRIPTEN__
 	glDisable(GL_BLEND);
 
 	glDisable(GL_DEPTH_TEST);
@@ -81,4 +87,7 @@ void TileBoundaryShader::bind(  Canvas     * canvas,
 	a_shaderProgram->bind();
 
 	a_shaderProgram->setUniform(a_MVP, canvas->getMVP_Ref());
+	#else
+	dmess("Fix!");
+	#endif
 }

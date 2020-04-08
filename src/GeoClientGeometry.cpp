@@ -25,7 +25,10 @@
   \copyright 2018
 */
 
+#ifndef __EMSCRIPTEN__
 #include <ctpl/ctpl.h>
+#endif
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <geos/index/quadtree/Quadtree.h>
 #include <webAsmPlay/Debug.h>
@@ -51,7 +54,9 @@
 using namespace std;
 using namespace std::chrono;
 using namespace glm;
+#ifndef __EMSCRIPTEN__
 using namespace ctpl;
+#endif
 using namespace geosUtil;
 using namespace geos::geom;
 using namespace geos::index::quadtree;
@@ -110,7 +115,9 @@ namespace
         return make_pair(height, minHeight);
     }
 
+#ifndef __EMSCRIPTEN__
 	thread_pool indexerPool(1);
+#endif
 }
 
 void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geoms)
@@ -118,6 +125,8 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
     dmess("GeoClient::createPolygonRenderiables " << geoms.size());
 
     auto startTime = system_clock::now();
+
+#ifndef __EMSCRIPTEN__
 
 	indexerPool.push([this, &geoms](int ID)
 	{
@@ -130,6 +139,19 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 			m_quadTreePolygons->insert(g->getEnvelopeInternal(), new tuple{ nullptr, g, attrs });
 		}
 	});
+
+#else
+
+	for(size_t i = 0; i < geoms.size(); ++i)
+	{
+		//doProgress("(5/6) Indexing polygons:", i, geoms.size(), _startTime);
+
+		const auto [attrs, g] = geoms[i];
+
+		m_quadTreePolygons->insert(g->getEnvelopeInternal(), new tuple{ nullptr, g, attrs });
+	}
+
+#endif
 
     GUI::progress("", 1.0f);
 
@@ -177,12 +199,16 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     if(auto r = RenderablePolygon::create(polygons, m_trans, true))
     {
+	#ifndef __EMSCRIPTEN__
 		r->setShader(new ColorDistanceShader(	ColorSymbology::getInstance("defaultPolygon"),
 												// Should render functor
 												[](const bool isOutline, const size_t renderingStage) -> bool
 												{
 													return renderingStage == G_BUFFER;
 												}));
+												#else
+												dmessError("Fix!");
+												#endif
 
         r->setRenderFill    (GUI::s_renderSettingsFillPolygons);
         r->setRenderOutline (GUI::s_renderSettingsRenderPolygonOutlines);
@@ -192,7 +218,12 @@ void GeoClient::createPolygonRenderiables(const vector<AttributedGeometry> & geo
 
     if(auto r = RenderableMesh::create(polygons3D, m_trans, true))
     {
+
+	#ifndef __EMSCRIPTEN__
 		r->setShader(ColorDistanceDepthShader3D::getDefaultInstance());
+		#else
+		dmessError("Fix!");
+		#endif
 
         r->setRenderFill    (GUI::s_renderSettingsFillMeshes);
         r->setRenderOutline (GUI::s_renderSettingsRenderMeshOutlines);
@@ -236,21 +267,33 @@ void GeoClient::createLineStringRenderiables(const vector<AttributedGeometry> & 
 		polylines.push_back(make_pair(geom, colorID));
 	}
 
+#ifndef __EMSCRIPTEN__
+
 	indexerPool.push([this, edges](int ID)
 	{
 		for(const auto edge : edges) { m_quadTreeLineStrings->insert(edge->getGeometry()->getEnvelopeInternal(), edge) ;}
 	});
+
+#else
+
+	for(const auto edge : edges) { m_quadTreeLineStrings->insert(edge->getGeometry()->getEnvelopeInternal(), edge) ;}
+
+#endif
 	
 	m_network->setEdges(edges);
 	
     auto r = RenderableLineString::create(polylines, m_trans, true);
 
+#ifndef __EMSCRIPTEN__
 	r->setShader(new ColorDistanceShader(	ColorSymbology::getInstance("defaultLinear"),
 											// Should render functor
 											[](const bool isOutline, const size_t renderingStage) -> bool
 											{
 												return renderingStage == POST_G_BUFFER;
 											}));
+											#else
+											dmessError("Fix!");
+											#endif
 
     r->setRenderOutline(GUI::s_renderSettingsRenderLinearFeatures);
 
@@ -328,7 +371,11 @@ void GeoClient::createPointRenderiables(const vector<AttributedGeometry> & geoms
 
     auto r = RenderablePolygon::create(points, m_trans, true);
 
+#ifndef __EMSCRIPTEN__
     r->setShader(ColorDistanceShader::getDefaultInstance());
+	#else
+	dmessError("Fix!");
+	#endif
 	
 	GUI::guiASync([this, r]() { m_canvas->addRenderable(r) ;});
     

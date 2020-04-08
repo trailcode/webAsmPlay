@@ -24,6 +24,8 @@
   \copyright 2018
 */
 
+#ifndef __EMSCRIPTEN__
+
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/Textures.h>
@@ -152,3 +154,5 @@ void ColorDistanceShader::bind(	const mat4		& MV,
 }
 
 size_t ColorDistanceShader::getNumRenderingStages() const { return 2 ;}
+
+#endif

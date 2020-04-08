@@ -72,6 +72,7 @@ SsaoShader* SsaoShader::getDefaultInstance() { return a_defaultInstance ;}
 
 void SsaoShader::ensureShader()
 {
+#ifndef __EMSCRIPTEN__
 	if(a_shaderProgram) { return ;}
 
 	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"SsaoShader.vs.glsl"	},
@@ -83,6 +84,10 @@ void SsaoShader::ensureShader()
 														{"mixPercent",			a_mixPercent			}}));
 
 	a_defaultInstance = new SsaoShader();
+	#else
+
+	dmess("Fix!");
+	#endif
 }
 
 SsaoShader::SsaoShader() : Shader(	"SsaoShader",
@@ -149,6 +154,7 @@ void SsaoShader::bind(	Canvas		* canvas,
 						const bool    isOutline,
 						const size_t  renderingStage)
 {
+#ifndef __EMSCRIPTEN__
 	a_shaderProgram->bind();
 
 	a_shaderProgram->setUniformf(a_ssaoRadius,	m_SSAO_Radius);
@@ -163,4 +169,10 @@ void SsaoShader::bind(	Canvas		* canvas,
 	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, m_colorTextureID);
 
 	glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, m_normalDepthTextureID);
+
+	#else
+
+	dmess("Fix!");
+
+	#endif
 }

@@ -15,7 +15,9 @@
 
 //---- Define assertion handler. Defaults to calling assert().
 //#define IM_ASSERT(_EXPR)  MyAssert(_EXPR)
-//#define IM_ASSERT(_EXPR)  ((void)(_EXPR))     // Disable asserts
+#ifdef __EMSCRIPTEN__
+#define IM_ASSERT(_EXPR)  ((void)(_EXPR))     // Disable asserts
+#endif
 
 //---- Define attributes of all API symbols declarations, e.g. for DLL under Windows 
 // Using dear imgui via a shared library is not recommended, because of function call overhead and because we don't guarantee backward nor forward ABI compatibility.

@@ -25,6 +25,8 @@
 */
 #pragma once
 
+#ifndef __EMSCRIPTEN__
+
 #include <webAsmPlay/shaders/Shader.h>
 
 class ColorDistanceShader : public Shader
@@ -53,7 +55,9 @@ public:
 	ColorDistanceShader(ColorSymbology * colorSymbology, const ShouldRenderFunctor & shouldRenderFunctor);
     ~ColorDistanceShader();
 
-	size_t getNumRenderingStages() const;
+	size_t getNumRenderingStages() const override;
 
 private:
 };
+
+#endif

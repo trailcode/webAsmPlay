@@ -40,16 +40,22 @@ namespace
 
 void NormalToRGB_Shader::ensureShader()
 {
+#ifndef __EMSCRIPTEN__
 	if(a_shaderProgram) { return ;}
 
 	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"NormalToRGB.vs.glsl"	},
 														{GL_FRAGMENT_SHADER,	"NormalToRGB.fs.glsl"	}}),
 											Variables(),
 											Variables({	{"tex",					a_tex					}}));
+#else
+	dmess("Fix!");
+#endif
 }
 
 void NormalToRGB_Shader::bind(const GLuint textureID)
 {
+#ifndef __EMSCRIPTEN__
+
 	a_shaderProgram->bind();
 
 	glDisable(GL_BLEND);
@@ -59,4 +65,10 @@ void NormalToRGB_Shader::bind(const GLuint textureID)
 	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, textureID);
 
 	a_shaderProgram->setUniformi(a_tex, 0);
+
+#else
+
+	dmess("Fix!");
+
+#endif
 }

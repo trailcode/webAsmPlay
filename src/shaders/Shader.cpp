@@ -76,9 +76,14 @@ void Shader::bind(	const mat4		& model,
 
 void Shader::ensureShaders()
 {
+#ifndef __EMSCRIPTEN__
+
 	BindlessTextureShader		::ensureShader();
 	ColorDistanceDepthShader3D	::ensureShader();
 	ColorDistanceShader			::ensureShader();
+
+#endif
+	
 	ColorShader					::ensureShader();
 	ColorVertexShader			::ensureShader();
 	SkyBoxShader				::ensureShader();

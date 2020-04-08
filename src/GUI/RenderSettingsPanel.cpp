@@ -96,12 +96,16 @@ void GUI::renderSettingsPanel()
             for(auto r : s_canvas->getRastersRef()) { r->setRenderFill(s_renderSettingsRenderBingMaps) ;}
         }
 
+#ifndef __EMSCRIPTEN__
+
         float heightMultiplier = ColorDistanceDepthShader3D::getDefaultInstance()->getHeightMultiplier();
 
         if(ImGui::SliderFloat("", &heightMultiplier, 0.0f, 1.0f, "Height mult: %.3f"))
         {
             ColorDistanceDepthShader3D::getDefaultInstance()->setHeightMultiplier(heightMultiplier);
         }
+
+#endif
 
         const char * items[] = { "TrackBall", "First Person", "Track Entity" };
         
@@ -117,10 +121,11 @@ void GUI::renderSettingsPanel()
 
         if(ImGui::Combo("Mesh", &meshShader, shaders, IM_ARRAYSIZE(shaders)))
         {
-            dmess("meshShader " << meshShader);
-
-            vector<Shader *> shaderMap({ColorDistanceShader       ::getDefaultInstance(),
+            vector<Shader *> shaderMap({
+#ifndef __EMSCRIPTEN__
+										ColorDistanceShader       ::getDefaultInstance(),
                                         ColorDistanceDepthShader3D::getDefaultInstance(),
+#endif
                                         ColorShader               ::getDefaultInstance(),
                                         ColorVertexShader         ::getDefaultInstance()
                                         });

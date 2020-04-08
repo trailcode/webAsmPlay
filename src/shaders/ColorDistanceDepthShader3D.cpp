@@ -24,6 +24,9 @@
   \copyright 2018
 */
 
+
+#ifndef __EMSCRIPTEN__
+
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Types.h>
 #include <webAsmPlay/canvas/Canvas.h>
@@ -204,3 +207,5 @@ vec3 ColorDistanceDepthShader3D::setLightPos(const vec3 & pos)					{ return m_li
 vec3 ColorDistanceDepthShader3D::getLightPos() const							{ return m_lightPos		  ;}
 
 size_t ColorDistanceDepthShader3D::getNumRenderingStages() const				{ return 2 ;}
+
+#endif

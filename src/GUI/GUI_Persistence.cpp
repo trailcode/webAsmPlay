@@ -67,6 +67,7 @@ bool GUI::s_showStreetSidePanel					 = false;
 bool GUI::s_showBubbleFaceTestPanel				 = false;
 bool GUI::s_showTextureSystemPanel				 = false;
 bool GUI::s_showPythonConsolePanel				 = false;
+bool GUI::s_showSolidNodeBSP_Panel				 = true;
 
 bool GUI::s_renderSettingsFillMeshes             = true;
 bool GUI::s_renderSettingsRenderMeshOutlines     = true;
@@ -128,6 +129,7 @@ void GUI::loadState()
 	setBool(L"showBubbleFaceTestPanel",				s_showBubbleFaceTestPanel);
 	setBool(L"showTextureSystemPanel",				s_showTextureSystemPanel);
 	setBool(L"showPythonConsolePanel",				s_showPythonConsolePanel);
+	setBool(L"showSolidNodeBSP_Panel",				s_showSolidNodeBSP_Panel);
 
     setBool(L"renderSettingsFillMeshes",            s_renderSettingsFillMeshes);
     setBool(L"renderSettingsRenderMeshOutlines",    s_renderSettingsRenderMeshOutlines);
@@ -154,10 +156,12 @@ void GUI::loadState()
 	
     getMainCamera()->update();
 
+#ifndef __EMSCRIPTEN__
     if(root.find(L"buildingHeightMultiplier") != root.end())
     {
         ColorDistanceDepthShader3D::getDefaultInstance()->setHeightMultiplier(float(root[L"buildingHeightMultiplier"]->AsNumber()));
     }
+#endif
 
 	Animation::loadFile("animation.json");
 }
@@ -190,6 +194,7 @@ void GUI::saveState()
 	root[L"showBubbleFaceTestPanel"]			  = new JSONValue(s_showBubbleFaceTestPanel);
 	root[L"showTextureSystemPanel"]				  = new JSONValue(s_showTextureSystemPanel);
 	root[L"showPythonConsolePanel"]				  = new JSONValue(s_showPythonConsolePanel);
+	root[L"showSolidNodeBSP_Panel"]				  = new JSONValue(s_showSolidNodeBSP_Panel);
 
     root[L"renderSettingsFillMeshes"]             = new JSONValue(s_renderSettingsFillMeshes);
     root[L"renderSettingsRenderMeshOutlines"]     = new JSONValue(s_renderSettingsRenderMeshOutlines);
@@ -199,7 +204,12 @@ void GUI::saveState()
     root[L"renderSettingsRenderSkyBox"]           = new JSONValue(s_renderSettingsRenderSkyBox);
     root[L"renderSettingsRenderBingMaps"]         = new JSONValue(s_renderSettingsRenderBingMaps);
     root[L"renderSettingsRenderModels"]           = new JSONValue(s_renderSettingsRenderModels);
+
+#ifndef __EMSCRIPTEN__
+
 	root[L"buildingHeightMultiplier"]             = new JSONValue(ColorDistanceDepthShader3D::getDefaultInstance()->getHeightMultiplier());
+
+#endif
 
     root[L"cameraEye"]                            = new JSONValue(s_canvas->getCamera()->getEyeConstRef());
     root[L"cameraCenter"]                         = new JSONValue(s_canvas->getCamera()->getCenterConstRef());

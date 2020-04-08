@@ -31,14 +31,19 @@
 
 using namespace std;
 using namespace glm;
+
+#ifndef __EMSCRIPTEN__
 using namespace ctpl;
+#endif
 
 namespace
 {
     Textures * a_instance = nullptr;
 } 
 
+#ifndef __EMSCRIPTEN__
 thread_pool<boost::lockfree::queue<std::function<void(int id)> *>> Textures::s_queue(1);
+#endif
 
 Textures * Textures::getInstance()
 {

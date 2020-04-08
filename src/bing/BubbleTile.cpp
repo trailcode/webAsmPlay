@@ -27,9 +27,13 @@
 #include <atomic>
 #include <unordered_set>
 #include <filesystem>
+
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
 #include <tbb/concurrent_unordered_map.h>
-#include <ctpl/ctpl.h>
+//#include <ctpl/ctpl.h>
+#endif
+
 #include <SDL_image.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Textures.h>
@@ -39,15 +43,23 @@
 
 using namespace std;
 using namespace std::filesystem;
+
+#ifndef __EMSCRIPTEN__
 using namespace tbb;
-using namespace ctpl;
+//using namespace ctpl;
+#endif
+
 using namespace curlUtil;
 
 namespace
 {
 	//concurrent_unordered_map<string, size_t> a_bubbleTiles;
 
-	thread_pool a_loaderQueue(16);
+#ifndef __EMSCRIPTEN__
+
+	//thread_pool a_loaderQueue(16);
+
+#endif
 
 	std::atomic<int> a_numLoading = {0};
 

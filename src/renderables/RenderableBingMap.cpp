@@ -33,7 +33,9 @@
 #include <functional>
 #include <unordered_map>
 #include <filesystem>
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
+#endif
 #include <SDL_image.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Util.h>
@@ -113,7 +115,12 @@ RenderableBingMap::RenderableBingMap(const AABB2D & bounds, const dmat4 & trans)
 	glGenBuffers(1,					&buffers.m_textureHandleBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER,  buffers.m_textureHandleBuffer);
 
+#ifndef __EMSCRIPTEN__
 	glBufferStorage(GL_UNIFORM_BUFFER, NUM_TEXTURES * sizeof(GLuint64) * 2, nullptr, GL_MAP_WRITE_BIT);
+#else
+
+	dmessError("Implement me!");
+#endif
 }
 
 RenderableBingMap::~RenderableBingMap()
@@ -200,13 +207,19 @@ namespace
 {
 	vector<RasterTile*> a_lastTilesRendered;
 
+#ifndef __EMSCRIPTEN__
+
 	BindlessTextureShader a_bindlessShader();
+
+#endif
 }
 
 //#include <webAsmPlay/shaders/ColorVertexShader.h>
 
 void RenderableBingMap::renderBindlessTextures(Canvas* canvas, const vector<RasterTile*>& toRender, const size_t renderStage)
 {
+#ifndef __EMSCRIPTEN__
+
 	if (!toRender.size()) { return; }
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 6, buffers.m_textureHandleBuffer);
@@ -219,6 +232,7 @@ void RenderableBingMap::renderBindlessTextures(Canvas* canvas, const vector<Rast
 
 		if (!tile->m_textureResident)
 		{
+
 			glMakeTextureHandleResidentARB(tile->m_handle);
 
 			tile->m_textureResident = true;
@@ -326,6 +340,12 @@ void RenderableBingMap::renderBindlessTextures(Canvas* canvas, const vector<Rast
 	glDeleteBuffers(1, &vbo);
 
 	glBindVertexArray(0);
+
+#else
+	
+	dmessError("Not supported!");
+
+#endif
 }
 
 void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
@@ -424,8 +444,12 @@ void RenderableBingMap::render(Canvas * canvas, const size_t renderStage)
 
 				tile->m_renderable->ensureVAO();
 
+#ifndef __EMSCRIPTEN__
 				if(Texture::s_useBindlessTextures)	{ tile->m_renderable->setShader(BindlessTextureShader	::getDefaultInstance()) ;}
 				else								{ tile->m_renderable->setShader(TextureShader			::getDefaultInstance()) ;}
+#else
+				tile->m_renderable->setShader(TextureShader::getDefaultInstance());
+#endif
 
 				tile->m_renderable->setRenderOutline (false);
 				tile->m_renderable->setRenderFill    (true);

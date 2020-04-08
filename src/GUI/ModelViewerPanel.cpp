@@ -30,6 +30,8 @@
 
 void GUI::modelViewerPanel()
 {
+	if(!s_modelViewerCanvas) { return ;}
+
 	s_modelViewerCanvas->setEnabled(s_showModelViewerPanel);
 
 	if(!s_showModelViewerPanel) { return ;}

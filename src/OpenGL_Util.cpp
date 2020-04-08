@@ -25,20 +25,29 @@
 */
 
 #include <unordered_set>
+#ifndef __EMSCRIPTEN__
 #include <tbb/concurrent_queue.h>
+#endif
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/shaders/Shader.h>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/OpenGL_Util.h>
 
 using namespace std;
+
+#ifndef __EMSCRIPTEN__
 using namespace tbb;
+#endif
 
 namespace
 {
 	const size_t a_numOpenGL_Contexts = 10;
 	
+#ifndef __EMSCRIPTEN__
+
 	concurrent_queue<GLFWwindow *> a_contextWindows;
+
+#endif
 
 	unordered_set<thread::id> a_setContextes;
 }
@@ -97,10 +106,14 @@ void OpenGL::init()
     
 #ifndef __APPLE__ // TODO Fix this!
     
+#ifndef __EMSCRIPTEN__
+
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
     glDebugMessageCallback(glDebugOutput, nullptr);
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+
+#endif
     
 #endif
 	
@@ -117,14 +130,20 @@ void OpenGL::init()
 
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 
+#ifndef __EMSCRIPTEN__
+
 	for (size_t i = 0; i < a_numOpenGL_Contexts; ++i)
 	{
 		a_contextWindows.push(glfwCreateWindow(1, 1, "Thread Window", nullptr, GUI::getMainWindow()));
 	}
+
+#endif
 }
 
 void OpenGL::ensureSharedContext()
 {
+#ifndef __EMSCRIPTEN__
+
 	const thread::id threadID = this_thread::get_id();
 
 	if(a_setContextes.find(threadID) != a_setContextes.end()) { return ;}
@@ -136,4 +155,6 @@ void OpenGL::ensureSharedContext()
 	glfwMakeContextCurrent(contextWindow);
 
 	a_setContextes.insert(threadID);
+
+#endif
 }

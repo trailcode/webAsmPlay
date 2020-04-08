@@ -25,7 +25,9 @@
 */
 #pragma once
 
+#ifndef __EMSCRIPTEN__
 #include <boost/python/numpy.hpp>
+#endif
 #include <atomic>
 #include <string>
 #include <unordered_map>
@@ -59,7 +61,11 @@ public:
 
 	static size_t getFrameNumber();
 
+#ifndef __EMSCRIPTEN__
+
 	static boost::python::numpy::ndarray textureToNdArray(const GLuint texID);
+
+#endif
 
 	static GLuint s_NO_DATA;
 

@@ -24,6 +24,8 @@
   \copyright 2019
 */
 
+#ifndef __EMSCRIPTEN__
+
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
 #include <boost/circular_buffer.hpp>
@@ -167,3 +169,4 @@ string Python::execute(const string & command)
 	return python_stdio_redirector.GetOutput();
 }
 
+#endif

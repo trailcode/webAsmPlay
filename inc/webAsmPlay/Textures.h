@@ -49,7 +49,11 @@ public:
 
     static GLuint set1D(const GLuint texture, const glm::vec4 * values, const size_t num);
 
+#ifndef __EMSCRIPTEN__
+
 	static ctpl::thread_pool<boost::lockfree::queue<std::function<void(int id)> *>> s_queue;
+
+#endif
 
 	static void deleteTextures(const std::vector<GLuint> & IDs);
 

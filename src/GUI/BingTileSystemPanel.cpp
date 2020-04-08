@@ -25,7 +25,11 @@
 */
 #pragma warning( push )
 #pragma warning( disable : 4005)
+
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
+#endif
+
 #include <webAsmPlay/GUI/GUI.h>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/bing/BingTileSystem.h>

@@ -25,6 +25,8 @@
 */
 #pragma once
 
+#ifndef __EMSCRIPTEN__
+
 #include <webAsmPlay/shaders/Shader.h>
 
 class ColorDistanceDepthShader3D : public Shader
@@ -60,3 +62,5 @@ private:
 
     glm::vec3 m_lightPos;
 };
+
+#endif

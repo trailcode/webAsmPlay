@@ -46,6 +46,8 @@ ivec2 FrameBuffer::initFrameBuffer(const ivec2& bufferSize)
 
 	m_drawBuffers.clear();
 
+#ifndef __EMSCRIPTEN__
+
 	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_prevFB);
 
 	glGenFramebuffers(1,				&m_renderFBO);
@@ -71,6 +73,36 @@ ivec2 FrameBuffer::initFrameBuffer(const ivec2& bufferSize)
 	glBindFramebuffer(GL_FRAMEBUFFER, m_prevFB);
 
 	return bufferSize;
+
+#endif
+
+	glGenFramebuffers(1, &m_renderFBO);
+    //glGenTextures(1, t);
+	glGenTextures(GLsizei(m_components.size()), &m_textures[0]);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_renderFBO);
+
+    glBindTexture(GL_TEXTURE_2D, m_textures[0]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_bufferSize.x, m_bufferSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textures[0], 0);
+
+    GLuint depthbuffer;
+    glGenRenderbuffers(1, &depthbuffer);    
+    glBindRenderbuffer(GL_RENDERBUFFER, depthbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, m_bufferSize.x, m_bufferSize.y);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthbuffer);
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if(status != GL_FRAMEBUFFER_COMPLETE)
+	{
+        dmessError("Error!");
+	}
+
+	return m_bufferSize;
 }
 
 void FrameBuffer::cleanup()

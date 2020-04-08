@@ -42,7 +42,9 @@
 
 #include <webAsmPlay/bing/StreetSide.h>
 
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
+#endif
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -53,10 +55,13 @@ void errorCallback(int error, const char* description);
 
 extern std::thread * openSteerThread;
 
+#ifndef __EMSCRIPTEN__
 using namespace boost::python;
+#endif
 
 void my_exePy(const std::string command)
 {
+#ifndef __EMSCRIPTEN__
 	try {
       //Py_Initialize();
    
@@ -75,14 +80,23 @@ void my_exePy(const std::string command)
   } catch( error_already_set ) {
     PyErr_Print();
   }
+#else
+
+  dmessError("Implement me!");
+
+#endif
 }
 
 #include <webAsmPlay/Util.h> 
 
 int main(int, char**)
 {
+	std::cout << "Start!" << std::endl;
+
+#ifndef __EMSCRIPTEN__
 	//exit(0);
 	Python::initPython();
+#endif
 
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
@@ -100,14 +114,14 @@ int main(int, char**)
 #else
     // GL 3.0 + GLSL 130
     const char* glsl_version = "#version 330";
-    //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
 	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
@@ -227,7 +241,7 @@ int main(int, char**)
 	
 	//dmess(Python::execute(readFile("objectDetection.py")));
 
-    #ifdef __EMSCRIPTEN__
+    #ifdef __AEMSCRIPTEN__
         
         glfwSetWindowRefreshCallback(window, GUI::mainLoop);
 

@@ -21,58 +21,12 @@
 
 \author Matthew Tang
 \email trailcode@gmail.com
-\copyright 2018
+\copyright 2019
 */
 
-#include <webAsmPlay/Debug.h>
-#include <webAsmPlay/canvas/Canvas.h>
-#include <webAsmPlay/shaders/ShaderProgram.h>
-#include <webAsmPlay/shaders/DepthToRGB_Shader.h>
+#include <webAsmPlay/GUI/GUI.h>
 
-//REGISTER_SHADER(TextureShader)
-
-namespace
+void GUI::solidNodeBSP_Panel()
 {
-	ShaderProgram  * a_shaderProgram = nullptr;
 
-	GLint a_vertInAttr;
-	
-	GLint a_MVP;
-	GLint a_tex;
-}
-
-void DepthToRGB_Shader::ensureShader()
-{
-#ifndef __EMSCRIPTEN__
-
-	if(a_shaderProgram) { return ;}
-
-	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"DepthToRGB.vs.glsl"	},
-														{GL_FRAGMENT_SHADER,	"DepthToRGB.fs.glsl"	}}),
-											Variables(),
-											Variables({	{"tex",					a_tex					}}));
-#else
-	dmess("Fix!");
-#endif
-}
-
-void DepthToRGB_Shader::bind(const GLuint textureID)
-{
-#ifndef __EMSCRIPTEN__
-
-	a_shaderProgram->bind();
-
-	glDisable(GL_BLEND);
-
-	glDisable(GL_DEPTH_TEST);
-
-	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, textureID);
-
-	a_shaderProgram->setUniformi(a_tex, 0);
-
-#else
-
-	dmess("Fix");
-
-#endif
 }

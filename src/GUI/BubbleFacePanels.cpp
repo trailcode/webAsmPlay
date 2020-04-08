@@ -24,7 +24,9 @@
 \copyright 2019
 */
 
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
+#endif
 #include <array>
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Debug.h>
@@ -68,6 +70,8 @@ extern float g_featureConfidence;
 void GUI::bubbleFacePanels()
 {
 	char buf[1024];
+
+#ifndef __EMSCRIPTEN__
 
 	for(size_t i = 0; i < 6; ++i)
 	{
@@ -146,4 +150,6 @@ void GUI::bubbleFacePanels()
 		}
 		ImGui::End();
 	}
+
+#endif
 }

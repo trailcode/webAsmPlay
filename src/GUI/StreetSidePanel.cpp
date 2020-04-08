@@ -24,7 +24,10 @@
 \copyright 2019
 */
 
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
+#endif
+
 #include <ctpl/ctpl.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Debug.h>

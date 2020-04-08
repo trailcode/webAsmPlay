@@ -31,6 +31,7 @@
 #include <ctpl/ctpl.h>
 #include <glm/mat4x4.hpp>
 #include <webAsmPlay/GUI/ImguiInclude.h>
+#include <webAsmPlay/Debug.h>
 #include <webAsmPlay/Types.h>
 
 class Canvas;
@@ -128,7 +129,15 @@ public:
 
 		auto _f = new std::function<void()>([pck]() { (*pck)() ;});
 
+#ifndef __EMSCRIPTEN__
+
 		s_eventQueue.push(_f);
+
+#else
+
+		dmessError("Implement me!");
+
+#endif
 
 		return pck->get_future();
 	}
@@ -147,9 +156,17 @@ public:
 
 		auto _f = new std::function<void()>([pck]() { (*pck)() ;});
 
+#ifndef __EMSCRIPTEN__
+
 		s_eventQueue.push(_f);
 
 		while (!s_eventQueue.empty()) { std::this_thread::sleep_for(std::chrono::milliseconds(10)) ;}
+
+#else
+
+		dmessError("Implement me!");
+
+#endif
 
 		return pck->get_future();
 	}
@@ -157,7 +174,10 @@ public:
 	template<typename F, typename... Rest>
 	static auto queue(F && f, Rest&&... rest) ->std::future<decltype(f(0, rest...))>
 	{
+#ifndef __EMSCRIPTEN__
 		return s_generalWorkPool.push(f, rest...);
+#endif
+		dmessError("Implement me!");
 	}
 
 	static void doQueue();
@@ -200,6 +220,7 @@ private:
 	static void bubbleFacePanels();
 	static void textureSystemPanel();
 	static void pythonConsolePanel();
+	static void solidNodeBSP_Panel();
 
     static void showHelpMarker(const char* desc);
 
@@ -235,6 +256,7 @@ private:
 	static bool s_showBubbleFacePanel[6];
 	static bool s_showTextureSystemPanel;
 	static bool s_showPythonConsolePanel;
+	static bool s_showSolidNodeBSP_Panel;
 
     static GLFWwindow * s_mainWindow;
 
@@ -254,7 +276,11 @@ private:
     
     static bool s_shuttingDown;
 
+#ifndef __EMSCRIPTEN__
+
 	static EventQueue s_eventQueue;
 
 	static ctpl::thread_pool<boost::lockfree::queue<std::function<void(int id)> *>> s_generalWorkPool;
+
+#endif
 };

@@ -32,12 +32,12 @@ extern void (*debugLoggerFunc)(const std::string & file, const size_t line, cons
 
 #define dmess(a) \
 { \
+	std::string f(__FILE__); \
     if(debugLoggerFunc) \
     { \
         std::stringstream ss; ss << "[" << a << std::endl; \
-        std::string f(__FILE__); \
         (*debugLoggerFunc)(f.substr(strlen(SOURCE_BASE_PATH)), __LINE__, ss.str()); \
-    } \
+    } else { std::cout << f.substr(strlen(SOURCE_BASE_PATH)) << " " << __LINE__ << " [" << a << std::endl; } \
 } \
 
 #define dmessError(a) { dmess(a); abort() ;}

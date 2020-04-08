@@ -31,6 +31,8 @@
 
 void GUI::openSteerTestPanel()
 {
+	if(!s_openSteerCanvas) { return ;}
+
     s_openSteerCanvas->setEnabled(s_showOpenSteerTestPanel);
 
     if (!s_showOpenSteerTestPanel) { return ;}

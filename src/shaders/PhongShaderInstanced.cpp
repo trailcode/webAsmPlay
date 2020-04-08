@@ -57,6 +57,7 @@ namespace
 
 void PhongShaderInstanced::ensureShader()
 {
+#ifndef __EMSCRIPTEN__
 	if(a_shaderProgram) { return ;}
 	
 	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"PhongShaderInstanced.vs.glsl"	},
@@ -76,6 +77,9 @@ void PhongShaderInstanced::ensureShader()
 														{"light.specular",		a_lightSpecular					}}));
 
     a_defaultInstance = new PhongShaderInstanced();
+	#else
+	dmess("Fix!");
+	#endif
 }
 
 PhongShaderInstanced * PhongShaderInstanced::getDefaultInstance() { return a_defaultInstance ;}
@@ -93,6 +97,7 @@ void PhongShaderInstanced::bind(	Canvas     * canvas,
 									const bool   isOutline,
 									const size_t renderingStage)
 {
+#ifndef __EMSCRIPTEN__
 	a_shaderProgram->bind();
 	
 	a_shaderProgram->setUniform(a_view,			canvas->getViewRef());
@@ -111,7 +116,9 @@ void PhongShaderInstanced::bind(	Canvas     * canvas,
 	glEnable(GL_DEPTH_TEST);
 
 	glDisable(GL_BLEND);
-
+	#else
+	dmess("Fix!");
+	#endif
 }
 
 void PhongShaderInstanced::setMaterial(const Material & mat) const

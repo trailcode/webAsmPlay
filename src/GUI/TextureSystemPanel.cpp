@@ -24,7 +24,10 @@
   \copyright 2019
 */
 
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
+#endif
+
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/Texture.h>
 #include <webAsmPlay/GUI/GUI.h>

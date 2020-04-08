@@ -36,7 +36,13 @@
 #include <webAsmPlay/CurlUtil.h>
 
 using namespace std;
+
+#ifndef __EMSCRIPTEN__
+
 using namespace ctpl;
+
+#endif
+
 using namespace curlUtil;
 
 namespace
@@ -128,24 +134,38 @@ BufferStruct * _download(const string & url, const size_t threadID)
 
 future<BufferStruct *> curlUtil::download(const string & url)
 {
+#ifndef __EMSCRIPTEN__
 	return a_loaderPool.push([url](int threadID)
 	{
 		return _download(url, threadID);
 	});
+#endif
+
+	dmessError("Implement me!");
 }
 
 void curlUtil::download(const string & url, const function<void(BufferStruct *)> & doneCallback)
 {
+#ifndef __EMSCRIPTEN__
+
 	a_loaderPool.push([url, doneCallback](int threadID)
 	{
 		auto ret = _download(url, threadID);
 
 		doneCallback(ret);
 	});
+
+#else
+	
+	dmessError("Implement me!");
+
+#endif
 }
 
 void curlUtil::download(const string & url, const function<bool()> & stillNeeded, const function<void(BufferStruct *)> & doneCallback)
 {
+#ifndef __EMSCRIPTEN__
+
 	a_loaderPool.push([url, stillNeeded, doneCallback](int threadID)
 	{
 		if(!stillNeeded()) { return ;}
@@ -154,4 +174,10 @@ void curlUtil::download(const string & url, const function<bool()> & stillNeeded
 
 		doneCallback(ret);
 	});
+
+#else
+	
+	dmessError("Implement me!");
+
+#endif
 }

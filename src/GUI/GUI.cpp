@@ -33,10 +33,12 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include <imguitoolbar.h>
+#ifndef __EMSCRIPTEN__
 #include <boost/python.hpp>
+#endif
 #include <webAsmPlay/GUI/ImguiInclude.h>
 #include <webAsmPlay/canvas/TrackBallInteractor.h>
-#include <webAsmPlay/canvas/Camera.h>
+#include <webAsmPlay/canvas/Camera.h> b
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/OpenGL_Util.h>
 #include <webAsmPlay/canvas/Canvas.h>
@@ -98,12 +100,17 @@ int					   GUI::s_cameraMode			= GUI::CAMERA_TRACK_BALL;
 bool				   GUI::s_shuttingDown			= false;
 GeoClient			 * GUI::s_client				= nullptr;
 vector<Canvas *>	   GUI::s_auxCanvases;
-EventQueue			   GUI::s_eventQueue;
 bool				   GUI::s_animationRunning		= false;
 float				   GUI::s_currAnimationTime		= 0;
 float				   GUI::s_animationDuration		= 42.0f;
 
+#ifndef __EMSCRIPTEN__
+
+EventQueue			   GUI::s_eventQueue;
+
 thread_pool<boost::lockfree::queue<function<void(int id)> *>> GUI::s_generalWorkPool(1);
+
+#endif
 
 namespace
 {
@@ -127,7 +134,7 @@ void GUI::refresh()
 #ifdef __EMSCRIPTEN__
     glfwPollEvents();
 
-    glfwMarkWindowForRefresh(mainWindow);
+    //glfwMarkWindowForRefresh(s_mainWindow);
 
 #else
 
@@ -335,16 +342,19 @@ void setFullScreen( bool fullscreen )
 		// switch to full screen
 		//glfwSetWindowMonitor( GUI::getMainWindow(), glfwGetPrimaryMonitor(), 0, 0, 1920, 1080, 0 );
 		//glfwSetWindowMonitor( GUI::getMainWindow(), monitors[0], 0, 0, mode->width, mode->height, mode->refreshRate);
+#ifndef __EMSCRIPTEN__
 		glfwSetWindowMonitor( GUI::getMainWindow(), monitors[0], 0, 0, 1920, 1080, mode->refreshRate);
-
+#endif
 		glfwSwapInterval(1);
 	}
 	else
 	{
 		glfwSwapInterval(1);
 
+#ifndef __EMSCRIPTEN__
 		// restore last window size and position
 		glfwSetWindowMonitor( GUI::getMainWindow(), nullptr,  _wndPos[0], _wndPos[1], _wndSize[0], _wndSize[1], 0);
+#endif
 	}
 
 	//_updateViewport = true;
@@ -396,6 +406,7 @@ void GUI::showMainMenuBar()
 		if (ImGui::MenuItem("Bubble Face Test"))		{ s_showBubbleFaceTestPanel				^= 1 ;}
 		if (ImGui::MenuItem("Texture System"))			{ s_showTextureSystemPanel				^= 1 ;}
 		if (ImGui::MenuItem("Python Console"))			{ s_showPythonConsolePanel				^= 1 ;}
+		if (ImGui::MenuItem("Solid Node BSP Demo"))		{ s_showSolidNodeBSP_Panel				^= 1 ;}
 		if (ImGui::MenuItem("Full Screen"))				{ setFullScreen(!g_fullScreen)				 ;}
 
         ImGui::EndMenu();
@@ -440,6 +451,7 @@ bool GUI::isMainThread() { return this_thread::get_id() == mainThreadID ;}
 
 void GUI::doQueue()
 {
+#ifndef __EMSCRIPTEN__
 	function<void()> * _f = nullptr;
 
 	if (s_eventQueue.try_pop(_f))
@@ -448,6 +460,11 @@ void GUI::doQueue()
 		
 		delete _f;
 	}
+#else
+
+	dmess("Implement me!");
+
+#endif
 }
 
 void GUI::mainLoop(GLFWwindow * window)
@@ -514,6 +531,32 @@ void GUI::mainLoop(GLFWwindow * window)
     
     time += ImGui::GetIO().DeltaTime;
 
+	//dmess("x " << ImGui::GetIO().MousePos.x << " y " << ImGui::GetIO().MousePos.y);
+
+	const auto mousePos = vec2(ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
+
+	/*
+	static vec2 lastMousePos;
+
+	if(lastMousePos != mousePos)
+	{
+		lastMousePos = mousePos;
+
+		for(auto c : s_auxCanvases)
+		{
+			//dmess("upper left " << vec2(c->getUpperLeft()).x << "," << vec2(c->getUpperLeft()).y << " pos " << xpos << "," << ypos);
+
+			const auto localPos = mousePos - vec2(c->getUpperLeft());
+
+			c->onMousePosition(window, localPos);
+		}
+
+		s_canvas->onMousePosition(window, mousePos);
+
+		//refresh();
+	}
+	*/
+
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
  
@@ -562,6 +605,7 @@ void GUI::mainLoop(GLFWwindow * window)
 	bubbleFacePanels();
 	textureSystemPanel();
 	pythonConsolePanel();
+	solidNodeBSP_Panel();
 
 	//ImGui::ShowDemoWindow();
 
@@ -652,13 +696,17 @@ void GUI::initOpenGL() // TODO, need some code refactor here
 
     s_auxCanvases = vector<Canvas *>(
     {
+#ifndef __EMSCRIPTEN__
         s_geosTestCanvas		= new GeosTestCanvas(),
 		s_KD_TreeTestCanvas		= new KD_TreeTestCanvas(),
         s_openSteerCanvas		= new OpenSteerCanvas(),
 		s_animationCanvas		= new AnimationCanvas(),
 		s_modelViewerCanvas		= new ModelViewerCanvas(),
 		s_bubbleFaceTestCanvas	= new BubbleFaceTestCanvas(),
+#endif
     });
+
+	dmess("Done initOpenGL");
 }
 
 Updatable GUI::addUpdatable(Updatable updatable)
@@ -675,7 +723,8 @@ void GUI::createWorld()
     if(s_renderSettingsRenderSkyBox) { s_canvas->setSkyBox(s_skyBox) ;} // TODO create check render functor
     else                             { s_canvas->setSkyBox(nullptr)  ;}
 
-	/*
+#ifndef __EMSCRIPTEN__
+
     s_generalWorkPool.push([](int ID) {
         
 		OpenGL::ensureSharedContext();
@@ -685,7 +734,8 @@ void GUI::createWorld()
         //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
         s_client->loadGeometry("data.geo");
     });
-	*/
+
+#endif
 }
 
 int GUI::getCameraMode() { return s_cameraMode ;}

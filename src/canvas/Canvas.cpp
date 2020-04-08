@@ -190,8 +190,12 @@ bool Canvas::preRender()
     Camera * camera = m_trackBallInteractor->getCamera();
 
     updateMVP();
+	
+#ifndef __EMSCRIPTEN__
 
     ColorDistanceDepthShader3D::getDefaultInstance()->setLightPos(camera->getEyeConstRef());
+
+#endif
 
     if(m_useFrameBuffer)
     {
@@ -397,22 +401,22 @@ void Canvas::onMouseScroll(GLFWwindow * window, const vec2 & mouseScroll)
     m_trackBallInteractor->update();
 }
 
-void Canvas::addLeftClickListener(const function<void(const dvec3 & posWC)> & listener)
+void Canvas::addLeftClickListener(const std::function<void(const dvec3 & posWC)> & listener)
 {
 	m_leftClickListeners.push_back(listener);
 }
 
-void Canvas::addMouseMoveListener(const function<void(const dvec3 & posWC)> & listener)
+void Canvas::addMouseMoveListener(const std::function<void(const dvec3 & posWC)> & listener)
 {
 	m_mouseMoveListeners.push_back(listener);
 }
 
-void Canvas::addPreRenderFunctor(const function<void()> & functor)
+void Canvas::addPreRenderFunctor(const std::function<void()> & functor)
 {
 	m_preRenderFunctors.push_back(functor);
 }
 
-void Canvas::addKeyListener(const function<void(const int key, const int scancode, const int action, const int mods)> & listener)
+void Canvas::addKeyListener(const std::function<void(const int key, const int scancode, const int action, const int mods)> & listener)
 {
 	m_keyListeners.push_back(listener);
 }

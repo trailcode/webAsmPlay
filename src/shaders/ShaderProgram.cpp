@@ -70,6 +70,8 @@ namespace
 
 			dmess("File: " << get<1>(typeAndFile));
 
+			dmessError("Fix!");
+
 			return false;
 		}
 

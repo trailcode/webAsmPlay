@@ -47,6 +47,7 @@ TextureShader * TextureShader::getDefaultInstance() { return a_defaultInstance ;
 
 void TextureShader::ensureShader()
 {
+#ifndef __EMSCRIPTEN__
     if(a_shaderProgram) { return ;}
 
 	a_shaderProgram = ShaderProgram::create(GLSL({		{GL_VERTEX_SHADER,		"TextureShader.vs.glsl"	},
@@ -60,6 +61,9 @@ void TextureShader::ensureShader()
 	{
 		return renderingStage == G_BUFFER;
 	});
+	#else
+	dmess("Fix!");
+	#endif
 }
 
 TextureShader::TextureShader(const ShouldRenderFunctor & shouldRender) : Shader("TextureShader",
@@ -98,6 +102,7 @@ using namespace glm;
 
 void TextureShader::bind(const dmat4 & MVP)
 {
+#ifndef __EMSCRIPTEN__
 	a_shaderProgram->bind();
 
 	glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, m_textureID);
@@ -105,4 +110,7 @@ void TextureShader::bind(const dmat4 & MVP)
 	a_shaderProgram->setUniformi(a_tex, 0);
 
     a_shaderProgram->setUniform(a_MVP, MVP);
+	#else
+	dmess("Fix!");
+	#endif
 }

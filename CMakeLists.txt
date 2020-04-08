@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(webAsmPlay)
 set(default_build_type "Release")
-#set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Debug)
 
 set(USE_FOLDERS ON)
 
@@ -259,9 +259,13 @@ add_definitions(-DBOOST_LIB_DIAGNOSTIC)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
     
-    #--js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_glfw.js \
+    #--js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_glfw.js \ Not copiling
     #--js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_gl.js \
     #--js-library /Users/trailcode/emsdk/emscripten/1.37.35/src/library_gl.js \
+
+	#foreach(shaderFilePath ${webAsmPlayShadersGLSL_SRC})
+
+	#get_filename_component(shaderFile ${shaderFilePath} NAME)
 
     SET(CMAKE_CXX_LINK_FLAGS   "--bind \
                                 -s ALLOW_MEMORY_GROWTH=1 \
@@ -271,16 +275,16 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
                                 -s USE_WEBGL2=1 \
                                 -s USE_GLFW=3 \
 								-s USE_BOOST_HEADERS=1 \
-                                --js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_glfw.js \
-                                --js-library ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw-imgui-emscripten/library_gl.js \
                                 -s USE_SDL=2 \
                                 -s USE_SDL_IMAGE=2 \
-                                -s SDL2_IMAGE_FORMATS='[\"png\"]' \
+                                -s SDL2_IMAGE_FORMATS=[\"png\"] \
                                 -s DISABLE_EXCEPTION_CATCHING=0 \
                                 -s FETCH=1 \
                                 -s DEMANGLE_SUPPORT=1 \
+								-s ERROR_ON_UNDEFINED_SYMBOLS=0 \
                                 --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/ \
-                                --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/config@/")
+                                --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/config@/ \
+								--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders@/")
 
 	SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-s USE_BOOST_HEADERS=1 -s USE_WEBGL2=1")
 
@@ -410,7 +414,7 @@ else()
 			
 		endif()
 	
-    endforeach(assetFile)
+    endforeach(assetFilePath)
 	
     foreach(configFilePath ${config_files})
 

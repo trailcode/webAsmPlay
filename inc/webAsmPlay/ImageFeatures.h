@@ -27,6 +27,8 @@
 
 #pragma once
 
+#ifndef __EMSCRIPTEN__
+
 #include <string>
 #include <vector>
 #include <boost/python/numpy.hpp>
@@ -47,3 +49,5 @@ public:
 	std::vector<std::string> m_labels;
 	std::vector<boost::python::numpy::ndarray> m_bounds;
 };
+
+#endif

@@ -32,7 +32,9 @@
 
 void GUI::geosTestPanel()
 {
-    s_geosTestCanvas->setEnabled(s_showGeosTestPanel);
+    if(!s_geosTestCanvas) { return ;}
+	
+	s_geosTestCanvas->setEnabled(s_showGeosTestPanel);
 
     if(!s_showGeosTestPanel) { return ;}
     

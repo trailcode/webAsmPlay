@@ -25,6 +25,8 @@
 */
 // Modified from: https://github.com/JoeyDeVries/LearnOpenGL
 
+#ifndef __EMSCRIPTEN__
+
 #include <glm/glm/vec2.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -288,7 +290,7 @@ void Model::processNode(aiNode *node, const aiScene *scene, const string & direc
     }
 }
 
-
+#endif 
 
 
 

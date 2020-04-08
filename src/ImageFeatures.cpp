@@ -25,6 +25,8 @@
   \copyright 2019
 */
 
+#ifndef __EMSCRIPTEN__
+
 #include <unordered_map>
 #include <webAsmPlay/Debug.h>
 #include <webAsmPlay/ImageFeatures.h>
@@ -67,3 +69,5 @@ const ImageFeatures * ImageFeatures::getFeatures(const string & imageID)
 
 	return &i->second;
 }
+
+#endif
