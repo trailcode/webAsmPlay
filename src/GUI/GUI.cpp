@@ -93,6 +93,7 @@ OpenSteerCanvas		 * GUI::s_openSteerCanvas		= nullptr;
 AnimationCanvas		 * GUI::s_animationCanvas		= nullptr;
 ModelViewerCanvas	 * GUI::s_modelViewerCanvas		= nullptr;
 BubbleFaceTestCanvas * GUI::s_bubbleFaceTestCanvas	= nullptr;
+Canvas				 * GUI::s_solidNodeBSP_Canvas	= nullptr;
 Canvas				 * GUI::s_canvas				= nullptr;
 SkyBox				 * GUI::s_skyBox				= nullptr;
 GLFWwindow			 * GUI::s_mainWindow			= nullptr;
@@ -703,6 +704,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
 		s_animationCanvas		= new AnimationCanvas(),
 		s_modelViewerCanvas		= new ModelViewerCanvas(),
 		s_bubbleFaceTestCanvas	= new BubbleFaceTestCanvas(),
+		s_solidNodeBSP_Canvas	= new Canvas(),
 #endif
     });
 
@@ -725,6 +727,7 @@ void GUI::createWorld()
 
 #ifndef __EMSCRIPTEN__
 
+	/*
     s_generalWorkPool.push([](int ID) {
         
 		OpenGL::ensureSharedContext();
@@ -734,6 +737,7 @@ void GUI::createWorld()
         //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
         s_client->loadGeometry("data.geo");
     });
+	*/
 
 #endif
 }

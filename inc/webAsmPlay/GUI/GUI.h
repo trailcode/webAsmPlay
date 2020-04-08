@@ -266,6 +266,7 @@ private:
 	static AnimationCanvas		* s_animationCanvas;
 	static ModelViewerCanvas	* s_modelViewerCanvas;
 	static BubbleFaceTestCanvas * s_bubbleFaceTestCanvas;
+	static Canvas				* s_solidNodeBSP_Canvas;
     static Canvas				* s_canvas;
     static SkyBox				* s_skyBox;
     static GeoClient			* s_client;
