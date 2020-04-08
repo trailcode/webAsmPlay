@@ -271,8 +271,8 @@ void DeferredRenderable::addCrossHair(	const vec2		& pos,
 										const vec4		& color,
 										const size_t	  slot)
 {
-	DeferredRenderable::addLine(pos - vec2(size, 0), pos + vec2(size, 0), color, slot);
-	DeferredRenderable::addLine(pos - vec2(0, size), pos + vec2(0, size), color, slot);
+	addLine(pos - vec2(size, 0), pos + vec2(size, 0), color, slot);
+	addLine(pos - vec2(0, size), pos + vec2(0, size), color, slot);
 }
 
 void DeferredRenderable::addCrossHairs(	const vector<vec2>	& positions,
@@ -298,6 +298,17 @@ void DeferredRenderable::addTriangle(const vec3		& A,
     a_triangleIndices[slot].push_back((uint32_t)index + 0);
     a_triangleIndices[slot].push_back((uint32_t)index + 1);
     a_triangleIndices[slot].push_back((uint32_t)index + 2);
+}
+
+void DeferredRenderable::addTriangleWire(const vec3		& A,
+										const vec3		& B,
+										const vec3		& C,
+										const vec4		& color,
+										const size_t	  slot)
+{
+	addLine(A, B, color, slot);
+	addLine(B, C, color, slot);
+	addLine(C, A, color, slot);
 }
 
 void DeferredRenderable::addTriangle(const vec2		& A,

@@ -29,6 +29,7 @@
 #include <glm/glm.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/canvas/Canvas.h>
+#include <webAsmPlay/canvas/Camera.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -369,7 +370,9 @@ namespace
 				const auto b = vec3(node->m_splitter->m_vertexList[node->m_splitter->m_indices[i + 1]].m_pos);
 				const auto c = vec3(node->m_splitter->m_vertexList[node->m_splitter->m_indices[i + 2]].m_pos);
 
-				DeferredRenderable::addTriangle(a, b, c, {1,1,0,0.5}, DEFER_FEATURES);
+				DeferredRenderable::addTriangle(a, b, c, {0,1,0,0.5}, DEFER_FEATURES);
+
+				DeferredRenderable::addTriangleWire(a, b, c, {1,0,0,1}, DEFER_FEATURES);
 			}
 
 			if (node->m_front) { walkBspTree(node->m_front, pos) ;}
@@ -382,6 +385,15 @@ namespace
 		if (node->m_back !=NULL) { walkBspTree(node->m_back,  pos) ;}
 
 		return;
+	}
+
+	Vertex getVert(float posx, float posy, float posz, fvec4 color, fvec4 specular, float tu, float tv)
+	{
+		const float scalX = 0.1;
+		const float scalY = 0.1;
+		const float scalZ = 0.1;
+
+		return Vertex(posx * scalX, posy * scalY, posz * scalZ, color, specular, tu, tv);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -406,18 +418,18 @@ namespace
 			if (BSPMAP[offset] != 0) {
 			
 				if (BSPMAP[offset] == 2) {	
-					VERTLIST[0][0] = { x-10.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 };
-					VERTLIST[0][1] = { x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 };
-					VERTLIST[0][2] = { x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 };
-					VERTLIST[0][3] = { x-10.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 };
+					VERTLIST[0][0] = getVert(x-10.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 );
+					VERTLIST[0][1] = getVert(x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 );
+					VERTLIST[0][2] = getVert(x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 );
+					VERTLIST[0][3] = getVert(x-10.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 );
 					direction[0]   = 1;
 					
 					if (x > 0) {
 						if (BSPMAP[offset-1] == 0) {
-							VERTLIST[1][0] = { x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 };
-							VERTLIST[1][1] = { x-10.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 };
-							VERTLIST[1][2] = { x-10.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 };
-							VERTLIST[1][3] = { x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 };
+							VERTLIST[1][0] = getVert( x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 );
+							VERTLIST[1][1] = getVert( x-10.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 );
+							VERTLIST[1][2] = getVert( x-10.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 );
+							VERTLIST[1][3] = getVert( x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 );
 							direction[1]   = 1;
 						} // End if 0
 
@@ -425,10 +437,10 @@ namespace
 
 					if (y > 0) {
 						if (BSPMAP[offset-20] == 0) {
-							VERTLIST[2][0] = { x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 };
-							VERTLIST[2][1] = { x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 };
-							VERTLIST[2][2] = { x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 };
-							VERTLIST[2][3] = { x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 };
+							VERTLIST[2][0] = getVert( x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0  );
+							VERTLIST[2][1] = getVert( x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 );
+							VERTLIST[2][2] = getVert( x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 );
+							VERTLIST[2][3] = getVert( x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1  );
 							direction[2]   = 1;;
 						} // End if 0
 					} // End if Y > 0
@@ -436,28 +448,28 @@ namespace
 				} // Endif 2
 				
 				if (BSPMAP[offset] == 3) {	
-					VERTLIST[0][0] = { x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 };
-					VERTLIST[0][1] = { x-9.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 };
-					VERTLIST[0][2] = { x-9.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 };
-					VERTLIST[0][3] = { x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 };
+					VERTLIST[0][0] = getVert( x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 );
+					VERTLIST[0][1] = getVert( x-9.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0  );
+					VERTLIST[0][2] = getVert( x-9.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1  );
+					VERTLIST[0][3] = getVert( x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 );
 					direction[0]   = 1;
 	
 					if (x < 19) {
 						if (BSPMAP[offset+1] == 0) {
-							VERTLIST[1][0] = { x-9.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 };
-							VERTLIST[1][1] = { x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 };
-							VERTLIST[1][2] = { x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 };
-							VERTLIST[1][3] = { x-9.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 };
+							VERTLIST[1][0] = getVert( x-9.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 );
+							VERTLIST[1][1] = getVert( x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 );
+							VERTLIST[1][2] = getVert( x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 );
+							VERTLIST[1][3] = getVert( x-9.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 );
 							direction[1]   = 1;
 						} // Endif 0
 					} // End if X < 19
 
 					if (y > 0) {
 						if (BSPMAP[offset-20] == 0) {
-							VERTLIST[2][0] = { x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 };
-							VERTLIST[2][1] = { x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 };
-							VERTLIST[2][2] = { x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 };
-							VERTLIST[2][3] = { x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 };
+							VERTLIST[2][0] = getVert( x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0  );
+							VERTLIST[2][1] = getVert( x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 );
+							VERTLIST[2][2] = getVert( x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 );
+							VERTLIST[2][3] = getVert( x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1  );
 							direction[2]   = 1;
 						} // End if 0
 					} // End if Y > 0
@@ -467,10 +479,10 @@ namespace
 				if (BSPMAP[offset] == 1) {
 					if (x > 0) {
 						if (BSPMAP[offset-1] == 0) {
-							VERTLIST[0][0] = { x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 };
-							VERTLIST[0][1] = { x-10.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 };
-							VERTLIST[0][2] = { x-10.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 };
-							VERTLIST[0][3] = { x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 };
+							VERTLIST[0][0] = getVert( x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 );
+							VERTLIST[0][1] = getVert( x-10.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 );
+							VERTLIST[0][2] = getVert( x-10.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 );
+							VERTLIST[0][3] = getVert( x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 );
 							direction[0]   = 1;
 						} // End if 0
 
@@ -478,10 +490,10 @@ namespace
  
 					if (x < 19) {
 						if (BSPMAP[offset+1] == 0) {
-							VERTLIST[1][0] = { x-9.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 };
-							VERTLIST[1][1] = { x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 };
-							VERTLIST[1][2] = { x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 };
-							VERTLIST[1][3] = { x-9.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 };
+							VERTLIST[1][0] = getVert( x-9.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 );
+							VERTLIST[1][1] = getVert( x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 );
+							VERTLIST[1][2] = getVert( x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 );
+							VERTLIST[1][3] = getVert( x-9.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 );
 							direction[1]   = 1;
 						} // Endif 0
 					} // End if X < 19
@@ -489,20 +501,20 @@ namespace
 
 					if (y > 0) {
 						if (BSPMAP[offset-20] == 0) {
-							VERTLIST[2][0] = { x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 };
-							VERTLIST[2][1] = { x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 };
-							VERTLIST[2][2] = { x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 };
-							VERTLIST[2][3] = { x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 };
+							VERTLIST[2][0] = getVert( x-9.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0  );
+							VERTLIST[2][1] = getVert( x-10.5f,3.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 );
+							VERTLIST[2][2] = getVert( x-10.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 );
+							VERTLIST[2][3] = getVert( x-9.5f,0.0f,(20.0f-y)+0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1  );
 							direction[2]   = 1;;
 						} // End if 0
 					} // End if Y > 0
 
 					if(y < 39) {	
 						if (BSPMAP[offset+20] == 0) {
-							VERTLIST[3][0] = { x-10.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 };
-							VERTLIST[3][1] = { x-9.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0 };
-							VERTLIST[3][2] = { x-9.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1 };
-							VERTLIST[3][3] = { x-10.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 };
+							VERTLIST[3][0] = getVert( x-10.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,0 );
+							VERTLIST[3][1] = getVert( x-9.5f,3.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,0  );
+							VERTLIST[3][2] = getVert( x-9.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},1,1  );
+							VERTLIST[3][3] = getVert( x-10.5f,0.0f,(20.0f-y)-0.5f,{ 1, 1, 1, 1}, {0,0,0,0},0,1 );
 							direction[3]   = 1;;
 						} // End if 0
 					} // End if Y < 39
@@ -830,9 +842,31 @@ void GUI::solidNodeBSP_Panel()
 
 		a_geoms.clear();
 
-		fvec3 posa(0,0,0);
+		fvec3 posa = s_solidNodeBSP_Canvas->getCamera()->getEyeConstRef();
 
 		walkBspTree(rootNode, &posa);
+
+		/*
+		size_t num = 0;
+
+		for(auto curr = polygonList; curr; curr = curr->m_next)
+		{
+			++num;
+
+			for(size_t i = 0; i < curr->m_numberOfIndices; i += 3)
+			{
+				const auto a = vec3(curr->m_vertexList[curr->m_indices[i + 0]].m_pos);
+				const auto b = vec3(curr->m_vertexList[curr->m_indices[i + 1]].m_pos);
+				const auto c = vec3(curr->m_vertexList[curr->m_indices[i + 2]].m_pos);
+
+				DeferredRenderable::addTriangle(a, b, c, {0,1,0,0.5}, DEFER_FEATURES);
+
+				DeferredRenderable::addTriangleWire(a, b, c, {1,0,0,1}, DEFER_FEATURES);
+			}
+		}
+
+		dmess("num " << num);
+		*/
 
 		auto r3 = DeferredRenderable::createFromQueued(DEFER_FEATURES);
 		

@@ -59,6 +59,12 @@ public:
                             const glm::vec4 & color,
 							const size_t	  slot);
 
+	static void addTriangleWire(const glm::vec3 & A,
+								const glm::vec3 & B,
+								const glm::vec3 & C,
+								const glm::vec4 & color,
+								const size_t	  slot);
+
 	static void addTriangle(const glm::vec2 & A,
                             const glm::vec2 & B,
                             const glm::vec2 & C,
