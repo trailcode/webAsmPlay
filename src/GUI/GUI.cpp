@@ -727,7 +727,7 @@ void GUI::createWorld()
 
 #ifndef __EMSCRIPTEN__
 
-	/*
+	//*
     s_generalWorkPool.push([](int ID) {
         
 		OpenGL::ensureSharedContext();
@@ -737,7 +737,7 @@ void GUI::createWorld()
         //client->loadGeometry("https://trailcode.github.io/ZombiGeoSim/data.geo");
         s_client->loadGeometry("data.geo");
     });
-	*/
+	//*/
 
 #endif
 }

@@ -27,6 +27,9 @@
 // Original code from a course at the GameInstitute. 
 
 #include <glm/glm.hpp>
+#include <webAsmPlay/Util.h>
+#include <webAsmPlay/canvas/Canvas.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
@@ -354,11 +357,20 @@ namespace
 		{
 			if (node->m_back) { walkBspTree(node->m_back, pos) ;}
 
+			//dmess("render " << node);
 			/*
 			lpDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, Node->Splitter->NumberOfVertices,
 											 Node->Splitter->NumberOfIndices / 3, &Node->Splitter->Indices[0],
 											 D3DFMT_INDEX16, &Node->Splitter->VertexList[0], sizeof(D3DLVERTEX));
 											 */
+			for(size_t i = 0; i < node->m_splitter->m_numberOfIndices; i += 3)
+			{
+				const auto a = vec3(node->m_splitter->m_vertexList[node->m_splitter->m_indices[i + 0]].m_pos);
+				const auto b = vec3(node->m_splitter->m_vertexList[node->m_splitter->m_indices[i + 1]].m_pos);
+				const auto c = vec3(node->m_splitter->m_vertexList[node->m_splitter->m_indices[i + 2]].m_pos);
+
+				DeferredRenderable::addTriangle(a, b, c, {1,1,0,0.5}, DEFER_FEATURES);
+			}
 
 			if (node->m_front) { walkBspTree(node->m_front, pos) ;}
 
@@ -789,6 +801,8 @@ namespace
 		} // end while splitter == null	
 		return SelectedPoly;
 	}
+
+	std::vector<std::unique_ptr<Renderable> > a_geoms;
 }
 
 void GUI::solidNodeBSP_Panel()
@@ -798,6 +812,39 @@ void GUI::solidNodeBSP_Panel()
 	if(!rootNode) { initPolygons() ;}
 
 	ImGui::Begin("Solid Node BSP Demo", &s_showSolidNodeBSP_Panel);
+
+		const ImVec2 pos = ImGui::GetCursorScreenPos();
+
+		ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+
+		const auto startPos = ImVec2(vMin.x + pos.x, vMin.y + pos.y);
+
+		//dmess("Posa " << startPos.x << "," << startPos.y);
+
+        const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+
+		//s_KD_TreeTestCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
+		s_solidNodeBSP_Canvas->setFrameBufferSize(__(sceneWindowSize), __(startPos) - __(pos));
+
+        s_solidNodeBSP_Canvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+
+		a_geoms.clear();
+
+		fvec3 posa(0,0,0);
+
+		walkBspTree(rootNode, &posa);
+
+		auto r3 = DeferredRenderable::createFromQueued(DEFER_FEATURES);
+		
+		s_solidNodeBSP_Canvas->addRenderable(r3);
+
+		a_geoms.push_back(unique_ptr<Renderable>(r3));
+
+        ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)s_solidNodeBSP_Canvas->render(),
+                                                pos,
+                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+                                                ImVec2(0, 1),
+                                                ImVec2(1, 0));
 
 	ImGui::End();
 }

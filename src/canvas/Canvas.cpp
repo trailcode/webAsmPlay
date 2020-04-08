@@ -187,7 +187,42 @@ bool Canvas::preRender()
         return false;
     }
 
-    Camera * camera = m_trackBallInteractor->getCamera();
+    auto camera = m_trackBallInteractor->getCamera();
+	
+	const auto & center = camera->getCenterConstRef();
+	const auto & eye = camera->getEyeConstRef();
+
+	const auto dir = normalize(center - eye);
+
+	const float speed = 0.5;
+
+	const auto timeDelta = ImGui::GetIO().DeltaTime * speed;
+
+	if(glfwGetKey(GUI::getMainWindow(), GLFW_KEY_W) == GLFW_PRESS)
+	{
+		camera->setCenter(center + dir * timeDelta);
+
+		camera->setEye(eye + dir * timeDelta);
+
+		camera->update();
+	}
+	if(glfwGetKey(GUI::getMainWindow(), GLFW_KEY_S) == GLFW_PRESS)
+	{
+		camera->setCenter(center - dir * timeDelta);
+
+		camera->setEye(eye - dir * timeDelta);
+
+		camera->update();
+	}
+	if(glfwGetKey(GUI::getMainWindow(), GLFW_KEY_A) == GLFW_PRESS)
+	{
+	
+	}
+	if(glfwGetKey(GUI::getMainWindow(), GLFW_KEY_D) == GLFW_PRESS)
+	{
+	
+	}
+
 
     updateMVP();
 	
@@ -450,10 +485,27 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
 
     switch(key)
     {
-        case GLFW_KEY_LEFT_SHIFT:	m_trackBallInteractor->setMotionLeftClick(ARC);  break;
+        //case GLFW_KEY_LEFT_SHIFT:	m_trackBallInteractor->setMotionLeftClick(ARC);  break;
+		case GLFW_KEY_LEFT_SHIFT:	m_trackBallInteractor->setMotionLeftClick(FIRSTPERSON);  break;
         case GLFW_KEY_LEFT_ALT:		m_trackBallInteractor->setMotionLeftClick(PAN);  break;
 		case GLFW_KEY_LEFT_CONTROL: m_trackBallInteractor->setMotionLeftClick(ZOOM); break;
     }
+
+	switch(key)
+	{
+		case GLFW_KEY_W:
+			dmess("W " << action);
+			break;
+		case GLFW_KEY_S:
+			dmess("S " << action);
+			break;
+		case GLFW_KEY_A:
+			dmess("A " << action);
+			break;
+		case GLFW_KEY_D:
+			dmess("D " << action);
+			break;
+	}
 
 	for(const auto & listener : m_keyListeners) { listener(key, scancode, action, mods) ;}
 }
