@@ -32,9 +32,30 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+//-----------------------------------------------------------------------------
+// Miscellaneous Application Definitions and constants
+//-----------------------------------------------------------------------------
+
 const float g_PI       =  3.14159265358979323846f; // Pi
 const float g_DEGTORAD =  0.01745329251994329547f; // Degrees to Radians
 const float g_EPSILON  =  0.001f;				   // Float Tolerance
+
+#define CSG_NONE				0
+#define CSG_DIFFERENCE			1
+#define CSG_INTERSECTION		2
+#define CSG_UNION				3
+
+#define CHUNK_BEGINMESHES		0x4000
+#define CHUNK_MESHDETAILS		0x4001
+#define CHUNK_POLYS				0x4002
+#define CHUNK_VERTEXCOORDS		0x4010
+#define CHUNK_VERTEXDIFFUSE		0x4011
+#define CHUNK_VERTEXTEXCOORDS	0x4012
+#define CHUNK_INDICES			0x4030
+#define	CHUNK_ENDMESHES			0x4040
+#define CHUNK_TEXTURELUT		0x4050
+#define CHUNK_ENTITIES			0x4055
+#define CHUNK_EOF				0x4100
 
 typedef struct {								// IWF File Header
 	uint32_t	Identifier;						// File identifier (should always be 'IIWF' )
@@ -70,7 +91,7 @@ struct BRUSH								// Stores the brush data
 	BBOX		Bounds;						// Brushes Bounding Box
 	POLYGON		*Faces;						// Polygon Data
 	uint32_t	FaceCount;					// Face Count
-	glm::mat4	Matrix;						// Brushes Translation Matrix
+	glm::fmat4	Matrix;						// Brushes Translation Matrix
 	void		*BSPTree;					// Brushes BSP Tree (each brush has one)
 };
 
