@@ -814,7 +814,7 @@ namespace
 		return SelectedPoly;
 	}
 
-	std::vector<std::unique_ptr<Renderable> > a_geoms;
+	vector<unique_ptr<Renderable> > a_geoms;
 }
 
 void GUI::solidNodeBSP_Panel()

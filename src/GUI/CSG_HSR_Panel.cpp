@@ -26,9 +26,11 @@
 
 // Original code from a course at the GameInstitute. 
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/geom/BSPTree.h>
+#include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/GUI/GUI.h>
 
 using namespace std;
@@ -104,7 +106,7 @@ namespace
 			Brushes[i].Matrix = fmat4(1.0f);
 		} // Next Brush
 
-		UpdateBSPTrees();
+		//UpdateBSPTrees();
 	} // END FUNCTION
 
 	//-----------------------------------------------------------------------------
@@ -379,29 +381,14 @@ namespace
 	// Name: BoundingBoxesIntersect()
 	// Desc: Returns true if the bounding boxes passed intersect.
 	//-----------------------------------------------------------------------------
-	bool BoundingBoxesIntersect( BBOX BoxA, BBOX BoxB )
+	bool BoundingBoxesIntersect( BBOX a, BBOX b )
 	{
-		dmessError("Implement me!");
-		/*
-		RECT Rect1, Rect2, DestRect;
-    
-		//First Do X/Z of bounding box
-		Rect1.left = (long)BoxA.Min.x - 1; Rect1.right  = (long)BoxA.Max.x + 1;
-		Rect1.top  = (long)BoxA.Min.z - 1; Rect1.bottom = (long)BoxA.Max.z + 1;
-		Rect2.left = (long)BoxB.Min.x - 1; Rect2.right  = (long)BoxB.Max.x + 1;
-		Rect2.top  = (long)BoxB.Min.z - 1; Rect2.bottom = (long)BoxB.Max.z + 1;
-    
-		if ( IntersectRect(&DestRect, &Rect1, &Rect2) == 0) return false;
-    
-		//Now Do X/Y of bounding box
-		Rect1.left = (long)BoxA.Min.x - 1; Rect1.right  = (long)BoxA.Max.x + 1;
-		Rect1.top  = (long)BoxA.Min.y - 1; Rect1.bottom = (long)BoxA.Max.y + 1;
-		Rect2.left = (long)BoxB.Min.x - 1; Rect2.right  = (long)BoxB.Max.x + 1;
-		Rect2.top  = (long)BoxB.Min.y - 1; Rect2.bottom = (long)BoxB.Max.y + 1;
-    
-		if ( IntersectRect(&DestRect, &Rect1, &Rect2) == 0) return false;
-		*/
-    
+		// Exit with no intersection if separated along an axis
+		if(a.Max[0] < b.Min[0] || a.Min[0] > b.Max[0]) { return false ;}
+		if(a.Max[1] < b.Min[1] || a.Min[1] > b.Max[1]) { return false ;}
+		if(a.Max[2] < b.Min[2] || a.Min[2] > b.Max[2]) { return false ;}
+
+		// Overlapping on all axes meas AABBs are intersecting.
 		return true;
 	}
 
@@ -486,6 +473,8 @@ namespace
 			delete []lpBrushes;
 		}// End if Brushes
 	}
+
+	vector<unique_ptr<Renderable> > a_geoms;
 }
 
 //-----------------------------------------------------------------------------
@@ -548,6 +537,52 @@ void GUI::CSG_HSR_Panel()
 		s_CSG_HSR_Canvas->setFrameBufferSize(__(sceneWindowSize), __(startPos) - __(pos));
 
         s_CSG_HSR_Canvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
+
+		vec4 colors[] = {{1,0,0,0.5}, {0,1,0,0.5}, {0,0,1,0.5}};
+		vec4 colors2[] = {{1,0,0,1}, {0,1,0,1}, {0,0,1,1}};
+
+		for(size_t i = 0; i < BrushCount; ++i)
+		{
+			for(size_t j = 0; j < Brushes[i].FaceCount; ++j)
+			{
+				const auto & face = Brushes[i].Faces[j];
+
+				for(size_t k = 0; k < face.IndexCount; k += 3)
+				{
+					const auto iA = face.Indices[k + 0];
+					const auto iB = face.Indices[k + 1];
+					const auto iC = face.Indices[k + 2];
+
+					const auto & A = face.Vertices[iA];
+					const auto & B = face.Vertices[iB];
+					const auto & C = face.Vertices[iC];
+
+					DeferredRenderable::addTriangle({A.x, A.y, A.z}, {B.x, B.y, B.z}, {C.x, C.y, C.z}, colors[i], DEFER_FEATURES);
+					DeferredRenderable::addTriangleWire({A.x, A.y, A.z}, {B.x, B.y, B.z}, {C.x, C.y, C.z}, colors2[i], DEFER_FEATURES);
+				}
+			}
+		}
+
+		static const auto trans = scale(dmat4(1.0), {0.001, 0.001, 0.001});
+
+		static DeferredRenderable * r3 = nullptr; 
+		
+		if(!r3)
+		{
+			r3 = DeferredRenderable::createFromQueued(DEFER_FEATURES, trans);
+
+			s_CSG_HSR_Canvas->addRenderable(r3);
+		}
+		
+		r3->setFromQueued(DEFER_FEATURES, trans);
+
+		//a_geoms.push_back(unique_ptr<Renderable>(r3));
+
+		ImGui::GetWindowDrawList()->AddImage(   (void *)(size_t)s_CSG_HSR_Canvas->render(),
+                                                pos,
+                                                ImVec2(pos.x + sceneWindowSize.x, pos.y + sceneWindowSize.y),
+                                                ImVec2(0, 1),
+                                                ImVec2(1, 0));
 
 	ImGui::End();
 }
