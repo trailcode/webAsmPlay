@@ -385,8 +385,8 @@ void Canvas::onMousePosition(GLFWwindow * window, const vec2 & mousePos)
 {
     if(!m_enabled) { return ;}
 
-    m_trackBallInteractor->setClickPoint(mousePos.x, mousePos.y);
-    m_trackBallInteractor->update();
+	m_trackBallInteractor->setClickPoint(mousePos.x, mousePos.y);
+	m_trackBallInteractor->update();
 
 	//dmess("m_size " << m_size.x << "," << m_size.y << " mousePos " << mousePos.x << "," << mousePos.y);
 
@@ -417,9 +417,7 @@ void Canvas::onMouseScroll(GLFWwindow * window, const vec2 & mouseScroll)
 {
     if(!m_enabled || !m_wantMouseCapture) { return ;}
 
-    int state = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
-
-    if (state == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
         // TODO This is not working correctly
         m_lastShiftKeyDownMousePos += ivec2(mouseScroll.x, 0);
@@ -459,8 +457,6 @@ void Canvas::addKeyListener(const std::function<void(const int key, const int sc
 void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const int action, const int mods)
 {
     if(!m_enabled || !m_wantMouseCapture) { return ;}
-
-	//dmess("key " << key << " scancode " << scancode << " action " << action << " mods " << mods);
 
     switch(key)
     {

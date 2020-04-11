@@ -133,30 +133,12 @@ namespace rsmz
     {
         float cosTheta = glm::dot(u, v);
         glm::vec3 rotationAxis;
-        static const float EPSILON = 1.0e-5f;
 
-        if (cosTheta < -1.0f + EPSILON){
-            // Parallel and opposite directions.
-            rotationAxis = glm::cross(glm::vec3(0.f, 0.f, 1.f), u);
+		float theta = acos(cosTheta);
+        rotationAxis = glm::cross(u, v);
 
-            if (glm::length2(rotationAxis) < 0.01 ) {
-                // Still parallel, retry.
-                rotationAxis = glm::cross(glm::vec3(1.f, 0.f, 0.f), u);
-            }
-
-            rotationAxis = glm::normalize(rotationAxis);
-            result = glm::angleAxis(180.0f, rotationAxis);
-        } else if (cosTheta > 1.0f - EPSILON) {
-            // Parallel and same direction.
-            result = glm::quat(1, 0, 0, 0);
-            return;
-        } else {
-            float theta = acos(cosTheta);
-            rotationAxis = glm::cross(u, v);
-
-            rotationAxis = glm::normalize(rotationAxis);
-            result = glm::angleAxis(theta * m_Speed, rotationAxis);
-        }
+        rotationAxis = glm::normalize(rotationAxis);
+        result = glm::angleAxis(theta * m_Speed, rotationAxis);
     }
 
     void TrackBallInteractor::drag()
@@ -394,7 +376,6 @@ namespace rsmz
 
     void TrackBallInteractor::setSpeed(float s)
     {
-        cout << "speed " << s << endl;
         m_Speed = s;
     }
 

@@ -30,6 +30,8 @@
 #include <webAsmPlay/Util.h>
 #include <webAsmPlay/canvas/Canvas.h>
 #include <webAsmPlay/geom/BSPTree.h>
+#include <webAsmPlay/canvas/Camera.h>
+#include <webAsmPlay/canvas/TrackBallInteractor.h>
 #include <webAsmPlay/renderables/DeferredRenderable.h>
 #include <webAsmPlay/GUI/GUI.h>
 
@@ -106,7 +108,7 @@ namespace
 			Brushes[i].Matrix = fmat4(1.0f);
 		} // Next Brush
 
-		//UpdateBSPTrees();
+		UpdateBSPTrees();
 	} // END FUNCTION
 
 	//-----------------------------------------------------------------------------
@@ -532,6 +534,8 @@ void GUI::CSG_HSR_Panel()
 		//dmess("Posa " << startPos.x << "," << startPos.y);
 
         const ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+
+		s_CSG_HSR_Canvas->getTrackBallInteractor()->setSpeed(5.0);
 
 		//s_KD_TreeTestCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
 		s_CSG_HSR_Canvas->setFrameBufferSize(__(sceneWindowSize), __(startPos) - __(pos));
