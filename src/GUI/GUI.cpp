@@ -94,6 +94,7 @@ AnimationCanvas		 * GUI::s_animationCanvas		= nullptr;
 ModelViewerCanvas	 * GUI::s_modelViewerCanvas		= nullptr;
 BubbleFaceTestCanvas * GUI::s_bubbleFaceTestCanvas	= nullptr;
 Canvas				 * GUI::s_solidNodeBSP_Canvas	= nullptr;
+Canvas				 * GUI::s_CSG_HSR_Canvas		= nullptr;
 Canvas				 * GUI::s_canvas				= nullptr;
 SkyBox				 * GUI::s_skyBox				= nullptr;
 GLFWwindow			 * GUI::s_mainWindow			= nullptr;
@@ -408,6 +409,7 @@ void GUI::showMainMenuBar()
 		if (ImGui::MenuItem("Texture System"))			{ s_showTextureSystemPanel				^= 1 ;}
 		if (ImGui::MenuItem("Python Console"))			{ s_showPythonConsolePanel				^= 1 ;}
 		if (ImGui::MenuItem("Solid Node BSP Demo"))		{ s_showSolidNodeBSP_Panel				^= 1 ;}
+		if (ImGui::MenuItem("CSG HSR Demo"))			{ s_showCSG_HSR_Panel					^= 1 ;}
 		if (ImGui::MenuItem("Full Screen"))				{ setFullScreen(!g_fullScreen)				 ;}
 
         ImGui::EndMenu();
@@ -607,6 +609,7 @@ void GUI::mainLoop(GLFWwindow * window)
 	textureSystemPanel();
 	pythonConsolePanel();
 	solidNodeBSP_Panel();
+	CSG_HSR_Panel();
 
 	//ImGui::ShowDemoWindow();
 
@@ -705,6 +708,7 @@ void GUI::initOpenGL() // TODO, need some code refactor here
 		s_modelViewerCanvas		= new ModelViewerCanvas(),
 		s_bubbleFaceTestCanvas	= new BubbleFaceTestCanvas(),
 		s_solidNodeBSP_Canvas	= new Canvas(),
+		s_CSG_HSR_Canvas		= new Canvas(),
 #endif
     });
 

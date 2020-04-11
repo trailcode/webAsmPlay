@@ -67,7 +67,8 @@ bool GUI::s_showStreetSidePanel					 = false;
 bool GUI::s_showBubbleFaceTestPanel				 = false;
 bool GUI::s_showTextureSystemPanel				 = false;
 bool GUI::s_showPythonConsolePanel				 = false;
-bool GUI::s_showSolidNodeBSP_Panel				 = true;
+bool GUI::s_showSolidNodeBSP_Panel				 = false;
+bool GUI::s_showCSG_HSR_Panel					 = false;
 
 bool GUI::s_renderSettingsFillMeshes             = true;
 bool GUI::s_renderSettingsRenderMeshOutlines     = true;
@@ -130,6 +131,7 @@ void GUI::loadState()
 	setBool(L"showTextureSystemPanel",				s_showTextureSystemPanel);
 	setBool(L"showPythonConsolePanel",				s_showPythonConsolePanel);
 	setBool(L"showSolidNodeBSP_Panel",				s_showSolidNodeBSP_Panel);
+	setBool(L"showCSG_HSR_Panel",					s_showCSG_HSR_Panel);
 
     setBool(L"renderSettingsFillMeshes",            s_renderSettingsFillMeshes);
     setBool(L"renderSettingsRenderMeshOutlines",    s_renderSettingsRenderMeshOutlines);
@@ -195,6 +197,7 @@ void GUI::saveState()
 	root[L"showTextureSystemPanel"]				  = new JSONValue(s_showTextureSystemPanel);
 	root[L"showPythonConsolePanel"]				  = new JSONValue(s_showPythonConsolePanel);
 	root[L"showSolidNodeBSP_Panel"]				  = new JSONValue(s_showSolidNodeBSP_Panel);
+	root[L"showCSG_HSR_Panel"]					  = new JSONValue(s_showCSG_HSR_Panel);
 
     root[L"renderSettingsFillMeshes"]             = new JSONValue(s_renderSettingsFillMeshes);
     root[L"renderSettingsRenderMeshOutlines"]     = new JSONValue(s_renderSettingsRenderMeshOutlines);

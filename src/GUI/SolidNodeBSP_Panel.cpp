@@ -331,7 +331,7 @@ namespace
 	// Name : classifyPoint()
 	// Desc : Classifies a point against the plane passed
 	//-----------------------------------------------------------------------------
-	int classifyPoint( fvec3 * pos, Polygon * plane)
+	int classifyPoint(fvec3 * pos, Polygon * plane)
 	{
 	
 		const auto vec1			= &plane->m_vertexList[0];
@@ -589,24 +589,24 @@ namespace
 	//        this is that this function is used in so many cases and some of them
 	//        required the Front and Back already be initialized. 
 	//-----------------------------------------------------------------------------
-	void splitPolygon(Polygon *Poly, Polygon *Plane, Polygon *FrontSplit, Polygon *BackSplit)
+	void splitPolygon(Polygon * poly, Polygon *Plane, Polygon *FrontSplit, Polygon *BackSplit)
 	{
 		// 50 is used here, as we should never
 		// really have more points on a portal than this.
-		Vertex		FrontList[50];
-		Vertex		BackList[50];
-		int				FrontCounter = 0;
-		int				BackCounter = 0;
+		Vertex	FrontList[50];
+		Vertex	BackList[50];
+		int		FrontCounter = 0;
+		int		BackCounter = 0;
 
-		int				PointLocation[50];
+		int		PointLocation[50];
 
-		int				InFront = 0, Behind = 0, OnPlane = 0;
-		int				CurrentVertex = 0, Location = 0;
+		int		InFront = 0, Behind = 0, OnPlane = 0;
+		int		CurrentVertex = 0, Location = 0;
 
 		// Determine each points location relative to the plane.
-		for ( int i = 0; i < Poly->m_numberOfVertices; i++)
+		for ( int i = 0; i < poly->m_numberOfVertices; i++)
 		{
-			Location = classifyPoint(&Poly->m_vertexList[i].m_pos, Plane);
+			Location = classifyPoint(&poly->m_vertexList[i].m_pos, Plane);
 
 			if (Location == CP_FRONT )
 				InFront++;
@@ -623,32 +623,32 @@ namespace
 		//PointLocation[Poly->NumberOfVertices] = PointLocation[0];
 
 		if (!InFront) {
-			memcpy(BackList, Poly->m_vertexList, Poly->m_numberOfVertices * sizeof(Vertex));
-			BackCounter = Poly->m_numberOfVertices;
+			memcpy(BackList, poly->m_vertexList, poly->m_numberOfVertices * sizeof(Vertex));
+			BackCounter = poly->m_numberOfVertices;
 		}
 
 		if (!Behind) {
-			memcpy(FrontList, Poly->m_vertexList, Poly->m_numberOfVertices * sizeof(Vertex));
-			FrontCounter = Poly->m_numberOfVertices;
+			memcpy(FrontList, poly->m_vertexList, poly->m_numberOfVertices * sizeof(Vertex));
+			FrontCounter = poly->m_numberOfVertices;
 		}
 
 		if (InFront && Behind) {
-			for ( size_t i = 0; i < Poly->m_numberOfVertices; i++) {
+			for ( size_t i = 0; i < poly->m_numberOfVertices; i++) {
 				// Store Current vertex remembering to MOD with number of vertices.
-				CurrentVertex = (i+1) % Poly->m_numberOfVertices;
+				CurrentVertex = (i+1) % poly->m_numberOfVertices;
 
 				if (PointLocation[i] == CP_ONPLANE ) {
-					FrontList[FrontCounter] = Poly->m_vertexList[i];
+					FrontList[FrontCounter] = poly->m_vertexList[i];
 					FrontCounter++;
-					BackList[BackCounter] = Poly->m_vertexList[i];
+					BackList[BackCounter] = poly->m_vertexList[i];
 					BackCounter++;
 					continue; // Skip to next vertex
 				}
 				if (PointLocation[i] == CP_FRONT ) {
-					FrontList[FrontCounter] = Poly->m_vertexList[i];
+					FrontList[FrontCounter] = poly->m_vertexList[i];
 					FrontCounter++;
 				} else {
-					BackList[BackCounter] = Poly->m_vertexList[i];
+					BackList[BackCounter] = poly->m_vertexList[i];
 					BackCounter++;
 				}
 			
@@ -660,16 +660,16 @@ namespace
 				fvec3 IntersectPoint;
 				float		percent;
 
-				getIntersect( &Poly->m_vertexList[i].m_pos, &Poly->m_vertexList[CurrentVertex].m_pos, &Plane->m_vertexList[0].m_pos, &Plane->m_normal, &IntersectPoint, &percent );
+				getIntersect( &poly->m_vertexList[i].m_pos, &poly->m_vertexList[CurrentVertex].m_pos, &Plane->m_vertexList[0].m_pos, &Plane->m_normal, &IntersectPoint, &percent );
 
 				// create new vertex and calculate new texture coordinate
 				Vertex copy;
-				float deltax	= Poly->m_vertexList[CurrentVertex].m_UV.x - Poly->m_vertexList[i].m_UV.x;
-				float deltay	= Poly->m_vertexList[CurrentVertex].m_UV.y - Poly->m_vertexList[i].m_UV.y;
-				float texx		= Poly->m_vertexList[i].m_UV.x + ( deltax * percent );
-				float texy		= Poly->m_vertexList[i].m_UV.y + ( deltay * percent );
+				float deltax	= poly->m_vertexList[CurrentVertex].m_UV.x - poly->m_vertexList[i].m_UV.x;
+				float deltay	= poly->m_vertexList[CurrentVertex].m_UV.y - poly->m_vertexList[i].m_UV.y;
+				float texx		= poly->m_vertexList[i].m_UV.x + ( deltax * percent );
+				float texy		= poly->m_vertexList[i].m_UV.y + ( deltay * percent );
 				copy.m_pos		= IntersectPoint;
-				copy.m_color	= Poly->m_vertexList[i].m_color;
+				copy.m_color	= poly->m_vertexList[i].m_color;
 				copy.m_UV		= { texx, texy };
 
 				BackList[BackCounter++]		= copy;
@@ -709,8 +709,8 @@ namespace
 		} // Next Tri
 
 		// Copy Extra Values
-		FrontSplit->m_normal		= Poly->m_normal;
-		BackSplit->m_normal		= Poly->m_normal;
+		FrontSplit->m_normal = poly->m_normal;
+		BackSplit ->m_normal = poly->m_normal;
 	}
 
 	//-----------------------------------------------------------------------------
