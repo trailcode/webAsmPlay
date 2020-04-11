@@ -37,6 +37,14 @@ namespace rsmz
         ZOOM,
     } CameraMotionType;
 
+	typedef enum PanAxis
+	{
+		ALL = 0,
+		X,
+		Y,
+		Z
+	} PanAxis;
+
     class TrackBallInteractor
     {
     public:
@@ -69,8 +77,11 @@ namespace rsmz
         void setScreenSize(float width, float height);
         void setSpeed(float s);
         float setZoomScale(const float scale);
+		float setPanScale(const float scale);
+		float setRollScale(const float scale);
         void update();
 		void updateCameraEyeUp(bool eye, bool up);
+		void setPanAxis(const PanAxis panAxis);
 
     protected:
 
@@ -120,6 +131,7 @@ namespace rsmz
         float m_Width;
         float m_ZoomSum;
         float m_ZoomScale;
+		PanAxis m_panAxis;
 
     }; // end class TrackBallInteractor
 

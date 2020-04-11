@@ -731,7 +731,7 @@ void GUI::createWorld()
 
 #ifndef __EMSCRIPTEN__
 
-	/*
+	//*
     s_generalWorkPool.push([](int ID) {
         
 		OpenGL::ensureSharedContext();

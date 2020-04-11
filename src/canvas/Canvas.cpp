@@ -481,10 +481,29 @@ void Canvas::onKey(GLFWwindow * window, const int key, const int scancode, const
 
     switch(key)
     {
-        case GLFW_KEY_LEFT_SHIFT:	m_trackBallInteractor->setMotionLeftClick(ARC);  break;
+        case GLFW_KEY_LEFT_SHIFT:	
+			
+			m_trackBallInteractor->setMotionLeftClick(ARC);
+
+			//m_trackBallInteractor->setSpeed(5.0);
+			
+			break;
 		//case GLFW_KEY_LEFT_SHIFT:	m_trackBallInteractor->setMotionLeftClick(FIRSTPERSON);  break;
-        case GLFW_KEY_LEFT_ALT:		m_trackBallInteractor->setMotionLeftClick(PAN);  break;
-		case GLFW_KEY_LEFT_CONTROL: m_trackBallInteractor->setMotionLeftClick(ZOOM); break;
+        case GLFW_KEY_LEFT_ALT:		
+		
+			//m_trackBallInteractor->setSpeed(1.0);
+
+			m_trackBallInteractor->setMotionLeftClick(PAN);  
+			
+			break;
+
+		case GLFW_KEY_LEFT_CONTROL: 
+		
+			//m_trackBallInteractor->setSpeed(0.1);
+
+			m_trackBallInteractor->setMotionLeftClick(ZOOM); 
+			
+			break;
     }
 
 	for(const auto & listener : m_keyListeners) { listener(key, scancode, action, mods) ;}

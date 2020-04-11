@@ -537,13 +537,17 @@ void GUI::CSG_HSR_Panel()
 
 		s_CSG_HSR_Canvas->getTrackBallInteractor()->setSpeed(5.0);
 
+		//s_CSG_HSR_Canvas->getTrackBallInteractor()->setRollScale(10.0);
+		s_CSG_HSR_Canvas->getTrackBallInteractor()->setZoomScale(0.1 / 5.0);
+		s_CSG_HSR_Canvas->getTrackBallInteractor()->setPanScale(0.005 / 5.0);
+
 		//s_KD_TreeTestCanvas->setFrameBufferSize(__(sceneWindowSize), __(pos));
 		s_CSG_HSR_Canvas->setFrameBufferSize(__(sceneWindowSize), __(startPos) - __(pos));
 
         s_CSG_HSR_Canvas->setWantMouseCapture(GImGui->IO.WantCaptureMouse);
 
-		vec4 colors[] = {{1,0,0,0.5}, {0,1,0,0.5}, {0,0,1,0.5}};
-		vec4 colors2[] = {{1,0,0,1}, {0,1,0,1}, {0,0,1,1}};
+		vec4 colors[]	= {{1,0,0,0.5}, {0,1,0,0.5}, {0,0,1,0.5}};
+		vec4 colors2[]	= {{1,0,0,1},	{0,1,0,1},	 {0,0,1,1}};
 
 		for(size_t i = 0; i < BrushCount; ++i)
 		{
@@ -561,8 +565,8 @@ void GUI::CSG_HSR_Panel()
 					const auto & B = face.Vertices[iB];
 					const auto & C = face.Vertices[iC];
 
-					DeferredRenderable::addTriangle({A.x, A.y, A.z}, {B.x, B.y, B.z}, {C.x, C.y, C.z}, colors[i], DEFER_FEATURES);
-					DeferredRenderable::addTriangleWire({A.x, A.y, A.z}, {B.x, B.y, B.z}, {C.x, C.y, C.z}, colors2[i], DEFER_FEATURES);
+					DeferredRenderable::addTriangle		({A.x, A.y, A.z}, {B.x, B.y, B.z}, {C.x, C.y, C.z}, colors[i],	DEFER_FEATURES);
+					DeferredRenderable::addTriangleWire	({A.x, A.y, A.z}, {B.x, B.y, B.z}, {C.x, C.y, C.z}, colors2[i], DEFER_FEATURES);
 				}
 			}
 		}

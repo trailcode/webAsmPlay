@@ -31,11 +31,10 @@ namespace rsmz
                                                     m_RotationSum(1.f, 0, 0, 0),
                                                     m_Speed(1.f),
                                                     m_Width(1),
-                                                    //mZoomScale(.1f * 0.2f),
-                                                    //mZoomScale(5.0f * 0.2f),
                                                     m_ZoomScale(1.0f * 0.2f),
                                                     m_ZoomSum(0.f),
-                                                    m_Camera(nullptr)
+                                                    m_Camera(nullptr),
+													m_panAxis(PanAxis::ALL)
     {
     }
 
@@ -97,9 +96,19 @@ namespace rsmz
         float length = glm::length(look);
         //float length = 1.0;
         glm::vec3 right = glm::normalize(m_RotationSum * -X);
-        //glm::vec3 right = glm::normalize(-X);
+        //glm::vec3 right = glm::normalize(m_RotationSum * -Y);
+
         glm::vec3 up = m_Camera->getUpConstRef();
-        up.z = 0;
+        
+		switch(m_panAxis)
+		{
+			case PanAxis::X: up.x = 0; break;
+			case PanAxis::Y: up.y = 0; break;
+			case PanAxis::Z: up.z = 0; break;
+		}
+
+		up.z = 0;
+
         //up = glm::normalize(up);
         //pan = (up * click.y + right * click.x) * mPanScale * mSpeed * length;
         //pan = (up * click.y + right * click.x) * mPanScale * length;
@@ -422,7 +431,12 @@ namespace rsmz
         m_Camera->update();
     }
 
-    float TrackBallInteractor::setZoomScale(const float scale) { return m_ZoomScale = scale ;}
+    float TrackBallInteractor::setZoomScale	(const float scale) { return m_ZoomScale = scale ;}
+	float TrackBallInteractor::setPanScale	(const float scale) { return m_PanScale  = scale ;}
+	float TrackBallInteractor::setRollScale	(const float scale) { return m_RollScale = scale ;}
+
+	void TrackBallInteractor::setPanAxis(const PanAxis panAxis) { m_panAxis = panAxis ;}
+
 
 } // end namespace rsmz
 
