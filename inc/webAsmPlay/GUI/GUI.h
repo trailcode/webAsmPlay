@@ -222,6 +222,7 @@ private:
 	static void pythonConsolePanel();
 	static void solidNodeBSP_Panel();
 	static void CSG_HSR_Panel();
+	static void octTreePanel();
 
     static void showHelpMarker(const char* desc);
 
@@ -259,6 +260,7 @@ private:
 	static bool s_showPythonConsolePanel;
 	static bool s_showSolidNodeBSP_Panel;
 	static bool s_showCSG_HSR_Panel;
+	static bool s_showOctTreePanel;
 
     static GLFWwindow * s_mainWindow;
 
@@ -270,6 +272,7 @@ private:
 	static BubbleFaceTestCanvas * s_bubbleFaceTestCanvas;
 	static Canvas				* s_solidNodeBSP_Canvas;
 	static Canvas				* s_CSG_HSR_Canvas;
+	static Canvas				* s_octTreeCanvas;
     static Canvas				* s_canvas;
     static SkyBox				* s_skyBox;
     static GeoClient			* s_client;

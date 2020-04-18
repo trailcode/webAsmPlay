@@ -302,9 +302,11 @@ GLuint Canvas::render()
 	for(const auto r : m_models)              { r->render(this, POST_G_BUFFER) ;}
 	for(const auto r : m_textLabels)		  { r->render(this, POST_G_BUFFER) ;}
 	
+	if(m_useFrameBuffer && m_skyBox) { m_skyBox->render(this) ;}
+
 	m_gBuffer->unbind();
 	
-	if(m_skyBox) { m_skyBox->render(this) ;}
+	if(!m_useFrameBuffer && m_skyBox) { m_skyBox->render(this) ;}
 
 	if(m_useFrameBuffer) { m_frameBuffer->bind() ;}
 

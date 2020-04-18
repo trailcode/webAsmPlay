@@ -132,9 +132,12 @@ DeferredRenderable * DeferredRenderable::createFromQueued(const size_t slot, con
 
 void DeferredRenderable::setFromQueued(const size_t slot, const glm::dmat4& trans)
 {
-	auto & vertsAndColors = a_vertsAndColors[slot];
-	auto & triangleIndices = a_triangleIndices[slot];
-	auto & lineIndices = a_lineIndices[slot];
+	auto & vertsAndColors	= a_vertsAndColors[slot];
+	auto & triangleIndices	= a_triangleIndices[slot];
+	auto & lineIndices		= a_lineIndices[slot];
+
+	if(vertsAndColors.empty())
+		return;
 
 	for (size_t i = 0; i < vertsAndColors.size(); i += 7)
 	{
